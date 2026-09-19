@@ -16,13 +16,15 @@ yallaflow init
 yallaflow --help
 ```
 
-If you have an existing requirements file, use it directly instead of retyping it into a prompt:
+If you have an existing requirements document, use it directly instead of retyping it into a prompt — the same command handles text, Office/OpenDocument, PDF, and image files:
 
 ```bash
-yallaflow intake SRS.md
+yallaflow intake SRS.docx
+yallaflow intake requirements.docx payment-rules.xlsx   # multiple files in one work item
+yallaflow intake add PF-0001 client-notes.docx           # attach one later
 ```
 
-(supported types this release: `.md`, `.txt`, `.json`, `.yaml`, `.yml`, `.csv` — not PDF or DOCX). Otherwise, start from plain text: `yallaflow start "<a plain-text request>"`.
+OCR/scanned-document understanding is not implemented — an image or a scanned PDF is preserved as a source but no text is extracted from it; `yallaflow source show <id> --content` tells you exactly what YallaFlow could and couldn't read. Otherwise, start from plain text: `yallaflow start "<a plain-text request>"`.
 
 From there, follow whatever the CLI and its documentation (`README.md`, `yallaflow --help`, `yallaflow <namespace> --help`) tell you to do next. Do not skip ahead using internal engineering notes, prior dogfood transcripts, or this repository's test fixtures as a script — that would test a different, easier path than a real user gets.
 
@@ -56,7 +58,8 @@ polish    — cosmetic, wording, or nice-to-have
 ## What We Are Testing
 
 - first-time setup
-- requirement intake (plain text and file)
+- requirement intake (plain text and file — including real Office documents, PDFs, and mixed-format work items)
+- extraction quality for your actual document formats (tables, headings, non-English/RTL text) — report it as friction if extracted text is unusable, not just if intake fails outright
 - source traceability (`yallaflow source list`/`show`, and whether a fresh agent can find the original file)
 - routing
 - Discover Before Ask

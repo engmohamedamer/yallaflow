@@ -53,6 +53,19 @@ YallaFlow applies Adaptive Spec-Driven Development: workflow depth follows the k
 - Optional `--title` on `intake` (or a mechanical filename-derived default) flows into the work item's title once routed, without YallaFlow ever inferring a title or routing decision from the file's contents
 - Full backward compatibility: `yallaflow start "<text>"` unchanged; workspaces without `sources/` remain valid; no read ever creates `sources/`
 
+### v0.3.2 — Universal File Intake
+
+- Format detection (`src/intake/detect.js`) by content signature, not extension alone; a fake `.docx` is detected as a mismatch and preserved as generic binary rather than parsed as if valid
+- Extensible adapter registry (`src/intake/registry.js` + `src/intake/adapters/`): one adapter module per format family, no switch statement scattered through CLI code
+- Office/OpenDocument extraction (`.docx .pptx .xlsx .rtf .odt .ods .odp`) via `officeparser`, with a structured pass for `.xlsx` (real sheet names + grid tables) and `.pptx` (per-slide sections)
+- PDF extraction via a first-party `pdfjs-dist`-based adapter, per page, with page boundaries preserved and a documented reading-order caveat for RTL/complex layouts
+- Images (`.png .jpg .jpeg .webp .gif .bmp .tif .tiff .svg`) accepted as sources with cheap header metadata (format, dimensions where trivial to read) — no OCR/vision performed or claimed
+- Generic binaries, `.odg`/`.epub`, and dangerous containers (`.zip .tar .gz .7z .rar`, never auto-unpacked) accepted as `original-only` sources instead of being rejected
+- Graceful degradation: extraction failures and oversize files fall back to `original-only` with a clear reason, never a silent partial result
+- `yallaflow intake <file> [<file> ...]` accepts multiple sources at once; `yallaflow intake add <work-id> <file> [<file> ...]` attaches sources to an existing (pending or routed) work item — closing the multi-source model `sources` was already designed for
+- Security hardening: no macro/embedded-script/OLE execution, no external fetches, decompression-bomb and entry-count limits on zip-based formats, path-traversal guards on every stored file name
+- `source.json` schema v2 (detected format, content availability, separate `original`/`representation` file references); v1 records from v0.3.1 remain readable without migration
+
 ### Still planned (not yet implemented)
 
 - **Tracker intake** — Azure DevOps, Jira, and GitHub Issues as requirement sources, with attachments and source traceability back to the originating ticket
@@ -60,7 +73,9 @@ YallaFlow applies Adaptive Spec-Driven Development: workflow depth follows the k
 - **Agent bootstrap/session guidance** — a deterministic session-start sequence so a cold agent session reliably loads `.yallaflow/AGENT.md` and calls `yallaflow resume` before acting
 - Git worktree safety and baseline verification for multi-source/multi-agent execution
 - Future semantic deduplication and optional assisted knowledge extraction (still explicitly agent-proposed, not inferred by YallaFlow)
-- `yallaflow intake add PF-0001 <file>` — attaching an additional source to an existing work item (the schema already supports a work item referencing more than one source; only the CLI verb is missing)
+- OCR/vision understanding of images and scanned PDFs (deliberately not introduced this release — see the parser-decisions notes in `CHANGELOG.md`)
+- `.odg` and `.epub` text extraction (recognized formats, preserved as original-only; no maintained lightweight parser evaluated for them yet)
+- `yallaflow intake-dir` (recursive directory ingestion) — multiple explicit file arguments to `intake`/`intake add` were chosen instead as the simpler, safer public UX
 
 ## v0.4 — Execution
 - Execution contracts

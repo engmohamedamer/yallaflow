@@ -23,23 +23,40 @@ Plain-text and file intake, and explicit project-knowledge promotion, are implem
 
 ```text
 Source
-→ Intake Adapter
+→ Format Detection
+→ Intake Adapter Registry
 → Normalized Intake Contract
 → Workspace Source Storage
 → Pending Work Item
 ```
 
-An **Intake Adapter** turns one kind of source into the same provider/source-neutral **Normalized Intake Contract** — `{ sourceType, sourceName, contentType, rawText, capturedAt, metadata }` — without knowing anything about workspace storage or routing. `src/intake/file.js` is the first adapter (`sourceType: 'file'`); a future tracker or message adapter would sit beside it and produce the same contract shape. `src/intake/text.js` does not exist as a separate module yet — plain-text intake (`yallaflow start "<request>"`) still writes directly into a work item's `rawRequest`, unchanged since v0.1, and is not required to route through the adapter boundary to remain valid (see [Compatibility](#file-intake-compatibility) below).
+**Format detection** (`src/intake/detect.js`) never trusts a file's extension alone for binary container formats: it checks magic bytes/signatures and reports a `mismatch` when they disagree (a fake `.docx` that isn't actually a zip is detected and routed to the generic binary handler, not parsed as if it were valid). Plain-text formats have no fixed signature and are trusted by extension — there is no meaningful "fake .txt".
 
-Workspace storage (`src/core/sources.js`) is a separate step that only runs after an adapter produces a normalized contract: it allocates a stable `SRC-####` ID (scanning `.yallaflow/sources/` the same way work IDs scan `.yallaflow/work/`, and never creating that directory merely to compute the next ID), copies the original bytes byte-for-byte, and writes a validated `source.json` record. A work item is then created exactly like a pending text intake, with an added `sources: [{ id, type, name }]` reference — an array, so a work item is never structurally limited to exactly one source even though intake only ever seeds the first entry — the same routing contract applies from there onward; **intake never infers a work type, scope, or title from a file's contents.**
+The **adapter registry** (`src/intake/registry.js`) maps a detected format to exactly one adapter module under `src/intake/adapters/`. Adding a new format family means adding one registry entry and one adapter — never a switch statement scattered through CLI or command code. Each adapter returns `{ contentAvailability, text?, metadata? }`; `src/intake/file.js` is the orchestrator that ties detection, the registry, safety limits, and error handling together into the final **Normalized Intake Contract**: `{ sourceType, sourceName, detectedFormat, contentType, contentAvailability, rawText?, metadata }` — provider/source-neutral, without knowing anything about workspace storage or routing. `src/intake/text.js` does not exist as a separate module for plain-text *intake*; `yallaflow start "<request>"` still writes directly into a work item's `rawRequest`, unchanged since v0.1 (see [Compatibility](#file-intake-compatibility) below).
 
-The source file is evidence. Original Source (the copied file), Normalized Requirement (`source.json`'s `rawText`, currently identical to the file for supported text formats), and Specification (produced later, by the `specification` skill) are three distinct artifacts that may exist independently — file intake never silently collapses one into another.
+Workspace storage (`src/core/sources.js`) is a separate step that only runs after the orchestrator produces a normalized contract: it allocates a stable `SRC-####` ID (scanning `.yallaflow/sources/` the same way work IDs scan `.yallaflow/work/`, and never creating that directory merely to compute the next ID), copies the original bytes byte-for-byte under their own sanitized file name, writes any extracted text to its own `extracted.txt`, and writes a validated `source.json` record. A work item is then created exactly like a pending text intake, with a `sources: [{ id, type, name, detectedFormat, contentAvailability }]` reference — always an array, so a work item is never structurally limited to exactly one source. The same routing contract applies from there onward; **intake never infers a work type, scope, or title from a file's contents.**
 
-Supported file types are deliberately narrow in this release — `.md`, `.txt`, `.json`, `.yaml`, `.yml`, `.csv` — anything requiring extraction (PDF, DOCX, images, OCR) is rejected with a clear, literal list of what is supported; it is never pretended to work. Each source also records a SHA-256 checksum for traceability and accidental-change detection (not semantic identity), and re-ingesting identical content never overwrites a prior source — it gets a new ID, with only a checksum-match warning.
+The source file is evidence. Original Source (the copied file), Extracted Representation (`extracted.txt`, when one exists), Normalized Intake (the in-memory contract that produced it), and Specification (produced later, by the `specification` skill) are four distinct artifacts that may exist independently — file intake never silently collapses one into another, and never claims to have understood content it could not extract.
+
+#### Support tiers
+
+| Tier | Formats | `contentAvailability` |
+| --- | --- | --- |
+| 1 — Native text | `.txt .md .markdown .rst .csv .tsv .json .jsonl .yaml .yml .xml .html .htm .toml .ini .cfg .conf .properties .log .sql` and common source files (`.js .ts .tsx .jsx .php .py .java .cs .go .rs .rb .sh`, treated as plain text — language semantics are never interpreted) | `native-text` |
+| 2 — Office / rich documents | `.docx .pptx .xlsx .rtf .odt .ods .odp` | `extracted` |
+| 3 — PDF | `.pdf` | `extracted` |
+| 4 — Images | `.png .jpg .jpeg .webp .gif .bmp .tif .tiff .svg` | `original-only` (no OCR/vision performed or claimed) |
+| 5 — Generic binary | anything else, plus recognized-but-not-yet-implemented `.odg`/`.epub`, plus dangerous containers `.zip .tar .gz .tgz .7z .rar` (never auto-unpacked — zip bombs, path traversal, nested archives, executable payloads) | `original-only` |
+
+`.docx`/`.pptx`/`.odt`/`.ods`/`.odp` extraction and generic PDF text go through `officeparser`; `.xlsx`/`.pptx` additionally get a structured pass (`src/intake/extractors/xlsx.js`, `pptx.js`) that reconstructs real sheet names and grid/slide sections — worth the extra parsing because that shape is part of the requirement, not incidental formatting. `.rtf` and `.pdf` are handled by small first-party extractors (`src/intake/extractors/rtf.js`, `pdf.js`); see "Parser decisions" in the release notes for why PDF specifically isn't routed through officeparser's own PDF path. If extraction fails for a format that should support it (a corrupt `.docx`, a malformed `.pdf`), intake does not fail the whole operation — it prints a warning, preserves the original file, and records `contentAvailability: 'original-only'` with the failure reason in `metadata.extractionError`. A file larger than the extraction size limit is preserved the same way, with `metadata.extractionSkipped` explaining why, rather than being parsed or silently truncated.
+
+Each source also records a SHA-256 checksum of the *original* bytes for traceability and accidental-change detection (not semantic identity), and re-ingesting identical content never overwrites a prior source — it gets a new ID, with only a checksum-match warning.
 
 #### File intake compatibility
 
-`createPendingIntake(root, rawRequest, options)` grew a third, optional `options.source` (the single source ref the caller has at creation time) / `options.titleHint` — existing two-argument callers (`yallaflow start`, and the majority of the test suite) are unaffected. Internally it is stored as `meta.sources` (an array of one). A pending or routed work item without a `sources` field is exactly the pre-v0.3 shape; `guide`, `resume`, and `status` show a `Source:` line only when one is present. Nothing under `.yallaflow/sources/` is created merely by reading a workspace — not `doctor`, not `source list`, not `guide`/`resume`/`status` — only `yallaflow intake` creates it, lazily, on first use; older workspaces without it remain fully valid with zero sources.
+`createPendingIntake(root, rawRequest, options)` grew a third, optional `options.sources` (array) / `options.titleHint` — existing two-argument callers (`yallaflow start`, and the majority of the test suite) are unaffected. A pending or routed work item without a `sources` field is exactly the pre-v0.3 shape; `guide`, `resume`, and `status` show a `Source:` line, with format and content availability, only when one is present. Nothing under `.yallaflow/sources/` is created merely by reading a workspace — not `doctor`, not `source list`, not `guide`/`resume`/`status` — only `yallaflow intake`/`intake add` create it, lazily, on first use; older workspaces without it remain fully valid with zero sources.
+
+`source.json` itself is versioned independently of the package: schema v1 (v0.3.1) is still read and displayed correctly by every command — `loadSourceText()` in `src/core/sources.js` abstracts the version difference away from display code — and is never migrated or rewritten. New sources are always written as the current schema version.
 
 ### Architectural-feature lifecycle
 
@@ -283,7 +300,7 @@ This is the canonical reference for YallaFlow's domain vocabulary. Other documen
 | **ADR** | An Architecture Decision Record: a long-lived architectural decision document under `decisions/`, optionally seeded from a ruling. |
 | **Knowledge Candidate** | An agent-proposed, work-scoped, stable fact or decision recorded in `knowledge.yaml`, pending promotion or rejection. |
 | **Project Knowledge** | Durable project context under `context/*.md` or `decisions/*.md`, produced only by promoting a reviewed Knowledge Candidate. |
-| **Source** | A captured, evidence-preserving intake artifact (`SRC-####`) recorded in `.yallaflow/sources/`, with its original bytes copied byte-for-byte, a normalized `rawText`, and a checksum. Linked to, but distinct from, the work item(s) it created. |
+| **Source** | A captured, evidence-preserving intake artifact (`SRC-####`) recorded in `.yallaflow/sources/`, with its original bytes copied byte-for-byte, a detected format, a checksum, and a `contentAvailability` (`native-text`, `extracted`, or `original-only`) describing what text, if any, could be read from it. Linked to, but distinct from, the work item(s) it created. |
 
 ## Architecture freeze entering v0.3
 

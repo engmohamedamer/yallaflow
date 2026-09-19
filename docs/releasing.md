@@ -52,4 +52,8 @@ Run in order. Every step should be reproducible from a clean checkout.
 [ ] GitHub release                    # from the tag, linking the CHANGELOG section
 ```
 
-This milestone (v0.2.6) does not execute any of the last five steps — no version bump, tag, publish, or GitHub release. It only establishes this policy and checklist.
+Internal prerelease tags (the `-internal.N` versions in `CHANGELOG.md`) execute the checklist through `git tag` and pushing it; `npm publish` and the GitHub release step remain untaken — no version has been published to the npm registry.
+
+## Known residual security considerations
+
+- **`file-type` DoS advisory ([GHSA-5v7r-6r5c-r473](https://github.com/advisories/GHSA-5v7r-6r5c-r473)), moderate.** Present in the dependency tree as an internal dependency of `officeparser`. **Mitigated, not resolved**: YallaFlow's own format detection (`src/intake/detect.js`) never calls the vulnerable package, and every file reaching `officeparser` has already passed our own signature gate first. `npm audit` will continue to report this finding on every check until `officeparser` ships a major version without it that also drops the OCR (`tesseract.js`) dependency we deliberately avoid — see `CHANGELOG.md`'s "Parser decisions" for the full evaluation. Re-evaluate on every `officeparser` upgrade; do not assume a clean release note means a clean `npm audit`.

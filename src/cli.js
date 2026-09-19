@@ -15,14 +15,14 @@ import { checkpointCommand, reviseCheckpointCommand } from './commands/checkpoin
 import { knowledgeCommand } from './commands/knowledge.js';
 import { questionCommand } from './commands/question.js';
 import { readyCommand } from './commands/ready.js';
-import { intakeCommand } from './commands/intake.js';
+import { intakeAddCommand, intakeCommand } from './commands/intake.js';
 import { sourceCommand } from './commands/source.js';
 import { SCOPES } from './behavior/constants.js';
 
 const VALID_PROJECT_TYPES = new Set(['greenfield', 'brownfield']);
 
 function help() {
-  console.log(`YallaFlow foundation CLI\n\nGive AI your project, not just your prompt.\n\nUsage:\n  yallaflow init [--name NAME] [--type greenfield|brownfield]\n  yallaflow start [request]\n  yallaflow intake <file> [--title TITLE]\n  yallaflow source --help\n  yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]\n  yallaflow guide [work-id]\n  yallaflow ready [work-id]\n  yallaflow skill <skill-id>\n  yallaflow checkpoint --help\n  yallaflow question --help\n  yallaflow knowledge --help\n  yallaflow feature <title> [--scope VALUE]\n  yallaflow bug <title> [--scope VALUE]\n  yallaflow investigate <title> [--scope VALUE]\n  yallaflow change <title> [--scope VALUE]\n  yallaflow refactor <title> [--scope VALUE]\n  yallaflow release <title> [--scope VALUE]\n  yallaflow status\n  yallaflow resume\n  yallaflow doctor\n  yallaflow advance\n  yallaflow verify -- <command>\n  yallaflow --version\n`);
+  console.log(`YallaFlow foundation CLI\n\nGive AI your project, not just your prompt.\n\nUsage:\n  yallaflow init [--name NAME] [--type greenfield|brownfield]\n  yallaflow start [request]\n  yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...]\n  yallaflow source --help\n  yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]\n  yallaflow guide [work-id]\n  yallaflow ready [work-id]\n  yallaflow skill <skill-id>\n  yallaflow checkpoint --help\n  yallaflow question --help\n  yallaflow knowledge --help\n  yallaflow feature <title> [--scope VALUE]\n  yallaflow bug <title> [--scope VALUE]\n  yallaflow investigate <title> [--scope VALUE]\n  yallaflow change <title> [--scope VALUE]\n  yallaflow refactor <title> [--scope VALUE]\n  yallaflow release <title> [--scope VALUE]\n  yallaflow status\n  yallaflow resume\n  yallaflow doctor\n  yallaflow advance\n  yallaflow verify -- <command>\n  yallaflow --version\n`);
 }
 
 function sourceHelp() {
@@ -48,7 +48,7 @@ function parseOptions(args, allowed) {
 async function main() {
   const [command, ...rest] = process.argv.slice(2);
   if (!command || command === '--help' || command === '-h') return help();
-  if (command === '--version' || command === '-v') return console.log('0.3.0-internal.1');
+  if (command === '--version' || command === '-v') return console.log('0.3.0-internal.2');
 
   if (command === 'init') {
     const { values } = parseOptions(rest, { name: { type: 'string' }, type: { type: 'string' } });
@@ -58,9 +58,15 @@ async function main() {
 
   if (command === 'start') return startCommand(rest.join(' '));
   if (command === 'intake') {
+    if (rest[0] === 'add') {
+      const { positionals } = parseOptions(rest.slice(1), {});
+      if (positionals.length < 2) throw new Error('Usage: yallaflow intake add <work-id> <file> [<file> ...]');
+      const [workId, ...files] = positionals;
+      return intakeAddCommand(workId, files);
+    }
     const { values, positionals } = parseOptions(rest, { title: { type: 'string' } });
-    if (positionals.length !== 1) throw new Error('Usage: yallaflow intake <file> [--title TITLE]');
-    return intakeCommand(positionals[0], { title: values.title });
+    if (positionals.length < 1) throw new Error('Usage: yallaflow intake <file> [<file> ...] [--title TITLE]');
+    return intakeCommand(positionals, { title: values.title });
   }
   if (command === 'source') {
     if (rest[0] === '--help' || rest[0] === '-h') return sourceHelp();

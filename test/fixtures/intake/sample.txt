@@ -1,0 +1,2 @@
+Plain text requirement notes.
+Contract creation and payment tracking.

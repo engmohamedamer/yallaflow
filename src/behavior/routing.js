@@ -47,10 +47,10 @@ export async function createPendingIntake(root, rawRequest, options = {}) {
   if (typeof rawRequest !== 'string' || !rawRequest.trim()) {
     throw new Error('A non-empty raw request is required.');
   }
-  // A work item may reference more than one source over time (a future
-  // `intake add` could attach client-notes.txt alongside SRS.md); `sources` is
-  // therefore always an array, even though intake only ever seeds the first entry.
-  const source = options.source !== undefined ? validateSourceRef(options.source) : undefined;
+  // A work item may reference more than one source at once (`yallaflow intake
+  // file1.docx file2.xlsx`) and more over time (`yallaflow intake add`); `sources`
+  // is therefore always an array.
+  const sources = options.sources !== undefined ? options.sources.map(validateSourceRef) : undefined;
   const titleHint = options.titleHint !== undefined ? normalizeTitleHint(options.titleHint) : undefined;
 
   const id = await nextWorkId(root);
@@ -63,7 +63,7 @@ export async function createPendingIntake(root, rawRequest, options = {}) {
     rawRequest,
     status: null,
     readOnly: true,
-    ...(source ? { sources: [source] } : {}),
+    ...(sources?.length ? { sources } : {}),
     ...(titleHint ? { titleHint } : {}),
     knowledgePolicy: {
       version: KNOWLEDGE_POLICY_VERSION,
@@ -136,20 +136,50 @@ export async function routeWorkItem(root, workId, input) {
   return meta;
 }
 
+// Attaches an additional source to an existing work item (pending or already routed)
+// without disturbing anything else about it — the missing half of the source-input
+// model that per-file `intake` alone doesn't cover (`yallaflow intake add`).
+export async function addSourceToWork(root, workId, source, now = new Date().toISOString()) {
+  const validated = validateSourceRef(source);
+  const workDir = path.join(workspacePath(root), 'work', workId);
+  const metaFile = path.join(workDir, 'meta.yaml');
+  if (!await exists(metaFile)) throw new Error(`Work item ${workId} was not found.`);
+  const meta = await readYaml(metaFile);
+
+  meta.sources = [...(meta.sources ?? []), validated];
+  meta.updatedAt = now;
+  await writeYaml(metaFile, meta);
+  await appendFile(path.join(workDir, 'work.md'), sourceAddedSection(validated), 'utf8');
+  await appendFile(path.join(workDir, 'progress.md'), `- ${now} Source attached: ${validated.id} (${validated.name})\n`, 'utf8');
+  return meta;
+}
+
 function pendingWorkTemplate(meta) {
   const intakeSection = meta.sources?.length
-    ? `## Sources\n\n${meta.sources.map((source) => `**Source ID:** ${source.id}\n**Type:** ${source.type}\n**Name:** ${source.name}\n\nRaw source preserved in: \`.yallaflow/sources/${source.id}/${source.name}\`. Read it directly; it is not duplicated here.`).join('\n\n')}\n`
+    ? `## Sources\n\n${meta.sources.map(sourceDetail).join('\n\n')}\n`
     : `## Raw Request\n\n${meta.rawRequest}\n`;
   return `# ${meta.id} — Pending Intake\n\n${intakeSection}\n## Routing\n\n**Status:** pending\n\nThe coding agent must classify this request using the YallaFlow routing contract.\n`;
 }
 
+function sourceAddedSection(source) {
+  return `\n## Source Added\n\n${sourceDetail(source)}\n`;
+}
+
+function sourceDetail(source) {
+  return `**Source ID:** ${source.id}\n**Type:** ${source.type}\n**Name:** ${source.name}\n\nRaw source preserved in: \`.yallaflow/sources/${source.id}/${source.name}\`. Read it directly; it is not duplicated here.`;
+}
+
 function validateSourceRef(source) {
   if (!source || typeof source !== 'object' || Array.isArray(source)) throw new Error('source must be an object.');
-  const { id, type, name } = source;
+  const { id, type, name, detectedFormat, contentAvailability } = source;
   if (!isNonEmptyString(id) || !isNonEmptyString(type) || !isNonEmptyString(name)) {
     throw new Error('source requires non-empty id, type, and name.');
   }
-  return { id, type, name };
+  return {
+    id, type, name,
+    ...(detectedFormat !== undefined ? { detectedFormat } : {}),
+    ...(contentAvailability !== undefined ? { contentAvailability } : {})
+  };
 }
 
 function normalizeTitleHint(value) {

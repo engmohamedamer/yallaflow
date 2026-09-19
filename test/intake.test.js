@@ -2,29 +2,29 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { mkdtemp, readFile, writeFile, mkdir } from 'node:fs/promises';
+import { mkdtemp, readFile, writeFile, mkdir, copyFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
 import path from 'node:path';
 import { initWorkspace, workspacePath } from '../src/core/workspace.js';
-import { readYaml } from '../src/core/yaml.js';
+import { readYaml, writeYaml } from '../src/core/yaml.js';
 import { exists } from '../src/utils/fs.js';
 import { prepareFileIntake } from '../src/intake/file.js';
 import { assertSafeSourceName, assertWithinDirectory } from '../src/intake/validation.js';
-import { listSources, loadSource, sourceDirPath } from '../src/core/sources.js';
+import { listSources, loadSource, loadSourceText, persistSource, removeSourceDir, sourceDirPath } from '../src/core/sources.js';
+import { MAX_EXTRACTION_INPUT_BYTES, MAX_SOURCE_BYTES, SOURCE_SCHEMA_VERSION } from '../src/intake/constants.js';
 
 const cli = fileURLToPath(new URL('../src/cli.js', import.meta.url));
+const fixturesDir = fileURLToPath(new URL('fixtures/intake/', import.meta.url));
+
+function fixture(name) {
+  return path.join(fixturesDir, name);
+}
 
 async function freshWorkspace(prefix = 'yallaflow-intake-') {
   const root = await mkdtemp(path.join(os.tmpdir(), prefix));
   await initWorkspace(root, 'demo', 'greenfield');
   return root;
-}
-
-async function writeSourceFile(root, name, content) {
-  const file = path.join(root, name);
-  await writeFile(file, content, 'utf8');
-  return file;
 }
 
 function intake(root, args) {
@@ -35,329 +35,208 @@ function run(root, args) {
   return spawnSync(process.execPath, [cli, ...args], { cwd: root, encoding: 'utf8' });
 }
 
-test('markdown intake', async () => {
+async function metaOf(root, workId) {
+  return readYaml(path.join(workspacePath(root), 'work', workId, 'meta.yaml'));
+}
+
+// ---------------------------------------------------------------------------
+// Tier 1 — Native Text
+// ---------------------------------------------------------------------------
+
+for (const [file, contentType] of [
+  ['sample.txt', 'text/plain'],
+  ['sample.md', 'text/markdown'],
+  ['sample.json', 'application/json'],
+  ['sample.jsonl', 'application/jsonl'],
+  ['sample.yaml', 'application/x-yaml'],
+  ['sample.xml', 'application/xml'],
+  ['sample.html', 'text/html'],
+  ['sample.csv', 'text/csv'],
+  ['sample.tsv', 'text/tab-separated-values'],
+  ['sample.toml', 'application/toml']
+]) {
+  test(`native text intake: ${file}`, async () => {
+    const root = await freshWorkspace();
+    const result = intake(root, [fixture(file)]);
+    assert.equal(result.status, 0, result.stderr);
+    const source = await loadSource(root, 'SRC-0001');
+    assert.equal(source.contentAvailability, 'native-text');
+    assert.equal(source.contentType, contentType);
+    assert.equal(source.rawText, await readFile(fixture(file), 'utf8'));
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Tier 2 — Office / Rich Documents
+// ---------------------------------------------------------------------------
+
+test('office intake: docx', async () => {
   const root = await freshWorkspace();
-  await writeSourceFile(root, 'SRS.md', '# Contract Management System\n\nGold or Silver packages.\n');
-  const result = intake(root, ['SRS.md']);
+  const result = intake(root, [fixture('sample.docx')]);
+  assert.equal(result.status, 0, result.stderr);
+  const source = await loadSource(root, 'SRC-0001');
+  assert.equal(source.contentAvailability, 'extracted');
+  const text = await loadSourceText(root, source);
+  assert.match(text, /Requirements/);
+  assert.match(text, /Contract creation/);
+});
+
+test('office intake: pptx produces per-slide sections', async () => {
+  const root = await freshWorkspace();
+  const result = intake(root, [fixture('sample.pptx')]);
+  assert.equal(result.status, 0, result.stderr);
+  const source = await loadSource(root, 'SRC-0001');
+  const text = await loadSourceText(root, source);
+  assert.match(text, /# Slide 1/);
+  assert.match(text, /# Slide 2/);
+  assert.match(text, /Contract Management System/);
+});
+
+test('office intake: xlsx produces a sheet table with the real sheet name', async () => {
+  const root = await freshWorkspace();
+  const result = intake(root, [fixture('sample.xlsx')]);
+  assert.equal(result.status, 0, result.stderr);
+  const source = await loadSource(root, 'SRC-0001');
+  const text = await loadSourceText(root, source);
+  assert.match(text, /# Sheet: sample/);
+  assert.match(text, /\| ID \| Requirement \| Priority \|/);
+  assert.match(text, /\| R1 \| Contract creation \| High \|/);
+});
+
+test('office intake: rtf', async () => {
+  const root = await freshWorkspace();
+  const result = intake(root, [fixture('sample.rtf')]);
+  assert.equal(result.status, 0, result.stderr);
+  const source = await loadSource(root, 'SRC-0001');
+  const text = await loadSourceText(root, source);
+  assert.match(text, /Requirements/);
+  assert.match(text, /Contract creation/);
+});
+
+test('office intake: odt', async () => {
+  const root = await freshWorkspace();
+  const result = intake(root, [fixture('sample.odt')]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal((await loadSource(root, 'SRC-0001')).contentAvailability, 'extracted');
+});
+
+test('office intake: ods', async () => {
+  const root = await freshWorkspace();
+  const result = intake(root, [fixture('sample.ods')]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal((await loadSource(root, 'SRC-0001')).contentAvailability, 'extracted');
+});
+
+test('office intake: odp', async () => {
+  const root = await freshWorkspace();
+  const result = intake(root, [fixture('sample.odp')]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal((await loadSource(root, 'SRC-0001')).contentAvailability, 'extracted');
+});
+
+// ---------------------------------------------------------------------------
+// Tier 3 — PDF
+// ---------------------------------------------------------------------------
+
+test('PDF intake produces per-page sections', async () => {
+  const root = await freshWorkspace();
+  const result = intake(root, [fixture('sample.pdf')]);
+  assert.equal(result.status, 0, result.stderr);
+  const source = await loadSource(root, 'SRC-0001');
+  assert.equal(source.contentAvailability, 'extracted');
+  const text = await loadSourceText(root, source);
+  assert.match(text, /# Page 1/);
+  assert.match(text, /Requirements/);
+});
+
+// ---------------------------------------------------------------------------
+// Tier 4 — Images / Visual Sources
+// ---------------------------------------------------------------------------
+
+for (const [file, format] of [['sample.png', 'png'], ['sample.jpg', 'jpg'], ['sample.svg', 'svg']]) {
+  test(`image intake preserves original without claiming extraction: ${file}`, async () => {
+    const root = await freshWorkspace();
+    const result = intake(root, [fixture(file)]);
+    assert.equal(result.status, 0, result.stderr);
+    const source = await loadSource(root, 'SRC-0001');
+    assert.equal(source.contentAvailability, 'original-only');
+    assert.equal(source.metadata.format, format);
+    assert.equal(await loadSourceText(root, source), null);
+  });
+}
+
+test('PNG dimensions are read from the header', async () => {
+  const root = await freshWorkspace();
+  intake(root, [fixture('sample.png')]);
+  const source = await loadSource(root, 'SRC-0001');
+  assert.equal(source.metadata.width, 64);
+  assert.equal(source.metadata.height, 32);
+});
+
+// ---------------------------------------------------------------------------
+// Tier 5 — Generic Binary Attachment
+// ---------------------------------------------------------------------------
+
+test('unsupported binary is accepted as original-only, not rejected', async () => {
+  const root = await freshWorkspace();
+  const result = intake(root, [fixture('sample.psd')]);
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /Source captured: SRC-0001/);
   const source = await loadSource(root, 'SRC-0001');
-  assert.equal(source.contentType, 'text/markdown');
+  assert.equal(source.contentAvailability, 'original-only');
 });
 
-test('text intake', async () => {
+test('a dangerous archive extension is preserved, never auto-unpacked', async () => {
   const root = await freshWorkspace();
-  await writeSourceFile(root, 'notes.txt', 'Plain text requirement notes.');
-  const result = intake(root, ['notes.txt']);
+  const zipPath = path.join(root, 'bundle.zip');
+  // Minimal valid empty zip (end-of-central-directory record only).
+  await writeFile(zipPath, Buffer.from([0x50, 0x4b, 0x05, 0x06, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]));
+  const result = intake(root, [zipPath]);
   assert.equal(result.status, 0, result.stderr);
   const source = await loadSource(root, 'SRC-0001');
-  assert.equal(source.contentType, 'text/plain');
+  assert.equal(source.contentAvailability, 'original-only');
+  assert.equal(source.detectedFormat, 'archive');
+  assert.equal(await exists(path.join(workspacePath(root), 'sources', 'SRC-0001', 'bundle.zip')), true);
 });
 
-test('JSON intake', async () => {
+// ---------------------------------------------------------------------------
+// Security / Failure
+// ---------------------------------------------------------------------------
+
+test('corrupt DOCX degrades to original-only instead of failing intake', async () => {
   const root = await freshWorkspace();
-  await writeSourceFile(root, 'req.json', JSON.stringify({ requirement: 'Contract management' }));
-  const result = intake(root, ['req.json']);
+  const result = intake(root, [fixture('corrupt.docx')]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /Warning: could not extract text/);
+  const source = await loadSource(root, 'SRC-0001');
+  assert.equal(source.contentAvailability, 'original-only');
+  assert.ok(source.metadata.extractionError);
+});
+
+test('corrupt PDF degrades to original-only instead of failing intake', async () => {
+  const root = await freshWorkspace();
+  const result = intake(root, [fixture('corrupt.pdf')]);
   assert.equal(result.status, 0, result.stderr);
   const source = await loadSource(root, 'SRC-0001');
-  assert.equal(source.contentType, 'application/json');
+  assert.equal(source.contentAvailability, 'original-only');
 });
 
-test('YAML intake', async () => {
+test('fake extension (non-zip content named .docx) is detected and preserved as binary', async () => {
   const root = await freshWorkspace();
-  await writeSourceFile(root, 'req.yaml', 'requirement: Contract management\n');
-  const result = intake(root, ['req.yaml']);
+  const result = intake(root, [fixture('fake.docx')]);
   assert.equal(result.status, 0, result.stderr);
   const source = await loadSource(root, 'SRC-0001');
-  assert.equal(source.contentType, 'application/x-yaml');
-
-  await writeSourceFile(root, 'req2.yml', 'requirement: Contract management v2\n');
-  const result2 = intake(root, ['req2.yml']);
-  assert.equal(result2.status, 0, result2.stderr);
-  assert.equal((await loadSource(root, 'SRC-0002')).contentType, 'application/x-yaml');
+  assert.equal(source.contentAvailability, 'original-only');
+  assert.equal(source.metadata.extensionMismatch, true);
 });
 
-test('CSV intake', async () => {
-  const root = await freshWorkspace();
-  await writeSourceFile(root, 'data.csv', 'id,name\n1,Contract A\n');
-  const result = intake(root, ['data.csv']);
-  assert.equal(result.status, 0, result.stderr);
-  const source = await loadSource(root, 'SRC-0001');
-  assert.equal(source.contentType, 'text/csv');
-});
-
-test('unsupported file rejected', async () => {
-  const root = await freshWorkspace();
-  await writeSourceFile(root, 'spec.pdf', '%PDF-1.4 fake');
-  const result = intake(root, ['spec.pdf']);
-  assert.equal(result.status, 1);
-  assert.match(result.stderr, /Unsupported file type: \.pdf/);
-  assert.match(result.stderr, /Supported in this release:/);
-  assert.match(result.stderr, /\.md, \.txt, \.json, \.yaml, \.yml, \.csv/);
-});
-
-test('missing file rejected', async () => {
-  const root = await freshWorkspace();
-  const result = intake(root, ['does-not-exist.md']);
-  assert.equal(result.status, 1);
-  assert.match(result.stderr, /Source file not found: does-not-exist\.md/);
-});
-
-test('directory rejected', async () => {
-  const root = await freshWorkspace();
-  await mkdir(path.join(root, 'a-directory.md'));
-  const result = intake(root, ['a-directory.md']);
-  assert.equal(result.status, 1);
-  assert.match(result.stderr, /Source path is a directory, not a file/);
-});
-
-test('empty file rejected', async () => {
-  const root = await freshWorkspace();
-  await writeSourceFile(root, 'empty.md', '');
-  const result = intake(root, ['empty.md']);
-  assert.equal(result.status, 1);
-  assert.match(result.stderr, /Source file is empty: empty\.md/);
-});
-
-test('source copied into workspace', async () => {
-  const root = await freshWorkspace();
-  const content = '# SRS\n\nOriginal content.\n';
-  await writeSourceFile(root, 'SRS.md', content);
-  intake(root, ['SRS.md']);
-  const copied = await readFile(path.join(workspacePath(root), 'sources', 'SRC-0001', 'SRS.md'), 'utf8');
-  assert.equal(copied, content);
-});
-
-test('source metadata persisted', async () => {
-  const root = await freshWorkspace();
-  await writeSourceFile(root, 'SRS.md', '# SRS\n');
-  intake(root, ['SRS.md']);
-  const source = await loadSource(root, 'SRC-0001');
-  assert.equal(source.id, 'SRC-0001');
-  assert.equal(source.sourceType, 'file');
-  assert.equal(source.sourceName, 'SRS.md');
-  assert.equal(source.sourceRef, 'sources/SRC-0001/SRS.md');
-  assert.ok(source.capturedAt);
-  assert.equal(source.metadata.extension, '.md');
-});
-
-test('SHA-256 persisted', async () => {
-  const root = await freshWorkspace();
-  const content = '# SRS\n\nHashed content.\n';
-  await writeSourceFile(root, 'SRS.md', content);
-  intake(root, ['SRS.md']);
-  const source = await loadSource(root, 'SRC-0001');
-  const expected = createHash('sha256').update(content, 'utf8').digest('hex');
-  assert.equal(source.metadata.sha256, expected);
-  assert.match(source.metadata.sha256, /^[a-f0-9]{64}$/);
-});
-
-test('pending work created', async () => {
-  const root = await freshWorkspace();
-  await writeSourceFile(root, 'SRS.md', '# SRS\n');
-  const result = intake(root, ['SRS.md']);
-  assert.match(result.stdout, /Work created: PF-0001/);
-  const meta = await readYaml(path.join(workspacePath(root), 'work', 'PF-0001', 'meta.yaml'));
-  assert.equal(meta.routingStatus, 'pending');
-  assert.equal(meta.status, null);
-});
-
-test('source linked to work', async () => {
-  const root = await freshWorkspace();
-  await writeSourceFile(root, 'SRS.md', '# SRS\n');
-  intake(root, ['SRS.md']);
-  const meta = await readYaml(path.join(workspacePath(root), 'work', 'PF-0001', 'meta.yaml'));
-  assert.deepEqual(meta.sources, [{ id: 'SRC-0001', type: 'file', name: 'SRS.md' }]);
-  const source = await loadSource(root, 'SRC-0001');
-  assert.deepEqual(source.linkedWork, ['PF-0001']);
-});
-
-test('raw content preserved exactly', async () => {
-  const root = await freshWorkspace();
-  const content = 'Line one.\r\nLine two with trailing spaces.   \nNo trailing newline at end.';
-  await writeSourceFile(root, 'exact.txt', content);
-  intake(root, ['exact.txt']);
-  const source = await loadSource(root, 'SRC-0001');
-  assert.equal(source.rawText, content);
-  const copied = await readFile(path.join(workspacePath(root), 'sources', 'SRC-0001', 'exact.txt'), 'utf8');
-  assert.equal(copied, content);
-});
-
-test('filename preserved', async () => {
-  const root = await freshWorkspace();
-  await writeSourceFile(root, 'Client-Requirements_v2.txt', 'content');
-  intake(root, ['Client-Requirements_v2.txt']);
-  const source = await loadSource(root, 'SRC-0001');
-  assert.equal(source.sourceName, 'Client-Requirements_v2.txt');
-});
-
-test('optional title flows into routing default without inference', async () => {
-  const root = await freshWorkspace();
-  await writeSourceFile(root, 'SRS.md', '# SRS\n');
-  intake(root, ['SRS.md', '--title', 'Contract Management System']);
-  const pending = await readYaml(path.join(workspacePath(root), 'work', 'PF-0001', 'meta.yaml'));
-  assert.equal(pending.titleHint, 'Contract Management System');
-
-  const route = run(root, [
-    'route', 'PF-0001', '--type', 'feature', '--scope', 'architectural',
-    '--confidence', 'high', '--reason', 'Greenfield SRS intake.'
-  ]);
-  assert.equal(route.status, 0, route.stderr);
-  const routed = await readYaml(path.join(workspacePath(root), 'work', 'PF-0001', 'meta.yaml'));
-  assert.equal(routed.title, 'Contract Management System');
-});
-
-test('default title is derived mechanically from the filename, not inferred', async () => {
-  const root = await freshWorkspace();
-  await writeSourceFile(root, 'SRS.md', '# SRS\n');
-  intake(root, ['SRS.md']);
-  const pending = await readYaml(path.join(workspacePath(root), 'work', 'PF-0001', 'meta.yaml'));
-  assert.equal(pending.titleHint, 'SRS');
-});
-
-test('no routing inference from file contents', async () => {
-  const root = await freshWorkspace();
-  await writeSourceFile(root, 'SRS.md', '# Bug: production is on fire\n\nThis looks like a bug report.\n');
-  intake(root, ['SRS.md']);
-  const pending = await readYaml(path.join(workspacePath(root), 'work', 'PF-0001', 'meta.yaml'));
-  assert.equal(pending.type, null);
-  assert.equal(pending.scope, null);
-  assert.equal(pending.routingStatus, 'pending');
-});
-
-test('duplicate intake does not overwrite', async () => {
-  const root = await freshWorkspace();
-  await writeSourceFile(root, 'a.md', 'same content');
-  await writeSourceFile(root, 'b.md', 'same content');
-  const first = intake(root, ['a.md']);
-  assert.match(first.stdout, /Source captured: SRC-0001/);
-  const second = intake(root, ['b.md']);
-  assert.match(second.stdout, /This file matches existing source SRC-0001\./);
-  assert.match(second.stdout, /Source captured: SRC-0002/);
-  const sources = await listSources(root);
-  assert.deepEqual(sources.map((s) => s.id), ['SRC-0001', 'SRC-0002']);
-});
-
-test('restart preserves source relationship', async () => {
-  const root = await freshWorkspace();
-  await writeSourceFile(root, 'SRS.md', '# SRS\n');
-  intake(root, ['SRS.md']);
-  const reloadedWork = await readYaml(path.join(workspacePath(root), 'work', 'PF-0001', 'meta.yaml'));
-  assert.deepEqual(reloadedWork.sources, [{ id: 'SRC-0001', type: 'file', name: 'SRS.md' }]);
-  const reloadedSource = await loadSource(root, 'SRC-0001');
-  assert.deepEqual(reloadedSource.linkedWork, ['PF-0001']);
-});
-
-test('guide exposes source', async () => {
-  const root = await freshWorkspace();
-  await writeSourceFile(root, 'SRS.md', '# SRS\n');
-  intake(root, ['SRS.md']);
-  const result = run(root, ['guide', 'PF-0001']);
-  assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /Source:\nSRC-0001 — SRS\.md/);
-});
-
-test('resume exposes source', async () => {
-  const root = await freshWorkspace();
-  await writeSourceFile(root, 'SRS.md', '# SRS\n');
-  intake(root, ['SRS.md']);
-  const result = run(root, ['resume']);
-  assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /Source: SRC-0001 — SRS\.md/);
-});
-
-test('source list', async () => {
-  const root = await freshWorkspace();
-  await writeSourceFile(root, 'SRS.md', '# SRS\n');
-  intake(root, ['SRS.md']);
-  const result = run(root, ['source', 'list']);
-  assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /Sources: 1/);
-  assert.match(result.stdout, /SRC-0001 \[file\] SRS\.md/);
-  assert.match(result.stdout, /linked: PF-0001/);
-});
-
-test('source show', async () => {
-  const root = await freshWorkspace();
-  await writeSourceFile(root, 'SRS.md', '# SRS\n');
-  intake(root, ['SRS.md']);
-  const result = run(root, ['source', 'show', 'SRC-0001']);
-  assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /^SRC-0001/);
-  assert.match(result.stdout, /Type: file/);
-  assert.match(result.stdout, /Name: SRS\.md/);
-  assert.match(result.stdout, /Content type: text\/markdown/);
-  assert.match(result.stdout, /Checksum: sha256:[a-f0-9]{64}/);
-  assert.match(result.stdout, /Location: \.yallaflow\/sources\/SRC-0001\/SRS\.md/);
-  assert.match(result.stdout, /Linked work: PF-0001/);
-  assert.doesNotMatch(result.stdout, /# SRS/);
-
-  const withContent = run(root, ['source', 'show', 'SRC-0001', '--content']);
-  assert.equal(withContent.status, 0, withContent.stderr);
-  assert.match(withContent.stdout, /# SRS/);
-});
-
-test('existing text start still works', async () => {
-  const root = await freshWorkspace();
-  const result = run(root, ['start', 'Production upload returns 500']);
-  assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /Raw request: Production upload returns 500/);
-  const meta = await readYaml(path.join(workspacePath(root), 'work', 'PF-0001', 'meta.yaml'));
-  assert.equal(meta.rawRequest, 'Production upload returns 500');
-  assert.equal(meta.sources, undefined);
-});
-
-test('old workspace without sources/ loads', async () => {
-  const root = await freshWorkspace();
-  assert.equal(await exists(path.join(workspacePath(root), 'sources')), false);
-  const sources = await listSources(root);
-  assert.deepEqual(sources, []);
-  const doctor = run(root, ['doctor']);
-  assert.equal(doctor.status, 0, doctor.stderr);
-  assert.match(doctor.stdout, /PASS sources \(0 present\)/);
-});
-
-test('read-only commands do not create sources/', async () => {
-  const root = await freshWorkspace();
-  for (const args of [['source', 'list'], ['status'], ['doctor']]) {
-    const result = run(root, args);
-    assert.equal(result.status, 0, result.stderr);
-  }
-  assert.equal(await exists(path.join(workspacePath(root), 'sources')), false);
-});
-
-test('failed intake leaves no partial work or source', async () => {
-  const root = await freshWorkspace();
-  await writeSourceFile(root, 'bad.pdf', 'not really a pdf');
-  const result = intake(root, ['bad.pdf']);
-  assert.equal(result.status, 1);
-  assert.equal(await exists(path.join(workspacePath(root), 'sources')), false);
-  const workDir = path.join(workspacePath(root), 'work');
-  const { readdir } = await import('node:fs/promises');
-  assert.deepEqual(await readdir(workDir), []);
-});
-
-test('large multiline SRS remains exact', async () => {
-  const root = await freshWorkspace();
-  const lines = [];
-  for (let i = 1; i <= 500; i++) lines.push(`Line ${i}: some requirement detail with unicode — é, 中文, emoji 🚀.`);
-  const content = `# Contract Management System\n\n${lines.join('\n')}\n`;
-  await writeSourceFile(root, 'SRS.md', content);
-  intake(root, ['SRS.md']);
-  const source = await loadSource(root, 'SRC-0001');
-  assert.equal(source.rawText, content);
-  assert.equal(source.metadata.sizeBytes, Buffer.byteLength(content, 'utf8'));
-  const copied = await readFile(path.join(workspacePath(root), 'sources', 'SRC-0001', 'SRS.md'), 'utf8');
-  assert.equal(copied, content);
-});
-
-test('source path traversal attempts are rejected', async () => {
+test('path traversal attempts are rejected at the validation boundary', async () => {
   assert.throws(() => assertSafeSourceName('../../etc/passwd'), /Unsafe source name/);
   assert.throws(() => assertSafeSourceName('..'), /Unsafe source name/);
   assert.throws(() => assertSafeSourceName('.'), /Unsafe source name/);
   assert.throws(() => assertSafeSourceName('a/b.md'), /Unsafe source name/);
   assert.throws(() => assertSafeSourceName('a\\b.md'), /Unsafe source name/);
-  assert.doesNotThrow(() => assertSafeSourceName('SRS.md'));
+  assert.doesNotThrow(() => assertSafeSourceName('SRS.docx'));
 
   const root = await freshWorkspace();
   const dir = sourceDirPath(root, 'SRC-0001');
@@ -365,18 +244,250 @@ test('source path traversal attempts are rejected', async () => {
     () => assertWithinDirectory(path.join(dir, '..', '..', 'escaped.md'), dir),
     /Refusing to write outside the source directory/
   );
-  assert.doesNotThrow(() => assertWithinDirectory(path.join(dir, 'SRS.md'), dir));
 });
 
-test('file adapter produces a source-neutral normalized intake contract', async () => {
+test('malicious filename with embedded traversal sequences is sanitized to its basename', async () => {
   const root = await freshWorkspace();
-  const file = await writeSourceFile(root, 'SRS.md', '# SRS\n\nContent.\n');
-  const normalized = await prepareFileIntake(file);
-  assert.equal(normalized.sourceType, 'file');
-  assert.equal(normalized.sourceName, 'SRS.md');
-  assert.equal(normalized.contentType, 'text/markdown');
-  assert.equal(normalized.rawText, '# SRS\n\nContent.\n');
-  assert.ok(normalized.capturedAt);
-  assert.equal(normalized.metadata.extension, '.md');
-  assert.match(normalized.metadata.sha256, /^[a-f0-9]{64}$/);
+  const weirdDir = path.join(root, 'weird..name');
+  await mkdir(weirdDir, { recursive: true });
+  const weirdFile = path.join(weirdDir, 'notes.txt');
+  await writeFile(weirdFile, 'Client notes.');
+  const result = intake(root, [weirdFile]);
+  assert.equal(result.status, 0, result.stderr);
+  const source = await loadSource(root, 'SRC-0001');
+  assert.equal(source.sourceName, 'notes.txt');
+});
+
+test('zero-byte file is rejected', async () => {
+  const root = await freshWorkspace();
+  const result = intake(root, [fixture('empty.txt')]);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /Source file is empty/);
+});
+
+test('oversize source file is rejected with a clear error, never silently truncated', async () => {
+  const root = await freshWorkspace();
+  const bigFile = path.join(root, 'huge.txt');
+  // A sparse file: ftruncate creates a hole file reporting the target size without
+  // actually writing/allocating real bytes, so this stays fast and cheap in CI.
+  const handle = await (await import('node:fs/promises')).open(bigFile, 'w');
+  await handle.truncate(MAX_SOURCE_BYTES + 1024);
+  await handle.close();
+
+  const result = intake(root, [bigFile]);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /exceeds the 200 MB safe size limit/);
+});
+
+test('a file exceeding the extraction limit is preserved as original-only rather than parsed', async () => {
+  const root = await freshWorkspace();
+  const bigDocx = path.join(root, 'huge.docx');
+  // Needs a real zip signature up front so format detection identifies it as
+  // "office" (and therefore subject to the extraction-size gate) rather than as a
+  // signature mismatch, which is a different, already-covered code path.
+  const handle = await (await import('node:fs/promises')).open(bigDocx, 'w');
+  await handle.write(Buffer.from([0x50, 0x4b, 0x03, 0x04]), 0, 4, 0);
+  await handle.truncate(MAX_EXTRACTION_INPUT_BYTES + 1024);
+  await handle.close();
+
+  const result = intake(root, [bigDocx]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /Warning:.*extraction limit/);
+  const source = await loadSource(root, 'SRC-0001');
+  assert.equal(source.contentAvailability, 'original-only');
+  assert.equal(source.metadata.extractionSkipped, 'exceeds-extraction-size-limit');
+});
+
+test('rollback: a persisted source can be removed if the owning work item fails to be created', async () => {
+  const root = await freshWorkspace();
+  const normalized = await prepareFileIntake(fixture('sample.txt'));
+  const source = await persistSource(root, normalized);
+  assert.equal(await exists(sourceDirPath(root, source.id)), true);
+  await removeSourceDir(root, source.id);
+  assert.equal(await exists(sourceDirPath(root, source.id)), false);
+});
+
+test('duplicate intake does not overwrite; checksum match is reported', async () => {
+  const root = await freshWorkspace();
+  const dupPath = path.join(root, 'duplicate.txt');
+  await copyFile(fixture('sample.txt'), dupPath);
+  const first = intake(root, [fixture('sample.txt')]);
+  assert.match(first.stdout, /Source captured: SRC-0001/);
+  const second = intake(root, [dupPath]);
+  assert.match(second.stdout, /This file matches existing source SRC-0001\./);
+  assert.match(second.stdout, /Source captured: SRC-0002/);
+  const sources = await listSources(root);
+  assert.deepEqual(sources.map((s) => s.id), ['SRC-0001', 'SRC-0002']);
+});
+
+test('restart preserves source relationship and checksum', async () => {
+  const root = await freshWorkspace();
+  intake(root, [fixture('sample.docx')]);
+  const meta = await metaOf(root, 'PF-0001');
+  assert.equal(meta.sources[0].id, 'SRC-0001');
+  assert.equal(meta.sources[0].detectedFormat, 'docx');
+  assert.equal(meta.sources[0].contentAvailability, 'extracted');
+  const reloaded = await loadSource(root, 'SRC-0001');
+  const expected = createHash('sha256').update(await readFile(fixture('sample.docx'))).digest('hex');
+  assert.equal(reloaded.original.sha256, expected);
+  assert.deepEqual(reloaded.linkedWork, ['PF-0001']);
+});
+
+// ---------------------------------------------------------------------------
+// Multiple sources
+// ---------------------------------------------------------------------------
+
+test('intake accepts multiple files at once, creating one work item with several sources', async () => {
+  const root = await freshWorkspace();
+  const result = intake(root, [fixture('sample.docx'), fixture('sample.xlsx'), '--title', 'Contract Hub']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /Sources captured: SRC-0001, SRC-0002/);
+  const meta = await metaOf(root, 'PF-0001');
+  assert.equal(meta.sources.length, 2);
+  assert.equal(meta.titleHint, 'Contract Hub');
+});
+
+test('intake add attaches an additional source to an existing work item', async () => {
+  const root = await freshWorkspace();
+  intake(root, [fixture('sample.docx')]);
+  const result = run(root, ['intake', 'add', 'PF-0001', fixture('sample.xlsx')]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /Attached to: PF-0001/);
+  assert.match(result.stdout, /Total sources on PF-0001: 2/);
+  const meta = await metaOf(root, 'PF-0001');
+  assert.equal(meta.sources.length, 2);
+  assert.equal(meta.sources[1].name, 'sample.xlsx');
+  const source2 = await loadSource(root, 'SRC-0002');
+  assert.deepEqual(source2.linkedWork, ['PF-0001']);
+});
+
+test('intake add works after the work item has been routed', async () => {
+  const root = await freshWorkspace();
+  intake(root, [fixture('sample.docx')]);
+  run(root, ['route', 'PF-0001', '--type', 'feature', '--scope', 'architectural', '--confidence', 'high', '--reason', 'Multi-source SRS.']);
+  const result = run(root, ['intake', 'add', 'PF-0001', fixture('sample.xlsx')]);
+  assert.equal(result.status, 0, result.stderr);
+  const resume = run(root, ['resume']);
+  assert.match(resume.stdout, /SRC-0001/);
+  assert.match(resume.stdout, /SRC-0002/);
+});
+
+// ---------------------------------------------------------------------------
+// source list / show
+// ---------------------------------------------------------------------------
+
+test('source list shows format and content availability', async () => {
+  const root = await freshWorkspace();
+  intake(root, [fixture('sample.docx')]);
+  const result = run(root, ['source', 'list']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /SRC-0001 \[DOCX\] sample\.docx — extracted text available/);
+});
+
+test('source show --content explains when no text representation exists', async () => {
+  const root = await freshWorkspace();
+  intake(root, [fixture('sample.png')]);
+  const result = run(root, ['source', 'show', 'SRC-0001', '--content']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /No text representation is available/);
+});
+
+test('source show --content prints extracted text for office documents', async () => {
+  const root = await freshWorkspace();
+  intake(root, [fixture('sample.docx')]);
+  const result = run(root, ['source', 'show', 'SRC-0001', '--content']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /Contract creation/);
+});
+
+// ---------------------------------------------------------------------------
+// guide / resume expose source quality
+// ---------------------------------------------------------------------------
+
+test('guide and resume expose format and content availability', async () => {
+  const root = await freshWorkspace();
+  intake(root, [fixture('sample.docx')]);
+  const guide = run(root, ['guide', 'PF-0001']);
+  assert.equal(guide.status, 0, guide.stderr);
+  assert.match(guide.stdout, /DOCX, extracted text available/);
+  const resume = run(root, ['resume']);
+  assert.equal(resume.status, 0, resume.stderr);
+  assert.match(resume.stdout, /DOCX, extracted text available/);
+});
+
+// ---------------------------------------------------------------------------
+// Legacy compatibility
+// ---------------------------------------------------------------------------
+
+test('legacy (schemaVersion 1) sources remain readable without migration', async () => {
+  const root = await freshWorkspace();
+  const dir = path.join(workspacePath(root), 'sources', 'SRC-0001');
+  await mkdir(dir, { recursive: true });
+  await writeFile(path.join(dir, 'SRS.md'), '# Legacy source\n', 'utf8');
+  const legacyRecord = {
+    schemaVersion: 1,
+    id: 'SRC-0001',
+    sourceType: 'file',
+    sourceName: 'SRS.md',
+    sourceRef: 'sources/SRC-0001/SRS.md',
+    contentType: 'text/markdown',
+    rawText: '# Legacy source\n',
+    capturedAt: '2026-01-01T00:00:00.000Z',
+    metadata: { sizeBytes: 17, sha256: 'a'.repeat(64), extension: '.md' },
+    linkedWork: ['PF-0001']
+  };
+  await writeYaml(path.join(dir, 'source.json'), legacyRecord);
+
+  const loaded = await loadSource(root, 'SRC-0001');
+  assert.equal(loaded.schemaVersion, 1);
+  assert.equal(await loadSourceText(root, loaded), '# Legacy source\n');
+
+  const listResult = run(root, ['source', 'list']);
+  assert.equal(listResult.status, 0, listResult.stderr);
+  assert.match(listResult.stdout, /SRC-0001/);
+
+  const showResult = run(root, ['source', 'show', 'SRC-0001']);
+  assert.equal(showResult.status, 0, showResult.stderr);
+  assert.match(showResult.stdout, /Content: native text/);
+});
+
+test('new sources are always written as the current schema version', async () => {
+  const root = await freshWorkspace();
+  intake(root, [fixture('sample.txt')]);
+  const record = await loadSource(root, 'SRC-0001');
+  assert.equal(record.schemaVersion, SOURCE_SCHEMA_VERSION);
+});
+
+// ---------------------------------------------------------------------------
+// Everything else already proven in the v0.3.1 foundation continues to hold
+// ---------------------------------------------------------------------------
+
+test('existing text start still works, unaffected by universal file intake', async () => {
+  const root = await freshWorkspace();
+  const result = run(root, ['start', 'Production upload returns 500']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /Raw request: Production upload returns 500/);
+  const meta = await metaOf(root, 'PF-0001');
+  assert.equal(meta.rawRequest, 'Production upload returns 500');
+  assert.equal(meta.sources, undefined);
+});
+
+test('old workspace without sources/ loads, and read-only commands never create it', async () => {
+  const root = await freshWorkspace();
+  assert.equal(await exists(path.join(workspacePath(root), 'sources')), false);
+  for (const args of [['source', 'list'], ['status'], ['doctor']]) {
+    const result = run(root, args);
+    assert.equal(result.status, 0, result.stderr);
+  }
+  assert.equal(await exists(path.join(workspacePath(root), 'sources')), false);
+});
+
+test('optional title and no routing inference', async () => {
+  const root = await freshWorkspace();
+  intake(root, [fixture('sample.docx'), '--title', 'Contract Management System']);
+  const pending = await metaOf(root, 'PF-0001');
+  assert.equal(pending.titleHint, 'Contract Management System');
+  assert.equal(pending.type, null);
+  assert.equal(pending.scope, null);
+  assert.equal(pending.routingStatus, 'pending');
 });

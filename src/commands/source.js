@@ -1,5 +1,6 @@
 import { findProjectRoot } from '../core/workspace.js';
-import { listSources, loadSource } from '../core/sources.js';
+import { listSources, loadSource, loadSourceText, sourceChecksum } from '../core/sources.js';
+import { describeContentAvailability } from '../intake/normalize.js';
 
 export async function sourceCommand(action, args = {}) {
   const root = await findProjectRoot();
@@ -11,7 +12,8 @@ export async function sourceCommand(action, args = {}) {
     if (!sources.length) console.log('(no sources captured)');
     for (const record of sources) {
       const linked = record.linkedWork.length ? record.linkedWork.join(', ') : 'none';
-      console.log(`${record.id} [${record.sourceType}] ${record.sourceName} — captured ${record.capturedAt} — linked: ${linked}`);
+      const format = (record.detectedFormat ?? record.metadata.extension.replace('.', '')).toUpperCase();
+      console.log(`${record.id} [${format}] ${record.sourceName} — ${describeContentAvailability(record.contentAvailability ?? 'native-text')} — captured ${record.capturedAt} — linked: ${linked}`);
     }
     return;
   }
@@ -19,18 +21,26 @@ export async function sourceCommand(action, args = {}) {
   if (action === 'show') {
     if (!args.sourceId) throw new Error('Usage: yallaflow source show <source-id> [--content]');
     const record = await loadSource(root, args.sourceId);
+    const legacy = record.schemaVersion === 1;
     console.log(record.id);
     console.log(`Type: ${record.sourceType}`);
     console.log(`Name: ${record.sourceName}`);
+    console.log(`Format: ${(record.detectedFormat ?? record.metadata.extension.replace('.', '')).toUpperCase()}`);
     console.log(`Content type: ${record.contentType}`);
+    console.log(`Content: ${describeContentAvailability(legacy ? 'native-text' : record.contentAvailability)}`);
     console.log(`Captured: ${record.capturedAt}`);
-    console.log(`Checksum: sha256:${record.metadata.sha256}`);
-    console.log(`Size: ${record.metadata.sizeBytes} bytes`);
-    console.log(`Location: .yallaflow/${record.sourceRef}`);
+    console.log(`Checksum: sha256:${sourceChecksum(record)}`);
+    console.log(`Size: ${legacy ? record.metadata.sizeBytes : record.original.sizeBytes} bytes`);
+    console.log(`Location: .yallaflow/${legacy ? record.sourceRef : record.original.path}`);
     console.log(`Linked work: ${record.linkedWork.length ? record.linkedWork.join(', ') : 'none'}`);
     if (args.content) {
-      console.log('\nContent:\n');
-      console.log(record.rawText);
+      const text = await loadSourceText(root, record);
+      if (text === null) {
+        console.log('\nContent:\n\nNo text representation is available for this source. Only the original file was preserved; inspect it directly at the location above.');
+      } else {
+        console.log('\nContent:\n');
+        console.log(text);
+      }
     }
     return;
   }

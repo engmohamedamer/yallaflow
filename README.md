@@ -11,10 +11,10 @@ It gives coding agents persistent project context, structured engineering workfl
 ```bash
 npm install /path/to/yallaflow-<version>.tgz   # or: npm link, from a checkout
 yallaflow init
-yallaflow intake SRS.md                         # or: yallaflow start "<a plain-text request>"
+yallaflow intake SRS.docx                       # or: yallaflow start "<a plain-text request>"
 ```
 
-`yallaflow intake` accepts `.md`, `.txt`, `.json`, `.yaml`, `.yml`, and `.csv` files in this release — not PDF or DOCX. The CLI's own output tells you what to do next; open your coding agent and continue from there.
+`yallaflow intake` accepts one universal command for virtually any requirements document — plain text, Office/OpenDocument files, PDF, and images — never a format-specific command. See [File intake](#file-intake) for the full support matrix. The CLI's own output tells you what to do next; open your coding agent and continue from there.
 
 ## Why
 
@@ -81,23 +81,37 @@ The CLI accepts two intake adapters today: plain text (`yallaflow start "<reques
 ### File intake
 
 ```bash
-yallaflow intake SRS.md
-yallaflow intake SRS.md --title "Contract Management System"
+yallaflow intake SRS.docx
+yallaflow intake SRS.docx --title "Contract Management System"
+yallaflow intake requirements.docx payment-rules.xlsx wireframes.pdf   # multiple sources at once
+yallaflow intake add PF-0001 client-notes.docx                         # attach to existing work later
 ```
 
-`yallaflow intake <file>` reads a local requirements file, copies it byte-for-byte into the workspace, and creates a pending work item pointing at it — without needing to paste the requirement into a prompt. The source file is evidence: it is never silently replaced by generated interpretation, and it stays distinct from any later normalized requirement or specification.
+`yallaflow intake <file>` reads a local requirements document, copies it byte-for-byte into the workspace, and creates a pending work item pointing at it — without needing to paste the requirement into a prompt. The source file is evidence: it is never silently replaced by generated interpretation. Original bytes, any extracted text, the normalized intake record, and any later specification are four distinct artifacts that stay distinct.
 
-Supported file types in this release: `.md`, `.txt`, `.json`, `.yaml`, `.yml`, `.csv`. Anything else (PDF, DOCX, images, OCR) is explicitly rejected with the supported list; YallaFlow does not pretend to extract text from formats it cannot read deterministically.
+One command handles every supported format — never a format-specific command like `yallaflow docx ...`. Format is detected from content (magic bytes), not trusted from the extension alone: a file wrongly named `.docx` is detected as a mismatch and preserved as a generic binary source instead of being parsed as if it were valid.
 
-Each intake gets a unique `SRC-####` ID, is stored under `.yallaflow/sources/<id>/` alongside a `source.json` record (content type, capture timestamp, a SHA-256 checksum, and the work IDs that reference it), and is linked to the work item it created via `meta.sources` (an array — a work item may end up referencing more than one source, even though intake only seeds the first entry today). Re-ingesting the same file never overwrites a prior source — it gets its own new ID, with a warning if the checksum matches an existing one. Inspect captured sources with:
+| Family | Formats | Text extraction |
+| --- | --- | --- |
+| Plain / structured text | `.txt .md .markdown .rst .csv .tsv .json .jsonl .yaml .yml .xml .html .htm .toml .ini .cfg .conf .properties .log .sql` and common source files (`.js .ts .py .java .go .rs .rb .sh` etc., read as plain text — language semantics are never interpreted) | Native (the file already is text) |
+| Office / rich documents | `.docx .pptx .xlsx .rtf .odt .ods .odp` | Yes — `.xlsx`/`.pptx` get real sheet names and per-slide sections; others get paragraph/table text |
+| PDF | `.pdf` | Yes, per page, for text-based PDFs — word order follows the PDF content stream, which is not guaranteed to match visual reading order (most notable for RTL scripts) |
+| Images | `.png .jpg .jpeg .webp .gif .bmp .tif .tiff .svg` | Original source only — **no OCR or vision understanding is performed or claimed** |
+| Other binary | anything else, plus `.odg`/`.epub` (recognized, extraction not yet implemented), plus archives `.zip .tar .gz .7z .rar` (never auto-unpacked) | Original source only |
+
+If extraction fails for a format that normally supports it (a corrupt `.docx`, a malformed `.pdf`) or the file is larger than the extraction size limit, intake does not fail — it preserves the original file, prints a warning, and records why no text is available, rather than pretending extraction succeeded or silently truncating it.
+
+Each intake gets a unique `SRC-####` ID, is stored under `.yallaflow/sources/<id>/` (the original file under its own name, plus `extracted.txt` when text was extracted) alongside a `source.json` record (detected format, content availability, a SHA-256 checksum, and the work IDs that reference it), and is linked to the work item it created via `meta.sources` — always an array, so a work item is never limited to one source. Re-ingesting the same file never overwrites a prior source — it gets its own new ID, with a warning if the checksum matches an existing one. Inspect captured sources with:
 
 ```bash
 yallaflow source list
 yallaflow source show SRC-0001
-yallaflow source show SRC-0001 --content
+yallaflow source show SRC-0001 --content   # native/extracted text, or an explicit "no text representation" note
 ```
 
-An optional `--title` on `intake` (or a plain, mechanical default derived from the filename, e.g. `SRS.md` → `SRS`) becomes the work item's title once routed — YallaFlow never infers a title semantically from the file's content. Routing itself works exactly as it does for text intake: `yallaflow intake` never classifies work type or scope from the file's contents; the agent still routes explicitly with `yallaflow route`.
+An optional `--title` on `intake` (or a plain, mechanical default derived from the filename, e.g. `SRS.docx` → `SRS`) becomes the work item's title once routed — YallaFlow never infers a title semantically from a file's content. Routing itself works exactly as it does for text intake: `yallaflow intake` never classifies work type or scope from a file's contents; the agent still routes explicitly with `yallaflow route`.
+
+Untrusted input is treated as untrusted: no macros, embedded scripts, or OLE objects are ever executed; no external links or content are fetched; archives are never auto-unpacked; and every stored file name is validated to stay inside its own source directory.
 
 ### Discover before ask
 
@@ -170,7 +184,8 @@ See [`docs/architecture.md`](docs/architecture.md) for internal concepts, and it
 ├── sources/                     # created by the first `yallaflow intake <file>`
 │   └── SRC-0001/
 │       ├── source.json
-│       └── SRS.md                # the original file, copied byte-for-byte
+│       ├── SRS.docx               # the original file, copied byte-for-byte
+│       └── extracted.txt          # present only when text was extracted
 ├── decisions/
 ├── releases/
 └── state/
@@ -188,7 +203,8 @@ npm link
 yallaflow init
 yallaflow start
 yallaflow start "Production upload returns 500"
-yallaflow intake SRS.md --title "Contract Management System"
+yallaflow intake SRS.docx --title "Contract Management System"
+yallaflow intake add PF-0001 payment-rules.xlsx
 yallaflow source list
 yallaflow source show SRC-0001
 yallaflow route PF-0001 --type bug --scope bounded --confidence high \
@@ -392,7 +408,7 @@ YallaFlow is an independent implementation informed by ideas seen in projects su
 
 ## Status
 
-**`0.3.0-internal.1` — File Intake Foundation.** Core froze at `0.2.0-internal.1`; this adds the first v0.3 capability, `yallaflow intake <file>`. The npm package remains private and no version has been published to the npm registry; see [`docs/releasing.md`](docs/releasing.md) for the release/versioning policy that will apply once publishing begins, and [`CHANGELOG.md`](CHANGELOG.md) for what has shipped so far. Piloting YallaFlow yourself? See [`docs/internal-pilot.md`](docs/internal-pilot.md).
+**`0.3.0-internal.2` — Universal File Intake.** Core froze at `0.2.0-internal.1`; `0.3.0-internal.1` added file intake for plain-text formats; this closes out the intake architecture with Office/OpenDocument, PDF, and image support behind the same `yallaflow intake <file>` command. The npm package remains private and no version has been published to the npm registry; see [`docs/releasing.md`](docs/releasing.md) for the release/versioning policy that will apply once publishing begins, and [`CHANGELOG.md`](CHANGELOG.md) for what has shipped so far. Piloting YallaFlow yourself? See [`docs/internal-pilot.md`](docs/internal-pilot.md).
 
 See [`docs/roadmap.md`](docs/roadmap.md).
 
