@@ -2,9 +2,15 @@
 
 All notable changes to YallaFlow are documented here. The format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-YallaFlow has not yet made a public npm release (`package.json` remains `"private": true` at version `0.2.0`). Every change below is therefore grouped under **[Unreleased]**, organized by internal development milestone rather than a published version tag. See [`docs/releasing.md`](docs/releasing.md) for the versioning policy that will apply once publishing begins, and [`docs/roadmap.md`](docs/roadmap.md) for planned work.
+YallaFlow has not yet made a public npm release (`package.json` remains `"private": true`). `0.2.0-internal.1` below is an **internal-only prerelease baseline**, git-tagged for a human internal pilot and never published to the npm registry. See [`docs/releasing.md`](docs/releasing.md) for the versioning policy that will apply once a public release begins, and [`docs/roadmap.md`](docs/roadmap.md) for planned work.
 
 ## [Unreleased]
+
+Nothing yet.
+
+## [0.2.0-internal.1] - 2026-09-19 — Internal Pilot Baseline
+
+**Internal prerelease. Not published to npm.** This is the reproducible baseline handed to the human internal pilot after Core froze and passed its standalone engineering dogfood. It brings together: Adaptive Spec-Driven Development with provider-agnostic work-type/scope routing; a versioned Skill Registry and pinned Behavior Contracts; a dedicated `specification` behavior distinct from design and planning; a structured questions ledger for business and architecture decisions; durable skill checkpoints with audited correction history; a delivery-readiness model (`SPEC_READY` / `PLAN_READY` / `DONE`) kept independent of workflow stage; verification gates; `resume`; knowledge promotion and ADRs; and backward-compatible handling of every earlier workspace shape (v0.1 through v0.2.5). Milestone-level detail below.
 
 ### v0.2.6 — Core Freeze & Release Readiness
 

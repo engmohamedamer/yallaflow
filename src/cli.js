@@ -42,7 +42,7 @@ function parseOptions(args, allowed) {
 async function main() {
   const [command, ...rest] = process.argv.slice(2);
   if (!command || command === '--help' || command === '-h') return help();
-  if (command === '--version' || command === '-v') return console.log('0.2.0');
+  if (command === '--version' || command === '-v') return console.log('0.2.0-internal.1');
 
   if (command === 'init') {
     const { values } = parseOptions(rest, { name: { type: 'string' }, type: { type: 'string' } });

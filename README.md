@@ -354,7 +354,7 @@ YallaFlow is an independent implementation informed by ideas seen in projects su
 
 ## Status
 
-**Internal milestone v0.2.6 — Core Freeze & Release Readiness.** Core has passed its standalone greenfield dogfood and is accepted as ready for v0.3 integrations work; this milestone froze runtime behavior and synchronized documentation with it. The npm package remains private at version `0.2.0`; see [`docs/releasing.md`](docs/releasing.md) for the release/versioning policy that will apply once publishing begins, and [`CHANGELOG.md`](CHANGELOG.md) for what has shipped so far.
+**`0.2.0-internal.1` — Internal Pilot Baseline.** Core has passed its standalone greenfield dogfood and Core freeze, and is now in a human internal pilot. The npm package remains private and this baseline has not been published to the npm registry; see [`docs/releasing.md`](docs/releasing.md) for the release/versioning policy that will apply once publishing begins, and [`CHANGELOG.md`](CHANGELOG.md) for what has shipped so far. Piloting YallaFlow yourself? See [`docs/internal-pilot.md`](docs/internal-pilot.md).
 
 See [`docs/roadmap.md`](docs/roadmap.md).
 
