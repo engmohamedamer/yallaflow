@@ -7,6 +7,7 @@ import { loadWorkProgress } from '../core/progress.js';
 import { isKnowledgeReviewRelevant, isKnowledgeReviewStage, loadWorkKnowledge, summarizeKnowledge } from '../knowledge/store.js';
 import { evaluateReadiness } from '../behavior/readiness.js';
 import { loadWorkQuestions } from '../questions/store.js';
+import { formatSourceList } from '../intake/normalize.js';
 
 export async function guideCommand(requestedWorkId) {
   const root = await findProjectRoot();
@@ -19,8 +20,11 @@ export async function guideCommand(requestedWorkId) {
   const meta = await readYaml(metaFile);
   if (meta.routingStatus === 'pending') {
     console.log(`${meta.id} — ${meta.rawRequest}`);
+    if (meta.sources?.length) console.log(`\nSource:\n${formatSourceList(meta.sources)}`);
     console.log('\nRouting: pending');
-    console.log('Next engineering objective: Classify work type and scope with `yallaflow route`.');
+    console.log(meta.sources?.length
+      ? 'Next engineering objective: Review the source and classify work type and scope with `yallaflow route`.'
+      : 'Next engineering objective: Classify work type and scope with `yallaflow route`.');
     return;
   }
 
@@ -33,6 +37,7 @@ export async function guideCommand(requestedWorkId) {
   const knowledgeSummary = summarizeKnowledge(knowledge.ledger);
   const knowledgeRelevant = isKnowledgeReviewRelevant(meta, stage, knowledge, readiness);
   console.log(`${meta.id} — ${meta.title ?? `${capitalize(meta.type)} work`}`);
+  if (meta.sources?.length) console.log(`\nSource: ${formatSourceList(meta.sources)}`);
   console.log(`\nType: ${meta.type}`);
   console.log(`Scope: ${meta.scope ?? meta.complexity ?? 'unspecified'}`);
   console.log(`Workflow: ${result.workflow}`);

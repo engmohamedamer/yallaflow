@@ -9,7 +9,7 @@ test('exposes the YallaFlow product and CLI identity', async () => {
   assert.equal(pkg.private, true);
   assert.equal(pkg.description, 'Adaptive Spec-Driven Development workflows for AI-assisted software engineering.');
   assert.deepEqual(pkg.bin, { yallaflow: 'src/cli.js' });
-  assert.equal(pkg.version, '0.2.0-internal.1');
+  assert.equal(pkg.version, '0.3.0-internal.1');
 
   const result = spawnSync(process.execPath, ['src/cli.js', '--help'], { encoding: 'utf8' });
   assert.equal(result.status, 0);
@@ -17,6 +17,8 @@ test('exposes the YallaFlow product and CLI identity', async () => {
   assert.match(result.stdout, /Give AI your project, not just your prompt\./);
   assert.match(result.stdout, /yallaflow init/);
   assert.match(result.stdout, /yallaflow start \[request\]/);
+  assert.match(result.stdout, /yallaflow intake <file> \[--title TITLE\]/);
+  assert.match(result.stdout, /yallaflow source --help/);
   assert.match(result.stdout, /yallaflow route <work-id>/);
   assert.match(result.stdout, /yallaflow guide \[work-id\]/);
   assert.match(result.stdout, /yallaflow ready \[work-id\]/);
@@ -42,4 +44,9 @@ test('namespace help is concise and discoverable', () => {
   assert.equal(knowledge.status, 0, knowledge.stderr);
   assert.match(knowledge.stdout, /yallaflow knowledge propose \[work-id\]/);
   assert.match(knowledge.stdout, /--source design-spec\|implementation-runtime/);
+
+  const source = spawnSync(process.execPath, ['src/cli.js', 'source', '--help'], { encoding: 'utf8' });
+  assert.equal(source.status, 0, source.stderr);
+  assert.match(source.stdout, /yallaflow source list/);
+  assert.match(source.stdout, /yallaflow source show <source-id> \[--content\]/);
 });

@@ -6,6 +6,7 @@ import { validateSkillRegistry } from '../skills/validation.js';
 import { loadWorkProgress } from '../core/progress.js';
 import { loadWorkKnowledge } from '../knowledge/store.js';
 import { loadWorkQuestions } from '../questions/store.js';
+import { listSources } from '../core/sources.js';
 
 export async function doctorCommand() {
   const root = await findProjectRoot();
@@ -40,6 +41,13 @@ export async function doctorCommand() {
     checks.push([`work question ledgers: ${error instanceof Error ? error.message : String(error)}`, false]);
   }
   checks.push(['schema parsing', parseOk]);
+
+  try {
+    const sources = await listSources(root);
+    checks.push([`sources (${sources.length} present)`, true]);
+  } catch (error) {
+    checks.push([`sources: ${error instanceof Error ? error.message : String(error)}`, false]);
+  }
 
   try {
     const registry = await validateSkillRegistry();

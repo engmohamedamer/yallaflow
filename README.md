@@ -6,6 +6,16 @@
 
 It gives coding agents persistent project context, structured engineering workflows, explicit behavior contracts, verification gates, and resumable work. YallaFlow does not assume every request is a feature or that every change needs a full specification. It first understands the project and the work, then applies the appropriate depth of discovery, clarification, design, planning, implementation, and verification.
 
+## Getting started
+
+```bash
+npm install /path/to/yallaflow-<version>.tgz   # or: npm link, from a checkout
+yallaflow init
+yallaflow intake SRS.md                         # or: yallaflow start "<a plain-text request>"
+```
+
+`yallaflow intake` accepts `.md`, `.txt`, `.json`, `.yaml`, `.yml`, and `.csv` files in this release — not PDF or DOCX. The CLI's own output tells you what to do next; open your coding agent and continue from there.
+
 ## Why
 
 Coding agents are good at a task. Software projects live much longer than a task.
@@ -66,7 +76,28 @@ Implementation / Verification
 Durable Project Knowledge
 ```
 
-Today, the CLI accepts plain-text intake and preserves it in a work item. The architecture can support future adapters for WhatsApp notes, meeting or phone-call notes, Azure Boards, Jira, GitHub Issues, email, and Word/PDF documents; those adapters are not implemented yet.
+The CLI accepts two intake adapters today: plain text (`yallaflow start "<request>"`) and local files (`yallaflow intake <file>`). The architecture can support future adapters for trackers (Azure Boards, Jira, GitHub Issues), messages, meeting/phone notes, and email; those adapters are not implemented yet.
+
+### File intake
+
+```bash
+yallaflow intake SRS.md
+yallaflow intake SRS.md --title "Contract Management System"
+```
+
+`yallaflow intake <file>` reads a local requirements file, copies it byte-for-byte into the workspace, and creates a pending work item pointing at it — without needing to paste the requirement into a prompt. The source file is evidence: it is never silently replaced by generated interpretation, and it stays distinct from any later normalized requirement or specification.
+
+Supported file types in this release: `.md`, `.txt`, `.json`, `.yaml`, `.yml`, `.csv`. Anything else (PDF, DOCX, images, OCR) is explicitly rejected with the supported list; YallaFlow does not pretend to extract text from formats it cannot read deterministically.
+
+Each intake gets a unique `SRC-####` ID, is stored under `.yallaflow/sources/<id>/` alongside a `source.json` record (content type, capture timestamp, a SHA-256 checksum, and the work IDs that reference it), and is linked to the work item it created via `meta.sources` (an array — a work item may end up referencing more than one source, even though intake only seeds the first entry today). Re-ingesting the same file never overwrites a prior source — it gets its own new ID, with a warning if the checksum matches an existing one. Inspect captured sources with:
+
+```bash
+yallaflow source list
+yallaflow source show SRC-0001
+yallaflow source show SRC-0001 --content
+```
+
+An optional `--title` on `intake` (or a plain, mechanical default derived from the filename, e.g. `SRS.md` → `SRS`) becomes the work item's title once routed — YallaFlow never infers a title semantically from the file's content. Routing itself works exactly as it does for text intake: `yallaflow intake` never classifies work type or scope from the file's contents; the agent still routes explicitly with `yallaflow route`.
 
 ### Discover before ask
 
@@ -106,7 +137,7 @@ Project Context ┘        │               │                │
                          └─ Feature / Bug / Investigation / Change / Refactor / Release
 ```
 
-See [`docs/architecture.md`](docs/architecture.md) for internal concepts, and its [core domain terminology](docs/architecture.md#core-domain-terminology) for the canonical definition of every term used below (Work Type, Scope, Workflow, Stage, Capability, Skill, Behavior Contract, Checkpoint, Readiness, Question, Ruling, ADR, Knowledge Candidate, Project Knowledge).
+See [`docs/architecture.md`](docs/architecture.md) for internal concepts, and its [core domain terminology](docs/architecture.md#core-domain-terminology) for the canonical definition of every term used below (Work Type, Scope, Workflow, Stage, Capability, Skill, Behavior Contract, Checkpoint, Readiness, Question, Ruling, ADR, Knowledge Candidate, Project Knowledge, Source).
 
 ## Workspace
 
@@ -136,6 +167,10 @@ See [`docs/architecture.md`](docs/architecture.md) for internal concepts, and it
 │       ├── attachments/
 │       ├── evidence/
 │       └── execution/
+├── sources/                     # created by the first `yallaflow intake <file>`
+│   └── SRC-0001/
+│       ├── source.json
+│       └── SRS.md                # the original file, copied byte-for-byte
 ├── decisions/
 ├── releases/
 └── state/
@@ -153,6 +188,9 @@ npm link
 yallaflow init
 yallaflow start
 yallaflow start "Production upload returns 500"
+yallaflow intake SRS.md --title "Contract Management System"
+yallaflow source list
+yallaflow source show SRC-0001
 yallaflow route PF-0001 --type bug --scope bounded --confidence high \
   --reason "Existing upload flow returns an unexpected 500 response." \
   --title "Upload 500 on production"
@@ -354,7 +392,7 @@ YallaFlow is an independent implementation informed by ideas seen in projects su
 
 ## Status
 
-**`0.2.0-internal.1` — Internal Pilot Baseline.** Core has passed its standalone greenfield dogfood and Core freeze, and is now in a human internal pilot. The npm package remains private and this baseline has not been published to the npm registry; see [`docs/releasing.md`](docs/releasing.md) for the release/versioning policy that will apply once publishing begins, and [`CHANGELOG.md`](CHANGELOG.md) for what has shipped so far. Piloting YallaFlow yourself? See [`docs/internal-pilot.md`](docs/internal-pilot.md).
+**`0.3.0-internal.1` — File Intake Foundation.** Core froze at `0.2.0-internal.1`; this adds the first v0.3 capability, `yallaflow intake <file>`. The npm package remains private and no version has been published to the npm registry; see [`docs/releasing.md`](docs/releasing.md) for the release/versioning policy that will apply once publishing begins, and [`CHANGELOG.md`](CHANGELOG.md) for what has shipped so far. Piloting YallaFlow yourself? See [`docs/internal-pilot.md`](docs/internal-pilot.md).
 
 See [`docs/roadmap.md`](docs/roadmap.md).
 

@@ -17,7 +17,29 @@ Raw Requirement
 → Durable Project Knowledge
 ```
 
-Plain-text intake and explicit project-knowledge promotion are implemented. External requirement-source adapters and automatic semantic extraction remain future architecture (see [`roadmap.md`](roadmap.md)).
+Plain-text and file intake, and explicit project-knowledge promotion, are implemented. Tracker/message/email requirement-source adapters and automatic semantic extraction remain future architecture (see [`roadmap.md`](roadmap.md)).
+
+### Intake adapters
+
+```text
+Source
+→ Intake Adapter
+→ Normalized Intake Contract
+→ Workspace Source Storage
+→ Pending Work Item
+```
+
+An **Intake Adapter** turns one kind of source into the same provider/source-neutral **Normalized Intake Contract** — `{ sourceType, sourceName, contentType, rawText, capturedAt, metadata }` — without knowing anything about workspace storage or routing. `src/intake/file.js` is the first adapter (`sourceType: 'file'`); a future tracker or message adapter would sit beside it and produce the same contract shape. `src/intake/text.js` does not exist as a separate module yet — plain-text intake (`yallaflow start "<request>"`) still writes directly into a work item's `rawRequest`, unchanged since v0.1, and is not required to route through the adapter boundary to remain valid (see [Compatibility](#file-intake-compatibility) below).
+
+Workspace storage (`src/core/sources.js`) is a separate step that only runs after an adapter produces a normalized contract: it allocates a stable `SRC-####` ID (scanning `.yallaflow/sources/` the same way work IDs scan `.yallaflow/work/`, and never creating that directory merely to compute the next ID), copies the original bytes byte-for-byte, and writes a validated `source.json` record. A work item is then created exactly like a pending text intake, with an added `sources: [{ id, type, name }]` reference — an array, so a work item is never structurally limited to exactly one source even though intake only ever seeds the first entry — the same routing contract applies from there onward; **intake never infers a work type, scope, or title from a file's contents.**
+
+The source file is evidence. Original Source (the copied file), Normalized Requirement (`source.json`'s `rawText`, currently identical to the file for supported text formats), and Specification (produced later, by the `specification` skill) are three distinct artifacts that may exist independently — file intake never silently collapses one into another.
+
+Supported file types are deliberately narrow in this release — `.md`, `.txt`, `.json`, `.yaml`, `.yml`, `.csv` — anything requiring extraction (PDF, DOCX, images, OCR) is rejected with a clear, literal list of what is supported; it is never pretended to work. Each source also records a SHA-256 checksum for traceability and accidental-change detection (not semantic identity), and re-ingesting identical content never overwrites a prior source — it gets a new ID, with only a checksum-match warning.
+
+#### File intake compatibility
+
+`createPendingIntake(root, rawRequest, options)` grew a third, optional `options.source` (the single source ref the caller has at creation time) / `options.titleHint` — existing two-argument callers (`yallaflow start`, and the majority of the test suite) are unaffected. Internally it is stored as `meta.sources` (an array of one). A pending or routed work item without a `sources` field is exactly the pre-v0.3 shape; `guide`, `resume`, and `status` show a `Source:` line only when one is present. Nothing under `.yallaflow/sources/` is created merely by reading a workspace — not `doctor`, not `source list`, not `guide`/`resume`/`status` — only `yallaflow intake` creates it, lazily, on first use; older workspaces without it remain fully valid with zero sources.
 
 ### Architectural-feature lifecycle
 
@@ -261,6 +283,7 @@ This is the canonical reference for YallaFlow's domain vocabulary. Other documen
 | **ADR** | An Architecture Decision Record: a long-lived architectural decision document under `decisions/`, optionally seeded from a ruling. |
 | **Knowledge Candidate** | An agent-proposed, work-scoped, stable fact or decision recorded in `knowledge.yaml`, pending promotion or rejection. |
 | **Project Knowledge** | Durable project context under `context/*.md` or `decisions/*.md`, produced only by promoting a reviewed Knowledge Candidate. |
+| **Source** | A captured, evidence-preserving intake artifact (`SRC-####`) recorded in `.yallaflow/sources/`, with its original bytes copied byte-for-byte, a normalized `rawText`, and a checksum. Linked to, but distinct from, the work item(s) it created. |
 
 ## Architecture freeze entering v0.3
 

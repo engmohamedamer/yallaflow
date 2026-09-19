@@ -2,6 +2,7 @@ import { findProjectRoot, getCurrentState, listWork } from '../core/workspace.js
 import { loadWorkProgress } from '../core/progress.js';
 import { buildBehaviorGuidance } from '../behavior/guidance.js';
 import { loadWorkReadiness } from '../behavior/readiness.js';
+import { formatSourceList } from '../intake/normalize.js';
 
 export async function statusCommand() {
   const root = await findProjectRoot();
@@ -14,7 +15,8 @@ export async function statusCommand() {
     if (item.routingStatus === 'pending') {
       console.log(`\n${item.id}`);
       console.log('Routing: pending');
-      console.log(`Raw request: ${item.rawRequest}`);
+      if (item.sources?.length) console.log(`Source: ${formatSourceList(item.sources)}`);
+      else console.log(`Raw request: ${item.rawRequest}`);
       console.log('Next: classify work type and scope');
       continue;
     }
@@ -25,6 +27,7 @@ export async function statusCommand() {
       const readiness = await loadWorkReadiness(root, { ...item, status: stage });
       console.log(`\n${item.id} — ${item.title ?? `${capitalize(item.type)} work`}`);
       console.log(`${item.type} / ${item.scope}`);
+      if (item.sources?.length) console.log(`Source: ${formatSourceList(item.sources)}`);
       console.log(`Stage: ${stage}`);
       console.log(`Behavior: ${guidance.progress.completedCount}/${guidance.progress.totalCount} completed`);
       console.log(`Current skill: ${guidance.progress.current?.skillId ?? 'none'}`);

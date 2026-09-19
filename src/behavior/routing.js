@@ -43,10 +43,15 @@ export function validateRoutingDecision(input) {
   };
 }
 
-export async function createPendingIntake(root, rawRequest) {
+export async function createPendingIntake(root, rawRequest, options = {}) {
   if (typeof rawRequest !== 'string' || !rawRequest.trim()) {
     throw new Error('A non-empty raw request is required.');
   }
+  // A work item may reference more than one source over time (a future
+  // `intake add` could attach client-notes.txt alongside SRS.md); `sources` is
+  // therefore always an array, even though intake only ever seeds the first entry.
+  const source = options.source !== undefined ? validateSourceRef(options.source) : undefined;
+  const titleHint = options.titleHint !== undefined ? normalizeTitleHint(options.titleHint) : undefined;
 
   const id = await nextWorkId(root);
   const now = new Date().toISOString();
@@ -58,6 +63,8 @@ export async function createPendingIntake(root, rawRequest) {
     rawRequest,
     status: null,
     readOnly: true,
+    ...(source ? { sources: [source] } : {}),
+    ...(titleHint ? { titleHint } : {}),
     knowledgePolicy: {
       version: KNOWLEDGE_POLICY_VERSION,
       reviewRequired: true
@@ -98,7 +105,7 @@ export async function routeWorkItem(root, workId, input) {
     registryVersion: REGISTRY_VERSION,
     skills: resolveSkills(policy.requiredCapabilities)
   };
-  const title = decision.title ?? `${capitalize(decision.work_type)} work`;
+  const title = decision.title ?? meta.titleHint ?? `${capitalize(decision.work_type)} work`;
   Object.assign(meta, {
     title,
     type: decision.work_type,
@@ -130,7 +137,28 @@ export async function routeWorkItem(root, workId, input) {
 }
 
 function pendingWorkTemplate(meta) {
-  return `# ${meta.id} — Pending Intake\n\n## Raw Request\n\n${meta.rawRequest}\n\n## Routing\n\n**Status:** pending\n\nThe coding agent must classify this request using the YallaFlow routing contract.\n`;
+  const intakeSection = meta.sources?.length
+    ? `## Sources\n\n${meta.sources.map((source) => `**Source ID:** ${source.id}\n**Type:** ${source.type}\n**Name:** ${source.name}\n\nRaw source preserved in: \`.yallaflow/sources/${source.id}/${source.name}\`. Read it directly; it is not duplicated here.`).join('\n\n')}\n`
+    : `## Raw Request\n\n${meta.rawRequest}\n`;
+  return `# ${meta.id} — Pending Intake\n\n${intakeSection}\n## Routing\n\n**Status:** pending\n\nThe coding agent must classify this request using the YallaFlow routing contract.\n`;
+}
+
+function validateSourceRef(source) {
+  if (!source || typeof source !== 'object' || Array.isArray(source)) throw new Error('source must be an object.');
+  const { id, type, name } = source;
+  if (!isNonEmptyString(id) || !isNonEmptyString(type) || !isNonEmptyString(name)) {
+    throw new Error('source requires non-empty id, type, and name.');
+  }
+  return { id, type, name };
+}
+
+function normalizeTitleHint(value) {
+  if (!isNonEmptyString(value)) throw new Error('titleHint must be a non-empty string when supplied.');
+  return value.trim();
+}
+
+function isNonEmptyString(value) {
+  return typeof value === 'string' && value.trim().length > 0;
 }
 
 function routedWorkAppendix(meta) {

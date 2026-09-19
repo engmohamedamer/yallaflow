@@ -4,7 +4,7 @@ YallaFlow applies Adaptive Spec-Driven Development: use the work type and scope 
 
 On session start, load `.yallaflow/AGENT.md`. If `.yallaflow/state/current.yaml` has active work, prefer `yallaflow resume` semantics. Route natural language into the supported workflow before editing code. Discover technical facts from the project; ask only about material business ambiguity or unavailable information.
 
-For an unclassified request, create an intake with `yallaflow start "<request>"`, classify it using the allowed routing contract, then apply the explicit decision with `yallaflow route`. The CLI validates and persists the decision; it does not perform semantic inference.
+For an unclassified request, create an intake with `yallaflow start "<request>"` or, if the user already has a requirements file, `yallaflow intake <file>` (`.md`, `.txt`, `.json`, `.yaml`, `.yml`, `.csv`); either preserves the original request/file and creates a pending work item. Classify it using the allowed routing contract, then apply the explicit decision with `yallaflow route`. The CLI validates and persists the decision; it does not perform semantic inference, and never routes from a file's contents on its own.
 
 Before engineering work, run `yallaflow guide [work-id]`. Follow the pinned skill order and retrieve exact package-owned instructions with `yallaflow skill <skill-id>`. Guidance reports whether the current workflow stage authorizes application-code modification.
 

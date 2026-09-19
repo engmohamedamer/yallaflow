@@ -44,16 +44,23 @@ YallaFlow applies Adaptive Spec-Driven Development: workflow depth follows the k
 
 ## v0.3 — Real-World Intake & Agent Integration
 
-Planned themes (not yet implemented):
+### v0.3.1 — File Intake Foundation
 
-- **Intake Adapter interface** — a common contract multiple requirement sources implement, so YallaFlow's routing/work engine stays adapter-agnostic
-- **Raw-source preservation** — every adapter preserves the exact original content it ingested, the same guarantee plain-text `yallaflow start` already gives
-- **File/text intake** — ingest local files and pasted documents as a work item's raw source
+- Intake Adapter boundary (`src/intake/`): Source → Intake Adapter → Normalized Intake Contract, kept separate from workspace storage and from routing
+- File intake: `yallaflow intake <file>` for `.md`, `.txt`, `.json`, `.yaml`, `.yml`, `.csv`; a clear, literal rejection (not a silent guess) for anything else
+- Workspace source storage (`.yallaflow/sources/SRC-####/`): byte-for-byte original file preserved, a validated `source.json` record (content type, capture timestamp, SHA-256 checksum, linked work IDs), never overwritten on re-ingestion
+- `sources: [{ id, type, name }]` linkage on the created work item (an array, not locked to exactly one source); `guide`/`resume`/`status` show it; `yallaflow source list` / `yallaflow source show [--content]` for inspection
+- Optional `--title` on `intake` (or a mechanical filename-derived default) flows into the work item's title once routed, without YallaFlow ever inferring a title or routing decision from the file's contents
+- Full backward compatibility: `yallaflow start "<text>"` unchanged; workspaces without `sources/` remain valid; no read ever creates `sources/`
+
+### Still planned (not yet implemented)
+
 - **Tracker intake** — Azure DevOps, Jira, and GitHub Issues as requirement sources, with attachments and source traceability back to the originating ticket
 - **Codex adapter** and **Claude adapter** — first-party agent adapters/plugins building on `resources/agents/codex/` and `resources/agents/claude/`
 - **Agent bootstrap/session guidance** — a deterministic session-start sequence so a cold agent session reliably loads `.yallaflow/AGENT.md` and calls `yallaflow resume` before acting
 - Git worktree safety and baseline verification for multi-source/multi-agent execution
 - Future semantic deduplication and optional assisted knowledge extraction (still explicitly agent-proposed, not inferred by YallaFlow)
+- `yallaflow intake add PF-0001 <file>` — attaching an additional source to an existing work item (the schema already supports a work item referencing more than one source; only the CLI verb is missing)
 
 ## v0.4 — Execution
 - Execution contracts

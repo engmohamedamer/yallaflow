@@ -12,6 +12,6 @@ export async function initCommand(options = {}) {
   console.log(`Project kind: ${kind}`);
   console.log(`Workspace: ${path.join(root, '.yallaflow')}`);
   console.log(kind === 'brownfield'
-    ? 'Next: run `yallaflow start`; let the agent deepen repository discovery before asking business-only questions.'
-    : 'Next: run `yallaflow start` and capture purpose, users, constraints, and the first work item.');
+    ? 'Next: run `yallaflow start "<request>"` (or `yallaflow intake <file>` if you already have a requirements file); let the agent deepen repository discovery before asking business-only questions.'
+    : 'Next: run `yallaflow start "<request>"` (or `yallaflow intake <file>` if you already have a requirements file) and capture purpose, users, constraints, and the first work item.');
 }

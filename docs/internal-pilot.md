@@ -1,6 +1,6 @@
 # Internal Pilot
 
-This is the pilot guide for the `0.2.0-internal.1` baseline. It is for humans using YallaFlow on real engineering work, not for the coding agent.
+This is the pilot guide for the internal prerelease baseline. It is for humans using YallaFlow on real engineering work, not for the coding agent.
 
 ## Goal
 
@@ -11,10 +11,18 @@ Use YallaFlow on real engineering work and report friction.
 Use the normal public CLI, exactly as any first-time user would:
 
 ```bash
-npm install /path/to/yallaflow-0.2.0-internal.1.tgz   # or: npm link, from a checkout
+npm install /path/to/yallaflow-<version>.tgz   # or: npm link, from a checkout
 yallaflow init
 yallaflow --help
 ```
+
+If you have an existing requirements file, use it directly instead of retyping it into a prompt:
+
+```bash
+yallaflow intake SRS.md
+```
+
+(supported types this release: `.md`, `.txt`, `.json`, `.yaml`, `.yml`, `.csv` — not PDF or DOCX). Otherwise, start from plain text: `yallaflow start "<a plain-text request>"`.
 
 From there, follow whatever the CLI and its documentation (`README.md`, `yallaflow --help`, `yallaflow <namespace> --help`) tell you to do next. Do not skip ahead using internal engineering notes, prior dogfood transcripts, or this repository's test fixtures as a script — that would test a different, easier path than a real user gets.
 
@@ -48,7 +56,8 @@ polish    — cosmetic, wording, or nice-to-have
 ## What We Are Testing
 
 - first-time setup
-- requirement intake
+- requirement intake (plain text and file)
+- source traceability (`yallaflow source list`/`show`, and whether a fresh agent can find the original file)
 - routing
 - Discover Before Ask
 - clarification
