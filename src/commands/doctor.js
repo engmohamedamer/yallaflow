@@ -1,0 +1,83 @@
+import path from 'node:path';
+import { exists } from '../utils/fs.js';
+import { findProjectRoot, listWork, workspacePath } from '../core/workspace.js';
+import { readYaml } from '../core/yaml.js';
+import { validateSkillRegistry } from '../skills/validation.js';
+import { loadWorkProgress } from '../core/progress.js';
+import { loadWorkKnowledge } from '../knowledge/store.js';
+import { loadWorkQuestions } from '../questions/store.js';
+
+export async function doctorCommand() {
+  const root = await findProjectRoot();
+  if (!root) throw new Error('FAIL No .yallaflow workspace found.');
+  const base = workspacePath(root);
+  const checks = [];
+  for (const relative of [
+    'config.yaml', 'PROJECT.md', 'AGENT.md', 'state/current.yaml',
+    'context/architecture.md', 'context/tech-stack.md', 'context/database.md',
+    'context/integrations.md', 'context/environments.md', 'context/conventions.md', 'context/business-rules.md',
+    'work', 'decisions', 'releases'
+  ]) checks.push([relative, await exists(path.join(base, relative))]);
+
+  let parseOk = true;
+  try {
+    const config = await readYaml(path.join(base, 'config.yaml'));
+    const state = await readYaml(path.join(base, 'state/current.yaml'));
+    parseOk = config.schemaVersion === 1 && state.schemaVersion === 1;
+  } catch {
+    parseOk = false;
+  }
+
+  try {
+    const work = await listWork(root);
+    let ledgerCount = 0;
+    for (const item of work) {
+      const questions = await loadWorkQuestions(root, item);
+      if (questions.exists) ledgerCount += 1;
+    }
+    checks.push([`work question ledgers (${ledgerCount} present)`, true]);
+  } catch (error) {
+    checks.push([`work question ledgers: ${error instanceof Error ? error.message : String(error)}`, false]);
+  }
+  checks.push(['schema parsing', parseOk]);
+
+  try {
+    const registry = await validateSkillRegistry();
+    checks.push([`built-in skill registry v${registry.registryVersion} (${registry.skillCount} skills)`, true]);
+  } catch (error) {
+    checks.push([`built-in skill registry: ${error instanceof Error ? error.message : String(error)}`, false]);
+  }
+
+  try {
+    const work = await listWork(root);
+    let ledgerCount = 0;
+    for (const item of work) {
+      const progress = await loadWorkProgress(root, item);
+      if (progress.exists) ledgerCount += 1;
+    }
+    checks.push([`work progress ledgers (${ledgerCount} present)`, true]);
+  } catch (error) {
+    checks.push([`work progress ledgers: ${error instanceof Error ? error.message : String(error)}`, false]);
+  }
+
+  try {
+    const work = await listWork(root);
+    let ledgerCount = 0;
+    for (const item of work) {
+      const knowledge = await loadWorkKnowledge(root, item);
+      if (knowledge.exists) ledgerCount += 1;
+    }
+    checks.push([`work knowledge ledgers (${ledgerCount} present)`, true]);
+  } catch (error) {
+    checks.push([`work knowledge ledgers: ${error instanceof Error ? error.message : String(error)}`, false]);
+  }
+
+  const failed = checks.filter(([, ok]) => !ok);
+  for (const [name, ok] of checks) console.log(`${ok ? 'PASS' : 'FAIL'} ${name}`);
+  if (failed.length) {
+    process.exitCode = 1;
+    console.log(`\n${failed.length} check(s) failed.`);
+  } else {
+    console.log('\nWorkspace healthy.');
+  }
+}
