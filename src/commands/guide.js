@@ -42,6 +42,7 @@ export async function guideCommand(requestedWorkId) {
   console.log(`Scope: ${meta.scope ?? meta.complexity ?? 'unspecified'}`);
   console.log(`Workflow: ${result.workflow}`);
   console.log(`Stage: ${result.stage ?? 'none'}`);
+  printReopenContext(meta);
   console.log(`Delivery status: ${readiness.deliveryStatus ?? 'NOT_READY'}`);
   console.log(`\nBehavior contract: ${result.contract.label}`);
   if (result.progress.entries.length) {
@@ -85,4 +86,14 @@ function capitalize(value) {
 
 function statusSymbol(status) {
   return { completed: '✓', in_progress: '→', pending: '○', blocked: '!' }[status] ?? '?';
+}
+
+function printReopenContext(meta) {
+  const lastReopen = [...(meta.lifecycleHistory ?? [])].reverse().find((entry) => entry.action === 'reopen');
+  if (!lastReopen || meta.status === 'DONE') return;
+  const priorCompletion = meta.completionHistory?.at(-1);
+  console.log('Status: reopened');
+  if (priorCompletion) console.log(`Previous completion: DONE at ${priorCompletion.completedAt}`);
+  console.log(`Reopened: ${lastReopen.changedAt}`);
+  console.log(`Reopen reason: ${lastReopen.reason}`);
 }

@@ -235,10 +235,12 @@ yallaflow change "Final approval now requires one approved well"
 yallaflow refactor "Extract the payment-log boundary" --scope bounded
 yallaflow release "Cut v1.4.0" --scope bounded
 yallaflow status
-yallaflow resume
+yallaflow resume [PF-0001]               # no ID: active work; an ID: read-only inspection, never changes focus
 yallaflow doctor
 yallaflow advance                       # move through the validated workflow; explains what blocks it
-yallaflow verify -- npm test             # record fresh verification evidence
+yallaflow verify -- npm test             # append fresh verification evidence
+yallaflow verify list PF-0001            # list every recorded verification run
+yallaflow reopen PF-0001 --to implementation --reason "Production defect discovered after completion."
 ```
 
 Existing direct commands remain available for already-classified work. The v0.1 `--complexity` option is accepted as a compatibility input, but new work metadata uses the semantic `scope` field. `--source` is required on `knowledge propose` for any work routed under the current Skill Registry (`design-spec` or `implementation-runtime`; see [Project knowledge promotion](#project-knowledge-promotion)).
@@ -293,7 +295,23 @@ yallaflow checkpoint revise PF-0001 --skill specification --status blocked \
   --reason "Material business decisions remain unresolved."
 ```
 
-`checkpoint revise` accepts only `pending`, `in_progress`, or `blocked` as the corrected status (completion always goes through the normal `--complete` path) and requires a non-empty `--reason`. Every correction appends a `{ skill, from, to, reason, changedAt }` entry to the ledger's history; prior state is never deleted. If the corrected skill gates a stage the work item already advanced past, YallaFlow reconciles the workflow stage backward, so stage and checkpoint state can never silently contradict each other.
+`checkpoint revise` accepts only `pending`, `in_progress`, or `blocked` as the corrected status (completion always goes through the normal `--complete` path) and requires a non-empty `--reason`. Every correction appends a `{ skill, from, to, reason, changedAt }` entry to the ledger's history; prior state is never deleted. If the corrected skill gates a stage the work item already advanced past, YallaFlow reconciles the workflow stage backward, so stage and checkpoint state can never silently contradict each other. Revising `implementation`, `verification`, or `code-review` also resets whichever of `verification`/`code-review` were already `completed` back to `pending` (they depended on the thing that just changed) and marks a freshness boundary that a later `yallaflow verify` must postdate before completion can be claimed again. `checkpoint revise` on a `DONE` work item is refused — see below.
+
+Leaving `IMPLEMENTATION`/`EXECUTION` requires the `implementation` checkpoint to be `completed`; leaving `VERIFICATION` requires the `verification` checkpoint to be `completed`; reaching `DONE` requires `code-review` to be `completed` when the Behavior Contract includes it, in addition to the existing fresh-verification-evidence and knowledge-review gates. These gates apply for every workflow, not only architectural feature work.
+
+### Reopening completed work
+
+> **DONE is a durable fact, not a dead end. Reopening it is explicit and auditable, never a hand-edited file.**
+
+A production issue found after DONE, or a review request on already-shipped work, is handled with `yallaflow reopen`, never by editing `state/current.yaml`, `meta.yaml`, or `progress.yaml` by hand:
+
+```bash
+yallaflow reopen PF-0001 --to implementation --reason "Production defect discovered after completion."
+yallaflow reopen PF-0001 --to verification --reason "A regression surfaced in a downstream environment."
+yallaflow reopen PF-0001 --to review --reason "A second reviewer is required."
+```
+
+`--to` accepts `implementation`, `verification`, or `review`; `--reason` is required. Reopening requires the work to currently be `DONE`, reactivates it as the active work item at the corresponding stage, resets the checkpoints downstream of the target back to `pending` (`implementation` itself becomes `in_progress`), and resets a completed knowledge review back to `pending` only when reopening to `implementation`. Nothing durable is ever deleted: prior checkpoint history, verification evidence, and knowledge candidates all remain, and every reopen is appended to `meta.lifecycleHistory`. A fresh `yallaflow verify` is required again — evidence recorded before the reopen cannot satisfy a later completion gate — and the work item can reach `DONE` again cleanly, recording a second entry in `meta.completionHistory` alongside the first.
 
 ### Structured questions / decision ledger
 

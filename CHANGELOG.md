@@ -8,6 +8,34 @@ YallaFlow has not yet made a public npm release (`package.json` remains `"privat
 
 Nothing yet.
 
+## [0.3.3-internal.1] - 2026-09-20 — Workflow Integrity & Recovery
+
+**Internal prerelease. Not published to npm.** Closes the workflow-integrity defects (GAP-REC-001 through GAP-REC-005) surfaced by the first full human pilot, where DONE work could not be safely reopened, checkpoint revisions could leave `meta.status` contradicting the checkpoint ledger, `IMPLEMENTATION`/`VERIFICATION` could be left without their own checkpoint completed, verification evidence was overwritten on every `verify` call, and `resume <work-id>` ignored the given ID. No feature decomposition, team mode, or model/provider work is included — this milestone is entirely about making existing single-work-item state trustworthy.
+
+#### Added
+- `yallaflow reopen <work-id> --to implementation|verification|review --reason "..."`: the only supported way to reactivate DONE work. Resets the checkpoints downstream of the reopen target to `pending` (and `implementation` itself to `in_progress`), marks a freshness boundary (`meta.lastInvalidationAt`) so stale evidence can never satisfy a later completion gate, resets a completed knowledge review to pending only when reopening to `implementation`, and records the event in a new `meta.lifecycleHistory` array. Fully audit-only otherwise: no evidence, checkpoint history, or knowledge candidate is ever deleted.
+- `yallaflow verify list [work-id]`: lists every recorded verification run. `evidence/verification.json` is now an append-only ledger (`schemaVersion: 2`, `runs: [...]`, ids `V-001`, `V-002`, ...); each `yallaflow verify -- <command>` appends a new run (and its own `V-00N-verification.log`) instead of overwriting the previous one.
+- `yallaflow resume <work-id>` now actually inspects the given work item instead of silently falling back to the active one. Inspecting a non-active item is clearly labeled and never mutates `state/current.yaml` — `yallaflow resume` (no argument) is unaffected.
+- `doctor` gained lifecycle-integrity checks: DONE with an incomplete `implementation`/`verification`/`code-review` checkpoint, a completed `verification` checkpoint with no (or stale, or failed) evidence, and DONE with an incomplete required knowledge review. Reported as actionable `FAIL` lines; never auto-repaired.
+- `meta.completionHistory` records every DONE transition (timestamp + the verification run ids that satisfied it), so a work item that reaches DONE a second time preserves, rather than overwrites, the first completion.
+
+#### Changed — workflow-integrity fixes (breaking within 0.x; see `docs/releasing.md`)
+- **Stage-exit gates are now generalized, not just architectural.** Leaving the `IMPLEMENTATION`/`EXECUTION` stage now requires the `implementation` checkpoint to be `completed` (when the Behavior Contract includes it), and leaving `VERIFICATION` now requires the `verification` checkpoint to be `completed`, for every workflow — not only the architectural-feature pre-implementation chain. Reaching `DONE` additionally requires the `code-review` checkpoint to be `completed` when the contract includes it (no workflow defines a distinct `REVIEW` stage, so this is enforced at the existing `VERIFICATION → DONE` gate, alongside the pre-existing verification-evidence and knowledge-review checks).
+- **`checkpoint revise` now cascades downstream.** Revising `implementation`, `verification`, or `code-review` resets whichever of the later two are `completed` back to `pending` (correction history preserved; pre-implementation design/spec checkpoint revisions are unaffected — they still only correct `meta.status` backward, matching the existing "stage vs. delivery readiness are independent" behavior). `checkpoint revise` on a `DONE` work item is now rejected with instructions to use `yallaflow reopen` instead of silently mutating completed execution state.
+- Completing `verification` now also requires its evidence to postdate the most recent implementation reopen/revision (`meta.lastInvalidationAt`), and completing `code-review` now requires `verification` to already be `completed`.
+- `yallaflow verify`'s console output now includes the run id (`Verification PASSED (exit 0) — V-001.`).
+
+#### Fixed
+- GAP-REC-001 (no supported reopen path) — resolved via `yallaflow reopen`.
+- GAP-REC-002 (checkpoint revision could contradict `meta.status`/readiness) — resolved: revision always reconciles stage and marks a freshness boundary through one shared resolver (`core/transitions.js` + `core/workflows.js`'s generalized `requiredSkillForStage`/`stageForSkill`).
+- GAP-REC-003 (incomplete IMPLEMENTATION/VERIFICATION exit gate) — resolved via the generalized stage-exit gate above.
+- GAP-REC-004 (verification evidence overwritten) — resolved via the append-only verification ledger.
+- GAP-REC-005 (`resume <work-id>` ignored its argument) — resolved.
+
+#### Compatibility
+- A pre-existing single-record `evidence/verification.json` (no `schemaVersion`) remains fully readable and is never rewritten by a read; it is normalized in memory to run `V-001` and only becomes an on-disk v2 ledger once a *new* `yallaflow verify` appends to it.
+- Existing v0.1–v0.3.2 workspaces, DONE work, progress ledgers, knowledge, questions, and registry v2 contracts are read exactly as before — no migration-on-read, no destructive rewrite.
+
 ## [0.3.0-internal.2] - 2026-09-19 — Universal File Intake
 
 **Internal prerelease. Not published to npm.** Closes out the file-intake architecture: one `yallaflow intake <file>` command now handles plain text, Office/OpenDocument documents, PDF, and images, instead of only the narrow plain-text set from `0.3.0-internal.1`.

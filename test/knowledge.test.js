@@ -48,7 +48,9 @@ async function complete(root, meta, skillId, evidence = []) {
 async function prepareBugForReview(root, meta) {
   await complete(root, meta, 'context-discovery');
   await complete(root, meta, 'systematic-debugging', ['evidence/root-cause.txt']);
-  for (let index = 0; index < 8; index++) await advanceActiveWork(root);
+  for (let index = 0; index < 7; index++) await advanceActiveWork(root); // -> IMPLEMENTATION
+  await complete(root, meta, 'implementation');
+  await advanceActiveWork(root); // -> VERIFICATION
   await recordVerification(root, meta.id, {
     command: 'node --test',
     success: true,
@@ -57,6 +59,7 @@ async function prepareBugForReview(root, meta) {
     finishedAt: '2026-01-01T00:00:01.000Z',
     log: 'verification.log'
   });
+  await complete(root, meta, 'verification');
   return readYaml(path.join(workspacePath(root), 'work', meta.id, 'meta.yaml'));
 }
 

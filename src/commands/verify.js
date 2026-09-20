@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { writeFile } from 'node:fs/promises';
-import { recordVerification } from '../core/evidence.js';
+import { nextVerificationRunId, recordVerification, listVerificationRuns } from '../core/evidence.js';
 import { findProjectRoot, getCurrentState, workspacePath } from '../core/workspace.js';
 import { readYaml } from '../core/yaml.js';
 
@@ -19,7 +19,9 @@ export async function verifyCommand(commandParts) {
   const result = spawnSync(command, { cwd: root, shell: true, encoding: 'utf8' });
   const finishedAt = new Date().toISOString();
   const output = `${result.stdout ?? ''}${result.stderr ?? ''}`;
-  const logFile = path.join(workspacePath(root), 'work', state.activeWork, 'evidence', 'verification.log');
+  const runId = await nextVerificationRunId(root, state.activeWork);
+  const logName = `${runId}-verification.log`;
+  const logFile = path.join(workspacePath(root), 'work', state.activeWork, 'evidence', logName);
   await writeFile(logFile, output, 'utf8');
   const record = {
     command,
@@ -27,10 +29,28 @@ export async function verifyCommand(commandParts) {
     exitCode: result.status,
     startedAt,
     finishedAt,
-    log: 'verification.log'
+    log: logName
   };
-  await recordVerification(root, state.activeWork, record);
+  const run = await recordVerification(root, state.activeWork, record);
   if (output) process.stdout.write(output);
-  console.log(`Verification ${record.success ? 'PASSED' : 'FAILED'} (exit ${record.exitCode ?? 'unknown'}).`);
-  if (!record.success) process.exitCode = 1;
+  console.log(`Verification ${run.status.toUpperCase()} (exit ${run.exitCode ?? 'unknown'}) — ${run.id}.`);
+  if (!run.success) process.exitCode = 1;
+}
+
+export async function verifyListCommand(requestedWorkId) {
+  const root = await findProjectRoot();
+  if (!root) throw new Error('No .yallaflow workspace found. Run `yallaflow init` first.');
+  const state = await getCurrentState(root);
+  const workId = requestedWorkId ?? state.activeWork;
+  if (!workId) throw new Error('No active work item. Provide a work ID: `yallaflow verify list PF-0001`.');
+  const runs = await listVerificationRuns(root, workId);
+  if (!runs.length) {
+    console.log(`${workId}: no verification evidence recorded.`);
+    return;
+  }
+  console.log(`${workId} — ${runs.length} verification run${runs.length === 1 ? '' : 's'}:`);
+  for (const run of runs) {
+    console.log(`${run.id} — ${run.status.toUpperCase()} (exit ${run.exitCode ?? 'unknown'}) — ${run.command}`);
+    console.log(`  verified: ${run.verifiedAt}`);
+  }
 }

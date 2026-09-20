@@ -9,7 +9,7 @@ test('exposes the YallaFlow product and CLI identity', async () => {
   assert.equal(pkg.private, true);
   assert.equal(pkg.description, 'Adaptive Spec-Driven Development workflows for AI-assisted software engineering.');
   assert.deepEqual(pkg.bin, { yallaflow: 'src/cli.js' });
-  assert.equal(pkg.version, '0.3.0-internal.2');
+  assert.equal(pkg.version, '0.3.3-internal.1');
 
   const result = spawnSync(process.execPath, ['src/cli.js', '--help'], { encoding: 'utf8' });
   assert.equal(result.status, 0);

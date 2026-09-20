@@ -7,6 +7,7 @@ import { loadWorkProgress } from '../core/progress.js';
 import { loadWorkKnowledge } from '../knowledge/store.js';
 import { loadWorkQuestions } from '../questions/store.js';
 import { listSources } from '../core/sources.js';
+import { checkWorkIntegrity } from '../core/integrity.js';
 
 export async function doctorCommand() {
   const root = await findProjectRoot();
@@ -78,6 +79,16 @@ export async function doctorCommand() {
     checks.push([`work knowledge ledgers (${ledgerCount} present)`, true]);
   } catch (error) {
     checks.push([`work knowledge ledgers: ${error instanceof Error ? error.message : String(error)}`, false]);
+  }
+
+  try {
+    const work = await listWork(root);
+    const issues = [];
+    for (const item of work) issues.push(...(await checkWorkIntegrity(root, item)));
+    if (issues.length) issues.forEach((issue) => checks.push([issue, false]));
+    else checks.push([`lifecycle integrity (${work.length} work item(s) checked)`, true]);
+  } catch (error) {
+    checks.push([`lifecycle integrity: ${error instanceof Error ? error.message : String(error)}`, false]);
   }
 
   const failed = checks.filter(([, ok]) => !ok);

@@ -7,7 +7,7 @@ import { resumeCommand } from './commands/resume.js';
 import { doctorCommand } from './commands/doctor.js';
 import { newWorkCommand } from './commands/work.js';
 import { advanceCommand } from './commands/advance.js';
-import { verifyCommand } from './commands/verify.js';
+import { verifyCommand, verifyListCommand } from './commands/verify.js';
 import { routeCommand } from './commands/route.js';
 import { guideCommand } from './commands/guide.js';
 import { skillCommand } from './commands/skill.js';
@@ -17,12 +17,13 @@ import { questionCommand } from './commands/question.js';
 import { readyCommand } from './commands/ready.js';
 import { intakeAddCommand, intakeCommand } from './commands/intake.js';
 import { sourceCommand } from './commands/source.js';
+import { reopenCommand } from './commands/reopen.js';
 import { SCOPES } from './behavior/constants.js';
 
 const VALID_PROJECT_TYPES = new Set(['greenfield', 'brownfield']);
 
 function help() {
-  console.log(`YallaFlow foundation CLI\n\nGive AI your project, not just your prompt.\n\nUsage:\n  yallaflow init [--name NAME] [--type greenfield|brownfield]\n  yallaflow start [request]\n  yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...]\n  yallaflow source --help\n  yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]\n  yallaflow guide [work-id]\n  yallaflow ready [work-id]\n  yallaflow skill <skill-id>\n  yallaflow checkpoint --help\n  yallaflow question --help\n  yallaflow knowledge --help\n  yallaflow feature <title> [--scope VALUE]\n  yallaflow bug <title> [--scope VALUE]\n  yallaflow investigate <title> [--scope VALUE]\n  yallaflow change <title> [--scope VALUE]\n  yallaflow refactor <title> [--scope VALUE]\n  yallaflow release <title> [--scope VALUE]\n  yallaflow status\n  yallaflow resume\n  yallaflow doctor\n  yallaflow advance\n  yallaflow verify -- <command>\n  yallaflow --version\n`);
+  console.log(`YallaFlow foundation CLI\n\nGive AI your project, not just your prompt.\n\nUsage:\n  yallaflow init [--name NAME] [--type greenfield|brownfield]\n  yallaflow start [request]\n  yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...]\n  yallaflow source --help\n  yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]\n  yallaflow guide [work-id]\n  yallaflow ready [work-id]\n  yallaflow skill <skill-id>\n  yallaflow checkpoint --help\n  yallaflow question --help\n  yallaflow knowledge --help\n  yallaflow feature <title> [--scope VALUE]\n  yallaflow bug <title> [--scope VALUE]\n  yallaflow investigate <title> [--scope VALUE]\n  yallaflow change <title> [--scope VALUE]\n  yallaflow refactor <title> [--scope VALUE]\n  yallaflow release <title> [--scope VALUE]\n  yallaflow status\n  yallaflow resume [work-id]\n  yallaflow doctor\n  yallaflow advance\n  yallaflow verify -- <command>\n  yallaflow verify list [work-id]\n  yallaflow reopen <work-id> --to implementation|verification|review --reason REASON\n  yallaflow --version\n`);
 }
 
 function sourceHelp() {
@@ -48,7 +49,7 @@ function parseOptions(args, allowed) {
 async function main() {
   const [command, ...rest] = process.argv.slice(2);
   if (!command || command === '--help' || command === '-h') return help();
-  if (command === '--version' || command === '-v') return console.log('0.3.0-internal.2');
+  if (command === '--version' || command === '-v') return console.log('0.3.3-internal.1');
 
   if (command === 'init') {
     const { values } = parseOptions(rest, { name: { type: 'string' }, type: { type: 'string' } });
@@ -250,7 +251,10 @@ async function main() {
     });
   }
   if (command === 'status') return statusCommand();
-  if (command === 'resume') return resumeCommand();
+  if (command === 'resume') {
+    if (rest.length > 1) throw new Error('Usage: yallaflow resume [work-id]');
+    return resumeCommand(rest[0]);
+  }
   if (command === 'ready') {
     if (rest.length > 1) throw new Error('Usage: yallaflow ready [work-id]');
     return readyCommand(rest[0]);
@@ -258,8 +262,18 @@ async function main() {
   if (command === 'doctor') return doctorCommand();
   if (command === 'advance') return advanceCommand();
   if (command === 'verify') {
+    if (rest[0] === 'list') {
+      const { positionals } = parseOptions(rest.slice(1), {});
+      if (positionals.length > 1) throw new Error('Usage: yallaflow verify list [work-id]');
+      return verifyListCommand(positionals[0]);
+    }
     const parts = rest[0] === '--' ? rest.slice(1) : rest;
     return verifyCommand(parts);
+  }
+  if (command === 'reopen') {
+    const { values, positionals } = parseOptions(rest, { to: { type: 'string' }, reason: { type: 'string' } });
+    if (positionals.length !== 1) throw new Error('Usage: yallaflow reopen <work-id> --to implementation|verification|review --reason "..."');
+    return reopenCommand(positionals[0], { toStage: values.to, reason: values.reason });
   }
 
   const workMap = { feature: 'feature', bug: 'bug', investigate: 'investigation', change: 'change', refactor: 'refactor', release: 'release' };

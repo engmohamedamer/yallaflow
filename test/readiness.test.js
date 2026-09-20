@@ -112,6 +112,7 @@ test('full implementation DONE remains supported', async () => {
     startedAt: '2026-01-01T00:00:00.000Z', finishedAt: '2026-01-01T00:00:01.000Z', log: 'verification.log'
   });
   await complete(root, meta, 'verification');
+  await complete(root, meta, 'code-review');
   await reviewKnowledgeNone(root, meta.id);
   const transition = await advanceActiveWork(root); // -> DONE
   assert.equal(transition.to, 'DONE');

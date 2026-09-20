@@ -10,6 +10,12 @@ import { loadWorkQuestions, summarizeQuestions } from '../questions/store.js';
 
 export const SKILL_STATUSES = Object.freeze(['pending', 'in_progress', 'completed', 'blocked']);
 
+// Post-implementation dependency chain: revising an earlier link invalidates completed
+// work on later links (they were built on top of what just changed), but never the
+// other way around, and pre-implementation design/spec checkpoints are deliberately
+// outside this chain (see reconcileStageAfterCheckpointRevision's stage-only handling).
+const CASCADE_ORDER = Object.freeze(['implementation', 'verification', 'code-review']);
+
 const LEDGER_FIELDS = new Set(['schemaVersion', 'behavior', 'skills', 'rulings', 'history', 'updatedAt']);
 const CHECKPOINT_FIELDS = new Set(['status', 'startedAt', 'completedAt', 'summary', 'evidence']);
 const RULING_FIELDS = new Set(['decision', 'reason', 'costIfWrong', 'createdAt']);
@@ -80,6 +86,11 @@ export async function reviseCheckpoint(root, workId, input, now = new Date().toI
   const metaFile = path.join(workspacePath(root), 'work', workId, 'meta.yaml');
   if (!await exists(metaFile)) throw new Error(`Work item ${workId} was not found.`);
   const meta = await readYaml(metaFile);
+  if (meta.status === 'DONE') {
+    throw new Error(
+      `${workId} is DONE.\n\nReopen the work before revising completed execution state.\n\nUse:\nyallaflow reopen ${workId} --to <stage> --reason "..."`
+    );
+  }
   const loaded = await loadWorkProgress(root, meta);
   if (!loaded.contract.skills.includes(input.skillId)) {
     throw new Error(`Skill ${input.skillId} is outside the Behavior Contract for ${meta.id}.`);
@@ -100,9 +111,28 @@ export async function reviseCheckpoint(root, workId, input, now = new Date().toI
     reason: input.reason.trim(),
     changedAt: now
   });
+
+  const cascadeIndex = CASCADE_ORDER.indexOf(input.skillId);
+  if (cascadeIndex >= 0) {
+    for (const downstream of CASCADE_ORDER.slice(cascadeIndex + 1)) {
+      if (!loaded.contract.skills.includes(downstream)) continue;
+      const downstreamCurrent = loaded.ledger.skills[downstream];
+      if (downstreamCurrent && downstreamCurrent.status !== 'pending') {
+        loaded.ledger.skills[downstream] = { status: 'pending' };
+        loaded.ledger.history.push({
+          skill: downstream,
+          from: downstreamCurrent.status,
+          to: 'pending',
+          reason: `Downstream of ${input.skillId} revision: ${input.reason.trim()}`,
+          changedAt: now
+        });
+      }
+    }
+  }
+
   loaded.ledger.updatedAt = now;
   await writeYaml(progressFilePath(root, workId), loaded.ledger);
-  return { meta, contract: loaded.contract, ledger: loaded.ledger, checkpoint: next };
+  return { meta, contract: loaded.contract, ledger: loaded.ledger, checkpoint: next, cascaded: cascadeIndex >= 0 };
 }
 
 export function summarizeProgress(contract, ledger = { skills: {} }) {
@@ -255,6 +285,14 @@ async function applySkillCheckpoint(root, meta, contract, ledger, input, now) {
     if (!verification?.success) {
       throw new Error('Completing verification requires fresh successful evidence from `yallaflow verify -- <command>`.');
     }
+    if (meta.lastInvalidationAt && !(verification.verifiedAt > meta.lastInvalidationAt)) {
+      throw new Error(
+        'Completing verification requires evidence recorded after the most recent implementation reopen/revision. Run `yallaflow verify -- <command>` again.'
+      );
+    }
+  }
+  if (input.status === 'completed' && input.skillId === 'code-review' && ledger.skills.verification?.status !== 'completed') {
+    throw new Error('Cannot complete code-review; complete the verification checkpoint first.');
   }
 
   const next = { status: input.status };
