@@ -27,7 +27,7 @@ export async function reviseCheckpointCommand(requestedWorkId, input) {
   if (!workId) throw new Error('No active work item. Provide a work ID: `yallaflow checkpoint revise PF-0001 ...`.');
 
   const result = await reviseCheckpoint(root, workId, input);
-  const stageCorrection = await reconcileStageAfterCheckpointRevision(root, result.meta, input.skillId);
+  const stageCorrection = await reconcileStageAfterCheckpointRevision(root, result.meta, input.skillId, input.reason);
   console.log(`${workId} — ${input.skillId}: ${result.ledger.history.at(-1).from} → ${input.status}`);
   console.log(`Reason: ${input.reason}`);
   if (stageCorrection) console.log(`Stage corrected: ${stageCorrection.from} → ${stageCorrection.to}`);

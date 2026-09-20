@@ -4,12 +4,15 @@ import { exists } from '../utils/fs.js';
 import { readYaml, writeYaml } from './yaml.js';
 import { latestVerification, listVerificationRuns } from './evidence.js';
 import { nextStageForWork, requiredSkillForStage, stageForSkill, workflowStagesFor } from './workflows.js';
-import { workspacePath } from './workspace.js';
+import { getConfig, workspacePath } from './workspace.js';
 import { incompleteImplementationSkills, loadWorkProgress, progressFilePath } from './progress.js';
 import { loadWorkKnowledge, writeKnowledgeLedger } from '../knowledge/store.js';
 import { loadWorkQuestions, summarizeQuestions } from '../questions/store.js';
 import { resolveBehaviorContract } from '../skills/resolver.js';
 import { WRITE_STAGES } from '../behavior/constants.js';
+import { SKILL_TO_GATE, resolveInteractionPolicy } from '../behavior/interaction.js';
+import { ensureGateRequested, gateStatus, invalidateGateIfApproved, loadReviews } from '../reviews/store.js';
+import { decompositionBlockers } from '../decomposition/store.js';
 
 // Skills whose revision/reopening invalidates completed work later in the chain (see
 // core/progress.js's CASCADE_ORDER and reopenWork below). Kept in one place so the
@@ -17,24 +20,27 @@ import { WRITE_STAGES } from '../behavior/constants.js';
 const CASCADE_CHAIN = Object.freeze(['implementation', 'verification', 'code-review']);
 const REOPEN_TARGETS = Object.freeze(['implementation', 'verification', 'review']);
 
-export async function advanceActiveWork(root) {
+export async function advanceActiveWork(root, requestedWorkId) {
   const base = workspacePath(root);
   const stateFile = path.join(base, 'state', 'current.yaml');
   const state = await readYaml(stateFile);
-  if (!state.activeWork) throw new Error('No active work item.');
+  const workId = requestedWorkId ?? state.activeWork;
+  if (!workId) throw new Error('No active work item.');
 
-  const workDir = path.join(base, 'work', state.activeWork);
+  const workDir = path.join(base, 'work', workId);
   const metaFile = path.join(workDir, 'meta.yaml');
+  if (!await exists(metaFile)) throw new Error(`Work item ${workId} was not found.`);
   const meta = await readYaml(metaFile);
   if (meta.routingStatus === 'pending') throw new Error(`${meta.id} is awaiting routing. Run \`yallaflow route\` first.`);
-  const current = state.stage ?? meta.status;
+  const isActive = workId === state.activeWork;
+  const current = isActive ? (state.stage ?? meta.status) : meta.status;
   const workflow = meta.workflow ?? meta.type;
   const next = nextStageForWork(meta, current);
   if (!next) throw new Error(`${meta.id} is already at the final stage.`);
 
   const progress = await loadWorkProgress(root, meta);
   const questions = await loadWorkQuestions(root, meta);
-  const blockers = stageExitBlockers(meta, current, progress.contract, progress.ledger, questions.ledger);
+  const blockers = await stageExitBlockers(root, meta, current, progress.contract, progress.ledger, questions.ledger);
   if (blockers.length) {
     throw new Error(
       `Cannot advance from ${current} to ${next}.\n\nBlocking requirements:\n` +
@@ -89,12 +95,14 @@ export async function advanceActiveWork(root) {
       verificationRunIds: relevant.map((run) => run.id)
     }];
   }
-  state.stage = next;
-  state.updatedAt = now;
-  if (next === 'DONE') state.activeWork = null;
 
   await writeYaml(metaFile, meta);
-  await writeYaml(stateFile, state);
+  if (isActive) {
+    state.stage = next;
+    state.updatedAt = now;
+    if (next === 'DONE') state.activeWork = null;
+    await writeYaml(stateFile, state);
+  }
   await appendFile(path.join(workDir, 'progress.md'), `- ${now} Stage: ${current} → ${next}\n`, 'utf8');
   return { id: meta.id, from: current, to: next, type: meta.type };
 }
@@ -104,7 +112,10 @@ export async function advanceActiveWork(root) {
 // (lastInvalidationAt) when the revised skill is part of the post-implementation
 // dependency chain — regardless of whether that also moves the stage, since e.g.
 // revising 'code-review' invalidates DONE-eligibility without any stage to roll back to.
-export async function reconcileStageAfterCheckpointRevision(root, meta, skillId, now = new Date().toISOString()) {
+// A revised skill's own review approval (if any) is invalidated, and so is every
+// downstream cascade skill's, since their approval was granted on top of what just
+// changed (see reviews/store.js's invalidateGateIfApproved — history is preserved).
+export async function reconcileStageAfterCheckpointRevision(root, meta, skillId, reason, now = new Date().toISOString()) {
   const targetStage = stageForSkill(meta, skillId);
   const stages = workflowStagesFor(meta);
   const currentIndex = stages.indexOf(meta.status);
@@ -119,6 +130,7 @@ export async function reconcileStageAfterCheckpointRevision(root, meta, skillId,
   if (marksInvalidation) meta.lastInvalidationAt = now;
   meta.updatedAt = now;
   await writeYaml(path.join(base, 'work', meta.id, 'meta.yaml'), meta);
+  await invalidateAffectedGates(root, meta.id, skillId, reason ?? `${skillId} revised`, now);
 
   if (!needsStageCorrection) return null;
   const stateFile = path.join(base, 'state', 'current.yaml');
@@ -130,6 +142,17 @@ export async function reconcileStageAfterCheckpointRevision(root, meta, skillId,
   }
   await appendFile(path.join(base, 'work', meta.id, 'progress.md'), `- ${now} Stage corrected: ${from} → ${targetStage}\n`, 'utf8');
   return { from, to: targetStage };
+}
+
+async function invalidateAffectedGates(root, workId, skillId, reason, now) {
+  const gateName = SKILL_TO_GATE[skillId];
+  if (gateName) await invalidateGateIfApproved(root, workId, gateName, reason, now);
+  const cascadeIndex = CASCADE_CHAIN.indexOf(skillId);
+  if (cascadeIndex < 0) return;
+  for (const downstream of CASCADE_CHAIN.slice(cascadeIndex + 1)) {
+    const downstreamGate = SKILL_TO_GATE[downstream];
+    if (downstreamGate) await invalidateGateIfApproved(root, workId, downstreamGate, `downstream of ${skillId} revision`, now);
+  }
 }
 
 // Reactivates DONE work at a supported execution stage, resetting the checkpoints that
@@ -182,6 +205,10 @@ export async function reopenWork(root, workId, input, now = new Date().toISOStri
   });
   ledger.updatedAt = now;
   await writeYaml(progressFilePath(root, workId), ledger);
+  for (const skillId of CASCADE_CHAIN.slice(targetIndex)) {
+    const gateName = SKILL_TO_GATE[skillId];
+    if (gateName) await invalidateGateIfApproved(root, workId, gateName, `reopened to ${input.toStage}: ${reason}`, now);
+  }
 
   if (input.toStage === 'implementation') {
     const knowledge = await loadWorkKnowledge(root, meta);
@@ -210,18 +237,52 @@ export async function reopenWork(root, workId, input, now = new Date().toISOStri
   return { id: workId, from, to: targetStage, reason };
 }
 
-function stageExitBlockers(meta, stage, contract, ledger, questionsLedger) {
+async function stageExitBlockers(root, meta, stage, contract, ledger, questionsLedger) {
   const blockers = [];
-  const requiredSkill = requiredSkillForStage(meta, stage, contract.skills);
-  if (requiredSkill) {
-    const status = ledger.skills[requiredSkill]?.status ?? 'pending';
-    if (status !== 'completed') blockers.push(`${requiredSkill} checkpoint is ${status}`);
+  const workflow = meta.workflow ?? meta.type;
+  const isWriteStage = (WRITE_STAGES[workflow] ?? []).includes(stage);
+
+  const decomposition = isWriteStage ? await decompositionBlockers(root, meta) : null;
+  if (decomposition !== null) {
+    blockers.push(...decomposition);
+  } else {
+    const requiredSkill = requiredSkillForStage(meta, stage, contract.skills);
+    if (requiredSkill) {
+      const status = ledger.skills[requiredSkill]?.status ?? 'pending';
+      if (status !== 'completed') {
+        blockers.push(`${requiredSkill} checkpoint is ${status}`);
+      } else {
+        const gateName = SKILL_TO_GATE[requiredSkill];
+        if (gateName) {
+          const reviewBlocker = await reviewGateBlocker(root, meta.id, gateName);
+          if (reviewBlocker) blockers.push(reviewBlocker);
+        }
+      }
+    }
   }
+
   if (['SPECIFICATION', 'PLAN'].includes(stage)) {
     const unresolved = summarizeQuestions(questionsLedger).materialOpen;
     if (unresolved.length) blockers.push(`unresolved material decisions: ${unresolved.length} (${unresolved.map((entry) => entry.id).join(', ')})`);
   }
   return blockers;
+}
+
+// Shared by the stage-exit gate above and `decompose execute` (for the 'decomposition'
+// gate, which has no skill/stage of its own). Autonomous mode's gate map is all-false,
+// so this never fires there; hard safety checks (checkpoint completion, verification
+// evidence, knowledge review, dependency completion) are never routed through here and
+// so can never be bypassed by any interaction mode.
+export async function reviewGateBlocker(root, workId, gateName) {
+  const config = await getConfig(root);
+  const policy = resolveInteractionPolicy(config);
+  if (!policy.gates[gateName]) return null;
+  const { ledger } = await loadReviews(root, workId);
+  const status = gateStatus(ledger, gateName);
+  if (status === 'approved') return null;
+  await ensureGateRequested(root, workId, gateName);
+  return `${gateName} review is ${status === 'not_requested' ? 'awaiting_review' : status} in the current interaction mode — ` +
+    `awaiting approval before execution. Run \`yallaflow approve ${workId} --stage ${gateName}\` or \`yallaflow feedback ${workId} --stage ${gateName} --changes-requested\`.`;
 }
 
 function isNonEmptyString(value) {

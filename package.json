@@ -1,6 +1,6 @@
 {
   "name": "yallaflow",
-  "version": "0.3.3-internal.1",
+  "version": "0.3.4-internal.1",
   "private": true,
   "description": "Adaptive Spec-Driven Development workflows for AI-assisted software engineering.",
   "type": "module",

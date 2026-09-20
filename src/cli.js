@@ -18,12 +18,22 @@ import { readyCommand } from './commands/ready.js';
 import { intakeAddCommand, intakeCommand } from './commands/intake.js';
 import { sourceCommand } from './commands/source.js';
 import { reopenCommand } from './commands/reopen.js';
+import { decomposeExecuteCommand, decomposeProposeCommand, decomposeStatusCommand, decomposeValidateCommand } from './commands/decompose.js';
+import { projectProgressCommand } from './commands/progress.js';
+import { nextCommand } from './commands/next.js';
+import { approveCommand, feedbackCommand } from './commands/review.js';
+import { handoffCommand } from './commands/handoff.js';
 import { SCOPES } from './behavior/constants.js';
+import { INTERACTION_MODES, GATE_NAMES } from './behavior/interaction.js';
 
 const VALID_PROJECT_TYPES = new Set(['greenfield', 'brownfield']);
 
 function help() {
-  console.log(`YallaFlow foundation CLI\n\nGive AI your project, not just your prompt.\n\nUsage:\n  yallaflow init [--name NAME] [--type greenfield|brownfield]\n  yallaflow start [request]\n  yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...]\n  yallaflow source --help\n  yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]\n  yallaflow guide [work-id]\n  yallaflow ready [work-id]\n  yallaflow skill <skill-id>\n  yallaflow checkpoint --help\n  yallaflow question --help\n  yallaflow knowledge --help\n  yallaflow feature <title> [--scope VALUE]\n  yallaflow bug <title> [--scope VALUE]\n  yallaflow investigate <title> [--scope VALUE]\n  yallaflow change <title> [--scope VALUE]\n  yallaflow refactor <title> [--scope VALUE]\n  yallaflow release <title> [--scope VALUE]\n  yallaflow status\n  yallaflow resume [work-id]\n  yallaflow doctor\n  yallaflow advance\n  yallaflow verify -- <command>\n  yallaflow verify list [work-id]\n  yallaflow reopen <work-id> --to implementation|verification|review --reason REASON\n  yallaflow --version\n`);
+  console.log(`YallaFlow foundation CLI\n\nGive AI your project, not just your prompt.\n\nUsage:\n  yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]\n  yallaflow start [request]\n  yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...]\n  yallaflow source --help\n  yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]\n  yallaflow guide [work-id]\n  yallaflow ready [work-id]\n  yallaflow skill <skill-id>\n  yallaflow checkpoint --help\n  yallaflow question --help\n  yallaflow knowledge --help\n  yallaflow decompose --help\n  yallaflow progress <parent-id>\n  yallaflow next <parent-id>\n  yallaflow approve <work-id> --stage GATE [--note TEXT]\n  yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]\n  yallaflow handoff [work-id]\n  yallaflow feature <title> [--scope VALUE]\n  yallaflow bug <title> [--scope VALUE]\n  yallaflow investigate <title> [--scope VALUE]\n  yallaflow change <title> [--scope VALUE]\n  yallaflow refactor <title> [--scope VALUE]\n  yallaflow release <title> [--scope VALUE]\n  yallaflow status\n  yallaflow resume [work-id]\n  yallaflow doctor\n  yallaflow advance [work-id]\n  yallaflow verify [work-id] -- <command>\n  yallaflow verify list [work-id]\n  yallaflow reopen <work-id> --to implementation|verification|review --reason REASON\n  yallaflow --version\n`);
+}
+
+function decomposeHelp() {
+  console.log(`Usage:\n  yallaflow decompose propose <parent-id> --file <decomposition.json>\n  yallaflow decompose validate <parent-id>\n  yallaflow decompose execute <parent-id>\n  yallaflow decompose status <parent-id>\n\nGate names (for approve/feedback): ${GATE_NAMES.join(', ')}\n`);
 }
 
 function sourceHelp() {
@@ -49,12 +59,13 @@ function parseOptions(args, allowed) {
 async function main() {
   const [command, ...rest] = process.argv.slice(2);
   if (!command || command === '--help' || command === '-h') return help();
-  if (command === '--version' || command === '-v') return console.log('0.3.3-internal.1');
+  if (command === '--version' || command === '-v') return console.log('0.3.4-internal.1');
 
   if (command === 'init') {
-    const { values } = parseOptions(rest, { name: { type: 'string' }, type: { type: 'string' } });
+    const { values } = parseOptions(rest, { name: { type: 'string' }, type: { type: 'string' }, mode: { type: 'string' } });
     if (values.type && !VALID_PROJECT_TYPES.has(values.type)) throw new Error('--type must be greenfield or brownfield');
-    return initCommand({ name: values.name, type: values.type });
+    if (values.mode && !INTERACTION_MODES.includes(values.mode)) throw new Error(`--mode must be one of: ${INTERACTION_MODES.join(', ')}`);
+    return initCommand({ name: values.name, type: values.type, mode: values.mode });
   }
 
   if (command === 'start') return startCommand(rest.join(' '));
@@ -260,20 +271,75 @@ async function main() {
     return readyCommand(rest[0]);
   }
   if (command === 'doctor') return doctorCommand();
-  if (command === 'advance') return advanceCommand();
+  if (command === 'advance') {
+    if (rest.length > 1) throw new Error('Usage: yallaflow advance [work-id]');
+    return advanceCommand(rest[0]);
+  }
   if (command === 'verify') {
     if (rest[0] === 'list') {
       const { positionals } = parseOptions(rest.slice(1), {});
       if (positionals.length > 1) throw new Error('Usage: yallaflow verify list [work-id]');
       return verifyListCommand(positionals[0]);
     }
-    const parts = rest[0] === '--' ? rest.slice(1) : rest;
-    return verifyCommand(parts);
+    const sepIndex = rest.indexOf('--');
+    if (sepIndex === -1) return verifyCommand(rest);
+    if (sepIndex > 1) throw new Error('Usage: yallaflow verify [work-id] -- <command>');
+    const workId = sepIndex === 1 ? rest[0] : undefined;
+    return verifyCommand(rest.slice(sepIndex + 1), workId);
   }
   if (command === 'reopen') {
     const { values, positionals } = parseOptions(rest, { to: { type: 'string' }, reason: { type: 'string' } });
     if (positionals.length !== 1) throw new Error('Usage: yallaflow reopen <work-id> --to implementation|verification|review --reason "..."');
     return reopenCommand(positionals[0], { toStage: values.to, reason: values.reason });
+  }
+  if (command === 'decompose') {
+    if (rest[0] === '--help' || rest[0] === '-h' || !rest[0]) return decomposeHelp();
+    const [action, ...actionArgs] = rest;
+    if (action === 'propose') {
+      const { values, positionals } = parseOptions(actionArgs, { file: { type: 'string' } });
+      if (positionals.length !== 1) throw new Error('Usage: yallaflow decompose propose <parent-id> --file <decomposition.json>');
+      return decomposeProposeCommand(positionals[0], { file: values.file });
+    }
+    if (action === 'validate') {
+      const { positionals } = parseOptions(actionArgs, {});
+      if (positionals.length !== 1) throw new Error('Usage: yallaflow decompose validate <parent-id>');
+      return decomposeValidateCommand(positionals[0]);
+    }
+    if (action === 'execute') {
+      const { positionals } = parseOptions(actionArgs, {});
+      if (positionals.length !== 1) throw new Error('Usage: yallaflow decompose execute <parent-id>');
+      return decomposeExecuteCommand(positionals[0]);
+    }
+    if (action === 'status') {
+      const { positionals } = parseOptions(actionArgs, {});
+      if (positionals.length !== 1) throw new Error('Usage: yallaflow decompose status <parent-id>');
+      return decomposeStatusCommand(positionals[0]);
+    }
+    throw new Error(`Unknown decompose action: ${action}. Use propose, validate, execute, or status.`);
+  }
+  if (command === 'progress') {
+    if (rest.length !== 1) throw new Error('Usage: yallaflow progress <parent-id>');
+    return projectProgressCommand(rest[0]);
+  }
+  if (command === 'next') {
+    if (rest.length !== 1) throw new Error('Usage: yallaflow next <parent-id>');
+    return nextCommand(rest[0]);
+  }
+  if (command === 'approve') {
+    const { values, positionals } = parseOptions(rest, { stage: { type: 'string' }, note: { type: 'string' } });
+    if (positionals.length !== 1) throw new Error('Usage: yallaflow approve <work-id> --stage GATE [--note TEXT]');
+    return approveCommand(positionals[0], { stage: values.stage, note: values.note });
+  }
+  if (command === 'feedback') {
+    const { values, positionals } = parseOptions(rest, {
+      stage: { type: 'string' }, 'changes-requested': { type: 'boolean' }, note: { type: 'string' }
+    });
+    if (positionals.length !== 1) throw new Error('Usage: yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]');
+    return feedbackCommand(positionals[0], { stage: values.stage, changesRequested: values['changes-requested'], note: values.note });
+  }
+  if (command === 'handoff') {
+    if (rest.length > 1) throw new Error('Usage: yallaflow handoff [work-id]');
+    return handoffCommand(rest[0]);
   }
 
   const workMap = { feature: 'feature', bug: 'bug', investigate: 'investigation', change: 'change', refactor: 'refactor', release: 'release' };

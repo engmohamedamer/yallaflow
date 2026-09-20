@@ -218,6 +218,34 @@ Open material decisions: 0
 - **Delivery status** is `SPEC_READY`, `PLAN_READY`, or `DONE` in that order of precedence, or unset ("not ready") when neither readiness has been reached.
 - **Application implementation** status (`NOT_STARTED` / `STARTED` / `COMPLETE`) reports separately from readiness and from whether code modification is currently authorized; reaching `PLAN_READY` never itself authorizes or starts implementation.
 
+### Work decomposition
+
+`Agent orchestrates. YallaFlow governs.` A work item may become a **parent** once — and only once — its own planning reaches `PLAN_READY` (reusing delivery readiness above rather than inventing a second "ready" concept):
+
+```text
+Raw Sources → Discovery → Clarification → Design → Specification → Planning → PLAN_READY
+→ Work Decomposition (propose → validate) → Review (interaction-mode dependent) → Execute
+→ Feature-by-feature Execution
+```
+
+`src/decomposition/store.js` never performs semantic requirement splitting — the Agent proposes the child breakdown (`yallaflow decompose propose <parent-id> --file decomposition.json`, structured input exactly like an intake file); YallaFlow only validates structure (non-empty unique keys, valid work type/scope, no self-dependency, no unknown dependency, no dependency cycle via DFS) and persists it. `yallaflow decompose validate` re-checks the stored proposal and reports requirements/acceptance-criteria traceability coverage: referenced, cross-cutting (referenced by more than one child — reported, never rejected, since a requirement may legitimately span several children), and unassigned (only computed when a `requirementsUniverse`/`acceptanceCriteriaUniverse` was declared — YallaFlow never invents what the total set of requirements is). `yallaflow decompose execute` is the one explicit, one-time boundary between planning and executing: it creates one normal, fully-routed work item per child (own type, scope, pinned Behavior Contract — reusing `routeWorkItem`'s exact contract-construction logic rather than a second, lighter task engine) and only then advances the parent into its write stage.
+
+**Canonical ownership**: the parent's `decomposition.yaml` is the single source of truth for the child graph — keys, requirements/acceptance-criteria references, `dependsOn` (referencing sibling keys, resolved to work IDs once created), and `required`. Each child's own `meta.yaml`/`progress.yaml`/evidence remain that child's own lifecycle's single source of truth; a child carries only a `parent`/`decompositionKey` back-reference, never a duplicated dependency list or checkpoint mirror. `yallaflow progress <parent-id>` and `yallaflow next <parent-id>` derive their view live from this graph plus each child's current `meta.status` — a child is `done` (its own status is `DONE`), `blocked` (an unmet dependency), `active` (the workspace's current active work), or `ready` (dependencies satisfied); `next` reports every ready child without YallaFlow ever choosing one for the Agent.
+
+A decomposed parent's `IMPLEMENTATION`-stage exit gate is replaced by "every required child is `DONE`" (see `decompositionBlockers` in `core/decomposition/store.js`, consulted by `core/transitions.js`'s stage-exit resolver) instead of its own `implementation` checkpoint, which is never meant to complete for a parent — the required children are the implementation. Its `VERIFICATION`, `code-review`, and knowledge stages are unchanged, so a decomposed project still gets a final, project-level verification/review/knowledge pass once every required child is `DONE`.
+
+### Interaction modes and review gates
+
+A durable per-project policy (`config.yaml`'s `interaction: { profile, mode, gates }`, `src/behavior/interaction.js`) controls which of 8 named boundaries (`discovery, clarification, design, specification, plan, decomposition, implementation, verification`) stop for explicit human/team review before the workflow may cross them. A `mode` (`autonomous` / **`adaptive`**, the default / `gated`) only selects the *default* preset for those 8 booleans; any project can override an individual gate without adopting a different mode's whole preset — this is how "not every project uses every boundary" is satisfied without special-casing per mode elsewhere in the codebase.
+
+Review state is durable, in `.yallaflow/work/<id>/reviews.yaml` (`src/reviews/store.js`): `awaiting_review`, `approved`, or `changes_requested`, with full history — this is workflow evidence that a review step occurred, never a cryptographic or authentication claim about who ran the command. The same stage-exit resolver that checks checkpoint completion (`core/transitions.js`) also checks the matching gate (via `SKILL_TO_GATE`) once its checkpoint is complete, auto-requesting review the first time a configured boundary is hit and reporting an actionable, specific error. **Hard correctness gates — checkpoint completion, verification evidence, knowledge review, dependency completion for children — are never routed through the gate system, so no interaction mode can ever bypass them**, including `autonomous`.
+
+A material revision to the reviewed artifact (`checkpoint revise`, `reopen`, or re-proposing an already-approved decomposition) invalidates that gate and every downstream gate in the same post-implementation dependency chain (see v0.3.3's `CASCADE_CHAIN`) back to `awaiting_review`; the prior approval is preserved in history, never deleted.
+
+### Agent handoff
+
+Conversation history is not authoritative project state. `yallaflow handoff [work-id]` (`src/commands/handoff.js`) assembles one compact, strictly read-only report from the same shared resolvers `guide` and `resume` already use — `loadWorkProgress`, `evaluateReadiness`, `buildBehaviorGuidance`, `discoverGitState` — rather than a fourth, competing lifecycle interpretation. `resume`, `guide`, and `handoff` intentionally answer three different questions: *what should I continue doing* (resume), *what workflow/skill behavior applies* (guide), and *compact, complete context for another agent or session* (handoff). For a decomposed parent, handoff additionally reports child DONE/active/blocked/ready counts, next executable candidates, and unresolved traceability gaps, reusing the decomposition primitives above rather than a separate parent-specific resolver.
+
 ### Structured questions / decision ledger
 
 Material business and architecture decisions are recorded structurally in `.yallaflow/work/<id>/questions.yaml`, not only as prose inside `work.md`:

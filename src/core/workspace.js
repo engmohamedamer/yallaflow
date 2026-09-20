@@ -27,7 +27,7 @@ export async function detectProjectKind(root) {
   return results.some(Boolean) ? 'brownfield' : 'greenfield';
 }
 
-export async function initWorkspace(root, name, kind) {
+export async function initWorkspace(root, name, kind, mode = 'adaptive') {
   const base = workspacePath(root);
   if (await exists(base)) throw new Error(`Workspace already exists at ${base}`);
   if (await exists(path.join(root, LEGACY_WORKSPACE_DIR))) {
@@ -48,6 +48,11 @@ export async function initWorkspace(root, name, kind) {
     },
     quality: {
       testingStrategy: kind === 'brownfield' ? 'project-convention' : 'tdd'
+    },
+    interaction: {
+      profile: 'developer',
+      mode,
+      gates: {}
     }
   };
 
@@ -148,6 +153,16 @@ function architecturalFeatureSections() {
 
 export async function getCurrentState(root) {
   return readYaml(path.join(workspacePath(root), 'state', 'current.yaml'));
+}
+
+export async function getConfig(root) {
+  return readYaml(path.join(workspacePath(root), 'config.yaml'));
+}
+
+export async function loadWorkMetaOrThrow(root, workId) {
+  const file = path.join(workspacePath(root), 'work', workId, 'meta.yaml');
+  if (!await exists(file)) throw new Error(`Work item ${workId} was not found.`);
+  return readYaml(file);
 }
 
 export async function listWork(root) {

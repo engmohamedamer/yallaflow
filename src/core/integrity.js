@@ -1,6 +1,13 @@
+import path from 'node:path';
+import { exists } from '../utils/fs.js';
 import { loadWorkProgress } from './progress.js';
+import { getConfig, workspacePath } from './workspace.js';
 import { loadWorkKnowledge } from '../knowledge/store.js';
 import { latestVerification } from './evidence.js';
+import { resolveInteractionPolicy, SKILL_TO_GATE } from '../behavior/interaction.js';
+import { gateStatus, loadReviews } from '../reviews/store.js';
+import { childProgressView, loadDecomposition, validateChildren } from '../decomposition/store.js';
+import { stageForSkill } from './workflows.js';
 
 // The single place that answers "does this work item's durable state contradict
 // itself" — consumed by `doctor` today. advance/guide/resume/ready already share the
@@ -17,6 +24,9 @@ import { latestVerification } from './evidence.js';
 //      workflow's REVIEW-equivalent exit gate)
 //   D: stage DONE, code-review checkpoint or required knowledge review incomplete
 //   E: verification checkpoint completed but no valid verification evidence exists
+// A and B are skipped for a decomposed parent (status executing/complete): its
+// 'implementation' checkpoint is never meant to complete — its required children are
+// the implementation (see decomposition-graph checks below).
 export async function checkWorkIntegrity(root, meta) {
   if (meta.routingStatus === 'pending') return [];
   const stage = meta.status;
@@ -24,8 +34,11 @@ export async function checkWorkIntegrity(root, meta) {
   const { contract, ledger } = progress;
   const issues = [];
 
+  const { exists: hasDecomposition, ledger: decomposition } = await loadDecomposition(root, meta.id);
+  const isDecomposedParent = hasDecomposition && ['executing', 'complete'].includes(decomposition.status);
+
   const implementationStatus = ledger.skills.implementation?.status ?? 'pending';
-  if (contract.skills.includes('implementation')) {
+  if (contract.skills.includes('implementation') && !isDecomposedParent) {
     if (stage === 'DONE' && implementationStatus !== 'completed') {
       issues.push(`${meta.id}: stage is DONE but implementation checkpoint is ${implementationStatus}.`);
     }
@@ -63,5 +76,60 @@ export async function checkWorkIntegrity(root, meta) {
     }
   }
 
+  if (meta.parent) {
+    const parentFile = path.join(workspacePath(root), 'work', meta.parent, 'meta.yaml');
+    if (!await exists(parentFile)) issues.push(`${meta.id}: references parent ${meta.parent}, which does not exist.`);
+  }
+
+  if (hasDecomposition) {
+    issues.push(...await checkDecompositionIntegrity(root, meta, decomposition));
+  }
+
+  const config = await getConfig(root);
+  const policy = resolveInteractionPolicy(config);
+  const { ledger: reviewLedger } = await loadReviews(root, meta.id);
+  for (const [skillId, gateName] of Object.entries(SKILL_TO_GATE)) {
+    if (!policy.gates[gateName]) continue;
+    if (!stageForSkill(meta, skillId)) continue; // this workflow never gates this skill's stage exit
+    if (ledger.skills[skillId]?.status !== 'completed') continue;
+    const status = gateStatus(reviewLedger, gateName);
+    if (status !== 'approved') issues.push(`${meta.id}: ${gateName} checkpoint is completed but its review is ${status}.`);
+  }
+
+  return issues;
+}
+
+async function checkDecompositionIntegrity(root, meta, decomposition) {
+  const issues = [];
+  const structural = validateChildren(decomposition.children);
+  issues.push(...structural.map((entry) => `${meta.id}: decomposition ${entry}`));
+
+  if (!['executing', 'complete'].includes(decomposition.status)) return issues;
+
+  for (const child of decomposition.children) {
+    if (!child.workId) {
+      issues.push(`${meta.id}: decomposition child ${child.key} was never created despite status ${decomposition.status}.`);
+      continue;
+    }
+    const childFile = path.join(workspacePath(root), 'work', child.workId, 'meta.yaml');
+    if (!await exists(childFile)) issues.push(`${meta.id}: decomposition references child ${child.workId}, which does not exist.`);
+  }
+
+  if (meta.status === 'DONE') {
+    const view = await childProgressView(root, decomposition);
+    const incomplete = view.filter((child) => child.required !== false && child.state !== 'done');
+    if (incomplete.length) {
+      issues.push(`${meta.id}: parent is DONE but required child ${incomplete.map((child) => child.workId ?? child.key).join(', ')} is not DONE.`);
+    }
+  }
+
+  const config = await getConfig(root);
+  const policy = resolveInteractionPolicy(config);
+  if (policy.gates.decomposition) {
+    const { ledger: reviewLedger } = await loadReviews(root, meta.id);
+    if (gateStatus(reviewLedger, 'decomposition') !== 'approved') {
+      issues.push(`${meta.id}: decomposition execution started without required review approval.`);
+    }
+  }
   return issues;
 }

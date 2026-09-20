@@ -18,7 +18,7 @@ const cli = fileURLToPath(new URL('../src/cli.js', import.meta.url));
 
 async function routedWork(workType = 'bug', scope = 'bounded') {
   const root = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-progress-'));
-  await initWorkspace(root, 'demo', 'greenfield');
+  await initWorkspace(root, 'demo', 'greenfield', 'autonomous');
   const intake = await createPendingIntake(root, `${workType} ${scope} request`);
   const meta = await routeWorkItem(root, intake.id, {
     work_type: workType,

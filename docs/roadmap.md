@@ -77,6 +77,28 @@ YallaFlow applies Adaptive Spec-Driven Development: workflow depth follows the k
 - `.odg` and `.epub` text extraction (recognized formats, preserved as original-only; no maintained lightweight parser evaluated for them yet)
 - `yallaflow intake-dir` (recursive directory ingestion) — multiple explicit file arguments to `intake`/`intake add` were chosen instead as the simpler, safer public UX
 
+### v0.3.3 — Workflow Integrity & Recovery
+
+The first full human pilot (Nice Day Contract Hub) reached `DONE`, and in doing so exposed workflow-integrity gaps in the state model itself:
+
+- `yallaflow reopen <work-id> --to implementation|verification|review --reason "..."` — the only supported way to safely reactivate `DONE` work; no manual state-file editing
+- Generalized stage-exit gates: `IMPLEMENTATION`/`VERIFICATION`/`code-review` checkpoint completion is now required for every workflow, not only architectural feature work
+- `checkpoint revise` cascades downstream (revising `implementation` invalidates `verification`/`code-review`) and is rejected outright on `DONE` work in favor of `reopen`
+- Append-only verification evidence ledger (`evidence/verification.json` schema v2, `V-001`, `V-002`, ...) and `yallaflow verify list`; legacy single-record files remain readable, never rewritten by a read
+- `yallaflow resume <work-id>` actually inspects the given work item, read-only, instead of silently falling back to the active one
+- `doctor` lifecycle-integrity checks (stage/checkpoint contradictions, missing/failed/stale verification evidence, impossible `DONE` states)
+
+### v0.3.4 — Work Decomposition, Review Gates & Agent Handoff
+
+The same pilot's implementation phase, run as one giant architectural work item, was too large to review, verify progress on, or hand off between agent sessions:
+
+- Durable work decomposition (`yallaflow decompose propose|validate|execute|status`): a `PLAN_READY` parent's Agent-proposed child breakdown, validated (structure, dependencies, no cycles) and persisted, never invented by YallaFlow itself; each child is a normal, fully-lifecycled YallaFlow work item
+- Requirements/acceptance-criteria traceability reporting (referenced, cross-cutting, unassigned) and a dependency graph that gates child executability
+- `yallaflow progress`/`yallaflow next` for project-level status and dependency-unblocked candidates, without YallaFlow ever picking one for the Agent
+- Durable interaction modes (`autonomous` / **`adaptive`** (default) / `gated`) and review gates (`yallaflow approve` / `yallaflow feedback`) at `specification`/`plan`/`decomposition`/etc. boundaries — optional stops layered on top of, never replacing, the hard correctness gates
+- `yallaflow handoff [work-id]`: a compact, read-only report letting a new agent/session continue from durable YallaFlow state, Git, and verification evidence — without the prior session's chat history
+- `advance`/`verify` accept an optional explicit work item, so a decomposed child can be driven without becoming the workspace's single "active" focus
+
 ## v0.4 — Execution
 - Execution contracts
 - Reviewed/native/multi-agent policies

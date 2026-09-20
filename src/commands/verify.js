@@ -5,23 +5,24 @@ import { nextVerificationRunId, recordVerification, listVerificationRuns } from 
 import { findProjectRoot, getCurrentState, workspacePath } from '../core/workspace.js';
 import { readYaml } from '../core/yaml.js';
 
-export async function verifyCommand(commandParts) {
+export async function verifyCommand(commandParts, requestedWorkId) {
   const root = await findProjectRoot();
   if (!root) throw new Error('No .yallaflow workspace found. Run `yallaflow init` first.');
   const state = await getCurrentState(root);
-  if (!state.activeWork) throw new Error('No active work item to verify.');
-  const meta = await readYaml(path.join(workspacePath(root), 'work', state.activeWork, 'meta.yaml'));
+  const workId = requestedWorkId ?? state.activeWork;
+  if (!workId) throw new Error('No active work item to verify.');
+  const meta = await readYaml(path.join(workspacePath(root), 'work', workId, 'meta.yaml'));
   if (meta.routingStatus === 'pending') throw new Error(`${meta.id} is awaiting routing. Run \`yallaflow route\` first.`);
   const command = commandParts.join(' ').trim();
-  if (!command) throw new Error('Usage: yallaflow verify -- <verification command>');
+  if (!command) throw new Error('Usage: yallaflow verify [work-id] -- <verification command>');
 
   const startedAt = new Date().toISOString();
   const result = spawnSync(command, { cwd: root, shell: true, encoding: 'utf8' });
   const finishedAt = new Date().toISOString();
   const output = `${result.stdout ?? ''}${result.stderr ?? ''}`;
-  const runId = await nextVerificationRunId(root, state.activeWork);
+  const runId = await nextVerificationRunId(root, workId);
   const logName = `${runId}-verification.log`;
-  const logFile = path.join(workspacePath(root), 'work', state.activeWork, 'evidence', logName);
+  const logFile = path.join(workspacePath(root), 'work', workId, 'evidence', logName);
   await writeFile(logFile, output, 'utf8');
   const record = {
     command,
@@ -31,7 +32,7 @@ export async function verifyCommand(commandParts) {
     finishedAt,
     log: logName
   };
-  const run = await recordVerification(root, state.activeWork, record);
+  const run = await recordVerification(root, workId, record);
   if (output) process.stdout.write(output);
   console.log(`Verification ${run.status.toUpperCase()} (exit ${run.exitCode ?? 'unknown'}) — ${run.id}.`);
   if (!run.success) process.exitCode = 1;

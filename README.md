@@ -200,7 +200,7 @@ The package owns workflow behavior and schemas. The project owns its business/te
 npm install
 npm link
 
-yallaflow init
+yallaflow init                            # --mode autonomous|adaptive|gated (default: adaptive)
 yallaflow start
 yallaflow start "Production upload returns 500"
 yallaflow intake SRS.docx --title "Contract Management System"
@@ -241,6 +241,15 @@ yallaflow advance                       # move through the validated workflow; e
 yallaflow verify -- npm test             # append fresh verification evidence
 yallaflow verify list PF-0001            # list every recorded verification run
 yallaflow reopen PF-0001 --to implementation --reason "Production defect discovered after completion."
+yallaflow decompose propose PF-0001 --file decomposition.json
+yallaflow decompose validate PF-0001
+yallaflow decompose execute PF-0001
+yallaflow decompose status PF-0001
+yallaflow progress PF-0001
+yallaflow next PF-0001
+yallaflow approve PF-0001 --stage plan --note "Reviewed."
+yallaflow feedback PF-0001 --stage plan --changes-requested --note "Needs another pass."
+yallaflow handoff PF-0004
 ```
 
 Existing direct commands remain available for already-classified work. The v0.1 `--complexity` option is accepted as a compatibility input, but new work metadata uses the semantic `scope` field. `--source` is required on `knowledge propose` for any work routed under the current Skill Registry (`design-spec` or `implementation-runtime`; see [Project knowledge promotion](#project-knowledge-promotion)).
@@ -353,6 +362,84 @@ Open material decisions: 0
 - **`DONE`** — the full workflow's requested outcome is complete, including verification and knowledge review where applicable.
 
 Reaching `PLAN_READY` never itself authorizes or starts implementation — application-code modification remains governed by workflow stage and the Behavior Contract, exactly as described above.
+
+### Work decomposition
+
+> **YallaFlow is for developers and teams, not a step-by-step wizard. Decomposition makes large project work reviewable, resumable, independently verifiable, and easy to hand off — it does not turn engineering into a checklist.**
+
+A single architectural work item that covers an entire project (the Nice Day Contract Hub pilot's real failure mode) produces one implementation session that is too large: hard to review, hard to verify completely, hard to hand off between agent sessions. Once — and only once — a work item reaches `PLAN_READY`, it may become a **parent**, decomposed into normal, independently-lifecycled child work items:
+
+```bash
+yallaflow decompose propose PF-0001 --file decomposition.json
+yallaflow decompose validate PF-0001
+yallaflow decompose execute PF-0001    # the explicit boundary: planning ends, execution begins
+yallaflow decompose status PF-0001
+yallaflow progress PF-0001             # required/optional child counts, ✓/→/○/⊘ view
+yallaflow next PF-0001                 # every dependency-unblocked child; never picks one for you
+```
+
+`decomposition.json` is Agent-supplied structured input, exactly like an intake file — YallaFlow never performs semantic requirement splitting or invents feature boundaries itself:
+
+```json
+{
+  "children": [
+    { "key": "foundation", "title": "Foundation & Authentication", "type": "feature", "scope": "bounded",
+      "required": true, "requirements": ["FR-01"], "acceptanceCriteria": ["AC-01"] },
+    { "key": "signing", "title": "Customer Signing", "type": "feature", "scope": "bounded",
+      "required": true, "requirements": ["FR-02"], "acceptanceCriteria": ["AC-02"], "dependsOn": ["foundation"] }
+  ],
+  "requirementsUniverse": ["FR-01", "FR-02", "FR-03"],
+  "acceptanceCriteriaUniverse": ["AC-01", "AC-02"]
+}
+```
+
+`propose`/`validate` reject self-dependencies, unknown dependency keys, and dependency cycles, and report traceability coverage: which requirements/acceptance criteria are referenced, which are referenced by more than one child (reported as cross-cutting, never treated as automatically invalid — some requirements legitimately span several features), and which are unassigned (only when a `requirementsUniverse`/`acceptanceCriteriaUniverse` was declared). `execute` is the one explicit, one-time boundary between planning the project and executing its child work: it creates one fully-routed YallaFlow work item per child — its own type, scope, pinned Behavior Contract, checkpoints, verification, review, and knowledge review, reusing the existing work lifecycle rather than a second, lighter task engine — then advances the parent into its write stage. Requirement/acceptance-criteria references are carried onto the created child's `meta.yaml` for traceability.
+
+The parent's `decomposition.yaml` is the single canonical store of the child graph (keys, requirements, `dependsOn`, `required`); each child's own `meta.yaml`/`progress.yaml`/evidence remain the single source of truth for that child's own lifecycle — nothing is duplicated into the parent, and a child only carries a `parent`/`decompositionKey` back-reference. A decomposed parent's `IMPLEMENTATION`-stage exit gate becomes "every required child is `DONE`" instead of its own `implementation` checkpoint (which is never meant to complete — the children are the implementation); its `VERIFICATION`, `code-review`, and knowledge stages are unchanged, for a final project-level pass once every required child is done.
+
+### Interaction modes & review gates
+
+> **The goal is not to force one interaction style globally. Some developers want the Agent to run to completion; others want deliberate stops. Hard correctness gates apply in every mode.**
+
+A durable, per-project interaction policy lives in `config.yaml` (`yallaflow init --mode autonomous|adaptive|gated`; **`adaptive` is the default**, matching a developer/technical audience):
+
+- **`autonomous`** — the Agent continues through every optional review boundary automatically. Unresolved business questions, workflow blockers, dependency blockers, required verification, and required knowledge review still apply — autonomous mode never bypasses a correctness gate.
+- **`adaptive`** (default) — routine technical decisions (discovery, clarification, design, implementation, verification) proceed automatically; the Agent stops at meaningful human boundaries: `specification`, `plan`, and `decomposition` are reviewed by default.
+- **`gated`** — every configured boundary stops for explicit review; a project can enable any subset of the 8 named boundaries (`discovery, clarification, design, specification, plan, decomposition, implementation, verification`) without adopting the whole preset.
+
+Review is durable state, not chat text, in `.yallaflow/work/<id>/reviews.yaml`:
+
+```bash
+yallaflow approve PF-0001 --stage plan --note "Reviewed the implementation plan."
+yallaflow feedback PF-0001 --stage plan --changes-requested --note "Scope is too broad for one child."
+```
+
+A blocked transition auto-requests review the first time it is hit and reports an actionable error:
+
+```text
+Cannot advance from SPECIFICATION to PLAN.
+
+Blocking requirements:
+- specification review is awaiting_review in the current interaction mode — awaiting approval before
+  execution. Run `yallaflow approve PF-0001 --stage specification` or
+  `yallaflow feedback PF-0001 --stage specification --changes-requested`.
+```
+
+Approval does not survive a material revision to the thing it approved: revising a checkpoint (or reopening past it) invalidates that gate and every downstream gate in the same dependency chain back to `awaiting_review`, while the prior approval is preserved in the gate's history, never deleted. This is workflow evidence, not an authentication claim — a CLI approval records that the workflow reached this state, nothing stronger.
+
+### Agent handoff
+
+> **Conversation history is not authoritative project state. A new agent should recover from durable YallaFlow state, the Git working tree, and verification evidence — not the previous session's chat transcript.**
+
+The Nice Day pilot proved cross-agent recovery works in practice (one agent's usage ended mid-implementation; a different agent continued from repository state alone). `yallaflow handoff [work-id]` makes that a first-class, read-only command:
+
+```bash
+yallaflow handoff PF-0004
+```
+
+It reports title/parent, type/scope/stage/readiness, completed/pending/blocked skills, the current/incomplete skill, open questions, review gates awaiting approval, the latest verification result, knowledge-review status, a read-only Git summary (branch, clean/dirty, changed/untracked counts), write authorization, and the next objective — for a decomposed parent, also child DONE/active/blocked/ready counts, next executable candidates, and unresolved traceability gaps. It never mutates workspace state or Git, and works identically for the active work item or an explicit, non-active ID.
+
+`resume`, `guide`, and `handoff` answer different questions and share the same underlying resolvers rather than three competing lifecycle interpretations: `resume` — what should I continue doing; `guide` — what workflow/skill behavior applies; `handoff` — compact, complete context for another agent or session.
 
 ### Project knowledge promotion
 

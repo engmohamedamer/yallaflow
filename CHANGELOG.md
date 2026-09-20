@@ -8,6 +8,40 @@ YallaFlow has not yet made a public npm release (`package.json` remains `"privat
 
 Nothing yet.
 
+## [0.3.4-internal.1] - 2026-09-20 — Work Decomposition, Review Gates & Agent Handoff
+
+**Internal prerelease. Not published to npm.** The Nice Day pilot's second lesson: one architectural work item covering an entire project produced a single implementation session too large to review, verify, or hand off cleanly. This milestone makes that decomposition — which the agent was already doing mentally — explicit, durable, and governed by YallaFlow, without YallaFlow ever inventing the split itself. `Agent orchestrates. YallaFlow governs.`
+
+#### Added — Work decomposition (`src/decomposition/`)
+- `yallaflow decompose propose <parent-id> --file <decomposition.json>`: once a work item reaches `PLAN_READY` (reusing the existing readiness model — no new "ready" concept), the Agent submits a structured proposal (`children: [{ key, title, type, scope, required, requirements, acceptanceCriteria, dependsOn }]`, plus optional `requirementsUniverse`/`acceptanceCriteriaUniverse`). YallaFlow validates structure, self-dependencies, unknown dependencies, and dependency cycles, and persists it — it never invents feature boundaries or performs semantic requirement splitting.
+- `yallaflow decompose validate <parent-id>`: re-validates the stored proposal and reports requirements/acceptance-criteria traceability coverage (referenced, cross-cutting/duplicated — reported, not rejected, since a requirement may legitimately span several children — and unassigned, only when a universe was declared).
+- `yallaflow decompose execute <parent-id>`: the one explicit, one-time boundary between planning and executing. Creates a normal, fully routed YallaFlow work item per child (own work type, scope, pinned Behavior Contract, checkpoints, verification, review, knowledge, DONE — no separate lightweight task engine), then advances the parent into its write stage. Never runs implicitly as a side effect of `propose`/`validate`.
+- `yallaflow decompose status <parent-id>`: read-only decomposition state, child progress, and traceability report.
+- `yallaflow progress <parent-id>`: required/optional child counts and a `✓ done / → active / ○ ready / ⊘ blocked` view, with a `completed / required` count — no misleading percentage.
+- `yallaflow next <parent-id>`: reports every dependency-unblocked child; it never picks one — prioritization stays with the Agent.
+- Canonical ownership model: the parent's `decomposition.yaml` is the single source of truth for the child graph (keys, requirements/AC references, `dependsOn`, `required`); each child's own `meta.yaml`/`progress.yaml`/evidence remain its own lifecycle's single source of truth (just `parent`/`decompositionKey` back-references) — no duplicated, competing state.
+- A decomposed parent's `IMPLEMENTATION`-stage exit gate is replaced by "every required child is DONE" (its own `implementation` checkpoint is never meant to complete — the children are the implementation); its `VERIFICATION`/`code-review`/knowledge stages are unchanged, for a final project-level pass.
+
+#### Added — Interaction modes & review gates (`src/behavior/interaction.js`, `src/reviews/`)
+- Durable per-project interaction policy in `config.yaml` (`interaction: { profile, mode, gates }`), set at `yallaflow init [--mode autonomous|adaptive|gated]` (default **adaptive** — the developer-oriented default from PART 8). A mode only selects a *default* gate preset; any of the 8 named gates (`discovery, clarification, design, specification, plan, decomposition, implementation, verification`) can be overridden per project.
+  - `autonomous`: no optional gates. `adaptive`: `specification`, `plan`, `decomposition` stop for review; routine technical boundaries proceed automatically. `gated`: every boundary stops.
+  - Hard safety checks (checkpoint completion, verification evidence, knowledge review, dependency-completion for children) are never routed through the gate system and so can never be weakened by any mode.
+- `yallaflow approve <work-id> --stage GATE [--note TEXT]` / `yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]`: durable review state (`awaiting_review` / `approved` / `changes_requested`) in `.yallaflow/work/<id>/reviews.yaml`, with full history — workflow evidence, not an authentication claim.
+- A blocked transition auto-requests review the first time it's hit and reports an actionable error (e.g. `specification review is awaiting_review in the current interaction mode — awaiting approval before execution. Run \`yallaflow approve ... \`.`).
+- Review freshness: a material revision to specification/plan/implementation/verification (via `checkpoint revise`, `reopen`, or a re-`decompose propose` after approval) invalidates that gate's approval — and every downstream gate in the same dependency chain — back to `awaiting_review`, with the prior approval preserved in history, never deleted.
+
+#### Added — Agent handoff
+- `yallaflow handoff [work-id]`: a single, compact, read-only report for a new agent/session with no access to prior chat history — title/parent, type/scope/stage/readiness, completed/pending/blocked skills, open questions, review gates awaiting approval, latest verification, knowledge-review status, read-only Git summary (branch, clean/dirty, changed/untracked counts — never mutated), write authorization, and next objective; for a decomposed parent, also child DONE/active/blocked/ready counts, next executable candidates, and unresolved traceability gaps. Built from the same shared resolvers `guide`/`resume` already use (`loadWorkProgress`, `evaluateReadiness`, `buildBehaviorGuidance`, `discoverGitState`) rather than a fourth lifecycle interpretation.
+- `resume` → "what should I continue doing"; `guide` → "what workflow/skill behavior applies"; `handoff` → "compact complete context for another agent/session." Distinct, non-overlapping responsibilities.
+
+#### Changed
+- `yallaflow advance [work-id]` and `yallaflow verify [work-id] -- <command>` now accept an optional explicit work item, mirroring `checkpoint`/`guide`/`ready`/`resume` — required for a decomposed child to be advanced/verified without becoming the workspace's single "active" focus.
+- `doctor` gained decomposition/review integrity checks: a child referencing a missing parent, a parent referencing a missing/uncreated child, a required child incorrectly considered complete (parent DONE while a required child isn't), decomposition execution started without a required approval, and a completed checkpoint whose required review isn't approved. Reports only; never auto-repairs.
+
+#### Compatibility
+- Fully additive: a work item with no `parent`, no `decomposition.yaml`, behaves exactly as in v0.3.3. No migration-on-read; existing v0.1–v0.3.3 workspaces, reopen behavior, the verification ledger, source intake, and the knowledge workflow are unaffected.
+- Session-level interaction-mode overrides (a temporary "work autonomously until PLAN_READY" instruction on top of the project default) are explicitly **not** implemented this milestone — only the durable project policy is — per this milestone's own scope guidance to land the project policy first and treat session override as follow-up.
+
 ## [0.3.3-internal.1] - 2026-09-20 — Workflow Integrity & Recovery
 
 **Internal prerelease. Not published to npm.** Closes the workflow-integrity defects (GAP-REC-001 through GAP-REC-005) surfaced by the first full human pilot, where DONE work could not be safely reopened, checkpoint revisions could leave `meta.status` contradicting the checkpoint ledger, `IMPLEMENTATION`/`VERIFICATION` could be left without their own checkpoint completed, verification evidence was overwritten on every `verify` call, and `resume <work-id>` ignored the given ID. No feature decomposition, team mode, or model/provider work is included — this milestone is entirely about making existing single-work-item state trustworthy.
