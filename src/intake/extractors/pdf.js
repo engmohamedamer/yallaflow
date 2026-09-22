@@ -1,8 +1,8 @@
-// pdfjs-dist 6.x uses Promise.withResolvers, which landed natively only in Node 22.
-// This is a standard, well-known shim (not a security-sensitive polyfill) applied
-// only when the runtime lacks it, so pdfjs-dist works on our documented Node >=20
-// baseline while staying on the patched pdfjs-dist version (see docs/architecture.md
-// "Parser decisions" for why the version matters).
+// pdfjs-dist is pinned to 5.4.624 (see docs/architecture.md "Parser decisions"),
+// which officially declares Node >=20.16.0 — no EBADENGINE, no polyfill required for
+// it specifically. This shim is kept only as cheap, harmless defense-in-depth (a
+// no-op via `??=` wherever Promise.withResolvers is already native) in case a future
+// pdfjs-dist upgrade reintroduces a dependency on it.
 Promise.withResolvers ??= function withResolvers() {
   let resolve, reject;
   const promise = new Promise((res, rej) => { resolve = res; reject = rej; });

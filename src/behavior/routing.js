@@ -154,6 +154,36 @@ export async function addSourceToWork(root, workId, source, now = new Date().toI
   return meta;
 }
 
+// GAP-CLI-002: the only supported way to correct a pending/unrouted work item's raw
+// request — never hand-editing meta.yaml. Only valid before routing; once routed, the
+// original intake is durable history, not a mutable field. History is preserved, and
+// file-backed sources (if any) are never touched — only the raw request text changes.
+export async function reviseRequest(root, workId, input, now = new Date().toISOString()) {
+  const workDir = path.join(workspacePath(root), 'work', workId);
+  const metaFile = path.join(workDir, 'meta.yaml');
+  if (!await exists(metaFile)) throw new Error(`Work item ${workId} was not found.`);
+  const meta = await readYaml(metaFile);
+  if (meta.routingStatus !== 'pending') {
+    throw new Error(`${workId} is already routed; its original request cannot be rewritten through this operation.`);
+  }
+  if (!isNonEmptyString(input.text)) throw new Error('--text must be a non-empty replacement request.');
+  if (!isNonEmptyString(input.reason)) throw new Error('Revising a pending request requires a non-empty --reason.');
+
+  const previousRequest = meta.rawRequest;
+  const nextRequest = input.text.trim();
+  meta.requestHistory = [...(meta.requestHistory ?? []), { previousRequest, reason: input.reason.trim(), revisedAt: now }];
+  meta.rawRequest = nextRequest;
+  meta.updatedAt = now;
+  await writeYaml(metaFile, meta);
+  await appendFile(path.join(workDir, 'work.md'), requestRevisedSection(previousRequest, nextRequest, input.reason, now), 'utf8');
+  await appendFile(path.join(workDir, 'progress.md'), `- ${now} Request revised: ${input.reason.trim()}\n`, 'utf8');
+  return meta;
+}
+
+function requestRevisedSection(previousRequest, nextRequest, reason, now) {
+  return `\n## Request Revised\n\n**Previous request:** ${previousRequest}\n**Revised request:** ${nextRequest}\n**Reason:** ${reason.trim()}\n**Timestamp:** ${now}\n`;
+}
+
 function pendingWorkTemplate(meta) {
   const intakeSection = meta.sources?.length
     ? `## Sources\n\n${meta.sources.map(sourceDetail).join('\n\n')}\n`

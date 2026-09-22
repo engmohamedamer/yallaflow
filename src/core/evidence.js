@@ -49,6 +49,10 @@ export async function recordVerification(root, workId, record, now = new Date().
   const run = {
     id: nextRunId(ledger.runs),
     command: record.command,
+    ...(record.executionMode ? { executionMode: record.executionMode } : {}),
+    ...(record.executable !== undefined ? { executable: record.executable } : {}),
+    ...(record.args !== undefined ? { args: record.args } : {}),
+    ...(record.displayCommand ? { displayCommand: record.displayCommand } : {}),
     success: Boolean(record.success),
     status: record.success ? 'passed' : 'failed',
     exitCode: record.exitCode ?? null,

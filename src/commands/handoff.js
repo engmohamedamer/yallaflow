@@ -13,6 +13,7 @@ import { loadReviews } from '../reviews/store.js';
 import { GATE_NAMES } from '../behavior/interaction.js';
 import { childProgressView, computeTraceability, loadDecomposition, readyChildren } from '../decomposition/store.js';
 import { formatSourceList } from '../intake/normalize.js';
+import { resolvePrimaryObjective } from '../behavior/objective.js';
 
 // Read-only by construction: every call below is a loader (loadWorkProgress,
 // evaluateReadiness, discoverGitState, ...), never a mutator — the same shared
@@ -44,6 +45,9 @@ export async function handoffCommand(requestedWorkId) {
   console.log(`Workflow: ${meta.workflow ?? meta.type}`);
   console.log(`Stage: ${stage}`);
   if (!isActive) console.log(`(read-only inspection; active work remains ${state.activeWork ?? 'none'})`);
+  if (meta.status === 'DONE') {
+    console.log(`\n${meta.id} DONE. This is one work item, not necessarily the whole project — see Parent below if this has one.`);
+  }
 
   const progress = await loadWorkProgress(root, meta);
   const guidance = buildBehaviorGuidance(meta, stage, progress.ledger);
@@ -54,7 +58,10 @@ export async function handoffCommand(requestedWorkId) {
   const git = discoverGitState(root);
   const { ledger: reviewLedger } = await loadReviews(root, workId);
 
-  console.log(`Delivery status: ${readiness.deliveryStatus ?? 'NOT_READY'}`);
+  const primaryObjective = resolvePrimaryObjective(meta, progress.ledger, guidance.modification);
+  if (primaryObjective) console.log(`\nPRIMARY UNRESOLVED OBJECTIVE:\n${primaryObjective}`);
+
+  console.log(`\nDelivery status: ${readiness.deliveryStatus ?? 'NOT_READY'}`);
   printChecklist('Completed skills', progress ? guidance.progress.completed : []);
   printChecklist('Pending skills', guidance.progress.pending);
   if (guidance.progress.blocked.length) printChecklist('Blocked skills', guidance.progress.blocked);
@@ -83,10 +90,18 @@ export async function handoffCommand(requestedWorkId) {
   console.log(`Reason: ${guidance.modification.reason}`);
   console.log(`\nNext objective:\n${guidance.nextObjective}`);
 
+  if (git.available && !git.clean) {
+    console.log(`\n${meta.id} has uncommitted Git changes (${git.summary}). Consider a source-control checkpoint before continuing; YallaFlow never commits automatically.`);
+  }
+
   const { exists: hasDecomposition, ledger: decomposition } = await loadDecomposition(root, workId);
   if (hasDecomposition) {
-    console.log(`\n--- Decomposition (${decomposition.status}) ---`);
     const view = await childProgressView(root, decomposition);
+    const required = view.filter((child) => child.required !== false);
+    const doneCount = required.filter((child) => child.state === 'done').length;
+    console.log(meta.status === 'DONE'
+      ? `\n--- Decomposition (${decomposition.status}) --- Project ${meta.id} is DONE (${doneCount}/${required.length} required children complete).`
+      : `\n--- Decomposition (${decomposition.status}) --- Project NOT complete: ${doneCount}/${required.length} required children DONE.`);
     const grouped = { done: [], active: [], blocked: [], ready: [], not_created: [] };
     for (const child of view) grouped[child.state].push(child);
     console.log(`DONE: ${grouped.done.length} | active: ${grouped.active.length} | blocked: ${grouped.blocked.length} | ready: ${grouped.ready.length}`);

@@ -100,6 +100,16 @@ export const SKILL_REGISTRY = Object.freeze([
     mode: 'review-only',
     prerequisites: [],
     instructionPath: 'resources/skills/code-review.md'
+  }),
+  skill({
+    id: 'repository-baseline',
+    version: 1,
+    capability: 'baseline',
+    title: 'Repository Baseline Discovery',
+    phase: 'discovery',
+    mode: 'read-only',
+    prerequisites: [],
+    instructionPath: 'resources/skills/repository-baseline.md'
   })
 ]);
 

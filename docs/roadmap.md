@@ -99,6 +99,18 @@ The same pilot's implementation phase, run as one giant architectural work item,
 - `yallaflow handoff [work-id]`: a compact, read-only report letting a new agent/session continue from durable YallaFlow state, Git, and verification evidence — without the prior session's chat history
 - `advance`/`verify` accept an optional explicit work item, so a decomposed child can be driven without becoming the workspace's single "active" focus
 
+### v0.3.5 — Brownfield Baseline & Execution Resilience
+
+Findings from multiple real human pilots (greenfield SRS/file-intake, full project decomposition and feature-by-feature execution, mid-feature and cross-provider agent handoff, reopen-after-DONE recovery, brownfield discovery with no existing docs, and brownfield feature implementation with durable-knowledge reuse):
+
+- First-class Brownfield Baseline (`yallaflow baseline start|draft|status|show|approve|feedback`): a reviewed, evidence-backed (confirmed/inferred/unresolved) understanding of an existing repository, promoted into durable `PROJECT.md`/`context/*.md` only on approval — reusing the investigation work lifecycle and the existing review-gate ledger rather than a second system
+- `<command> --help`/`-h` can no longer mutate workspace state under any namespace (previously `start --help` created a pending work item; `verify --help` could attempt to run `--help` as a command)
+- `yallaflow request revise <work-id> --text TEXT --reason TEXT` — the supported, auditable correction path for a pending/unrouted work item's raw request
+- `yallaflow init` also refuses to silently reinitialize over a `.yallaflow` that is Git-tracked (index or HEAD) but missing from the working tree
+- Verification execution rewritten to argv-mode-by-default (`shell: false`, exact argv boundaries preserved), with explicit `--shell`/`--script` modes and fixed stdin inheritance; the evidence ledger gained additive execution-metadata fields
+- `handoff`/`resume` surface a `PRIMARY UNRESOLVED OBJECTIVE` (reopen/revision/blocker) and are explicit that a child's `DONE` is not project completion
+- Risk-aware routing/question guidance (financial, security/privacy, authorization, data-model, integration-contract, and irreversibility considerations) and no redundant re-confirmation once a review gate is already approved
+
 ## v0.4 — Execution
 - Execution contracts
 - Reviewed/native/multi-agent policies

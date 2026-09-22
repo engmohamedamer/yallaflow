@@ -12,6 +12,8 @@ Resolve business or behavioral ambiguity that repository discovery cannot settle
 4. Prefer a small number of precise questions over a broad questionnaire.
 5. Record the resulting decisions in the work artifact.
 
+Business clarification asks what the product/policy needs, not how the system implements it. For example, on a refund feature: who may issue a refund, whether it can be partial, what it means for a contract's lifecycle, and what appears in revenue are business questions. Whether a refund is stored as its own table versus an immutable signed ledger entry, the locking strategy, or the storage/event structure are architecture/design decisions for design exploration, not something to ask a developer about routinely — design from repository conventions instead, and raise it as a question only when it is genuinely a material, unresolved architectural choice.
+
 ## Guard
 
 This skill is read-only. Clarification does not authorize implementation.

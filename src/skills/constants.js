@@ -1,4 +1,4 @@
-export const REGISTRY_VERSION = 2;
+export const REGISTRY_VERSION = 3;
 
 export const SKILL_PHASES = Object.freeze([
   'discovery',

@@ -114,6 +114,8 @@ Runs approved work with a configurable policy: native, reviewed, or multi-agent.
 - Investigation is read-only.
 - Durable state beats conversational memory.
 - Stage and readiness never silently contradict checkpoint state.
+- Asking for help never mutates YallaFlow state, in any command namespace.
+- Initializing a workspace never silently discards prior tracked state (filesystem or Git).
 
 "Discover before asking" means technical unknowns are resolved from the repository whenever possible. User questions are reserved for business ambiguity, policy choices, acceptance criteria, and information the project cannot provide.
 
@@ -245,6 +247,35 @@ A material revision to the reviewed artifact (`checkpoint revise`, `reopen`, or 
 ### Agent handoff
 
 Conversation history is not authoritative project state. `yallaflow handoff [work-id]` (`src/commands/handoff.js`) assembles one compact, strictly read-only report from the same shared resolvers `guide` and `resume` already use — `loadWorkProgress`, `evaluateReadiness`, `buildBehaviorGuidance`, `discoverGitState` — rather than a fourth, competing lifecycle interpretation. `resume`, `guide`, and `handoff` intentionally answer three different questions: *what should I continue doing* (resume), *what workflow/skill behavior applies* (guide), and *compact, complete context for another agent or session* (handoff). For a decomposed parent, handoff additionally reports child DONE/active/blocked/ready counts, next executable candidates, and unresolved traceability gaps, reusing the decomposition primitives above rather than a separate parent-specific resolver.
+
+### Primary unresolved objective (v0.3.5)
+
+A pilot found that a replacement agent could recover stage/state after a reopen but still drifted into secondary regressions before addressing the actual reason the work was reopened. `src/behavior/objective.js`'s `resolvePrimaryObjective` is a small, shared resolver — consumed by both `handoff` and `resume`, never duplicated — that surfaces one durable fact as the `PRIMARY UNRESOLVED OBJECTIVE`: the most recent of (a) a reopen reason (`meta.lifecycleHistory`), or (b) a checkpoint-revision reason (the progress ledger's `history`), whichever timestamp is later; falling back to (c) the active write-authorization blocker when neither exists. It never infers an objective from code semantics — only from durable workflow facts already recorded elsewhere.
+
+### Brownfield Baseline (v0.3.5)
+
+Deterministic bootstrap (`core/discovery.js`, run at `yallaflow init` for a brownfield project) is cheap, mechanical seed data — package-manager/framework markers, CI/container hints. It is not, and was never meant to be, a reviewed project understanding. Before v0.3.5, an agent could reconstruct a rich understanding of an undocumented repository during a session, but nothing durable captured it unless a later feature happened to promote knowledge — a new agent session had to rediscover the same ground.
+
+```text
+Existing repository
+→ deterministic bootstrap (seeds, does not replace, the baseline)
+→ yallaflow baseline start           (read-only investigation work item)
+→ repository/runtime discovery
+→ yallaflow baseline draft --file    (evidence-backed facts: confirmed/inferred/unresolved)
+→ human review (yallaflow baseline show/status)
+→ yallaflow baseline approve          → durable PROJECT.md / context/*.md
+   or yallaflow baseline feedback --changes-requested → revise → re-submit
+```
+
+`src/baseline/store.js` reuses the normal work-item lifecycle (`type: 'investigation'`, `readOnly: true` — no application code modification is authorized during baseline discovery) rather than a second work engine, and a single new, additive Skill Registry entry (`repository-baseline`, read-only; `REGISTRY_VERSION` bumped 2→3 — existing pinned v2 contracts are read exactly as pinned and are unaffected). Because baseline discovery has no meaningful intermediate investigation stages (`QUESTION`/`EVIDENCE`/`HYPOTHESIS`/...), `baseline approve` is a narrow, documented exception: it is the one deliberate transition straight into `DONE`, rather than forcing an unrelated 8-stage vocabulary onto a fundamentally different flow.
+
+Every baseline fact carries a **confidence level** — `confirmed` (direct repository/runtime evidence), `inferred` (a strong interpretation, not explicitly declared), or `unresolved` (cannot safely be established) — a **provenance** (`repository`, `runtime`, or `user-confirmed`; prior chat/model memory is never evidence), and at least one evidence reference. Review reuses the same durable gate ledger (`reviews.yaml`, a `'baseline'` gate) v0.3.4 introduced for `specification`/`plan`/`decomposition`, rather than a second review mechanism.
+
+**One promotion mechanism, two producers.** `src/knowledge/promotion.js` already had one idempotent, marker-guarded append primitive writing into `context/*.md` for ordinary work-scoped knowledge candidates. Baseline approval reuses that exact primitive (`appendMarkedSection`) for its own facts, through two new knowledge kinds — `project` (→ `PROJECT.md`) and `tech-stack` (→ `context/tech-stack.md`) — added to `CONTEXT_TARGETS` alongside the existing five. Whether a section in `context/architecture.md` came from a feature's `knowledge propose`/`promote` or from an approved baseline fact, exactly one mechanism ever wrote it; the two input pipelines can never produce two competing versions of the same durable document. Unresolved facts are promoted too, under the same marker convention — "this could not be established" is durable knowledge a future agent should not have to rediscover by guessing.
+
+### Reliable verification execution (v0.3.5)
+
+A pilot's compound/quoted verification commands changed meaning because the CLI joined `argv` back into a single string and executed it with `shell: true`. `yallaflow verify` now defaults to **argv mode**: `spawnSync(executable, args, { shell: false })`, preserving exact argument boundaries (including arguments containing spaces) with no shell reinterpretation. Two explicit alternatives cover genuine shell needs without ever guessing shell intent: `--shell "<command>"` (pipes, redirection — `shell: true`, deliberately) and `--script <path>` (a script file executed directly). All three modes use `stdio: ['inherit', 'pipe', 'pipe']` — stdin is inherited from the parent process (fixing a pilot's stdin-fed verification, previously detached) while stdout/stderr are still captured into the append-only evidence log. The verification ledger gained additive fields (`executionMode`, `executable`, `args`, `displayCommand`) on top of the v0.3.3 append-only schema; existing runs, and legacy pre-v0.3.3 single-record files, remain fully readable.
 
 ### Structured questions / decision ledger
 

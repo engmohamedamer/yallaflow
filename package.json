@@ -1,6 +1,6 @@
 {
   "name": "yallaflow",
-  "version": "0.3.4-internal.1",
+  "version": "0.3.5-internal.1",
   "private": true,
   "description": "Adaptive Spec-Driven Development workflows for AI-assisted software engineering.",
   "type": "module",
@@ -21,15 +21,15 @@
     "check": "npm run check:syntax && npm test"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20.16.0"
   },
   "dependencies": {
     "@xmldom/xmldom": "^0.8.10",
     "officeparser": "5.2.2",
-    "pdfjs-dist": "6.3.289",
+    "pdfjs-dist": "5.4.624",
     "yauzl": "^3.1.3"
   },
   "overrides": {
-    "pdfjs-dist": "6.3.289"
+    "pdfjs-dist": "5.4.624"
   }
 }

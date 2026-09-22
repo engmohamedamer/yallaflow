@@ -7,7 +7,7 @@ import { loadWorkProgress } from '../core/progress.js';
 import { loadWorkKnowledge } from '../knowledge/store.js';
 import { loadWorkQuestions } from '../questions/store.js';
 import { listSources } from '../core/sources.js';
-import { checkWorkIntegrity } from '../core/integrity.js';
+import { checkWorkIntegrity, checkWorkspaceIntegrity } from '../core/integrity.js';
 
 export async function doctorCommand() {
   const root = await findProjectRoot();
@@ -91,12 +91,24 @@ export async function doctorCommand() {
     checks.push([`lifecycle integrity: ${error instanceof Error ? error.message : String(error)}`, false]);
   }
 
+  // Informational only: YallaFlow does not mandate a Git/team workflow, so an
+  // untracked-and-ungitignored workspace is a warning, never a structural-integrity
+  // failure — it must never make an otherwise healthy workspace report unhealthy.
+  const warnings = [];
+  try {
+    warnings.push(...checkWorkspaceIntegrity(root));
+  } catch (error) {
+    warnings.push(`workspace/Git tracking: ${error instanceof Error ? error.message : String(error)}`);
+  }
+
   const failed = checks.filter(([, ok]) => !ok);
   for (const [name, ok] of checks) console.log(`${ok ? 'PASS' : 'FAIL'} ${name}`);
+  for (const warning of warnings) console.log(`WARN ${warning}`);
   if (failed.length) {
     process.exitCode = 1;
     console.log(`\n${failed.length} check(s) failed.`);
   } else {
     console.log('\nWorkspace healthy.');
+    if (warnings.length) console.log(`${warnings.length} warning(s) — informational only, does not affect workspace health.`);
   }
 }

@@ -10,6 +10,7 @@ import { isKnowledgeReviewRelevant, isKnowledgeReviewStage, loadWorkKnowledge, s
 import { evaluateReadiness } from '../behavior/readiness.js';
 import { loadWorkQuestions } from '../questions/store.js';
 import { formatSourceList } from '../intake/normalize.js';
+import { resolvePrimaryObjective } from '../behavior/objective.js';
 
 export async function resumeCommand(requestedWorkId) {
   const root = await findProjectRoot();
@@ -57,13 +58,18 @@ export async function resumeCommand(requestedWorkId) {
   console.log(`Workflow: ${meta.workflow ?? meta.type}`);
   console.log(`Stage: ${stage}`);
   printReopenContext(meta);
-  console.log(`Delivery status: ${readiness.deliveryStatus ?? 'NOT_READY'}`);
+  const primaryObjective = resolvePrimaryObjective(meta, progress.ledger, guidance.modification);
+  if (primaryObjective) console.log(`\nPRIMARY UNRESOLVED OBJECTIVE:\n${primaryObjective}`);
+  console.log(`\nDelivery status: ${readiness.deliveryStatus ?? 'NOT_READY'}`);
   printProgress(guidance.progress);
   if (guidance.progress.current?.summary) console.log(`\nCurrent finding: ${guidance.progress.current.summary}`);
   console.log(`\nVerification: ${verification ? (verification.success ? 'passed' : 'failed') : 'not recorded'}`);
   if (knowledgeRelevant) printKnowledge(knowledgeSummary);
   printOpenQuestions(readiness.questions);
   console.log(`Git: ${git.summary}`);
+  if (stage === 'DONE' && git.available && !git.clean) {
+    console.log(`${meta.id} is DONE. Git working tree contains uncommitted changes. Consider a source-control checkpoint before unrelated work begins. YallaFlow never commits automatically.`);
+  }
   const atCompletionStage = isKnowledgeReviewStage(meta, stage);
   const nextObjective = readiness.questions.materialOpen.length && ['specification', 'implementation-planning'].includes(guidance.progress.current?.skillId)
     ? `Resolve ${readiness.questions.materialOpen.length} material open decision(s) before completing ${guidance.progress.current.skillId}.`

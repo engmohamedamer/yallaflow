@@ -18,7 +18,9 @@ const CONTEXT_HEADINGS = Object.freeze({
   integration: '# Integrations',
   environment: '# Environments',
   convention: '# Engineering Conventions',
-  'business-rule': '# Business Rules'
+  'business-rule': '# Business Rules',
+  project: null, // PROJECT.md always exists already (written at init); never re-headered
+  'tech-stack': '# Tech Stack'
 });
 
 export async function promoteKnowledge(root, workId, candidateId, now = new Date().toISOString()) {
@@ -43,15 +45,22 @@ export async function promoteKnowledge(root, workId, candidateId, now = new Date
 async function promoteContext(root, workId, candidate, now) {
   const relative = CONTEXT_TARGETS[candidate.kind];
   if (!relative) throw new Error(`No project-memory target exists for knowledge kind ${candidate.kind}.`);
-  const file = path.join(workspacePath(root), relative);
   const marker = knowledgeMarker(workId, candidate.id);
+  await appendMarkedSection(root, relative, marker, contextSection(workId, candidate, now, marker), CONTEXT_HEADINGS[candidate.kind]);
+  return relative;
+}
+
+// Shared, idempotent (marker-guarded) append primitive: exactly one mechanism ever
+// writes into a context/PROJECT.md target, whether the caller is an ordinary
+// work-scoped knowledge candidate or a Brownfield Baseline fact (src/baseline/store.js)
+// — so the two input pipelines can never produce two competing versions of the same
+// durable document.
+export async function appendMarkedSection(root, relativePath, marker, section, header) {
+  const file = path.join(workspacePath(root), relativePath);
   let current = '';
   if (await exists(file)) current = await readText(file);
-  else await writeText(file, `${CONTEXT_HEADINGS[candidate.kind]}\n\n`);
-  if (!current.includes(marker)) {
-    await appendFile(file, contextSection(workId, candidate, now, marker), 'utf8');
-  }
-  return relative;
+  else if (header) await writeText(file, `${header}\n\n`);
+  if (!current.includes(marker)) await appendFile(file, section, 'utf8');
 }
 
 async function promoteDecision(root, workId, candidate, now) {

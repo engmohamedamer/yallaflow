@@ -1,13 +1,17 @@
 import path from 'node:path';
-import { exists } from '../utils/fs.js';
+import { spawnSync } from 'node:child_process';
+import { readText, exists } from '../utils/fs.js';
 import { loadWorkProgress } from './progress.js';
-import { getConfig, workspacePath } from './workspace.js';
+import { getConfig, workspacePath, WORKSPACE_DIR } from './workspace.js';
 import { loadWorkKnowledge } from '../knowledge/store.js';
-import { latestVerification } from './evidence.js';
+import { latestVerification, listVerificationRuns } from './evidence.js';
 import { resolveInteractionPolicy, SKILL_TO_GATE } from '../behavior/interaction.js';
 import { gateStatus, loadReviews } from '../reviews/store.js';
 import { childProgressView, loadDecomposition, validateChildren } from '../decomposition/store.js';
 import { stageForSkill } from './workflows.js';
+import { loadBaseline } from '../baseline/store.js';
+import { CONTEXT_TARGETS } from '../knowledge/constants.js';
+import { BASELINE_AREAS, BASELINE_FACT_SOURCES, BASELINE_FACT_STATUSES } from '../baseline/constants.js';
 
 // The single place that answers "does this work item's durable state contradict
 // itself" — consumed by `doctor` today. advance/guide/resume/ready already share the
@@ -85,6 +89,16 @@ export async function checkWorkIntegrity(root, meta) {
     issues.push(...await checkDecompositionIntegrity(root, meta, decomposition));
   }
 
+  if (meta.baseline) {
+    issues.push(...await checkBaselineIntegrity(root, meta));
+  }
+
+  if (meta.requestHistory) {
+    issues.push(...checkRequestHistoryIntegrity(meta));
+  }
+
+  issues.push(...await checkVerificationMetadataIntegrity(root, meta));
+
   const config = await getConfig(root);
   const policy = resolveInteractionPolicy(config);
   const { ledger: reviewLedger } = await loadReviews(root, meta.id);
@@ -130,6 +144,83 @@ async function checkDecompositionIntegrity(root, meta, decomposition) {
     if (gateStatus(reviewLedger, 'decomposition') !== 'approved') {
       issues.push(`${meta.id}: decomposition execution started without required review approval.`);
     }
+  }
+  return issues;
+}
+
+async function checkBaselineIntegrity(root, meta) {
+  const issues = [];
+  const { exists: hasBaseline, ledger } = await loadBaseline(root, meta.id);
+  if (!hasBaseline) return issues;
+
+  for (const fact of ledger.facts) {
+    if (!BASELINE_AREAS.includes(fact.area)) issues.push(`${meta.id}: baseline fact ${fact.id} has unknown area ${JSON.stringify(fact.area)}.`);
+    if (!BASELINE_FACT_STATUSES.includes(fact.status)) issues.push(`${meta.id}: baseline fact ${fact.id} has unknown status ${JSON.stringify(fact.status)}.`);
+    if (!BASELINE_FACT_SOURCES.includes(fact.source)) issues.push(`${meta.id}: baseline fact ${fact.id} has unknown source ${JSON.stringify(fact.source)}.`);
+    if (!Array.isArray(fact.evidence) || !fact.evidence.length) issues.push(`${meta.id}: baseline fact ${fact.id} has no evidence references.`);
+  }
+
+  if (ledger.status === 'approved') {
+    for (const fact of ledger.facts) {
+      const relative = CONTEXT_TARGETS[fact.area];
+      const marker = `<!-- yallaflow-baseline:${meta.id}:${fact.id} -->`;
+      const file = path.join(workspacePath(root), relative);
+      if (!await exists(file) || !(await readText(file)).includes(marker)) {
+        issues.push(`${meta.id}: baseline is approved but fact ${fact.id} was never promoted into ${relative}.`);
+      }
+    }
+  }
+  return issues;
+}
+
+function checkRequestHistoryIntegrity(meta) {
+  const issues = [];
+  if (!Array.isArray(meta.requestHistory)) {
+    issues.push(`${meta.id}: requestHistory must be an array.`);
+    return issues;
+  }
+  meta.requestHistory.forEach((entry, index) => {
+    const label = `${meta.id}: requestHistory[${index}]`;
+    if (!entry || typeof entry !== 'object') { issues.push(`${label} must be an object.`); return; }
+    for (const field of ['previousRequest', 'reason', 'revisedAt']) {
+      if (typeof entry[field] !== 'string' || !entry[field].trim()) issues.push(`${label} has an invalid or missing ${field}.`);
+    }
+  });
+  return issues;
+}
+
+async function checkVerificationMetadataIntegrity(root, meta) {
+  const issues = [];
+  const runs = await listVerificationRuns(root, meta.id);
+  for (const run of runs) {
+    if (run.executionMode === undefined) continue; // legacy run, nothing to validate
+    if (!['argv', 'shell', 'script'].includes(run.executionMode)) {
+      issues.push(`${meta.id}: verification run ${run.id} has unknown executionMode ${JSON.stringify(run.executionMode)}.`);
+    }
+    if (run.executionMode === 'argv' && !Array.isArray(run.args)) {
+      issues.push(`${meta.id}: verification run ${run.id} is argv mode but has no args array.`);
+    }
+    if (!run.executable || typeof run.executable !== 'string') {
+      issues.push(`${meta.id}: verification run ${run.id} is missing its executable.`);
+    }
+  }
+  return issues;
+}
+
+// Workspace-level (not per-work-item) check: `.yallaflow` is durable project state and
+// is expected to be committed like any other project file. Neither tracked nor
+// deliberately gitignored suggests accidental drift, not a deliberate choice — reported
+// only, never repaired, and skipped entirely outside a Git repository.
+export function checkWorkspaceIntegrity(root) {
+  const issues = [];
+  const insideRepo = spawnSync('git', ['rev-parse', '--is-inside-work-tree'], { cwd: root, encoding: 'utf8' });
+  if (insideRepo.status !== 0) return issues;
+  const tracked = spawnSync('git', ['ls-files', '--', WORKSPACE_DIR], { cwd: root, encoding: 'utf8' });
+  const ignored = spawnSync('git', ['check-ignore', '-q', WORKSPACE_DIR], { cwd: root });
+  const isTracked = tracked.status === 0 && tracked.stdout.trim().length > 0;
+  const isIgnored = ignored.status === 0;
+  if (!isTracked && !isIgnored) {
+    issues.push(`${WORKSPACE_DIR} exists but is neither tracked by Git nor gitignored; project state is not shared/durable across clones until it is committed or deliberately ignored.`);
   }
   return issues;
 }

@@ -8,6 +8,8 @@ It gives coding agents persistent project context, structured engineering workfl
 
 ## Getting started
 
+Requires **Node.js ≥20.16.0**.
+
 ```bash
 npm install /path/to/yallaflow-<version>.tgz   # or: npm link, from a checkout
 yallaflow init
@@ -15,6 +17,8 @@ yallaflow intake SRS.docx                       # or: yallaflow start "<a plain-
 ```
 
 `yallaflow intake` accepts one universal command for virtually any requirements document — plain text, Office/OpenDocument files, PDF, and images — never a format-specific command. See [File intake](#file-intake) for the full support matrix. The CLI's own output tells you what to do next; open your coding agent and continue from there.
+
+`pdfjs-dist` is pinned to `5.4.624`, the newest release that officially declares Node ≥20.16.0 support (`>=20.16.0 || >=22.3.0`) while predating every known pdfjs-dist security advisory in this dependency tree — this is exactly why YallaFlow's own minimum is `≥20.16.0` rather than a round `≥20`. `npm install` produces no `EBADENGINE` warning for it or any other runtime dependency on a satisfying Node version; `test/node-compatibility.test.js` verifies this by scanning the whole installed tree against YallaFlow's own declared floor, not just this one package.
 
 ## Why
 
@@ -203,6 +207,8 @@ npm link
 yallaflow init                            # --mode autonomous|adaptive|gated (default: adaptive)
 yallaflow start
 yallaflow start "Production upload returns 500"
+yallaflow request revise PF-0002 --text "Add refund summary to revenue dashboard" \
+  --reason "Accidental --help intake."
 yallaflow intake SRS.docx --title "Contract Management System"
 yallaflow intake add PF-0001 payment-rules.xlsx
 yallaflow source list
@@ -238,8 +244,14 @@ yallaflow status
 yallaflow resume [PF-0001]               # no ID: active work; an ID: read-only inspection, never changes focus
 yallaflow doctor
 yallaflow advance                       # move through the validated workflow; explains what blocks it
-yallaflow verify -- npm test             # append fresh verification evidence
+yallaflow verify -- npm test              # argv mode (default): shell:false, exact args preserved
+yallaflow verify --shell 'npm test | tail -20'  # explicit shell mode for real shell syntax
+yallaflow verify --script evidence/smoke.sh     # a script file, executed directly
 yallaflow verify list PF-0001            # list every recorded verification run
+# `verify` with no `--`/`--shell`/`--script` (an old, undocumented shell fallback) is no longer accepted — always name the mode explicitly.
+yallaflow baseline start                 # brownfield: read-only repository baseline discovery
+yallaflow baseline draft PF-0005 --file baseline.json
+yallaflow baseline approve PF-0005       # promotes confirmed/inferred/unresolved facts into durable docs
 yallaflow reopen PF-0001 --to implementation --reason "Production defect discovered after completion."
 yallaflow decompose propose PF-0001 --file decomposition.json
 yallaflow decompose validate PF-0001
@@ -439,7 +451,49 @@ yallaflow handoff PF-0004
 
 It reports title/parent, type/scope/stage/readiness, completed/pending/blocked skills, the current/incomplete skill, open questions, review gates awaiting approval, the latest verification result, knowledge-review status, a read-only Git summary (branch, clean/dirty, changed/untracked counts), write authorization, and the next objective — for a decomposed parent, also child DONE/active/blocked/ready counts, next executable candidates, and unresolved traceability gaps. It never mutates workspace state or Git, and works identically for the active work item or an explicit, non-active ID.
 
+Both `handoff` and `resume` lead with a **`PRIMARY UNRESOLVED OBJECTIVE`** whenever one exists — the most recent of a reopen reason, a checkpoint-revision reason, or the active write-authorization blocker — so a replacement agent never has to infer why work was reopened purely from lifecycle history:
+
+```text
+PRIMARY UNRESOLVED OBJECTIVE:
+Cancellation lifecycle is unreachable and signed-version preservation must be verified.
+```
+
+A `DONE` work item is one work item, not necessarily the whole project: `handoff`/`progress` say "PF-0006 DONE" or "Project NOT complete: 5/7 required children DONE," never "project complete," unless the parent/project work item itself is `DONE`. `handoff` also notes (never enforces) a dirty Git tree at a `DONE` boundary — YallaFlow never commits automatically.
+
 `resume`, `guide`, and `handoff` answer different questions and share the same underlying resolvers rather than three competing lifecycle interpretations: `resume` — what should I continue doing; `guide` — what workflow/skill behavior applies; `handoff` — compact, complete context for another agent or session.
+
+### Brownfield baseline
+
+> **Discover once, reuse durable project understanding. Deterministic bootstrap seeds a baseline; it is not a substitute for one.**
+
+An agent can already reconstruct a rich understanding of an undocumented repository during a session — the gap was that nothing durable captured it. `yallaflow baseline` closes that gap with a reviewed, evidence-backed project baseline, promoted into `PROJECT.md`/`context/*.md` only on approval:
+
+```bash
+yallaflow baseline start                             # read-only investigation work item
+yallaflow checkpoint PF-0005 --skill repository-baseline --complete --summary "Repository discovered."
+yallaflow baseline draft PF-0005 --file baseline.json
+yallaflow baseline status PF-0005
+yallaflow baseline show PF-0005
+yallaflow baseline approve PF-0005 --note "Looks complete."
+yallaflow baseline feedback PF-0005 --changes-requested --note "Add database evidence."
+```
+
+`baseline.json` is Agent-supplied structured input — never guessed:
+
+```json
+{
+  "facts": [
+    { "area": "tech-stack", "status": "confirmed", "summary": "PostgreSQL is the application database.",
+      "evidence": ["compose.yaml", "config/database.php"], "source": "repository" },
+    { "area": "environment", "status": "unresolved", "summary": "Production hosting provider cannot be established.",
+      "evidence": [".env.example", "compose.yaml"], "source": "repository" }
+  ]
+}
+```
+
+Every fact carries a **confidence level** (`confirmed` — directly supported by repository/runtime evidence; `inferred` — a strong interpretation, not explicitly declared; `unresolved` — cannot safely be established) and a **provenance** (`repository`, `runtime`, or `user-confirmed`). Prior conversation/model memory is never accepted as evidence. Review reuses the same `reviews.yaml` gate ledger as `specification`/`plan`/`decomposition` (a new `baseline` gate) — approval is the only thing that promotes facts, through the exact same idempotent append mechanism ordinary `knowledge propose`/`promote` already uses for `context/*.md` (two new knowledge kinds, `project` → `PROJECT.md` and `tech-stack` → `context/tech-stack.md`), so a document is never written by two competing mechanisms. Deterministic bootstrap content is preserved, never overwritten.
+
+A subsequent agent session reads `PROJECT.md` and only the relevant `context/*.md` docs first, instead of rescanning the whole repository — but repository evidence remains authoritative if durable context looks stale.
 
 ### Project knowledge promotion
 
@@ -449,7 +503,7 @@ It reports title/parent, type/scope/stage/readiness, completed/pending/blocked s
 Work → Knowledge Candidate → Review → Promotion → Project Memory
 ```
 
-The agent—not YallaFlow—decides which learning may matter to future work. `yallaflow knowledge propose` records a work-scoped candidate in `knowledge.yaml`. YallaFlow accepts only `architecture`, `database`, `integration`, `environment`, `convention`, `business-rule`, and `decision`; it validates structure without keyword classification or model APIs.
+The agent—not YallaFlow—decides which learning may matter to future work. `yallaflow knowledge propose` records a work-scoped candidate in `knowledge.yaml`. YallaFlow accepts only `architecture`, `database`, `integration`, `environment`, `convention`, `business-rule`, `decision`, `project`, and `tech-stack` (the last two added in v0.3.5 for the same durable targets Brownfield Baseline promotes into, `PROJECT.md` and `context/tech-stack.md`); it validates structure without keyword classification or model APIs.
 
 Non-decision candidates append traceable sections to the matching context document. Business rules use `context/business-rules.md`. Decision candidates require explicit context, decision, reason, and cost-if-wrong fields, then create an ADR under `decisions/`. Every promoted entry retains its source work ID, candidate ID, and promotion timestamp.
 
@@ -484,11 +538,11 @@ Review is explicit. Resolving all candidates marks it reviewed; `knowledge revie
 
 ### Brownfield bootstrap
 
-When an existing repository is detected, `yallaflow init` performs a deterministic first pass over common framework/CI markers and records initial stack hints. The AI then deepens discovery instead of asking the user for facts the repository already contains.
+When an existing repository is detected, `yallaflow init` performs a deterministic first pass over common framework/CI markers and records initial stack hints. This is deliberately cheap and mechanical — it seeds, but does not replace, a full [Brownfield baseline](#brownfield-baseline); the AI then deepens discovery instead of asking the user for facts the repository already contains.
 
 ### Existing v0.1 workspaces
 
-YallaFlow does not automatically migrate a legacy `.projectflow/` workspace. If one is present, `yallaflow init` stops with a migration message instead of creating a parallel `.yallaflow/` workspace. The `PF-####` work ID format introduced in v0.1 remains unchanged in v0.2; a brand-neutral ID format requires a separate migration decision.
+YallaFlow does not automatically migrate a legacy `.projectflow/` workspace. If one is present, `yallaflow init` stops with a migration message instead of creating a parallel `.yallaflow/` workspace. `yallaflow init` also refuses to silently reinitialize over a `.yallaflow` that is Git-tracked (in the index or `HEAD`) but currently missing from the working tree — an actionable error names the restore path instead. The `PF-####` work ID format introduced in v0.1 remains unchanged in v0.2; a brand-neutral ID format requires a separate migration decision.
 
 Work-item compatibility is read-only by default: v0.1 work without routing or a Behavior Contract still loads; v0.2.1 capabilities derive an unpinned contract; v0.2.2 pinned contracts without `progress.yaml` appear with all skills pending; v0.2.3 work has no required knowledge policy; and work pinned to registry v1 (before the `specification` skill existed) keeps that contract and is not retroactively given a specification checkpoint. No ledger — `progress.yaml`, `questions.yaml`, or `knowledge.yaml` — is created merely by reading old work.
 

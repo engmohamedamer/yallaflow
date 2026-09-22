@@ -8,7 +8,13 @@
 export const INTERACTION_MODES = Object.freeze(['autonomous', 'adaptive', 'gated']);
 
 export const GATE_NAMES = Object.freeze([
-  'discovery', 'clarification', 'design', 'specification', 'plan', 'decomposition', 'implementation', 'verification'
+  'discovery', 'clarification', 'design', 'specification', 'plan', 'decomposition', 'implementation', 'verification',
+  // 'baseline' is not part of any interaction-mode preset below — Brownfield Baseline
+  // approval (src/baseline/store.js) is always an explicit, human-driven command
+  // regardless of mode, never an automatic stage-exit check. It reuses the same
+  // reviews.yaml ledger purely for its durable awaiting_review/approved/
+  // changes_requested history, not as a mode-gated blocker.
+  'baseline'
 ]);
 
 const ALL_FALSE = Object.freeze(Object.fromEntries(GATE_NAMES.map((name) => [name, false])));

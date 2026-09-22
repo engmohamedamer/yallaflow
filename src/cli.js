@@ -7,7 +7,7 @@ import { resumeCommand } from './commands/resume.js';
 import { doctorCommand } from './commands/doctor.js';
 import { newWorkCommand } from './commands/work.js';
 import { advanceCommand } from './commands/advance.js';
-import { verifyCommand, verifyListCommand } from './commands/verify.js';
+import { verifyCommand, verifyListCommand, verifyScriptCommand, verifyShellCommand } from './commands/verify.js';
 import { routeCommand } from './commands/route.js';
 import { guideCommand } from './commands/guide.js';
 import { skillCommand } from './commands/skill.js';
@@ -23,17 +23,30 @@ import { projectProgressCommand } from './commands/progress.js';
 import { nextCommand } from './commands/next.js';
 import { approveCommand, feedbackCommand } from './commands/review.js';
 import { handoffCommand } from './commands/handoff.js';
+import { requestReviseCommand } from './commands/request.js';
+import {
+  baselineApproveCommand,
+  baselineDraftCommand,
+  baselineFeedbackCommand,
+  baselineShowCommand,
+  baselineStartCommand,
+  baselineStatusCommand
+} from './commands/baseline.js';
 import { SCOPES } from './behavior/constants.js';
 import { INTERACTION_MODES, GATE_NAMES } from './behavior/interaction.js';
 
 const VALID_PROJECT_TYPES = new Set(['greenfield', 'brownfield']);
 
 function help() {
-  console.log(`YallaFlow foundation CLI\n\nGive AI your project, not just your prompt.\n\nUsage:\n  yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]\n  yallaflow start [request]\n  yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...]\n  yallaflow source --help\n  yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]\n  yallaflow guide [work-id]\n  yallaflow ready [work-id]\n  yallaflow skill <skill-id>\n  yallaflow checkpoint --help\n  yallaflow question --help\n  yallaflow knowledge --help\n  yallaflow decompose --help\n  yallaflow progress <parent-id>\n  yallaflow next <parent-id>\n  yallaflow approve <work-id> --stage GATE [--note TEXT]\n  yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]\n  yallaflow handoff [work-id]\n  yallaflow feature <title> [--scope VALUE]\n  yallaflow bug <title> [--scope VALUE]\n  yallaflow investigate <title> [--scope VALUE]\n  yallaflow change <title> [--scope VALUE]\n  yallaflow refactor <title> [--scope VALUE]\n  yallaflow release <title> [--scope VALUE]\n  yallaflow status\n  yallaflow resume [work-id]\n  yallaflow doctor\n  yallaflow advance [work-id]\n  yallaflow verify [work-id] -- <command>\n  yallaflow verify list [work-id]\n  yallaflow reopen <work-id> --to implementation|verification|review --reason REASON\n  yallaflow --version\n`);
+  console.log(`YallaFlow foundation CLI\n\nGive AI your project, not just your prompt.\n\nUsage:\n  yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]\n  yallaflow start [request]\n  yallaflow request --help\n  yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...]\n  yallaflow source --help\n  yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]\n  yallaflow baseline --help\n  yallaflow guide [work-id]\n  yallaflow ready [work-id]\n  yallaflow skill <skill-id>\n  yallaflow checkpoint --help\n  yallaflow question --help\n  yallaflow knowledge --help\n  yallaflow decompose --help\n  yallaflow progress <parent-id>\n  yallaflow next <parent-id>\n  yallaflow approve <work-id> --stage GATE [--note TEXT]\n  yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]\n  yallaflow handoff [work-id]\n  yallaflow feature <title> [--scope VALUE]\n  yallaflow bug <title> [--scope VALUE]\n  yallaflow investigate <title> [--scope VALUE]\n  yallaflow change <title> [--scope VALUE]\n  yallaflow refactor <title> [--scope VALUE]\n  yallaflow release <title> [--scope VALUE]\n  yallaflow status\n  yallaflow resume [work-id]\n  yallaflow doctor\n  yallaflow advance [work-id]\n  yallaflow verify [work-id] -- <executable> [args...]\n  yallaflow verify [work-id] --shell "<command>"\n  yallaflow verify [work-id] --script <path>\n  yallaflow verify list [work-id]\n  yallaflow reopen <work-id> --to implementation|verification|review --reason REASON\n  yallaflow --version\n`);
 }
 
 function decomposeHelp() {
   console.log(`Usage:\n  yallaflow decompose propose <parent-id> --file <decomposition.json>\n  yallaflow decompose validate <parent-id>\n  yallaflow decompose execute <parent-id>\n  yallaflow decompose status <parent-id>\n\nGate names (for approve/feedback): ${GATE_NAMES.join(', ')}\n`);
+}
+
+function baselineHelp() {
+  console.log(`Usage:\n  yallaflow baseline start\n  yallaflow baseline draft <work-id> --file <baseline.json>\n  yallaflow baseline status [work-id]\n  yallaflow baseline show [work-id]\n  yallaflow baseline approve <work-id> [--note TEXT]\n  yallaflow baseline feedback <work-id> --changes-requested [--note TEXT]\n`);
 }
 
 function sourceHelp() {
@@ -56,10 +69,136 @@ function parseOptions(args, allowed) {
   return parseArgs({ args, options: allowed, allowPositionals: true, strict: true });
 }
 
+// Every command's usage line, used both for `<command> --help`/`-h` and for the
+// "Unknown command" fallback below — one source of truth, and a guarantee that
+// asking for help can never reach a mutating command handler (GAP-CLI-001).
+const USAGE = {
+  init: 'yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]',
+  start: 'yallaflow start [request]',
+  intake: 'yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...]',
+  guide: 'yallaflow guide [work-id]',
+  skill: 'yallaflow skill <skill-id>',
+  route: 'yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]',
+  status: 'yallaflow status',
+  resume: 'yallaflow resume [work-id]',
+  ready: 'yallaflow ready [work-id]',
+  doctor: 'yallaflow doctor',
+  advance: 'yallaflow advance [work-id]',
+  verify: 'yallaflow verify [work-id] -- <executable> [args...]\n  yallaflow verify [work-id] --shell "<command>"\n  yallaflow verify [work-id] --script <path>\n  yallaflow verify list [work-id]',
+  reopen: 'yallaflow reopen <work-id> --to implementation|verification|review --reason REASON',
+  progress: 'yallaflow progress <parent-id>',
+  next: 'yallaflow next <parent-id>',
+  approve: 'yallaflow approve <work-id> --stage GATE [--note TEXT]',
+  feedback: 'yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]',
+  handoff: 'yallaflow handoff [work-id]',
+  request: 'yallaflow request revise <work-id> --text TEXT --reason TEXT',
+  baseline: 'yallaflow baseline start\n  yallaflow baseline draft <work-id> --file <baseline.json>\n  yallaflow baseline status [work-id]\n  yallaflow baseline show [work-id]\n  yallaflow baseline approve <work-id> [--note TEXT]\n  yallaflow baseline feedback <work-id> --changes-requested [--note TEXT]',
+  feature: 'yallaflow feature <title> [--scope VALUE]',
+  bug: 'yallaflow bug <title> [--scope VALUE]',
+  investigate: 'yallaflow investigate <title> [--scope VALUE]',
+  change: 'yallaflow change <title> [--scope VALUE]',
+  refactor: 'yallaflow refactor <title> [--scope VALUE]',
+  release: 'yallaflow release <title> [--scope VALUE]'
+};
+
+// Per-namespace sub-action usage, so `<namespace> <action> --help` gets a precise
+// answer instead of falling back to the whole namespace's dump. Every namespace with
+// sub-actions (propose/validate/execute/status, start/draft/status/show/approve/
+// feedback, add/list/promote/reject/review, add/list/answer/resolve, revise, list)
+// is listed here — this table, plus the single scan below, is the entire help
+// strategy: no per-branch `--help` checks are scattered through the command handlers.
+const NAMESPACE_ACTIONS = {
+  baseline: {
+    start: 'yallaflow baseline start',
+    draft: 'yallaflow baseline draft <work-id> --file <baseline.json>',
+    status: 'yallaflow baseline status [work-id]',
+    show: 'yallaflow baseline show [work-id]',
+    approve: 'yallaflow baseline approve [work-id] [--note TEXT]',
+    feedback: 'yallaflow baseline feedback [work-id] --changes-requested [--note TEXT]'
+  },
+  decompose: {
+    propose: 'yallaflow decompose propose <parent-id> --file <decomposition.json>',
+    validate: 'yallaflow decompose validate <parent-id>',
+    execute: 'yallaflow decompose execute <parent-id>',
+    status: 'yallaflow decompose status <parent-id>'
+  },
+  request: {
+    revise: 'yallaflow request revise <work-id> --text TEXT --reason TEXT'
+  },
+  verify: {
+    list: 'yallaflow verify list [work-id]'
+  },
+  source: {
+    list: 'yallaflow source list',
+    show: 'yallaflow source show <source-id> [--content]'
+  },
+  intake: {
+    add: 'yallaflow intake add <work-id> <file> [<file> ...]'
+  },
+  checkpoint: {
+    revise: 'yallaflow checkpoint revise [work-id] --skill SKILL --status STATUS --reason TEXT [--summary TEXT]'
+  },
+  knowledge: {
+    propose: 'yallaflow knowledge propose [work-id] --kind KIND --source design-spec|implementation-runtime --summary TEXT --evidence REF',
+    list: 'yallaflow knowledge list [work-id]',
+    promote: 'yallaflow knowledge promote [work-id] --candidate ID',
+    reject: 'yallaflow knowledge reject [work-id] --candidate ID --reason TEXT',
+    review: 'yallaflow knowledge review [work-id] --none'
+  },
+  question: {
+    add: 'yallaflow question add [work-id] --category business|architecture --text TEXT [--proposal TEXT] [--non-material]',
+    list: 'yallaflow question list [work-id]',
+    answer: 'yallaflow question answer [work-id] --id Q-001 --answer TEXT',
+    resolve: 'yallaflow question resolve [work-id] --id Q-001 [--resolution TEXT]'
+  }
+};
+
+function isHelpToken(token) {
+  return token === '--help' || token === '-h';
+}
+
+// Commands whose own documented syntax defines a `--` separator marking the start of
+// literal payload/child-process argv (`yallaflow verify [work-id] -- <executable>
+// [args...]`). YallaFlow's help scan must never cross that boundary — everything
+// after it belongs to the thing being verified, not to YallaFlow, so a `--help`
+// intended for the child (`verify PF-0001 -- node --help`) must run as verification,
+// never be swallowed as a request for YallaFlow's own help. This is what makes the
+// scan command-aware rather than a blind scan across all argv: only commands that
+// actually define this boundary get it applied.
+const PAYLOAD_BOUNDARY_COMMANDS = new Set(['verify']);
+
+// The scope of tokens YallaFlow's own help scan is allowed to inspect: the full
+// argument list for an ordinary command/subcommand, or only the prefix before `--`
+// for a payload-boundary command. Note this is about *scope*, not substring matching:
+// isHelpToken already only ever matches a token that IS exactly `--help`/`-h`, so an
+// option's own value (`--text "Document --help behavior"`, `start "...--help..."`) is
+// never mistaken for the flag — those arrive as one argv entry, not as `--help` itself.
+function helpScanScope(command, rest) {
+  if (!PAYLOAD_BOUNDARY_COMMANDS.has(command)) return rest;
+  const sepIndex = rest.indexOf('--');
+  return sepIndex === -1 ? rest : rest.slice(0, sepIndex);
+}
+
+function printCommandHelp(command, rest) {
+  const actionKey = rest.find((token) => !isHelpToken(token) && !token.startsWith('-'));
+  const nested = NAMESPACE_ACTIONS[command]?.[actionKey];
+  if (nested) return console.log(`Usage:\n  ${nested}\n`);
+  const dedicated = { source: sourceHelp, checkpoint: checkpointHelp, knowledge: knowledgeHelp, question: questionHelp, decompose: decomposeHelp, baseline: baselineHelp };
+  if (dedicated[command]) return dedicated[command]();
+  if (USAGE[command]) return console.log(`Usage:\n  ${USAGE[command]}\n`);
+  return help();
+}
+
 async function main() {
   const [command, ...rest] = process.argv.slice(2);
   if (!command || command === '--help' || command === '-h') return help();
-  if (command === '--version' || command === '-v') return console.log('0.3.4-internal.1');
+  if (command === '--version' || command === '-v') return console.log('0.3.5-internal.1');
+  // Asking for help never mutates YallaFlow state, for any command/sub-action, at any
+  // position within YallaFlow's own arguments — but never crosses a documented `--`
+  // payload boundary into a child command's own argv (see helpScanScope above). This,
+  // plus the per-namespace usage table above, is the entire help strategy; no
+  // scattered per-branch exceptions are needed or present.
+  if (helpScanScope(command, rest).some(isHelpToken)) return printCommandHelp(command, rest);
 
   if (command === 'init') {
     const { values } = parseOptions(rest, { name: { type: 'string' }, type: { type: 'string' }, mode: { type: 'string' } });
@@ -69,6 +208,13 @@ async function main() {
   }
 
   if (command === 'start') return startCommand(rest.join(' '));
+  if (command === 'request') {
+    const [action, ...actionArgs] = rest;
+    if (action !== 'revise') throw new Error('Usage: yallaflow request revise <work-id> --text TEXT --reason TEXT');
+    const { values, positionals } = parseOptions(actionArgs, { text: { type: 'string' }, reason: { type: 'string' } });
+    if (positionals.length !== 1) throw new Error('Usage: yallaflow request revise <work-id> --text TEXT --reason TEXT');
+    return requestReviseCommand(positionals[0], { text: values.text, reason: values.reason });
+  }
   if (command === 'intake') {
     if (rest[0] === 'add') {
       const { positionals } = parseOptions(rest.slice(1), {});
@@ -81,7 +227,6 @@ async function main() {
     return intakeCommand(positionals, { title: values.title });
   }
   if (command === 'source') {
-    if (rest[0] === '--help' || rest[0] === '-h') return sourceHelp();
     const [action, ...actionArgs] = rest;
     if (!action) return sourceHelp();
     if (action === 'list') {
@@ -105,7 +250,6 @@ async function main() {
     return skillCommand(rest[0]);
   }
   if (command === 'checkpoint') {
-    if (rest[0] === '--help' || rest[0] === '-h') return checkpointHelp();
     if (rest[0] === 'revise') {
       const { values, positionals } = parseOptions(rest.slice(1), {
         skill: { type: 'string' },
@@ -155,7 +299,6 @@ async function main() {
     });
   }
   if (command === 'knowledge') {
-    if (rest[0] === '--help' || rest[0] === '-h') return knowledgeHelp();
     const [action, ...actionArgs] = rest;
     if (!action) throw new Error('Usage: yallaflow knowledge <propose|list|promote|reject|review> [work-id]');
     if (action === 'propose') {
@@ -207,7 +350,6 @@ async function main() {
     throw new Error(`Unknown knowledge action: ${action}. Use propose, list, promote, reject, or review.`);
   }
   if (command === 'question') {
-    if (rest[0] === '--help' || rest[0] === '-h') return questionHelp();
     const [action, ...actionArgs] = rest;
     if (!action) return questionHelp();
     if (action === 'add') {
@@ -282,8 +424,24 @@ async function main() {
       return verifyListCommand(positionals[0]);
     }
     const sepIndex = rest.indexOf('--');
-    if (sepIndex === -1) return verifyCommand(rest);
-    if (sepIndex > 1) throw new Error('Usage: yallaflow verify [work-id] -- <command>');
+    const shellIndex = rest.indexOf('--shell');
+    const scriptIndex = rest.indexOf('--script');
+    const modeCount = [sepIndex, shellIndex, scriptIndex].filter((index) => index >= 0).length;
+    if (modeCount > 1) throw new Error('Use only one of: -- <executable> [args...], --shell "<command>", --script <path>.');
+    if (shellIndex >= 0) {
+      if (shellIndex > 1) throw new Error('Usage: yallaflow verify [work-id] --shell "<command>"');
+      if (rest.length !== shellIndex + 2) throw new Error('Usage: yallaflow verify [work-id] --shell "<command>"');
+      const workId = shellIndex === 1 ? rest[0] : undefined;
+      return verifyShellCommand(rest[shellIndex + 1], workId);
+    }
+    if (scriptIndex >= 0) {
+      if (scriptIndex > 1) throw new Error('Usage: yallaflow verify [work-id] --script <path>');
+      if (rest.length !== scriptIndex + 2) throw new Error('Usage: yallaflow verify [work-id] --script <path>');
+      const workId = scriptIndex === 1 ? rest[0] : undefined;
+      return verifyScriptCommand(rest[scriptIndex + 1], workId);
+    }
+    if (sepIndex === -1) throw new Error('Usage: yallaflow verify [work-id] -- <executable> [args...] (or --shell / --script)');
+    if (sepIndex > 1) throw new Error('Usage: yallaflow verify [work-id] -- <executable> [args...]');
     const workId = sepIndex === 1 ? rest[0] : undefined;
     return verifyCommand(rest.slice(sepIndex + 1), workId);
   }
@@ -293,7 +451,7 @@ async function main() {
     return reopenCommand(positionals[0], { toStage: values.to, reason: values.reason });
   }
   if (command === 'decompose') {
-    if (rest[0] === '--help' || rest[0] === '-h' || !rest[0]) return decomposeHelp();
+    if (!rest[0]) return decomposeHelp();
     const [action, ...actionArgs] = rest;
     if (action === 'propose') {
       const { values, positionals } = parseOptions(actionArgs, { file: { type: 'string' } });
@@ -336,6 +494,40 @@ async function main() {
     });
     if (positionals.length !== 1) throw new Error('Usage: yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]');
     return feedbackCommand(positionals[0], { stage: values.stage, changesRequested: values['changes-requested'], note: values.note });
+  }
+  if (command === 'baseline') {
+    const [action, ...actionArgs] = rest;
+    if (!action) return baselineHelp();
+    if (action === 'start') {
+      if (actionArgs.length) throw new Error('Usage: yallaflow baseline start');
+      return baselineStartCommand();
+    }
+    if (action === 'draft') {
+      const { values, positionals } = parseOptions(actionArgs, { file: { type: 'string' } });
+      if (positionals.length !== 1) throw new Error('Usage: yallaflow baseline draft <work-id> --file <baseline.json>');
+      return baselineDraftCommand(positionals[0], { file: values.file });
+    }
+    if (action === 'status') {
+      const { positionals } = parseOptions(actionArgs, {});
+      if (positionals.length > 1) throw new Error('Usage: yallaflow baseline status [work-id]');
+      return baselineStatusCommand(positionals[0]);
+    }
+    if (action === 'show') {
+      const { positionals } = parseOptions(actionArgs, {});
+      if (positionals.length > 1) throw new Error('Usage: yallaflow baseline show [work-id]');
+      return baselineShowCommand(positionals[0]);
+    }
+    if (action === 'approve') {
+      const { values, positionals } = parseOptions(actionArgs, { note: { type: 'string' } });
+      if (positionals.length > 1) throw new Error('Usage: yallaflow baseline approve [work-id] [--note TEXT]');
+      return baselineApproveCommand(positionals[0], { note: values.note });
+    }
+    if (action === 'feedback') {
+      const { values, positionals } = parseOptions(actionArgs, { 'changes-requested': { type: 'boolean' }, note: { type: 'string' } });
+      if (positionals.length > 1) throw new Error('Usage: yallaflow baseline feedback [work-id] --changes-requested [--note TEXT]');
+      return baselineFeedbackCommand(positionals[0], { changesRequested: values['changes-requested'], note: values.note });
+    }
+    throw new Error(`Unknown baseline action: ${action}. Use start, draft, status, show, approve, or feedback.`);
   }
   if (command === 'handoff') {
     if (rest.length > 1) throw new Error('Usage: yallaflow handoff [work-id]');

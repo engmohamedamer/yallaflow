@@ -24,6 +24,8 @@ Classify each considered decision clearly:
 
 Business clarification asks what behavior the product needs. Architecture decisions define how the system should technically satisfy approved behavior. Do not silently choose technology. Use structured architecture questions and proposals when a material decision remains open; use a ruling only for an agent-owned local decision whose authority is clear.
 
+A routine implementation choice the repository's own conventions already answer (e.g. which existing storage/service pattern to reuse, a naming convention, a validation approach already used elsewhere) is a design decision to make and record here, not a question for a developer. Reserve architecture questions/proposals for choices that are both material and genuinely unresolved by existing project conventions — for example, on a refund feature: a new mutable table versus an immutable signed ledger, the locking strategy, or the storage/event structure, once the business meaning of a refund (asked during requirement clarification) is already settled.
+
 ## Guard
 
 This skill is read-only. A design decision precedes planning and implementation.

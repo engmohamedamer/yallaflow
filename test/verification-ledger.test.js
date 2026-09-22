@@ -92,11 +92,11 @@ test('yallaflow verify appends evidence and yallaflow verify list shows every ru
   const { root, meta } = await routedWork();
   const first = spawnSync(process.execPath, [cli, 'verify', '--', 'true'], { cwd: root, encoding: 'utf8' });
   assert.equal(first.status, 0, first.stderr);
-  assert.match(first.stdout, /Verification PASSED \(exit 0\) — V-001\./);
+  assert.match(first.stdout, /Verification PASSED \(exit 0\) — V-001 \[argv\]\./);
 
   const second = spawnSync(process.execPath, [cli, 'verify', '--', 'false'], { cwd: root, encoding: 'utf8' });
   assert.equal(second.status, 1);
-  assert.match(second.stdout, /Verification FAILED \(exit 1\) — V-002\./);
+  assert.match(second.stdout, /Verification FAILED \(exit 1\) — V-002 \[argv\]\./);
 
   const list = spawnSync(process.execPath, [cli, 'verify', 'list', meta.id], { cwd: root, encoding: 'utf8' });
   assert.equal(list.status, 0, list.stderr);
