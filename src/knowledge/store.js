@@ -6,6 +6,9 @@ import { readYaml, writeYaml } from '../core/yaml.js';
 import { workspacePath } from '../core/workspace.js';
 import { loadWorkReadiness } from '../behavior/readiness.js';
 import { usesArchitecturalReadiness } from '../core/workflows.js';
+import { loadContextLedger, findFact } from '../context/ledger.js';
+import { CONFIDENCE_LEVELS, PROVENANCE_VALUES, RELATION_TYPES } from '../context/constants.js';
+import { loadWorkLimitations, sameStatement } from '../limitations/store.js';
 import {
   CANDIDATE_STATUSES,
   KNOWLEDGE_KINDS,
@@ -18,8 +21,11 @@ import {
 const LEDGER_FIELDS = new Set(['version', 'reviewStatus', 'reviewedAt', 'candidates', 'updatedAt']);
 const CANDIDATE_FIELDS = new Set([
   'id', 'kind', 'source', 'summary', 'evidence', 'status', 'createdAt', 'decisionDetails',
-  'promotedAt', 'target', 'rejectedAt', 'rejectionReason'
+  'promotedAt', 'target', 'rejectedAt', 'rejectionReason',
+  // v0.3.6 living project memory (all optional; absent on earlier candidates):
+  'confidence', 'provenance', 'relation', 'factId'
 ]);
+const RELATION_FIELDS = new Set(['type', 'factId']);
 const DECISION_FIELDS = new Set(['context', 'decision', 'reason', 'costIfWrong', 'sourceRuling']);
 const POLICY_FIELDS = new Set(['version', 'reviewRequired']);
 
@@ -74,6 +80,19 @@ export async function proposeKnowledge(root, workId, input, now = new Date().toI
     throw new Error(`source must be one of: ${KNOWLEDGE_SOURCES.join(', ')}; received ${JSON.stringify(input.source)}.`);
   }
 
+  if (input.confidence !== undefined && !CONFIDENCE_LEVELS.includes(input.confidence)) {
+    throw new Error(`confidence must be one of: ${CONFIDENCE_LEVELS.join(', ')}; received ${JSON.stringify(input.confidence)}.`);
+  }
+  if (input.provenance !== undefined && !PROVENANCE_VALUES.includes(input.provenance)) {
+    throw new Error(`provenance must be one of: ${PROVENANCE_VALUES.join(', ')}; received ${JSON.stringify(input.provenance)}.`);
+  }
+  await assertNotDiscoveryLimitation(root, meta.id, summary);
+  const hasRelationInput = RELATION_TYPES.some((type) => input[type] !== undefined);
+  if ((hasRelationInput || input.confidence || input.provenance) && input.kind === 'decision') {
+    throw new Error('--supersedes/--reconfirms/--disputes, --confidence, and --provenance apply to project context facts, not decision (ADR) candidates.');
+  }
+  const relation = await resolveRelation(root, input);
+
   const loaded = await loadWorkKnowledge(root, meta);
   const candidate = {
     id: nextCandidateId(loaded.ledger.candidates),
@@ -81,9 +100,16 @@ export async function proposeKnowledge(root, workId, input, now = new Date().toI
     ...(input.source ? { source: input.source } : {}),
     summary,
     evidence,
+    ...(input.confidence ? { confidence: input.confidence } : {}),
+    ...(input.provenance ? { provenance: input.provenance } : {}),
+    ...(relation ? { relation } : {}),
     status: 'proposed',
     createdAt: now
   };
+  if (relation && relation.type !== 'supersedes' && relation.area !== input.kind) {
+    throw new Error(`${relation.factId} is ${relation.area} knowledge; a candidate that ${relation.type === 'reconfirms' ? 'reconfirms' : 'disputes'} it must use --kind ${relation.area}.`);
+  }
+  if (relation) delete relation.area;
   if (input.kind === 'decision') {
     candidate.decisionDetails = await resolveDecisionDetails(root, meta, input);
   } else if (hasDecisionInput(input)) {
@@ -253,6 +279,7 @@ function cloneLedger(ledger) {
     candidates: ledger.candidates.map((candidate) => ({
       ...candidate,
       evidence: [...candidate.evidence],
+      ...(candidate.relation ? { relation: { ...candidate.relation } } : {}),
       ...(candidate.decisionDetails ? { decisionDetails: { ...candidate.decisionDetails } } : {})
     }))
   };
@@ -289,6 +316,33 @@ async function resolveDecisionDetails(root, meta, input) {
   return details;
 }
 
+// The Agent declares the relationship explicitly; YallaFlow only validates that the
+// referenced fact exists and that the transition is legal for its current state. It
+// never infers semantic equivalence between prose statements.
+async function resolveRelation(root, input) {
+  const declared = RELATION_TYPES.filter((type) => input[type] !== undefined);
+  if (!declared.length) return null;
+  if (declared.length > 1) throw new Error('Use only one of --supersedes, --reconfirms, or --disputes per candidate.');
+  const type = declared[0];
+  const factId = typeof input[type] === 'string' ? input[type].trim() : input[type];
+  const { ledger } = await loadContextLedger(root);
+  const fact = findFact(ledger, factId);
+  if (!fact) throw new Error(`--${type} ${factId}: project context fact ${factId} was not found. Run \`yallaflow context status\` to list current facts.`);
+  const allowed = type === 'disputes' ? ['current'] : ['current', 'disputed'];
+  if (!allowed.includes(fact.state)) {
+    throw new Error(`--${type} ${factId}: ${factId} is ${fact.state}${fact.supersededBy ? ` (superseded by ${fact.supersededBy})` : ''} and cannot be ${type === 'supersedes' ? 'superseded' : type === 'reconfirms' ? 'reconfirmed' : 'disputed'}.`);
+  }
+  return { type, factId, area: fact.area };
+}
+
+async function assertNotDiscoveryLimitation(root, workId, summary) {
+  const { ledger } = await loadWorkLimitations(root, workId);
+  const match = (ledger.limitations ?? []).find((entry) => sameStatement(entry.summary, summary));
+  if (match) {
+    throw new Error(`"${summary}" is recorded as discovery limitation ${match.id} for ${workId}. Discovery limitations are work-scoped and cannot become project knowledge.`);
+  }
+}
+
 function validateCandidate(candidate) {
   if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) throw new Error('Knowledge candidate must be an object.');
   rejectUnknownFields(candidate, CANDIDATE_FIELDS, `knowledge candidate ${candidate.id ?? '<unknown>'}`);
@@ -310,6 +364,24 @@ function validateCandidate(candidate) {
   }
   if (candidate.status === 'rejected' && (!isNonEmptyString(candidate.rejectedAt) || !isNonEmptyString(candidate.rejectionReason))) {
     throw new Error(`Rejected candidate ${candidate.id} requires rejectedAt and rejectionReason.`);
+  }
+  if (candidate.confidence !== undefined && !CONFIDENCE_LEVELS.includes(candidate.confidence)) {
+    throw new Error(`Knowledge candidate ${candidate.id} has unsupported confidence ${JSON.stringify(candidate.confidence)}.`);
+  }
+  if (candidate.provenance !== undefined && !PROVENANCE_VALUES.includes(candidate.provenance)) {
+    throw new Error(`Knowledge candidate ${candidate.id} has unsupported provenance ${JSON.stringify(candidate.provenance)}.`);
+  }
+  if (candidate.relation !== undefined) {
+    const relation = candidate.relation;
+    if (!relation || typeof relation !== 'object' || Array.isArray(relation)) throw new Error(`Knowledge candidate ${candidate.id} has an invalid relation.`);
+    rejectUnknownFields(relation, RELATION_FIELDS, `relation of knowledge candidate ${candidate.id}`);
+    if (!RELATION_TYPES.includes(relation.type) || !/^CTX-\d{4,}$/.test(relation.factId ?? '')) {
+      throw new Error(`Knowledge candidate ${candidate.id} has an invalid relation.`);
+    }
+    if (candidate.kind === 'decision') throw new Error(`Decision candidate ${candidate.id} cannot relate to a project context fact.`);
+  }
+  if (candidate.factId !== undefined && (candidate.status !== 'promoted' || !/^CTX-\d{4,}$/.test(candidate.factId))) {
+    throw new Error(`Knowledge candidate ${candidate.id} has an invalid factId.`);
   }
   if (candidate.status === 'proposed' && ['promotedAt', 'target', 'rejectedAt', 'rejectionReason'].some((field) => candidate[field] !== undefined)) {
     throw new Error(`Proposed candidate ${candidate.id} cannot contain disposition fields.`);

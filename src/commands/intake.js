@@ -2,7 +2,8 @@ import { findProjectRoot, getCurrentState } from '../core/workspace.js';
 import { prepareFileIntake } from '../intake/file.js';
 import { defaultTitleFromFilename, describeContentAvailability } from '../intake/normalize.js';
 import { findSourceByChecksum, linkSourceToWork, persistSource, removeSourceDir } from '../core/sources.js';
-import { addSourceToWork, createPendingIntake } from '../behavior/routing.js';
+import { addSourceToWork, assertSourceLinkAllowed, createPendingIntake } from '../behavior/routing.js';
+import { loadWorkMetaOrThrow } from '../core/workspace.js';
 
 // Creates a new pending work item from one or more source files:
 //   yallaflow intake SRS.docx
@@ -39,18 +40,20 @@ export async function intakeCommand(filePaths, options = {}) {
 
 // Attaches one or more additional sources to an existing work item:
 //   yallaflow intake add PF-0001 client-notes.docx
-export async function intakeAddCommand(requestedWorkId, filePaths) {
+export async function intakeAddCommand(requestedWorkId, filePaths, options = {}) {
   const root = await findProjectRoot();
   if (!root) throw new Error('No .yallaflow workspace found. Run `yallaflow init` first.');
   const state = await getCurrentState(root);
   const workId = requestedWorkId ?? state.activeWork;
   if (!workId) throw new Error('No active work item. Provide a work ID: `yallaflow intake add PF-0001 <file>`.');
-  if (!filePaths?.length) throw new Error('Usage: yallaflow intake add <work-id> <file> [<file> ...]');
+  if (!filePaths?.length) throw new Error('Usage: yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]');
+  // Checked before any source is persisted, so a refused link leaves no orphan source.
+  assertSourceLinkAllowed(await loadWorkMetaOrThrow(root, workId), options.reason);
 
   const sources = await captureSources(root, filePaths);
   let work;
   try {
-    for (const source of sources) work = await addSourceToWork(root, workId, sourceRef(source));
+    for (const source of sources) work = await addSourceToWork(root, workId, sourceRef(source), undefined, { reason: options.reason });
   } catch (error) {
     for (const source of sources) await removeSourceDir(root, source.id);
     throw error;
@@ -61,6 +64,7 @@ export async function intakeAddCommand(requestedWorkId, filePaths) {
   console.log(`Attached to: ${work.id}`);
   console.log(`\nSource${sources.length > 1 ? 's' : ''}:\n${sources.map(describeSource).join('\n')}`);
   console.log(`\nTotal sources on ${work.id}: ${work.sources.length}`);
+  if (work.status === 'DONE') console.log(`${work.id} remains DONE; recorded as recovered source(s) attached after completion (reason: ${options.reason.trim()}).`);
 }
 
 async function captureSources(root, filePaths) {

@@ -44,6 +44,7 @@ export async function baselineDraftCommand(workId, input) {
   for (const status of ['confirmed', 'inferred', 'unresolved']) {
     console.log(`${status}: ${summary.byStatus[status].length}`);
   }
+  if (summary.limitations.length) console.log(`discovery limitations: ${summary.limitations.length} (work-scoped, never promoted)`);
   console.log(`\nNext: yallaflow baseline approve ${workId} (or \`baseline feedback ${workId} --changes-requested\`).`);
 }
 
@@ -72,6 +73,7 @@ export async function baselineStatusCommand(requestedWorkId) {
   for (const [area, facts] of Object.entries(summary.byArea)) {
     if (facts.length) console.log(`  ${area}: ${facts.length}`);
   }
+  if (summary.limitations.length) console.log(`Discovery limitations: ${summary.limitations.length} (work-scoped, never promoted)`);
 }
 
 export async function baselineShowCommand(requestedWorkId) {
@@ -90,6 +92,11 @@ export async function baselineShowCommand(requestedWorkId) {
     if (fact.note) console.log(`  Note: ${fact.note}`);
     console.log(`  Evidence: ${fact.evidence.join(', ')}`);
   }
+  const limitations = ledger.limitations ?? [];
+  if (limitations.length) {
+    console.log('\nDiscovery limitations (what this baseline could not inspect — work-scoped, never promoted as project facts):');
+    for (const entry of limitations) console.log(`${entry.id} [${entry.type}] ${entry.area} — ${entry.summary} (reason: ${entry.reason})`);
+  }
 }
 
 export async function baselineApproveCommand(requestedWorkId, input) {
@@ -97,7 +104,7 @@ export async function baselineApproveCommand(requestedWorkId, input) {
   if (!root) throw new Error('No .yallaflow workspace found. Run `yallaflow init` first.');
   const workId = await resolveWorkId(root, requestedWorkId);
   const { ledger } = await approveBaseline(root, workId, input.note);
-  console.log(`${workId} — baseline approved and promoted (${ledger.facts.length} fact(s) written to durable project docs).`);
+  console.log(`${workId} — baseline approved and promoted (${ledger.facts.length} fact(s) recorded in .yallaflow/context/index.yaml and projected into durable project docs).`);
   console.log(`${workId} status: DONE.`);
 }
 

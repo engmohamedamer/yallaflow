@@ -280,7 +280,11 @@ async function applySkillCheckpoint(root, meta, contract, ledger, input, now) {
   if (input.status === 'completed' && input.skillId === 'systematic-debugging' && meta.type === 'bug' && !evidence.length) {
     throw new Error('Completing systematic-debugging for a bug requires at least one --evidence reference for the confirmed root cause.');
   }
-  if (input.status === 'completed' && input.skillId === 'verification' && !meta.readOnly) {
+  // Applies to read-only work too (investigations, bug spikes): doctor requires every
+  // completed verification checkpoint to be backed by successful evidence, so the
+  // checkpoint may never be completed without it. `yallaflow verify` runs a
+  // read-only proof command; it does not authorize application-code changes.
+  if (input.status === 'completed' && input.skillId === 'verification') {
     const verification = await latestVerification(root, meta.id);
     if (!verification?.success) {
       throw new Error('Completing verification requires fresh successful evidence from `yallaflow verify -- <command>`.');

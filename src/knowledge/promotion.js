@@ -1,7 +1,10 @@
 import path from 'node:path';
-import { appendFile } from 'node:fs/promises';
 import { exists, readText, writeText } from '../utils/fs.js';
 import { workspacePath } from '../core/workspace.js';
+import { listVerificationRuns } from '../core/evidence.js';
+import { appliedTransition, loadContextLedger, mutateContextLedger, validateContextLedger } from '../context/ledger.js';
+import { writeContextProjection } from '../context/projection.js';
+import { hasResolvableEvidence, normalizeEvidenceRefs } from '../context/evidence.js';
 import { CONTEXT_TARGETS } from './constants.js';
 import {
   assertKnowledgeReviewAllowed,
@@ -12,17 +15,6 @@ import {
   writeKnowledgeLedger
 } from './store.js';
 
-const CONTEXT_HEADINGS = Object.freeze({
-  architecture: '# Architecture',
-  database: '# Database',
-  integration: '# Integrations',
-  environment: '# Environments',
-  convention: '# Engineering Conventions',
-  'business-rule': '# Business Rules',
-  project: null, // PROJECT.md always exists already (written at init); never re-headered
-  'tech-stack': '# Tech Stack'
-});
-
 export async function promoteKnowledge(root, workId, candidateId, now = new Date().toISOString()) {
   const meta = await loadWorkMeta(root, workId);
   const loaded = await loadWorkKnowledge(root, meta);
@@ -31,9 +23,14 @@ export async function promoteKnowledge(root, workId, candidateId, now = new Date
   if (candidate.status === 'rejected') throw new Error(`Candidate ${candidateId} was rejected and cannot be promoted.`);
   if (candidate.status === 'promoted') throw new Error(`Candidate ${candidateId} is already promoted to ${candidate.target}.`);
 
-  const target = candidate.kind === 'decision'
-    ? await promoteDecision(root, workId, candidate, now)
-    : await promoteContext(root, workId, candidate, now);
+  let target;
+  if (candidate.kind === 'decision') {
+    target = await promoteDecision(root, workId, candidate, now);
+  } else {
+    const promoted = await promoteContext(root, workId, candidate, now);
+    target = promoted.target;
+    candidate.factId = promoted.factId;
+  }
   candidate.status = 'promoted';
   candidate.promotedAt = now;
   candidate.target = target;
@@ -42,25 +39,49 @@ export async function promoteKnowledge(root, workId, candidateId, now = new Date
   return { meta, candidate, target, ledger: loaded.ledger };
 }
 
+// Context knowledge enters (or evolves) the canonical project-context ledger, whose
+// single writer then re-renders the affected Markdown projection — the same path an
+// approved Brownfield Baseline takes, so no durable document is ever written by two
+// competing mechanisms. The candidate itself (this work item's historical record)
+// keeps its original evidence strings and only records which CTX fact it produced or
+// affected.
 async function promoteContext(root, workId, candidate, now) {
-  const relative = CONTEXT_TARGETS[candidate.kind];
-  if (!relative) throw new Error(`No project-memory target exists for knowledge kind ${candidate.kind}.`);
-  const marker = knowledgeMarker(workId, candidate.id);
-  await appendMarkedSection(root, relative, marker, contextSection(workId, candidate, now, marker), CONTEXT_HEADINGS[candidate.kind]);
-  return relative;
-}
-
-// Shared, idempotent (marker-guarded) append primitive: exactly one mechanism ever
-// writes into a context/PROJECT.md target, whether the caller is an ordinary
-// work-scoped knowledge candidate or a Brownfield Baseline fact (src/baseline/store.js)
-// — so the two input pipelines can never produce two competing versions of the same
-// durable document.
-export async function appendMarkedSection(root, relativePath, marker, section, header) {
-  const file = path.join(workspacePath(root), relativePath);
-  let current = '';
-  if (await exists(file)) current = await readText(file);
-  else if (header) await writeText(file, `${header}\n\n`);
-  if (!current.includes(marker)) await appendFile(file, section, 'utf8');
+  if (!CONTEXT_TARGETS[candidate.kind]) throw new Error(`No project-memory target exists for knowledge kind ${candidate.kind}.`);
+  const evidence = await normalizeEvidenceRefs(root, candidate.evidence, {
+    workId,
+    verificationRuns: await listVerificationRuns(root, workId)
+  });
+  const relation = candidate.relation;
+  if (relation && !hasResolvableEvidence(evidence)) {
+    throw new Error(
+      `Candidate ${candidate.id} ${relation.type} ${relation.factId} but cites no resolvable evidence. ` +
+      'Knowledge evolution requires at least one existing repository path, runtime:<observation>, verification:V-###, or user:<confirmation> reference.'
+    );
+  }
+  const origin = { workId, candidateId: candidate.id };
+  // Retry after a partially completed promotion (ledger written, projection or
+  // candidate update failed): never re-apply the transition; re-render and finish.
+  const { ledger: existing } = await loadContextLedger(root);
+  const already = appliedTransition(existing, origin);
+  if (already) {
+    if (!validateContextLedger(existing).length) await writeContextProjection(root, existing);
+    return { target: CONTEXT_TARGETS[already.area], factId: already.id };
+  }
+  const factInput = {
+    area: candidate.kind,
+    summary: candidate.summary,
+    confidence: candidate.confidence,
+    provenance: candidate.provenance,
+    evidence,
+    origin
+  };
+  const { result: fact } = await mutateContextLedger(root, (ops) => {
+    if (!relation) return ops.introduce(factInput);
+    if (relation.type === 'supersedes') return ops.supersede(relation.factId, factInput).fact;
+    if (relation.type === 'reconfirms') return ops.reconfirm(relation.factId, { evidence, confidence: candidate.confidence, origin }).fact;
+    return ops.dispute(relation.factId, { summary: candidate.summary, evidence, origin }).fact;
+  }, now);
+  return { target: CONTEXT_TARGETS[fact.area], factId: fact.id };
 }
 
 async function promoteDecision(root, workId, candidate, now) {
@@ -74,11 +95,6 @@ async function promoteDecision(root, workId, candidate, now) {
   }
   await writeText(file, adrDocument(workId, candidate, now, marker));
   return relative;
-}
-
-function contextSection(workId, candidate, now, marker) {
-  const evidence = candidate.evidence.map((entry) => `  - ${entry}`).join('\n');
-  return `\n${marker}\n## ${candidate.id} — ${candidate.summary}\n\n- **Source work:** ${workId}\n- **Knowledge ID:** ${candidate.id}\n- **Promoted at:** ${now}\n- **Evidence:**\n${evidence}\n`;
 }
 
 function adrDocument(workId, candidate, now, marker) {

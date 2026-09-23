@@ -1,6 +1,6 @@
 # Roadmap
 
-YallaFlow applies Adaptive Spec-Driven Development: workflow depth follows the kind and scope of work instead of forcing every request through one specification template.
+YallaFlow is an AI-agnostic engineering governance layer for coding agents — durable project memory, adaptive workflows, and evidence-backed delivery. It applies Adaptive Spec-Driven Development where the work needs it: workflow depth follows the kind and scope of work instead of forcing every request through one specification template.
 
 ## v0.1 — Foundation
 - CLI: init, start, feature, bug, investigate, change, status, resume, doctor
@@ -110,6 +110,24 @@ Findings from multiple real human pilots (greenfield SRS/file-intake, full proje
 - Verification execution rewritten to argv-mode-by-default (`shell: false`, exact argv boundaries preserved), with explicit `--shell`/`--script` modes and fixed stdin inheritance; the evidence ledger gained additive execution-metadata fields
 - `handoff`/`resume` surface a `PRIMARY UNRESOLVED OBJECTIVE` (reopen/revision/blocker) and are explicit that a child's `DONE` is not project completion
 - Risk-aware routing/question guidance (financial, security/privacy, authorization, data-model, integration-contract, and irreversibility considerations) and no redundant re-confirmation once a review gate is already approved
+
+### v0.3.6 — Living Project Memory & Context Integrity
+
+Findings from the real YaSchools Brownfield pilot (baseline → reviewed durable context → fresh agent reuse → scoped investigation → knowledge promotion → bounded implementation → verification):
+
+- One canonical, structured project-context ledger (`.yallaflow/context/index.yaml`, `CTX-####` facts) with state (`current`/`superseded`/`disputed`) separate from confidence, provenance, originating work, structured evidence (path + content hash + Git commit; never contents), and verification point; `PROJECT.md`/`context/*.md` become projections of current facts (one managed block per document, human content preserved)
+- Knowledge evolution through the existing candidate flow: `knowledge propose --reconfirms|--supersedes|--disputes CTX-####` — the Agent declares the relationship, YallaFlow validates the transition; work history is never rewritten
+- Mechanical Git/content-hash freshness (`FRESH`/`MAY_BE_STALE`/`STALE_EVIDENCE`/`UNKNOWN`) and change impact; read-only `yallaflow context status|list|show|history|affected`; `context render` for explicit projection repair
+- Work-scoped discovery limitations (`yallaflow limitation add|list`, baseline `limitations`) that can never become project facts
+- Brownfield Baseline approval feeds the ledger; v0.3.5 workspaces are never migrated on read, with an explicit `yallaflow context adopt [--dry-run]` upgrade
+- Doctor context integrity (lineage, lifecycle, provenance, evidence metadata, projection drift, promoted limitations; freshness as warnings), and handoff/resume relevant-context summaries
+- Sparse workspace: optional work artifact directories are created lazily; `execution/` reserved and no longer created; `attachments/` retired in favor of `sources/`
+- One canonical work-creation path: direct `feature|bug|investigate|...` shortcuts require `--scope` and create routed, contract-pinned work (no new contract-less work)
+- Pre-freeze integrity: every command-reachable state passes `doctor` (investigation DONE/verification consistency); atomic ledger writes with idempotent retry and `context render` recovery; versioned `AGENT.md` agent contract with `yallaflow agent status|refresh`; auditable recovered sources for DONE work
+- Durable user-provided artifacts: material screenshots/files registered as immutable, linked `SRC-####` sources (checksum-verified by `doctor`, located by `handoff`/`resume`), or recorded as `uncaptured-artifact` limitations when inaccessible
+- `guide`/`advance` report the current objective, blocker, and exact next valid action from one shared resolver; agent guidance prefers argv verification
+
+Deliberately not in scope: automatic semantic refresh or LLM comparison in the CLI, automatic baseline refresh (a second approved baseline is still refused), team mode, and any graph/vector store.
 
 ## v0.4 — Execution
 - Execution contracts

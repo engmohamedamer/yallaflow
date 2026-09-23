@@ -10,7 +10,8 @@ import { checkpointWork } from '../src/core/progress.js';
 import { advanceActiveWork } from '../src/core/transitions.js';
 import { recordVerification } from '../src/core/evidence.js';
 import { reviewKnowledgeNone } from '../src/knowledge/store.js';
-import { createWorkItem, initWorkspace, workspacePath } from '../src/core/workspace.js';
+import { initWorkspace, workspacePath } from '../src/core/workspace.js';
+import { createRoutedWork } from '../src/behavior/routing.js';
 import { readYaml } from '../src/core/yaml.js';
 
 const cli = fileURLToPath(new URL('../src/cli.js', import.meta.url));
@@ -35,7 +36,7 @@ test('resume with no ID inspects the active work item', async () => {
 
 test('resume with an explicit ID reads that work item without mutating the active pointer', async () => {
   const { root, meta: first } = await routedWork();
-  const second = await createWorkItem(root, 'feature', 'Second item', 'bounded');
+  const second = await createRoutedWork(root, 'Second item', { work_type: 'feature', scope: 'bounded', confidence: 'high', reason: 'Test fixture.', title: 'Second item' });
 
   const before = await readYaml(path.join(workspacePath(root), 'state', 'current.yaml'));
   assert.equal(before.activeWork, second.id);

@@ -30,3 +30,16 @@ export const CONTEXT_TARGETS = Object.freeze({
   project: 'PROJECT.md',
   'tech-stack': 'context/tech-stack.md'
 });
+
+// The heading a durable target document is created with when it does not yet exist.
+// PROJECT.md always exists already (written at init) and is never re-headered.
+export const CONTEXT_HEADINGS = Object.freeze({
+  architecture: '# Architecture',
+  database: '# Database',
+  integration: '# Integrations',
+  environment: '# Environments',
+  convention: '# Engineering Conventions',
+  'business-rule': '# Business Rules',
+  project: null,
+  'tech-stack': '# Tech Stack'
+});

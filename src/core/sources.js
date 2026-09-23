@@ -150,6 +150,22 @@ export function sourceOriginalPath(root, record) {
   return path.join(workspacePath(root), relative);
 }
 
+// Read-only lines describing a work item's linked sources, including where a fresh
+// agent can open each preserved original. Used by handoff and resume.
+export async function describeWorkSourceLocations(root, sources = []) {
+  const lines = [];
+  for (const ref of sources) {
+    try {
+      const record = await loadSource(root, ref.id);
+      const late = ref.relationship === 'recovered-source' ? ' (recovered after DONE — not available during the original execution)' : '';
+      lines.push(`${ref.id} — ${ref.name}: ${path.relative(root, sourceOriginalPath(root, record)).split(path.sep).join('/')}${late}`);
+    } catch {
+      lines.push(`${ref.id} — ${ref.name}: source record missing (run \`yallaflow doctor\`)`);
+    }
+  }
+  return lines;
+}
+
 // Best-effort rollback used when a source was persisted but the associated work item
 // failed to be created; keeps intake "atomic-ish" without a real transaction system.
 export async function removeSourceDir(root, sourceId) {

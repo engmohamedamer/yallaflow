@@ -8,6 +8,8 @@ import { loadWorkKnowledge } from '../knowledge/store.js';
 import { loadWorkQuestions } from '../questions/store.js';
 import { listSources } from '../core/sources.js';
 import { checkWorkIntegrity, checkWorkspaceIntegrity } from '../core/integrity.js';
+import { checkContextIntegrity } from '../context/integrity.js';
+import { describeAgentContractState, inspectAgentContract } from '../agent/contract.js';
 
 export async function doctorCommand() {
   const root = await findProjectRoot();
@@ -91,10 +93,30 @@ export async function doctorCommand() {
     checks.push([`lifecycle integrity: ${error instanceof Error ? error.message : String(error)}`, false]);
   }
 
+  // Project memory: structural ledger/lineage/projection problems fail; freshness and
+  // unadopted legacy context are warnings only.
+  const warnings = [];
+  try {
+    const context = await checkContextIntegrity(root);
+    if (context.errors.length) context.errors.forEach((issue) => checks.push([issue, false]));
+    else checks.push([context.hasLedger ? `project context ledger (${context.factCount} fact(s))` : 'project context ledger (not yet created)', true]);
+    warnings.push(...context.warnings);
+  } catch (error) {
+    checks.push([`project context ledger: ${error instanceof Error ? error.message : String(error)}`, false]);
+  }
+
+  // Agent guidance that predates the installed package contract is a warning — doctor
+  // never rewrites AGENT.md (see `yallaflow agent refresh`).
+  try {
+    const agent = await inspectAgentContract(root);
+    if (!['current', 'missing'].includes(agent.state)) warnings.push(`AGENT.md agent contract: ${describeAgentContractState(agent)}`);
+  } catch (error) {
+    warnings.push(`AGENT.md agent contract: ${error instanceof Error ? error.message : String(error)}`);
+  }
+
   // Informational only: YallaFlow does not mandate a Git/team workflow, so an
   // untracked-and-ungitignored workspace is a warning, never a structural-integrity
   // failure — it must never make an otherwise healthy workspace report unhealthy.
-  const warnings = [];
   try {
     warnings.push(...checkWorkspaceIntegrity(root));
   } catch (error) {

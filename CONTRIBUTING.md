@@ -4,7 +4,10 @@ Thanks for helping improve YallaFlow.
 
 ## Principles
 - Solve one real problem per change.
-- Preserve YallaFlow's Adaptive Spec-Driven Development model: ceremony should match work type and scope.
+- Preserve YallaFlow's role as an engineering governance layer: the agent reasons, YallaFlow validates and governs state transitions, and project memory persists.
+- Preserve Adaptive Spec-Driven Development: ceremony should match work type and scope.
+- Every state reachable through supported commands must pass `yallaflow doctor`; fix transitions, never weaken integrity checks.
+- Work records are immutable history; project memory evolves only through explicit reconfirm/supersede/dispute transitions.
 - Discover technical facts before asking; reserve questions for material business ambiguity.
 - Add or update tests for behavior changes.
 - Do not weaken workflow gates without evidence.
@@ -32,7 +35,7 @@ npm run check
 
 ## Documentation and CHANGELOG
 
-Update `README.md`, `docs/architecture.md`, and/or `docs/roadmap.md` alongside any behavior change they describe. Add a corresponding entry to [`CHANGELOG.md`](CHANGELOG.md) under `[Unreleased]`. See [`docs/releasing.md`](docs/releasing.md) for how package, Skill Registry, knowledge-policy, and workspace-schema versions relate, and for the maintainer release checklist.
+Update `README.md`, the relevant `docs/` page (`guide.md`, `workflows.md`, `cli.md`, `project-memory.md`, `architecture.md`, `limitations.md`, `roadmap.md`), and — for agent-facing behavior — the generated agent contract (`src/agent/contract.js`, bumping `AGENT_CONTRACT_VERSION`) alongside any behavior change they describe. Add a corresponding entry to [`CHANGELOG.md`](CHANGELOG.md) under `[Unreleased]`. See [`docs/releasing.md`](docs/releasing.md) for how package, Skill Registry, knowledge-policy, and workspace-schema versions relate, and for the maintainer release checklist.
 
 ## Pull requests
 Describe the requirement, work type/scope, behavior before/after, tests/evidence, and any compatibility implications. Keep task-local execution details out of durable project knowledge unless they establish a stable fact or decision.

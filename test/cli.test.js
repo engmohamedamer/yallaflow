@@ -7,9 +7,9 @@ test('exposes the YallaFlow product and CLI identity', async () => {
   const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
   assert.equal(pkg.name, 'yallaflow');
   assert.equal(pkg.private, true);
-  assert.equal(pkg.description, 'Adaptive Spec-Driven Development workflows for AI-assisted software engineering.');
+  assert.equal(pkg.description, 'AI-agnostic engineering governance layer for coding agents: durable project memory, adaptive workflows, and evidence-backed delivery.');
   assert.deepEqual(pkg.bin, { yallaflow: 'src/cli.js' });
-  assert.equal(pkg.version, '0.3.5-internal.1');
+  assert.equal(pkg.version, '0.3.6-internal.1');
 
   const result = spawnSync(process.execPath, ['src/cli.js', '--help'], { encoding: 'utf8' });
   assert.equal(result.status, 0);
@@ -27,6 +27,9 @@ test('exposes the YallaFlow product and CLI identity', async () => {
   assert.match(result.stdout, /yallaflow checkpoint --help/);
   assert.match(result.stdout, /yallaflow question --help/);
   assert.match(result.stdout, /yallaflow knowledge --help/);
+  assert.match(result.stdout, /yallaflow context --help/);
+  assert.match(result.stdout, /yallaflow limitation --help/);
+  assert.match(result.stdout, /yallaflow agent --help/);
   assert.doesNotMatch(result.stdout, /\bpf\b/);
 });
 

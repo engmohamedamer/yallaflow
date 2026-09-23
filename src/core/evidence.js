@@ -79,6 +79,7 @@ export async function latestVerification(root, workId) {
 
 export async function hasAnyEvidence(root, workId) {
   const dir = path.join(workspacePath(root), 'work', workId, 'evidence');
+  if (!await exists(dir)) return false; // sparse workspace: no evidence/ until first verification
   const entries = await readdir(dir);
   return entries.length > 0;
 }

@@ -11,6 +11,10 @@ import { childProgressView, loadDecomposition, validateChildren } from '../decom
 import { stageForSkill } from './workflows.js';
 import { loadBaseline } from '../baseline/store.js';
 import { CONTEXT_TARGETS } from '../knowledge/constants.js';
+import { loadContextLedger } from '../context/ledger.js';
+import { hashFile } from '../context/evidence.js';
+import { loadSource, sourceChecksum, sourceOriginalPath } from './sources.js';
+import { validateLimitation } from '../limitations/store.js';
 import { BASELINE_AREAS, BASELINE_FACT_SOURCES, BASELINE_FACT_STATUSES } from '../baseline/constants.js';
 
 // The single place that answers "does this work item's durable state contradict
@@ -98,6 +102,7 @@ export async function checkWorkIntegrity(root, meta) {
   }
 
   issues.push(...await checkVerificationMetadataIntegrity(root, meta));
+  issues.push(...await checkSourceLinkIntegrity(root, meta));
 
   const config = await getConfig(root);
   const policy = resolveInteractionPolicy(config);
@@ -160,8 +165,20 @@ async function checkBaselineIntegrity(root, meta) {
     if (!Array.isArray(fact.evidence) || !fact.evidence.length) issues.push(`${meta.id}: baseline fact ${fact.id} has no evidence references.`);
   }
 
+  for (const [index, entry] of (ledger.limitations ?? []).entries()) {
+    for (const problem of validateLimitation(entry, `${meta.id}: baseline limitation ${entry?.id ?? index + 1}`)) issues.push(problem);
+  }
+
+  // An approved fact is promoted when the canonical ledger holds a fact originating
+  // from it (v0.3.6+, or adopted), or — for a v0.3.5 approval never adopted — when its
+  // legacy append-only marker is present in the target document.
   if (ledger.status === 'approved') {
+    const { ledger: context } = await loadContextLedger(root);
+    const promoted = new Set((context.facts ?? [])
+      .filter((fact) => fact?.origin?.workId === meta.id && fact.origin.baselineFactId)
+      .map((fact) => fact.origin.baselineFactId));
     for (const fact of ledger.facts) {
+      if (promoted.has(fact.id)) continue;
       const relative = CONTEXT_TARGETS[fact.area];
       const marker = `<!-- yallaflow-baseline:${meta.id}:${fact.id} -->`;
       const file = path.join(workspacePath(root), relative);
@@ -186,6 +203,32 @@ function checkRequestHistoryIntegrity(meta) {
       if (typeof entry[field] !== 'string' || !entry[field].trim()) issues.push(`${label} has an invalid or missing ${field}.`);
     }
   });
+  return issues;
+}
+
+// Sources are immutable original inputs: every source a work item references must
+// exist, link back to the work item, and still match the checksum recorded at capture.
+async function checkSourceLinkIntegrity(root, meta) {
+  const issues = [];
+  for (const ref of meta.sources ?? []) {
+    if (ref.relationship === 'recovered-source' && (ref.workStatusAtLink !== 'DONE' || typeof ref.reason !== 'string' || !ref.reason.trim() || !ref.linkedAt)) {
+      issues.push(`${meta.id}: recovered source ${ref.id} is missing its audit metadata (linkedAt, workStatusAtLink DONE, reason).`);
+    }
+    let record;
+    try {
+      record = await loadSource(root, ref.id);
+    } catch {
+      issues.push(`${meta.id}: references source ${ref.id}, which does not exist.`);
+      continue;
+    }
+    if (!record.linkedWork.includes(meta.id)) issues.push(`${meta.id}: references source ${ref.id}, but ${ref.id} does not link back to ${meta.id}.`);
+    const original = sourceOriginalPath(root, record);
+    if (!await exists(original)) {
+      issues.push(`${meta.id}: source ${ref.id}'s preserved original is missing.`);
+    } else if (`sha256:${sourceChecksum(record)}` !== await hashFile(original)) {
+      issues.push(`${meta.id}: source ${ref.id}'s preserved original no longer matches its recorded checksum (sources are immutable; capture a new version with \`yallaflow intake add\`).`);
+    }
+  }
   return issues;
 }
 

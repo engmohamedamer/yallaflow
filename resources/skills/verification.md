@@ -13,7 +13,14 @@ Require fresh evidence before completion or success claims.
 5. Record the command, outcome, and evidence through the existing YallaFlow verification mechanism.
 6. Allow a completion claim only after the required proof succeeds.
 
-Use `yallaflow verify -- <command>` when recording command-based verification for an active work item.
+Record command-based verification with argv mode by default — each argument is passed exactly, with no shell quoting to get wrong:
+
+```bash
+yallaflow verify PF-0004 -- php artisan test
+yallaflow verify PF-0004 -- npm test -- --runInBand
+```
+
+Use `--shell "<command>"` only when shell syntax is genuinely required (pipes, redirection, `&&`), and `--script <path>` for a checked-in script. Every attempt — including a failed or mis-quoted one — stays in the append-only evidence ledger; re-run correctly rather than trying to hide a failed attempt. A successful run can back durable knowledge as `--evidence verification:V-###`.
 
 ## Guard
 

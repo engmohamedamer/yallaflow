@@ -14,6 +14,9 @@ import { GATE_NAMES } from '../behavior/interaction.js';
 import { childProgressView, computeTraceability, loadDecomposition, readyChildren } from '../decomposition/store.js';
 import { formatSourceList } from '../intake/normalize.js';
 import { resolvePrimaryObjective } from '../behavior/objective.js';
+import { projectContextLines } from '../context/summary.js';
+import { loadWorkLimitations } from '../limitations/store.js';
+import { describeWorkSourceLocations } from '../core/sources.js';
 
 // Read-only by construction: every call below is a loader (loadWorkProgress,
 // evaluateReadiness, discoverGitState, ...), never a mutator — the same shared
@@ -84,6 +87,7 @@ export async function handoffCommand(requestedWorkId) {
   console.log(`\nVerification: ${verification ? (verification.success ? 'passed' : 'failed') : 'not recorded'}${verification ? ` (${verification.id}, ${verification.verifiedAt})` : ''}`);
   const knowledgeSummary = summarizeKnowledge(knowledge.ledger);
   console.log(`Knowledge review: ${knowledgeSummary.reviewStatus}`);
+  await printProjectMemory(root, meta, knowledge.ledger);
   console.log(`\nGit: ${git.summary}`);
 
   console.log(`\nApplication code modification: ${guidance.modification.authorized ? 'AUTHORIZED' : 'NOT AUTHORIZED'}`);
@@ -129,4 +133,23 @@ function printOpenQuestions(summary) {
   if (!summary.open.length) return;
   console.log(`\nOpen decisions: ${summary.open.length} (${summary.materialOpen.length} material)`);
   for (const entry of summary.open) console.log(`- ${entry.id} [${entry.status}] ${entry.question}`);
+}
+
+// Relevant project-memory integrity (stale/disputed facts, facts this work relates to)
+// plus this work item's own discovery limitations — never the whole ledger.
+async function printProjectMemory(root, meta, knowledgeLedger) {
+  if (meta.sources?.length) {
+    console.log('\nSources (original user/project inputs, immutable — open these rather than relying on prior conversation):');
+    for (const line of await describeWorkSourceLocations(root, meta.sources)) console.log(`- ${line}`);
+  }
+  const lines = await projectContextLines(root, knowledgeLedger);
+  if (lines.length) {
+    console.log('\nRelevant project context:');
+    for (const line of lines) console.log(line);
+  }
+  const { ledger } = await loadWorkLimitations(root, meta.id);
+  if (ledger.limitations.length) {
+    console.log(`\nDiscovery limitations (${meta.id}, work-scoped — not project facts):`);
+    for (const entry of ledger.limitations) console.log(`- ${entry.id} [${entry.type}] ${entry.area} — ${entry.summary}`);
+  }
 }

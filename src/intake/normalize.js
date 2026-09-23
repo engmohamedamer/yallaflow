@@ -18,7 +18,10 @@ export function formatSourceList(sources = []) {
     const format = source.detectedFormat ? source.detectedFormat.toUpperCase() : null;
     const availability = source.contentAvailability ? describeContentAvailability(source.contentAvailability) : null;
     const detail = [format, availability].filter(Boolean).join(', ');
-    return `${source.id} — ${source.name}${detail ? ` (${detail})` : ''}`;
+    const recovered = source.relationship === 'recovered-source'
+      ? ` [recovered after DONE${source.linkedAt ? ` on ${source.linkedAt}` : ''}: ${source.reason}]`
+      : '';
+    return `${source.id} — ${source.name}${detail ? ` (${detail})` : ''}${recovered}`;
   }).join('\n');
 }
 

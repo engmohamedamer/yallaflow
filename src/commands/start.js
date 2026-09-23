@@ -21,13 +21,13 @@ export async function startCommand(rawRequest = '') {
   const state = await getCurrentState(root);
   console.log('YallaFlow is ready.');
   if (state.activeWork) console.log(`There is active work (${state.activeWork}). Use: yallaflow resume`);
-  console.log('\nChoose the engineering intent:');
-  console.log('  yallaflow feature "<title>"      New functionality');
-  console.log('  yallaflow bug "<title>"          Something is broken');
-  console.log('  yallaflow investigate "<title>"  Read-only root-cause / feasibility investigation');
-  console.log('  yallaflow change "<title>"       Existing requirement changed');
-  console.log('  yallaflow refactor "<title>"     Behavior-preserving code improvement');
-  console.log('  yallaflow release "<title>"      Release work');
+  console.log('\nChoose the engineering intent (type and scope are both required; scope: spike | bounded | architectural):');
+  console.log('  yallaflow feature "<title>" --scope SCOPE      New functionality');
+  console.log('  yallaflow bug "<title>" --scope SCOPE          Something is broken');
+  console.log('  yallaflow investigate "<title>" --scope SCOPE  Read-only root-cause / feasibility investigation');
+  console.log('  yallaflow change "<title>" --scope SCOPE       Existing requirement changed');
+  console.log('  yallaflow refactor "<title>" --scope SCOPE     Behavior-preserving code improvement');
+  console.log('  yallaflow release "<title>" --scope SCOPE      Release work');
   console.log('  yallaflow status                   Project engineering status');
   console.log('\nOr create an unclassified intake: yallaflow start "<request>"');
 }

@@ -3,7 +3,10 @@ import assert from 'node:assert/strict';
 import { mkdtemp } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { initWorkspace, createWorkItem } from '../src/core/workspace.js';
+import { initWorkspace } from '../src/core/workspace.js';
+// Legacy (pre-v0.3.6, contract-less) work: stage-only lifecycles remain supported for
+// existing items, though v0.3.6 can no longer create them.
+import { createLegacyWorkItem as createWorkItem } from '../test-support/legacy-work.js';
 import { advanceActiveWork } from '../src/core/transitions.js';
 import { recordVerification } from '../src/core/evidence.js';
 import { reviewKnowledgeNone } from '../src/knowledge/store.js';

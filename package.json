@@ -1,8 +1,8 @@
 {
   "name": "yallaflow",
-  "version": "0.3.5-internal.1",
+  "version": "0.3.6-internal.1",
   "private": true,
-  "description": "Adaptive Spec-Driven Development workflows for AI-assisted software engineering.",
+  "description": "AI-agnostic engineering governance layer for coding agents: durable project memory, adaptive workflows, and evidence-backed delivery.",
   "type": "module",
   "bin": {
     "yallaflow": "src/cli.js"
@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "test": "node --test",
-    "check:syntax": "find src test -name '*.js' -print0 | xargs -0 -n1 node --check",
+    "check:syntax": "find src test test-support -name '*.js' -print0 | xargs -0 -n1 node --check",
     "check": "npm run check:syntax && npm test"
   },
   "engines": {

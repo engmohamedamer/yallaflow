@@ -9,7 +9,8 @@ import { buildBehaviorGuidance } from '../src/behavior/guidance.js';
 import { createPendingIntake, routeWorkItem } from '../src/behavior/routing.js';
 import { checkpointWork, loadWorkProgress, progressFilePath, summarizeProgress } from '../src/core/progress.js';
 import { advanceActiveWork } from '../src/core/transitions.js';
-import { createWorkItem, initWorkspace, workspacePath } from '../src/core/workspace.js';
+import { initWorkspace, workspacePath } from '../src/core/workspace.js';
+import { createLegacyWorkItem } from '../test-support/legacy-work.js';
 import { readYaml } from '../src/core/yaml.js';
 import { recordVerification } from '../src/core/evidence.js';
 import { exists } from '../src/utils/fs.js';
@@ -150,6 +151,8 @@ test('investigation never gains write authorization after all checkpoints comple
   const { root, meta } = await routedWork('investigation', 'bounded');
   await complete(root, meta, 'context-discovery');
   await complete(root, meta, 'systematic-debugging');
+  // v0.3.6: read-only work also needs successful evidence to complete verification.
+  await recordVerification(root, meta.id, { command: 'grep -q conclusion notes.md', success: true, exitCode: 0 });
   const result = await complete(root, meta, 'verification');
   const guidance = buildBehaviorGuidance(meta, 'CONCLUSION', result.ledger);
   assert.equal(guidance.modification.authorized, false);
@@ -234,7 +237,7 @@ test('v0.2.1 derived Behavior Contract supports checkpoints without metadata mut
 test('v0.1 work still loads without creating a ledger', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-progress-v01-'));
   await initWorkspace(root, 'demo', 'greenfield');
-  const meta = await createWorkItem(root, 'bug', 'Legacy bug', 'bounded');
+  const meta = await createLegacyWorkItem(root, 'bug', 'Legacy bug', 'bounded');
   const loaded = await loadWorkProgress(root, meta);
   assert.equal(loaded.contract.skills.length, 0);
   assert.equal(loaded.exists, false);

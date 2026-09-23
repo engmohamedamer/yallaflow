@@ -35,54 +35,9 @@ export async function advanceActiveWork(root, requestedWorkId) {
   const isActive = workId === state.activeWork;
   const current = isActive ? (state.stage ?? meta.status) : meta.status;
   const workflow = meta.workflow ?? meta.type;
-  const next = nextStageForWork(meta, current);
-  if (!next) throw new Error(`${meta.id} is already at the final stage.`);
-
-  const progress = await loadWorkProgress(root, meta);
-  const questions = await loadWorkQuestions(root, meta);
-  const blockers = await stageExitBlockers(root, meta, current, progress.contract, progress.ledger, questions.ledger);
-  if (blockers.length) {
-    throw new Error(
-      `Cannot advance from ${current} to ${next}.\n\nBlocking requirements:\n` +
-      blockers.map((blocker) => `- ${blocker}`).join('\n')
-    );
-  }
-
-  if (['IMPLEMENTATION', 'EXECUTION'].includes(next)) {
-    if (progress.contract.skills.length) {
-      const incomplete = incompleteImplementationSkills(progress.contract, progress.ledger);
-      if (incomplete.length) {
-        throw new Error(`Cannot transition to ${next}; complete required checkpoint(s) first: ${incomplete.join(', ')}.`);
-      }
-    }
-  }
-
-  let verification = null;
-  if (next === 'DONE' && workflow !== 'investigation') {
-    verification = await latestVerification(root, meta.id);
-    if (!verification?.success) {
-      throw new Error('Cannot transition to DONE without fresh successful verification evidence. Run `yallaflow verify -- <command>` first.');
-    }
-    if (meta.lastInvalidationAt && !(verification.verifiedAt > meta.lastInvalidationAt)) {
-      throw new Error(
-        'Cannot transition to DONE: verification evidence predates a later implementation reopen or revision. Run `yallaflow verify -- <command>` again.'
-      );
-    }
-  }
-
-  if (next === 'DONE' && progress.contract.skills.includes('code-review') && progress.ledger.skills['code-review']?.status !== 'completed') {
-    throw new Error('Cannot transition to DONE until the code-review checkpoint is completed.');
-  }
-
-  if (next === 'DONE' && meta.knowledgePolicy?.reviewRequired === true) {
-    const knowledge = await loadWorkKnowledge(root, meta);
-    if (knowledge.ledger.reviewStatus !== 'reviewed') {
-      throw new Error(
-        'Cannot transition to DONE until project knowledge review is complete. ' +
-        'Resolve all candidates or run `yallaflow knowledge review --none`.'
-      );
-    }
-  }
+  const verdict = await evaluateAdvance(root, meta, current, { mutate: true });
+  if (!verdict.allowed) throw new Error(verdict.error);
+  const next = verdict.next;
 
   const now = new Date().toISOString();
   meta.status = next;
@@ -105,6 +60,102 @@ export async function advanceActiveWork(root, requestedWorkId) {
   }
   await appendFile(path.join(workDir, 'progress.md'), `- ${now} Stage: ${current} → ${next}\n`, 'utf8');
   return { id: meta.id, from: current, to: next, type: meta.type };
+}
+
+// The single interpretation of "may this work item leave its current stage?", shared
+// by `advance` (mutate: true — it may record a newly requested review gate) and the
+// read-only `guide`/`next action` resolver (mutate: false). Returns the first blocking
+// requirement together with the exact next valid CLI action, so an agent does not need
+// repeated advance/guide round-trips to discover what to do next. Error text is the
+// exact text `advance` has always thrown.
+export async function evaluateAdvance(root, meta, current, { mutate = false } = {}) {
+  const id = meta.id;
+  const workflow = meta.workflow ?? meta.type;
+  const next = nextStageForWork(meta, current);
+  if (!next) return { allowed: false, next: null, final: true, error: `${id} is already at the final stage.`, blocker: null, action: null };
+  const blocked = (error, blocker, action) => ({ allowed: false, next, error, blocker, action });
+
+  const progress = await loadWorkProgress(root, meta);
+  const questions = await loadWorkQuestions(root, meta);
+  const blockers = await stageExitBlockers(root, meta, current, progress.contract, progress.ledger, questions.ledger, { mutate });
+  if (blockers.length) {
+    return blocked(
+      `Cannot advance from ${current} to ${next}.\n\nBlocking requirements:\n` + blockers.map((entry) => `- ${entry.text}`).join('\n'),
+      blockers[0].text,
+      blockers[0].action
+    );
+  }
+
+  if (['IMPLEMENTATION', 'EXECUTION'].includes(next) && progress.contract.skills.length) {
+    const incomplete = incompleteImplementationSkills(progress.contract, progress.ledger);
+    if (incomplete.length) {
+      return blocked(
+        `Cannot transition to ${next}; complete required checkpoint(s) first: ${incomplete.join(', ')}.`,
+        `required checkpoint(s) incomplete: ${incomplete.join(', ')}`,
+        checkpointAction(id, incomplete[0])
+      );
+    }
+  }
+
+  // Workflows without a VERIFICATION stage (investigation) never hit the stage-exit
+  // verification gate above, but doctor still requires a pinned verification
+  // checkpoint to be completed before DONE — so DONE enforces it for every workflow.
+  if (next === 'DONE' && progress.contract.skills.includes('verification') && progress.ledger.skills.verification?.status !== 'completed') {
+    const needsEvidence = !await hasFreshSuccessfulVerification(root, meta);
+    return blocked(
+      'Cannot transition to DONE until the verification checkpoint is completed.',
+      'verification checkpoint is incomplete',
+      needsEvidence ? `yallaflow verify ${id} -- <command>` : checkpointAction(id, 'verification')
+    );
+  }
+
+  if (next === 'DONE' && workflow !== 'investigation') {
+    const verification = await latestVerification(root, id);
+    if (!verification?.success) {
+      return blocked(
+        'Cannot transition to DONE without fresh successful verification evidence. Run `yallaflow verify -- <command>` first.',
+        'no fresh successful verification evidence exists',
+        `yallaflow verify ${id} -- <command>`
+      );
+    }
+    if (meta.lastInvalidationAt && !(verification.verifiedAt > meta.lastInvalidationAt)) {
+      return blocked(
+        'Cannot transition to DONE: verification evidence predates a later implementation reopen or revision. Run `yallaflow verify -- <command>` again.',
+        'verification evidence predates a later reopen/revision',
+        `yallaflow verify ${id} -- <command>`
+      );
+    }
+  }
+
+  if (next === 'DONE' && progress.contract.skills.includes('code-review') && progress.ledger.skills['code-review']?.status !== 'completed') {
+    return blocked('Cannot transition to DONE until the code-review checkpoint is completed.', 'code-review checkpoint is incomplete', checkpointAction(id, 'code-review'));
+  }
+
+  if (next === 'DONE' && meta.knowledgePolicy?.reviewRequired === true) {
+    const knowledge = await loadWorkKnowledge(root, meta);
+    if (knowledge.ledger.reviewStatus !== 'reviewed') {
+      const proposed = knowledge.ledger.candidates.filter((candidate) => candidate.status === 'proposed');
+      return blocked(
+        'Cannot transition to DONE until project knowledge review is complete. ' +
+        'Resolve all candidates or run `yallaflow knowledge review --none`.',
+        proposed.length ? `${proposed.length} knowledge candidate(s) awaiting promote/reject` : 'project knowledge review is pending',
+        proposed.length
+          ? `yallaflow knowledge promote ${id} --candidate ${proposed[0].id}   (or: knowledge reject ${id} --candidate ${proposed[0].id} --reason "...")`
+          : `yallaflow knowledge propose ${id} --kind KIND --source SOURCE --summary "..." --evidence REF   (or: knowledge review ${id} --none)`
+      );
+    }
+  }
+
+  return { allowed: true, next, error: null, blocker: null, action: `yallaflow advance ${id}` };
+}
+
+async function hasFreshSuccessfulVerification(root, meta) {
+  const verification = await latestVerification(root, meta.id);
+  return Boolean(verification?.success) && !(meta.lastInvalidationAt && !(verification.verifiedAt > meta.lastInvalidationAt));
+}
+
+function checkpointAction(workId, skillId) {
+  return `yallaflow checkpoint ${workId} --skill ${skillId} --complete --summary "..."`;
 }
 
 // Ordinary checkpoint revision walks the workflow stage backward when an earlier,
@@ -237,25 +288,31 @@ export async function reopenWork(root, workId, input, now = new Date().toISOStri
   return { id: workId, from, to: targetStage, reason };
 }
 
-async function stageExitBlockers(root, meta, stage, contract, ledger, questionsLedger) {
+async function stageExitBlockers(root, meta, stage, contract, ledger, questionsLedger, { mutate = true } = {}) {
   const blockers = [];
   const workflow = meta.workflow ?? meta.type;
   const isWriteStage = (WRITE_STAGES[workflow] ?? []).includes(stage);
 
   const decomposition = isWriteStage ? await decompositionBlockers(root, meta) : null;
   if (decomposition !== null) {
-    blockers.push(...decomposition);
+    blockers.push(...decomposition.map((text) => ({ text, action: `yallaflow next ${meta.id}` })));
   } else {
     const requiredSkill = requiredSkillForStage(meta, stage, contract.skills);
     if (requiredSkill) {
       const status = ledger.skills[requiredSkill]?.status ?? 'pending';
       if (status !== 'completed') {
-        blockers.push(`${requiredSkill} checkpoint is ${status}`);
+        // The verification checkpoint itself requires fresh successful evidence, so the
+        // next valid action is to record it first when none exists yet.
+        const needsEvidence = requiredSkill === 'verification' && !await hasFreshSuccessfulVerification(root, meta);
+        blockers.push({
+          text: `${requiredSkill} checkpoint is ${status}`,
+          action: needsEvidence ? `yallaflow verify ${meta.id} -- <command>` : checkpointAction(meta.id, requiredSkill)
+        });
       } else {
         const gateName = SKILL_TO_GATE[requiredSkill];
         if (gateName) {
-          const reviewBlocker = await reviewGateBlocker(root, meta.id, gateName);
-          if (reviewBlocker) blockers.push(reviewBlocker);
+          const reviewBlocker = await reviewGateBlocker(root, meta.id, gateName, { mutate });
+          if (reviewBlocker) blockers.push({ text: reviewBlocker, action: `yallaflow approve ${meta.id} --stage ${gateName}   (human review; or: feedback ${meta.id} --stage ${gateName} --changes-requested)` });
         }
       }
     }
@@ -263,7 +320,12 @@ async function stageExitBlockers(root, meta, stage, contract, ledger, questionsL
 
   if (['SPECIFICATION', 'PLAN'].includes(stage)) {
     const unresolved = summarizeQuestions(questionsLedger).materialOpen;
-    if (unresolved.length) blockers.push(`unresolved material decisions: ${unresolved.length} (${unresolved.map((entry) => entry.id).join(', ')})`);
+    if (unresolved.length) {
+      blockers.push({
+        text: `unresolved material decisions: ${unresolved.length} (${unresolved.map((entry) => entry.id).join(', ')})`,
+        action: `yallaflow question answer ${meta.id} --id ${unresolved[0].id} --answer "..."   (then: question resolve ${meta.id} --id ${unresolved[0].id})`
+      });
+    }
   }
   return blockers;
 }
@@ -273,14 +335,14 @@ async function stageExitBlockers(root, meta, stage, contract, ledger, questionsL
 // so this never fires there; hard safety checks (checkpoint completion, verification
 // evidence, knowledge review, dependency completion) are never routed through here and
 // so can never be bypassed by any interaction mode.
-export async function reviewGateBlocker(root, workId, gateName) {
+export async function reviewGateBlocker(root, workId, gateName, { mutate = true } = {}) {
   const config = await getConfig(root);
   const policy = resolveInteractionPolicy(config);
   if (!policy.gates[gateName]) return null;
   const { ledger } = await loadReviews(root, workId);
   const status = gateStatus(ledger, gateName);
   if (status === 'approved') return null;
-  await ensureGateRequested(root, workId, gateName);
+  if (mutate) await ensureGateRequested(root, workId, gateName);
   return `${gateName} review is ${status === 'not_requested' ? 'awaiting_review' : status} in the current interaction mode — ` +
     `awaiting approval before execution. Run \`yallaflow approve ${workId} --stage ${gateName}\` or \`yallaflow feedback ${workId} --stage ${gateName} --changes-requested\`.`;
 }

@@ -1,4 +1,7 @@
-import { findProjectRoot } from '../core/workspace.js';
+import path from 'node:path';
+import { exists } from '../utils/fs.js';
+import { readYaml } from '../core/yaml.js';
+import { findProjectRoot, workspacePath } from '../core/workspace.js';
 import { listSources, loadSource, loadSourceText, sourceChecksum } from '../core/sources.js';
 import { describeContentAvailability } from '../intake/normalize.js';
 
@@ -33,6 +36,16 @@ export async function sourceCommand(action, args = {}) {
     console.log(`Size: ${legacy ? record.metadata.sizeBytes : record.original.sizeBytes} bytes`);
     console.log(`Location: .yallaflow/${legacy ? record.sourceRef : record.original.path}`);
     console.log(`Linked work: ${record.linkedWork.length ? record.linkedWork.join(', ') : 'none'}`);
+    for (const workId of record.linkedWork) {
+      const metaFile = path.join(workspacePath(root), 'work', workId, 'meta.yaml');
+      if (!await exists(metaFile)) continue;
+      const ref = ((await readYaml(metaFile)).sources ?? []).find((entry) => entry.id === record.id);
+      if (!ref) continue;
+      const timing = ref.linkedAt ? `linked ${ref.linkedAt} while ${ref.workStatusAtLink}` : 'linked before link auditing existed';
+      console.log(ref.relationship === 'recovered-source'
+        ? `  ${workId}: RECOVERED SOURCE — ${timing}; not available during the original execution. Reason: ${ref.reason}`
+        : `  ${workId}: work input — ${timing}`);
+    }
     if (args.content) {
       const text = await loadSourceText(root, record);
       if (text === null) {

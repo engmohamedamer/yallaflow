@@ -1,26 +1,16 @@
 import path from 'node:path';
 import { appendFile } from 'node:fs/promises';
-import { exists, ensureDir, writeText } from '../utils/fs.js';
+import { exists, writeText } from '../utils/fs.js';
 import { readYaml, writeYaml } from '../core/yaml.js';
 import { listWork, nextWorkId, workspacePath } from '../core/workspace.js';
 import { loadWorkProgress } from '../core/progress.js';
-import { appendMarkedSection } from '../knowledge/promotion.js';
+import { appliedTransition, loadContextLedger, mutateContextLedger } from '../context/ledger.js';
+import { normalizeEvidenceRefs } from '../context/evidence.js';
+import { nextLimitationId, normalizeLimitation, sameStatement, validateLimitation } from '../limitations/store.js';
 import { invalidateGateIfApproved, setGateStatus } from '../reviews/store.js';
 import { KNOWLEDGE_POLICY_VERSION } from '../knowledge/constants.js';
 import { REGISTRY_VERSION } from '../skills/constants.js';
-import { CONTEXT_TARGETS } from '../knowledge/constants.js';
 import { BASELINE_AREAS, BASELINE_FACT_SOURCES, BASELINE_FACT_STATUSES, BASELINE_SCHEMA_VERSION } from './constants.js';
-
-const CONTEXT_HEADINGS = Object.freeze({
-  project: null,
-  'tech-stack': '# Tech Stack',
-  architecture: '# Architecture',
-  database: '# Database',
-  integration: '# Integrations',
-  environment: '# Environments',
-  convention: '# Engineering Conventions',
-  'business-rule': '# Business Rules'
-});
 
 function baselineFilePath(root, workId) {
   return path.join(workspacePath(root), 'work', workId, 'baseline.yaml');
@@ -75,10 +65,9 @@ export async function startBaseline(root, now = new Date().toISOString()) {
     createdAt: now,
     updatedAt: now
   };
+  // Sparse workspace (v0.3.6): optional artifact directories are created lazily by the
+  // first artifact that needs them, never eagerly.
   const dir = path.join(workspacePath(root), 'work', id);
-  await ensureDir(path.join(dir, 'attachments'));
-  await ensureDir(path.join(dir, 'evidence'));
-  await ensureDir(path.join(dir, 'execution'));
   await writeYaml(path.join(dir, 'meta.yaml'), meta);
   await writeText(path.join(dir, 'work.md'), baselineWorkTemplate(meta));
   await writeText(path.join(dir, 'progress.md'), `# Work Ledger — ${id}\n\nCreated: ${now}\nKind: brownfield baseline discovery\n\n`);
@@ -122,12 +111,27 @@ export async function draftBaseline(root, workId, input, now = new Date().toISOS
 
   const facts = (input.facts ?? []).map((fact, index) => normalizeFact(fact, index));
   const errors = validateFacts(facts);
+  // Discovery limitations ("lockfile versions were not inspected") describe this
+  // session, not the project: they are recorded alongside the draft, shown in review,
+  // and never promoted into project context.
+  if (input.limitations !== undefined && !Array.isArray(input.limitations)) errors.push('limitations must be an array when supplied.');
+  const limitations = [];
+  for (const [index, raw] of (Array.isArray(input.limitations) ? input.limitations : []).entries()) {
+    const entry = normalizeLimitation(raw, nextLimitationId(limitations), now);
+    errors.push(...validateLimitation(entry, `limitation ${index + 1}`));
+    limitations.push(entry);
+  }
+  for (const fact of facts) {
+    const clash = limitations.find((entry) => sameStatement(entry.summary, fact.summary));
+    if (clash) errors.push(`fact ${fact.id} repeats discovery limitation ${clash.id}; a discovery limitation is not a project fact — keep it only under limitations.`);
+  }
   if (errors.length) throw new Error(`Baseline draft for ${workId} is invalid:\n${errors.map((entry) => `- ${entry}`).join('\n')}`);
 
   const ledger = {
     schemaVersion: BASELINE_SCHEMA_VERSION,
     status: 'draft',
     facts,
+    ...(limitations.length ? { limitations } : {}),
     history: [...(existing.exists ? existing.ledger.history : []), { action: 'drafted', at: now, factCount: facts.length }],
     draftedAt: now,
     updatedAt: now
@@ -142,26 +146,43 @@ export async function draftBaseline(root, workId, input, now = new Date().toISOS
 export function summarizeBaseline(ledger) {
   const byArea = Object.fromEntries(BASELINE_AREAS.map((area) => [area, ledger.facts.filter((fact) => fact.area === area)]));
   const byStatus = Object.fromEntries(BASELINE_FACT_STATUSES.map((status) => [status, ledger.facts.filter((fact) => fact.status === status)]));
-  return { byArea, byStatus, totalCount: ledger.facts.length };
+  return { byArea, byStatus, totalCount: ledger.facts.length, limitations: ledger.limitations ?? [] };
 }
 
-// Promotes confirmed/inferred/unresolved facts alike into their mapped durable
-// context target (see knowledge/constants.js's CONTEXT_TARGETS) through the exact
-// same idempotent, marker-guarded append primitive ordinary knowledge-candidate
-// promotion uses — one mechanism writes each document, regardless of which pipeline
-// produced the fact. An unresolved fact is still durable knowledge: "this could not
-// be established" is more useful to a future agent than silence.
+// Approval turns every drafted fact — confirmed, inferred, and unresolved alike — into
+// a canonical project-context fact (context/index.yaml) through the ledger's single
+// writer, which then renders the Markdown projection. This is the same path ordinary
+// knowledge promotion takes, so each durable document still has exactly one writer. An
+// unresolved fact is still durable knowledge: "this could not be established" is more
+// useful to a future agent than silence. Discovery limitations are never promoted.
 export async function approveBaseline(root, workId, note, now = new Date().toISOString()) {
   const meta = await loadMeta(root, workId);
   const { exists: hasBaseline, ledger } = await loadBaseline(root, workId);
   if (!hasBaseline) throw new Error(`${workId} has no baseline draft to approve. Run \`yallaflow baseline draft\` first.`);
   if (ledger.status === 'approved') throw new Error(`${workId}'s baseline is already approved.`);
 
+  // Idempotent on retry: facts a previous, partially completed approval already
+  // introduced are not introduced again (their projection is re-rendered).
+  const { ledger: context } = await loadContextLedger(root);
+  const prepared = [];
+  const areas = new Set();
   for (const fact of ledger.facts) {
-    const relative = CONTEXT_TARGETS[fact.area];
-    const marker = `<!-- yallaflow-baseline:${workId}:${fact.id} -->`;
-    await appendMarkedSection(root, relative, marker, factSection(workId, fact, now, marker), CONTEXT_HEADINGS[fact.area]);
+    areas.add(fact.area);
+    if (appliedTransition(context, { workId, baselineFactId: fact.id })) continue;
+    prepared.push({
+      area: fact.area,
+      summary: fact.summary,
+      confidence: fact.status,
+      provenance: fact.source,
+      evidence: await normalizeEvidenceRefs(root, fact.evidence, { workId }),
+      origin: { workId, baselineFactId: fact.id },
+      ...(fact.note ? { note: fact.note } : {})
+    });
   }
+  await mutateContextLedger(root, (ops) => {
+    for (const area of areas) ops.touch(area);
+    return prepared.map((input) => ops.introduce(input));
+  }, now);
 
   ledger.status = 'approved';
   ledger.approvedAt = now;
@@ -195,11 +216,6 @@ export async function feedbackBaseline(root, workId, note, now = new Date().toIS
   ledger.updatedAt = now;
   await writeYaml(baselineFilePath(root, workId), ledger);
   return { meta, ledger };
-}
-
-function factSection(workId, fact, now, marker) {
-  const evidence = fact.evidence.map((entry) => `  - ${entry}`).join('\n');
-  return `\n${marker}\n## ${fact.id} — ${fact.summary}\n\n- **Status:** ${fact.status}\n- **Source:** ${fact.source}\n- **From baseline:** ${workId}\n- **Recorded at:** ${now}\n${fact.note ? `- **Note:** ${fact.note}\n` : ''}- **Evidence:**\n${evidence}\n`;
 }
 
 function normalizeFact(fact, index) {

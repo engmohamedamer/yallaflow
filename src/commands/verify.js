@@ -1,9 +1,13 @@
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { writeFile } from 'node:fs/promises';
+import { ensureDir } from '../utils/fs.js';
 import { nextVerificationRunId, recordVerification, listVerificationRuns } from '../core/evidence.js';
 import { findProjectRoot, getCurrentState, workspacePath } from '../core/workspace.js';
 import { readYaml } from '../core/yaml.js';
+import { loadWorkProgress, reviseCheckpoint } from '../core/progress.js';
+import { reconcileStageAfterCheckpointRevision } from '../core/transitions.js';
+import { workflowStagesFor } from '../core/workflows.js';
 
 // GAP-VERIFY-001: argv boundaries are preserved exactly and executed with shell:false
 // by default — YallaFlow never reconstructs a shell command from argv. Shell syntax
@@ -41,6 +45,13 @@ async function runVerification(root, workId, execution) {
   if (!resolvedWorkId) throw new Error('No active work item to verify.');
   const meta = await readYaml(path.join(workspacePath(root), 'work', resolvedWorkId, 'meta.yaml'));
   if (meta.routingStatus === 'pending') throw new Error(`${meta.id} is awaiting routing. Run \`yallaflow route\` first.`);
+  // DONE work's verification history is closed: new proof (passing or failing) belongs
+  // to a reopened lifecycle, exactly as checkpoint revision does.
+  if (meta.status === 'DONE') {
+    throw new Error(workflowStagesFor(meta).includes('VERIFICATION')
+      ? `${meta.id} is DONE.\n\nReopen the work before recording new verification evidence:\nyallaflow reopen ${meta.id} --to verification --reason "..."`
+      : `${meta.id} is DONE and its ${meta.workflow ?? meta.type} workflow cannot be reopened.\n\nRecord new proof in a new work item (e.g. \`yallaflow start "..."\`).`);
+  }
 
   const startedAt = new Date().toISOString();
   const { executionMode, executable, args, displayCommand, result } = await execution(root);
@@ -48,7 +59,9 @@ async function runVerification(root, workId, execution) {
   const output = `${result.stdout ?? ''}${result.stderr ?? ''}`;
   const runId = await nextVerificationRunId(root, resolvedWorkId);
   const logName = `${runId}-verification.log`;
-  const logFile = path.join(workspacePath(root), 'work', resolvedWorkId, 'evidence', logName);
+  const evidenceDir = path.join(workspacePath(root), 'work', resolvedWorkId, 'evidence');
+  await ensureDir(evidenceDir); // created lazily by the first verification run
+  const logFile = path.join(evidenceDir, logName);
   await writeFile(logFile, output, 'utf8');
   const record = {
     command: displayCommand,
@@ -65,7 +78,23 @@ async function runVerification(root, workId, execution) {
   const run = await recordVerification(root, resolvedWorkId, record);
   if (output) process.stdout.write(output);
   console.log(`Verification ${run.status.toUpperCase()} (exit ${run.exitCode ?? 'unknown'}) — ${run.id} [${executionMode}].`);
-  if (!run.success) process.exitCode = 1;
+  if (!run.success) {
+    process.exitCode = 1;
+    await invalidateCompletedVerification(root, meta, run);
+  }
+}
+
+// A completed verification checkpoint claims the work is proven. A later failed run
+// contradicts that claim, so the checkpoint returns to in_progress through the normal
+// audited revision path (history entry, downstream cascade, freshness boundary) —
+// never leaving a state doctor would reject.
+async function invalidateCompletedVerification(root, meta, run) {
+  const progress = await loadWorkProgress(root, meta);
+  if (progress.ledger.skills.verification?.status !== 'completed') return;
+  const reason = `Verification ${run.id} failed after the verification checkpoint was completed.`;
+  const result = await reviseCheckpoint(root, meta.id, { skillId: 'verification', status: 'in_progress', reason });
+  await reconcileStageAfterCheckpointRevision(root, result.meta, 'verification', reason);
+  console.log(`Verification checkpoint reopened (in_progress): ${reason}`);
 }
 
 export async function verifyCommand(argv, requestedWorkId) {

@@ -151,7 +151,7 @@ test('PROJECT.md is updated after approval', async () => {
   await approveBaseline(root, meta.id);
   const project = await readFile(path.join(workspacePath(root), 'PROJECT.md'), 'utf8');
   assert.match(project, /Production hosting cannot be established/);
-  assert.match(project, /\*\*Status:\*\* unresolved/);
+  assert.match(project, /\*\*Confidence:\*\* unresolved/);
 });
 
 test('context docs are populated after approval, and prior deterministic content is preserved', async () => {
@@ -168,7 +168,7 @@ test('context docs are populated after approval, and prior deterministic content
   assert.match(techStack, /Node\.js project\./);
   const database = await readFile(path.join(workspacePath(root), 'context', 'database.md'), 'utf8');
   assert.match(database, /Likely uses PostgreSQL/);
-  assert.match(database, /\*\*Status:\*\* inferred/);
+  assert.match(database, /\*\*Confidence:\*\* inferred/);
 });
 
 test('a fresh agent can consume an approved baseline without rediscovery', async () => {

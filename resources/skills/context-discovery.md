@@ -6,10 +6,11 @@ Understand the repository and its technical context before asking for informatio
 
 ## Behavior
 
-1. Inspect the repository structure and applicable project instructions.
-2. Locate the files, configuration, tests, integrations, and recent implementation patterns relevant to the work.
-3. Record what the repository proves separately from assumptions and unresolved business decisions.
-4. Ask the user only for information that cannot reasonably be established from available project evidence.
+1. Start from durable project memory: read `.yallaflow/PROJECT.md` and only the `context/*.md` documents relevant to the work (they show current knowledge only).
+2. Check freshness before trusting it: `yallaflow context status` (or `yallaflow context affected`) reports facts whose supporting evidence changed since they were verified (`MAY_BE_STALE`), whose evidence disappeared (`STALE_EVIDENCE`), or that are `DISPUTED`. `MAY_BE_STALE` does not mean false — it means revalidate before relying on it.
+3. Rediscover only where it matters: inspect the files, configuration, tests, integrations, and recent implementation patterns relevant to the work, plus any relevant fact that is stale, disputed, or unresolved. Do not rescan unrelated areas that durable context already covers with fresh evidence.
+4. Record what the repository proves separately from assumptions and unresolved business decisions. Record what you could not inspect (no production access, out of scope, not sampled) as a work-scoped discovery limitation with `yallaflow limitation add` — never as a project fact.
+5. Ask the user only for information that cannot reasonably be established from available project evidence.
 
 ## Guard
 

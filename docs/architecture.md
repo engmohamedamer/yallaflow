@@ -1,6 +1,10 @@
 # Architecture
 
-YallaFlow is an AI-agnostic engineering workflow for Adaptive Spec-Driven Development. It is organized around four independent layers.
+YallaFlow is an AI-agnostic engineering governance layer for coding agents, providing durable project memory, adaptive workflows, and evidence-backed delivery. Adaptive Spec-Driven Development is the workflow philosophy it applies according to work type and scope — not ceremony for every task. The Agent orchestrates; YallaFlow governs state transitions; project memory persists. It is organized around four independent layers.
+
+```text
+Understand → Decide → Change → Verify → Remember → Revalidate when evidence changes
+```
 
 ## Adaptive SDD model
 
@@ -88,7 +92,9 @@ Adaptive SDD does not require every work item to be implemented. A work item may
 See [Delivery readiness](#delivery-readiness) for how this is computed and reported.
 
 ## 1. Project Memory
-Durable facts about the software: purpose, architecture, stack, database, integrations, environments, conventions, and ADRs.
+Durable facts about the software: purpose, architecture, stack, database, integrations, environments, conventions, and ADRs. Since v0.3.6 the canonical form is one structured ledger, `.yallaflow/context/index.yaml`; `PROJECT.md` and `context/*.md` are its human-readable projection of current facts. See [Living Project Memory](#living-project-memory-v036).
+
+> **Work records preserve history. Project memory preserves current understanding.**
 
 ## 2. Work Engine
 Persistent work items with explicit type, scope, stage, evidence, decisions, verification, and knowledge-update lifecycle.
@@ -111,6 +117,9 @@ Runs approved work with a configurable policy: native, reviewed, or multi-agent.
 - Understand before changing.
 - Prove before claiming.
 - Remember after finishing.
+- Revalidate before trusting stale knowledge.
+- Work history is immutable; project memory evolves (supersede, never rewrite).
+- Exactly one canonical structured source of truth for durable project knowledge, with exactly one writer.
 - Investigation is read-only.
 - Durable state beats conversational memory.
 - Stage and readiness never silently contradict checkpoint state.
@@ -271,11 +280,106 @@ Existing repository
 
 Every baseline fact carries a **confidence level** — `confirmed` (direct repository/runtime evidence), `inferred` (a strong interpretation, not explicitly declared), or `unresolved` (cannot safely be established) — a **provenance** (`repository`, `runtime`, or `user-confirmed`; prior chat/model memory is never evidence), and at least one evidence reference. Review reuses the same durable gate ledger (`reviews.yaml`, a `'baseline'` gate) v0.3.4 introduced for `specification`/`plan`/`decomposition`, rather than a second review mechanism.
 
-**One promotion mechanism, two producers.** `src/knowledge/promotion.js` already had one idempotent, marker-guarded append primitive writing into `context/*.md` for ordinary work-scoped knowledge candidates. Baseline approval reuses that exact primitive (`appendMarkedSection`) for its own facts, through two new knowledge kinds — `project` (→ `PROJECT.md`) and `tech-stack` (→ `context/tech-stack.md`) — added to `CONTEXT_TARGETS` alongside the existing five. Whether a section in `context/architecture.md` came from a feature's `knowledge propose`/`promote` or from an approved baseline fact, exactly one mechanism ever wrote it; the two input pipelines can never produce two competing versions of the same durable document. Unresolved facts are promoted too, under the same marker convention — "this could not be established" is durable knowledge a future agent should not have to rediscover by guessing.
+**One promotion mechanism, two producers.** *(v0.3.6: the shared mechanism is now the project-context ledger writer — see [Living Project Memory](#living-project-memory-v036); the paragraph below describes the v0.3.5 design it replaced.)* `src/knowledge/promotion.js` already had one idempotent, marker-guarded append primitive writing into `context/*.md` for ordinary work-scoped knowledge candidates. Baseline approval reuses that exact primitive (`appendMarkedSection`) for its own facts, through two new knowledge kinds — `project` (→ `PROJECT.md`) and `tech-stack` (→ `context/tech-stack.md`) — added to `CONTEXT_TARGETS` alongside the existing five. Whether a section in `context/architecture.md` came from a feature's `knowledge propose`/`promote` or from an approved baseline fact, exactly one mechanism ever wrote it; the two input pipelines can never produce two competing versions of the same durable document. Unresolved facts are promoted too, under the same marker convention — "this could not be established" is durable knowledge a future agent should not have to rediscover by guessing.
 
 ### Reliable verification execution (v0.3.5)
 
 A pilot's compound/quoted verification commands changed meaning because the CLI joined `argv` back into a single string and executed it with `shell: true`. `yallaflow verify` now defaults to **argv mode**: `spawnSync(executable, args, { shell: false })`, preserving exact argument boundaries (including arguments containing spaces) with no shell reinterpretation. Two explicit alternatives cover genuine shell needs without ever guessing shell intent: `--shell "<command>"` (pipes, redirection — `shell: true`, deliberately) and `--script <path>` (a script file executed directly). All three modes use `stdio: ['inherit', 'pipe', 'pipe']` — stdin is inherited from the parent process (fixing a pilot's stdin-fed verification, previously detached) while stdout/stderr are still captured into the append-only evidence log. The verification ledger gained additive fields (`executionMode`, `executable`, `args`, `displayCommand`) on top of the v0.3.3 append-only schema; existing runs, and legacy pre-v0.3.3 single-record files, remain fully readable.
+
+## Living Project Memory (v0.3.6)
+
+The YaSchools Brownfield pilot proved the baseline → durable context → fresh-agent-reuse loop, and exposed the next problem: project knowledge goes stale as the repository evolves, and append-only Markdown can end up holding two competing truths ("replica inactive" and "replica active") with no canonical indication of which is current.
+
+```text
+Work item (immutable history)          Project memory (evolves)
+work/PF-0010/knowledge.yaml   ──K-001──▶  context/index.yaml  ──render──▶  context/database.md
+  candidate: supersedes CTX-0017            CTX-0017 superseded → CTX-0048     (current facts only)
+                                            CTX-0048 current (supersedes CTX-0017)
+work/PF-0001/…  unchanged
+```
+
+**Ownership.** `src/context/ledger.js` owns the canonical ledger and is its only writer (`mutateContextLedger`: load → validate → apply transitions → validate → write the ledger → re-render affected projections). Only the ledger write is atomic — nothing is written if the result is invalid, and `index.yaml` is replaced via temp-file + rename. Ledger and projection are **not** one filesystem transaction: if rendering fails after the ledger write, canonical knowledge is intact, `doctor` reports the drift, `yallaflow context render` regenerates it deterministically, and retrying the originating `knowledge promote`/`baseline approve` is idempotent (`appliedTransition` recognizes a transition the same candidate or baseline fact already applied, so no fact, history entry, or lineage link is duplicated). There are two producers, both pre-existing: `knowledge promote` (`src/knowledge/promotion.js`) and `baseline approve` (`src/baseline/store.js`). Neither writes Markdown itself any more. `src/context/projection.js` owns exactly one managed block per durable document. Work items keep their own history (`knowledge.yaml` records the candidate, its declared relation, and the resulting `factId`; `baseline.yaml` keeps its `BF-###` facts) and are never edited when project understanding changes. There is no second knowledge system: candidates are still the only way knowledge enters or evolves.
+
+**Fact schema** (`schemaVersion: 1`, JSON-compatible YAML like every other ledger):
+
+```json
+{
+  "id": "CTX-0048",
+  "area": "database",
+  "state": "current",
+  "confidence": "confirmed",
+  "summary": "Read replica is active for reporting.",
+  "provenance": "repository",
+  "origin": { "workId": "PF-0010", "candidateId": "K-001" },
+  "evidence": [
+    { "type": "repository", "path": "common/config/db.php", "contentHash": "sha256:…", "gitCommit": "abc123…" },
+    { "type": "runtime", "description": "phpunit ReportingTest (passed)", "workId": "PF-0010", "verificationRunId": "V-002" }
+  ],
+  "verifiedAt": "2026-09-23T10:00:00.000Z",
+  "verifiedAtCommit": "abc123…",
+  "supersedes": ["CTX-0017"],
+  "supersededBy": null,
+  "history": [{ "action": "introduced", "at": "…", "workId": "PF-0010", "candidateId": "K-001", "supersedes": "CTX-0017" }],
+  "createdAt": "…",
+  "updatedAt": "…"
+}
+```
+
+- **Identity** — `CTX-####`, global, sequential, never reused or renumbered. Areas are exactly the existing `CONTEXT_TARGETS` kinds (project, tech-stack, architecture, database, integration, environment, convention, business-rule); `decision` stays an ADR.
+- **State vs confidence** — `state` (`current` | `superseded` | `disputed`) says whether the project currently believes it; `confidence` (`confirmed` | `inferred` | `unresolved`) says how strongly it was established. Two fields, not one overloaded vocabulary. A `disputed` fact carries a `dispute` record (summary, conflicting evidence, raisedBy); a `superseded` fact names its successor.
+- **Evidence** — normalized from ordinary `--evidence` strings: an existing repository path (optionally `#symbol` / `:range`) records location, a sha256 content hash, and the current Git commit — never file contents, so secret values are never copied; `runtime:` / `verification:V-###` / `user:` record runtime and user-confirmed evidence; anything else is a free-text `reference` with no verification point. Knowledge *evolution* (supersede/reconfirm/dispute) requires at least one non-reference entry.
+- **Provenance** — `repository` / `runtime` / `user-confirmed`, declared (`--provenance`, or the baseline fact's `source`) or derived from evidence types; `unspecified` exists only for reference-only legacy facts.
+
+**Transitions** — declared by the Agent, validated by YallaFlow (the referenced fact must exist and be in a legal state; semantic equivalence is never inferred):
+
+| Candidate relation | Allowed from | Result |
+|---|---|---|
+| none | — | new `current` fact |
+| `reconfirms` | current, disputed | same ID and summary; evidence + verification point replaced, prior evidence kept in history; a dispute is resolved into history |
+| `supersedes` | current, disputed | new `current` fact with `supersedes`; old fact `superseded` with `supersededBy`; excluded from Markdown |
+| `disputes` | current | fact `disputed` with the conflicting evidence; rendered under "Disputed project knowledge" until reconfirmed or superseded |
+
+A second candidate superseding an already-superseded fact is rejected, so two current successors can never exist for one fact.
+
+**Mechanical freshness** (`src/context/freshness.js`, read-only, computed never stored): per repository evidence entry, compare the recorded content hash with the file now (or, for directory evidence, `git diff <recorded commit> -- <path>` plus untracked files). Any missing → `stale-evidence`; any changed → `may-be-stale`; all unchanged → `fresh`; no repository verification point → `unknown`; superseded → `historical`. Changed evidence means revalidation is needed, never that the fact is false — nothing is rewritten, invalidated, or superseded automatically. `factsAffectedByPaths` maps changed paths (explicit, working tree, or `--since REF`) to the facts citing them, for `context affected`. Revalidation itself is Agent work: targeted rediscovery, then reconfirm/supersede/dispute. There is no semantic refresh engine and no full re-baseline.
+
+**Markdown projection.** One managed block per document, rendered deterministically from the ledger (current facts, then disputed facts under an explicit warning; superseded facts never). Everything outside the block is preserved byte-for-byte. Freshness is deliberately not rendered, so the projection changes only when the ledger does and drift is deterministic. `doctor` compares each block with what the ledger renders; `yallaflow context render` regenerates blocks explicitly.
+
+**Discovery limitations** (`src/limitations/store.js`). A limitation (`not-inspected`, `unavailable`, `out-of-scope`, `runtime-unavailable`, `insufficient-evidence`; area; summary; reason) describes what one investigation could not inspect. It lives in `work/<id>/discovery.yaml` (created only by `yallaflow limitation add`) or a baseline draft's `limitations` array, is shown by `handoff` and `baseline show`, and never enters the ledger: `knowledge propose` refuses a candidate that restates a limitation of the same work item, a baseline draft refuses a fact that restates one of its limitations, and `doctor` fails if any ledger fact restates any recorded limitation.
+
+**Compatibility.** No migration on read: a v0.3.5 workspace opens, reports, and passes `doctor` unchanged (unadopted legacy sections are a warning). The ledger is created lazily by the first new baseline approval or promotion; new facts then render into a managed block while legacy sections remain. `yallaflow context adopt [--dry-run]` is the explicit upgrade: it reads approved `baseline.yaml` facts and promoted `knowledge.yaml` candidates (never the Markdown prose), creates `adopted` facts with no verification point (`UNKNOWN` freshness until reconfirmed), removes only legacy sections that still exactly match the v0.3.5 template, and reports hand-edited ones. Baseline integrity accepts either a ledger fact originating from each approved `BF-###` or its legacy marker. A second approved baseline is still refused; living memory replaces baseline refresh.
+
+**Integrity** (`src/context/integrity.js`, surfaced by `doctor`, never auto-repaired). Errors: malformed ledger/fact fields, duplicate IDs, unknown supersession targets, one-directional lineage, cycles, impossible states (superseded without successor, current with `supersededBy`, disputed without a dispute record), missing origin work items, malformed evidence or provenance, projection drift or a superseded fact still projected, and a discovery limitation recorded as a fact. Warnings: `MAY_BE_STALE`/`STALE_EVIDENCE`/disputed facts and unadopted v0.3.5 context — stale knowledge is a revalidation signal, not corruption.
+
+**Handoff/resume** add a compact "Relevant project context" block from one shared summary (`src/context/summary.js`): totals, the stale/disputed facts, and any fact this work item's own candidates relate to that is stale — never the whole ledger — plus the work item's discovery limitations.
+
+### Sparse workspace and `execution/` (v0.3.6)
+
+Work creation (`createWorkItem`, `createPendingIntake`, decomposition children, `baseline start`) no longer creates `attachments/`, `evidence/`, or `execution/`. A new work item is `meta.yaml`, `work.md`, `progress.md`; `progress.yaml`, `questions.yaml`, `knowledge.yaml`, `discovery.yaml`, `reviews.yaml`, and `evidence/` appear when first written. **Decision:** `execution/` had no producer or consumer anywhere in the code, so it is reserved for a future structured execution-artifact feature and no longer created (rather than being filled with command dumps, which would add noise, duplication, and secret risk). `attachments/` likewise had no writer and is **retired**: the canonical `SRC-####` source system is the single home for user-provided inputs.
+
+### Durable user-provided artifacts (v0.3.6)
+
+The YaSchools pilot's bounded change came with text *and* a UI screenshot; the Agent used the screenshot in conversation, but nothing durable held it, so a later agent could recover the words but not the visual requirement. No new mechanism was needed: `yallaflow intake add <work-id> <file>` already copies the original byte-for-byte into an immutable, checksummed `SRC-####` (images as `original-only`), and links work item ↔ source both ways. v0.3.6 closes the remaining gaps without a parallel attachment system: the Agent contract and `requirement-clarification` skill now require registering *material* artifacts the Agent can access; `handoff`/`resume` list each linked source with the path of its preserved original; `doctor` fails when a referenced source is missing, does not link back, or its original is missing or no longer matches the checksum recorded at capture (sources are immutable — a new version is a new `SRC-####`); and an artifact the Agent could not access is recorded as a work-scoped `uncaptured-artifact` discovery limitation (area `requirement`) rather than implied to be preserved. Existing directories remain valid and are never deleted.
+
+### One canonical work-creation path (v0.3.6)
+
+**Every newly created routed work item is governed by the same workflow policy, Skill Registry, Behavior Contract, knowledge policy, and integrity rules regardless of which public CLI entry path created it.** `createRoutedWork` (`src/behavior/routing.js`) is exactly `start` → `route`: it validates the routing decision and resolves the workflow policy before writing anything, then calls `createPendingIntake` and `routeWorkItem`. The direct shortcuts (`feature|bug|investigate|change|refactor|release`) use it with the user's explicit classification (type from the command, scope from the now-required `--scope`, confidence `high`, reason naming the command); without `--scope` they create nothing. The legacy `createWorkItem`, which wrote contract-less work, was removed from product code; contract-less items written by earlier versions remain readable and keep their stage-only behavior (tests build such fixtures with `test-support/legacy-work.js`, kept outside `test/` so the runner does not load it as a test module).
+
+### Lifecycle invariant (v0.3.6)
+
+**Any state reachable through supported YallaFlow commands satisfies YallaFlow's own integrity rules.** The pre-freeze audit found two violations, both fixed at the transition rather than by weakening `doctor`: (1) an investigation (no VERIFICATION stage) could advance CONCLUSION → DONE with its pinned `verification` checkpoint pending — DONE now requires that checkpoint for every workflow whose contract includes it; (2) read-only work could complete `verification` without evidence — completing it now requires fresh successful evidence for all work (`yallaflow verify` runs a read-only proof command). Two related paths were closed the same way: a failing `verify` recorded after the verification checkpoint was completed returns the checkpoint to `in_progress` through the audited revision path (history entry, cascade, freshness boundary), and `verify` on DONE work is refused with the reopen path (or, for investigation workflows that cannot be reopened, a new-work-item hint). Evidence stays append-only; failed runs are never hidden.
+
+### Agent contract versioning (v0.3.6)
+
+`src/agent/contract.js` owns the package agent guidance. `AGENT.md` is project-owned; YallaFlow manages only a marked block recording the contract version and a hash of its body. `inspectAgentContract` (read-only; used by `doctor` warnings, `status`, `agent status`) classifies the file as current / outdated / modified / newer / legacy-generated / legacy-customized / broken / missing. Pre-v0.3.6 files are recognized as unmodified only by byte-exact fingerprints of every template YallaFlow ever generated (recovered from git history: v0.1–v0.3.4 and v0.3.5). `agent refresh` is the only writer: it updates only the managed block, replaces only unmodified generated files, refuses customized or hand-edited guidance unless `--preserve-existing` (kept verbatim under *Preserved project instructions*), refuses downgrades, supports `--dry-run`, and is idempotent. Bump `AGENT_CONTRACT_VERSION` whenever the guidance changes.
+
+### Recovered sources (v0.3.6)
+
+Every new source link records `linkedAt`, `workStatusAtLink`, and `relationship` on the work item's `sources` entry (`work-input`, or `recovered-source` for DONE work, which also requires a `reason`). A recovered link leaves the work DONE, does not append to `work.md` (the record of the work as executed) — only the append-only `progress.md` — and is labelled in `handoff`, `resume`, and `source show` as not available during the original execution. The `SRC-####` record and its bytes are unchanged; `doctor` checks recovered links for their audit metadata and every linked original for its capture checksum. Links made before v0.3.6 have no timing metadata and are shown as work inputs.
+
+### Next valid action (v0.3.6)
+
+`evaluateAdvance` (`src/core/transitions.js`) is now the single interpretation of "may this work item leave its stage?", used by `advance` (which may still record a newly requested review gate) and, read-only, by `guide` and by `advance`'s post-transition report. It returns the first blocker and the exact next valid command (checkpoint, `verify … -- <command>`, `approve … --stage`, question resolution, knowledge disposition, or `advance`), so an agent no longer needs repeated advance/guide round-trips. `advance`'s error messages are unchanged; stage transitions were not redesigned.
 
 ### Structured questions / decision ledger
 
@@ -322,7 +426,7 @@ Knowledge kinds map deterministically:
 - `business-rule` → `context/business-rules.md`
 - `decision` → `decisions/ADR-<work-id>-<candidate-id>.md`
 
-YallaFlow validates structure and disposition but does not infer durable meaning, assess evidence truth, or semantically deduplicate prose. Context promotion is append-only and marker-protected. ADR promotion requires explicit context, decision, reason, and cost-if-wrong content.
+YallaFlow validates structure and disposition but does not infer durable meaning, assess evidence truth, or semantically deduplicate prose. Since v0.3.6, context promotion writes a canonical fact into `context/index.yaml` (optionally reconfirming, superseding, or disputing an existing fact the Agent names explicitly) and re-renders the document's managed block; the v0.3.5 append-only, marker-protected sections that already exist remain valid until explicitly adopted. ADR promotion requires explicit context, decision, reason, and cost-if-wrong content.
 
 New work pins a knowledge policy version, independently of the package and Skill Registry versions. That policy requires a `reviewed` knowledge ledger before `DONE`. Work without the marker is legacy and retains its previous completion behavior. Reads derive a pending in-memory view and never create `knowledge.yaml`.
 
@@ -358,7 +462,12 @@ This is the canonical reference for YallaFlow's domain vocabulary. Other documen
 | **Ruling** | A task-local execution decision (with reason and cost-if-wrong) recorded in a work item's progress ledger. Not itself durable project knowledge. |
 | **ADR** | An Architecture Decision Record: a long-lived architectural decision document under `decisions/`, optionally seeded from a ruling. |
 | **Knowledge Candidate** | An agent-proposed, work-scoped, stable fact or decision recorded in `knowledge.yaml`, pending promotion or rejection. |
-| **Project Knowledge** | Durable project context under `context/*.md` or `decisions/*.md`, produced only by promoting a reviewed Knowledge Candidate. |
+| **Project Knowledge** | Durable project context, produced only by promoting a reviewed Knowledge Candidate or approving a Brownfield Baseline: context facts in the canonical ledger `context/index.yaml` (projected into `PROJECT.md`/`context/*.md`), and ADRs under `decisions/*.md`. |
+| **Project Context Fact** | One canonical unit of project memory (`CTX-####`) in `context/index.yaml`, with an area, a *state* (`current`/`superseded`/`disputed`), a *confidence* (`confirmed`/`inferred`/`unresolved`), a provenance, its originating work item, structured evidence, a verification point, and supersession lineage. |
+| **Freshness** | A mechanical, read-only comparison of a fact's repository evidence with the working tree: `fresh`, `may-be-stale` (evidence changed since verification — revalidate, not "false"), `stale-evidence` (evidence missing), or `unknown` (no verification point). Never stored and never changes a fact. |
+| **Evidence** | Proof produced or captured during engineering/verification (verification runs and logs under `work/<id>/evidence/`, checkpoint evidence references). Never a Source. |
+| **Generated Artifact** | An optional output created by the work itself (e.g. an export, a report); lives with the application, not under `sources/`. |
+| **Discovery Limitation** | A work-scoped record (`discovery.yaml` or a baseline draft's `limitations`) of what an investigation could not inspect (`not-inspected`, `unavailable`, `out-of-scope`, `runtime-unavailable`, `insufficient-evidence`). Describes the session, not the project; never promoted into project context. |
 | **Source** | A captured, evidence-preserving intake artifact (`SRC-####`) recorded in `.yallaflow/sources/`, with its original bytes copied byte-for-byte, a detected format, a checksum, and a `contentAvailability` (`native-text`, `extracted`, or `original-only`) describing what text, if any, could be read from it. Linked to, but distinct from, the work item(s) it created. |
 
 ## Architecture freeze entering v0.3

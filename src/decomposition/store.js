@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { exists, ensureDir, writeText } from '../utils/fs.js';
+import { exists, writeText } from '../utils/fs.js';
 import { readYaml, writeYaml } from '../core/yaml.js';
 import { nextWorkId, workSections, workspacePath } from '../core/workspace.js';
 import { loadWorkReadiness } from '../behavior/readiness.js';
@@ -205,9 +205,8 @@ async function createChildWorkItem(root, parentId, child, now) {
     updatedAt: now
   };
   const dir = path.join(workspacePath(root), 'work', id);
-  await ensureDir(path.join(dir, 'attachments'));
-  await ensureDir(path.join(dir, 'evidence'));
-  await ensureDir(path.join(dir, 'execution'));
+  // Sparse workspace (v0.3.6): no optional artifact directory (evidence/, attachments/,
+  // execution/) exists until the first artifact that needs it is written.
   await writeYaml(path.join(dir, 'meta.yaml'), meta);
   await writeText(path.join(dir, 'work.md'), childWorkTemplate(meta, parentId));
   await writeText(path.join(dir, 'progress.md'), `# Work Ledger — ${id}\n\nCreated: ${now}\nDecomposed from: ${parentId}\n\n`);

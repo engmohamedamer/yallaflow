@@ -3,6 +3,7 @@ import { loadWorkProgress } from '../core/progress.js';
 import { buildBehaviorGuidance } from '../behavior/guidance.js';
 import { loadWorkReadiness } from '../behavior/readiness.js';
 import { formatSourceList } from '../intake/normalize.js';
+import { describeAgentContractState, inspectAgentContract } from '../agent/contract.js';
 
 export async function statusCommand() {
   const root = await findProjectRoot();
@@ -11,6 +12,8 @@ export async function statusCommand() {
   console.log(`Active work: ${state.activeWork ?? 'none'}`);
   console.log(`Stage: ${state.stage ?? 'none'}`);
   console.log(`Work items: ${work.length}`);
+  const agent = await inspectAgentContract(root);
+  if (agent.state !== 'current') console.log(`Agent contract: ${describeAgentContractState(agent)}`);
   for (const item of work) {
     if (item.routingStatus === 'pending') {
       console.log(`\n${item.id}`);

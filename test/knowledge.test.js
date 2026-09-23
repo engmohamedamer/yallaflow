@@ -9,7 +9,8 @@ import { createPendingIntake, routeWorkItem } from '../src/behavior/routing.js';
 import { checkpointWork } from '../src/core/progress.js';
 import { recordVerification } from '../src/core/evidence.js';
 import { advanceActiveWork } from '../src/core/transitions.js';
-import { createWorkItem, initWorkspace, workspacePath } from '../src/core/workspace.js';
+import { initWorkspace, workspacePath } from '../src/core/workspace.js';
+import { createLegacyWorkItem } from '../test-support/legacy-work.js';
 import { readYaml } from '../src/core/yaml.js';
 import {
   knowledgeFilePath,
@@ -341,7 +342,7 @@ test('legacy work loads without knowledge state or a required policy', async () 
 test('legacy work is not retroactively blocked at DONE', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-knowledge-legacy-'));
   await initWorkspace(root, 'demo', 'greenfield');
-  const item = await createWorkItem(root, 'bug', 'Legacy completion fixture', 'bounded');
+  const item = await createLegacyWorkItem(root, 'bug', 'Legacy completion fixture', 'bounded');
   const metaFile = path.join(workspacePath(root), 'work', item.id, 'meta.yaml');
   const legacy = await readYaml(metaFile);
   delete legacy.knowledgePolicy;

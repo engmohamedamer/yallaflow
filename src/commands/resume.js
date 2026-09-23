@@ -11,6 +11,9 @@ import { evaluateReadiness } from '../behavior/readiness.js';
 import { loadWorkQuestions } from '../questions/store.js';
 import { formatSourceList } from '../intake/normalize.js';
 import { resolvePrimaryObjective } from '../behavior/objective.js';
+import { projectContextLines } from '../context/summary.js';
+import { loadWorkLimitations } from '../limitations/store.js';
+import { describeWorkSourceLocations } from '../core/sources.js';
 
 export async function resumeCommand(requestedWorkId) {
   const root = await findProjectRoot();
@@ -18,7 +21,7 @@ export async function resumeCommand(requestedWorkId) {
   const state = await getCurrentState(root);
   const workId = requestedWorkId ?? state.activeWork;
   if (!workId) {
-    console.log('No active work item. Run `yallaflow start` or create one with `yallaflow feature`, `yallaflow bug`, or `yallaflow investigate`.');
+    console.log('No active work item. Run `yallaflow start` or create classified work directly with `yallaflow feature|bug|investigate|change|refactor|release "<title>" --scope SCOPE`.');
     return;
   }
   const metaFile = path.join(workspacePath(root), 'work', workId, 'meta.yaml');
@@ -66,6 +69,7 @@ export async function resumeCommand(requestedWorkId) {
   console.log(`\nVerification: ${verification ? (verification.success ? 'passed' : 'failed') : 'not recorded'}`);
   if (knowledgeRelevant) printKnowledge(knowledgeSummary);
   printOpenQuestions(readiness.questions);
+  await printProjectMemory(root, meta, knowledge.ledger);
   console.log(`Git: ${git.summary}`);
   if (stage === 'DONE' && git.available && !git.clean) {
     console.log(`${meta.id} is DONE. Git working tree contains uncommitted changes. Consider a source-control checkpoint before unrelated work begins. YallaFlow never commits automatically.`);
@@ -138,5 +142,24 @@ function printProgress(progress) {
     if (!entries.length) continue;
     console.log(`\n${label}:`);
     for (const entry of entries) console.log(`${symbol} ${entry.skillId}${entry.summary ? ` — ${entry.summary}` : ''}`);
+  }
+}
+
+// Relevant project-memory integrity (stale/disputed facts, facts this work relates to)
+// plus this work item's own discovery limitations — never the whole ledger.
+async function printProjectMemory(root, meta, knowledgeLedger) {
+  if (meta.sources?.length) {
+    console.log('\nSources (original user/project inputs, immutable — open these rather than relying on prior conversation):');
+    for (const line of await describeWorkSourceLocations(root, meta.sources)) console.log(`- ${line}`);
+  }
+  const lines = await projectContextLines(root, knowledgeLedger);
+  if (lines.length) {
+    console.log('\nRelevant project context:');
+    for (const line of lines) console.log(line);
+  }
+  const { ledger } = await loadWorkLimitations(root, meta.id);
+  if (ledger.limitations.length) {
+    console.log(`\nDiscovery limitations (${meta.id}, work-scoped — not project facts):`);
+    for (const entry of ledger.limitations) console.log(`- ${entry.id} [${entry.type}] ${entry.area} — ${entry.summary}`);
   }
 }

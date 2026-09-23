@@ -11,10 +11,12 @@ Use YallaFlow on real engineering work and report friction.
 Use the normal public CLI, exactly as any first-time user would:
 
 ```bash
-npm install /path/to/yallaflow-<version>.tgz   # or: npm link, from a checkout
+npm install -g /path/to/yallaflow-<version>.tgz   # isolated CLI; or: npm link, from a checkout
 yallaflow init
 yallaflow --help
 ```
+
+On a legacy repository, never add YallaFlow to the application's `package.json` — it can make npm rewrite an old lockfile. See [`installation.md`](installation.md#legacy-and-brownfield-repositories). Upgrading an existing v0.3.5 pilot workspace: [`upgrading-to-v0.3.6.md`](upgrading-to-v0.3.6.md).
 
 If you have an existing requirements document, use it directly instead of retyping it into a prompt — the same command handles text, Office/OpenDocument, PDF, and image files:
 
@@ -26,7 +28,7 @@ yallaflow intake add PF-0001 client-notes.docx           # attach one later
 
 OCR/scanned-document understanding is not implemented — an image or a scanned PDF is preserved as a source but no text is extracted from it; `yallaflow source show <id> --content` tells you exactly what YallaFlow could and couldn't read. Otherwise, start from plain text: `yallaflow start "<a plain-text request>"`.
 
-From there, follow whatever the CLI and its documentation (`README.md`, `yallaflow --help`, `yallaflow <namespace> --help`) tell you to do next. Do not skip ahead using internal engineering notes, prior dogfood transcripts, or this repository's test fixtures as a script — that would test a different, easier path than a real user gets.
+From there, follow whatever the CLI and its documentation (`README.md`, [`workflows.md`](workflows.md), `yallaflow --help`, `yallaflow <namespace> --help`) tell you to do next. Do not skip ahead using internal engineering notes, prior dogfood transcripts, or this repository's test fixtures as a script — that would test a different, easier path than a real user gets.
 
 ## Pilot Rule
 
@@ -71,6 +73,9 @@ polish    — cosmetic, wording, or nice-to-have
 - implementation handoff
 - verification
 - knowledge review
+- Brownfield baseline and living project memory (`context status`, freshness, reconfirm/supersede/dispute)
+- material user-provided artifacts (screenshots/files captured as sources, or recorded as `uncaptured-artifact`)
+- cross-agent handoff and `agent status`/`agent refresh`
 - everyday CLI usability
 
 Keep reports practical and short — a real friction log beats a polished one.

@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { createWorkItem, initWorkspace, listWork } from '../src/core/workspace.js';
+import { initWorkspace, listWork } from '../src/core/workspace.js';
+import { createRoutedWork } from '../src/behavior/routing.js';
+import { createLegacyWorkItem } from '../test-support/legacy-work.js';
 import { exists } from '../src/utils/fs.js';
 
 test('initializes durable project structure', async () => {
@@ -28,8 +30,8 @@ test('refuses to create a parallel workspace beside a legacy workspace', async (
 test('creates sequential work items and investigation is read-only', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-'));
   await initWorkspace(root, 'demo', 'brownfield');
-  const one = await createWorkItem(root, 'feature', 'One', 'bounded');
-  const two = await createWorkItem(root, 'investigation', 'Two', 'spike');
+  const one = await createRoutedWork(root, 'One', { work_type: 'feature', scope: 'bounded', confidence: 'high', reason: 'Test fixture.', title: 'One' });
+  const two = await createRoutedWork(root, 'Two', { work_type: 'investigation', scope: 'spike', confidence: 'high', reason: 'Test fixture.', title: 'Two' });
   assert.equal(one.id, 'PF-0001');
   assert.equal(two.id, 'PF-0002');
   assert.equal(one.scope, 'bounded');
@@ -42,7 +44,7 @@ test('creates sequential work items and investigation is read-only', async () =>
 test('loads v0.1 work metadata without requiring migration', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-'));
   await initWorkspace(root, 'demo', 'brownfield');
-  const item = await createWorkItem(root, 'bug', 'Legacy item', 'bounded');
+  const item = await createLegacyWorkItem(root, 'bug', 'Legacy item', 'bounded');
   const metaFile = path.join(root, '.yallaflow/work', item.id, 'meta.yaml');
   const meta = JSON.parse(await readFile(metaFile, 'utf8'));
   delete meta.scope;

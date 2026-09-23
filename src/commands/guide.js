@@ -8,6 +8,7 @@ import { isKnowledgeReviewRelevant, isKnowledgeReviewStage, loadWorkKnowledge, s
 import { evaluateReadiness } from '../behavior/readiness.js';
 import { loadWorkQuestions } from '../questions/store.js';
 import { formatSourceList } from '../intake/normalize.js';
+import { evaluateAdvance } from '../core/transitions.js';
 
 export async function guideCommand(requestedWorkId) {
   const root = await findProjectRoot();
@@ -68,6 +69,25 @@ export async function guideCommand(requestedWorkId) {
       ? 'Advance the reviewed work to DONE.'
     : result.nextObjective;
   console.log(`\nNext engineering objective:\n${nextObjective}`);
+  await printNextAction(root, meta, stage, nextObjective);
+}
+
+// GAP-WORKFLOW-001: one read-only answer to "what exactly do I do now?" — the current
+// objective, the first blocking requirement for leaving this stage, and the exact next
+// valid command — from the same evaluateAdvance resolver `advance` enforces, so an
+// agent no longer needs repeated advance/guide round-trips to discover it. Never
+// mutates state (no review gate is requested by guide).
+export async function printNextAction(root, meta, stage, objective) {
+  const verdict = await evaluateAdvance(root, meta, stage, { mutate: false });
+  console.log(`\nCURRENT OBJECTIVE:\n${objective}`);
+  if (verdict.final) {
+    console.log('\nBLOCKER:\nnone');
+    console.log(`\nNEXT VALID ACTION:\nnone — ${meta.id} is DONE.`);
+    return;
+  }
+  console.log(`\nBLOCKER:\n${verdict.allowed ? 'none' : verdict.blocker}`);
+  console.log(`\nNEXT VALID ACTION:\n${verdict.action}`);
+  console.log(`Advance to ${verdict.next} allowed now: ${verdict.allowed ? 'yes' : 'no'}`);
 }
 
 function printOpenQuestions(summary) {

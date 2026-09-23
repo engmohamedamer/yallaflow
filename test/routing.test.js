@@ -11,6 +11,8 @@ import { initWorkspace, workspacePath } from '../src/core/workspace.js';
 import { readYaml } from '../src/core/yaml.js';
 import { advanceActiveWork } from '../src/core/transitions.js';
 import { reviewKnowledgeNone } from '../src/knowledge/store.js';
+import { checkpointWork } from '../src/core/progress.js';
+import { recordVerification } from '../src/core/evidence.js';
 
 const cli = fileURLToPath(new URL('../src/cli.js', import.meta.url));
 
@@ -170,6 +172,13 @@ test('routed bug spike cannot enter an implementation stage', async () => {
   const stages = [];
   for (let index = 0; index < 6; index++) stages.push((await advanceActiveWork(root)).to);
   await reviewKnowledgeNone(root, item.id);
+  // v0.3.6: DONE requires the pinned verification checkpoint for every workflow.
+  await assert.rejects(() => advanceActiveWork(root), /verification checkpoint is completed/);
+  for (const skillId of ['context-discovery', 'systematic-debugging']) {
+    await checkpointWork(root, item.id, { skillId, status: 'completed', summary: 'Done.', evidence: ['notes'] });
+  }
+  await recordVerification(root, item.id, { command: 'node diagnose.js', success: true, exitCode: 0 });
+  await checkpointWork(root, item.id, { skillId: 'verification', status: 'completed', summary: 'Diagnosis reproduced.', evidence: [] });
   stages.push((await advanceActiveWork(root)).to);
   assert.deepEqual(stages, ['QUESTION', 'DISCOVERY', 'EVIDENCE', 'HYPOTHESIS', 'FINDINGS', 'CONCLUSION', 'DONE']);
   assert.equal(stages.includes('IMPLEMENTATION'), false);
