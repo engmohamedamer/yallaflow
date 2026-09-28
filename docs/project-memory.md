@@ -4,18 +4,19 @@
 
 Project knowledge goes stale as a repository evolves. YallaFlow therefore keeps project memory as an evidence-backed ledger that evolves through normal work, instead of append-only notes that end up holding two competing truths.
 
-## Four kinds of memory
+## Kinds of memory
 
 | Memory | Question | Where | Changes by |
 |---|---|---|---|
-| **Work memory** | What happened during PF-####? | `work/PF-####/` | the work itself; never rewritten afterwards |
-| **Project memory** | What is currently believed true about the project? | `context/index.yaml` → `PROJECT.md`, `context/*.md` | baseline approval, knowledge promotion |
+| **Work history** | What happened during PF-####? | `work/PF-####/` | the work itself; an **immutable** record, never rewritten afterwards |
+| **Project memory** | What is currently believed true about the project? | `context/index.yaml` → `PROJECT.md`, `context/*.md` | baseline approval, knowledge promotion, applied reconciliation — **evolving** current truth |
 | **Historical knowledge** | What used to be believed, and what replaced it? | superseded facts in `context/index.yaml` | supersession |
+| **Reconciliation history** | How did old (v0.3.5) knowledge become current memory? | `work/PF-####/reconciliation.yaml`, `legacy-context.md` | `yallaflow context reconcile` — interprets old knowledge without rewriting work history |
 | **Discovery limitations** | What could this investigation not inspect? | `work/PF-####/discovery.yaml`, baseline drafts | `yallaflow limitation add` — never promoted |
 
 ## The canonical ledger
 
-`.yallaflow/context/index.yaml` is the single structured source of truth for durable project knowledge. It is created by the first approved baseline or promoted knowledge candidate; reads never create it. Each fact:
+`.yallaflow/context/index.yaml` is the single structured source of truth for durable project knowledge. It is created by the first approved baseline, promoted knowledge candidate, or applied reconciliation; reads never create it. Each fact:
 
 ```json
 {
@@ -41,6 +42,19 @@ Project knowledge goes stale as a repository evolves. YallaFlow therefore keeps 
 - **Confidence** — `confirmed`, `inferred`, or `unresolved`. Separate from state.
 - **Provenance** — `repository`, `runtime`, or `user-confirmed`.
 - **Areas** — `project`, `tech-stack`, `architecture`, `database`, `integration`, `environment`, `convention`, `business-rule`. Decisions remain ADRs under `decisions/`.
+
+### Multi-origin facts (v0.3.7)
+
+One current fact may have been established by several historical work items. This needs **context schema v2**, where every fact records its provenance in exactly one field, `origins` (the introducing origin first), instead of v1's single `origin`. The two are never mixed. v0.3.7 reads v1 ledgers as-is, keeps a ledger at v1 while its content fits, and moves it to v2 only when a mutation needs it; `context reconcile apply` is the usual path ([storage contract](upgrading-to-v0.3.7.md#context-ledger-storage-contract-schema-v1--v2)).
+
+```json
+"origins": [
+  { "workId": "PF-0001", "baselineFactId": "BF-013", "adopted": true, "reconciliation": { "workId": "PF-0006", "candidate": "RC-0013" } },
+  { "workId": "PF-0002", "candidateId": "K-002",     "adopted": true, "reconciliation": { "workId": "PF-0006", "candidate": "RC-0053" } }
+]
+```
+
+Adding an origin to an existing fact is provenance only: its evidence, verification point, state, and freshness do not change. A `merged` history event (candidates collapsed into this fact) or a `reconfirmed` one (one more historical observation of it) records which relationship was chosen. An origin appears at most once per fact and on at most one fact. `yallaflow context show` lists every origin.
 
 ### Evidence references
 
@@ -85,7 +99,7 @@ Freshness is mechanical and read-only. For each fact's repository evidence, Yall
 | `FRESH` | evidence unchanged since verification |
 | `MAY_BE_STALE` | evidence changed since verification — **revalidate before relying on it; it does not mean false** |
 | `STALE_EVIDENCE` | evidence file no longer exists |
-| `UNKNOWN` | no repository verification point (runtime/user evidence, adopted legacy facts) |
+| `UNKNOWN` | no repository verification point (runtime/user evidence, adopted or reconciled legacy facts) |
 
 Nothing is rewritten, invalidated, or superseded automatically. Revalidation is agent work: targeted rediscovery, then reconfirm, supersede, or dispute.
 
@@ -126,9 +140,50 @@ Do not edit inside the block. `doctor` reports drift; `yallaflow context render`
 
 Discovery limitation types: `not-inspected`, `unavailable`, `out-of-scope`, `runtime-unavailable`, `insufficient-evidence`, `uncaptured-artifact`. "The lockfile was not deeply inspected" or "production schema was not reachable" describe a session, not the project: a candidate restating a limitation of its own work item is refused, a baseline fact may not restate one of its limitations, and `doctor` fails if one reaches the ledger.
 
+## Legacy knowledge reconciliation (v0.3.7)
+
+v0.3.5 appended one Markdown section per promoted fact. After many work items, the same durable truth can appear several times in different words:
+
+```text
+A  PF-0001 BF-013  Root Codeception enables api/apps.
+B  PF-0002 K-002   Root Codeception includes api/apps and excludes the other checked-in suites.
+```
+
+Importing both would give two current facts for one truth. Whether two statements are the same fact, a refinement, a supersession, or a contradiction is an engineering judgement, so legacy knowledge becomes canonical only through reconciliation:
+
+```text
+legacy facts → RC candidates → Agent decisions → preview → human review → atomic apply → CTX ledger
+```
+
+```bash
+yallaflow context reconcile start                  # RC-#### candidates in a read-only work item
+yallaflow context reconcile show                   # the Agent inspects them
+yallaflow context reconcile plan --file d.json     # explicit relationships
+yallaflow context reconcile preview                # resulting current memory, nothing changed
+yallaflow context reconcile approve                # a human approves (hash-bound)
+yallaflow context reconcile apply                  # one atomic ledger write
+```
+
+For the example above, `A: new` plus `B: merge-with A` gives one canonical current fact with both origins preserved. `merge-with` collapses candidates that are the same statement, so its target is always another candidate. `reconfirms` records one more observation of a truth already represented (an existing `CTX-####`, or another candidate's fact) of the same kind. The actions are `new`, `merge-with`, `reconfirms`, `supersedes`, `disputes` (targeting a candidate or an existing `CTX-####`), `skip` (with a reason), and `limitation` (kept as a work-scoped discovery limitation). YallaFlow validates the relationship graph and applies it deterministically. The only thing it compares automatically is exact textual identity (`exactDuplicateOf`), which it reports and never acts on. Ambiguous pairs stay undecided with a question for the human, and the rest applies. Reconciled legacy sections that are byte-for-byte what v0.3.5 generated are archived with the reconciliation work item and removed from the documents. Hand-edited ones are kept and flagged for review. The full walkthrough is in [upgrading-to-v0.3.7.md](upgrading-to-v0.3.7.md#4-reconcile-legacy-project-context).
+
+`yallaflow context adopt` imports directly only when that is provably duplicate-free (one legacy item, no current facts); otherwise it points to reconciliation.
+
+## State ownership
+
+Agents never edit YallaFlow-owned structured or history state directly when a supported command exists. YallaFlow enforces this with guidance (the agent contract) and deterministic `doctor` checks, not with locks: `.yallaflow` stays ordinary, reviewable, Git-tracked files.
+
+| Owner | Files | Changed only by |
+|---|---|---|
+| **CLI** | `work/<id>/meta.yaml`, `progress.yaml`, `progress.md`, `knowledge.yaml`, `reviews.yaml`, `questions.yaml`, `baseline.yaml`, `discovery.yaml`, `decomposition.yaml`, `reconciliation.yaml`, `legacy-context.md`, `evidence/` (verification ledger); `context/index.yaml`; `sources/SRC-####/` (originals + metadata); `state/current.yaml`; generated `decisions/ADR-*.md` | the matching `yallaflow` command |
+| **Projection** | the managed blocks in `PROJECT.md`, `context/*.md`, `AGENT.md` | `yallaflow context render`, `yallaflow agent refresh` |
+| **Shared** | `work/<id>/work.md` | the Agent writes the narrative sections (discovery notes, specification, plan, findings, result); CLI-appended lifecycle records (Routing Decision, Source Added, Request Revised) are history and are never edited |
+| **Human** | `config.yaml`; content outside managed blocks | deliberate human edits |
+
+Deterministic tamper checks include strict schema validation of every ledger, the reconciliation plan's approval fingerprint, projection drift, source checksums, and (a warning) a Routing Decision in `work.md` that no longer matches `meta.yaml`.
+
 ## Agent contract
 
-`.yallaflow/AGENT.md` tells agents how to work with YallaFlow, including the project memory sequence (read relevant context, check freshness, rediscover only what changed, relate new knowledge to existing facts). It carries a versioned managed block. `doctor` and `status` warn when it predates the installed contract; `yallaflow agent refresh` updates it deliberately — see [`upgrading-to-v0.3.6.md`](upgrading-to-v0.3.6.md#3-refresh-the-agent-contract).
+`.yallaflow/AGENT.md` tells agents how to work with YallaFlow: the project memory sequence (read relevant context, check freshness, rediscover only what changed, relate new knowledge to existing facts), legacy reconciliation, state ownership, and `yallaflow brief` as the first command of a fresh session. It carries a versioned managed block (v3 since v0.3.7). `doctor` and `status` warn when it predates the installed contract, and `yallaflow agent refresh` updates it deliberately. See [`upgrading-to-v0.3.7.md`](upgrading-to-v0.3.7.md#3-refresh-the-agent-contract-v2--v3).
 
 ## No baseline refresh
 

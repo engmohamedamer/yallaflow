@@ -65,7 +65,8 @@ function skillGuidance(skillId, status) {
     'implementation-planning': 'Produce a scope-appropriate implementation contract before editing code.',
     implementation: 'Perform the smallest implementation that satisfies the approved work contract.',
     verification: 'Run fresh proof and record it through the existing verification gate.',
-    'code-review': 'Review completed work for compliance, regressions, maintainability, security, and unintended scope.'
+    'code-review': 'Review completed work for compliance, regressions, maintainability, security, and unintended scope.',
+    'context-reconciliation': 'Declare an explicit, evidence-based relationship for every legacy candidate; record genuine ambiguity as a question instead of guessing.'
   };
   return guidance[skillId] ?? `Continue ${skillId} according to its package-owned instructions.`;
 }

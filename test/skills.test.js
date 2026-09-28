@@ -34,7 +34,7 @@ async function routedWork(workType, scope) {
 }
 
 test('built-in skill registry validates successfully', async () => {
-  assert.deepEqual(await validateSkillRegistry(), { registryVersion: 3, skillCount: 10 });
+  assert.deepEqual(await validateSkillRegistry(), { registryVersion: 4, skillCount: 11 });
 });
 
 test('skill registry rejects duplicate IDs', async () => {
@@ -120,13 +120,13 @@ test('skill prerequisites are inserted automatically', () => {
   ]);
 });
 
-test('new routed work receives a pinned registry v3 contract', async () => {
+test('new routed work receives a pinned registry v4 contract', async () => {
   const { meta } = await routedWork('bug', 'bounded');
   assert.deepEqual(meta.behaviorContract, {
-    registryVersion: 3,
+    registryVersion: 4,
     skills: ['context-discovery', 'systematic-debugging', 'implementation', 'verification']
   });
-  assert.equal(resolveBehaviorContract(meta).label, 'registry v3 (pinned)');
+  assert.equal(resolveBehaviorContract(meta).label, 'registry v4 (pinned)');
 });
 
 test('legacy routed work derives an unpinned contract without mutation', async () => {
@@ -184,7 +184,7 @@ test('guide command uses active work and reports the behavior gate', async () =>
   const { root } = await routedWork('bug', 'bounded');
   const result = spawnSync(process.execPath, [cli, 'guide'], { cwd: root, encoding: 'utf8' });
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /Behavior contract: registry v3 \(pinned\)/);
+  assert.match(result.stdout, /Behavior contract: registry v4 \(pinned\)/);
   assert.match(result.stdout, /○ systematic-debugging/);
   assert.match(result.stdout, /Application code modification: NOT AUTHORIZED/);
   assert.match(result.stdout, /systematic debugging\/root-cause gate/);
@@ -211,5 +211,5 @@ test('doctor validates the built-in Skill Registry', async () => {
   await initWorkspace(root, 'demo', 'greenfield');
   const result = spawnSync(process.execPath, [cli, 'doctor'], { cwd: root, encoding: 'utf8' });
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /PASS built-in skill registry v3 \(10 skills\)/);
+  assert.match(result.stdout, /PASS built-in skill registry v4 \(11 skills\)/);
 });

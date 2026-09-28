@@ -1,6 +1,6 @@
 # Canonical Workflows
 
-Command-accurate, end-to-end workflows for YallaFlow v0.3.6. In practice your coding agent runs these commands (guided by `.yallaflow/AGENT.md`); you review, answer business questions, and approve gates. At any point:
+Command-accurate, end-to-end workflows for YallaFlow v0.3.7. In practice your coding agent runs these commands (guided by `.yallaflow/AGENT.md`); you review, answer business questions, and approve gates. At any point:
 
 ```bash
 yallaflow guide <work-id>     # CURRENT OBJECTIVE, BLOCKER, NEXT VALID ACTION
@@ -17,6 +17,7 @@ Stage counts below are illustrative — `guide` and `advance` always name the ne
 - [Task with a user-provided screenshot or file](#task-with-a-user-provided-screenshot-or-file)
 - [Cross-agent handoff](#cross-agent-handoff)
 - [Context freshness and revalidation](#context-freshness-and-revalidation)
+- [Upgrading a legacy workspace (reconciliation)](#upgrading-a-legacy-workspace-reconciliation)
 
 ## Greenfield
 
@@ -188,6 +189,7 @@ yallaflow handoff PF-0006
 Incoming agent, with no access to the previous chat:
 
 ```bash
+yallaflow brief                                       # one read-only orientation: contract, active/recent work, memory, next command
 yallaflow agent status                                # is AGENT.md current?
 yallaflow handoff PF-0006                             # PRIMARY UNRESOLVED OBJECTIVE, progress, gates, sources, stale context, next objective
 yallaflow resume PF-0006
@@ -224,3 +226,50 @@ yallaflow context history CTX-0017
 ```
 
 `MAY_BE_STALE` never means false, and nothing changes automatically. Do not rescan unrelated areas, and never edit old work items to reflect new truth.
+
+## Upgrading a legacy workspace (reconciliation)
+
+A workspace that ran v0.3.5 holds append-only context sections. Some of them may describe the same durable truth from different work items. They become canonical current truth only through a reviewed reconciliation, never a blind import (full walkthrough: [upgrading-to-v0.3.7.md](upgrading-to-v0.3.7.md)).
+
+```bash
+yallaflow upgrade status                              # what the workspace needs; read-only
+yallaflow upgrade plan                                # ordered deliberate steps
+yallaflow agent refresh                               # agent contract v2 → v3
+yallaflow context reconcile start                     # PF-0006 + RC-0001 … RC-0053; history untouched
+```
+
+Agent:
+
+```bash
+yallaflow skill context-reconciliation
+yallaflow context reconcile show PF-0006
+yallaflow context list                                # existing canonical facts (e.g. CTX-0001)
+yallaflow context reconcile plan PF-0006 --file decisions.json
+yallaflow question add PF-0006 --category architecture --text "RC-0012 vs RC-0041: same production behavior?"   # never guess
+yallaflow context reconcile preview PF-0006           # resulting current memory; nothing changes
+yallaflow checkpoint PF-0006 --skill context-reconciliation --complete --summary "51 of 53 related; 2 escalated as Q-001."
+```
+
+`decisions.json` declares one relationship per candidate:
+
+```json
+{ "decisions": [
+  { "candidate": "RC-0013", "action": "reconfirms", "target": "CTX-0001", "reason": "The baseline observed the truth CTX-0001 already records." },
+  { "candidate": "RC-0053", "action": "merge-with", "target": "RC-0013", "reason": "Restates BF-013 in different words." },
+  { "candidate": "RC-0044", "action": "new", "summary": "The Azure production pipeline has never executed Codeception tests." },
+  { "candidate": "RC-0051", "action": "reconfirms", "target": "RC-0044", "reason": "Refinement with more detailed evidence." },
+  { "candidate": "RC-0050", "action": "limitation", "limitationType": "not-inspected", "reason": "Describes the session, not the project." },
+  { "candidate": "RC-0007", "action": "skip", "reason": "Transient execution observation." }
+] }
+```
+
+Human, then Agent:
+
+```bash
+yallaflow context reconcile approve PF-0006           # or: feedback PF-0006 --changes-requested --note "..."
+yallaflow context reconcile apply PF-0006             # atomic; the undecided pair stays pending
+# later: answer Q-001, record the two remaining decisions, approve again, apply again → PF-0006 DONE
+yallaflow doctor
+```
+
+The result is one canonical current fact per durable truth, with every origin traceable (`yallaflow context show CTX-0001`) and superseded knowledge kept as lineage. Retired legacy sections are archived verbatim in `work/PF-0006/legacy-context.md`, and hand-edited ones are kept for review. No historical work item is edited.

@@ -1,9 +1,10 @@
 import { findProjectRoot } from '../core/workspace.js';
 import { gitChangedPaths } from '../core/git.js';
-import { findFact, lineageOf, loadContextLedger, validateContextLedger } from '../context/ledger.js';
+import { factOrigins, findFact, lineageOf, loadContextLedger, validateContextLedger } from '../context/ledger.js';
 import { factFreshness, factsAffectedByPaths } from '../context/freshness.js';
-import { findLegacySections, writeContextProjection } from '../context/projection.js';
-import { adoptLegacyContext } from '../context/adopt.js';
+import { writeContextProjection } from '../context/projection.js';
+import { adoptLegacyContext, adoptionRefusal } from '../context/adopt.js';
+import { findActiveReconciliation, pendingLegacyCandidates } from '../reconciliation/store.js';
 import { formatEvidence } from '../context/evidence.js';
 import { describe, summarizeProjectContext } from '../context/summary.js';
 import { CONTEXT_AREAS, FRESHNESS_LABELS } from '../context/constants.js';
@@ -21,12 +22,8 @@ export async function contextStatusCommand() {
   console.log('Project Context');
   if (!summary.exists) {
     console.log('\nNo canonical project-context ledger yet (.yallaflow/context/index.yaml).');
-    console.log('It is created by the first approved baseline or promoted knowledge candidate.');
-    const legacy = await findLegacySections(root);
-    if (legacy.length) {
-      console.log(`\n${legacy.length} v0.3.5 context section(s) are not yet governed by the ledger.`);
-      console.log('Next: yallaflow context adopt --dry-run');
-    }
+    console.log('It is created by the first approved baseline, promoted knowledge candidate, or applied reconciliation.');
+    await printLegacyStatus(root, true);
     return;
   }
   for (const entry of summary.areas) {
@@ -48,8 +45,21 @@ export async function contextStatusCommand() {
   } else {
     console.log('\nNo facts currently need revalidation.');
   }
-  const legacy = await findLegacySections(root);
-  if (legacy.length) console.log(`\n${legacy.length} v0.3.5 context section(s) are not yet adopted. See \`yallaflow context adopt --dry-run\`.`);
+  await printLegacyStatus(root, false);
+}
+
+// Legacy v0.3.5 knowledge is counted from the structured work records (not Markdown),
+// minus whatever is already governed or deliberately settled by reconciliation.
+async function printLegacyStatus(root, noLedger) {
+  const pending = await pendingLegacyCandidates(root);
+  const active = await findActiveReconciliation(root);
+  if (active) {
+    console.log(`\nLegacy context reconciliation in progress: ${active.meta.id} (${pending.length} legacy item(s) not yet reconciled).`);
+    console.log(`Next: yallaflow context reconcile status ${active.meta.id}`);
+  } else if (pending.length) {
+    console.log(`\n${pending.length} v0.3.5 context section(s) are not yet governed by the ledger.`);
+    console.log(`Next: yallaflow context reconcile start${noLedger ? ' (inspect first with `yallaflow context adopt --dry-run`)' : ''}`);
+  }
 }
 
 export async function contextListCommand({ area, all } = {}) {
@@ -78,8 +88,12 @@ export async function contextShowCommand(factId) {
   console.log(`State: ${fact.state}${fact.state === 'disputed' ? ' (not settled truth)' : ''}`);
   console.log(`Confidence: ${fact.confidence}`);
   console.log(`Provenance: ${fact.provenance}`);
-  const origin = fact.origin;
-  console.log(`Introduced by: ${origin.workId}${origin.candidateId ? ` (${origin.candidateId})` : ''}${origin.baselineFactId ? ` (baseline ${origin.baselineFactId})` : ''}${origin.adopted ? ' — adopted from v0.3.5 context' : ''}`);
+  const [origin, ...others] = factOrigins(fact);
+  console.log(`Introduced by: ${describeOrigin(origin)}`);
+  if (others.length) {
+    console.log('Also established by:');
+    for (const extra of others) console.log(`  - ${describeOrigin(extra)}`);
+  }
   console.log(`Verified: ${fact.verifiedAt}${fact.verifiedAtCommit ? ` at commit ${fact.verifiedAtCommit}` : ' (no Git verification point)'}`);
   console.log(`Freshness: ${FRESHNESS_LABELS[freshness.status]}`);
   if (freshness.changed.length) console.log(`  changed since verification: ${freshness.changed.join(', ')}`);
@@ -99,6 +113,12 @@ export async function contextShowCommand(factId) {
   }
 }
 
+function describeOrigin(origin) {
+  const id = origin.candidateId ? ` (${origin.candidateId})` : origin.baselineFactId ? ` (baseline ${origin.baselineFactId})` : '';
+  const via = origin.reconciliation ? `, reconciled in ${origin.reconciliation.workId} ${origin.reconciliation.candidate}` : '';
+  return `${origin.workId}${id}${origin.adopted ? ` — adopted from v0.3.5 context${via}` : ''}`;
+}
+
 export async function contextHistoryCommand(factId) {
   const root = await requireRoot();
   const { ledger } = await loadContextLedger(root);
@@ -109,7 +129,7 @@ export async function contextHistoryCommand(factId) {
   for (const entry of lineage) {
     console.log(`\n${entry.id} [${entry.state}] ${entry.summary}`);
     for (const event of entry.history) {
-      const who = [event.workId, event.candidateId, event.baselineFactId].filter(Boolean).join(' ');
+      const who = [event.workId, event.candidateId, event.baselineFactId, event.reconciliation && `via ${event.reconciliation.workId} ${event.reconciliation.candidate}`].filter(Boolean).join(' ');
       const detail = event.supersedes ? ` supersedes ${event.supersedes}` : event.supersededBy ? ` by ${event.supersededBy}` : event.resolution ? ` (${event.resolution})` : event.summary ? `: ${event.summary}` : '';
       console.log(`  ${event.at} ${event.action}${detail}${who ? ` — ${who}` : ''}`);
     }
@@ -152,7 +172,11 @@ export async function contextAdoptCommand({ dryRun } = {}) {
   if (dryRun) {
     console.log(`Would adopt ${result.items.length} legacy fact(s) into .yallaflow/context/index.yaml:`);
     for (const item of result.items) console.log(`  ${item.origin.workId} ${item.origin.baselineFactId ?? item.origin.candidateId} [${item.area}] ${item.summary}`);
-    console.log('\nWork records (baseline.yaml, knowledge.yaml) are never modified. Run without --dry-run to adopt.');
+    console.log('\nWork records (baseline.yaml, knowledge.yaml) are never modified.');
+    const refusal = await adoptionRefusal(root, result);
+    console.log(refusal
+      ? `Direct adoption is not available: ${refusal}`
+      : 'This adoption is provably duplicate-free (one legacy item, no current facts); run without --dry-run to adopt, or reconcile it with `yallaflow context reconcile start`.');
     return;
   }
   console.log(`Adopted ${result.facts.length} legacy fact(s): ${result.facts.map((fact) => fact.id).join(', ')}`);

@@ -129,6 +129,17 @@ Findings from the real YaSchools Brownfield pilot (baseline → reviewed durable
 
 Deliberately not in scope: automatic semantic refresh or LLM comparison in the CLI, automatic baseline refresh (a second approved baseline is still refused), team mode, and any graph/vector store.
 
+### v0.3.7 — Context Reconciliation & Upgrade Intelligence
+
+Finding from the clean YaSchools v0.3.5 → v0.3.6 upgrade: 53 legacy context sections, several describing the same durable truth from different work items — blind adoption would duplicate current facts.
+
+- Reviewable legacy knowledge reconciliation (`yallaflow context reconcile start|status|show|plan|preview|approve|feedback|apply`): stable `RC-####` candidates, explicit Agent relationships (`new`, `merge-with`, `reconfirms`, `supersedes`, `disputes`, `skip`, `limitation`), hash-bound human review, read-only preview of the resulting memory, atomic idempotent apply, partial apply with unresolved pairs held as questions
+- Backward-compatible multi-origin facts; legacy Markdown retired only when byte-for-byte generated (archived verbatim), hand-edited sections kept for review; `context adopt` limited to provably duplicate-free cases
+- Read-only upgrade intelligence (`yallaflow upgrade status|plan`) and fresh-agent orientation (`yallaflow brief`)
+- Explicit YallaFlow state ownership (CLI-owned vs projection vs shared `work.md` vs human) with deterministic doctor checks; Agent Contract v3; Skill Registry v4 (`context-reconciliation`)
+
+Deliberately not in scope: semantic/fuzzy deduplication, embeddings or LLM calls in the CLI, an automatic "upgrade everything" command, locking, team mode.
+
 ## v0.4 — Execution
 - Execution contracts
 - Reviewed/native/multi-agent policies

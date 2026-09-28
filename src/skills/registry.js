@@ -110,6 +110,16 @@ export const SKILL_REGISTRY = Object.freeze([
     mode: 'read-only',
     prerequisites: [],
     instructionPath: 'resources/skills/repository-baseline.md'
+  }),
+  skill({
+    id: 'context-reconciliation',
+    version: 1,
+    capability: 'reconcile',
+    title: 'Legacy Context Reconciliation',
+    phase: 'analysis',
+    mode: 'read-only',
+    prerequisites: [],
+    instructionPath: 'resources/skills/context-reconciliation.md'
   })
 ]);
 

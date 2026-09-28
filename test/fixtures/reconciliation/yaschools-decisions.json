@@ -1,0 +1,12 @@
+{
+  "decisions": [
+    { "candidate": "RC-0001", "action": "reconfirms", "target": "CTX-0001", "reason": "The baseline independently observed the truth CTX-0001 already records: codeception.yml includes only tests/api and tests/apps." },
+    { "candidate": "RC-0006", "action": "merge-with", "target": "RC-0001", "reason": "PF-0002 K-002 and PF-0001 BF-001 are the same legacy statement worded differently; collapse them into one canonical fact." },
+    { "candidate": "RC-0002", "action": "new", "summary": "The Azure production pipeline has never executed Codeception tests: it installs dependencies and deploys, with no test step or test artifacts." },
+    { "candidate": "RC-0005", "action": "reconfirms", "target": "RC-0002", "reason": "Refinement: K-001 confirms BF-002 with more detailed evidence; its precise wording is the canonical summary." },
+    { "candidate": "RC-0003", "action": "limitation", "limitationType": "not-inspected", "reason": "Describes what the baseline session did not inspect, not a property of the project." },
+    { "candidate": "RC-0004", "action": "new" },
+    { "candidate": "RC-0007", "action": "new" },
+    { "candidate": "RC-0008", "action": "supersedes", "target": "RC-0007", "reason": "docker-compose.yml now pins mysql:8.0; the 5.7 statement is historical." }
+  ]
+}

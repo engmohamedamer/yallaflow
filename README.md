@@ -181,7 +181,7 @@ A new session or a different coding agent can use durable state, Git, project co
 - what project knowledge is relevant
 - what the next valid action is
 
-`yallaflow handoff` and `yallaflow resume` are designed around this recovery model.
+`yallaflow handoff` and `yallaflow resume` are designed around this recovery model. A fresh agent starts with `yallaflow brief` — a read-only orientation that points at the next valid action.
 
 ---
 
@@ -249,6 +249,10 @@ yallaflow intake requirements.docx architecture.pdf
 yallaflow guide PF-0001
 ```
 
+Then open your coding agent in the repository and have it run `yallaflow brief` first (a one-line pointer in your repository's `AGENTS.md`/`CLAUDE.md` helps: *This repository uses YallaFlow — run `yallaflow brief` first.*). The generated `.yallaflow/AGENT.md` tells it how to work. Commit `.yallaflow/` with the project.
+
+Upgrading an existing workspace? Run `yallaflow upgrade status` — see [`docs/upgrading-to-v0.3.7.md`](docs/upgrading-to-v0.3.7.md).
+
 For legacy repositories, install YallaFlow as an isolated CLI rather than adding it to the application's dependency tree.
 
 See [`docs/installation.md`](docs/installation.md) for the supported installation model.
@@ -305,7 +309,7 @@ Discovery
 → Knowledge
 ```
 
-Large plans can be decomposed into dependency-aware child work items while keeping requirements and acceptance-criteria traceability.
+Large plans can be decomposed into dependency-aware child work items. Each child can carry the requirement and acceptance-criteria references the Agent assigns it, and `yallaflow decompose validate` reports coverage (referenced, cross-cutting, unassigned) for those references. They are Agent-declared labels: YallaFlow does not yet give requirements a validated identity or prove that they were delivered.
 
 ---
 
@@ -315,14 +319,17 @@ YallaFlow separates different kinds of memory deliberately.
 
 | Memory | Question | Location |
 | --- | --- | --- |
-| Work memory | What happened during this work item? | `.yallaflow/work/PF-####/` |
+| Work history | What happened during this work item? | `.yallaflow/work/PF-####/` — immutable, never rewritten |
 | Project memory | What is currently believed true? | `.yallaflow/context/index.yaml` |
 | Human-readable context | What should a person or agent quickly read? | `.yallaflow/PROJECT.md`, `.yallaflow/context/*.md` |
 | Historical knowledge | What was previously believed? | superseded/disputed `CTX-####` facts |
 | Source memory | What original input did the work come from? | `.yallaflow/sources/SRC-####/` |
 | Decisions | What architectural decisions were accepted? | `.yallaflow/decisions/` |
+| Reconciliation history | How did legacy (v0.3.5) knowledge become current memory? | the reconciliation work item's `reconciliation.yaml` |
 
 Project facts evolve by explicit relationships such as reconfirm, supersede, and dispute. Work history remains immutable.
+
+Old knowledge is reviewed before it becomes current truth: legacy project context from earlier workspaces is reconciled through explicit, human-approved relationships (`yallaflow context reconcile`), never imported blindly. Details: [`docs/project-memory.md`](docs/project-memory.md).
 
 ---
 
@@ -345,6 +352,7 @@ Project facts evolve by explicit relationships such as reconfirm, supersede, and
 │       ├── discovery.yaml
 │       ├── knowledge.yaml
 │       ├── reviews.yaml
+│       ├── reconciliation.yaml   # reconciliation work items only
 │       └── evidence/
 ├── sources/
 │   └── SRC-0001/
@@ -356,7 +364,7 @@ Project facts evolve by explicit relationships such as reconfirm, supersede, and
 
 The workspace is project-owned and intended to be versioned with the repository.
 
-Optional directories are created lazily only when they are needed.
+Optional directories are created lazily only when they are needed. Structured state is CLI-owned: agents change it through `yallaflow` commands, never by hand ([state ownership](docs/project-memory.md#state-ownership)).
 
 ---
 
@@ -364,6 +372,8 @@ Optional directories are created lazily only when they are needed.
 
 ```text
 yallaflow init
+yallaflow brief
+yallaflow upgrade
 yallaflow start
 yallaflow intake
 yallaflow route
@@ -475,7 +485,7 @@ Those rules are intentionally simple. The value is that YallaFlow makes them dur
 
 ## Status
 
-Current public baseline: **`0.3.6-internal.1` — Living Project Memory & Context Integrity**.
+Current version: **`0.3.7-internal.1` — Context Reconciliation & Upgrade Intelligence** (internal prerelease; `package.json` is `private`, nothing is published to npm). Upgrading: run `yallaflow upgrade status`, then see [`docs/upgrading-to-v0.3.7.md`](docs/upgrading-to-v0.3.7.md).
 
 YallaFlow is under active development and its workspace/package contracts have not reached 1.0 stability yet.
 
@@ -490,6 +500,8 @@ YallaFlow is under active development and its workspace/package contracts have n
 | [`docs/cli.md`](docs/cli.md) | Complete CLI reference |
 | [`docs/guide.md`](docs/guide.md) | Feature and behavior guide |
 | [`docs/project-memory.md`](docs/project-memory.md) | Living project memory and artifact model |
+| [`docs/upgrading-to-v0.3.7.md`](docs/upgrading-to-v0.3.7.md) | Upgrading to v0.3.7: `upgrade status`, reconciling legacy context |
+| [`docs/upgrading-to-v0.3.6.md`](docs/upgrading-to-v0.3.6.md) | Upgrading a v0.3.5 workspace to v0.3.6 |
 | [`docs/architecture.md`](docs/architecture.md) | Internal architecture and invariants |
 | [`docs/security.md`](docs/security.md) | Security and trust model |
 | [`docs/limitations.md`](docs/limitations.md) | Known boundaries |

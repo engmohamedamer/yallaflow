@@ -125,7 +125,7 @@ test('full implementation DONE remains supported', async () => {
 
 test('old pinned contracts remain unaffected by a newer registry version', async () => {
   const { root, meta } = await routedWork('bug', 'bounded');
-  assert.equal(meta.behaviorContract.registryVersion, 3);
+  assert.equal(meta.behaviorContract.registryVersion, 4);
   assert.equal(meta.behaviorContract.skills.includes('specification'), false);
 
   const persisted = await readYaml(path.join(workspacePath(root), 'work', meta.id, 'meta.yaml'));
@@ -139,7 +139,7 @@ test('old pinned contracts remain unaffected by a newer registry version', async
 test('new architectural work includes the specification skill in its pinned contract', async () => {
   const { meta } = await routedWork('feature', 'architectural');
   assert.ok(meta.behaviorContract.skills.includes('specification'));
-  assert.equal(meta.behaviorContract.registryVersion, 3);
+  assert.equal(meta.behaviorContract.registryVersion, 4);
 });
 
 test('specification checkpoint persists across restart', async () => {

@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "database",
+      "source": "implementation-runtime",
+      "summary": "Read replica is active for reporting.",
+      "evidence": [
+        "db.yml"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0001"
+      },
+      "status": "promoted",
+      "createdAt": "2026-09-24T12:26:21.844Z",
+      "factId": "CTX-0003",
+      "promotedAt": "2026-09-24T12:26:21.959Z",
+      "target": "context/database.md"
+    },
+    {
+      "id": "K-002",
+      "kind": "tech-stack",
+      "source": "implementation-runtime",
+      "summary": "Node.js project.",
+      "evidence": [
+        "package.json"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0002"
+      },
+      "status": "promoted",
+      "createdAt": "2026-09-24T12:26:22.092Z",
+      "factId": "CTX-0002",
+      "promotedAt": "2026-09-24T12:26:22.208Z",
+      "target": "context/tech-stack.md"
+    }
+  ],
+  "updatedAt": "2026-09-24T12:26:22.208Z",
+  "reviewedAt": "2026-09-24T12:26:22.208Z"
+}

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0001",
+  "sourceType": "file",
+  "sourceName": "request.txt",
+  "detectedFormat": "txt",
+  "contentType": "text/plain",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-09-24T12:26:20.776Z",
+  "original": {
+    "path": "sources/SRC-0001/request.txt",
+    "sha256": "c72b0ed2c75f5ed56361434427f52f047f346df66cf92b54a539273c7d23576c",
+    "sizeBytes": 29
+  },
+  "metadata": {
+    "extension": ".txt",
+    "detectedFormat": "txt"
+  },
+  "linkedWork": [
+    "PF-0002"
+  ],
+  "rawText": "Calendar export requirement.\n"
+}

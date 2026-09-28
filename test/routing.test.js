@@ -147,7 +147,7 @@ test('routing decision survives a separate CLI process', async () => {
   assert.ok(persisted.requiredCapabilities.includes('systematic-debugging'));
   assert.ok(persisted.routedAt);
   assert.deepEqual(persisted.behaviorContract, {
-    registryVersion: 3,
+    registryVersion: 4,
     skills: ['context-discovery', 'systematic-debugging', 'implementation', 'verification']
   });
 

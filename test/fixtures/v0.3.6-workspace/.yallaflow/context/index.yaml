@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "facts": [
+    {
+      "id": "CTX-0001",
+      "area": "database",
+      "state": "superseded",
+      "confidence": "confirmed",
+      "summary": "Read replica is configured but inactive.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0001",
+        "baselineFactId": "BF-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "db.yml",
+          "contentHash": "sha256:d562ef463be2558a96457114d5efae86fb0baaae4d43eaec7312b20503d0c574"
+        }
+      ],
+      "verifiedAt": "2026-09-24T12:26:20.646Z",
+      "verifiedAtCommit": null,
+      "supersedes": [],
+      "supersededBy": "CTX-0003",
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-09-24T12:26:20.646Z",
+          "workId": "PF-0001",
+          "baselineFactId": "BF-001"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-09-24T12:26:21.959Z",
+          "supersededBy": "CTX-0003",
+          "workId": "PF-0002",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-09-24T12:26:20.646Z",
+      "updatedAt": "2026-09-24T12:26:21.959Z"
+    },
+    {
+      "id": "CTX-0002",
+      "area": "tech-stack",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Node.js project.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0001",
+        "baselineFactId": "BF-002"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "package.json",
+          "contentHash": "sha256:b57686b4bc216eb78116787bcabbb65cfd9460d3b29874eaf4095b6a71412f3a"
+        }
+      ],
+      "verifiedAt": "2026-09-24T12:26:22.208Z",
+      "verifiedAtCommit": null,
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-09-24T12:26:20.646Z",
+          "workId": "PF-0001",
+          "baselineFactId": "BF-002"
+        },
+        {
+          "action": "reconfirmed",
+          "at": "2026-09-24T12:26:22.208Z",
+          "workId": "PF-0002",
+          "candidateId": "K-002",
+          "previousEvidence": [
+            {
+              "type": "repository",
+              "path": "package.json",
+              "contentHash": "sha256:b57686b4bc216eb78116787bcabbb65cfd9460d3b29874eaf4095b6a71412f3a"
+            }
+          ],
+          "previousVerifiedAt": "2026-09-24T12:26:20.646Z",
+          "previousVerifiedAtCommit": null
+        }
+      ],
+      "createdAt": "2026-09-24T12:26:20.646Z",
+      "updatedAt": "2026-09-24T12:26:22.208Z"
+    },
+    {
+      "id": "CTX-0003",
+      "area": "database",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Read replica is active for reporting.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0002",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "db.yml",
+          "contentHash": "sha256:d562ef463be2558a96457114d5efae86fb0baaae4d43eaec7312b20503d0c574"
+        }
+      ],
+      "verifiedAt": "2026-09-24T12:26:21.959Z",
+      "verifiedAtCommit": null,
+      "supersedes": [
+        "CTX-0001"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-09-24T12:26:21.959Z",
+          "workId": "PF-0002",
+          "candidateId": "K-001",
+          "supersedes": "CTX-0001"
+        }
+      ],
+      "createdAt": "2026-09-24T12:26:21.959Z",
+      "updatedAt": "2026-09-24T12:26:21.959Z"
+    }
+  ],
+  "updatedAt": "2026-09-24T12:26:22.208Z"
+}

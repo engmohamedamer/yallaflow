@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "runtime-unavailable",
+      "area": "database",
+      "summary": "Production replica lag not observed.",
+      "reason": "No production access.",
+      "recordedAt": "2026-09-24T12:26:22.337Z"
+    }
+  ],
+  "updatedAt": "2026-09-24T12:26:22.337Z"
+}

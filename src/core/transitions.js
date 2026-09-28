@@ -74,6 +74,12 @@ export async function evaluateAdvance(root, meta, current, { mutate = false } = 
   const next = nextStageForWork(meta, current);
   if (!next) return { allowed: false, next: null, final: true, error: `${id} is already at the final stage.`, blocker: null, action: null };
   const blocked = (error, blocker, action) => ({ allowed: false, next, error, blocker, action });
+  // A legacy-context reconciliation has no meaningful investigation stages: it becomes
+  // DONE only when `context reconcile apply` settles its last candidate (v0.3.7).
+  if (meta.reconciliation) {
+    const text = `${id} is a legacy-context reconciliation; it completes only through \`yallaflow context reconcile apply\` once every candidate is reconciled.`;
+    return blocked(text, text, `yallaflow context reconcile status ${id}`);
+  }
 
   const progress = await loadWorkProgress(root, meta);
   const questions = await loadWorkQuestions(root, meta);

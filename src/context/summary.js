@@ -1,6 +1,7 @@
 import { loadContextLedger } from './ledger.js';
 import { ledgerFreshness, needsRevalidation } from './freshness.js';
 import { AREA_LABELS, CONTEXT_AREAS, FRESHNESS } from './constants.js';
+import { findActiveReconciliation, pendingLegacyCandidates } from '../reconciliation/store.js';
 
 // Shared, read-only project-memory summary used by `context status`, `handoff`, and
 // `resume` — one interpretation of the ledger + freshness, never three.
@@ -45,7 +46,8 @@ export async function summarizeProjectContext(root) {
 // the whole ledger.
 export async function projectContextLines(root, knowledgeLedger = null, limit = 5) {
   const summary = await summarizeProjectContext(root);
-  if (!summary.exists) return [];
+  const legacy = await legacyContextLine(root);
+  if (!summary.exists) return legacy;
   const { totals, revalidate, freshness, ledger } = summary;
   const lines = [`Project context: ${totals.current} current, ${totals.mayBeStale + totals.staleEvidence} may be stale, ${totals.disputed} disputed, ${totals.unresolved} unresolved`];
   for (const fact of revalidate.slice(0, limit)) lines.push(`- ${describe(fact, freshness.get(fact.id))}`);
@@ -59,7 +61,15 @@ export async function projectContextLines(root, knowledgeLedger = null, limit = 
     lines.push(`This work's ${candidate.id} ${candidate.relation.type} ${fact.id}, which ${fact.state === 'disputed' ? 'is disputed' : 'may be stale'} — revalidate it before relying on it.`);
   }
   if (revalidate.length) lines.push('Revalidate affected facts before relying on them: targeted rediscovery, then `knowledge propose --reconfirms|--supersedes|--disputes CTX-####`.');
-  return lines;
+  return [...lines, ...legacy];
+}
+
+// v0.3.5 knowledge not yet reconciled is not current truth; say so once, compactly.
+async function legacyContextLine(root) {
+  const [pending, active] = await Promise.all([pendingLegacyCandidates(root), findActiveReconciliation(root)]);
+  if (active) return [`Legacy context: reconciliation ${active.meta.id} in progress (${pending.length} legacy item(s) not yet reconciled; not current truth until applied).`];
+  if (pending.length) return [`Legacy context: ${pending.length} v0.3.5 fact(s) pending reconciliation — not canonical current truth (yallaflow context reconcile start).`];
+  return [];
 }
 
 export function describe(fact, freshness) {

@@ -10,10 +10,28 @@ import { listSources } from '../core/sources.js';
 import { checkWorkIntegrity, checkWorkspaceIntegrity } from '../core/integrity.js';
 import { checkContextIntegrity } from '../context/integrity.js';
 import { describeAgentContractState, inspectAgentContract } from '../agent/contract.js';
+import { checkWorkRecordOwnership } from '../core/ownership.js';
 
 export async function doctorCommand() {
   const root = await findProjectRoot();
   if (!root) throw new Error('FAIL No .yallaflow workspace found.');
+  const { checks, warnings } = await collectDoctorReport(root);
+  const failed = checks.filter(([, ok]) => !ok);
+  for (const [name, ok] of checks) console.log(`${ok ? 'PASS' : 'FAIL'} ${name}`);
+  for (const warning of warnings) console.log(`WARN ${warning}`);
+  if (failed.length) {
+    process.exitCode = 1;
+    console.log(`\n${failed.length} check(s) failed.`);
+  } else {
+    console.log('\nWorkspace healthy.');
+    if (warnings.length) console.log(`${warnings.length} warning(s) — informational only, does not affect workspace health.`);
+  }
+}
+
+// The complete read-only integrity report — shared by `doctor` (which prints it) and
+// the `upgrade status|plan` / `brief` assessments (which aggregate it), so there is
+// exactly one interpretation of workspace health.
+export async function collectDoctorReport(root) {
   const base = workspacePath(root);
   const checks = [];
   for (const relative of [
@@ -93,9 +111,17 @@ export async function doctorCommand() {
     checks.push([`lifecycle integrity: ${error instanceof Error ? error.message : String(error)}`, false]);
   }
 
-  // Project memory: structural ledger/lineage/projection problems fail; freshness and
-  // unadopted legacy context are warnings only.
+  // State ownership (v0.3.7): CLI-appended work.md lifecycle records must still match
+  // the structured state they were written from. Informational — work.md is shared.
   const warnings = [];
+  try {
+    for (const item of await listWork(root)) warnings.push(...(await checkWorkRecordOwnership(root, item)));
+  } catch (error) {
+    warnings.push(`work record ownership: ${error instanceof Error ? error.message : String(error)}`);
+  }
+
+  // Project memory: structural ledger/lineage/projection problems fail; freshness and
+  // unreconciled legacy context are warnings only.
   try {
     const context = await checkContextIntegrity(root);
     if (context.errors.length) context.errors.forEach((issue) => checks.push([issue, false]));
@@ -123,14 +149,5 @@ export async function doctorCommand() {
     warnings.push(`workspace/Git tracking: ${error instanceof Error ? error.message : String(error)}`);
   }
 
-  const failed = checks.filter(([, ok]) => !ok);
-  for (const [name, ok] of checks) console.log(`${ok ? 'PASS' : 'FAIL'} ${name}`);
-  for (const warning of warnings) console.log(`WARN ${warning}`);
-  if (failed.length) {
-    process.exitCode = 1;
-    console.log(`\n${failed.length} check(s) failed.`);
-  } else {
-    console.log('\nWorkspace healthy.');
-    if (warnings.length) console.log(`${warnings.length} warning(s) — informational only, does not affect workspace health.`);
-  }
+  return { checks, warnings };
 }

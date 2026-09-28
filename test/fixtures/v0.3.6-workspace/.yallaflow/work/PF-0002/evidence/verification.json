@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --version",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--version"
+      ],
+      "displayCommand": "node --version",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-09-24T12:26:21.712Z",
+      "finishedAt": "2026-09-24T12:26:21.717Z",
+      "verifiedAt": "2026-09-24T12:26:21.717Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

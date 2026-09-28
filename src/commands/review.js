@@ -34,4 +34,9 @@ export async function feedbackCommand(workId, input) {
 
 function requireGate(stage) {
   if (!GATE_NAMES.includes(stage)) throw new Error(`--stage must be one of: ${GATE_NAMES.join(', ')}; received ${JSON.stringify(stage)}.`);
+  // A reconciliation approval is bound to the exact plan content it covers; a bare gate
+  // flip would record an approval of nothing in particular.
+  if (stage === 'reconciliation') {
+    throw new Error('The reconciliation gate is managed by `yallaflow context reconcile approve|feedback`, which binds the review to the exact plan content. No files were changed.');
+  }
 }

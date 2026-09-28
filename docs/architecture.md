@@ -92,7 +92,7 @@ Adaptive SDD does not require every work item to be implemented. A work item may
 See [Delivery readiness](#delivery-readiness) for how this is computed and reported.
 
 ## 1. Project Memory
-Durable facts about the software: purpose, architecture, stack, database, integrations, environments, conventions, and ADRs. Since v0.3.6 the canonical form is one structured ledger, `.yallaflow/context/index.yaml`; `PROJECT.md` and `context/*.md` are its human-readable projection of current facts. See [Living Project Memory](#living-project-memory-v036).
+Durable facts about the software: purpose, architecture, stack, database, integrations, environments, conventions, and ADRs. Since v0.3.6 the canonical form is one structured ledger, `.yallaflow/context/index.yaml`; `PROJECT.md` and `context/*.md` are its human-readable projection of current facts. See [Living Project Memory](#living-project-memory-v036). Since v0.3.7, legacy knowledge enters it only through [reviewed reconciliation](#context-reconciliation--upgrade-intelligence-v037).
 
 > **Work records preserve history. Project memory preserves current understanding.**
 
@@ -119,6 +119,8 @@ Runs approved work with a configurable policy: native, reviewed, or multi-agent.
 - Remember after finishing.
 - Revalidate before trusting stale knowledge.
 - Work history is immutable; project memory evolves (supersede, never rewrite).
+- Legacy knowledge becomes current truth only through explicit, reviewed reconciliation — migration is not reconciliation.
+- Agents never edit CLI-owned YallaFlow state directly when a supported command exists.
 - Exactly one canonical structured source of truth for durable project knowledge, with exactly one writer.
 - Investigation is read-only.
 - Durable state beats conversational memory.
@@ -300,7 +302,7 @@ work/PF-0001/…  unchanged
 
 **Ownership.** `src/context/ledger.js` owns the canonical ledger and is its only writer (`mutateContextLedger`: load → validate → apply transitions → validate → write the ledger → re-render affected projections). Only the ledger write is atomic — nothing is written if the result is invalid, and `index.yaml` is replaced via temp-file + rename. Ledger and projection are **not** one filesystem transaction: if rendering fails after the ledger write, canonical knowledge is intact, `doctor` reports the drift, `yallaflow context render` regenerates it deterministically, and retrying the originating `knowledge promote`/`baseline approve` is idempotent (`appliedTransition` recognizes a transition the same candidate or baseline fact already applied, so no fact, history entry, or lineage link is duplicated). There are two producers, both pre-existing: `knowledge promote` (`src/knowledge/promotion.js`) and `baseline approve` (`src/baseline/store.js`). Neither writes Markdown itself any more. `src/context/projection.js` owns exactly one managed block per durable document. Work items keep their own history (`knowledge.yaml` records the candidate, its declared relation, and the resulting `factId`; `baseline.yaml` keeps its `BF-###` facts) and are never edited when project understanding changes. There is no second knowledge system: candidates are still the only way knowledge enters or evolves.
 
-**Fact schema** (`schemaVersion: 1`, JSON-compatible YAML like every other ledger):
+**Fact schema** (`schemaVersion: 1` as introduced in v0.3.6 — v0.3.7 adds schema v2, see below; JSON-compatible YAML like every other ledger):
 
 ```json
 {
@@ -380,6 +382,73 @@ Every new source link records `linkedAt`, `workStatusAtLink`, and `relationship`
 ### Next valid action (v0.3.6)
 
 `evaluateAdvance` (`src/core/transitions.js`) is now the single interpretation of "may this work item leave its stage?", used by `advance` (which may still record a newly requested review gate) and, read-only, by `guide` and by `advance`'s post-transition report. It returns the first blocker and the exact next valid command (checkpoint, `verify … -- <command>`, `approve … --stage`, question resolution, knowledge disposition, or `advance`), so an agent no longer needs repeated advance/guide round-trips. `advance`'s error messages are unchanged; stage transitions were not redesigned.
+
+## Context Reconciliation & Upgrade Intelligence (v0.3.7)
+
+The clean YaSchools v0.3.5 → v0.3.6 upgrade exposed the next problem. `context adopt` could find all 53 legacy sections, but several were the same durable truth recorded by different work items in different words, and blind adoption would have turned each into its own current fact. Deciding sameness, refinement, supersession, or contradiction takes engineering reasoning, and the CLI never performs semantic inference.
+
+```text
+Work history (immutable)      Reconciliation (interprets, never rewrites)          Project memory (evolves)
+PF-0001 baseline.yaml BF-013 ─┐                                                    ┌▶ CTX-0002 current
+PF-0002 knowledge.yaml K-002 ─┴▶ PF-0006 reconciliation.yaml                       │   origins: PF-0001 BF-013,
+                                 RC-0013 new · RC-0053 merge-with RC-0013 ──apply──┘            PF-0002 K-002
+                                 approval: sha256 of candidates + decisions         PF-0006 legacy-context.md (archive)
+```
+
+**Reused primitives, no second memory system.**
+
+- A reconciliation is an ordinary read-only work item (`reconciliation: true`, the Brownfield Baseline shape), so the work lifecycle, `guide`/`resume`/`handoff`, `questions.yaml` (unresolved ambiguity), `discovery.yaml` (limitation outcomes), and the `reviews.yaml` gate ledger (new `reconciliation` gate) all apply unchanged.
+- The plan (`work/<id>/reconciliation.yaml`) is the durable reconciliation history. It is never part of the canonical ledger.
+- Canonical memory changes only through `mutateContextLedger`. Preview uses `simulateContextLedger`, which runs the same operations against a deep copy with no I/O, so preview and apply share one application model (`buildApplication`).
+
+**Plan model** (`src/reconciliation/plan.js`, pure).
+
+- Candidates are frozen at `start` with deterministic IDs.
+- `resolvePlan` resolves every relation to a *node*: a candidate that becomes its own fact this round, or an existing CTX fact, including the fact an earlier round produced.
+- It separates structural errors (unknown, self, cyclic, conflicting, undecided, or non-fact-producing targets) from state issues (a target the ledger has since moved past).
+- `planHash` fingerprints candidates and decisions and excludes apply bookkeeping, so applying an approved plan never invalidates its own approval, while any content change does.
+
+**Apply semantics** (all candidates of one round, one atomic ledger write).
+
+- Fact-producing candidates (`new`, `supersedes`) are created in supersession-dependency order. Their merge/reconfirm members join at creation, with evidence taken as the union of the members' legacy evidence and `verifiedAt` as the latest recorded time.
+- Members joining an existing fact get `attachOrigin`: provenance only, with evidence, verification point, and freshness unchanged.
+- Disputes run last.
+- Idempotency is keyed on origins (`appliedTransition` now also checks `origins` and `merged` history), so a crash between the ledger write and plan bookkeeping is finished by a plain retry.
+
+**Multi-origin facts.**
+
+- **Storage contract.** Schema v1 facts record `origin`. Schema v2 facts record only `origins`, which v0.3.6 cannot read (its reader requires `schemaVersion: 1`). There is one canonical field per schema, never both, and `validateContextLedger` rejects divergent or cross-schema provenance.
+- **Reads.** A ledger is read exactly as stored (no migration on read) through one accessor, `factOrigins()`. A schema newer than v2 is refused up front by `loadContextLedger`, and `probeContextSchema` reports it read-only for `upgrade status`/`brief`.
+- **Writes.** `applyToDraft` converts the draft to the working form (`origins` on every fact, keys renamed in place), runs the operations, and writes at `max(current, minSchema, requiresSchemaV2 ? 2 : 1)`. Ordinary work on a v1 ledger stays v1 and byte-stable. Reconciliation apply passes `minSchema: 2`. A ledger is never downgraded.
+- **Normalizing vs. keeping both fields.** Normalizing to a single field per schema was chosen over keeping both `origin` and `origins`, because two fields could diverge silently.
+- An origin may carry `{ reconciliation: { workId, candidate } }`.
+- The ledger rejects duplicate origins within a fact and across facts.
+
+**Legacy Markdown.** A reconciled section is retired only when it is byte-for-byte what v0.3.5's `factSection`/`contextSection` generated from the candidate's own record (`generatedLegacySectionPattern`; only the timestamp value is a wildcard). It is archived verbatim first. Any hand edit keeps the section, and `doctor` flags it for review. A still-generated reconciled section left in a document is an error: parallel current truth.
+
+**`context adopt`** is kept for the provably trivial case only (one legacy item, no current facts). Everything else is refused with zero mutation and points to reconciliation. No shortcut bypasses review.
+
+**Upgrade intelligence and orientation.**
+
+- `collectDoctorReport` (extracted from `doctor`) is the single interpretation of workspace health.
+- `assessWorkspace` (`src/core/assessment.js`) aggregates it with agent-contract state, project memory, pending legacy items, reconciliation status, sources, and Git durability. This backs the read-only `upgrade status`, `upgrade plan`, and `brief`.
+- None of these migrate, repair, or infer anything.
+
+**State ownership** (`src/core/ownership.js`).
+
+- An explicit table classifies every file YallaFlow writes: CLI-owned, projection, shared (`work.md`), or human.
+- A test asserts that a full lifecycle writes no unclassified file.
+- The agent contract names every CLI-owned file.
+- `doctor` checks what is deterministic: strict schemas, approval fingerprints, projection drift, checksums, and the `work.md` Routing Decision against `meta.yaml`.
+- This is guidance plus integrity checks, never locking.
+
+**Merge vs. reconfirm.**
+
+- `merge-with` collapses candidates that are the same statement into one canonical fact. Its target must be another candidate, and cross-area merges are allowed for misfiled duplicates.
+- `reconfirms` records one more historical observation of a truth already represented (a CTX fact or another candidate's fact). It must be the same area, the rule `knowledge --reconfirms` already applies.
+- Both use `attachOrigin`, but history keeps `merged` vs `reconfirmed`, and preview labels every member with its action.
+
+**Versions.** Agent Contract v3 (new behavior rules). Skill Registry v4 (new `context-reconciliation` skill; pinned work unaffected). Context ledger schema v2, written only when needed. Reconciliation plan `schemaVersion: 1`.
 
 ### Structured questions / decision ledger
 

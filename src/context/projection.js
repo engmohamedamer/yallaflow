@@ -3,6 +3,7 @@ import { exists, readText, writeText } from '../utils/fs.js';
 import { workspacePath } from '../core/workspace.js';
 import { CONTEXT_HEADINGS, CONTEXT_TARGETS } from '../knowledge/constants.js';
 import { formatEvidence } from './evidence.js';
+import { factOrigins } from './ledger.js';
 import { CONTEXT_AREAS } from './constants.js';
 
 // Markdown projection of the canonical ledger. Each durable document owns exactly one
@@ -55,7 +56,7 @@ function renderFact(fact) {
     `- **Confidence:** ${fact.confidence}`,
     `- **Provenance:** ${fact.provenance}`
   ];
-  const origin = fact.origin ?? {};
+  const [origin = {}, ...others] = factOrigins(fact);
   if (origin.baselineFactId) {
     lines.push(`- **From baseline:** ${origin.workId} (${origin.baselineFactId})`, `- **Recorded at:** ${fact.createdAt}`);
   } else {
@@ -63,7 +64,15 @@ function renderFact(fact) {
     if (origin.candidateId) lines.push(`- **Knowledge ID:** ${origin.candidateId}`);
     lines.push(`- **Promoted at:** ${fact.createdAt}`);
   }
-  if (origin.adopted) lines.push('- **Adopted from:** v0.3.5 context (verification point unknown)');
+  if (origin.adopted) {
+    const via = origin.reconciliation ? `; reconciled in ${origin.reconciliation.workId} ${origin.reconciliation.candidate}` : '';
+    lines.push(`- **Adopted from:** v0.3.5 context (verification point unknown${via})`);
+  }
+  // Multi-origin facts (v0.3.7): every other historical work item that established it.
+  for (const extra of others) {
+    const via = extra.reconciliation ? ` — reconciled in ${extra.reconciliation.workId} ${extra.reconciliation.candidate}` : '';
+    lines.push(`- **Also established by:** ${extra.workId} (${extra.baselineFactId ? `baseline ${extra.baselineFactId}` : extra.candidateId})${via}`);
+  }
   if (fact.supersedes?.length) lines.push(`- **Supersedes:** ${fact.supersedes.join(', ')}`);
   lines.push(`- **Verified:** ${fact.verifiedAt}${fact.verifiedAtCommit ? ` (commit ${fact.verifiedAtCommit.slice(0, 7)})` : ''}`);
   if (fact.note) lines.push(`- **Note:** ${fact.note}`);
@@ -161,8 +170,46 @@ export async function findLegacySections(root) {
 // factSection/contextSection wrote). A section a human has edited no longer matches
 // the template and is left in place — the caller reports it.
 export function removeLegacySection(content, marker) {
+  const section = matchLegacySection(content, marker);
+  if (section === null) return null;
+  return content.replace(section, '');
+}
+
+// The exact text of one still-templated legacy section, or null when the marker is
+// absent or the section no longer matches the template (hand-edited).
+export function matchLegacySection(content, marker) {
   const escaped = marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const pattern = new RegExp(`\\n?${escaped}\\n## [^\\n]*\\n\\n(?:- \\*\\*(?!Evidence:\\*\\*)[^\\n]*\\n)*- \\*\\*Evidence:\\*\\*\\n(?:  - [^\\n]*(?:\\n|$))+`);
-  if (!pattern.test(content)) return null;
-  return content.replace(pattern, '');
+  return pattern.exec(content)?.[0] ?? null;
+}
+
+// 'absent' | 'template' (exactly as YallaFlow wrote it — safe to retire) | 'edited'
+// (marker present, content changed by hand — never removed automatically).
+export function legacySectionState(content, marker) {
+  if (content === null || !content.includes(marker)) return 'absent';
+  return matchLegacySection(content, marker) === null ? 'edited' : 'template';
+}
+
+// Exact regeneration of the section v0.3.5 wrote for one structured legacy record
+// (baseline factSection / knowledge contextSection at e15eb97). Everything is literal
+// except the timestamp line's value, which v0.3.5 stamped with its own clock. A
+// section matching this is byte-for-byte what YallaFlow generated from the record, so
+// retiring it loses nothing; any hand edit — even inside a bullet's value — no longer
+// matches and the section is kept for human review. `item` is a legacy item or
+// reconciliation candidate (origin, summary, confidence, provenance, evidence, note).
+export function generatedLegacySectionPattern(item) {
+  const esc = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const { workId, baselineFactId, candidateId } = item.origin;
+  const evidence = item.evidence.map((entry) => `  - ${esc(entry)}`).join('\\n');
+  const body = baselineFactId
+    ? `${esc(`<!-- yallaflow-baseline:${workId}:${baselineFactId} -->`)}\\n## ${esc(`${baselineFactId} — ${item.summary}`)}\\n\\n- \\*\\*Status:\\*\\* ${esc(item.confidence)}\\n- \\*\\*Source:\\*\\* ${esc(item.provenance)}\\n- \\*\\*From baseline:\\*\\* ${esc(workId)}\\n- \\*\\*Recorded at:\\*\\* [^\\n]*\\n${item.note ? `- \\*\\*Note:\\*\\* ${esc(item.note)}\\n` : ''}- \\*\\*Evidence:\\*\\*\\n${evidence}\\n`
+    : `${esc(`<!-- yallaflow-knowledge:${workId}:${candidateId} -->`)}\\n## ${esc(`${candidateId} — ${item.summary}`)}\\n\\n- \\*\\*Source work:\\*\\* ${esc(workId)}\\n- \\*\\*Knowledge ID:\\*\\* ${esc(candidateId)}\\n- \\*\\*Promoted at:\\*\\* [^\\n]*\\n- \\*\\*Evidence:\\*\\*\\n${evidence}\\n`;
+  return new RegExp(`\\n?${body}`);
+}
+
+// 'absent' | 'generated' (exactly as YallaFlow wrote it from `item`) | 'edited'.
+export function generatedLegacySectionState(content, item, marker) {
+  if (content === null || !content.includes(marker)) return { state: 'absent', text: null };
+  const match = generatedLegacySectionPattern(item).exec(content);
+  return match ? { state: 'generated', text: match[0] } : { state: 'edited', text: null };
 }

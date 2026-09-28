@@ -1,16 +1,12 @@
-// v0.3.6 compatibility with v0.3.5 workspaces: no migration on read, explicit
-// `context adopt` upgrade, and coexistence of legacy sections with the managed block.
+// v0.3.6/v0.3.7 compatibility with v0.3.5 workspaces: no migration on read,
+// coexistence of legacy sections with the managed block, and — since v0.3.7 — legacy
+// knowledge becomes canonical only through reviewed reconciliation (blind multi-item
+// `context adopt` is refused; provably trivial adoption still works).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { spawnSync } from 'node:child_process';
-import { appendFile, mkdtemp, readFile, readdir, writeFile } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
-import os from 'node:os';
+import { readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { initWorkspace, workspacePath } from '../src/core/workspace.js';
-import { readYaml, writeYaml } from '../src/core/yaml.js';
-import { checkpointWork } from '../src/core/progress.js';
-import { draftBaseline, startBaseline } from '../src/baseline/store.js';
+import { workspacePath } from '../src/core/workspace.js';
 import { createPendingIntake, routeWorkItem } from '../src/behavior/routing.js';
 import { advanceActiveWork } from '../src/core/transitions.js';
 import { knowledgeFilePath, proposeKnowledge } from '../src/knowledge/store.js';
@@ -18,72 +14,10 @@ import { promoteKnowledge } from '../src/knowledge/promotion.js';
 import { contextLedgerPath, loadContextLedger } from '../src/context/ledger.js';
 import { factFreshness } from '../src/context/freshness.js';
 import { exists } from '../src/utils/fs.js';
-
-const cli = fileURLToPath(new URL('../src/cli.js', import.meta.url));
+import { cli, legacyWorkspace, reconcile, snapshotWorkspace } from '../test-support/legacy-context.js';
 
 function run(root, args) {
-  const result = spawnSync(process.execPath, [cli, ...args], { cwd: root, encoding: 'utf8' });
-  assert.equal(result.status, 0, `${args.join(' ')}: ${result.stderr || result.stdout}`);
-  return result;
-}
-
-// Byte-for-byte the section templates v0.3.5 appended (src/baseline/store.js
-// factSection and src/knowledge/promotion.js contextSection at e15eb97).
-function legacyBaselineSection(workId, fact, now) {
-  const marker = `<!-- yallaflow-baseline:${workId}:${fact.id} -->`;
-  const evidence = fact.evidence.map((entry) => `  - ${entry}`).join('\n');
-  return `\n${marker}\n## ${fact.id} — ${fact.summary}\n\n- **Status:** ${fact.status}\n- **Source:** ${fact.source}\n- **From baseline:** ${workId}\n- **Recorded at:** ${now}\n${fact.note ? `- **Note:** ${fact.note}\n` : ''}- **Evidence:**\n${evidence}\n`;
-}
-
-function legacyKnowledgeSection(workId, candidate, now) {
-  const marker = `<!-- yallaflow-knowledge:${workId}:${candidate.id} -->`;
-  const evidence = candidate.evidence.map((entry) => `  - ${entry}`).join('\n');
-  return `\n${marker}\n## ${candidate.id} — ${candidate.summary}\n\n- **Source work:** ${workId}\n- **Knowledge ID:** ${candidate.id}\n- **Promoted at:** ${now}\n- **Evidence:**\n${evidence}\n`;
-}
-
-// Reproduces the durable state a v0.3.5 workspace has after an approved baseline and
-// one promoted knowledge candidate — without any v0.3.6 ledger.
-async function legacyWorkspace() {
-  const root = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-compat-'));
-  await writeFile(path.join(root, 'package.json'), JSON.stringify({ name: 'legacy' }));
-  await writeFile(path.join(root, 'db.yml'), 'replica: false\n');
-  await initWorkspace(root, 'legacy', 'brownfield');
-  const base = workspacePath(root);
-  const now = '2026-09-01T10:00:00.000Z';
-
-  const { meta } = await startBaseline(root);
-  await checkpointWork(root, meta.id, { skillId: 'repository-baseline', status: 'completed', summary: 'Discovered.', evidence: [] });
-  await draftBaseline(root, meta.id, {
-    facts: [
-      { area: 'database', status: 'confirmed', summary: 'Read replica is configured but inactive.', evidence: ['db.yml'], source: 'repository' },
-      { area: 'tech-stack', status: 'confirmed', summary: 'Node.js project.', evidence: ['package.json'], source: 'repository' }
-    ]
-  });
-  const baselineFile = path.join(base, 'work', meta.id, 'baseline.yaml');
-  const baseline = await readYaml(baselineFile);
-  for (const fact of baseline.facts) {
-    const target = { database: 'context/database.md', 'tech-stack': 'context/tech-stack.md' }[fact.area];
-    await appendFile(path.join(base, target), legacyBaselineSection(meta.id, fact, now));
-  }
-  baseline.status = 'approved';
-  baseline.approvedAt = now;
-  baseline.history.push({ action: 'approved', at: now });
-  await writeYaml(baselineFile, baseline);
-  const metaFile = path.join(base, 'work', meta.id, 'meta.yaml');
-  await writeYaml(metaFile, { ...(await readYaml(metaFile)), status: 'DONE' });
-  await writeYaml(path.join(base, 'state', 'current.yaml'), { schemaVersion: 1, activeWork: null, stage: null, updatedAt: now });
-
-  const pending = await createPendingIntake(root, 'Investigate queue');
-  await routeWorkItem(root, pending.id, { work_type: 'investigation', scope: 'bounded', confidence: 'high', reason: 'Read-only.' });
-  for (let i = 0; i < 6; i++) await advanceActiveWork(root, pending.id);
-  await proposeKnowledge(root, pending.id, { kind: 'architecture', source: 'implementation-runtime', summary: 'Jobs run through a DB-backed queue.', evidence: ['db.yml'] });
-  const knowledgeFile = knowledgeFilePath(root, pending.id);
-  const knowledge = await readYaml(knowledgeFile);
-  Object.assign(knowledge.candidates[0], { status: 'promoted', promotedAt: now, target: 'context/architecture.md' });
-  Object.assign(knowledge, { reviewStatus: 'reviewed', reviewedAt: now, updatedAt: now });
-  await writeYaml(knowledgeFile, knowledge);
-  await appendFile(path.join(base, 'context', 'architecture.md'), legacyKnowledgeSection(pending.id, knowledge.candidates[0], now));
-  return { root, baselineId: meta.id, workId: pending.id };
+  return cli(root, args);
 }
 
 async function snapshot(root) {
@@ -139,21 +73,49 @@ test('a new promotion in an unadopted v0.3.5 workspace creates the ledger lazily
   assert.match(doctor.stdout, /Workspace healthy\./);
 });
 
-test('context adopt imports legacy facts, replaces legacy sections, and never touches work records', async () => {
+test('blind multi-item context adopt is refused with zero mutation and points to reconciliation', async () => {
+  const { root } = await legacyWorkspace();
+  const before = await snapshotWorkspace(root);
+  const adopt = cli(root, ['context', 'adopt'], false);
+  assert.equal(adopt.status, 1);
+  assert.match(adopt.stderr, /Refusing to adopt legacy context: 3 legacy item\(s\) may describe overlapping truths/);
+  assert.match(adopt.stderr, /yallaflow context reconcile start/);
+  assert.match(adopt.stderr, /No files were changed\./);
+  assert.deepEqual(await snapshotWorkspace(root), before);
+  const dryRun = run(root, ['context', 'adopt', '--dry-run']);
+  assert.match(dryRun.stdout, /Would adopt 3 legacy fact\(s\)/);
+  assert.match(dryRun.stdout, /Direct adoption is not available: .*context reconcile start/);
+  assert.deepEqual(await snapshotWorkspace(root), before);
+});
+
+test('provably trivial adoption (one legacy item, no current facts) still works as in v0.3.6', async () => {
+  const { root, baselineId } = await legacyWorkspace({ baseline: [{ area: 'database', status: 'confirmed', summary: 'Read replica is configured but inactive.', evidence: ['db.yml'], source: 'repository' }], knowledge: [] });
+  assert.match(run(root, ['context', 'adopt', '--dry-run']).stdout, /provably duplicate-free/);
+  const adopt = run(root, ['context', 'adopt']);
+  assert.match(adopt.stdout, /Adopted 1 legacy fact\(s\): CTX-0001/);
+  assert.match(adopt.stdout, /Legacy Markdown sections replaced by the managed projection: 1/);
+  const { ledger } = await loadContextLedger(root);
+  assert.equal(ledger.schemaVersion, 1, 'trivial adoption needs no v2 feature, so the ledger stays v0.3.6-readable');
+  assert.deepEqual(ledger.facts.map((fact) => [fact.id, fact.origin.workId, fact.origin.baselineFactId, fact.origin.adopted]), [['CTX-0001', baselineId, 'BF-001', true]]);
+  assert.equal(ledger.facts[0].history[0].action, 'adopted');
+  assert.match(run(root, ['doctor']).stdout, /Workspace healthy\./);
+  assert.match(run(root, ['context', 'adopt']).stdout, /Nothing to adopt \(1 legacy item\(s\) already adopted\)/);
+});
+
+test('reconciliation imports legacy facts as distinct NEW facts, retires legacy sections, and never touches work records', async () => {
   const { root, baselineId, workId } = await legacyWorkspace();
   const base = workspacePath(root);
-  const workFiles = ['baseline.yaml', 'meta.yaml'].map((name) => path.join(base, 'work', baselineId, name)).concat(knowledgeFilePath(root, workId));
+  const workFiles = ['baseline.yaml', 'meta.yaml', 'work.md'].map((name) => path.join(base, 'work', baselineId, name)).concat(knowledgeFilePath(root, workId));
   const workBefore = await Promise.all(workFiles.map((file) => readFile(file, 'utf8')));
 
-  const adopt = run(root, ['context', 'adopt']);
-  assert.match(adopt.stdout, /Adopted 3 legacy fact\(s\): CTX-0001, CTX-0002, CTX-0003/);
-  assert.match(adopt.stdout, /Legacy Markdown sections replaced by the managed projection: 3/);
+  const reconciliationId = await reconcile(root, ['RC-0001', 'RC-0002', 'RC-0003'].map((candidate) => ({ candidate, action: 'new' })));
 
   const { ledger } = await loadContextLedger(root);
-  assert.deepEqual(ledger.facts.map((fact) => [fact.id, fact.origin.workId, fact.origin.baselineFactId ?? fact.origin.candidateId, fact.origin.adopted]), [
-    ['CTX-0001', baselineId, 'BF-001', true],
-    ['CTX-0002', baselineId, 'BF-002', true],
-    ['CTX-0003', workId, 'K-001', true]
+  assert.equal(ledger.schemaVersion, 2);
+  assert.deepEqual(ledger.facts.map((fact) => [fact.id, fact.origins[0].workId, fact.origins[0].baselineFactId ?? fact.origins[0].candidateId, fact.origins[0].adopted, fact.origins[0].reconciliation.candidate]), [
+    ['CTX-0001', baselineId, 'BF-001', true, 'RC-0001'],
+    ['CTX-0002', baselineId, 'BF-002', true, 'RC-0002'],
+    ['CTX-0003', workId, 'K-001', true, 'RC-0003']
   ]);
   assert.equal(ledger.facts[0].history[0].action, 'adopted');
   assert.equal(ledger.facts[0].verifiedAtCommit, null);
@@ -163,29 +125,31 @@ test('context adopt imports legacy facts, replaces legacy sections, and never to
   const database = await readFile(path.join(base, 'context', 'database.md'), 'utf8');
   assert.doesNotMatch(database, /yallaflow-baseline:/);
   assert.match(database, /CTX-0001 — Read replica is configured but inactive\./);
-  assert.match(database, /Adopted from:\*\* v0\.3\.5 context/);
-  const techStack = await readFile(path.join(base, 'context', 'tech-stack.md'), 'utf8');
-  assert.match(techStack, /Deterministically discovered during YallaFlow bootstrap|# Tech Stack/);
+  assert.match(database, new RegExp(`Adopted from:\\*\\* v0\\.3\\.5 context \\(verification point unknown; reconciled in ${reconciliationId} RC-0001\\)`));
+  const archive = await readFile(path.join(base, 'work', reconciliationId, 'legacy-context.md'), 'utf8');
+  assert.match(archive, /<!-- yallaflow-baseline:PF-0001:BF-001 -->\n## BF-001 — Read replica is configured but inactive\./);
 
   assert.deepEqual(await Promise.all(workFiles.map((file) => readFile(file, 'utf8'))), workBefore);
   assert.match(run(root, ['doctor']).stdout, /Workspace healthy\./);
   assert.match(run(root, ['context', 'adopt']).stdout, /Nothing to adopt \(3 legacy item\(s\) already adopted\)/);
 });
 
-test('adopt leaves a hand-edited legacy section in place and reports it', async () => {
+test('reconciliation leaves a hand-edited legacy section in place, reports it, and doctor asks for review', async () => {
   const { root } = await legacyWorkspace();
   const file = path.join(workspacePath(root), 'context', 'database.md');
   const content = await readFile(file, 'utf8');
   await writeFile(file, content.replace('- **Source:** repository', '- **Source:** repository (checked by hand)\nExtra human paragraph.'));
-  const adopt = run(root, ['context', 'adopt']);
-  assert.match(adopt.stdout, /Hand-edited legacy sections left in place/);
-  assert.match(adopt.stdout, /context\/database\.md: <!-- yallaflow-baseline:PF-0001:BF-001 -->/);
+  const workId = await reconcile(root, ['RC-0001', 'RC-0002', 'RC-0003'].map((candidate) => ({ candidate, action: 'new' })));
   assert.match(await readFile(file, 'utf8'), /Extra human paragraph\./);
+  assert.match(run(root, ['context', 'reconcile', 'status', workId]).stdout, /Hand-edited legacy sections kept for manual review: RC-0001 \(context\/database\.md\)/);
+  const doctor = run(root, ['doctor']);
+  assert.match(doctor.stdout, /Workspace healthy\./);
+  assert.match(doctor.stdout, new RegExp(`WARN context/database\\.md: legacy section PF-0001 BF-001 was reconciled \\(${workId} RC-0001\\) but has been hand-edited`));
 });
 
-test('an adopted legacy fact can then be superseded through normal work', async () => {
+test('a reconciled legacy fact can then be superseded through normal work', async () => {
   const { root } = await legacyWorkspace();
-  run(root, ['context', 'adopt']);
+  await reconcile(root, ['RC-0001', 'RC-0002', 'RC-0003'].map((candidate) => ({ candidate, action: 'new' })));
   await writeFile(path.join(root, 'db.yml'), 'replica: true\n');
   const pending = await createPendingIntake(root, 'Replica check');
   await routeWorkItem(root, pending.id, { work_type: 'investigation', scope: 'bounded', confidence: 'high', reason: 'Read-only.' });
@@ -195,6 +159,7 @@ test('an adopted legacy fact can then be superseded through normal work', async 
   const database = await readFile(path.join(workspacePath(root), 'context', 'database.md'), 'utf8');
   assert.doesNotMatch(database, /configured but inactive/);
   assert.match(database, /Read replica is active for reporting\./);
+  assert.match(run(root, ['doctor']).stdout, /Workspace healthy\./);
 });
 
 test('v0.3.5 knowledge candidates without v0.3.6 fields still validate and list', async () => {

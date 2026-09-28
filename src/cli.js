@@ -34,6 +34,19 @@ import {
   contextStatusCommand
 } from './commands/context.js';
 import { limitationCommand } from './commands/limitation.js';
+import {
+  reconcileApplyCommand,
+  reconcileApproveCommand,
+  reconcileFeedbackCommand,
+  reconcilePlanCommand,
+  reconcilePreviewCommand,
+  reconcileShowCommand,
+  reconcileStartCommand,
+  reconcileStatusCommand
+} from './commands/reconcile.js';
+import { upgradePlanCommand, upgradeStatusCommand } from './commands/upgrade.js';
+import { briefCommand } from './commands/brief.js';
+import { PACKAGE_VERSION } from './version.js';
 import { agentRefreshCommand, agentStatusCommand } from './commands/agent.js';
 import {
   baselineApproveCommand,
@@ -49,7 +62,7 @@ import { INTERACTION_MODES, GATE_NAMES } from './behavior/interaction.js';
 const VALID_PROJECT_TYPES = new Set(['greenfield', 'brownfield']);
 
 function help() {
-  console.log(`YallaFlow foundation CLI\n\nGive AI your project, not just your prompt.\n\nUsage:\n  yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]\n  yallaflow start [request]\n  yallaflow request --help\n  yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]\n  yallaflow source --help\n  yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]\n  yallaflow baseline --help\n  yallaflow guide [work-id]\n  yallaflow ready [work-id]\n  yallaflow skill <skill-id>\n  yallaflow checkpoint --help\n  yallaflow question --help\n  yallaflow knowledge --help\n  yallaflow context --help\n  yallaflow limitation --help\n  yallaflow agent --help\n  yallaflow decompose --help\n  yallaflow progress <parent-id>\n  yallaflow next <parent-id>\n  yallaflow approve <work-id> --stage GATE [--note TEXT]\n  yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]\n  yallaflow handoff [work-id]\n  yallaflow feature <title> --scope SCOPE\n  yallaflow bug <title> --scope SCOPE\n  yallaflow investigate <title> --scope SCOPE\n  yallaflow change <title> --scope SCOPE\n  yallaflow refactor <title> --scope SCOPE\n  yallaflow release <title> --scope SCOPE\n  yallaflow status\n  yallaflow resume [work-id]\n  yallaflow doctor\n  yallaflow advance [work-id]\n  yallaflow verify [work-id] -- <executable> [args...]\n  yallaflow verify [work-id] --shell "<command>"\n  yallaflow verify [work-id] --script <path>\n  yallaflow verify list [work-id]\n  yallaflow reopen <work-id> --to implementation|verification|review --reason REASON\n  yallaflow --version\n`);
+  console.log(`YallaFlow foundation CLI\n\nGive AI your project, not just your prompt.\n\nUsage:\n  yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]\n  yallaflow start [request]\n  yallaflow request --help\n  yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]\n  yallaflow source --help\n  yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]\n  yallaflow baseline --help\n  yallaflow guide [work-id]\n  yallaflow ready [work-id]\n  yallaflow skill <skill-id>\n  yallaflow checkpoint --help\n  yallaflow question --help\n  yallaflow knowledge --help\n  yallaflow context --help\n  yallaflow upgrade status|plan\n  yallaflow brief\n  yallaflow limitation --help\n  yallaflow agent --help\n  yallaflow decompose --help\n  yallaflow progress <parent-id>\n  yallaflow next <parent-id>\n  yallaflow approve <work-id> --stage GATE [--note TEXT]\n  yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]\n  yallaflow handoff [work-id]\n  yallaflow feature <title> --scope SCOPE\n  yallaflow bug <title> --scope SCOPE\n  yallaflow investigate <title> --scope SCOPE\n  yallaflow change <title> --scope SCOPE\n  yallaflow refactor <title> --scope SCOPE\n  yallaflow release <title> --scope SCOPE\n  yallaflow status\n  yallaflow resume [work-id]\n  yallaflow doctor\n  yallaflow advance [work-id]\n  yallaflow verify [work-id] -- <executable> [args...]\n  yallaflow verify [work-id] --shell "<command>"\n  yallaflow verify [work-id] --script <path>\n  yallaflow verify list [work-id]\n  yallaflow reopen <work-id> --to implementation|verification|review --reason REASON\n  yallaflow --version\n`);
 }
 
 function decomposeHelp() {
@@ -60,12 +73,18 @@ function baselineHelp() {
   console.log(`Usage:\n  yallaflow baseline start\n  yallaflow baseline draft <work-id> --file <baseline.json>\n  yallaflow baseline status [work-id]\n  yallaflow baseline show [work-id]\n  yallaflow baseline approve <work-id> [--note TEXT]\n  yallaflow baseline feedback <work-id> --changes-requested [--note TEXT]\n`);
 }
 
-const CONTEXT_USAGE = 'yallaflow context status\n  yallaflow context list [--area AREA] [--all]\n  yallaflow context show <CTX-id>\n  yallaflow context history <CTX-id>\n  yallaflow context affected [--since REF] [path ...]\n  yallaflow context adopt [--dry-run]\n  yallaflow context render';
+const RECONCILE_USAGE = 'yallaflow context reconcile start\n  yallaflow context reconcile status [work-id]\n  yallaflow context reconcile show [work-id] [--candidate RC-####]\n  yallaflow context reconcile plan [work-id] --file <decisions.json>\n  yallaflow context reconcile preview [work-id]\n  yallaflow context reconcile approve [work-id] [--note TEXT]\n  yallaflow context reconcile feedback [work-id] --changes-requested [--note TEXT]\n  yallaflow context reconcile apply [work-id]';
+const CONTEXT_USAGE = `yallaflow context status\n  yallaflow context list [--area AREA] [--all]\n  yallaflow context show <CTX-id>\n  yallaflow context history <CTX-id>\n  yallaflow context affected [--since REF] [path ...]\n  yallaflow context adopt [--dry-run]\n  yallaflow context render\n  ${RECONCILE_USAGE}`;
+const UPGRADE_USAGE = 'yallaflow upgrade status\n  yallaflow upgrade plan';
 const AGENT_USAGE = 'yallaflow agent status\n  yallaflow agent refresh [--preserve-existing] [--dry-run]';
 const LIMITATION_USAGE = 'yallaflow limitation add [work-id] --type TYPE --area AREA --summary TEXT --reason TEXT\n  yallaflow limitation list [work-id]';
 
 function contextHelp() {
-  console.log(`Usage:\n  ${CONTEXT_USAGE}\n\nProject memory lives in .yallaflow/context/index.yaml; context/*.md is its projection.\nEvolve facts through work: yallaflow knowledge propose ... --supersedes|--reconfirms|--disputes CTX-####\n`);
+  console.log(`Usage:\n  ${CONTEXT_USAGE}\n\nProject memory lives in .yallaflow/context/index.yaml; context/*.md is its projection.\nEvolve facts through work: yallaflow knowledge propose ... --supersedes|--reconfirms|--disputes CTX-####\nLegacy v0.3.5 context becomes current truth only through a reviewed reconciliation: yallaflow context reconcile start\n`);
+}
+
+function upgradeHelp() {
+  console.log(`Usage:\n  ${UPGRADE_USAGE}\n\nRead-only upgrade assessment: aggregates doctor, agent-contract, project-memory, and reconciliation state. Never migrates or repairs anything.\n`);
 }
 
 function agentHelp() {
@@ -120,6 +139,8 @@ const USAGE = {
   handoff: 'yallaflow handoff [work-id]',
   request: 'yallaflow request revise <work-id> --text TEXT --reason TEXT',
   context: CONTEXT_USAGE,
+  upgrade: UPGRADE_USAGE,
+  brief: 'yallaflow brief',
   limitation: LIMITATION_USAGE,
   agent: AGENT_USAGE,
   baseline: 'yallaflow baseline start\n  yallaflow baseline draft <work-id> --file <baseline.json>\n  yallaflow baseline status [work-id]\n  yallaflow baseline show [work-id]\n  yallaflow baseline approve <work-id> [--note TEXT]\n  yallaflow baseline feedback <work-id> --changes-requested [--note TEXT]',
@@ -162,7 +183,12 @@ const NAMESPACE_ACTIONS = {
     history: 'yallaflow context history <CTX-id>',
     affected: 'yallaflow context affected [--since REF] [path ...]',
     adopt: 'yallaflow context adopt [--dry-run]',
-    render: 'yallaflow context render'
+    render: 'yallaflow context render',
+    reconcile: RECONCILE_USAGE
+  },
+  upgrade: {
+    status: 'yallaflow upgrade status',
+    plan: 'yallaflow upgrade plan'
   },
   agent: {
     status: 'yallaflow agent status',
@@ -230,7 +256,7 @@ function printCommandHelp(command, rest) {
   const actionKey = rest.find((token) => !isHelpToken(token) && !token.startsWith('-'));
   const nested = NAMESPACE_ACTIONS[command]?.[actionKey];
   if (nested) return console.log(`Usage:\n  ${nested}\n`);
-  const dedicated = { agent: agentHelp, context: contextHelp, limitation: limitationHelp, source: sourceHelp, checkpoint: checkpointHelp, knowledge: knowledgeHelp, question: questionHelp, decompose: decomposeHelp, baseline: baselineHelp };
+  const dedicated = { agent: agentHelp, context: contextHelp, upgrade: upgradeHelp, limitation: limitationHelp, source: sourceHelp, checkpoint: checkpointHelp, knowledge: knowledgeHelp, question: questionHelp, decompose: decomposeHelp, baseline: baselineHelp };
   if (dedicated[command]) return dedicated[command]();
   if (USAGE[command]) return console.log(`Usage:\n  ${USAGE[command]}\n`);
   return help();
@@ -239,7 +265,7 @@ function printCommandHelp(command, rest) {
 async function main() {
   const [command, ...rest] = process.argv.slice(2);
   if (!command || command === '--help' || command === '-h') return help();
-  if (command === '--version' || command === '-v') return console.log('0.3.6-internal.1');
+  if (command === '--version' || command === '-v') return console.log(PACKAGE_VERSION);
   // Asking for help never mutates YallaFlow state, for any command/sub-action, at any
   // position within YallaFlow's own arguments — but never crosses a documented `--`
   // payload boundary into a child command's own argv (see helpScanScope above). This,
@@ -618,7 +644,8 @@ async function main() {
       if (positionals.length) throw new Error('Usage: yallaflow context render');
       return contextRenderCommand();
     }
-    throw new Error(`Unknown context action: ${action}. Use status, list, show, history, affected, adopt, or render.`);
+    if (action === 'reconcile') return reconcileCommand(actionArgs);
+    throw new Error(`Unknown context action: ${action}. Use status, list, show, history, affected, adopt, render, or reconcile.`);
   }
   if (command === 'agent') {
     const [action, ...actionArgs] = rest;
@@ -652,6 +679,19 @@ async function main() {
     }
     throw new Error(`Unknown limitation action: ${action}. Use add or list.`);
   }
+  if (command === 'upgrade') {
+    const [action, ...actionArgs] = rest;
+    if (!action) return upgradeHelp();
+    const { positionals } = parseOptions(actionArgs, {});
+    if (positionals.length) throw new Error(`Usage: yallaflow upgrade ${action}`);
+    if (action === 'status') return upgradeStatusCommand();
+    if (action === 'plan') return upgradePlanCommand();
+    throw new Error(`Unknown upgrade action: ${action}. Use status or plan.`);
+  }
+  if (command === 'brief') {
+    if (rest.length) throw new Error('Usage: yallaflow brief');
+    return briefCommand();
+  }
   if (command === 'handoff') {
     if (rest.length > 1) throw new Error('Usage: yallaflow handoff [work-id]');
     return handoffCommand(rest[0]);
@@ -672,6 +712,42 @@ async function main() {
   }
 
   throw new Error(`Unknown command: ${command}`);
+}
+
+function reconcileCommand(args) {
+  const [action, ...actionArgs] = args;
+  const usage = (line) => new Error(`Usage: yallaflow context reconcile ${line}`);
+  if (!action) return console.log(`Usage:\n  ${RECONCILE_USAGE}\n`);
+  if (action === 'start') {
+    if (actionArgs.length) throw usage('start');
+    return reconcileStartCommand();
+  }
+  if (['status', 'preview', 'apply'].includes(action)) {
+    const { positionals } = parseOptions(actionArgs, {});
+    if (positionals.length > 1) throw usage(`${action} [work-id]`);
+    return { status: reconcileStatusCommand, preview: reconcilePreviewCommand, apply: reconcileApplyCommand }[action](positionals[0]);
+  }
+  if (action === 'show') {
+    const { values, positionals } = parseOptions(actionArgs, { candidate: { type: 'string' } });
+    if (positionals.length > 1) throw usage('show [work-id] [--candidate RC-####]');
+    return reconcileShowCommand(positionals[0], { candidate: values.candidate });
+  }
+  if (action === 'plan') {
+    const { values, positionals } = parseOptions(actionArgs, { file: { type: 'string' } });
+    if (positionals.length > 1 || !values.file) throw usage('plan [work-id] --file <decisions.json>');
+    return reconcilePlanCommand(positionals[0], { file: values.file });
+  }
+  if (action === 'approve') {
+    const { values, positionals } = parseOptions(actionArgs, { note: { type: 'string' } });
+    if (positionals.length > 1) throw usage('approve [work-id] [--note TEXT]');
+    return reconcileApproveCommand(positionals[0], { note: values.note });
+  }
+  if (action === 'feedback') {
+    const { values, positionals } = parseOptions(actionArgs, { 'changes-requested': { type: 'boolean' }, note: { type: 'string' } });
+    if (positionals.length > 1) throw usage('feedback [work-id] --changes-requested [--note TEXT]');
+    return reconcileFeedbackCommand(positionals[0], { changesRequested: values['changes-requested'], note: values.note });
+  }
+  throw new Error(`Unknown context reconcile action: ${action}. Use start, status, show, plan, preview, approve, feedback, or apply.`);
 }
 
 main().catch((error) => {

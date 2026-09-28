@@ -1,6 +1,16 @@
 import { CONTEXT_TARGETS } from '../knowledge/constants.js';
 
-export const CONTEXT_SCHEMA_VERSION = 1;
+// Ledger storage contract (context/index.yaml):
+//   1 — v0.3.6: each fact records one `origin`. Readable by v0.3.6 and later.
+//   2 — v0.3.7: each fact records `origins` (every historical work item that
+//       established it) and may carry reconciliation references and `merged` history.
+//       v0.3.6 cannot consume it (its reader requires schemaVersion 1).
+// A ledger is written at the lowest version that can represent its content and is
+// never downgraded; there is no migration on read.
+export const CONTEXT_SCHEMA_V1 = 1;
+export const CONTEXT_SCHEMA_V2 = 2;
+export const SUPPORTED_CONTEXT_SCHEMAS = Object.freeze([CONTEXT_SCHEMA_V1, CONTEXT_SCHEMA_V2]);
+export const CONTEXT_SCHEMA_VERSION = CONTEXT_SCHEMA_V2; // newest this CLI reads and writes
 
 // Canonical project-memory areas are exactly the durable context targets knowledge
 // promotion and Brownfield Baseline already write into (knowledge/constants.js) — the
@@ -32,9 +42,11 @@ export const EVIDENCE_TYPES = Object.freeze(['repository', 'runtime', 'user-conf
 
 export const RELATION_TYPES = Object.freeze(['supersedes', 'reconfirms', 'disputes']);
 
-export const HISTORY_ACTIONS = Object.freeze([
+export const V1_HISTORY_ACTIONS = Object.freeze([
   'introduced', 'adopted', 'reconfirmed', 'superseded', 'disputed', 'dispute-resolved'
 ]);
+// Schema v2 adds 'merged': a reconciliation candidate collapsed into this fact.
+export const HISTORY_ACTIONS = Object.freeze([...V1_HISTORY_ACTIONS, 'merged']);
 
 // Mechanical freshness only — computed from evidence vs. the current working tree,
 // never stored and never a semantic judgment. MAY_BE_STALE does not mean false.

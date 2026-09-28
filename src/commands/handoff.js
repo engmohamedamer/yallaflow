@@ -17,6 +17,7 @@ import { resolvePrimaryObjective } from '../behavior/objective.js';
 import { projectContextLines } from '../context/summary.js';
 import { loadWorkLimitations } from '../limitations/store.js';
 import { describeWorkSourceLocations } from '../core/sources.js';
+import { reconciliationSummaryLines } from '../reconciliation/store.js';
 
 // Read-only by construction: every call below is a loader (loadWorkProgress,
 // evaluateReadiness, discoverGitState, ...), never a mutator — the same shared
@@ -61,8 +62,15 @@ export async function handoffCommand(requestedWorkId) {
   const git = discoverGitState(root);
   const { ledger: reviewLedger } = await loadReviews(root, workId);
 
-  const primaryObjective = resolvePrimaryObjective(meta, progress.ledger, guidance.modification);
+  const reconciliation = meta.reconciliation ? await reconciliationSummaryLines(root, meta) : null;
+  const primaryObjective = reconciliation && meta.status !== 'DONE'
+    ? 'Reconcile legacy project context.'
+    : resolvePrimaryObjective(meta, progress.ledger, guidance.modification);
   if (primaryObjective) console.log(`\nPRIMARY UNRESOLVED OBJECTIVE:\n${primaryObjective}`);
+  if (reconciliation) {
+    console.log('\nReconciliation:');
+    for (const line of reconciliation.lines) console.log(line);
+  }
 
   console.log(`\nDelivery status: ${readiness.deliveryStatus ?? 'NOT_READY'}`);
   printChecklist('Completed skills', progress ? guidance.progress.completed : []);
@@ -77,6 +85,7 @@ export async function handoffCommand(requestedWorkId) {
   }
   const awaitingReview = GATE_NAMES.filter((name) => reviewLedger.gates[name]?.status && reviewLedger.gates[name].status !== 'approved');
   if (awaitingReview.length) blockers.push(`review gate(s) not approved: ${awaitingReview.map((name) => `${name} (${reviewLedger.gates[name].status})`).join(', ')}`);
+  if (reconciliation) blockers.push(...reconciliation.status.blockers.filter((entry) => !entry.startsWith('review ') && !entry.includes('open reconciliation question')));
   console.log(`\nBlockers: ${blockers.length ? blockers.join('; ') : 'none'}`);
   printOpenQuestions(readiness.questions);
   if (awaitingReview.length) {
@@ -92,7 +101,7 @@ export async function handoffCommand(requestedWorkId) {
 
   console.log(`\nApplication code modification: ${guidance.modification.authorized ? 'AUTHORIZED' : 'NOT AUTHORIZED'}`);
   console.log(`Reason: ${guidance.modification.reason}`);
-  console.log(`\nNext objective:\n${guidance.nextObjective}`);
+  console.log(`\nNext objective:\n${reconciliation ? reconciliation.status.nextAction : guidance.nextObjective}`);
 
   if (git.available && !git.clean) {
     console.log(`\n${meta.id} has uncommitted Git changes (${git.summary}). Consider a source-control checkpoint before continuing; YallaFlow never commits automatically.`);

@@ -8,6 +8,65 @@ YallaFlow has not yet made a public npm release (`package.json` remains `"privat
 
 Nothing yet.
 
+## [0.3.7-internal.1] - 2026-09-24 — Context Reconciliation & Upgrade Intelligence
+
+**Internal prerelease. Not published to npm.** Driven by the clean YaSchools v0.3.5 → v0.3.6 upgrade: `context adopt --dry-run` correctly found 53 legacy context sections, but some described the same durable truth from different work items (PF-0001 BF-013 and PF-0002 K-002 both state which root Codeception suites are enabled). Blind adoption would have created two current facts for one truth.
+
+> **Migration is not reconciliation. Old knowledge is reviewed before it becomes current truth.** The Agent reasons; YallaFlow validates and applies; a human reviews.
+
+#### Added — Legacy knowledge reconciliation (`src/reconciliation/`)
+- `yallaflow context reconcile start|status|show|plan|preview|approve|feedback|apply`. `start` creates one read-only reconciliation work item (reusing the ordinary work lifecycle, like Brownfield Baseline) whose plan, `work/<id>/reconciliation.yaml` (`schemaVersion: 1`), freezes every legacy item as a stable `RC-####` candidate. Each candidate keeps its original work item, BF/K identifier, area, wording, confidence, provenance, evidence, recorded time, and legacy Markdown location. Legacy items are read from the structured records (approved `baseline.yaml` facts; promoted, non-decision `knowledge.yaml` candidates that never became a CTX fact), never from prose. Historical work is never rewritten; temporary migration state never enters `context/index.yaml`.
+- Explicit Agent-declared relationships per candidate, recorded from a JSON file (`plan --file`, upserted, `"pending"` clears). The actions and their targets:
+  - `new`
+  - `merge-with`: collapse legacy candidates that are the same statement into one fact; target another `RC-####` only.
+  - `reconfirms`: one more historical observation of a truth already represented; target a `CTX-####` or `RC-####`, same area required.
+  - `supersedes` and `disputes`: target an `RC-####` or `CTX-####`.
+  - `skip`: reason required.
+  - `limitation`: type and reason required; kept as a work-scoped discovery limitation.
+
+  History records `merged` vs `reconfirmed`, and preview labels every member with its action. A candidate that becomes a fact may set a clearer canonical summary or area. Whole-file validation with zero mutation on any error: unknown RC/CTX, self-relations, merge and supersession cycles, two successors or two disputes for one fact, supersede and dispute on one fact, targets that are undecided or not fact-producing, relations the ledger has moved past, and changes to already-applied decisions.
+- Works with or without an existing v0.3.6 ledger: a legacy candidate can reconfirm, supersede, or dispute `CTX-0001` directly (and candidates merged with it land on `CTX-0001` too). The v0.3.6 ledger never has to be deleted.
+- Deterministic exact-duplicate flag only (`exactDuplicateOf`: same area, NFC/whitespace/case-normalized summary, same evidence) plus `sameStatementAs CTX-####` for identical wording. Both are reported and never acted on. No fuzzy matching, embeddings, similarity scores, or LLM calls.
+- Hash-bound human review through the existing `reviews.yaml` gate ledger (new `reconciliation` gate, outside every interaction-mode preset). `approve` requires the `context-reconciliation` checkpoint and a valid plan, and records a SHA-256 fingerprint of every candidate and decision. Any later plan change sends it back to review. A hand edit makes `apply` refuse and `doctor` fail. The generic `yallaflow approve --stage reconciliation` is refused.
+- `preview` (read-only) runs the exact apply logic against an in-memory ledger copy (`simulateContextLedger`). It shows resulting current-fact counts, per-area totals, new facts with the CTX IDs apply will assign, merge groups with all origins, facts joined into existing CTX facts, supersessions, disputes, limitations, skips, pending items, and which legacy sections will be retired or kept.
+- `apply` validates the whole plan against the live ledger first, then writes canonical memory in one atomic ledger write through the single ledger writer, so a merge group is never half-applied. Projection failure stays recoverable through `context render`. Retry and repeated apply are idempotent (no duplicate facts, origins, history, or limitations). The approved subset applies while undecided candidates stay pending; later rounds join facts earlier rounds produced. The reconciliation work item becomes DONE when the last candidate is applied, and `advance` cannot complete it around the plan.
+- Unresolved ambiguity uses the existing questions ledger (`question add <reconciliation-id>`), never a guess. `status`, `handoff`, `resume`, and `brief` show progress and blockers without listing every candidate.
+- New skill `context-reconciliation` (capability `reconcile`).
+
+#### Changed — Context ledger schema v2 and multi-origin facts
+- **Storage contract.** Context ledger schema v2 records each fact's provenance only in `origins` (every historical work item that established it, introducing origin first), with optional `reconciliation` references (`{ workId, candidate }`) and a new history action, `merged`. Schema v1 keeps the single `origin`. The two fields are never both present.
+- **Reads.** v0.3.7 reads v1 as-is (no migration on read) and refuses any newer schema up front with an *upgrade YallaFlow* message. `upgrade status` reports the workspace's context schema, including one that is newer than supported.
+- **Writes.** A mutation writes the lowest schema that can represent the result. Ordinary work on a v1 ledger keeps it v1, and therefore v0.3.6-readable, byte-stable for untouched facts. Content that needs v2 (multi-origin, reconciliation) moves it to v2, which `context reconcile apply` requires explicitly. The ledger is never downgraded, and conversion keeps each key's position.
+- **v0.3.6 on a v2 ledger.** `doctor` fails on `schemaVersion must be 1` and every write refuses. Some v0.3.6 read-only commands predate any read-side version check (see the upgrade notes).
+- Doctor rejects divergent or cross-schema provenance: both fields present, `origins` in v1, `origin` in v2, reconciliation data or `merged` history in v1, or an empty `origins`. Joining an existing fact (`attachOrigin`) adds provenance only; evidence, verification point, state, and freshness are untouched. Ledger validation rejects duplicate origins within a fact and one origin claimed by two facts ("applied twice"). `context show`, `context history`, and the Markdown projection list all origins; single-origin rendering is byte-for-byte unchanged.
+
+#### Changed — Legacy Markdown ownership
+- A reconciled legacy section that is byte-for-byte what v0.3.5 generated from its own structured record (exact regeneration; only the timestamp value is a wildcard) is archived verbatim in `work/<id>/legacy-context.md`, then removed from the durable document. Any hand edit, even inside a bullet value, keeps the section in place, and it is reported for review. Unreconciled sections stay until reconciled.
+
+#### Changed — `context adopt` (safety)
+- `context adopt --dry-run` is unchanged (read-only) and now says whether direct adoption is available. `context adopt` imports only when provably duplicate-free (exactly one legacy item and no current facts). Otherwise it is refused with zero mutation and points to `context reconcile start`. There is no `--force`.
+
+#### Added — Upgrade intelligence and fresh-agent orientation
+- `yallaflow upgrade status` / `upgrade plan`: one read-only, deterministic assessment aggregating the existing doctor report (refactored into a shared `collectDoctorReport`), agent-contract state, project memory, pending legacy facts, reconciliation progress, sources, work history, and Git durability, with an ordered list of deliberate commands. There is no automatic "upgrade everything" command.
+- `yallaflow brief`: a concise, read-only orientation for a fresh Agent (agent contract, active and most recent work, project memory, pending reconciliation and its blockers, sources, primary next concern, next command). It never dumps context and points to `resume`/`handoff`/`context reconcile` rather than replacing them.
+
+#### Added — YallaFlow state ownership
+- Explicit ownership model (`src/core/ownership.js`, documented in project-memory.md): CLI-owned structured and history state, generated projections, the shared `work.md` (Agent writes narrative sections; CLI-appended lifecycle records are history), and human-owned settings. Every file a full lifecycle writes is classified (tested). `doctor` warns deterministically when a CLI-recorded Routing Decision in `work.md` no longer matches `meta.yaml`. There is no filesystem locking, and `.yallaflow` is not made read-only.
+
+#### Added — Doctor reconciliation integrity
+- Errors: malformed plan or invalid action; missing candidate origin (work item, baseline fact, or knowledge candidate); unknown RC/CTX targets; self-relations and cycles; conflicting relations; an approval that no longer matches the plan or its gate; an applied candidate whose CTX lineage is missing or points elsewhere; a skip/limitation candidate that also appears in the ledger; ledger lineage naming a reconciliation that does not record it; orphaned plans; more than one open reconciliation; DONE/applied mismatches; a reconciled legacy section still presented as current truth.
+- Warnings: relations the ledger has since moved past; an interrupted apply; reconciled or adopted legacy sections kept because they were hand-edited; unreconciled legacy context (now pointing to `context reconcile start`).
+- Baseline integrity accepts a legacy baseline fact settled by reconciliation (merged, disputed, skipped, or recorded as a limitation).
+
+#### Changed — Agent Contract v3 (`AGENT_CONTRACT_VERSION` 2 → 3)
+- New sections: *Legacy context reconciliation sequence* (reconcile before trusting; evidence-based relationships only; ask instead of guessing; never approve on the human's behalf; never rewrite historical work) and *YallaFlow state ownership*. The start sequence now begins with `yallaflow brief`. A v2 block is reported `outdated (v2 → v3)` and upgraded in place by `agent refresh`. The Claude/Codex adapters were updated to match.
+
+#### Versions
+- Package `0.3.7-internal.1`. Agent Contract v3 (behavior change). Skill Registry v4 (new skill; work pinned to v3 keeps its skills). Context ledger schema **1 → 2**, written only when content requires it (v0.3.6 cannot read v2; every v1 ledger stays valid and is never migrated on read). Reconciliation plan `schemaVersion: 1` (new).
+
+#### Tests
+- 508 tests, up from 450. New suites: `context-schema` (v1 → v2 storage contract, divergent provenance, newer-schema refusal, and mixed-version behavior against the real frozen v0.3.6 CLI extracted from its tag), `reconciliation`, `reconciliation-pilot` (the YaSchools upgrade class end to end, with an Agent-authored plan fixture), `upgrade-intelligence`, `state-ownership`, and `v037-compatibility`, which runs against a workspace fixture generated by the frozen v0.3.6 CLI (`test/fixtures/v0.3.6-workspace/`). Three v0.3.6 `context adopt` tests were rewritten to assert the new safety model (refusal with zero mutation, trivial adoption, and the same imports through reconciliation). Version-specific assertions follow the new contract and registry versions.
+
 ## [0.3.6-internal.1] - 2026-09-23 — Living Project Memory & Context Integrity
 
 **Internal prerelease. Not published to npm.** Driven by the real YaSchools Brownfield pilot, which proved the baseline → reviewed durable context → fresh agent reuse → scoped investigation → knowledge promotion → bounded implementation → verification loop, and exposed that project knowledge goes stale as the repository evolves.

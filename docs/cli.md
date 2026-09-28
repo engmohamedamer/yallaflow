@@ -1,6 +1,6 @@
 # CLI Reference
 
-YallaFlow v0.3.6. Every command also answers `--help` / `-h` (at any position, including sub-actions such as `yallaflow knowledge propose --help`) without changing any state. `[work-id]` defaults to the active work item.
+YallaFlow v0.3.7. Every command also answers `--help` / `-h` (at any position, including sub-actions such as `yallaflow knowledge propose --help`) without changing any state. `[work-id]` defaults to the active work item.
 
 ## Workspace
 
@@ -8,7 +8,10 @@ YallaFlow v0.3.6. Every command also answers `--help` / `-h` (at any position, i
 |---|---|
 | `yallaflow init [--name NAME] [--type greenfield\|brownfield] [--mode autonomous\|adaptive\|gated]` | Create `.yallaflow/`. Type is detected when omitted; mode defaults to `adaptive`. Refuses to overwrite an existing, legacy `.projectflow/`, or Git-tracked-but-missing workspace. |
 | `yallaflow status` | All work items, stages, write access; warns if `AGENT.md` predates the installed agent contract. |
-| `yallaflow doctor` | Read-only integrity report: workspace files, ledgers, lifecycle consistency, project-context ledger, projection drift, source checksums. Freshness, agent-contract, and Git-tracking notes are warnings. Exit code 1 on structural failures. |
+| `yallaflow doctor` | Read-only integrity report: workspace files, ledgers, lifecycle consistency, project-context ledger, projection drift, source checksums, reconciliation plans and lineage, legacy sections presented as current truth. Freshness, agent-contract, hand-edited legacy sections, work.md lifecycle-record drift, and Git-tracking notes are warnings. Exit code 1 on structural failures. |
+| `yallaflow brief` | Fresh-agent orientation, read-only: agent contract, active and most recent work, project memory, pending legacy reconciliation, sources, the primary next concern and the command to run next. Never dumps context. |
+| `yallaflow upgrade status` | Read-only upgrade assessment: installed version, legacy structures, agent contract, canonical and pending legacy facts, reconciliation progress, sources, work history, integrity, Git durability, recommended next action. |
+| `yallaflow upgrade plan` | The ordered upgrade steps as deliberate commands. Never migrates or repairs anything itself. |
 | `yallaflow --version` | Package version. |
 
 ## Intake and routing
@@ -42,7 +45,7 @@ Types: `feature`, `bug`, `investigation`, `change`, `refactor`, `release`. Scope
 | `yallaflow handoff [work-id]` | Compact, read-only context for another agent or session. |
 | `yallaflow reopen <work-id> --to implementation\|verification\|review --reason REASON` | Reactivate DONE work auditably. |
 
-Skills (Skill Registry v3): `context-discovery`, `requirement-clarification`, `design-exploration`, `specification`, `implementation-planning`, `systematic-debugging`, `implementation`, `verification`, `code-review`, `repository-baseline`.
+Skills (Skill Registry v4): `context-discovery`, `requirement-clarification`, `design-exploration`, `specification`, `implementation-planning`, `systematic-debugging`, `implementation`, `verification`, `code-review`, `repository-baseline`, `context-reconciliation`. Work pinned to an earlier registry version keeps its recorded skills.
 
 ## Verification
 
@@ -66,7 +69,7 @@ A mode is always required. Runs are appended to `work/<id>/evidence/`. Refused o
 | `yallaflow approve <work-id> --stage GATE [--note TEXT]` | Approve a review gate. |
 | `yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]` | Request changes. |
 
-Gates: `discovery`, `clarification`, `design`, `specification`, `plan`, `decomposition`, `implementation`, `verification` (and `baseline`, managed by the baseline commands).
+Gates: `discovery`, `clarification`, `design`, `specification`, `plan`, `decomposition`, `implementation`, `verification` (plus `baseline`, managed by the baseline commands, and `reconciliation`, managed only by `context reconcile approve|feedback` — the generic `approve --stage reconciliation` is refused).
 
 ## Decomposition
 
@@ -100,11 +103,28 @@ Gates: `discovery`, `clarification`, `design`, `specification`, `plan`, `decompo
 | `yallaflow context list [--area AREA] [--all]` | Current facts with freshness; `--all` includes superseded. |
 | `yallaflow context show <CTX-id>` · `yallaflow context history <CTX-id>` | One fact in detail; its lineage and events. |
 | `yallaflow context affected [--since REF] [path ...]` | Facts whose evidence paths changed (working tree, since a ref, or given paths). |
-| `yallaflow context adopt [--dry-run]` | Explicitly import v0.3.5 context into the ledger. |
+| `yallaflow context adopt [--dry-run]` | `--dry-run` lists legacy v0.3.5 items not yet governed (read-only). Without it, imports only when provably duplicate-free (one legacy item, no current facts); otherwise refused — use reconciliation. |
 | `yallaflow context render` | Regenerate managed Markdown blocks from the ledger. |
 | `yallaflow limitation add [work-id] --type TYPE --area AREA --summary TEXT --reason TEXT` · `yallaflow limitation list [work-id]` | Work-scoped discovery limitations. |
 
 Knowledge kinds: `architecture`, `database`, `integration`, `environment`, `convention`, `business-rule`, `project`, `tech-stack`, `decision`. Limitation types: `not-inspected`, `unavailable`, `out-of-scope`, `runtime-unavailable`, `insufficient-evidence`, `uncaptured-artifact`. Limitation areas: the eight context areas plus `requirement`, `testing`, `security`, `other`.
+
+## Legacy context reconciliation
+
+`[work-id]` defaults to the open reconciliation work item.
+
+| Command | Purpose |
+|---|---|
+| `yallaflow context reconcile start` | Create (or resume) the read-only reconciliation work item; every pending legacy item becomes a stable `RC-####` candidate. Refused when nothing is pending. |
+| `yallaflow context reconcile status [work-id]` | Progress, decisions by action, review state, open questions, pending candidates, blockers, next action. |
+| `yallaflow context reconcile show [work-id] [--candidate RC-####]` | Candidates with origin, wording, evidence, legacy location, flags, and decision. |
+| `yallaflow context reconcile plan [work-id] --file <decisions.json>` | Record Agent decisions (`{"decisions":[{"candidate","action","target","reason","summary","area","limitationType"}]}`; upserted; `"action":"pending"` clears). Whole file rejected on any invalid relation. Invalidates a prior approval. |
+| `yallaflow context reconcile preview [work-id]` | Read-only: resulting current memory (counts, areas, new facts with their future CTX IDs, merges, supersessions, disputes, limitations, skips, pending, legacy Markdown impact). |
+| `yallaflow context reconcile approve [work-id] [--note TEXT]` | Human approval bound to the plan's content fingerprint (requires the `context-reconciliation` checkpoint). |
+| `yallaflow context reconcile feedback [work-id] --changes-requested [--note TEXT]` | Request changes. |
+| `yallaflow context reconcile apply [work-id]` | Apply the approved, decided candidates in one atomic ledger write; archive and retire generated legacy sections; idempotent. DONE once every candidate is applied. |
+
+Actions: `new`; `merge-with` (target `RC-####` only — collapse candidates that are the same statement); `reconfirms` (target `CTX-####` or `RC-####`, same area — one more observation of a truth already represented); `supersedes`, `disputes` (target `RC-####` or `CTX-####`); `skip` (reason); `limitation` (`limitationType` + reason). Applying writes context schema v2. See [upgrading-to-v0.3.7.md](upgrading-to-v0.3.7.md#4-reconcile-legacy-project-context).
 
 ## Agent contract
 

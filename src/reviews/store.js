@@ -77,3 +77,18 @@ export async function invalidateGateIfApproved(root, workId, gateName, reason, n
 function requireGateName(gateName) {
   if (!GATE_NAMES.includes(gateName)) throw new Error(`--stage must be one of: ${GATE_NAMES.join(', ')}; received ${JSON.stringify(gateName)}.`);
 }
+
+// A revised artifact goes (back) to awaiting_review whatever its prior decision was —
+// approved or changes_requested — with the reason recorded; a gate never requested
+// before is requested. History is never deleted. A no-op when already awaiting review.
+export async function requestGateReview(root, workId, gateName, reason, now = new Date().toISOString()) {
+  requireGateName(gateName);
+  const { ledger } = await loadReviews(root, workId);
+  const current = ledger.gates[gateName];
+  if (current?.status === 'awaiting_review') return ledger;
+  ledger.gates[gateName] = {
+    status: 'awaiting_review', requestedAt: now,
+    history: [...(current?.history ?? []), { status: 'awaiting_review', at: now, ...(reason ? { reason } : {}) }]
+  };
+  return persist(root, workId, ledger, now);
+}

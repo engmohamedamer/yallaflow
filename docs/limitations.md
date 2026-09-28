@@ -1,4 +1,4 @@
-# Current Limitations (v0.3.6)
+# Current Limitations (v0.3.7)
 
 Known gaps and deliberate boundaries. Planned work is tracked in [`roadmap.md`](roadmap.md).
 
@@ -23,7 +23,11 @@ Known gaps and deliberate boundaries. Planned work is tracked in [`roadmap.md`](
 
 ## Project memory
 
-- **No semantic judgment.** YallaFlow never detects duplicate or contradictory prose. The agent must declare `--reconfirms`, `--supersedes`, or `--disputes`.
+- **No semantic judgment.** YallaFlow never detects duplicate or contradictory prose. The agent must declare `--reconfirms`, `--supersedes`, or `--disputes` — and, for legacy knowledge, an explicit reconciliation action per candidate. The only automatic comparison is exact textual identity (`exactDuplicateOf`), which is reported, never acted on.
+- **Reconciliation is manual by design.** Every legacy candidate needs an Agent decision and a human review; a large v0.3.5 workspace takes real reviewing effort. Undecided candidates can wait, but their legacy sections stay until reconciled.
+- **Reconciled legacy facts have `UNKNOWN` freshness.** Their original verification point is unknown; reconfirm them with fresh evidence through normal work.
+- **Hand-edited legacy sections are never removed automatically.** After reconciliation they remain outside the managed block until a human removes them (`doctor` warns).
+- **State ownership is not enforced by locks.** Agents are told not to edit CLI-owned files, and `doctor` detects what is deterministic (schemas, fingerprints, drift, checksums, the `work.md` Routing Decision); free-form edits to narrative text are not detectable, by design.
 - **Freshness is mechanical and coarse.** Only repository evidence has a verification point; runtime and user-confirmed facts show `UNKNOWN`. Any change under a cited directory marks the fact `MAY_BE_STALE`.
 - **Limitation detection is exact-text only.** A limitation reworded as a fact is not caught.
 - **No baseline refresh.** Only one approved baseline per workspace; living memory keeps it current.
@@ -32,6 +36,7 @@ Known gaps and deliberate boundaries. Planned work is tracked in [`roadmap.md`](
 
 ## Upgrades
 
-- **`AGENT.md` refresh is manual.** Existing workspaces keep their old agent guidance until `yallaflow agent refresh` is run.
-- **No downgrades or mixed versions** once v0.3.6 has written to a workspace ([upgrading-to-v0.3.6.md](upgrading-to-v0.3.6.md#mixed-versions-and-downgrades)).
+- **`AGENT.md` refresh is manual.** Existing workspaces keep their old agent guidance until `yallaflow agent refresh` is run (`yallaflow upgrade status` reports it).
+- **No automatic upgrade.** `upgrade status|plan` only report; each step is a deliberate command.
+- **No downgrades or mixed versions** once a newer version has written to a workspace ([upgrading-to-v0.3.7.md](upgrading-to-v0.3.7.md#mixed-versions-and-downgrades)).
 - **Legacy `.projectflow/` workspaces** are not migrated automatically, and the `PF-####` work ID format is unchanged.

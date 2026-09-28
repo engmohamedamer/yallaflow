@@ -3,3 +3,6 @@ dist/
 coverage/
 .DS_Store
 *.log
+!test/fixtures/**/*.log
+.idea/
+yallaflow-*.tgz

@@ -39,6 +39,8 @@ yallaflow agent refresh
 
 ## 4. Bring project context under living memory (optional)
 
+> **With v0.3.7 or later installed:** legacy facts are brought under the ledger through reviewed reconciliation (`yallaflow context reconcile start`), and `context adopt` imports directly only when that is provably duplicate-free. See [upgrading-to-v0.3.7.md](upgrading-to-v0.3.7.md#4-reconcile-legacy-project-context). The text below describes v0.3.6.
+
 Existing `PROJECT.md`/`context/*.md` sections from v0.3.5 remain valid Markdown. The canonical ledger (`context/index.yaml`) is created automatically by the next baseline approval or knowledge promotion; new facts then appear in a managed block alongside the old sections.
 
 To govern the old facts too — so they can be reconfirmed, superseded, or disputed:

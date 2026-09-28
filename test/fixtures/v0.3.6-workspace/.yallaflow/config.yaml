@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "project": {
+    "name": "yaschools",
+    "kind": "brownfield",
+    "root": "."
+  },
+  "workflow": {
+    "discoverBeforeAsk": true,
+    "verifyBeforeDone": true,
+    "knowledgeUpdateOnClose": true
+  },
+  "quality": {
+    "testingStrategy": "project-convention"
+  },
+  "interaction": {
+    "profile": "developer",
+    "mode": "adaptive",
+    "gates": {}
+  }
+}

@@ -14,7 +14,12 @@ export const GATE_NAMES = Object.freeze([
   // regardless of mode, never an automatic stage-exit check. It reuses the same
   // reviews.yaml ledger purely for its durable awaiting_review/approved/
   // changes_requested history, not as a mode-gated blocker.
-  'baseline'
+  'baseline',
+  // 'reconciliation' (v0.3.7) likewise sits outside every mode preset: applying a
+  // legacy-context reconciliation plan always requires an explicit human approval via
+  // `yallaflow context reconcile approve`, which binds the approval to the exact plan
+  // content (a generic `approve --stage reconciliation` is refused).
+  'reconciliation'
 ]);
 
 const ALL_FALSE = Object.freeze(Object.fromEntries(GATE_NAMES.map((name) => [name, false])));

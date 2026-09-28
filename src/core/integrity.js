@@ -11,7 +11,8 @@ import { childProgressView, loadDecomposition, validateChildren } from '../decom
 import { stageForSkill } from './workflows.js';
 import { loadBaseline } from '../baseline/store.js';
 import { CONTEXT_TARGETS } from '../knowledge/constants.js';
-import { loadContextLedger } from '../context/ledger.js';
+import { appliedTransition, loadContextLedger, originKey } from '../context/ledger.js';
+import { listReconciliations, settledOriginKeys } from '../reconciliation/store.js';
 import { hashFile } from '../context/evidence.js';
 import { loadSource, sourceChecksum, sourceOriginalPath } from './sources.js';
 import { validateLimitation } from '../limitations/store.js';
@@ -174,11 +175,14 @@ async function checkBaselineIntegrity(root, meta) {
   // legacy append-only marker is present in the target document.
   if (ledger.status === 'approved') {
     const { ledger: context } = await loadContextLedger(root);
-    const promoted = new Set((context.facts ?? [])
-      .filter((fact) => fact?.origin?.workId === meta.id && fact.origin.baselineFactId)
-      .map((fact) => fact.origin.baselineFactId));
+    // v0.3.7: represented anywhere in the ledger's lineage (introducing or contributing
+    // origin, or a reconciled dispute), or deliberately kept out of project memory by an
+    // applied reconciliation (skip / limitation) — settled, not missing.
+    const settled = settledOriginKeys(await listReconciliations(root));
+    const ledgerOk = Array.isArray(context.facts);
     for (const fact of ledger.facts) {
-      if (promoted.has(fact.id)) continue;
+      const origin = { workId: meta.id, baselineFactId: fact.id };
+      if ((ledgerOk && appliedTransition(context, origin)) || settled.has(originKey(origin))) continue;
       const relative = CONTEXT_TARGETS[fact.area];
       const marker = `<!-- yallaflow-baseline:${meta.id}:${fact.id} -->`;
       const file = path.join(workspacePath(root), relative);

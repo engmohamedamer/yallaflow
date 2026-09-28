@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "status": "approved",
+  "facts": [
+    {
+      "id": "BF-001",
+      "area": "database",
+      "status": "confirmed",
+      "summary": "Read replica is configured but inactive.",
+      "evidence": [
+        "db.yml"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-002",
+      "area": "tech-stack",
+      "status": "confirmed",
+      "summary": "Node.js project.",
+      "evidence": [
+        "package.json"
+      ],
+      "source": "repository"
+    }
+  ],
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "tech-stack",
+      "summary": "Lockfile not inspected.",
+      "reason": "Out of time.",
+      "recordedAt": "2026-09-24T12:26:20.521Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "drafted",
+      "at": "2026-09-24T12:26:20.521Z",
+      "factCount": 2
+    },
+    {
+      "action": "approved",
+      "at": "2026-09-24T12:26:20.646Z"
+    }
+  ],
+  "draftedAt": "2026-09-24T12:26:20.521Z",
+  "updatedAt": "2026-09-24T12:26:20.646Z",
+  "approvedAt": "2026-09-24T12:26:20.646Z"
+}

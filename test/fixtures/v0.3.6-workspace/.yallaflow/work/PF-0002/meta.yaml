@@ -1,0 +1,46 @@
+{
+  "id": "PF-0002",
+  "type": "investigation",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "File intake: request.txt",
+  "status": "CONCLUSION",
+  "readOnly": true,
+  "sources": [
+    {
+      "id": "SRC-0001",
+      "type": "file",
+      "name": "request.txt",
+      "detectedFormat": "txt",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-09-24T12:26:20.779Z",
+      "workStatusAtLink": "PENDING",
+      "relationship": "work-input"
+    }
+  ],
+  "titleHint": "request",
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-09-24T12:26:20.780Z",
+  "updatedAt": "2026-09-24T12:26:21.597Z",
+  "title": "request",
+  "routingConfidence": "high",
+  "routingReason": "Read-only.",
+  "routedAt": "2026-09-24T12:26:20.895Z",
+  "workflow": "investigation",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 3,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "verification"
+    ]
+  }
+}

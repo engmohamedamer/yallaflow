@@ -40,4 +40,4 @@ git add .yallaflow && git commit -m "Initialize YallaFlow"
 
 `.yallaflow/` is durable project state and is meant to be committed; `doctor` warns when it is neither tracked nor deliberately ignored. Review [`security.md`](security.md) before capturing files that might contain sensitive data.
 
-Upgrading an existing workspace from v0.3.5: see [`upgrading-to-v0.3.6.md`](upgrading-to-v0.3.6.md).
+Upgrading an existing workspace: run `yallaflow upgrade status`, then see [`upgrading-to-v0.3.7.md`](upgrading-to-v0.3.7.md) (and [`upgrading-to-v0.3.6.md`](upgrading-to-v0.3.6.md) for the v0.3.5 → v0.3.6 changes).

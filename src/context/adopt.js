@@ -1,81 +1,55 @@
 import path from 'node:path';
 import { exists, readText, writeText } from '../utils/fs.js';
-import { readYaml } from '../core/yaml.js';
-import { listWork, workspacePath } from '../core/workspace.js';
-import { loadWorkKnowledge } from '../knowledge/store.js';
+import { workspacePath } from '../core/workspace.js';
 import { CONTEXT_TARGETS } from '../knowledge/constants.js';
-import { loadContextLedger, mutateContextLedger } from './ledger.js';
+import { currentFacts, loadContextLedger, mutateContextLedger } from './ledger.js';
+import { collectLegacyItems } from './legacy.js';
 import { deriveProvenance, normalizeEvidenceRefs } from './evidence.js';
-import { removeLegacySection } from './projection.js';
+import { generatedLegacySectionState } from './projection.js';
+import { findActiveReconciliation, pendingLegacyCandidates } from '../reconciliation/store.js';
 
-// Explicit, opt-in upgrade of v0.3.5 project context into the canonical ledger.
-// Nothing is migrated on read: a v0.3.5 workspace stays fully usable (its legacy
-// append-only sections remain valid Markdown, and doctor accepts them) until a human
-// or agent deliberately runs `yallaflow context adopt`.
+// `context adopt` (v0.3.6) imported every legacy v0.3.5 fact at once. That is migration,
+// not reconciliation: two work items that recorded the same durable truth in different
+// words would become two separate current facts, and nothing could tell. Since v0.3.7:
 //
-// Adoption reads the structured historical records — approved baseline.yaml facts and
-// promoted knowledge.yaml candidates — never the Markdown prose, and never rewrites
-// those work records. Adopted facts carry no verification point (their evidence was
-// checked at an unknown earlier time), so their freshness is UNKNOWN until reconfirmed.
-// Only legacy sections that still exactly match the template YallaFlow wrote are
-// removed from the Markdown; a hand-edited section is left in place and reported.
+//   --dry-run   unchanged and read-only — lists what is not yet governed.
+//   adopt       only when adoption is provably duplicate-free: exactly one legacy item
+//               and no current canonical facts it could overlap with. Otherwise it is
+//               refused (no mutation) and points to `yallaflow context reconcile start`,
+//               the reviewable workflow. There is deliberately no --force.
+//
+// Adoption reads the structured historical records (never the Markdown prose) and
+// never rewrites them. Adopted facts carry no verification point, so their freshness
+// is UNKNOWN until reconfirmed. Only a legacy section that is byte-for-byte what v0.3.5
+// generated from the item's own record is removed; any hand edit leaves it in place.
 export async function planAdoption(root) {
-  const { ledger } = await loadContextLedger(root);
-  const adopted = new Set(ledger.facts.map((fact) => originKey(fact.origin)));
-  const items = [];
-  let alreadyAdopted = 0;
+  const all = await collectLegacyItems(root);
+  const pending = await pendingLegacyCandidates(root);
+  const items = pending.map((item) => ({ ...item, origin: { ...item.origin, adopted: true }, marker: item.legacySection.marker }));
+  return { items, alreadyAdopted: all.length - pending.length };
+}
 
-  for (const meta of await listWork(root)) {
-    if (meta.baseline) {
-      const file = path.join(workspacePath(root), 'work', meta.id, 'baseline.yaml');
-      if (await exists(file)) {
-        const baseline = await readYaml(file);
-        if (baseline.status === 'approved') {
-          for (const fact of baseline.facts) {
-            const origin = { workId: meta.id, baselineFactId: fact.id, adopted: true };
-            if (adopted.has(originKey(origin))) { alreadyAdopted += 1; continue; }
-            items.push({
-              origin,
-              area: fact.area,
-              summary: fact.summary,
-              confidence: fact.status,
-              provenance: fact.source,
-              evidenceRefs: fact.evidence,
-              verifiedAt: baseline.approvedAt ?? baseline.updatedAt,
-              note: fact.note,
-              marker: `<!-- yallaflow-baseline:${meta.id}:${fact.id} -->`
-            });
-          }
-        }
-      }
-    }
-    const knowledge = await loadWorkKnowledge(root, meta);
-    for (const candidate of knowledge.ledger.candidates) {
-      if (candidate.status !== 'promoted' || candidate.kind === 'decision' || candidate.factId) continue;
-      const origin = { workId: meta.id, candidateId: candidate.id, adopted: true };
-      if (adopted.has(originKey(origin))) { alreadyAdopted += 1; continue; }
-      items.push({
-        origin,
-        area: candidate.kind,
-        summary: candidate.summary,
-        confidence: candidate.confidence ?? 'confirmed',
-        provenance: candidate.provenance,
-        evidenceRefs: candidate.evidence,
-        verifiedAt: candidate.promotedAt,
-        marker: `<!-- yallaflow-knowledge:${meta.id}:${candidate.id} -->`
-      });
-    }
+export async function adoptionRefusal(root, plan) {
+  const active = await findActiveReconciliation(root);
+  if (active) return `A legacy-context reconciliation is in progress (${active.meta.id}); continue it with \`yallaflow context reconcile status ${active.meta.id}\`.`;
+  const { ledger } = await loadContextLedger(root);
+  const live = currentFacts(ledger).length;
+  if (plan.items.length > 1 || live) {
+    return `${plan.items.length} legacy item(s)${live ? ` and ${live} current canonical fact(s)` : ''} may describe overlapping truths; ` +
+      'blind adoption could create duplicate current facts. Reconcile them explicitly instead: `yallaflow context reconcile start`.';
   }
-  return { items, alreadyAdopted };
+  return null;
 }
 
 export async function adoptLegacyContext(root, { dryRun = false } = {}, now = new Date().toISOString()) {
   const plan = await planAdoption(root);
   if (dryRun || !plan.items.length) return { ...plan, dryRun, facts: [], removed: [], leftInPlace: [] };
+  const refusal = await adoptionRefusal(root, plan);
+  if (refusal) throw new Error(`Refusing to adopt legacy context: ${refusal}\nNo files were changed.`);
 
   const prepared = [];
   for (const item of plan.items) {
-    const evidence = await normalizeEvidenceRefs(root, item.evidenceRefs, { workId: item.origin.workId, adopted: true });
+    const evidence = await normalizeEvidenceRefs(root, item.evidence, { workId: item.origin.workId, adopted: true });
     prepared.push({
       item,
       input: {
@@ -85,7 +59,7 @@ export async function adoptLegacyContext(root, { dryRun = false } = {}, now = ne
         provenance: item.provenance ?? deriveProvenance(evidence),
         evidence,
         origin: item.origin,
-        verifiedAt: item.verifiedAt ?? now,
+        verifiedAt: item.recordedAt ?? now,
         verifiedAtCommit: null,
         ...(item.note ? { note: item.note } : {})
       }
@@ -99,17 +73,13 @@ export async function adoptLegacyContext(root, { dryRun = false } = {}, now = ne
     const file = path.join(workspacePath(root), CONTEXT_TARGETS[item.area]);
     if (!await exists(file)) continue;
     const content = await readText(file);
-    if (!content.includes(item.marker)) continue;
-    const next = removeLegacySection(content, item.marker);
-    if (next === null) leftInPlace.push({ marker: item.marker, relative: CONTEXT_TARGETS[item.area] });
+    const { state, text } = generatedLegacySectionState(content, item, item.marker);
+    if (state === 'absent') continue;
+    if (state === 'edited') leftInPlace.push({ marker: item.marker, relative: CONTEXT_TARGETS[item.area] });
     else {
-      await writeText(file, next);
+      await writeText(file, content.replace(text, ''));
       removed.push({ marker: item.marker, relative: CONTEXT_TARGETS[item.area] });
     }
   }
   return { ...plan, dryRun, facts, removed, leftInPlace };
-}
-
-function originKey(origin = {}) {
-  return `${origin.workId}:${origin.baselineFactId ?? origin.candidateId ?? ''}`;
 }

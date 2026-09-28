@@ -130,8 +130,8 @@ test('a missing AGENT.md is recreated by refresh', async () => {
 // Contract v2 (v0.3.6): direct classified commands require --scope. Workspaces whose
 // AGENT.md carries the real v1 managed block (fixture captured from the v1 template)
 // must be detected as outdated and upgraded in place.
-test('agent contract v2 teaches scope-required direct commands', async () => {
-  assert.equal(AGENT_CONTRACT_VERSION, 2);
+test('agent contract (v2+) teaches scope-required direct commands', async () => {
+  assert.ok(AGENT_CONTRACT_VERSION >= 2);
   const body = agentContractBody();
   assert.match(body, /yallaflow feature\|bug\|investigate\|change\|refactor\|release "<title>" --scope <spike\|bounded\|architectural>/);
   assert.match(body, /--scope is required; never guess or default a scope/);
@@ -143,28 +143,29 @@ test('a v1 managed contract is reported outdated, read-only, by agent status, st
   const v1 = await fixture('v1-managed.md');
   assert.match(v1, /^<!-- yallaflow-agent-contract:begin version=1 /);
   const { root, file } = await workspaceWithAgent(v1);
-  assert.deepEqual(await inspectAgentContract(root), { state: 'outdated', installed: 2, version: 1 });
+  const v = AGENT_CONTRACT_VERSION;
+  assert.deepEqual(await inspectAgentContract(root), { state: 'outdated', installed: v, version: 1 });
   const status = run(root, ['agent', 'status']).stdout;
   assert.match(status, /Agent contract \(\.yallaflow\/AGENT\.md\): outdated/);
-  assert.match(status, /Installed package contract: v2/);
+  assert.match(status, new RegExp(`Installed package contract: v${v}`));
   assert.match(status, /Workspace contract: v1/);
-  assert.match(status, /outdated \(v1 → v2\); run `yallaflow agent refresh`/);
-  assert.match(run(root, ['doctor']).stdout, /WARN AGENT\.md agent contract: outdated \(v1 → v2\)/);
-  assert.match(run(root, ['status']).stdout, /Agent contract: outdated \(v1 → v2\)/);
+  assert.match(status, new RegExp(`outdated \\(v1 → v${v}\\); run \`yallaflow agent refresh\``));
+  assert.match(run(root, ['doctor']).stdout, new RegExp(`WARN AGENT\\.md agent contract: outdated \\(v1 → v${v}\\)`));
+  assert.match(run(root, ['status']).stdout, new RegExp(`Agent contract: outdated \\(v1 → v${v}\\)`));
   run(root, ['agent', 'refresh', '--dry-run']);
   assert.equal(await readFile(file, 'utf8'), v1);
 });
 
-test('refresh upgrades a v1 block to v2 in place, preserves custom instructions, and is idempotent', async () => {
+test('refresh upgrades a v1 block to the installed contract in place, preserves custom instructions, and is idempotent', async () => {
   const before = '# Team instructions\n\nNever run migrations against production from an agent session.\n\n';
   const after = '\n## Local conventions\n\nArabic UI strings live in lang/ar.\n';
   const { root, file } = await workspaceWithAgent(`${before}${await fixture('v1-managed.md')}${after}`);
-  assert.match(run(root, ['agent', 'refresh']).stdout, /update only the YallaFlow-managed block \(content outside it unchanged\) \(agent contract v2\)/);
+  assert.match(run(root, ['agent', 'refresh']).stdout, new RegExp(`update only the YallaFlow-managed block \\(content outside it unchanged\\) \\(agent contract v${AGENT_CONTRACT_VERSION}\\)`));
   const upgraded = await readFile(file, 'utf8');
   assert.equal(upgraded, `${before}${renderAgentContractBlock()}${after}`);
   assert.match(upgraded, /--scope is required; never guess or default a scope/);
   assert.equal((await inspectAgentContract(root)).state, 'current');
-  assert.match(run(root, ['agent', 'refresh']).stdout, /already at agent contract v2; nothing changed/);
+  assert.match(run(root, ['agent', 'refresh']).stdout, new RegExp(`already at agent contract v${AGENT_CONTRACT_VERSION}; nothing changed`));
   assert.equal(await readFile(file, 'utf8'), upgraded);
 });
 
@@ -180,10 +181,44 @@ test('a hand-edited v1 block is still never overwritten without --preserve-exist
   assert.match(refreshed, /## Preserved project instructions[\s\S]*Team rule: billing\/ is off-limits\./);
 });
 
-test('the v2 CLI refuses to downgrade a v3 contract', async () => {
-  const { root, file } = await workspaceWithAgent(renderAgentContractBlock(3, agentContractBody()));
+test('the installed CLI refuses to downgrade a newer contract', async () => {
+  const newer = AGENT_CONTRACT_VERSION + 1;
+  const { root, file } = await workspaceWithAgent(renderAgentContractBlock(newer, agentContractBody()));
   const before = await readFile(file, 'utf8');
   assert.equal((await inspectAgentContract(root)).state, 'newer');
-  assert.match(run(root, ['agent', 'refresh'], false).stderr, /newer YallaFlow contract \(v3\); refusing to downgrade it to v2/);
+  assert.match(run(root, ['agent', 'refresh'], false).stderr, new RegExp(`newer YallaFlow contract \\(v${newer}\\); refusing to downgrade it to v${AGENT_CONTRACT_VERSION}`));
   assert.equal(await readFile(file, 'utf8'), before);
+});
+
+// Contract v3 (v0.3.7): legacy context reconciliation, state ownership, fresh-agent
+// brief. The fixture is the exact v2 managed block v0.3.6 generated (a YaSchools-style
+// workspace upgraded to v0.3.6), which must upgrade in place.
+test('agent contract v3 teaches reconciliation, immutable history, and state ownership', async () => {
+  assert.equal(AGENT_CONTRACT_VERSION, 3);
+  const body = agentContractBody();
+  assert.match(body, /not canonical current truth until it is reconciled; migration is not reconciliation/);
+  assert.match(body, /never on wording similarity alone; do not semantically merge facts/);
+  assert.match(body, /new, merge-with, reconfirms, supersedes, disputes, skip \(with a reason\), or limitation/);
+  assert.match(body, /leave the candidate undecided and record a question/);
+  assert.match(body, /never rewrite historical work \(baseline\.yaml, knowledge\.yaml, earlier work\.md\)/);
+  assert.match(body, /Never edit YallaFlow-owned structured or history state directly when a supported command exists/);
+  for (const file of ['meta.yaml', 'progress.yaml', 'knowledge.yaml', 'reviews.yaml', 'baseline.yaml', 'discovery.yaml', 'reconciliation.yaml', 'context/index.yaml', 'evidence/']) {
+    assert.ok(body.includes(file), `contract names CLI-owned ${file}`);
+  }
+  assert.match(body, /run yallaflow brief first/);
+  assert.match(body, /merge-with collapses two or more legacy candidates that are the same statement into one canonical fact \(its target is another RC-#### candidate\)/);
+  assert.match(body, /reconfirms records one more historical observation of a truth already represented/);
+  assert.match(body, /Relate a candidate to an existing CTX fact with reconfirms, supersedes, or disputes, never merge-with/);
+});
+
+test('a real v0.3.6 (v2) managed block upgrades to v3 in place and keeps project text', async () => {
+  const v2 = await fixture('v2-managed.md');
+  assert.match(v2, /^<!-- yallaflow-agent-contract:begin version=2 /);
+  const extra = '\n## YaSchools notes\n\nCodeception runs from the repository root.\n';
+  const { root, file } = await workspaceWithAgent(`${v2}${extra}`);
+  assert.deepEqual(await inspectAgentContract(root), { state: 'outdated', installed: 3, version: 2 });
+  assert.match(run(root, ['doctor']).stdout, /WARN AGENT\.md agent contract: outdated \(v2 → v3\)/);
+  run(root, ['agent', 'refresh']);
+  assert.equal(await readFile(file, 'utf8'), `${renderAgentContractBlock()}${extra}`);
+  assert.equal((await inspectAgentContract(root)).state, 'current');
 });

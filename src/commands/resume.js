@@ -14,6 +14,7 @@ import { resolvePrimaryObjective } from '../behavior/objective.js';
 import { projectContextLines } from '../context/summary.js';
 import { loadWorkLimitations } from '../limitations/store.js';
 import { describeWorkSourceLocations } from '../core/sources.js';
+import { reconciliationSummaryLines } from '../reconciliation/store.js';
 
 export async function resumeCommand(requestedWorkId) {
   const root = await findProjectRoot();
@@ -61,8 +62,16 @@ export async function resumeCommand(requestedWorkId) {
   console.log(`Workflow: ${meta.workflow ?? meta.type}`);
   console.log(`Stage: ${stage}`);
   printReopenContext(meta);
-  const primaryObjective = resolvePrimaryObjective(meta, progress.ledger, guidance.modification);
+  const reconciliation = meta.reconciliation ? await reconciliationSummaryLines(root, meta) : null;
+  const primaryObjective = reconciliation && meta.status !== 'DONE'
+    ? 'Reconcile legacy project context.'
+    : resolvePrimaryObjective(meta, progress.ledger, guidance.modification);
   if (primaryObjective) console.log(`\nPRIMARY UNRESOLVED OBJECTIVE:\n${primaryObjective}`);
+  if (reconciliation) {
+    console.log('\nReconciliation:');
+    for (const line of reconciliation.lines) console.log(line);
+    if (reconciliation.status.blockers.length) console.log(`Blockers: ${reconciliation.status.blockers.join('; ')}`);
+  }
   console.log(`\nDelivery status: ${readiness.deliveryStatus ?? 'NOT_READY'}`);
   printProgress(guidance.progress);
   if (guidance.progress.current?.summary) console.log(`\nCurrent finding: ${guidance.progress.current.summary}`);
@@ -82,7 +91,7 @@ export async function resumeCommand(requestedWorkId) {
     : atCompletionStage && knowledgeSummary.reviewStatus === 'reviewed'
       ? 'Advance the reviewed work to DONE.'
     : guidance.nextObjective;
-  console.log(`\nNext engineering objective:\n${nextObjective}`);
+  console.log(`\nNext engineering objective:\n${reconciliation ? reconciliation.status.nextAction : nextObjective}`);
   console.log(`\nApplication code modification: ${guidance.modification.authorized ? 'AUTHORIZED' : 'NOT AUTHORIZED'}`);
   console.log(`Reason: ${guidance.modification.reason}`);
   console.log(`\nRead: .yallaflow/work/${meta.id}/work.md, progress.md, and progress.yaml when present before taking action.`);

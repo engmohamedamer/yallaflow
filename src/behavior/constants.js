@@ -21,7 +21,8 @@ export const CAPABILITIES = Object.freeze([
   'implement',
   'verify',
   'review',
-  'baseline'
+  'baseline',
+  'reconcile'
 ]);
 
 export const WRITE_STAGES = Object.freeze({
