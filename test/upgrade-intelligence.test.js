@@ -8,6 +8,8 @@ import { fileURLToPath } from 'node:url';
 import os from 'node:os';
 import path from 'node:path';
 import { initWorkspace, workspacePath } from '../src/core/workspace.js';
+import { AGENT_CONTRACT_VERSION } from '../src/agent/contract.js';
+import { PACKAGE_VERSION } from '../src/version.js';
 import { cli, legacyWorkspace, planReconciliation, snapshotWorkspace, yaschoolsWorkspace } from '../test-support/legacy-context.js';
 
 const fixture = (name) => readFile(fileURLToPath(new URL(`./fixtures/agent-contract/${name}`, import.meta.url)), 'utf8');
@@ -36,7 +38,7 @@ test('47. a v0.3.5 workspace: refresh the unversioned agent guidance, then recon
   await gitRepo(root);
   await withAgent(root, await fixture('v0.3.5.md'));
   const status = cli(root, ['upgrade', 'status']).stdout;
-  assert.match(status, /Installed package: 0\.3\.7-internal\.1/);
+  assert.match(status, new RegExp(`Installed package: ${PACKAGE_VERSION.replaceAll('.', '\\.')}`));
   assert.match(status, /Workspace: legacy structures present\n  - unversioned AGENT\.md \(pre-v0\.3\.6 agent guidance\)\n  - v0\.3\.5 append-only project context \(3 item\(s\) not yet reconciled\)/);
   assert.match(status, /Agent contract: predates versioned agent contracts \(unmodified v0\.3\.5 template\)/);
   assert.match(status, /no canonical ledger yet\n  3 legacy fact\(s\) pending reconciliation/);
@@ -51,8 +53,8 @@ test('48. a v0.3.6 workspace (v2 contract, one CTX fact, legacy facts pending): 
   const { root } = await yaschoolsWorkspace();
   await withAgent(root, await fixture('v2-managed.md'));
   const status = cli(root, ['upgrade', 'status']).stdout;
-  assert.match(status, /  - agent contract v2 \(installed v3\)/);
-  assert.match(status, /Agent contract: outdated \(v2 → v3\); run `yallaflow agent refresh`/);
+  assert.match(status, new RegExp(`  - agent contract v2 \\(installed v${AGENT_CONTRACT_VERSION}\\)`));
+  assert.match(status, new RegExp(`Agent contract: outdated \\(v2 → v${AGENT_CONTRACT_VERSION}\\); run \`yallaflow agent refresh\``));
   assert.match(status, /1 canonical current fact\(s\) · 0 disputed · 0 superseded\n  10 legacy fact\(s\) pending reconciliation/);
   assert.match(status, /Work history: 3 item\(s\) · healthy/);
   assert.match(status, /Integrity: doctor healthy/);
@@ -71,7 +73,7 @@ test('49. a fully current workspace reports no upgrade action', async () => {
   await writeFile(path.join(root, '.gitignore'), '.yallaflow\n');
   const status = cli(root, ['upgrade', 'status']).stdout;
   assert.match(status, /Workspace: current structures/);
-  assert.match(status, /Agent contract: v3 \/ current/);
+  assert.match(status, new RegExp(`Agent contract: v${AGENT_CONTRACT_VERSION} / current`));
   assert.match(status, /Recommended next action:\n  none — the workspace is current/);
   assert.doesNotMatch(status, /Warnings:/);
   assert.match(cli(root, ['upgrade', 'plan']).stdout, /No upgrade actions required\. The workspace is current\./);
@@ -85,7 +87,7 @@ test('50 + 52. brief is a concise orientation: no context dump, sources surfaced
   const lines = brief.trim().split('\n');
   assert.ok(lines.length <= 16, `brief stays short (${lines.length} lines)`);
   assert.match(brief, /^YallaFlow Brief — legacy \(brownfield\)/);
-  assert.match(brief, /Agent contract: v3 current/);
+  assert.match(brief, new RegExp(`Agent contract: v${AGENT_CONTRACT_VERSION} current`));
   assert.match(brief, /Project memory: 1 current \(1 fresh\) · 0 disputed · 0 to revalidate/);
   assert.match(brief, /Legacy context: 10 fact\(s\) pending reconciliation/);
   assert.match(brief, /Sources: 1 \(latest SRC-0001\)/);

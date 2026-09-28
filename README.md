@@ -126,10 +126,19 @@ In YallaFlow, completion is a state that must be supported by the workflow:
 - unresolved material questions can block readiness
 - verification runs are recorded as append-only evidence
 - review gates remain auditable
-- downstream verification/review can be invalidated when earlier work is revised
+- for feature work and architectural changes, every active acceptance criterion must be shown — with evidence — to be delivered (**convergence**), not just tested
+- downstream verification/review/convergence can be invalidated when earlier work is revised or the approved intent changes
 - `doctor` checks for impossible or contradictory lifecycle states
 
 YallaFlow distinguishes:
+
+```text
+Verification  = do the recorded technical checks pass?
+Review        = is the implementation technically acceptable?
+Convergence   = does the delivered implementation satisfy the approved intent?
+```
+
+and:
 
 - `SPEC_READY` — specification is reviewable
 - `PLAN_READY` — specification and implementation plan are reviewable
@@ -151,7 +160,9 @@ Implementation
 
 `yallaflow intake` can preserve local files such as DOCX, XLSX, PPTX, PDF, text files, and images as immutable `SRC-####` sources, with checksums and work-item linkage.
 
-That means a future session can answer not only **what did we build?**, but also **what were we originally given?**
+Approved intent gets stable identity: the agent extracts requirements and acceptance criteria (`REQ-###`, `AC-###`) from the specification or clarified request, each traced to where it came from; YallaFlow validates and records them. If a new source arrives, or the requirements change, after the intent was fixed, YallaFlow raises an **impact assessment**: the agent decides which completed stages are affected, and YallaFlow invalidates them through its audited revision path, never deleting evidence.
+
+That means a future session can answer not only **what did we build?**, but also **what were we originally given?**, **does the delivery match it?**, and **what became stale when it changed?**
 
 ### 6. Brownfield is a first-class workflow
 
@@ -181,7 +192,7 @@ A new session or a different coding agent can use durable state, Git, project co
 - what project knowledge is relevant
 - what the next valid action is
 
-`yallaflow handoff` and `yallaflow resume` are designed around this recovery model. A fresh agent starts with `yallaflow brief` — a read-only orientation that points at the next valid action.
+`yallaflow handoff` and `yallaflow resume` are designed around this recovery model. A fresh agent starts with `yallaflow brief` — a read-only orientation that points at the next valid action — and `yallaflow agent setup codex|claude` gives Codex (`AGENTS.md`) or Claude (`CLAUDE.md`) a thin, versioned pointer to the one canonical contract, so a cold session finds YallaFlow on its own.
 
 ---
 
@@ -209,7 +220,7 @@ Raw request / files
      Implement
         │
         ▼
- Verify + Review
+ Verify + Convergence + Review
         │
         ▼
  Knowledge review
@@ -249,9 +260,15 @@ yallaflow intake requirements.docx architecture.pdf
 yallaflow guide PF-0001
 ```
 
-Then open your coding agent in the repository and have it run `yallaflow brief` first (a one-line pointer in your repository's `AGENTS.md`/`CLAUDE.md` helps: *This repository uses YallaFlow — run `yallaflow brief` first.*). The generated `.yallaflow/AGENT.md` tells it how to work. Commit `.yallaflow/` with the project.
+Then connect your coding agent and open it in the repository:
 
-Upgrading an existing workspace? Run `yallaflow upgrade status` — see [`docs/upgrading-to-v0.3.7.md`](docs/upgrading-to-v0.3.7.md).
+```bash
+yallaflow agent setup codex     # or: yallaflow agent setup claude
+```
+
+This adds a small managed block to `AGENTS.md` / `CLAUDE.md` (your own content is kept) that tells the agent to follow `.yallaflow/AGENT.md` and run `yallaflow brief` first. Commit `.yallaflow/` (and that file) with the project.
+
+Upgrading an existing workspace? Run `yallaflow upgrade status` — see [`docs/upgrading-to-v0.3.8.md`](docs/upgrading-to-v0.3.8.md).
 
 For legacy repositories, install YallaFlow as an isolated CLI rather than adding it to the application's dependency tree.
 
@@ -309,7 +326,7 @@ Discovery
 → Knowledge
 ```
 
-Large plans can be decomposed into dependency-aware child work items. Each child can carry the requirement and acceptance-criteria references the Agent assigns it, and `yallaflow decompose validate` reports coverage (referenced, cross-cutting, unassigned) for those references. They are Agent-declared labels: YallaFlow does not yet give requirements a validated identity or prove that they were delivered.
+The specification's requirements and acceptance criteria are recorded as `REQ-###`/`AC-###`. Large plans can be decomposed into dependency-aware child work items that reference those IDs — YallaFlow refuses references not recorded in the parent's requirements ledger and reports unassigned criteria — and each feature child must show convergence on the criteria assigned to it before it is DONE. The parent's final convergence can cite the children's assessments and must assess any criterion no child owned.
 
 ---
 
@@ -325,6 +342,7 @@ YallaFlow separates different kinds of memory deliberately.
 | Historical knowledge | What was previously believed? | superseded/disputed `CTX-####` facts |
 | Source memory | What original input did the work come from? | `.yallaflow/sources/SRC-####/` |
 | Decisions | What architectural decisions were accepted? | `.yallaflow/decisions/` |
+| Delivery intent and evidence | What was this work asked to deliver, and does it? | the work item's `requirements.yaml`, `convergence.yaml`, `impact.yaml` — work-delivery state, never project facts |
 | Reconciliation history | How did legacy (v0.3.5) knowledge become current memory? | the reconciliation work item's `reconciliation.yaml` |
 
 Project facts evolve by explicit relationships such as reconfirm, supersede, and dispute. Work history remains immutable.
@@ -352,6 +370,9 @@ Old knowledge is reviewed before it becomes current truth: legacy project contex
 │       ├── discovery.yaml
 │       ├── knowledge.yaml
 │       ├── reviews.yaml
+│       ├── requirements.yaml     # REQ-### / AC-### (feature and architectural-change work)
+│       ├── convergence.yaml      # append-only convergence assessments
+│       ├── impact.yaml           # change-impact assessments
 │       ├── reconciliation.yaml   # reconciliation work items only
 │       └── evidence/
 ├── sources/
@@ -386,6 +407,10 @@ yallaflow question
 yallaflow ready
 yallaflow advance
 yallaflow verify
+yallaflow requirement
+yallaflow convergence
+yallaflow impact
+yallaflow agent
 yallaflow reopen
 yallaflow decompose
 yallaflow progress
@@ -434,40 +459,16 @@ See [`docs/limitations.md`](docs/limitations.md) for explicit current boundaries
 
 ---
 
-## What's next
+## From "tests passed" to "intent delivered"
 
-The next product direction strengthens the gap between **"tests passed"** and **"the requested intent was actually delivered"**.
-
-Planned focus includes:
-
-- first-party Codex and Claude bootstrap/adapters
-- stable requirement and acceptance-criteria identity
-- requirement-to-implementation traceability
-- delivery convergence analysis
-- explicit source/change impact assessment
-- stronger cross-session continuity
-
-The target model is:
+v0.3.8 closed the gap between **"tests passed"** and **"the requested intent was actually delivered"**: stable requirement and acceptance-criteria identity, evidence-backed convergence as a delivery gate, explicit change-impact assessment, and first-party Codex/Claude bootstrap.
 
 ```text
-Original Intent
-      ↓
-Specification
-      ↓
-Implementation
-      ↓
-Verification
-      ↓
-Convergence
-      ↓
-Durable Project Knowledge
-      ↓
-Next Agent Session
+Original Intent → Requirements / Acceptance Criteria → Specification → Implementation
+  → Verification → Convergence → Durable Project Knowledge → Next Agent Session
 ```
 
-Longer-term execution policies and multi-agent orchestration remain separate future work.
-
-See [`docs/roadmap.md`](docs/roadmap.md).
+Next: execution policies, multi-agent orchestration, and tracker intake remain separate future work, and team mode stays deliberately out of scope for now — see [`docs/roadmap.md`](docs/roadmap.md).
 
 ---
 
@@ -485,7 +486,7 @@ Those rules are intentionally simple. The value is that YallaFlow makes them dur
 
 ## Status
 
-Current version: **`0.3.7-internal.1` — Context Reconciliation & Upgrade Intelligence** (internal prerelease; `package.json` is `private`, nothing is published to npm). Upgrading: run `yallaflow upgrade status`, then see [`docs/upgrading-to-v0.3.7.md`](docs/upgrading-to-v0.3.7.md).
+Current version: **`0.3.8-internal.1` — Delivery Convergence & Agent Continuity** (internal prerelease; `package.json` is `private`, nothing is published to npm). Upgrading: run `yallaflow upgrade status`, then see [`docs/upgrading-to-v0.3.8.md`](docs/upgrading-to-v0.3.8.md).
 
 YallaFlow is under active development and its workspace/package contracts have not reached 1.0 stability yet.
 
@@ -500,6 +501,7 @@ YallaFlow is under active development and its workspace/package contracts have n
 | [`docs/cli.md`](docs/cli.md) | Complete CLI reference |
 | [`docs/guide.md`](docs/guide.md) | Feature and behavior guide |
 | [`docs/project-memory.md`](docs/project-memory.md) | Living project memory and artifact model |
+| [`docs/upgrading-to-v0.3.8.md`](docs/upgrading-to-v0.3.8.md) | Upgrading to v0.3.8: delivery convergence, agent bootstrap |
 | [`docs/upgrading-to-v0.3.7.md`](docs/upgrading-to-v0.3.7.md) | Upgrading to v0.3.7: `upgrade status`, reconciling legacy context |
 | [`docs/upgrading-to-v0.3.6.md`](docs/upgrading-to-v0.3.6.md) | Upgrading a v0.3.5 workspace to v0.3.6 |
 | [`docs/architecture.md`](docs/architecture.md) | Internal architecture and invariants |

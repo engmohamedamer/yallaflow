@@ -11,6 +11,7 @@ import { advanceActiveWork, reconcileStageAfterCheckpointRevision, reopenWork } 
 import { recordVerification } from '../src/core/evidence.js';
 import { reviewKnowledgeNone } from '../src/knowledge/store.js';
 import { initWorkspace, workspacePath } from '../src/core/workspace.js';
+import { convergeAll, ensureIntentFor, recordIntent } from '../test-support/delivery.js';
 import { readYaml } from '../src/core/yaml.js';
 
 const cli = fileURLToPath(new URL('../src/cli.js', import.meta.url));
@@ -26,6 +27,7 @@ async function routedWork(workType = 'bug', scope = 'architectural') {
 }
 
 async function complete(root, meta, skillId, evidence = []) {
+  await ensureIntentFor(root, meta.id, skillId);
   return checkpointWork(root, meta.id, { skillId, status: 'completed', summary: `${skillId} completed.`, evidence });
 }
 
@@ -150,6 +152,7 @@ test('DONE work cannot incorrectly report project complete while the parent is i
   await advanceActiveWork(root, childA);
   await recordVerification(root, childA, { command: 'true', success: true, exitCode: 0 });
   await complete(root, { id: childA }, 'verification');
+  await convergeAll(root, childA);
   await reviewKnowledgeNone(root, childA);
   const childDone = await advanceActiveWork(root, childA);
   assert.equal(childDone.to, 'DONE');

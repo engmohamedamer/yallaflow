@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import os from 'node:os';
 import path from 'node:path';
 import { workspacePath } from '../src/core/workspace.js';
+import { cliConvergeAll, cliRecordIntent } from '../test-support/delivery.js';
 import { readYaml } from '../src/core/yaml.js';
 
 const cli = fileURLToPath(new URL('../src/cli.js', import.meta.url));
@@ -89,12 +90,14 @@ test('DONE feature work: verify is refused with the reopen path, and works after
   const root = await workspace();
   const id = /Created (PF-\d+)/.exec(run(root, ['start', 'Add CSV export']).stdout)[1];
   run(root, ['route', id, '--type', 'feature', '--scope', 'bounded', '--confidence', 'high', '--reason', 'Small.']);
+  await cliRecordIntent(root, id);
   for (const skill of ['context-discovery', 'requirement-clarification']) run(root, ['checkpoint', id, '--skill', skill, '--complete', '--summary', 'ok']);
   for (let i = 0; i < 5; i++) run(root, ['advance', id]);
   run(root, ['checkpoint', id, '--skill', 'implementation', '--complete', '--summary', 'done']);
   run(root, ['advance', id]);
   run(root, ['verify', id, '--', ...PROOF]);
   run(root, ['checkpoint', id, '--skill', 'verification', '--complete', '--summary', 'ok']);
+  await cliConvergeAll(root, id);
   run(root, ['knowledge', 'review', id, '--none']);
   run(root, ['advance', id]);
   const refused = run(root, ['verify', id, '--', ...PROOF], false);

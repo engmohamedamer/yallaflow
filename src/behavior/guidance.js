@@ -3,11 +3,16 @@ import { resolveBehaviorContract } from '../skills/resolver.js';
 import { incompleteImplementationSkills, summarizeProgress } from '../core/progress.js';
 import { WRITE_STAGES } from './constants.js';
 
-export function buildBehaviorGuidance(meta, stage, ledger) {
+// `delivery.pendingImpact` (v0.3.8, from src/delivery/summary.js): a change of approved
+// intent awaiting assessment closes the write gate and becomes the objective.
+export function buildBehaviorGuidance(meta, stage, ledger, delivery = {}) {
   const workflow = meta.workflow ?? meta.type;
   const contract = resolveBehaviorContract(meta);
   const progress = summarizeProgress(contract, ledger);
-  const gate = resolveModificationGate(meta, workflow, stage, contract, ledger);
+  const pending = delivery.pendingImpact ?? null;
+  const gate = pending
+    ? { authorized: false, reason: `impact ${pending.id} is pending: the approved intent changed and must be assessed before implementation continues` }
+    : resolveModificationGate(meta, workflow, stage, contract, ledger);
   const guidance = [];
 
   if (progress.current) guidance.push(skillGuidance(progress.current.skillId, progress.current.status));
@@ -23,7 +28,9 @@ export function buildBehaviorGuidance(meta, stage, ledger) {
     stage,
     guidance,
     modification: gate,
-    nextObjective: progressObjective(progress) ?? nextObjective(workflow, stage)
+    nextObjective: pending
+      ? `Assess impact ${pending.id}: decide which completed stages the changed intent affects (yallaflow impact status ${meta.id}).`
+      : progressObjective(progress) ?? nextObjective(workflow, stage)
   };
 }
 

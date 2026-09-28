@@ -33,7 +33,7 @@ test('architectural feature requires brainstorming, planning, and review', () =>
 
 test('bounded feature does not require architectural planning', () => {
   const policy = resolveWorkflowPolicy('feature', 'bounded');
-  assert.deepEqual(policy.requiredCapabilities, ['discover', 'clarify', 'implement', 'verify']);
+  assert.deepEqual(policy.requiredCapabilities, ['discover', 'clarify', 'implement', 'verify', 'converge']);
   assert.equal(policy.requiredCapabilities.includes('plan'), false);
   assert.equal(policy.requiredCapabilities.includes('brainstorm'), false);
   assert.equal(policy.requiredCapabilities.includes('review'), false);
@@ -147,7 +147,7 @@ test('routing decision survives a separate CLI process', async () => {
   assert.ok(persisted.requiredCapabilities.includes('systematic-debugging'));
   assert.ok(persisted.routedAt);
   assert.deepEqual(persisted.behaviorContract, {
-    registryVersion: 4,
+    registryVersion: 5,
     skills: ['context-discovery', 'systematic-debugging', 'implementation', 'verification']
   });
 

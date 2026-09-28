@@ -10,6 +10,7 @@ import { checkpointWork, reviseCheckpoint } from '../src/core/progress.js';
 import { advanceActiveWork, reconcileStageAfterCheckpointRevision } from '../src/core/transitions.js';
 import { initWorkspace, getConfig } from '../src/core/workspace.js';
 import { resolveInteractionPolicy } from '../src/behavior/interaction.js';
+import { ensureIntentFor } from '../test-support/delivery.js';
 import { loadReviews, setGateStatus } from '../src/reviews/store.js';
 
 const cli = fileURLToPath(new URL('../src/cli.js', import.meta.url));
@@ -25,6 +26,7 @@ async function architecturalWork(mode) {
 }
 
 async function complete(root, meta, skillId) {
+  await ensureIntentFor(root, meta.id, skillId);
   return checkpointWork(root, meta.id, { skillId, status: 'completed', summary: `${skillId} completed.`, evidence: [] });
 }
 

@@ -12,6 +12,7 @@ import { recordVerification } from '../src/core/evidence.js';
 import { reviewKnowledgeNone } from '../src/knowledge/store.js';
 import { initWorkspace } from '../src/core/workspace.js';
 import { executeDecomposition, proposeDecomposition, validateDecomposition } from '../src/decomposition/store.js';
+import { convergeAll, ensureIntentFor } from '../test-support/delivery.js';
 
 const cli = fileURLToPath(new URL('../src/cli.js', import.meta.url));
 
@@ -36,6 +37,7 @@ async function planReadyParent() {
 }
 
 async function complete(root, meta, skillId, evidence = []) {
+  await ensureIntentFor(root, meta.id, skillId);
   return checkpointWork(root, meta.id, { skillId, status: 'completed', summary: `${skillId} completed.`, evidence });
 }
 
@@ -47,6 +49,7 @@ async function completeChild(root, workId) {
   await advanceActiveWork(root, workId); // -> VERIFICATION
   await recordVerification(root, workId, { command: 'true', success: true, exitCode: 0 });
   await complete(root, { id: workId }, 'verification');
+  await convergeAll(root, workId);
   await reviewKnowledgeNone(root, workId);
   const result = await advanceActiveWork(root, workId); // -> DONE
   assert.equal(result.to, 'DONE');

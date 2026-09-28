@@ -4,6 +4,7 @@ import { buildBehaviorGuidance } from '../behavior/guidance.js';
 import { loadWorkReadiness } from '../behavior/readiness.js';
 import { formatSourceList } from '../intake/normalize.js';
 import { describeAgentContractState, inspectAgentContract } from '../agent/contract.js';
+import { loadDeliverySummary } from '../delivery/summary.js';
 
 export async function statusCommand() {
   const root = await findProjectRoot();
@@ -26,7 +27,8 @@ export async function statusCommand() {
     if (item.routingStatus === 'routed') {
       const stage = item.id === state.activeWork ? state.stage : item.status;
       const progress = await loadWorkProgress(root, item);
-      const guidance = buildBehaviorGuidance(item, stage, progress.ledger);
+      const delivery = await loadDeliverySummary(root, item);
+      const guidance = buildBehaviorGuidance(item, stage, progress.ledger, delivery);
       const readiness = await loadWorkReadiness(root, { ...item, status: stage });
       console.log(`\n${item.id} — ${item.title ?? `${capitalize(item.type)} work`}`);
       console.log(`${item.type} / ${item.scope}`);
@@ -36,6 +38,7 @@ export async function statusCommand() {
       console.log(`Current skill: ${guidance.progress.current?.skillId ?? 'none'}`);
       console.log(`Delivery: ${readiness.deliveryStatus ?? 'not ready'}`);
       console.log(`Write access: ${guidance.modification.authorized ? 'authorized' : 'blocked'}`);
+      if (delivery.pendingImpact) console.log(`Impact: ${delivery.pendingImpact.id} pending assessment`);
       continue;
     }
     const scope = item.scope ?? item.complexity ?? 'unspecified';

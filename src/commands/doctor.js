@@ -10,6 +10,8 @@ import { listSources } from '../core/sources.js';
 import { checkWorkIntegrity, checkWorkspaceIntegrity } from '../core/integrity.js';
 import { checkContextIntegrity } from '../context/integrity.js';
 import { describeAgentContractState, inspectAgentContract } from '../agent/contract.js';
+import { describeBootstrapState, inspectAllBootstraps } from '../agent/bootstrap.js';
+import { checkDeliveryIntegrity } from '../delivery/integrity.js';
 import { checkWorkRecordOwnership } from '../core/ownership.js';
 
 export async function doctorCommand() {
@@ -111,9 +113,27 @@ export async function collectDoctorReport(root) {
     checks.push([`lifecycle integrity: ${error instanceof Error ? error.message : String(error)}`, false]);
   }
 
+  // Work-delivery state (v0.3.8): requirement identity, convergence, and impact.
+  // Contradictions fail; evidence drift after convergence is a warning.
+  const deliveryWarnings = [];
+  try {
+    const work = await listWork(root);
+    let failed = false;
+    for (const item of work) {
+      const result = await checkDeliveryIntegrity(root, item);
+      for (const error of result.errors) checks.push([error, false]);
+      failed ||= result.errors.length > 0;
+      deliveryWarnings.push(...result.warnings);
+    }
+    if (!failed) checks.push([`delivery integrity (${work.length} work item(s) checked)`, true]);
+  } catch (error) {
+    checks.push([`delivery integrity: ${error instanceof Error ? error.message : String(error)}`, false]);
+  }
+
   // State ownership (v0.3.7): CLI-appended work.md lifecycle records must still match
   // the structured state they were written from. Informational — work.md is shared.
   const warnings = [];
+  warnings.push(...deliveryWarnings);
   try {
     for (const item of await listWork(root)) warnings.push(...(await checkWorkRecordOwnership(root, item)));
   } catch (error) {
@@ -138,6 +158,15 @@ export async function collectDoctorReport(root) {
     if (!['current', 'missing'].includes(agent.state)) warnings.push(`AGENT.md agent contract: ${describeAgentContractState(agent)}`);
   } catch (error) {
     warnings.push(`AGENT.md agent contract: ${error instanceof Error ? error.message : String(error)}`);
+  }
+  // Provider bootstrap blocks are project files; a stale or edited block is a
+  // warning, and a provider that was never set up is not reported at all.
+  try {
+    for (const bootstrap of await inspectAllBootstraps(root)) {
+      if (!['current', 'not-installed', 'shared'].includes(bootstrap.state)) warnings.push(`${bootstrap.file} agent bootstrap: ${describeBootstrapState(bootstrap)}`);
+    }
+  } catch (error) {
+    warnings.push(`agent bootstrap: ${error instanceof Error ? error.message : String(error)}`);
   }
 
   // Informational only: YallaFlow does not mandate a Git/team workflow, so an

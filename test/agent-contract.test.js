@@ -193,8 +193,8 @@ test('the installed CLI refuses to downgrade a newer contract', async () => {
 // Contract v3 (v0.3.7): legacy context reconciliation, state ownership, fresh-agent
 // brief. The fixture is the exact v2 managed block v0.3.6 generated (a YaSchools-style
 // workspace upgraded to v0.3.6), which must upgrade in place.
-test('agent contract v3 teaches reconciliation, immutable history, and state ownership', async () => {
-  assert.equal(AGENT_CONTRACT_VERSION, 3);
+test('agent contract (v3+) teaches reconciliation, immutable history, and state ownership', async () => {
+  assert.ok(AGENT_CONTRACT_VERSION >= 3);
   const body = agentContractBody();
   assert.match(body, /not canonical current truth until it is reconciled; migration is not reconciliation/);
   assert.match(body, /never on wording similarity alone; do not semantically merge facts/);
@@ -211,13 +211,42 @@ test('agent contract v3 teaches reconciliation, immutable history, and state own
   assert.match(body, /Relate a candidate to an existing CTX fact with reconfirms, supersedes, or disputes, never merge-with/);
 });
 
-test('a real v0.3.6 (v2) managed block upgrades to v3 in place and keeps project text', async () => {
+test('a real v0.3.6 (v2) managed block upgrades to the installed contract in place and keeps project text', async () => {
   const v2 = await fixture('v2-managed.md');
   assert.match(v2, /^<!-- yallaflow-agent-contract:begin version=2 /);
   const extra = '\n## YaSchools notes\n\nCodeception runs from the repository root.\n';
   const { root, file } = await workspaceWithAgent(`${v2}${extra}`);
-  assert.deepEqual(await inspectAgentContract(root), { state: 'outdated', installed: 3, version: 2 });
-  assert.match(run(root, ['doctor']).stdout, /WARN AGENT\.md agent contract: outdated \(v2 → v3\)/);
+  assert.deepEqual(await inspectAgentContract(root), { state: 'outdated', installed: AGENT_CONTRACT_VERSION, version: 2 });
+  assert.match(run(root, ['doctor']).stdout, new RegExp(`WARN AGENT\\.md agent contract: outdated \\(v2 → v${AGENT_CONTRACT_VERSION}\\)`));
+  run(root, ['agent', 'refresh']);
+  assert.equal(await readFile(file, 'utf8'), `${renderAgentContractBlock()}${extra}`);
+  assert.equal((await inspectAgentContract(root)).state, 'current');
+});
+
+// Contract v4 (v0.3.8): delivery convergence — requirement identity, evidence-backed
+// convergence (verification ≠ review ≠ convergence), change impact. The fixture is the
+// exact v3 managed block v0.3.7 generated, which must upgrade in place.
+test('agent contract v4 teaches requirement identity, convergence, and change impact', async () => {
+  assert.equal(AGENT_CONTRACT_VERSION, 4);
+  const body = agentContractBody();
+  assert.match(body, /## Delivery intent and convergence sequence/);
+  assert.match(body, /Verification asks whether the recorded technical checks pass; code review asks whether the implementation is technically acceptable; convergence asks whether the delivered implementation satisfies the approved requirements and acceptance criteria/);
+  assert.match(body, /yallaflow requirement record <work-id> --file <requirements\.json>/);
+  assert.match(body, /satisfied, partial, missing, or contradicts/);
+  assert.match(body, /accepted \(with a reason\) or removed/);
+  assert.match(body, /never invent intent the user did not express/);
+  assert.match(body, /yallaflow impact assess <work-id> --file <impact\.json>/);
+  assert.match(body, /work-delivery records, not project facts/);
+  for (const file of ['requirements.yaml', 'convergence.yaml', 'impact.yaml']) assert.ok(body.includes(file), `contract names CLI-owned ${file}`);
+});
+
+test('a real v0.3.7 (v3) managed block upgrades to v4 in place and keeps project text', async () => {
+  const v3 = await fixture('v3-managed.md');
+  assert.match(v3, /^<!-- yallaflow-agent-contract:begin version=3 /);
+  const extra = '\n## Project notes\n\nRun the PHP suite with composer test.\n';
+  const { root, file } = await workspaceWithAgent(`${v3}${extra}`);
+  assert.deepEqual(await inspectAgentContract(root), { state: 'outdated', installed: 4, version: 3 });
+  assert.match(run(root, ['upgrade', 'plan']).stdout, /Refresh the Agent Contract/);
   run(root, ['agent', 'refresh']);
   assert.equal(await readFile(file, 'utf8'), `${renderAgentContractBlock()}${extra}`);
   assert.equal((await inspectAgentContract(root)).state, 'current');

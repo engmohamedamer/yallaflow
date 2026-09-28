@@ -10,6 +10,8 @@ import path from 'node:path';
 import { workspacePath } from '../src/core/workspace.js';
 import { loadContextLedger, validateContextLedger } from '../src/context/ledger.js';
 import { exists } from '../src/utils/fs.js';
+import { REGISTRY_VERSION } from '../src/skills/constants.js';
+import { AGENT_CONTRACT_VERSION } from '../src/agent/contract.js';
 import { cli, legacyWorkspace, reconcile, snapshotWorkspace } from '../test-support/legacy-context.js';
 
 const FIXTURE = fileURLToPath(new URL('./fixtures/v0.3.6-workspace/', import.meta.url));
@@ -30,7 +32,7 @@ test('57. a v0.3.6 canonical ledger and its projection read unchanged; render re
     ['resume', 'PF-0002'], ['handoff', 'PF-0002'], ['guide', 'PF-0002'], ['upgrade', 'status'], ['upgrade', 'plan'], ['brief'], ['context', 'adopt', '--dry-run']]) cli(root, args);
   const doctor = cli(root, ['doctor']).stdout;
   assert.match(doctor, /Workspace healthy\./);
-  assert.match(doctor, /WARN AGENT\.md agent contract: outdated \(v2 → v3\)/);
+  assert.match(doctor, new RegExp(`WARN AGENT\\.md agent contract: outdated \\(v2 → v${AGENT_CONTRACT_VERSION}\\)`));
   assert.doesNotMatch(doctor, /FAIL/);
   cli(root, ['context', 'render']);
   assert.deepEqual(await snapshotWorkspace(root), before, 'reads and a re-render change nothing');
@@ -74,7 +76,7 @@ test('61. pinned registry-v3 Behavior Contracts keep working; direct commands st
   assert.equal(refused.status, 1);
   cli(root, ['feature', 'Export calendar', '--scope', 'bounded']);
   const created = JSON.parse(await readFile(path.join(workspacePath(root), 'work', 'PF-0003', 'meta.yaml'), 'utf8'));
-  assert.equal(created.behaviorContract.registryVersion, 4);
+  assert.equal(created.behaviorContract.registryVersion, REGISTRY_VERSION, 'new work pins the installed registry');
   assert.ok(!created.behaviorContract.skills.includes('context-reconciliation'));
 });
 

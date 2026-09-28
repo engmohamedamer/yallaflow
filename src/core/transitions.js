@@ -12,12 +12,16 @@ import { resolveBehaviorContract } from '../skills/resolver.js';
 import { WRITE_STAGES } from '../behavior/constants.js';
 import { SKILL_TO_GATE, resolveInteractionPolicy } from '../behavior/interaction.js';
 import { ensureGateRequested, gateStatus, invalidateGateIfApproved, loadReviews } from '../reviews/store.js';
-import { decompositionBlockers } from '../decomposition/store.js';
+import { decompositionBlockers, loadDecomposition } from '../decomposition/store.js';
+import { CONVERGENCE_SKILL } from '../delivery/constants.js';
+import { convergenceRequired } from '../delivery/policy.js';
+import { loadWorkImpacts, pendingImpact } from '../delivery/impact.js';
+import { evaluateConvergence } from '../delivery/convergence.js';
 
 // Skills whose revision/reopening invalidates completed work later in the chain (see
 // core/progress.js's CASCADE_ORDER and reopenWork below). Kept in one place so the
 // stage-correction resolver and reopen both mark the same freshness boundary.
-const CASCADE_CHAIN = Object.freeze(['implementation', 'verification', 'code-review']);
+const CASCADE_CHAIN = Object.freeze(['implementation', 'verification', 'delivery-convergence', 'code-review']);
 const REOPEN_TARGETS = Object.freeze(['implementation', 'verification', 'review']);
 
 export async function advanceActiveWork(root, requestedWorkId) {
@@ -82,6 +86,19 @@ export async function evaluateAdvance(root, meta, current, { mutate = false } = 
   }
 
   const progress = await loadWorkProgress(root, meta);
+  // A change of approved intent (new source, changed requirements) must be assessed
+  // before the work moves anywhere (v0.3.8).
+  const deliveryRequired = convergenceRequired(progress.contract);
+  if (deliveryRequired) {
+    const pending = pendingImpact((await loadWorkImpacts(root, meta)).ledger);
+    if (pending) {
+      return blocked(
+        `Cannot advance from ${current} to ${next}: impact ${pending.id} is pending. A change of approved intent must be assessed before the work continues.`,
+        `impact ${pending.id} is pending assessment`,
+        `yallaflow impact status ${id}   (then: yallaflow impact assess ${id} --file impact.json)`
+      );
+    }
+  }
   const questions = await loadWorkQuestions(root, meta);
   const blockers = await stageExitBlockers(root, meta, current, progress.contract, progress.ledger, questions.ledger, { mutate });
   if (blockers.length) {
@@ -133,6 +150,31 @@ export async function evaluateAdvance(root, meta, current, { mutate = false } = 
     }
   }
 
+  if (next === 'DONE' && deliveryRequired) {
+    const convergence = await evaluateConvergence(root, meta);
+    if (!convergence.converged) {
+      return blocked(
+        'Cannot transition to DONE: the delivered implementation has not converged on the approved intent.\n\nDONE blocked:\n' +
+        convergence.blockers.map((entry) => `- ${entry.text}`).join('\n') +
+        '\n\nNext valid action: resolve the convergence gaps and record a new convergence assessment.',
+        `convergence: ${convergence.blockers[0].text}${convergence.blockers.length > 1 ? ` (+${convergence.blockers.length - 1} more)` : ''}`,
+        `yallaflow convergence status ${id}   (then: yallaflow convergence record ${id} --file convergence.json)`
+      );
+    }
+    if (progress.ledger.skills[CONVERGENCE_SKILL]?.status !== 'completed') {
+      return blocked(`Cannot transition to DONE until the ${CONVERGENCE_SKILL} checkpoint is completed.`, `${CONVERGENCE_SKILL} checkpoint is incomplete`, checkpointAction(id, CONVERGENCE_SKILL));
+    }
+    // An impact assessment can reopen an earlier checkpoint without moving the stage
+    // (bounded work has no stage per checkpoint): DONE requires the whole pinned
+    // contract to be complete again. A decomposed parent's implementation is its children.
+    const decomposition = await loadDecomposition(root, id);
+    const decomposed = decomposition.exists && ['executing', 'complete'].includes(decomposition.ledger.status);
+    const incomplete = progress.contract.skills.filter((skill) => progress.ledger.skills[skill]?.status !== 'completed' && !(decomposed && skill === 'implementation'));
+    if (incomplete.length) {
+      return blocked(`Cannot transition to DONE; checkpoint(s) reopened since they were completed: ${incomplete.join(', ')}.`, `checkpoint(s) incomplete: ${incomplete.join(', ')}`, checkpointAction(id, incomplete[0]));
+    }
+  }
+
   if (next === 'DONE' && progress.contract.skills.includes('code-review') && progress.ledger.skills['code-review']?.status !== 'completed') {
     return blocked('Cannot transition to DONE until the code-review checkpoint is completed.', 'code-review checkpoint is incomplete', checkpointAction(id, 'code-review'));
   }
@@ -178,8 +220,13 @@ export async function reconcileStageAfterCheckpointRevision(root, meta, skillId,
   const currentIndex = stages.indexOf(meta.status);
   const targetIndex = targetStage ? stages.indexOf(targetStage) : -1;
   const needsStageCorrection = Boolean(targetStage) && currentIndex >= 0 && currentIndex > targetIndex;
-  const marksInvalidation = CASCADE_CHAIN.includes(skillId);
-  if (!needsStageCorrection && !marksInvalidation) return null;
+  // Revising delivery-convergence re-opens the intent assessment only: verification
+  // evidence stays valid, so it does not move the verification freshness boundary.
+  const marksInvalidation = CASCADE_CHAIN.includes(skillId) && skillId !== 'delivery-convergence';
+  if (!needsStageCorrection && !marksInvalidation) {
+    if (CASCADE_CHAIN.includes(skillId)) await invalidateAffectedGates(root, meta.id, skillId, reason ?? `${skillId} revised`, now);
+    return null;
+  }
 
   const base = workspacePath(root);
   const from = meta.status;
@@ -239,7 +286,7 @@ export async function reopenWork(root, workId, input, now = new Date().toISOStri
   const progress = await loadWorkProgress(root, meta);
   const ledger = progress.ledger;
   const reason = input.reason.trim();
-  const targetIndex = { implementation: 0, verification: 1, review: 2 }[input.toStage];
+  const targetIndex = CASCADE_CHAIN.indexOf({ implementation: 'implementation', verification: 'verification', review: 'code-review' }[input.toStage]);
 
   CASCADE_CHAIN.forEach((skillId, index) => {
     if (index < targetIndex || !contract.skills.includes(skillId)) return;
@@ -280,7 +327,10 @@ export async function reopenWork(root, workId, input, now = new Date().toISOStri
   const from = meta.status;
   meta.status = targetStage;
   meta.updatedAt = now;
-  meta.lastInvalidationAt = now;
+  // Reopening for review re-reviews what was already implemented and verified: it does
+  // not move the verification freshness boundary (v0.3.8; earlier it did, which left
+  // completed verification and convergence contradicting doctor).
+  if (input.toStage !== 'review') meta.lastInvalidationAt = now;
   meta.lifecycleHistory = [...(meta.lifecycleHistory ?? []), {
     action: 'reopen', fromStage: from, toStage: targetStage, reason, changedAt: now
   }];

@@ -9,6 +9,7 @@ import { evaluateReadiness } from '../behavior/readiness.js';
 import { loadWorkQuestions } from '../questions/store.js';
 import { formatSourceList } from '../intake/normalize.js';
 import { evaluateAdvance } from '../core/transitions.js';
+import { loadDeliverySummary } from '../delivery/summary.js';
 
 export async function guideCommand(requestedWorkId) {
   const root = await findProjectRoot();
@@ -31,7 +32,8 @@ export async function guideCommand(requestedWorkId) {
 
   const stage = workId === state.activeWork ? state.stage : meta.status;
   const progress = await loadWorkProgress(root, meta);
-  const result = buildBehaviorGuidance(meta, stage, progress.ledger);
+  const delivery = await loadDeliverySummary(root, meta);
+  const result = buildBehaviorGuidance(meta, stage, progress.ledger, delivery);
   const questions = await loadWorkQuestions(root, meta);
   const readiness = evaluateReadiness(meta, progress, questions);
   const knowledge = await loadWorkKnowledge(root, meta);
@@ -58,10 +60,13 @@ export async function guideCommand(requestedWorkId) {
     console.log(`\nProject knowledge review: ${knowledgeSummary.reviewStatus.toUpperCase()}`);
   }
   printOpenQuestions(readiness.questions);
+  if (delivery.lines.length) console.log(`\n${delivery.lines.join('\n')}`);
   console.log(`\nApplication code modification: ${result.modification.authorized ? 'AUTHORIZED' : 'NOT AUTHORIZED'}`);
   console.log(`Reason: ${result.modification.reason}`);
   const atCompletionStage = isKnowledgeReviewStage(meta, stage);
-  const nextObjective = readiness.questions.materialOpen.length && ['specification', 'implementation-planning'].includes(result.progress.current?.skillId)
+  const nextObjective = delivery.pendingImpact
+    ? result.nextObjective
+    : readiness.questions.materialOpen.length && ['specification', 'implementation-planning'].includes(result.progress.current?.skillId)
     ? `Resolve ${readiness.questions.materialOpen.length} material open decision(s) before completing ${result.progress.current.skillId}.`
     : knowledgeRelevant && knowledgeSummary.reviewStatus === 'pending'
     ? 'Review completed work for durable project knowledge.'

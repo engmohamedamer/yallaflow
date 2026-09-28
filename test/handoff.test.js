@@ -11,6 +11,7 @@ import { advanceActiveWork } from '../src/core/transitions.js';
 import { recordVerification } from '../src/core/evidence.js';
 import { reviewKnowledgeNone } from '../src/knowledge/store.js';
 import { initWorkspace, workspacePath } from '../src/core/workspace.js';
+import { ensureIntentFor, pinRegistryV4Contract } from '../test-support/delivery.js';
 import { readYaml } from '../src/core/yaml.js';
 import { executeDecomposition, proposeDecomposition, validateDecomposition } from '../src/decomposition/store.js';
 
@@ -27,6 +28,7 @@ async function routedWork(workType = 'bug', scope = 'bounded') {
 }
 
 async function complete(root, workId, skillId, evidence = []) {
+  await ensureIntentFor(root, workId, skillId);
   return checkpointWork(root, workId, { skillId, status: 'completed', summary: `${skillId} completed.`, evidence });
 }
 
@@ -87,6 +89,9 @@ test('parent handoff includes child progress, dependencies, and traceability gap
   await initWorkspace(root, 'demo', 'greenfield', 'autonomous');
   const intake = await createPendingIntake(root, 'Nice Day Contract Hub');
   const meta = await routeWorkItem(root, intake.id, { work_type: 'feature', scope: 'architectural', confidence: 'high', reason: 'r' });
+  // Free-form traceability labels (FR-01) are the model for parents without a
+  // requirements ledger: a v0.3.7-routed (Registry v4) parent.
+  await pinRegistryV4Contract(root, meta.id);
   await complete(root, meta.id, 'context-discovery');
   await advanceActiveWork(root);
   await complete(root, meta.id, 'requirement-clarification');

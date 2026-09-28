@@ -7,6 +7,11 @@ import { latestVerification } from './evidence.js';
 import { readYaml, writeYaml } from './yaml.js';
 import { workspacePath } from './workspace.js';
 import { loadWorkQuestions, summarizeQuestions } from '../questions/store.js';
+import { CONVERGENCE_SKILL } from '../delivery/constants.js';
+import { convergenceRequired, intentSkill } from '../delivery/policy.js';
+import { intentCheckpointBlocker } from '../delivery/requirements.js';
+import { loadWorkImpacts, pendingImpact, pendingImpactMessage } from '../delivery/impact.js';
+import { evaluateConvergence } from '../delivery/convergence.js';
 
 export const SKILL_STATUSES = Object.freeze(['pending', 'in_progress', 'completed', 'blocked']);
 
@@ -14,7 +19,7 @@ export const SKILL_STATUSES = Object.freeze(['pending', 'in_progress', 'complete
 // work on later links (they were built on top of what just changed), but never the
 // other way around, and pre-implementation design/spec checkpoints are deliberately
 // outside this chain (see reconcileStageAfterCheckpointRevision's stage-only handling).
-const CASCADE_ORDER = Object.freeze(['implementation', 'verification', 'code-review']);
+const CASCADE_ORDER = Object.freeze(['implementation', 'verification', 'delivery-convergence', 'code-review']);
 
 const LEDGER_FIELDS = new Set(['schemaVersion', 'behavior', 'skills', 'rulings', 'history', 'updatedAt']);
 const CHECKPOINT_FIELDS = new Set(['status', 'startedAt', 'completedAt', 'summary', 'evidence']);
@@ -298,6 +303,9 @@ async function applySkillCheckpoint(root, meta, contract, ledger, input, now) {
   if (input.status === 'completed' && input.skillId === 'code-review' && ledger.skills.verification?.status !== 'completed') {
     throw new Error('Cannot complete code-review; complete the verification checkpoint first.');
   }
+  if (input.status === 'completed' && convergenceRequired(contract)) {
+    await assertDeliveryCheckpoint(root, meta, contract, input.skillId);
+  }
 
   const next = { status: input.status };
   if (current.startedAt || ['in_progress', 'completed', 'blocked'].includes(input.status)) next.startedAt = current.startedAt ?? now;
@@ -307,6 +315,29 @@ async function applySkillCheckpoint(root, meta, contract, ledger, input, now) {
   if (evidence.length && input.status !== 'pending') next.evidence = evidence;
   ledger.skills[input.skillId] = next;
   return { value: next, unchanged: false };
+}
+
+// Delivery-convergence contracts (Skill Registry v5+): no checkpoint completes while
+// a change of intent awaits its impact assessment; the intent checkpoint requires
+// recorded acceptance criteria; the convergence checkpoint requires every active
+// criterion to be currently satisfied and no open unrequested behavior.
+async function assertDeliveryCheckpoint(root, meta, contract, skillId) {
+  const pending = pendingImpact((await loadWorkImpacts(root, meta)).ledger);
+  if (pending) throw new Error(`Cannot complete ${skillId}. ${pendingImpactMessage(meta.id, pending)}`);
+  if (skillId === intentSkill(contract)) {
+    const blocker = await intentCheckpointBlocker(root, meta);
+    if (blocker) throw new Error(`Cannot complete ${skillId}; this work's approved intent must carry structured acceptance criteria: ${blocker}.`);
+  }
+  if (skillId === CONVERGENCE_SKILL) {
+    const convergence = await evaluateConvergence(root, meta);
+    if (!convergence.converged) {
+      throw new Error(
+        `Cannot complete ${CONVERGENCE_SKILL}; the delivered implementation has not converged on the approved intent:\n` +
+        convergence.blockers.map((entry) => `- ${entry.text}`).join('\n') +
+        `\n\nResolve the gaps, then record a new assessment: yallaflow convergence record ${meta.id} --file convergence.json`
+      );
+    }
+  }
 }
 
 function applyRuling(ledger, ruling, now) {

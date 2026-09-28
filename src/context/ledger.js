@@ -1,6 +1,5 @@
 import path from 'node:path';
-import { rename, writeFile } from 'node:fs/promises';
-import { ensureDir, exists } from '../utils/fs.js';
+import { exists, writeTextAtomic } from '../utils/fs.js';
 import { readYaml } from '../core/yaml.js';
 import { workspacePath } from '../core/workspace.js';
 import { gitHead } from '../core/git.js';
@@ -174,11 +173,7 @@ function renameKey(object, from, to, value) {
 }
 
 async function writeLedgerAtomically(root, ledger) {
-  const file = contextLedgerPath(root);
-  await ensureDir(path.dirname(file));
-  const temporary = `${file}.${process.pid}.tmp`;
-  await writeFile(temporary, `${JSON.stringify(ledger, null, 2)}\n`, 'utf8');
-  await rename(temporary, file);
+  await writeTextAtomic(contextLedgerPath(root), `${JSON.stringify(ledger, null, 2)}\n`);
 }
 
 // Every historical origin a fact carries, introducing origin first: `origins` (schema

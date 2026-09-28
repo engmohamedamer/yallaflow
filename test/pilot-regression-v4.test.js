@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import os from 'node:os';
 import path from 'node:path';
 import { workspacePath } from '../src/core/workspace.js';
+import { MINIMAL_INTENT, cliConvergeAll, cliRecordIntent } from '../test-support/delivery.js';
 import { exists } from '../src/utils/fs.js';
 
 const cli = fileURLToPath(new URL('../src/cli.js', import.meta.url));
@@ -165,6 +166,7 @@ test('Scenario 4 — new bounded task: no empty artifact directories; first veri
   assert.deepEqual((await readdir(dir)).sort(), ['meta.yaml', 'progress.md', 'work.md']);
 
   run(root, ['checkpoint', workId, '--skill', 'context-discovery', '--complete', '--summary', 'Reused durable database context.']);
+  await cliRecordIntent(root, workId, MINIMAL_INTENT, run);
   run(root, ['checkpoint', workId, '--skill', 'requirement-clarification', '--complete', '--summary', 'No open questions.']);
   for (let i = 0; i < 5; i++) run(root, ['advance', workId]);
   run(root, ['checkpoint', workId, '--skill', 'implementation', '--complete', '--summary', 'Implemented.']);
@@ -174,6 +176,7 @@ test('Scenario 4 — new bounded task: no empty artifact directories; first veri
   assert.equal(await exists(path.join(dir, 'evidence', 'verification.json')), true);
   for (const lazy of ['attachments', 'execution']) assert.equal(await exists(path.join(dir, lazy)), false);
   run(root, ['checkpoint', workId, '--skill', 'verification', '--complete', '--summary', 'Verified.']);
+  await cliConvergeAll(root, workId, { run });
   run(root, ['knowledge', 'review', workId, '--none']);
   assert.match(run(root, ['advance', workId]).stdout, /→ DONE/);
 });

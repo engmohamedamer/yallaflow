@@ -10,9 +10,12 @@ This guide explains each YallaFlow capability in depth. For end-to-end sequences
 - [Reopening completed work](#reopening-completed-work)
 - [Structured questions](#structured-questions)
 - [Delivery readiness](#delivery-readiness)
+- [Requirement identity and delivery convergence](#requirement-identity-and-delivery-convergence)
+- [Change impact](#change-impact)
 - [Interaction modes and review gates](#interaction-modes-and-review-gates)
 - [Work decomposition](#work-decomposition)
 - [Agent handoff](#agent-handoff)
+- [Agent bootstrap (Codex, Claude)](#agent-bootstrap-codex-claude)
 - [Brownfield bootstrap and baseline](#brownfield-bootstrap-and-baseline)
 - [Project knowledge promotion](#project-knowledge-promotion)
 - [Work lifecycle](#work-lifecycle)
@@ -117,7 +120,7 @@ Corrections are explicit and audited, never hand edits:
 yallaflow checkpoint revise PF-0001 --skill specification --status blocked --reason "Material business decisions remain unresolved."
 ```
 
-`revise` accepts `pending`, `in_progress`, or `blocked`, requires `--reason`, appends history, walks the stage back if needed, resets dependent `verification`/`code-review` checkpoints, and marks a freshness boundary that later verification must postdate. It is refused on DONE work (use `reopen`).
+`revise` accepts `pending`, `in_progress`, or `blocked`, requires `--reason`, appends history, walks the stage back if needed, resets dependent `verification`/`delivery-convergence`/`code-review` checkpoints, and marks a freshness boundary that later verification must postdate. It is refused on DONE work (use `reopen`).
 
 A **ruling** is a task-local decision in the progress ledger; an **ADR** is a long-lived decision under `decisions/`. A decision candidate can be seeded from a ruling with `--from-ruling`; the ruling is not changed.
 
@@ -148,7 +151,7 @@ yallaflow reopen PF-0001 --to verification --reason "A regression surfaced downs
 yallaflow reopen PF-0001 --to review --reason "A second reviewer is required."
 ```
 
-Reopen requires DONE work, reactivates it at the matching stage, resets downstream checkpoints (and knowledge review when reopening to implementation), and appends to `meta.lifecycleHistory`. Evidence, checkpoint history, and knowledge candidates are never deleted. Fresh verification is required again; reaching DONE again adds a second `completionHistory` entry. Workflows without an implementation or verification stage (investigations) cannot be reopened.
+Reopen requires DONE work, reactivates it at the matching stage, resets downstream checkpoints (including `delivery-convergence` when reopening to implementation or verification, whose findings then become stale; and knowledge review when reopening to implementation), and appends to `meta.lifecycleHistory`. Evidence, checkpoint history, and knowledge candidates are never deleted. After a reopen to implementation or verification, fresh verification is required again (a reopen to review keeps the existing verification and convergence current); reaching DONE again adds a second `completionHistory` entry. Workflows without an implementation or verification stage (investigations) cannot be reopened.
 
 ## Structured questions
 
@@ -169,6 +172,59 @@ Questions (`business` or `architecture`; `open`, `proposed`, `answered`, `resolv
 > **Stage describes where work is. Readiness describes which deliverable is ready.**
 
 `yallaflow ready [work-id]` reports `SPEC_READY` (specification complete enough for review), `PLAN_READY` (specification and plan ready to hand off), or `DONE`. Reaching `PLAN_READY` never authorizes or starts implementation; the stage and the Behavior Contract still govern writes.
+
+## Requirement identity and delivery convergence
+
+> **Passing tests does not prove that the delivered implementation matches the approved intent.**
+
+| Question | Answered by |
+|---|---|
+| Do the recorded technical checks pass? | **Verification** (`yallaflow verify`) |
+| Is the implementation technically acceptable? | **Review** (`code-review`) |
+| Does the delivered implementation satisfy the approved requirements and acceptance criteria? | **Convergence** (`yallaflow convergence`) |
+
+The Agent determines semantic meaning; YallaFlow validates and records it.
+
+**Where it applies.** Work whose pinned Behavior Contract includes the `delivery-convergence` skill: `feature` (bounded and architectural) and `change` architectural, routed on Skill Registry v5+. Bounded changes, bugs, refactors, releases, investigations, and older work never get this ceremony. `yallaflow guide` shows whether it applies.
+
+**Requirement identity.** Before completing the intent checkpoint (`specification`, or `requirement-clarification` when there is no specification), the Agent extracts the approved intent as `REQ-###` requirements and `AC-###` acceptance criteria and records them with `yallaflow requirement record <work-id> --file requirements.json`. Each carries a short statement and provenance — the request, a specification section, a linked source, or an answered question — and a status (`active`, `withdrawn`, `deferred`; the last two need a reason and stay visible). IDs are never reused; revisions keep the previous content in history. The approved specification stays authoritative; the ledger only identifies what implementation must prove. `yallaflow requirement list|show` reads it.
+
+**Convergence.** Once the verification checkpoint is completed, the Agent inspects the implementation against every active criterion and records one finding each with a reason and evidence:
+
+| Finding | Meaning |
+|---|---|
+| `satisfied` | Implemented, and the cited evidence demonstrates it (needs more than free-text references) |
+| `partial` | Some, but not all, of the criterion is implemented |
+| `missing` | Not implemented |
+| `contradicts` | The implementation behaves contrary to the criterion |
+
+Behavior that no criterion requested is recorded separately as unrequested (`UR-###`) and must be resolved: `accepted` with a reason (a deliberate addition) or `removed`. An open `UR-###` blocks DONE; accepted items stay in history — *requested and satisfied* is not the same as *not requested but deliberately accepted*.
+
+Assessments (`CV-###`) are append-only; the current state of each criterion is its latest finding. A finding becomes **stale** — its history stays, its current reliability does not — when the work is reopened or revised after it, its criterion is revised, an impact assessment invalidates convergence, or a repository file it cites changes. DONE requires the `delivery-convergence` checkpoint and every active criterion currently satisfied:
+
+```text
+DONE blocked:
+- AC-003 → partial
+- AC-007 → missing
+- AC-011 → stale (evidence src/Services/PaymentService.php changed since CV-002)
+
+Next valid action: resolve the convergence gaps and record a new convergence assessment.
+```
+
+If a DONE item's cited evidence later changes, DONE is not rewritten: `doctor` and `handoff` report the convergence as no longer current, and a reopen revalidates it.
+
+**Decomposition.** When a parent owns a requirements ledger, children reference its IDs (`"acceptanceCriteria": ["AC-004"]`, or `PF-0001/AC-004`), `decompose propose` refuses references the ledger does not contain, and the coverage universe is the ledger's active set. A feature child answers for the criteria assigned to it (read from the parent, never copied), and the parent cannot withdraw or defer such a criterion while that child is not DONE. The parent's final convergence can cite a direct child's assessment as `convergence:PF-0007/CV-002` — only one that recorded that criterion as satisfied, and it goes stale whenever the child's current finding does — and must assess any criterion no child owned.
+
+## Change impact
+
+When approved intent changes on in-flight work once it is fixed — the intent checkpoint completed, or any later checkpoint already started (revising the intent checkpoint back does not reopen intent for free changes) — a source attached with `intake add`, or requirements changed with `requirement record` — YallaFlow raises a pending impact (`IM-###`). It does not judge what the change means. Until the Agent assesses it, `advance`, checkpoint completion, and `convergence record` are refused and code changes are not authorized.
+
+```bash
+yallaflow impact status PF-0001                   # triggers and the completed stages that need a verdict
+yallaflow impact assess PF-0001 --file impact.json
+```
+
+The Agent marks each completed stage `affected` or `unaffected`, each with a reason. YallaFlow checks only mechanical consequences — an affected post-implementation stage makes every later one affected; any affected stage, or a changed acceptance criterion, makes convergence affected — and then revises the affected checkpoints through the same audited path as `checkpoint revise`: history entries, stage correction to the earliest affected stage, review-gate invalidation, and a verification freshness boundary. Verification runs, reviews, and convergence assessments are never deleted; they become stale. Unaffected stages keep their completed checkpoints.
 
 ## Interaction modes and review gates
 
@@ -202,15 +258,14 @@ yallaflow next PF-0001                 # dependency-unblocked children; never pi
 {
   "children": [
     { "key": "foundation", "title": "Foundation & Authentication", "type": "feature", "scope": "bounded",
-      "required": true, "requirements": ["FR-01"], "acceptanceCriteria": ["AC-01"] },
+      "required": true, "requirements": ["REQ-001"], "acceptanceCriteria": ["AC-001", "AC-002"] },
     { "key": "signing", "title": "Customer Signing", "type": "feature", "scope": "bounded",
-      "requirements": ["FR-02"], "dependsOn": ["foundation"] }
-  ],
-  "requirementsUniverse": ["FR-01", "FR-02", "FR-03"]
+      "requirements": ["REQ-002"], "acceptanceCriteria": ["AC-003"], "dependsOn": ["foundation"] }
+  ]
 }
 ```
 
-The file is agent-supplied; YallaFlow never splits requirements semantically. Validation rejects self-dependencies, unknown keys, and cycles, and reports traceability (cross-cutting and unassigned requirements). `execute` creates one fully routed child per entry — each with its own contract, checkpoints, verification, and knowledge review. The parent's implementation gate becomes "every required child is DONE"; its verification, code-review, and knowledge stages remain.
+The file is agent-supplied; YallaFlow never splits requirements semantically. Validation rejects self-dependencies, unknown keys, and cycles, and reports traceability (cross-cutting and unassigned requirements). When the parent has a requirements ledger (v0.3.8), references must resolve against it and the universe is its active set; a parent without one (work routed before v0.3.8, or contracts without delivery convergence) keeps free-form labels with an optional declared `requirementsUniverse`/`acceptanceCriteriaUniverse`. `execute` creates one fully routed child per entry — each with its own contract, checkpoints, verification, and knowledge review. The parent's implementation gate becomes "every required child is DONE"; its verification, code-review, and knowledge stages remain.
 
 ## Agent handoff
 
@@ -220,11 +275,24 @@ The file is agent-supplied; YallaFlow never splits requirements semantically. Va
 yallaflow handoff PF-0004
 ```
 
-`handoff` is a read-only, compact report for another agent or session: title/parent, type/scope/stage/readiness, completed/pending/blocked skills, open questions, review gates, latest verification, knowledge review, Git summary, write authorization, relevant project context (stale/disputed facts), linked sources with their paths, discovery limitations, and the next objective. For a decomposed parent it adds child counts, executable candidates, and traceability gaps.
+`handoff` is a read-only, compact report for another agent or session: title/parent, type/scope/stage/readiness, completed/pending/blocked skills, open questions, review gates, latest verification, the delivery block (requirement/criteria counts, convergence counts, blocking criteria, open unrequested behavior, pending impact), knowledge review, Git summary, write authorization, relevant project context (stale/disputed facts), linked sources with their paths, discovery limitations, and the next objective. For a decomposed parent it adds child counts, executable candidates, and traceability gaps.
 
-`handoff` and `resume` lead with a **PRIMARY UNRESOLVED OBJECTIVE** when one exists — the latest reopen reason, checkpoint-revision reason, or write blocker. A child reaching DONE is never reported as project completion. A dirty Git tree at a DONE boundary is noted, never enforced; YallaFlow never commits.
+`handoff` and `resume` lead with a **PRIMARY UNRESOLVED OBJECTIVE** when one exists — a pending impact assessment, otherwise the latest reopen reason, checkpoint-revision reason, or write blocker. A child reaching DONE is never reported as project completion. A dirty Git tree at a DONE boundary is noted, never enforced; YallaFlow never commits.
 
 `resume` answers *what should I continue*, `guide` *which behavior applies now*, `handoff` *complete context for someone else* — all from the same resolvers.
+
+## Agent bootstrap (Codex, Claude)
+
+A cold agent session should find YallaFlow without the developer explaining it again. `.yallaflow/AGENT.md` remains the one behavioral contract; provider files only point to it.
+
+```bash
+yallaflow agent setup codex     # repository-root AGENTS.md
+yallaflow agent setup claude    # repository-root CLAUDE.md (imports @.yallaflow/AGENT.md)
+yallaflow agent status
+yallaflow agent refresh
+```
+
+`agent setup` appends one versioned, hash-checked block holding the session-start sequence — confirm `.yallaflow/` exists, follow AGENT.md, run `yallaflow brief`, `resume`/`handoff` the active work, `guide` for the next valid action, follow the pinned contract, record through YallaFlow commands. Existing file content is kept byte-for-byte. Setup is idempotent and supports `--dry-run`; a hand-edited block is refused unless `--preserve-existing`; a block from a newer YallaFlow is never downgraded. `agent status`, `brief`, `upgrade plan`, and `doctor` (as a warning) report outdated or edited blocks; `agent refresh` updates only unmodified, outdated ones. No provider file is written unless you run `agent setup`.
 
 ## Brownfield bootstrap and baseline
 
@@ -280,8 +348,8 @@ Work progress ≠ project knowledge        Ruling ≠ ADR
 
 ## Work lifecycle
 
-A work item stores intake, facts, questions, evidence, a scope-appropriate specification, a plan where required, verification, rulings, knowledge updates, and the result. Bugs are root-cause-first. Investigations are read-only and have no implementation stage. Architectural work gets the design → specification → planning path.
+A work item stores intake, facts, questions, evidence, a scope-appropriate specification, a plan where required, verification, rulings, knowledge updates, and the result — and, for feature work and architectural changes, its structured intent (requirements, acceptance criteria), convergence assessments, and impact assessments. Bugs are root-cause-first. Investigations are read-only and have no implementation stage. Architectural work gets the design → specification → planning path.
 
 ## Compatibility with older workspaces
 
-Reads never migrate or create files. Older work keeps loading: v0.1 contract-less items (also those created by pre-v0.3.6 direct commands) keep their stage-only behavior; v0.2.1 capabilities derive an unpinned contract; v0.2.2 contracts without `progress.yaml` show all skills pending; v0.2.3 work has no required knowledge policy; registry-v1 work keeps its contract. A legacy `.projectflow/` workspace is not migrated — `yallaflow init` stops with a message instead of creating a parallel workspace, and it refuses to reinitialize over a Git-tracked `.yallaflow` missing from the working tree. For the v0.3.5 → v0.3.6 upgrade see [`upgrading-to-v0.3.6.md`](upgrading-to-v0.3.6.md); for v0.3.7 (reconciling legacy context, `upgrade status`, `brief`) see [`upgrading-to-v0.3.7.md`](upgrading-to-v0.3.7.md).
+Reads never migrate or create files. Older work keeps loading: v0.1 contract-less items (also those created by pre-v0.3.6 direct commands) keep their stage-only behavior; v0.2.1 capabilities derive an unpinned contract; v0.2.2 contracts without `progress.yaml` show all skills pending; v0.2.3 work has no required knowledge policy; registry-v1 work keeps its contract. A legacy `.projectflow/` workspace is not migrated — `yallaflow init` stops with a message instead of creating a parallel workspace, and it refuses to reinitialize over a Git-tracked `.yallaflow` missing from the working tree. For the v0.3.5 → v0.3.6 upgrade see [`upgrading-to-v0.3.6.md`](upgrading-to-v0.3.6.md); for v0.3.7 (reconciling legacy context, `upgrade status`, `brief`) see [`upgrading-to-v0.3.7.md`](upgrading-to-v0.3.7.md); for v0.3.8 (delivery convergence, agent bootstrap) see [`upgrading-to-v0.3.8.md`](upgrading-to-v0.3.8.md). Work routed before v0.3.8 keeps its pinned registry ≤ v4 contract and never acquires requirement, convergence, or impact gates.

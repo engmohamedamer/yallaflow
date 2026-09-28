@@ -1,6 +1,6 @@
 # Releasing
 
-YallaFlow has not yet made a public npm release (`package.json` remains `"private": true`; current internal prerelease `0.3.7-internal.1`). This document defines the release policy the project will follow once publishing begins, and the checklist a maintainer runs before cutting a release.
+YallaFlow has not yet made a public npm release (`package.json` remains `"private": true`; current internal prerelease `0.3.8-internal.1`). This document defines the release policy the project will follow once publishing begins, and the checklist a maintainer runs before cutting a release.
 
 ## Versioning model
 
@@ -11,8 +11,8 @@ YallaFlow tracks **five independent version numbers**. They are not tied togethe
 | **Package version** | `package.json` `version` | The published npm package (CLI + built-in skill instructions + docs). What a consumer `npm install`s. |
 | **Skill Registry version** | `src/skills/constants.js` (`REGISTRY_VERSION`) | The set and shape of built-in skills, their capabilities, prerequisites, and modes. Pinned into every routed work item's Behavior Contract. |
 | **Knowledge policy version** | `src/knowledge/constants.js` (`KNOWLEDGE_POLICY_VERSION`) | Whether knowledge review is required before `DONE`, and how it is evaluated. Pinned into new work items' `meta.yaml`. |
-| **Agent contract version** | `src/agent/contract.js` (`AGENT_CONTRACT_VERSION`) | The YallaFlow-managed guidance block in each workspace's `AGENT.md`. Existing workspaces are told (never forced) to refresh with `yallaflow agent refresh`. |
-| **Workspace/schema version** | `schemaVersion` fields in `config.yaml`, `state/current.yaml`, `progress.yaml`, `knowledge.yaml`, `questions.yaml`, `context/index.yaml`, `discovery.yaml`, `baseline.yaml`, `source.json` | The on-disk shape of each durable file. |
+| **Agent contract version** | `src/agent/contract.js` (`AGENT_CONTRACT_VERSION`) | The YallaFlow-managed guidance block in each workspace's `AGENT.md`. Existing workspaces are told (never forced) to refresh with `yallaflow agent refresh`. The provider bootstrap block (`src/agent/bootstrap.js`, `BOOTSTRAP_VERSION`) in `AGENTS.md`/`CLAUDE.md` is versioned the same way. |
+| **Workspace/schema version** | `schemaVersion` fields in `config.yaml`, `state/current.yaml`, `progress.yaml`, `knowledge.yaml`, `questions.yaml`, `context/index.yaml`, `discovery.yaml`, `baseline.yaml`, `requirements.yaml`, `convergence.yaml`, `impact.yaml`, `source.json` | The on-disk shape of each durable file. |
 
 A package release can ship without bumping the registry, policy, or schema versions (pure CLI/doc changes). Conversely, bumping the registry version (e.g. adding a new skill to the architectural chain) is a behavior-contract change that deserves its own changelog entry regardless of the package version it ships in. **Never infer one version from another.**
 

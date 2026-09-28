@@ -14,6 +14,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { initWorkspace, workspacePath } from '../src/core/workspace.js';
 import { readYaml } from '../src/core/yaml.js';
+import { cliConvergeAll, cliRecordIntent } from '../test-support/delivery.js';
 
 const cli = fileURLToPath(new URL('../src/cli.js', import.meta.url));
 
@@ -23,7 +24,7 @@ function run(root, args) {
   return result;
 }
 
-async function completeBoundedFeatureChild(root, workId) {
+async function completeBoundedFeatureChild(root, workId, assigned) {
   run(root, ['checkpoint', workId, '--skill', 'context-discovery', '--complete', '--summary', 'Discovered.']);
   run(root, ['checkpoint', workId, '--skill', 'requirement-clarification', '--complete', '--summary', 'Clarified.']);
   for (let index = 0; index < 5; index++) run(root, ['advance', workId]); // -> IMPLEMENTATION
@@ -31,6 +32,8 @@ async function completeBoundedFeatureChild(root, workId) {
   run(root, ['advance', workId]); // -> VERIFICATION
   run(root, ['verify', workId, '--', 'true']);
   run(root, ['checkpoint', workId, '--skill', 'verification', '--complete', '--summary', 'Verified.']);
+  // v0.3.8: the child answers for the parent's acceptance criteria assigned to it.
+  await cliConvergeAll(root, workId, { criteria: assigned, run });
   run(root, ['knowledge', 'review', workId, '--none']);
   const result = run(root, ['advance', workId]); // -> DONE
   assert.match(result.stdout, /→ DONE/);
@@ -50,6 +53,16 @@ test('pilot regression v2: SPEC_READY -> review -> PLAN_READY -> review -> decom
   run(root, ['advance', workId]); // -> CLARIFICATION
   run(root, ['checkpoint', workId, '--skill', 'design-exploration', '--complete', '--summary', 'Designed.']);
   run(root, ['advance', workId]); // -> DESIGN
+  // v0.3.8: the specification's requirements and acceptance criteria get stable identity.
+  const specification = (id, statement) => ({ id, statement, provenance: [{ type: 'specification', section: 'Functional requirements' }] });
+  await cliRecordIntent(root, workId, {
+    requirements: [specification('REQ-001', 'Staff authenticate.'), specification('REQ-002', 'Customers sign contracts.'), specification('REQ-003', 'Contracts are archived.')],
+    acceptanceCriteria: [
+      { ...specification('AC-001', 'Login succeeds with valid credentials.'), requirement: 'REQ-001' },
+      { ...specification('AC-002', 'A signed contract is stored with its signature.'), requirement: 'REQ-002' },
+      { ...specification('AC-003', 'An archived contract is read-only.'), requirement: 'REQ-003' }
+    ]
+  }, run);
   run(root, ['checkpoint', workId, '--skill', 'specification', '--complete', '--summary', 'Specified.']);
   run(root, ['advance', workId]); // -> SPECIFICATION (SPEC_READY)
 
@@ -68,11 +81,9 @@ test('pilot regression v2: SPEC_READY -> review -> PLAN_READY -> review -> decom
   const decompositionFile = path.join(root, 'decomposition.json');
   await writeFile(decompositionFile, JSON.stringify({
     children: [
-      { key: 'foundation', title: 'Foundation & Authentication', type: 'feature', scope: 'bounded', required: true, requirements: ['FR-01'], acceptanceCriteria: ['AC-01'] },
-      { key: 'signing', title: 'Customer Signing', type: 'feature', scope: 'bounded', required: true, requirements: ['FR-02'], acceptanceCriteria: ['AC-02'], dependsOn: ['foundation'] }
-    ],
-    requirementsUniverse: ['FR-01', 'FR-02', 'FR-03'],
-    acceptanceCriteriaUniverse: ['AC-01', 'AC-02']
+      { key: 'foundation', title: 'Foundation & Authentication', type: 'feature', scope: 'bounded', required: true, requirements: ['REQ-001'], acceptanceCriteria: ['AC-001'] },
+      { key: 'signing', title: 'Customer Signing', type: 'feature', scope: 'bounded', required: true, requirements: ['REQ-002'], acceptanceCriteria: ['PF-0001/AC-002'], dependsOn: ['foundation'] }
+    ]
   }));
   run(root, ['decompose', 'propose', workId, '--file', 'decomposition.json']);
   run(root, ['decompose', 'validate', workId]);
@@ -96,12 +107,12 @@ test('pilot regression v2: SPEC_READY -> review -> PLAN_READY -> review -> decom
   assert.match(handoff.stdout, new RegExp(`^${foundationId} —`));
   assert.match(handoff.stdout, new RegExp(`Parent: ${workId}`));
 
-  await completeBoundedFeatureChild(root, foundationId);
+  await completeBoundedFeatureChild(root, foundationId, ['AC-001']);
 
   const nextAfter = run(root, ['next', workId]);
   assert.match(nextAfter.stdout, new RegExp(signingId));
 
-  await completeBoundedFeatureChild(root, signingId);
+  await completeBoundedFeatureChild(root, signingId, ['PF-0001/AC-002']);
 
   const progress = run(root, ['progress', workId]);
   assert.match(progress.stdout, /2 \/ 2 DONE/);
@@ -109,6 +120,16 @@ test('pilot regression v2: SPEC_READY -> review -> PLAN_READY -> review -> decom
   run(root, ['advance', workId]); // IMPLEMENTATION -> VERIFICATION (all required children DONE)
   run(root, ['verify', workId, '--', 'true']);
   run(root, ['checkpoint', workId, '--skill', 'verification', '--complete', '--summary', 'Project-level verification passed.']);
+  // Project-level convergence: the children's assessments prove what they were
+  // assigned; the parent assesses the criterion no child owned (AC-003) itself.
+  const convergenceFile = path.join(root, 'convergence.json');
+  await writeFile(convergenceFile, JSON.stringify({ findings: [
+    { criterion: 'AC-001', status: 'satisfied', reason: 'Delivered by the foundation child.', evidence: [`convergence:${foundationId}/CV-001`] },
+    { criterion: 'AC-002', status: 'satisfied', reason: 'Delivered by the signing child.', evidence: [`convergence:${signingId}/CV-001`] },
+    { criterion: 'AC-003', status: 'satisfied', reason: 'Archive is read-only.', evidence: ['runtime: archived contract edit refused'] }
+  ] }));
+  run(root, ['convergence', 'record', workId, '--file', 'convergence.json']);
+  run(root, ['checkpoint', workId, '--skill', 'delivery-convergence', '--complete', '--summary', 'Project converged.']);
   run(root, ['checkpoint', workId, '--skill', 'code-review', '--complete', '--summary', 'Reviewed.']);
   run(root, ['knowledge', 'review', workId, '--none']);
   const finalDone = run(root, ['advance', workId]);

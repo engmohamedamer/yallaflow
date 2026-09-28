@@ -16,6 +16,7 @@ import { proposeDecomposition, validateDecomposition } from '../src/decompositio
 import { draftBaseline, startBaseline } from '../src/baseline/store.js';
 import { setGateStatus } from '../src/reviews/store.js';
 import { initWorkspace, workspacePath } from '../src/core/workspace.js';
+import { recordIntent } from '../test-support/delivery.js';
 
 const cli = fileURLToPath(new URL('../src/cli.js', import.meta.url));
 
@@ -55,6 +56,7 @@ async function richWorkspace() {
   await checkpointWork(root, parent.id, { skillId: 'context-discovery', status: 'completed', summary: 'x', evidence: [] });
   await checkpointWork(root, parent.id, { skillId: 'requirement-clarification', status: 'completed', summary: 'x', evidence: [] });
   await checkpointWork(root, parent.id, { skillId: 'design-exploration', status: 'completed', summary: 'x', evidence: [] });
+  await recordIntent(root, parent.id);
   await checkpointWork(root, parent.id, { skillId: 'specification', status: 'completed', summary: 'x', evidence: [] });
   await checkpointWork(root, parent.id, { skillId: 'implementation-planning', status: 'completed', summary: 'x', evidence: [] });
   await setGateStatus(root, parent.id, 'specification', 'approved', 'Reviewed.');
@@ -92,7 +94,13 @@ const HELP_INVOCATIONS = [
   ['decompose', 'propose', '--help'],
   ['checkpoint', '--help'],
   ['knowledge', '--help'],
-  ['question', '--help']
+  ['question', '--help'],
+  // v0.3.8 delivery namespaces and agent bootstrap
+  ['requirement', '--help'],
+  ['requirement', 'record', 'PF-0001', '--file', 'requirements.json', '--help'],
+  ['convergence', 'record', 'PF-0001', '--file', 'convergence.json', '-h'],
+  ['impact', 'assess', 'PF-0001', '--file', 'impact.json', '--help'],
+  ['agent', 'setup', 'claude', '--help']
 ];
 
 for (const args of HELP_INVOCATIONS) {

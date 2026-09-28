@@ -17,6 +17,7 @@ import { resolveWorkflowPolicy } from '../src/behavior/policy.js';
 import { SCOPES, WORK_TYPES } from '../src/behavior/constants.js';
 import { REGISTRY_VERSION } from '../src/skills/constants.js';
 import { KNOWLEDGE_POLICY_VERSION } from '../src/knowledge/constants.js';
+import { cliConvergeAll, cliRecordIntent } from '../test-support/delivery.js';
 import { createLegacyWorkItem } from '../test-support/legacy-work.js';
 
 const { workspacePath } = workspace;
@@ -78,7 +79,7 @@ test('direct feature --scope bounded creates routed work with a pinned Behavior 
   assert.equal(item.workflow, 'feature');
   assert.equal(item.scope, 'bounded');
   assert.equal(item.behaviorContract.registryVersion, REGISTRY_VERSION);
-  assert.deepEqual(item.behaviorContract.skills, ['context-discovery', 'requirement-clarification', 'implementation', 'verification']);
+  assert.deepEqual(item.behaviorContract.skills, ['context-discovery', 'requirement-clarification', 'implementation', 'verification', 'delivery-convergence']);
   assert.deepEqual(item.requiredCapabilities, resolveWorkflowPolicy('feature', 'bounded').requiredCapabilities);
   assert.deepEqual(item.knowledgePolicy, { version: KNOWLEDGE_POLICY_VERSION, reviewRequired: true });
   assert.equal(item.readOnly, false);
@@ -145,6 +146,7 @@ test('verification and knowledge gates are identical to routed work, and doctor 
   const id = item.id;
   for (let i = 0; i < 4; i++) run(root, ['advance', id]);
   assert.match(run(root, ['advance', id], false).stderr, /complete required checkpoint\(s\) first: context-discovery, requirement-clarification/);
+  await cliRecordIntent(root, id);
   for (const skill of ['context-discovery', 'requirement-clarification']) run(root, ['checkpoint', id, '--skill', skill, '--complete', '--summary', 'ok']);
   run(root, ['advance', id]);
   run(root, ['checkpoint', id, '--skill', 'implementation', '--complete', '--summary', 'Implemented.']);
@@ -153,6 +155,8 @@ test('verification and knowledge gates are identical to routed work, and doctor 
   assert.match(run(root, ['advance', id], false).stderr, /verification checkpoint is pending/);
   run(root, ['verify', id, '--', process.execPath, '-e', 'process.exit(0)']);
   run(root, ['checkpoint', id, '--skill', 'verification', '--complete', '--summary', 'Verified.']);
+  assert.match(run(root, ['advance', id], false).stderr, /has not converged on the approved intent/);
+  await cliConvergeAll(root, id);
   assert.match(run(root, ['advance', id], false).stderr, /project knowledge review is complete/);
   run(root, ['knowledge', 'review', id, '--none']);
   assert.match(run(root, ['advance', id]).stdout, /VERIFICATION → DONE/);

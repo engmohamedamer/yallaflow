@@ -22,6 +22,8 @@ yallaflow verify PF-0004 -- npm test -- --runInBand
 
 Use `--shell "<command>"` only when shell syntax is genuinely required (pipes, redirection, `&&`), and `--script <path>` for a checked-in script. Every attempt — including a failed or mis-quoted one — stays in the append-only evidence ledger; re-run correctly rather than trying to hide a failed attempt. A successful run can back durable knowledge as `--evidence verification:V-###`.
 
+Verification proves that the recorded technical checks pass. Whether the delivered implementation matches the approved intent is a separate judgment — delivery convergence (`yallaflow skill delivery-convergence`) — when the work's contract includes it.
+
 ## Guard
 
 This skill verifies behavior. It does not authorize unrelated implementation changes or replace the existing DONE transition gate.

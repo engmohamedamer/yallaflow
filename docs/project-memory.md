@@ -13,6 +13,9 @@ Project knowledge goes stale as a repository evolves. YallaFlow therefore keeps 
 | **Historical knowledge** | What used to be believed, and what replaced it? | superseded facts in `context/index.yaml` | supersession |
 | **Reconciliation history** | How did old (v0.3.5) knowledge become current memory? | `work/PF-####/reconciliation.yaml`, `legacy-context.md` | `yallaflow context reconcile` — interprets old knowledge without rewriting work history |
 | **Discovery limitations** | What could this investigation not inspect? | `work/PF-####/discovery.yaml`, baseline drafts | `yallaflow limitation add` — never promoted |
+| **Delivery intent and evidence** (v0.3.8) | What was this work asked to deliver, and does the implementation match it? | `work/PF-####/requirements.yaml`, `convergence.yaml`, `impact.yaml` | `yallaflow requirement record`, `convergence record`, `impact assess` — work-delivery state, **never** project facts |
+
+Requirement identity, convergence findings, and impact assessments describe one work item's delivery. They are never promoted into `context/index.yaml`. If delivering the work established a stable truth about the project — a business rule, an integration constraint — the Agent proposes it through the ordinary knowledge flow (`yallaflow knowledge propose`), where it is reviewed like any other candidate. Intent, delivery evidence, and current project truth are three distinct concepts.
 
 ## The canonical ledger
 
@@ -174,16 +177,16 @@ Agents never edit YallaFlow-owned structured or history state directly when a su
 
 | Owner | Files | Changed only by |
 |---|---|---|
-| **CLI** | `work/<id>/meta.yaml`, `progress.yaml`, `progress.md`, `knowledge.yaml`, `reviews.yaml`, `questions.yaml`, `baseline.yaml`, `discovery.yaml`, `decomposition.yaml`, `reconciliation.yaml`, `legacy-context.md`, `evidence/` (verification ledger); `context/index.yaml`; `sources/SRC-####/` (originals + metadata); `state/current.yaml`; generated `decisions/ADR-*.md` | the matching `yallaflow` command |
-| **Projection** | the managed blocks in `PROJECT.md`, `context/*.md`, `AGENT.md` | `yallaflow context render`, `yallaflow agent refresh` |
+| **CLI** | `work/<id>/meta.yaml`, `progress.yaml`, `progress.md`, `knowledge.yaml`, `reviews.yaml`, `questions.yaml`, `baseline.yaml`, `discovery.yaml`, `decomposition.yaml`, `reconciliation.yaml`, `legacy-context.md`, `requirements.yaml`, `convergence.yaml`, `impact.yaml`, `evidence/` (verification ledger); `context/index.yaml`; `sources/SRC-####/` (originals + metadata); `state/current.yaml`; generated `decisions/ADR-*.md` | the matching `yallaflow` command |
+| **Projection** | the managed blocks in `PROJECT.md`, `context/*.md`, `AGENT.md`; outside `.yallaflow/`, the bootstrap block in a repository-root `AGENTS.md`/`CLAUDE.md` | `yallaflow context render`, `yallaflow agent refresh`, `yallaflow agent setup` |
 | **Shared** | `work/<id>/work.md` | the Agent writes the narrative sections (discovery notes, specification, plan, findings, result); CLI-appended lifecycle records (Routing Decision, Source Added, Request Revised) are history and are never edited |
 | **Human** | `config.yaml`; content outside managed blocks | deliberate human edits |
 
-Deterministic tamper checks include strict schema validation of every ledger, the reconciliation plan's approval fingerprint, projection drift, source checksums, and (a warning) a Routing Decision in `work.md` that no longer matches `meta.yaml`.
+Deterministic tamper checks include strict schema validation of every ledger (including the delivery ledgers and their references), the reconciliation plan's approval fingerprint, projection drift, source checksums, and (a warning) a Routing Decision in `work.md` that no longer matches `meta.yaml`.
 
 ## Agent contract
 
-`.yallaflow/AGENT.md` tells agents how to work with YallaFlow: the project memory sequence (read relevant context, check freshness, rediscover only what changed, relate new knowledge to existing facts), legacy reconciliation, state ownership, and `yallaflow brief` as the first command of a fresh session. It carries a versioned managed block (v3 since v0.3.7). `doctor` and `status` warn when it predates the installed contract, and `yallaflow agent refresh` updates it deliberately. See [`upgrading-to-v0.3.7.md`](upgrading-to-v0.3.7.md#3-refresh-the-agent-contract-v2--v3).
+`.yallaflow/AGENT.md` tells agents how to work with YallaFlow: the project memory sequence (read relevant context, check freshness, rediscover only what changed, relate new knowledge to existing facts), the delivery intent and convergence sequence, legacy reconciliation, state ownership, and `yallaflow brief` as the first command of a fresh session. It carries a versioned managed block (v4 since v0.3.8). `doctor` and `status` warn when it predates the installed contract, and `yallaflow agent refresh` updates it deliberately. Provider session files (`AGENTS.md`, `CLAUDE.md`) may carry a thin bootstrap block pointing to it (`yallaflow agent setup`); they never restate it. See [`upgrading-to-v0.3.8.md`](upgrading-to-v0.3.8.md).
 
 ## No baseline refresh
 

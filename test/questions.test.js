@@ -9,6 +9,7 @@ import { createPendingIntake, routeWorkItem } from '../src/behavior/routing.js';
 import { checkpointWork } from '../src/core/progress.js';
 import { addQuestion, answerQuestion, loadWorkQuestions, questionsFilePath, resolveQuestion } from '../src/questions/store.js';
 import { loadWorkReadiness } from '../src/behavior/readiness.js';
+import { recordIntent } from '../test-support/delivery.js';
 import { exists } from '../src/utils/fs.js';
 
 const cli = fileURLToPath(new URL('../src/cli.js', import.meta.url));
@@ -91,6 +92,7 @@ test('open material questions affect readiness', async () => {
   await checkpointWork(root, meta.id, {
     skillId: 'design-exploration', status: 'completed', summary: 'Design explored.', evidence: []
   });
+  await recordIntent(root, meta.id);
   await checkpointWork(root, meta.id, {
     skillId: 'specification', status: 'completed', summary: 'Spec drafted.', evidence: []
   });

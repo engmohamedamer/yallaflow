@@ -1,5 +1,6 @@
 import { findProjectRoot } from '../core/workspace.js';
 import { describeAgentContractState, inspectAgentContract, refreshAgentContract } from '../agent/contract.js';
+import { describeBootstrapState, inspectAllBootstraps, refreshBootstraps, resolveBootstrapProvider, setupBootstrap } from '../agent/bootstrap.js';
 
 async function requireRoot() {
   const root = await findProjectRoot();
@@ -16,6 +17,34 @@ export async function agentStatusCommand() {
   if (status.version !== undefined) console.log(`Workspace contract: v${status.version}`);
   if (status.legacy) console.log(`Workspace contract: unversioned ${status.legacy} template`);
   console.log(describeAgentContractState(status));
+  console.log('\nAgent bootstrap (repository-root session files pointing to AGENT.md):');
+  for (const bootstrap of await inspectAllBootstraps(root)) {
+    console.log(`- ${bootstrap.provider} (${bootstrap.file}): ${describeBootstrapState(bootstrap)}`);
+  }
+}
+
+const BOOTSTRAP_ACTIONS = {
+  created: (file) => `create ${file} with the YallaFlow bootstrap block`,
+  appended: (file) => `append the YallaFlow bootstrap block to ${file} (existing content unchanged)`,
+  'updated-managed-block': (file) => `update only the YallaFlow bootstrap block in ${file} (content outside it unchanged)`,
+  'installed-with-preserved-content': (file) => `install the current bootstrap block in ${file} and keep the edited block text verbatim under "## Preserved YallaFlow bootstrap edits"`
+};
+
+export async function agentSetupCommand(providerName, { preserveExisting, dryRun } = {}) {
+  const root = await requireRoot();
+  const provider = resolveBootstrapProvider(providerName);
+  const result = await setupBootstrap(root, provider, { preserveExisting, dryRun });
+  if (result.action === 'unchanged') {
+    console.log(`${provider.file} already has the current YallaFlow bootstrap block (v${result.status.installed}); nothing changed.`);
+  } else {
+    console.log(`${dryRun ? 'Would' : 'Did'} ${BOOTSTRAP_ACTIONS[result.action](provider.file)} (bootstrap v${result.status.installed}).`);
+    if (dryRun) {
+      console.log('\n--- preview ---');
+      process.stdout.write(result.preview);
+    }
+  }
+  const contract = await inspectAgentContract(root);
+  if (contract.state !== 'current') console.log(`\nNote: the canonical contract .yallaflow/AGENT.md is ${contract.state} — ${describeAgentContractState(contract)}`);
 }
 
 export async function agentRefreshCommand({ preserveExisting, dryRun } = {}) {
@@ -23,6 +52,7 @@ export async function agentRefreshCommand({ preserveExisting, dryRun } = {}) {
   const result = await refreshAgentContract(root, { preserveExisting, dryRun });
   if (result.action === 'unchanged') {
     console.log(`AGENT.md is already at agent contract v${result.status.installed}; nothing changed.`);
+    await refreshProviderBootstraps(root, dryRun);
     return;
   }
   const verb = dryRun ? 'Would' : 'Did';
@@ -36,5 +66,17 @@ export async function agentRefreshCommand({ preserveExisting, dryRun } = {}) {
   if (dryRun) {
     console.log('\n--- preview ---');
     process.stdout.write(result.preview);
+  }
+  await refreshProviderBootstraps(root, dryRun);
+}
+
+// Installed provider bootstrap blocks are refreshed with AGENT.md; only unmodified,
+// outdated blocks are rewritten. Anything else is reported, never forced.
+async function refreshProviderBootstraps(root, dryRun) {
+  for (const result of await refreshBootstraps(root, { dryRun })) {
+    const { status } = result;
+    if (result.action === 'unchanged') console.log(`${status.file}: bootstrap block already current; nothing changed.`);
+    else if (result.action === 'skipped') console.log(`${status.file}: bootstrap block not refreshed — ${describeBootstrapState(status)}`);
+    else console.log(`${status.file}: ${dryRun ? 'would update' : 'updated'} only the YallaFlow bootstrap block (v${status.version} → v${status.installed}).`);
   }
 }

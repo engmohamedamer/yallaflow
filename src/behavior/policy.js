@@ -1,9 +1,13 @@
 import { SCOPES, WORK_TYPES } from './constants.js';
 
+// 'converge' (v0.3.8, Skill Registry v5) is part of the policy only where the work
+// carries an approved-intent contract worth proving: features, and architectural
+// changes. Bounded changes, bugs, refactors, releases, and investigations deliberately
+// do not require delivery convergence.
 const POLICIES = {
   feature: {
-    bounded: ['discover', 'clarify', 'implement', 'verify'],
-    architectural: ['discover', 'clarify', 'brainstorm', 'specify', 'plan', 'implement', 'verify', 'review']
+    bounded: ['discover', 'clarify', 'implement', 'verify', 'converge'],
+    architectural: ['discover', 'clarify', 'brainstorm', 'specify', 'plan', 'implement', 'verify', 'converge', 'review']
   },
   bug: {
     spike: ['discover', 'systematic-debugging', 'verify'],
@@ -17,7 +21,7 @@ const POLICIES = {
   },
   change: {
     bounded: ['discover', 'clarify', 'plan', 'implement', 'verify'],
-    architectural: ['discover', 'clarify', 'brainstorm', 'plan', 'implement', 'verify', 'review']
+    architectural: ['discover', 'clarify', 'brainstorm', 'plan', 'implement', 'verify', 'converge', 'review']
   },
   refactor: {
     bounded: ['discover', 'plan', 'implement', 'verify'],

@@ -9,6 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { initWorkspace, workspacePath } from '../src/core/workspace.js';
 import { exists } from '../src/utils/fs.js';
+import { MINIMAL_INTENT, cliConvergeAll, cliRecordIntent } from '../test-support/delivery.js';
 
 const cli = fileURLToPath(new URL('../src/cli.js', import.meta.url));
 
@@ -24,6 +25,7 @@ async function boundedFeature(mode = 'adaptive') {
   const start = run(root, ['start', 'Add CSV export']);
   const id = /Created (PF-\d+)/.exec(start.stdout)[1];
   run(root, ['route', id, '--type', 'feature', '--scope', 'bounded', '--confidence', 'high', '--reason', 'Small.']);
+  await cliRecordIntent(root, id, MINIMAL_INTENT, run);
   return { root, id };
 }
 
@@ -106,6 +108,7 @@ test('guide on DONE work reports no further action', async () => {
   run(root, ['advance', id]);
   run(root, ['verify', id, '--', process.execPath, '-e', 'process.exit(0)']);
   run(root, ['checkpoint', id, '--skill', 'verification', '--complete', '--summary', 'ok']);
+  await cliConvergeAll(root, id, { run });
   run(root, ['knowledge', 'review', id, '--none']);
   run(root, ['advance', id]);
   const guide = run(root, ['guide', id]);

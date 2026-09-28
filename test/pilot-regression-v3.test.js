@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import os from 'node:os';
 import path from 'node:path';
 import { workspacePath } from '../src/core/workspace.js';
+import { MINIMAL_INTENT, cliConvergeAll, cliRecordIntent } from '../test-support/delivery.js';
 import { readYaml } from '../src/core/yaml.js';
 
 const cli = fileURLToPath(new URL('../src/cli.js', import.meta.url));
@@ -59,12 +60,14 @@ test('Scenario A — Brownfield: undocumented repo -> baseline -> changes reques
   const featureId = /^Created (PF-\d+)/.exec(start.stdout)[1];
   run(root, ['route', featureId, '--type', 'feature', '--scope', 'bounded', '--confidence', 'high', '--reason', 'Small, bounded UI addition.']);
   run(root, ['checkpoint', featureId, '--skill', 'context-discovery', '--complete', '--summary', 'Reused durable tech-stack context.']);
+  await cliRecordIntent(root, featureId, MINIMAL_INTENT, run);
   run(root, ['checkpoint', featureId, '--skill', 'requirement-clarification', '--complete', '--summary', 'No open questions.']);
   for (let i = 0; i < 5; i++) run(root, ['advance', featureId]);
   run(root, ['checkpoint', featureId, '--skill', 'implementation', '--complete', '--summary', 'Implemented toggle.']);
   run(root, ['advance', featureId]);
   run(root, ['verify', featureId, '--', 'true']);
   run(root, ['checkpoint', featureId, '--skill', 'verification', '--complete', '--summary', 'Verified.']);
+  await cliConvergeAll(root, featureId, { run });
   run(root, ['knowledge', 'review', featureId, '--none']);
   const done = run(root, ['advance', featureId]);
   assert.match(done.stdout, /→ DONE/);

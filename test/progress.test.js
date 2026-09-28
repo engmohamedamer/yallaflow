@@ -10,6 +10,7 @@ import { createPendingIntake, routeWorkItem } from '../src/behavior/routing.js';
 import { checkpointWork, loadWorkProgress, progressFilePath, summarizeProgress } from '../src/core/progress.js';
 import { advanceActiveWork } from '../src/core/transitions.js';
 import { initWorkspace, workspacePath } from '../src/core/workspace.js';
+import { convergeAll, ensureIntentFor, recordIntent } from '../test-support/delivery.js';
 import { createLegacyWorkItem } from '../test-support/legacy-work.js';
 import { readYaml } from '../src/core/yaml.js';
 import { recordVerification } from '../src/core/evidence.js';
@@ -31,6 +32,7 @@ async function routedWork(workType = 'bug', scope = 'bounded') {
 }
 
 async function complete(root, meta, skillId, extra = {}) {
+  await ensureIntentFor(root, meta.id, skillId);
   return checkpointWork(root, meta.id, {
     skillId,
     status: 'completed',

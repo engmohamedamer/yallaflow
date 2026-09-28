@@ -20,6 +20,8 @@ export async function upgradeStatusCommand() {
   console.log(`Workspace: ${report.legacyStructures.length ? 'legacy structures present' : 'current structures'}`);
   for (const entry of report.legacyStructures) console.log(`  - ${entry}`);
   console.log(`\nAgent contract: ${report.agent.state === 'current' ? `v${report.agent.version} / current` : describeAgentContractState(report.agent)}`);
+  const bootstraps = report.bootstraps.filter((item) => !['not-installed', 'shared'].includes(item.state));
+  console.log(`Agent bootstrap: ${bootstraps.length ? bootstraps.map((item) => `${item.file} ${item.state}`).join(', ') : 'none set up (optional)'}`);
   console.log('\nProject context:');
   console.log(`  ${describeSchema(report.schema)}`);
   if (memory.unreadable) console.log('  not read — the ledger schema is not supported by this CLI');

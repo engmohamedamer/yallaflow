@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import {
   childProgressView,
-  computeTraceability,
+  loadDecompositionTraceability,
   executeDecomposition,
   loadDecomposition,
   proposeDecomposition,
@@ -81,7 +81,7 @@ export async function decomposeStatusCommand(parentId) {
     const suffix = child.state === 'blocked' ? ` — blocked by ${child.blockedBy.join(', ')}` : '';
     console.log(`${marker} ${child.workId ?? child.key} — ${child.title}${child.required ? '' : ' (optional)'}${suffix}`);
   }
-  printCoverage(computeTraceability(ledger));
+  printCoverage(await loadDecompositionTraceability(root, parentId, ledger));
 }
 
 function printCoverage(coverage) {
@@ -92,5 +92,6 @@ function printCoverage(coverage) {
     if (summary.unassigned === null) console.log('  coverage vs. total: not available (no universe declared)');
     else if (summary.unassigned.length) console.log(`  unassigned: ${summary.unassigned.join(', ')}`);
     else console.log('  unassigned: none');
+    if (summary.inactive?.length) console.log(`  no longer active in the requirements ledger: ${summary.inactive.join(', ')}`);
   }
 }

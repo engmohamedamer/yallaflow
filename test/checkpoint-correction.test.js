@@ -11,6 +11,7 @@ import { advanceActiveWork, reconcileStageAfterCheckpointRevision } from '../src
 import { loadWorkReadiness } from '../src/behavior/readiness.js';
 import { initWorkspace, workspacePath } from '../src/core/workspace.js';
 import { readYaml } from '../src/core/yaml.js';
+import { ensureIntentFor } from '../test-support/delivery.js';
 
 const cli = fileURLToPath(new URL('../src/cli.js', import.meta.url));
 
@@ -28,6 +29,7 @@ async function routedWork(workType = 'feature', scope = 'architectural') {
 }
 
 async function complete(root, meta, skillId) {
+  await ensureIntentFor(root, meta.id, skillId);
   return checkpointWork(root, meta.id, { skillId, status: 'completed', summary: `${skillId} completed.`, evidence: [] });
 }
 

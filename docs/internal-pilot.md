@@ -16,7 +16,7 @@ yallaflow init
 yallaflow --help
 ```
 
-On a legacy repository, never add YallaFlow to the application's `package.json` — it can make npm rewrite an old lockfile. See [`installation.md`](installation.md#legacy-and-brownfield-repositories). Upgrading an existing pilot workspace: `yallaflow upgrade status`, then [`upgrading-to-v0.3.7.md`](upgrading-to-v0.3.7.md).
+On a legacy repository, never add YallaFlow to the application's `package.json` — it can make npm rewrite an old lockfile. See [`installation.md`](installation.md#legacy-and-brownfield-repositories). Upgrading an existing pilot workspace: `yallaflow upgrade status`, then [`upgrading-to-v0.3.8.md`](upgrading-to-v0.3.8.md). Connect the pilot agent with `yallaflow agent setup codex|claude`.
 
 If you have an existing requirements document, use it directly instead of retyping it into a prompt — the same command handles text, Office/OpenDocument, PDF, and image files:
 

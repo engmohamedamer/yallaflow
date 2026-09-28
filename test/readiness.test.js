@@ -15,6 +15,8 @@ import { reviewKnowledgeNone, proposeKnowledge } from '../src/knowledge/store.js
 import { promoteKnowledge } from '../src/knowledge/promotion.js';
 import { initWorkspace, workspacePath } from '../src/core/workspace.js';
 import { readYaml, writeYaml } from '../src/core/yaml.js';
+import { convergeAll, ensureIntentFor } from '../test-support/delivery.js';
+import { REGISTRY_VERSION } from '../src/skills/constants.js';
 import { addQuestion } from '../src/questions/store.js';
 
 const cli = fileURLToPath(new URL('../src/cli.js', import.meta.url));
@@ -34,6 +36,7 @@ async function routedWork(workType = 'feature', scope = 'architectural') {
 }
 
 async function complete(root, meta, skillId) {
+  await ensureIntentFor(root, meta.id, skillId);
   return checkpointWork(root, meta.id, { skillId, status: 'completed', summary: `${skillId} completed.`, evidence: [] });
 }
 
@@ -112,6 +115,7 @@ test('full implementation DONE remains supported', async () => {
     startedAt: '2026-01-01T00:00:00.000Z', finishedAt: '2026-01-01T00:00:01.000Z', log: 'verification.log'
   });
   await complete(root, meta, 'verification');
+  await convergeAll(root, meta.id);
   await complete(root, meta, 'code-review');
   await reviewKnowledgeNone(root, meta.id);
   const transition = await advanceActiveWork(root); // -> DONE
@@ -125,7 +129,7 @@ test('full implementation DONE remains supported', async () => {
 
 test('old pinned contracts remain unaffected by a newer registry version', async () => {
   const { root, meta } = await routedWork('bug', 'bounded');
-  assert.equal(meta.behaviorContract.registryVersion, 4);
+  assert.equal(meta.behaviorContract.registryVersion, REGISTRY_VERSION);
   assert.equal(meta.behaviorContract.skills.includes('specification'), false);
 
   const persisted = await readYaml(path.join(workspacePath(root), 'work', meta.id, 'meta.yaml'));
@@ -139,7 +143,7 @@ test('old pinned contracts remain unaffected by a newer registry version', async
 test('new architectural work includes the specification skill in its pinned contract', async () => {
   const { meta } = await routedWork('feature', 'architectural');
   assert.ok(meta.behaviorContract.skills.includes('specification'));
-  assert.equal(meta.behaviorContract.registryVersion, 4);
+  assert.equal(meta.behaviorContract.registryVersion, REGISTRY_VERSION);
 });
 
 test('specification checkpoint persists across restart', async () => {

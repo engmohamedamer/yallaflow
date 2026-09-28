@@ -8,6 +8,9 @@ import { readYaml, writeYaml } from '../core/yaml.js';
 import { REGISTRY_VERSION } from '../skills/constants.js';
 import { resolveSkills } from '../skills/resolver.js';
 import { KNOWLEDGE_POLICY_VERSION } from '../knowledge/constants.js';
+import { loadWorkProgress } from '../core/progress.js';
+import { intentFixed } from '../delivery/policy.js';
+import { raiseImpact } from '../delivery/impact.js';
 
 const ROUTING_FIELDS = new Set(['work_type', 'scope', 'confidence', 'reason', 'title']);
 
@@ -183,6 +186,14 @@ export async function addSourceToWork(root, workId, source, now = new Date().toI
     relationship: recovered ? 'recovered-source' : 'work-input',
     ...(isNonEmptyString(reason) ? { reason: reason.trim() } : {})
   });
+
+  // v0.3.8: a source attached after the approved intent was fixed may change it. The
+  // CLI cannot know whether it does, so it raises a pending impact (before the link is
+  // written) for the Agent to assess; it never judges the source's meaning.
+  if (!recovered && meta.routingStatus === 'routed') {
+    const progress = await loadWorkProgress(root, meta);
+    if (intentFixed(meta, progress.contract, progress.ledger)) await raiseImpact(root, meta, { type: 'source', source: validated.id }, now);
+  }
 
   meta.sources = [...(meta.sources ?? []), validated];
   meta.updatedAt = now;

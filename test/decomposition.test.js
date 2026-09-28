@@ -18,15 +18,21 @@ import {
   readyChildren,
   validateDecomposition
 } from '../src/decomposition/store.js';
+import { ensureIntentFor, pinRegistryV4Contract } from '../test-support/delivery.js';
 
+// The parent is pinned to a v0.3.7 (Registry v4) contract: these tests cover the
+// free-form requirement/acceptance-criteria labels decomposition supports for parents
+// without a structured requirements ledger. Ledger-backed decomposition (v0.3.8) is
+// covered in test/delivery-decomposition.test.js.
 async function planReadyParent() {
   const root = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-decomposition-'));
   await initWorkspace(root, 'demo', 'greenfield', 'autonomous');
   const intake = await createPendingIntake(root, 'Nice Day Contract Hub');
-  const meta = await routeWorkItem(root, intake.id, {
+  await routeWorkItem(root, intake.id, {
     work_type: 'feature', scope: 'architectural', confidence: 'high',
     reason: 'Large project requiring decomposition.', title: 'Nice Day Contract Hub'
   });
+  const meta = await pinRegistryV4Contract(root, intake.id);
   await complete(root, meta, 'context-discovery');
   await advanceActiveWork(root); // -> DISCOVERY
   await complete(root, meta, 'requirement-clarification');
@@ -41,6 +47,7 @@ async function planReadyParent() {
 }
 
 async function complete(root, meta, skillId) {
+  await ensureIntentFor(root, meta.id, skillId);
   return checkpointWork(root, meta.id, { skillId, status: 'completed', summary: `${skillId} completed.`, evidence: [] });
 }
 

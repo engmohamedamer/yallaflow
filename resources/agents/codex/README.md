@@ -1,29 +1,25 @@
 # Codex Adapter
 
-YallaFlow is an engineering governance layer for coding agents — durable project memory, adaptive workflows, and evidence-backed delivery. It applies Adaptive Spec-Driven Development where the work needs it: use the work type and scope to determine the necessary depth of discovery, clarification, specification, planning, and verification.
+YallaFlow is agent-agnostic: the only behavioral contract is the workspace's `.yallaflow/AGENT.md`, generated and versioned by YallaFlow. This adapter does not restate it.
 
-On session start, load `.yallaflow/AGENT.md`. If `.yallaflow/state/current.yaml` has active work, prefer `yallaflow resume` semantics. Route natural language into the supported workflow before editing code. Discover technical facts from the project; ask only about material business ambiguity or unavailable information.
+## Setup
 
-For an unclassified request, create an intake with `yallaflow start "<request>"` or, if the user already has a requirements document, `yallaflow intake <file>` — one command for plain text, Office/OpenDocument, PDF, and image files alike; never a format-specific command. Multiple files can be given at once, and `yallaflow intake add <work-id> <file>` attaches more sources later. Either path preserves the original request/file and creates a pending work item; extraction failures or unsupported formats fall back to preserving the original file rather than failing, and `yallaflow source show <id> --content` shows exactly what text, if any, is available before you rely on it. Classify the work using the allowed routing contract, then apply the explicit decision with `yallaflow route`. The CLI validates and persists the decision; it does not perform semantic inference, and never routes from a file's contents on its own.
+```bash
+yallaflow agent setup codex      # adds a managed bootstrap block to the repository-root AGENTS.md
+yallaflow agent status             # AGENT.md and bootstrap block: current / outdated / modified / not set up
+yallaflow agent refresh            # after upgrading YallaFlow
+```
 
-Before engineering work, run `yallaflow guide [work-id]`. Follow the pinned skill order and retrieve exact package-owned instructions with `yallaflow skill <skill-id>`. Guidance reports whether the current workflow stage authorizes application-code modification.
+Codex reads `AGENTS.md` but has no import syntax, so the block tells the agent to read `.yallaflow/AGENT.md` before any project work.
 
-Record starts, completions, blockers, evidence references, and local rulings with `yallaflow checkpoint`. Never infer skill completion from conversation text. If a checkpoint was recorded in error or later found invalid, correct it explicitly with `yallaflow checkpoint revise --status pending|in_progress|blocked --reason TEXT`; never edit `progress.yaml` by hand. On a new session, use `yallaflow resume`; work files, `progress.yaml`, evidence, Git history, and verification output are authoritative.
+The block contains only the session-start sequence:
 
-Persist material business or architecture decisions with `yallaflow question add`, not only as prose in `work.md`; resolve them with `yallaflow question answer`/`resolve`. Check `yallaflow ready [work-id]` for current delivery readiness (`SPEC_READY` / `PLAN_READY` / `DONE`) — not every work item needs to reach implementation, and reaching a readiness level never itself authorizes writing application code.
+1. Confirm `.yallaflow/` exists.
+2. Follow `.yallaflow/AGENT.md`.
+3. Run `yallaflow brief`.
+4. `yallaflow resume` / `yallaflow handoff` the active work.
+5. `yallaflow guide` for the current objective and next valid action.
+6. Follow the pinned Behavior Contract.
+7. Record progress and evidence only through `yallaflow` commands.
 
-Near completion, review the work for stable future-facing project knowledge. Propose only durable facts or decisions with `yallaflow knowledge propose --source design-spec|implementation-runtime`; reject execution noise, or record `yallaflow knowledge review --none`. A ruling is task-local and is not an ADR unless an explicit decision candidate is promoted.
-
-Once a work item reaches `PLAN_READY`, a project too large for one implementation session may be decomposed: propose the child breakdown with `yallaflow decompose propose <parent-id> --file decomposition.json` (never invent the split's semantics yourself as workspace state — this file is Agent-supplied structured input), then `yallaflow decompose validate` and `yallaflow decompose execute`. Check `yallaflow progress <parent-id>` / `yallaflow next <parent-id>` for project status and dependency-unblocked children — YallaFlow reports readiness, it never picks which child to work on. If the project's interaction mode requires review at a boundary (`config.yaml`'s `interaction.mode`, default `adaptive`), a blocked transition names the gate; do not attempt to bypass it — request approval with `yallaflow approve <work-id> --stage GATE`. `DONE` work is reactivated only with `yallaflow reopen <work-id> --to implementation|verification|review --reason "..."`, never by editing state files. On entering a repository with unfamiliar history, run `yallaflow handoff [work-id]` before anything else — it is read-only and gives complete durable context without needing the prior session's chat transcript.
-
-Project memory is living, evidence-backed state, not append-only notes. Before work in an area, read the relevant current context and check `yallaflow context status` (or `yallaflow context affected`) for facts that are `MAY_BE_STALE`, `STALE_EVIDENCE`, or `DISPUTED`; rediscover only those and the area the work touches — do not silently trust stale context and do not rescan unrelated areas. After work, relate new durable knowledge to existing facts explicitly: `yallaflow knowledge propose ... --reconfirms CTX-####` (still true, fresh evidence), `--supersedes CTX-####` (no longer true; the old fact becomes history), or `--disputes CTX-####` (conflicting evidence you cannot settle). YallaFlow validates the transition; it never decides semantic truth. Record what you could not inspect with `yallaflow limitation add` — limitations are work-scoped and never project facts. Never edit a past work item to reflect newly discovered truth: work records preserve history; project memory preserves current understanding.
-
-Prefer argv verification (`yallaflow verify <work-id> -- <executable> [args...]`); use `--shell` only when shell operators are actually needed.
-
-Material user-provided artifacts (a UI screenshot, a spreadsheet, a PDF) must not exist only in the conversation. If one materially shapes the request and you can reach its file, register it with `yallaflow intake add <work-id> <file>` — it becomes an immutable, linked `SRC-####` source that `handoff`/`resume` point a fresh agent to. If you cannot access its bytes or path, record `yallaflow limitation add <work-id> --type uncaptured-artifact --area requirement --summary "..." --reason "..."` instead of implying it was preserved. Sources are inputs; verification output is evidence (`yallaflow verify`); neither replaces the other.
-
-In a fresh session, run `yallaflow brief` first — a read-only orientation that names the active and most recent work, project-memory health, sources, and the next command to run (`resume`, `handoff`, `context reconcile ...`). A repository that uses YallaFlow may not mention it anywhere outside `.yallaflow/`; `yallaflow brief` is the entry point either way.
-
-Legacy (v0.3.5) project context is not current truth until it is reconciled: use `yallaflow context reconcile start`, declare one explicit, evidence-based relationship per `RC-####` candidate (`new`, `merge-with`, `reconfirms`, `supersedes`, `disputes`, `skip`, `limitation`) with `yallaflow context reconcile plan --file`, record genuine ambiguity as a question instead of guessing, and apply only after a human approves (`yallaflow context reconcile approve` → `apply`). Never rewrite historical work items to make a migration cleaner.
-
-Never edit YallaFlow-owned structured state (`meta.yaml`, `progress.yaml`, `progress.md`, `knowledge.yaml`, `reviews.yaml`, `questions.yaml`, `baseline.yaml`, `discovery.yaml`, `reconciliation.yaml`, `context/index.yaml`, sources, the verification ledger, `state/current.yaml`) by hand when a command exists. In `work.md`, write the narrative sections; leave CLI-appended lifecycle records (Routing Decision, Source Added, Request Revised) untouched.
+Existing content in `AGENTS.md` is preserved byte-for-byte; only the managed block is ever updated, and a hand-edited block is refused unless `--preserve-existing`. See [`docs/guide.md`](../../../docs/guide.md#agent-bootstrap-codex-claude).

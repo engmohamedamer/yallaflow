@@ -11,6 +11,7 @@ import { initWorkspace, workspacePath } from '../src/core/workspace.js';
 import { createPendingIntake, createRoutedWork, routeWorkItem } from '../src/behavior/routing.js';
 import { createLegacyWorkItem } from '../test-support/legacy-work.js';
 import { startBaseline } from '../src/baseline/store.js';
+import { MINIMAL_INTENT, cliRecordIntent } from '../test-support/delivery.js';
 import { exists } from '../src/utils/fs.js';
 
 const cli = fileURLToPath(new URL('../src/cli.js', import.meta.url));
@@ -57,6 +58,7 @@ test('decomposed children are created sparse too', async () => {
   const start = run(root, ['start', 'Build billing']);
   const parentId = /Created (PF-\d+)/.exec(start.stdout)[1];
   run(root, ['route', parentId, '--type', 'feature', '--scope', 'architectural', '--confidence', 'high', '--reason', 'Large.']);
+  await cliRecordIntent(root, parentId, MINIMAL_INTENT, run);
   for (const skill of ['context-discovery', 'requirement-clarification', 'design-exploration', 'specification', 'implementation-planning']) {
     run(root, ['checkpoint', parentId, '--skill', skill, '--complete', '--summary', 'done']);
   }

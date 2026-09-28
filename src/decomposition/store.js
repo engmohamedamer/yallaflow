@@ -10,6 +10,7 @@ import { resolveSkills } from '../skills/resolver.js';
 import { KNOWLEDGE_POLICY_VERSION } from '../knowledge/constants.js';
 import { invalidateGateIfApproved } from '../reviews/store.js';
 import { DECOMPOSITION_SCHEMA_VERSION } from './constants.js';
+import { bareRef, loadWorkRequirements } from '../delivery/requirements.js';
 
 function decompositionFilePath(root, workId) {
   return path.join(workspacePath(root), 'work', workId, 'decomposition.yaml');
@@ -42,8 +43,19 @@ export async function proposeDecomposition(root, parentId, input, now = new Date
   const errors = validateChildren(children);
   if (errors.length) throw new Error(`Decomposition proposal for ${parentId} is invalid:\n${errors.map((entry) => `- ${entry}`).join('\n')}`);
 
-  const requirementsUniverse = normalizeStringArray(input.requirementsUniverse, 'requirementsUniverse');
-  const acceptanceCriteriaUniverse = normalizeStringArray(input.acceptanceCriteriaUniverse, 'acceptanceCriteriaUniverse');
+  let requirementsUniverse = normalizeStringArray(input.requirementsUniverse, 'requirementsUniverse');
+  let acceptanceCriteriaUniverse = normalizeStringArray(input.acceptanceCriteriaUniverse, 'acceptanceCriteriaUniverse');
+  // v0.3.8: when the parent owns a structured requirements ledger, child coverage
+  // references must resolve against it and the universe is the ledger's active set —
+  // no longer free-form labels. Parents without a ledger keep the free-form model.
+  const requirements = await loadWorkRequirements(root, meta);
+  if (requirements.exists) {
+    const traced = resolveAgainstLedger(parentId, children, requirements.ledger, { requirementsUniverse, acceptanceCriteriaUniverse });
+    if (traced.errors.length) throw new Error(`Decomposition proposal for ${parentId} is invalid:\n${traced.errors.map((entry) => `- ${entry}`).join('\n')}`);
+    // Never stored: the universe is the parent's requirements ledger, derived at read time.
+    requirementsUniverse = [];
+    acceptanceCriteriaUniverse = [];
+  }
 
   const ledger = {
     schemaVersion: DECOMPOSITION_SCHEMA_VERSION,
@@ -69,7 +81,7 @@ export async function validateDecomposition(root, parentId, now = new Date().toI
   if (!existing.exists) throw new Error(`${parentId} has no proposed decomposition. Run \`yallaflow decompose propose\` first.`);
   const ledger = existing.ledger;
   const errors = validateChildren(ledger.children);
-  const coverage = computeTraceability(ledger);
+  const coverage = await loadDecompositionTraceability(root, parentId, ledger);
   if (errors.length) return { meta, ledger, errors, coverage, valid: false };
 
   if (ledger.status === 'proposed') {
@@ -153,20 +165,30 @@ export function readyChildren(view) {
   return view.filter((child) => child.state === 'ready');
 }
 
-export function computeTraceability(ledger) {
+// `requirements` (v0.3.8): the parent's requirements ledger when it has one. The
+// universe is then derived from it at read time — never from a stored copy — and
+// references to criteria no longer active are reported.
+export function computeTraceability(ledger, requirements = null) {
   const requirementCounts = tallyReferences(ledger.children, 'requirements');
   const acceptanceCounts = tallyReferences(ledger.children, 'acceptanceCriteria');
+  const active = (entries) => entries.filter((entry) => entry.status === 'active').map((entry) => entry.id);
   return {
-    requirements: coverageSummary(requirementCounts, ledger.requirementsUniverse),
-    acceptanceCriteria: coverageSummary(acceptanceCounts, ledger.acceptanceCriteriaUniverse)
+    requirements: coverageSummary(requirementCounts, requirements ? active(requirements.requirements) : ledger.requirementsUniverse, Boolean(requirements)),
+    acceptanceCriteria: coverageSummary(acceptanceCounts, requirements ? active(requirements.acceptanceCriteria) : ledger.acceptanceCriteriaUniverse, Boolean(requirements))
   };
 }
 
-function coverageSummary(counts, universe = []) {
+export async function loadDecompositionTraceability(root, parentId, ledger) {
+  const requirements = await loadWorkRequirements(root, { id: parentId });
+  return computeTraceability(ledger, requirements.exists ? requirements.ledger : null);
+}
+
+function coverageSummary(counts, universe = [], derived = false) {
   return {
     referenced: [...counts.keys()],
     duplicated: [...counts.entries()].filter(([, count]) => count > 1).map(([id]) => id),
-    unassigned: universe.length ? universe.filter((id) => !counts.has(id)) : null
+    unassigned: universe.length || derived ? universe.filter((id) => !counts.has(id)) : null,
+    ...(derived ? { inactive: [...counts.keys()].filter((id) => !universe.includes(id)) } : {})
   };
 }
 
@@ -301,4 +323,30 @@ async function loadMeta(root, workId) {
 
 function isNonEmptyString(value) {
   return typeof value === 'string' && value.trim().length > 0;
+}
+
+function resolveAgainstLedger(parentId, children, ledger, declared) {
+  const errors = [];
+  const activeRequirements = ledger.requirements.filter((entry) => entry.status === 'active').map((entry) => entry.id);
+  const activeCriteria = ledger.acceptanceCriteria.filter((entry) => entry.status === 'active').map((entry) => entry.id);
+  const check = (refs, active, all, label, owner) => refs.map((ref) => {
+    const id = bareRef(ref, parentId);
+    if (!all.includes(id)) errors.push(`${owner}: ${label} ${JSON.stringify(ref)} is not recorded in ${parentId}'s requirements ledger`);
+    else if (!active.includes(id)) errors.push(`${owner}: ${label} ${id} is not active in ${parentId}'s requirements ledger`);
+    return id;
+  });
+  const allRequirements = ledger.requirements.map((entry) => entry.id);
+  const allCriteria = ledger.acceptanceCriteria.map((entry) => entry.id);
+  for (const child of children) {
+    child.requirements = check(child.requirements, activeRequirements, allRequirements, 'requirement', `child ${child.key}`);
+    child.acceptanceCriteria = check(child.acceptanceCriteria, activeCriteria, allCriteria, 'acceptance criterion', `child ${child.key}`);
+  }
+  const sameSet = (a, b) => a.length === b.length && a.every((id) => b.includes(id));
+  if (declared.requirementsUniverse.length && !sameSet(declared.requirementsUniverse.map((ref) => bareRef(ref, parentId)), activeRequirements)) {
+    errors.push(`requirementsUniverse must match ${parentId}'s active requirements (${activeRequirements.join(', ')}) or be omitted`);
+  }
+  if (declared.acceptanceCriteriaUniverse.length && !sameSet(declared.acceptanceCriteriaUniverse.map((ref) => bareRef(ref, parentId)), activeCriteria)) {
+    errors.push(`acceptanceCriteriaUniverse must match ${parentId}'s active acceptance criteria (${activeCriteria.join(', ')}) or be omitted`);
+  }
+  return { errors, requirementsUniverse: activeRequirements, acceptanceCriteriaUniverse: activeCriteria };
 }

@@ -9,7 +9,7 @@ test('exposes the YallaFlow product and CLI identity', async () => {
   assert.equal(pkg.private, true);
   assert.equal(pkg.description, 'AI-agnostic engineering governance layer for coding agents: durable project memory, adaptive workflows, and evidence-backed delivery.');
   assert.deepEqual(pkg.bin, { yallaflow: 'src/cli.js' });
-  assert.equal(pkg.version, '0.3.7-internal.1');
+  assert.equal(pkg.version, '0.3.8-internal.1');
 
   const result = spawnSync(process.execPath, ['src/cli.js', '--help'], { encoding: 'utf8' });
   assert.equal(result.status, 0);

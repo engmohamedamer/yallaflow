@@ -92,6 +92,16 @@ export const SKILL_REGISTRY = Object.freeze([
     instructionPath: 'resources/skills/verification.md'
   }),
   skill({
+    id: 'delivery-convergence',
+    version: 1,
+    capability: 'converge',
+    title: 'Delivery Convergence',
+    phase: 'verification',
+    mode: 'review-only',
+    prerequisites: ['verification'],
+    instructionPath: 'resources/skills/delivery-convergence.md'
+  }),
+  skill({
     id: 'code-review',
     version: 1,
     capability: 'review',

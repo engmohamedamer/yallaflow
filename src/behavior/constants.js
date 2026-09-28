@@ -20,6 +20,7 @@ export const CAPABILITIES = Object.freeze([
   'plan',
   'implement',
   'verify',
+  'converge',
   'review',
   'baseline',
   'reconcile'

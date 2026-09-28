@@ -4,6 +4,7 @@ import { defaultTitleFromFilename, describeContentAvailability } from '../intake
 import { findSourceByChecksum, linkSourceToWork, persistSource, removeSourceDir } from '../core/sources.js';
 import { addSourceToWork, assertSourceLinkAllowed, createPendingIntake } from '../behavior/routing.js';
 import { loadWorkMetaOrThrow } from '../core/workspace.js';
+import { describeTrigger, loadWorkImpacts, pendingImpact } from '../delivery/impact.js';
 
 // Creates a new pending work item from one or more source files:
 //   yallaflow intake SRS.docx
@@ -65,6 +66,11 @@ export async function intakeAddCommand(requestedWorkId, filePaths, options = {})
   console.log(`\nSource${sources.length > 1 ? 's' : ''}:\n${sources.map(describeSource).join('\n')}`);
   console.log(`\nTotal sources on ${work.id}: ${work.sources.length}`);
   if (work.status === 'DONE') console.log(`${work.id} remains DONE; recorded as recovered source(s) attached after completion (reason: ${options.reason.trim()}).`);
+  const impact = pendingImpact((await loadWorkImpacts(root, work)).ledger);
+  if (impact && impact.triggers.some((trigger) => trigger.type === 'source' && sources.some((source) => source.id === trigger.source))) {
+    console.log(`\nImpact ${impact.id} pending: ${impact.triggers.map(describeTrigger).join('; ')} after ${work.id}'s approved intent was fixed.`);
+    console.log(`YallaFlow does not judge what the source changes. Assess which completed stages it affects before continuing:\n  yallaflow impact status ${work.id}\n  yallaflow impact assess ${work.id} --file impact.json`);
+  }
 }
 
 async function captureSources(root, filePaths) {

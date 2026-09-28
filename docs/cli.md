@@ -1,6 +1,6 @@
 # CLI Reference
 
-YallaFlow v0.3.7. Every command also answers `--help` / `-h` (at any position, including sub-actions such as `yallaflow knowledge propose --help`) without changing any state. `[work-id]` defaults to the active work item.
+YallaFlow v0.3.8. Every command also answers `--help` / `-h` (at any position, including sub-actions such as `yallaflow knowledge propose --help`) without changing any state. `[work-id]` defaults to the active work item.
 
 ## Workspace
 
@@ -8,8 +8,8 @@ YallaFlow v0.3.7. Every command also answers `--help` / `-h` (at any position, i
 |---|---|
 | `yallaflow init [--name NAME] [--type greenfield\|brownfield] [--mode autonomous\|adaptive\|gated]` | Create `.yallaflow/`. Type is detected when omitted; mode defaults to `adaptive`. Refuses to overwrite an existing, legacy `.projectflow/`, or Git-tracked-but-missing workspace. |
 | `yallaflow status` | All work items, stages, write access; warns if `AGENT.md` predates the installed agent contract. |
-| `yallaflow doctor` | Read-only integrity report: workspace files, ledgers, lifecycle consistency, project-context ledger, projection drift, source checksums, reconciliation plans and lineage, legacy sections presented as current truth. Freshness, agent-contract, hand-edited legacy sections, work.md lifecycle-record drift, and Git-tracking notes are warnings. Exit code 1 on structural failures. |
-| `yallaflow brief` | Fresh-agent orientation, read-only: agent contract, active and most recent work, project memory, pending legacy reconciliation, sources, the primary next concern and the command to run next. Never dumps context. |
+| `yallaflow doctor` | Read-only integrity report: workspace files, ledgers, lifecycle consistency, project-context ledger, projection drift, source checksums, reconciliation plans and lineage, legacy sections presented as current truth, delivery state (requirement/criterion references, convergence findings and evidence, impact revisions, a DONE or completed-convergence state the recorded findings never supported). Freshness (including convergence evidence that changed after it was recorded), agent-contract and bootstrap-block, hand-edited legacy sections, work.md lifecycle-record drift, and Git-tracking notes are warnings. Exit code 1 on structural failures. |
+| `yallaflow brief` | Fresh-agent orientation, read-only: agent contract and provider bootstrap blocks, active and most recent work (with its delivery/convergence line and any pending impact), project memory, pending legacy reconciliation, sources, the primary next concern and the command to run next. Never dumps context. |
 | `yallaflow upgrade status` | Read-only upgrade assessment: installed version, legacy structures, agent contract, canonical and pending legacy facts, reconciliation progress, sources, work history, integrity, Git durability, recommended next action. |
 | `yallaflow upgrade plan` | The ordered upgrade steps as deliberate commands. Never migrates or repairs anything itself. |
 | `yallaflow --version` | Package version. |
@@ -20,7 +20,7 @@ YallaFlow v0.3.7. Every command also answers `--help` / `-h` (at any position, i
 |---|---|
 | `yallaflow start ["<request>"]` | Without text: show intents. With text: create a pending, unclassified work item preserving the raw request. |
 | `yallaflow intake <file> [<file> ...] [--title TITLE]` | Capture files as immutable `SRC-####` sources and create one pending work item. |
-| `yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]` | Attach sources to existing work. `--reason` is required for DONE work (recorded as a recovered source). |
+| `yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]` | Attach sources to existing work. `--reason` is required for DONE work (recorded as a recovered source). On delivery-convergence work whose approved intent is already fixed, it also raises a pending impact assessment (see [Delivery convergence](#delivery-convergence-and-change-impact)). |
 | `yallaflow source list` · `yallaflow source show <source-id> [--content]` | Inspect sources, their linked work, and (optionally) available text. |
 | `yallaflow request revise <work-id> --text TEXT --reason TEXT` | Correct a pending (unrouted) request; history is kept. |
 | `yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]` | Apply the agent's classification: pins the Behavior Contract, workflow, read-only and knowledge policy. |
@@ -43,9 +43,9 @@ Types: `feature`, `bug`, `investigation`, `change`, `refactor`, `release`. Scope
 | `yallaflow ready [work-id]` | Delivery readiness: `SPEC_READY`, `PLAN_READY`, `DONE`. |
 | `yallaflow resume [work-id]` | What to continue. With an ID: read-only inspection, active work unchanged. |
 | `yallaflow handoff [work-id]` | Compact, read-only context for another agent or session. |
-| `yallaflow reopen <work-id> --to implementation\|verification\|review --reason REASON` | Reactivate DONE work auditably. |
+| `yallaflow reopen <work-id> --to implementation\|verification\|review --reason REASON` | Reactivate DONE work auditably. Resets the post-implementation chain from the target (implementation → verification → delivery-convergence → code-review); evidence and convergence history are kept, and reopening to implementation or verification makes them stale. Reopening to review resets only code review and leaves verification and convergence current. |
 
-Skills (Skill Registry v4): `context-discovery`, `requirement-clarification`, `design-exploration`, `specification`, `implementation-planning`, `systematic-debugging`, `implementation`, `verification`, `code-review`, `repository-baseline`, `context-reconciliation`. Work pinned to an earlier registry version keeps its recorded skills.
+Skills (Skill Registry v5): `context-discovery`, `requirement-clarification`, `design-exploration`, `specification`, `implementation-planning`, `systematic-debugging`, `implementation`, `verification`, `delivery-convergence`, `code-review`, `repository-baseline`, `context-reconciliation`. Work pinned to an earlier registry version keeps its recorded skills.
 
 ## Verification
 
@@ -126,9 +126,27 @@ Knowledge kinds: `architecture`, `database`, `integration`, `environment`, `conv
 
 Actions: `new`; `merge-with` (target `RC-####` only — collapse candidates that are the same statement); `reconfirms` (target `CTX-####` or `RC-####`, same area — one more observation of a truth already represented); `supersedes`, `disputes` (target `RC-####` or `CTX-####`); `skip` (reason); `limitation` (`limitationType` + reason). Applying writes context schema v2. See [upgrading-to-v0.3.7.md](upgrading-to-v0.3.7.md#4-reconcile-legacy-project-context).
 
+## Delivery convergence and change impact
+
+Applies to work whose pinned Behavior Contract includes `delivery-convergence` (Skill Registry v5+): `feature` (bounded, architectural) and `change` architectural. Other work, and work routed before v0.3.8, is unaffected — these commands report *not applicable* and write nothing. Read commands never mutate; `record`/`assess` validate the whole file first and change nothing on any error.
+
+| Command | Purpose |
+|---|---|
+| `yallaflow requirement record <work-id> --file <requirements.json>` | Record Agent-extracted requirements (`REQ-###`) and acceptance criteria (`AC-###`): `{"requirements":[{"id","statement","provenance":[...],"status","reason"}],"acceptanceCriteria":[{"id","requirement","statement","provenance":[...],"status","reason"}]}`. Upsert by ID; omitted entries are unchanged; revisions keep the previous content in history. Provenance: `{"type":"request"}`, `{"type":"specification","section":"..."}`, `{"type":"source","source":"SRC-####","locator":"..."}`, `{"type":"question","question":"Q-###"}`. Status `active`, `withdrawn`, or `deferred` (the last two need a reason). Every active requirement needs an active criterion. Refused on DONE work and on decomposed children that answer for their parent's criteria. Once the intent is fixed — the intent checkpoint completed, or any later checkpoint already started — a change raises a pending impact. A criterion a not-yet-DONE decomposed child answers for cannot be withdrawn or deferred on the parent. |
+| `yallaflow requirement list <work-id>` | Requirements, criteria (own, or assigned from the parent), and each criterion's current convergence. |
+| `yallaflow requirement show <work-id> <REQ-###\|AC-###>` | One entry: statement, status, provenance, history, and (for a criterion) its current finding and staleness. |
+| `yallaflow convergence record <work-id> --file <convergence.json>` | Append assessment `CV-###`: `{"summary","findings":[{"criterion","status","reason","evidence":[...]}],"unrequested":[{"id?","summary","evidence","disposition","reason"}]}`. Status `satisfied`, `partial`, `missing`, `contradicts`; every finding needs a reason and evidence; `satisfied` needs more than free-text references and cannot rest on a failed run. Evidence: repository paths, `verification:V-###`, `runtime:`/`user:` text, `convergence:PF-####/CV-###` (a child's assessment), or a reference. Unrequested behavior (`UR-###`, allocated when `id` is omitted): `open`, `accepted` (reason), `removed` (reason). Allowed once the verification checkpoint is completed, never on DONE or while an impact is pending. `convergence:` evidence must cite a direct decomposition child's assessment that recorded this criterion as satisfied, and goes stale when the child's current finding does. Paths under `.yallaflow/` are not accepted as evidence. A gap recorded after the `delivery-convergence` checkpoint was completed returns it to `in_progress`. |
+| `yallaflow convergence status <work-id>` | Counts per status (and stale), open unrequested behavior, blockers, next valid action. |
+| `yallaflow convergence show <work-id> [CV-###\|AC-###\|UR-###]` | All assessments, one assessment, or one criterion's/item's history. |
+| `yallaflow impact status <work-id>` | Assessed impacts and the pending one: its triggers and every completed stage that needs a verdict, with a JSON template. |
+| `yallaflow impact assess <work-id> --file <impact.json>` | `{"impact":"IM-###","summary","stages":{"<skill>":{"verdict":"affected\|unaffected","reason":"..."}}}` — one verdict per completed stage. Rules: an affected post-implementation stage makes every later one affected; any affected stage, or a changed acceptance criterion, makes `delivery-convergence` affected. Affected checkpoints are revised through the audited `checkpoint revise` path (stage correction, gate invalidation, verification freshness boundary); no evidence is deleted. |
+
+A pending impact blocks `advance`, checkpoint completion, and `convergence record`, and withholds write authorization in `guide`. DONE requires the `delivery-convergence` checkpoint, every active criterion currently satisfied (not stale), no open unrequested behavior, and no pending impact.
+
 ## Agent contract
 
 | Command | Purpose |
 |---|---|
-| `yallaflow agent status` | Is `.yallaflow/AGENT.md` at the installed agent-contract version? Read-only. |
-| `yallaflow agent refresh [--preserve-existing] [--dry-run]` | Deliberate, idempotent update of the managed block; customized guidance is kept only with `--preserve-existing`. |
+| `yallaflow agent status` | Is `.yallaflow/AGENT.md` at the installed agent-contract version, and which provider bootstrap blocks are set up (and current)? Read-only. |
+| `yallaflow agent refresh [--preserve-existing] [--dry-run]` | Deliberate, idempotent update of the managed block; customized guidance is kept only with `--preserve-existing`. Also updates installed provider bootstrap blocks that are unmodified and outdated; anything else is reported, never forced. |
+| `yallaflow agent setup <codex\|claude> [--preserve-existing] [--dry-run]` | Add a thin, versioned YallaFlow bootstrap block to the provider's repository-root session file (`codex` → `AGENTS.md`, `claude` → `CLAUDE.md`). The block holds only the session-start sequence and a pointer to `.yallaflow/AGENT.md` (for Claude, an `@.yallaflow/AGENT.md` import); it never restates the contract. Existing content is kept byte-for-byte (the block is appended); idempotent; a hand-edited block is refused unless `--preserve-existing`; a newer block is never downgraded. |

@@ -15,6 +15,7 @@ import { projectContextLines } from '../context/summary.js';
 import { loadWorkLimitations } from '../limitations/store.js';
 import { describeWorkSourceLocations } from '../core/sources.js';
 import { reconciliationSummaryLines } from '../reconciliation/store.js';
+import { loadDeliverySummary } from '../delivery/summary.js';
 
 export async function resumeCommand(requestedWorkId) {
   const root = await findProjectRoot();
@@ -42,7 +43,8 @@ export async function resumeCommand(requestedWorkId) {
   }
   const stage = isActive ? state.stage : meta.status;
   const progress = await loadWorkProgress(root, meta);
-  const guidance = buildBehaviorGuidance(meta, stage, progress.ledger);
+  const delivery = await loadDeliverySummary(root, meta);
+  const guidance = buildBehaviorGuidance(meta, stage, progress.ledger, delivery);
   const questions = await loadWorkQuestions(root, meta);
   const readiness = evaluateReadiness(meta, progress, questions);
   const verification = await latestVerification(root, meta.id);
@@ -65,7 +67,9 @@ export async function resumeCommand(requestedWorkId) {
   const reconciliation = meta.reconciliation ? await reconciliationSummaryLines(root, meta) : null;
   const primaryObjective = reconciliation && meta.status !== 'DONE'
     ? 'Reconcile legacy project context.'
-    : resolvePrimaryObjective(meta, progress.ledger, guidance.modification);
+    : delivery.pendingImpact
+      ? guidance.nextObjective
+      : resolvePrimaryObjective(meta, progress.ledger, guidance.modification);
   if (primaryObjective) console.log(`\nPRIMARY UNRESOLVED OBJECTIVE:\n${primaryObjective}`);
   if (reconciliation) {
     console.log('\nReconciliation:');
@@ -76,6 +80,7 @@ export async function resumeCommand(requestedWorkId) {
   printProgress(guidance.progress);
   if (guidance.progress.current?.summary) console.log(`\nCurrent finding: ${guidance.progress.current.summary}`);
   console.log(`\nVerification: ${verification ? (verification.success ? 'passed' : 'failed') : 'not recorded'}`);
+  if (delivery.lines.length) console.log(`\n${delivery.lines.join('\n')}`);
   if (knowledgeRelevant) printKnowledge(knowledgeSummary);
   printOpenQuestions(readiness.questions);
   await printProjectMemory(root, meta, knowledge.ledger);

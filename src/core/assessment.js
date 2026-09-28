@@ -3,6 +3,7 @@ import { checkWorkspaceIntegrity } from './integrity.js';
 import { listSources } from './sources.js';
 import { collectDoctorReport } from '../commands/doctor.js';
 import { describeAgentContractState, inspectAgentContract } from '../agent/contract.js';
+import { describeBootstrapState, inspectAllBootstraps } from '../agent/bootstrap.js';
 import { summarizeProjectContext } from '../context/summary.js';
 import { probeContextSchema, unsupportedSchemaMessage } from '../context/ledger.js';
 import { findActiveReconciliation, pendingLegacyCandidates, reconciliationStatus } from '../reconciliation/store.js';
@@ -17,12 +18,13 @@ export async function assessWorkspace(root) {
   // sections are skipped rather than misinterpreted.
   const schema = await probeContextSchema(root);
   const readable = schema.supported || !schema.exists;
-  const [config, state, work, sources, agent, doctor, memory, pendingLegacy, active] = await Promise.all([
+  const [config, state, work, sources, agent, bootstraps, doctor, memory, pendingLegacy, active] = await Promise.all([
     getConfig(root),
     getCurrentState(root),
     listWork(root),
     listSources(root).catch(() => []),
     inspectAgentContract(root),
+    inspectAllBootstraps(root),
     collectDoctorReport(root),
     readable ? summarizeProjectContext(root) : { exists: false, unreadable: true },
     readable ? pendingLegacyCandidates(root) : [],
@@ -52,6 +54,11 @@ export async function assessWorkspace(root) {
       : ['legacy-customized', 'modified'].includes(agent.state) ? 'yallaflow agent refresh --preserve-existing --dry-run' : 'yallaflow agent refresh';
     plan.push({ title: agent.state === 'newer' ? 'Upgrade the installed YallaFlow package' : 'Refresh the Agent Contract', command, detail: describeAgentContractState(agent) });
   }
+  // Provider bootstrap is optional: only an installed block that needs attention is a step.
+  for (const bootstrap of bootstraps.filter((item) => ['outdated', 'modified', 'newer'].includes(item.state))) {
+    const command = bootstrap.state === 'newer' ? null : bootstrap.state === 'modified' ? `yallaflow agent setup ${bootstrap.provider} --preserve-existing --dry-run` : 'yallaflow agent refresh';
+    plan.push({ title: bootstrap.state === 'newer' ? 'Upgrade the installed YallaFlow package' : `Refresh the ${bootstrap.file} agent bootstrap`, command, detail: describeBootstrapState(bootstrap) });
+  }
   if (reconciliation) {
     plan.push({ title: 'Continue legacy context reconciliation', command: reconciliation.nextAction, detail: `${reconciliation.meta.id}: ${reconciliation.counts.decided}/${reconciliation.counts.total} decided, ${reconciliation.counts.applied} applied, review ${reconciliation.review}.` });
   } else if (pendingLegacy.length) {
@@ -73,6 +80,7 @@ export async function assessWorkspace(root) {
     work,
     sources,
     agent,
+    bootstraps,
     doctor: { failures, warnings: doctor.warnings },
     memory,
     pendingLegacy,

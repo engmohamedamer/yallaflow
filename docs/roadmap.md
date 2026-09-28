@@ -69,8 +69,7 @@ YallaFlow is an AI-agnostic engineering governance layer for coding agents — d
 ### Still planned (not yet implemented)
 
 - **Tracker intake** — Azure DevOps, Jira, and GitHub Issues as requirement sources, with attachments and source traceability back to the originating ticket
-- **Codex adapter** and **Claude adapter** — first-party agent adapters/plugins building on `resources/agents/codex/` and `resources/agents/claude/`
-- **Agent bootstrap/session guidance** — a deterministic session-start sequence so a cold agent session reliably loads `.yallaflow/AGENT.md` and calls `yallaflow resume` before acting
+- ~~**Codex adapter** and **Claude adapter**~~ and ~~**agent bootstrap/session guidance**~~ — delivered in v0.3.8 as thin, versioned bootstrap blocks (`yallaflow agent setup codex|claude`) pointing to `.yallaflow/AGENT.md`; deeper provider integration (hooks, plugins) remains future work
 - Git worktree safety and baseline verification for multi-source/multi-agent execution
 - Future semantic deduplication and optional assisted knowledge extraction (still explicitly agent-proposed, not inferred by YallaFlow)
 - OCR/vision understanding of images and scanned PDFs (deliberately not introduced this release — see the parser-decisions notes in `CHANGELOG.md`)
@@ -139,6 +138,20 @@ Finding from the clean YaSchools v0.3.5 → v0.3.6 upgrade: 53 legacy context se
 - Explicit YallaFlow state ownership (CLI-owned vs projection vs shared `work.md` vs human) with deterministic doctor checks; Agent Contract v3; Skill Registry v4 (`context-reconciliation`)
 
 Deliberately not in scope: semantic/fuzzy deduplication, embeddings or LLM calls in the CLI, an automatic "upgrade everything" command, locking, team mode.
+
+### v0.3.8 — Delivery Convergence & Agent Continuity
+
+Passing tests did not prove that the delivered implementation matched the approved intent, a new requirement source attached mid-implementation left the approved specification and plan standing, and a cold agent session still depended on the developer to point it at YallaFlow:
+
+- Stable, Agent-proposed requirement and acceptance-criterion identity (`REQ-###`, `AC-###`, cross-work `PF-####/AC-###`) in `work/<id>/requirements.yaml`, with provenance to the request, specification sections, linked sources, and answered questions; required at the intent checkpoint of feature work and architectural changes (Skill Registry v5 pins `delivery-convergence` there, and nowhere else)
+- Append-only convergence ledger: per-criterion `satisfied`/`partial`/`missing`/`contradicts` findings with reasons and evidence, unrequested behavior (`UR-###`) accepted or removed, derived staleness (reopen, revision, criterion change, impact, changed evidence) — never converted, never deleted
+- Convergence as a DONE gate for delivery contracts only; SPEC_READY/PLAN_READY unchanged; reopen/revise/failing verification invalidate it through the existing cascade
+- Deterministic change impact: a source attached or requirements changed after the intent is fixed raises a pending impact; the Agent assesses each completed stage; YallaFlow applies audited checkpoint revision (no second lifecycle engine, no deleted evidence)
+- Ledger-backed decomposition traceability: child references resolve against the parent's requirements; children answer for their assigned criteria
+- Compact delivery block in `guide`/`resume`/`handoff`/`brief`; doctor delivery integrity (errors for contradictions, warnings for evidence drift)
+- First-party agent bootstrap for Codex (`AGENTS.md`) and Claude (`CLAUDE.md`), versioned and refreshable; Agent Contract v4
+
+Deliberately not in scope: team mode, locking, remote sync, tracker/email intake, dashboards, semantic inference or LLM calls in the CLI, an execution engine, multi-agent orchestration, model-tier routing.
 
 ## v0.4 — Execution
 - Execution contracts

@@ -47,7 +47,17 @@ import {
 import { upgradePlanCommand, upgradeStatusCommand } from './commands/upgrade.js';
 import { briefCommand } from './commands/brief.js';
 import { PACKAGE_VERSION } from './version.js';
-import { agentRefreshCommand, agentStatusCommand } from './commands/agent.js';
+import { agentRefreshCommand, agentSetupCommand, agentStatusCommand } from './commands/agent.js';
+import {
+  convergenceRecordCommand,
+  convergenceShowCommand,
+  convergenceStatusCommand,
+  impactAssessCommand,
+  impactStatusCommand,
+  requirementListCommand,
+  requirementRecordCommand,
+  requirementShowCommand
+} from './commands/delivery.js';
 import {
   baselineApproveCommand,
   baselineDraftCommand,
@@ -62,7 +72,7 @@ import { INTERACTION_MODES, GATE_NAMES } from './behavior/interaction.js';
 const VALID_PROJECT_TYPES = new Set(['greenfield', 'brownfield']);
 
 function help() {
-  console.log(`YallaFlow foundation CLI\n\nGive AI your project, not just your prompt.\n\nUsage:\n  yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]\n  yallaflow start [request]\n  yallaflow request --help\n  yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]\n  yallaflow source --help\n  yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]\n  yallaflow baseline --help\n  yallaflow guide [work-id]\n  yallaflow ready [work-id]\n  yallaflow skill <skill-id>\n  yallaflow checkpoint --help\n  yallaflow question --help\n  yallaflow knowledge --help\n  yallaflow context --help\n  yallaflow upgrade status|plan\n  yallaflow brief\n  yallaflow limitation --help\n  yallaflow agent --help\n  yallaflow decompose --help\n  yallaflow progress <parent-id>\n  yallaflow next <parent-id>\n  yallaflow approve <work-id> --stage GATE [--note TEXT]\n  yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]\n  yallaflow handoff [work-id]\n  yallaflow feature <title> --scope SCOPE\n  yallaflow bug <title> --scope SCOPE\n  yallaflow investigate <title> --scope SCOPE\n  yallaflow change <title> --scope SCOPE\n  yallaflow refactor <title> --scope SCOPE\n  yallaflow release <title> --scope SCOPE\n  yallaflow status\n  yallaflow resume [work-id]\n  yallaflow doctor\n  yallaflow advance [work-id]\n  yallaflow verify [work-id] -- <executable> [args...]\n  yallaflow verify [work-id] --shell "<command>"\n  yallaflow verify [work-id] --script <path>\n  yallaflow verify list [work-id]\n  yallaflow reopen <work-id> --to implementation|verification|review --reason REASON\n  yallaflow --version\n`);
+  console.log(`YallaFlow foundation CLI\n\nGive AI your project, not just your prompt.\n\nUsage:\n  yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]\n  yallaflow start [request]\n  yallaflow request --help\n  yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]\n  yallaflow source --help\n  yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]\n  yallaflow baseline --help\n  yallaflow guide [work-id]\n  yallaflow ready [work-id]\n  yallaflow skill <skill-id>\n  yallaflow checkpoint --help\n  yallaflow question --help\n  yallaflow knowledge --help\n  yallaflow requirement --help\n  yallaflow convergence --help\n  yallaflow impact --help\n  yallaflow context --help\n  yallaflow upgrade status|plan\n  yallaflow brief\n  yallaflow limitation --help\n  yallaflow agent --help\n  yallaflow decompose --help\n  yallaflow progress <parent-id>\n  yallaflow next <parent-id>\n  yallaflow approve <work-id> --stage GATE [--note TEXT]\n  yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]\n  yallaflow handoff [work-id]\n  yallaflow feature <title> --scope SCOPE\n  yallaflow bug <title> --scope SCOPE\n  yallaflow investigate <title> --scope SCOPE\n  yallaflow change <title> --scope SCOPE\n  yallaflow refactor <title> --scope SCOPE\n  yallaflow release <title> --scope SCOPE\n  yallaflow status\n  yallaflow resume [work-id]\n  yallaflow doctor\n  yallaflow advance [work-id]\n  yallaflow verify [work-id] -- <executable> [args...]\n  yallaflow verify [work-id] --shell "<command>"\n  yallaflow verify [work-id] --script <path>\n  yallaflow verify list [work-id]\n  yallaflow reopen <work-id> --to implementation|verification|review --reason REASON\n  yallaflow --version\n`);
 }
 
 function decomposeHelp() {
@@ -76,7 +86,10 @@ function baselineHelp() {
 const RECONCILE_USAGE = 'yallaflow context reconcile start\n  yallaflow context reconcile status [work-id]\n  yallaflow context reconcile show [work-id] [--candidate RC-####]\n  yallaflow context reconcile plan [work-id] --file <decisions.json>\n  yallaflow context reconcile preview [work-id]\n  yallaflow context reconcile approve [work-id] [--note TEXT]\n  yallaflow context reconcile feedback [work-id] --changes-requested [--note TEXT]\n  yallaflow context reconcile apply [work-id]';
 const CONTEXT_USAGE = `yallaflow context status\n  yallaflow context list [--area AREA] [--all]\n  yallaflow context show <CTX-id>\n  yallaflow context history <CTX-id>\n  yallaflow context affected [--since REF] [path ...]\n  yallaflow context adopt [--dry-run]\n  yallaflow context render\n  ${RECONCILE_USAGE}`;
 const UPGRADE_USAGE = 'yallaflow upgrade status\n  yallaflow upgrade plan';
-const AGENT_USAGE = 'yallaflow agent status\n  yallaflow agent refresh [--preserve-existing] [--dry-run]';
+const AGENT_USAGE = 'yallaflow agent status\n  yallaflow agent refresh [--preserve-existing] [--dry-run]\n  yallaflow agent setup <codex|claude> [--preserve-existing] [--dry-run]';
+const REQUIREMENT_USAGE = 'yallaflow requirement record <work-id> --file <requirements.json>\n  yallaflow requirement list <work-id>\n  yallaflow requirement show <work-id> <REQ-###|AC-###>';
+const CONVERGENCE_USAGE = 'yallaflow convergence record <work-id> --file <convergence.json>\n  yallaflow convergence status <work-id>\n  yallaflow convergence show <work-id> [CV-###|AC-###|UR-###]';
+const IMPACT_USAGE = 'yallaflow impact status <work-id>\n  yallaflow impact assess <work-id> --file <impact.json>';
 const LIMITATION_USAGE = 'yallaflow limitation add [work-id] --type TYPE --area AREA --summary TEXT --reason TEXT\n  yallaflow limitation list [work-id]';
 
 function contextHelp() {
@@ -88,7 +101,19 @@ function upgradeHelp() {
 }
 
 function agentHelp() {
-  console.log(`Usage:\n  ${AGENT_USAGE}\n\nAGENT.md is project-owned; YallaFlow manages only its marked agent-contract block and never rewrites it automatically.\n`);
+  console.log(`Usage:\n  ${AGENT_USAGE}\n\nAGENT.md is project-owned; YallaFlow manages only its marked agent-contract block and never rewrites it automatically.\n\`agent setup\` adds a thin, versioned bootstrap block to the provider's repository-root session file (codex → AGENTS.md, claude → CLAUDE.md) that points to .yallaflow/AGENT.md; content outside the block is never changed. \`agent refresh\` also updates installed, unmodified bootstrap blocks.\n`);
+}
+
+function requirementHelp() {
+  console.log(`Usage:\n  ${REQUIREMENT_USAGE}\n\nStable requirement (REQ-###) and acceptance-criterion (AC-###) identity for work whose Behavior Contract includes delivery-convergence.\nThe Agent extracts them from the approved intent; YallaFlow validates and records them in work/<id>/requirements.yaml. The approved specification stays authoritative.\nChanging them after the intent checkpoint is completed raises a pending impact assessment.\n`);
+}
+
+function convergenceHelp() {
+  console.log(`Usage:\n  ${CONVERGENCE_USAGE}\n\nConvergence answers: does the delivered implementation match the approved intent? (verification: do the checks pass? review: is it technically acceptable?)\nThe Agent records one finding per acceptance criterion — satisfied, partial, missing, or contradicts — with a reason and evidence, plus unrequested behavior (UR-###: open, accepted, removed).\nAssessments are append-only; stale findings are reported, never rewritten. DONE requires every active criterion to be currently satisfied.\n`);
+}
+
+function impactHelp() {
+  console.log(`Usage:\n  ${IMPACT_USAGE}\n\nA source attached, or requirements changed, after the approved intent was fixed raises a pending impact.\nThe Agent assesses each completed stage as affected or unaffected (with reasons); YallaFlow revises the affected checkpoints through the audited revision path. No evidence is deleted.\n`);
 }
 
 function limitationHelp() {
@@ -192,7 +217,22 @@ const NAMESPACE_ACTIONS = {
   },
   agent: {
     status: 'yallaflow agent status',
-    refresh: 'yallaflow agent refresh [--preserve-existing] [--dry-run]'
+    refresh: 'yallaflow agent refresh [--preserve-existing] [--dry-run]',
+    setup: 'yallaflow agent setup <codex|claude> [--preserve-existing] [--dry-run]'
+  },
+  requirement: {
+    record: 'yallaflow requirement record <work-id> --file <requirements.json>',
+    list: 'yallaflow requirement list <work-id>',
+    show: 'yallaflow requirement show <work-id> <REQ-###|AC-###>'
+  },
+  convergence: {
+    record: 'yallaflow convergence record <work-id> --file <convergence.json>',
+    status: 'yallaflow convergence status <work-id>',
+    show: 'yallaflow convergence show <work-id> [CV-###|AC-###|UR-###]'
+  },
+  impact: {
+    status: 'yallaflow impact status <work-id>',
+    assess: 'yallaflow impact assess <work-id> --file <impact.json>'
   },
   limitation: {
     add: 'yallaflow limitation add [work-id] --type TYPE --area AREA --summary TEXT --reason TEXT',
@@ -256,10 +296,30 @@ function printCommandHelp(command, rest) {
   const actionKey = rest.find((token) => !isHelpToken(token) && !token.startsWith('-'));
   const nested = NAMESPACE_ACTIONS[command]?.[actionKey];
   if (nested) return console.log(`Usage:\n  ${nested}\n`);
-  const dedicated = { agent: agentHelp, context: contextHelp, upgrade: upgradeHelp, limitation: limitationHelp, source: sourceHelp, checkpoint: checkpointHelp, knowledge: knowledgeHelp, question: questionHelp, decompose: decomposeHelp, baseline: baselineHelp };
+  const dedicated = { requirement: requirementHelp, convergence: convergenceHelp, impact: impactHelp, agent: agentHelp, context: contextHelp, upgrade: upgradeHelp, limitation: limitationHelp, source: sourceHelp, checkpoint: checkpointHelp, knowledge: knowledgeHelp, question: questionHelp, decompose: decomposeHelp, baseline: baselineHelp };
   if (dedicated[command]) return dedicated[command]();
   if (USAGE[command]) return console.log(`Usage:\n  ${USAGE[command]}\n`);
   return help();
+}
+
+async function deliveryCommand(command, rest) {
+  const [action, ...actionArgs] = rest;
+  const helpFor = { requirement: requirementHelp, convergence: convergenceHelp, impact: impactHelp }[command];
+  if (!action) return helpFor();
+  const usage = NAMESPACE_ACTIONS[command][action];
+  if (!usage) throw new Error(`Unknown ${command} action: ${action}. Use ${Object.keys(NAMESPACE_ACTIONS[command]).join(', ')}.`);
+  const writes = ['record', 'assess'].includes(action);
+  const { values, positionals } = parseOptions(actionArgs, writes ? { file: { type: 'string' } } : {});
+  const wanted = command === 'requirement' && action === 'show' ? 2 : command === 'convergence' && action === 'show' ? [1, 2] : 1;
+  const ok = Array.isArray(wanted) ? wanted.includes(positionals.length) : positionals.length === wanted;
+  if (!ok || (writes && !values.file)) throw new Error(`Usage: ${usage}`);
+  const [workId, id] = positionals;
+  const handlers = {
+    requirement: { record: () => requirementRecordCommand(workId, values), list: () => requirementListCommand(workId), show: () => requirementShowCommand(workId, id) },
+    convergence: { record: () => convergenceRecordCommand(workId, values), status: () => convergenceStatusCommand(workId), show: () => convergenceShowCommand(workId, id) },
+    impact: { status: () => impactStatusCommand(workId), assess: () => impactAssessCommand(workId, values) }
+  };
+  return handlers[command][action]();
 }
 
 async function main() {
@@ -660,8 +720,14 @@ async function main() {
       if (positionals.length) throw new Error('Usage: yallaflow agent refresh [--preserve-existing] [--dry-run]');
       return agentRefreshCommand({ preserveExisting: values['preserve-existing'], dryRun: values['dry-run'] });
     }
-    throw new Error(`Unknown agent action: ${action}. Use status or refresh.`);
+    if (action === 'setup') {
+      const { values, positionals } = parseOptions(actionArgs, { 'preserve-existing': { type: 'boolean' }, 'dry-run': { type: 'boolean' } });
+      if (positionals.length !== 1) throw new Error('Usage: yallaflow agent setup <codex|claude> [--preserve-existing] [--dry-run]');
+      return agentSetupCommand(positionals[0], { preserveExisting: values['preserve-existing'], dryRun: values['dry-run'] });
+    }
+    throw new Error(`Unknown agent action: ${action}. Use status, refresh, or setup.`);
   }
+  if (command === 'requirement' || command === 'convergence' || command === 'impact') return deliveryCommand(command, rest);
   if (command === 'limitation') {
     const [action, ...actionArgs] = rest;
     if (!action) return limitationHelp();

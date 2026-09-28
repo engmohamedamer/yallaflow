@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { exists, readText } from '../utils/fs.js';
 import { workspacePath } from './workspace.js';
+import { BOOTSTRAP_PROVIDERS } from '../agent/bootstrap.js';
 
 // Who may write each part of .yallaflow/ (v0.3.7). The invariant: an Agent never
 // edits YallaFlow-owned structured or history state directly when a supported CLI
@@ -24,6 +25,9 @@ export const STATE_OWNERSHIP = Object.freeze([
   { path: 'work/<id>/decomposition.yaml', owner: 'cli', via: 'decompose propose|validate|execute', pattern: /^work\/PF-\d+\/decomposition\.yaml$/ },
   { path: 'work/<id>/reconciliation.yaml', owner: 'cli', via: 'context reconcile start|plan|approve|feedback|apply', pattern: /^work\/PF-\d+\/reconciliation\.yaml$/ },
   { path: 'work/<id>/legacy-context.md', owner: 'cli', via: 'context reconcile apply (verbatim archive of retired legacy sections)', pattern: /^work\/PF-\d+\/legacy-context\.md$/ },
+  { path: 'work/<id>/requirements.yaml', owner: 'cli', via: 'requirement record', pattern: /^work\/PF-\d+\/requirements\.yaml$/ },
+  { path: 'work/<id>/convergence.yaml', owner: 'cli', via: 'convergence record (append-only assessments)', pattern: /^work\/PF-\d+\/convergence\.yaml$/ },
+  { path: 'work/<id>/impact.yaml', owner: 'cli', via: 'intake add / requirement record (raise), impact assess', pattern: /^work\/PF-\d+\/impact\.yaml$/ },
   { path: 'work/<id>/evidence/', owner: 'cli', via: 'verify (append-only verification ledger and logs)', pattern: /^work\/PF-\d+\/evidence\// },
   { path: 'context/index.yaml', owner: 'cli', via: 'baseline approve, knowledge promote, context reconcile apply, context adopt', pattern: /^context\/index\.yaml$/ },
   { path: 'sources/SRC-####/', owner: 'cli', via: 'intake, intake add (immutable originals + source.json metadata)', pattern: /^sources\/SRC-\d+\// },
@@ -35,8 +39,19 @@ export const STATE_OWNERSHIP = Object.freeze([
   { path: 'config.yaml', owner: 'human', via: 'deliberate project settings (interaction mode, gate overrides)', pattern: /^config\.yaml$/ }
 ]);
 
-export function ownershipOf(relative) {
-  return STATE_OWNERSHIP.find((entry) => entry.pattern.test(relative.split('\\').join('/'))) ?? null;
+// Files YallaFlow may write outside .yallaflow/ (v0.3.8), relative to the repository
+// root. Only the managed bootstrap block is YallaFlow's; the rest of each file belongs
+// to the project and is never rewritten.
+export const REPOSITORY_OWNERSHIP = Object.freeze(Object.values(BOOTSTRAP_PROVIDERS).map((provider) => ({
+  path: `${provider.file} managed bootstrap block`,
+  owner: 'projection',
+  via: `agent setup ${provider.id}, agent refresh; content outside the block is project-owned`,
+  pattern: new RegExp(`^${provider.file.replace('.', '\\.')}$`)
+})));
+
+export function ownershipOf(relative, { base = 'workspace' } = {}) {
+  const table = base === 'repository' ? REPOSITORY_OWNERSHIP : STATE_OWNERSHIP;
+  return table.find((entry) => entry.pattern.test(relative.split('\\').join('/'))) ?? null;
 }
 
 // Deterministic tamper check for the one CLI-appended work.md record whose exact

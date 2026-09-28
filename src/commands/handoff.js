@@ -11,13 +11,14 @@ import { discoverGitState } from '../core/git.js';
 import { loadWorkKnowledge, summarizeKnowledge } from '../knowledge/store.js';
 import { loadReviews } from '../reviews/store.js';
 import { GATE_NAMES } from '../behavior/interaction.js';
-import { childProgressView, computeTraceability, loadDecomposition, readyChildren } from '../decomposition/store.js';
+import { childProgressView, loadDecomposition, loadDecompositionTraceability, readyChildren } from '../decomposition/store.js';
 import { formatSourceList } from '../intake/normalize.js';
 import { resolvePrimaryObjective } from '../behavior/objective.js';
 import { projectContextLines } from '../context/summary.js';
 import { loadWorkLimitations } from '../limitations/store.js';
 import { describeWorkSourceLocations } from '../core/sources.js';
 import { reconciliationSummaryLines } from '../reconciliation/store.js';
+import { loadDeliverySummary } from '../delivery/summary.js';
 
 // Read-only by construction: every call below is a loader (loadWorkProgress,
 // evaluateReadiness, discoverGitState, ...), never a mutator — the same shared
@@ -54,7 +55,8 @@ export async function handoffCommand(requestedWorkId) {
   }
 
   const progress = await loadWorkProgress(root, meta);
-  const guidance = buildBehaviorGuidance(meta, stage, progress.ledger);
+  const delivery = await loadDeliverySummary(root, meta);
+  const guidance = buildBehaviorGuidance(meta, stage, progress.ledger, delivery);
   const questions = await loadWorkQuestions(root, meta);
   const readiness = evaluateReadiness(meta, progress, questions);
   const verification = await latestVerification(root, meta.id);
@@ -65,7 +67,9 @@ export async function handoffCommand(requestedWorkId) {
   const reconciliation = meta.reconciliation ? await reconciliationSummaryLines(root, meta) : null;
   const primaryObjective = reconciliation && meta.status !== 'DONE'
     ? 'Reconcile legacy project context.'
-    : resolvePrimaryObjective(meta, progress.ledger, guidance.modification);
+    : delivery.pendingImpact
+      ? guidance.nextObjective
+      : resolvePrimaryObjective(meta, progress.ledger, guidance.modification);
   if (primaryObjective) console.log(`\nPRIMARY UNRESOLVED OBJECTIVE:\n${primaryObjective}`);
   if (reconciliation) {
     console.log('\nReconciliation:');
@@ -85,6 +89,7 @@ export async function handoffCommand(requestedWorkId) {
   }
   const awaitingReview = GATE_NAMES.filter((name) => reviewLedger.gates[name]?.status && reviewLedger.gates[name].status !== 'approved');
   if (awaitingReview.length) blockers.push(`review gate(s) not approved: ${awaitingReview.map((name) => `${name} (${reviewLedger.gates[name].status})`).join(', ')}`);
+  if (delivery.pendingImpact) blockers.push(`impact ${delivery.pendingImpact.id} pending assessment`);
   if (reconciliation) blockers.push(...reconciliation.status.blockers.filter((entry) => !entry.startsWith('review ') && !entry.includes('open reconciliation question')));
   console.log(`\nBlockers: ${blockers.length ? blockers.join('; ') : 'none'}`);
   printOpenQuestions(readiness.questions);
@@ -94,6 +99,7 @@ export async function handoffCommand(requestedWorkId) {
   }
 
   console.log(`\nVerification: ${verification ? (verification.success ? 'passed' : 'failed') : 'not recorded'}${verification ? ` (${verification.id}, ${verification.verifiedAt})` : ''}`);
+  if (delivery.lines.length) console.log(delivery.lines.join('\n'));
   const knowledgeSummary = summarizeKnowledge(knowledge.ledger);
   console.log(`Knowledge review: ${knowledgeSummary.reviewStatus}`);
   await printProjectMemory(root, meta, knowledge.ledger);
@@ -121,7 +127,7 @@ export async function handoffCommand(requestedWorkId) {
     for (const child of grouped.blocked) console.log(`⊘ ${child.workId ?? child.key} — blocked by ${child.blockedBy.join(', ')}`);
     const ready = readyChildren(view);
     console.log(`Next executable candidates: ${ready.length ? ready.map((child) => child.workId).join(', ') : 'none'}`);
-    const coverage = computeTraceability(decomposition);
+    const coverage = await loadDecompositionTraceability(root, workId, decomposition);
     const unassigned = [
       ...(coverage.requirements.unassigned ?? []),
       ...(coverage.acceptanceCriteria.unassigned ?? [])

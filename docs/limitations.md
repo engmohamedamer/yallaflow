@@ -1,4 +1,4 @@
-# Current Limitations (v0.3.7)
+# Current Limitations (v0.3.8)
 
 Known gaps and deliberate boundaries. Planned work is tracked in [`roadmap.md`](roadmap.md).
 
@@ -34,9 +34,25 @@ Known gaps and deliberate boundaries. Planned work is tracked in [`roadmap.md`](
 - **Ledger and Markdown projection are not one transaction.** A rendering failure leaves canonical knowledge intact; `yallaflow context render` repairs the Markdown.
 - **No knowledge graph, embeddings, or search.** The ledger is a small local file.
 
+## Delivery convergence
+
+- **Convergence is the Agent's judgment.** YallaFlow validates that every finding names a real, active criterion, carries a reason and evidence, and that `satisfied` rests on more than free text; it cannot tell whether the judgment is right. Review the assessment like any other engineering claim.
+- **Applies to feature work and architectural changes only.** Bounded changes, bugs, refactors, releases, investigations, and work routed before v0.3.8 have no requirement identity, convergence, or impact gate — by design.
+- **Staleness is mechanical.** A repository file cited as evidence that changes (any byte) makes the finding stale, even when the change is unrelated to the criterion; directory evidence uses Git diff. Runtime, user, and reference evidence cannot go stale mechanically.
+- **Impact is raised for two events only:** a source attached, or requirements changed, after the intent checkpoint was completed. A change of intent communicated only in conversation is invisible to YallaFlow until the Agent records it.
+- **One pending impact at a time.** Further triggers join it; it is assessed as a whole.
+- **Decomposed children do not receive their parent's impacts.** A parent revising a criterion a child answers for makes the child's finding stale (reported, and DONE is blocked for a child not yet DONE); the parent owns the impact assessment.
+- **No human review gate for convergence.** Convergence is a hard correctness gate; there is no optional `approve --stage convergence` in this release.
+
+## Agent bootstrap
+
+- **Two providers.** `agent setup` supports Codex (`AGENTS.md`) and Claude (`CLAUDE.md`). Other agents can follow `.yallaflow/AGENT.md` directly.
+- **Instruction files only.** No hooks, plugins, or settings files are written; whether a session actually reads the bootstrap file is up to the agent product.
+- **Mixed versions.** A v0.3.7 CLI does not know the delivery gate and can complete v0.3.8-routed feature work without convergence (v0.3.8's `doctor` then reports it). Upgrade everyone together.
+
 ## Upgrades
 
-- **`AGENT.md` refresh is manual.** Existing workspaces keep their old agent guidance until `yallaflow agent refresh` is run (`yallaflow upgrade status` reports it).
+- **`AGENT.md` refresh is manual.** Existing workspaces keep their old agent guidance until `yallaflow agent refresh` is run (`yallaflow upgrade status` reports it). The same holds for provider bootstrap blocks.
 - **No automatic upgrade.** `upgrade status|plan` only report; each step is a deliberate command.
-- **No downgrades or mixed versions** once a newer version has written to a workspace ([upgrading-to-v0.3.7.md](upgrading-to-v0.3.7.md#mixed-versions-and-downgrades)).
+- **No downgrades or mixed versions** once a newer version has written to a workspace ([upgrading-to-v0.3.8.md](upgrading-to-v0.3.8.md#mixed-versions-and-downgrades), [upgrading-to-v0.3.7.md](upgrading-to-v0.3.7.md#mixed-versions-and-downgrades)).
 - **Legacy `.projectflow/` workspaces** are not migrated automatically, and the `PF-####` work ID format is unchanged.

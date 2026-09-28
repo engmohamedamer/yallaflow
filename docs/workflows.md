@@ -1,6 +1,6 @@
 # Canonical Workflows
 
-Command-accurate, end-to-end workflows for YallaFlow v0.3.7. In practice your coding agent runs these commands (guided by `.yallaflow/AGENT.md`); you review, answer business questions, and approve gates. At any point:
+Command-accurate, end-to-end workflows for YallaFlow v0.3.8. In practice your coding agent runs these commands (guided by `.yallaflow/AGENT.md`); you review, answer business questions, and approve gates. At any point:
 
 ```bash
 yallaflow guide <work-id>     # CURRENT OBJECTIVE, BLOCKER, NEXT VALID ACTION
@@ -14,10 +14,13 @@ Stage counts below are illustrative — `guide` and `advance` always name the ne
 - [Bug](#bug)
 - [Investigation](#investigation)
 - [Bounded change](#bounded-change)
+- [Bounded feature with delivery convergence](#bounded-feature-with-delivery-convergence)
+- [Intent changes after work has started](#intent-changes-after-work-has-started)
 - [Task with a user-provided screenshot or file](#task-with-a-user-provided-screenshot-or-file)
 - [Cross-agent handoff](#cross-agent-handoff)
 - [Context freshness and revalidation](#context-freshness-and-revalidation)
 - [Upgrading a legacy workspace (reconciliation)](#upgrading-a-legacy-workspace-reconciliation)
+- [Setting up Codex or Claude](#setting-up-codex-or-claude)
 
 ## Greenfield
 
@@ -29,7 +32,7 @@ yallaflow intake SRS.docx --title "Contract Hub"      # or: yallaflow start "<pl
 yallaflow source show SRC-0001 --content              # what text YallaFlow could extract
 yallaflow route PF-0001 --type feature --scope architectural --confidence high \
   --reason "New multi-actor system with payments and signing."
-yallaflow guide PF-0001                               # pinned contract: discovery → clarification → design → specification → planning → implementation → verification → code review
+yallaflow guide PF-0001                               # pinned contract: discovery → clarification → design → specification → planning → implementation → verification → delivery convergence → code review
 ```
 
 For each skill in order: read `yallaflow skill <id>`, do the work, record it, and advance:
@@ -40,7 +43,9 @@ yallaflow advance PF-0001
 yallaflow question add PF-0001 --category business --text "Can a contract receive multiple payments?"
 yallaflow question answer PF-0001 --id Q-001 --answer "Yes, up to three partial payments."
 yallaflow question resolve PF-0001 --id Q-001
-# … requirement-clarification, design-exploration, specification …
+# … requirement-clarification, design-exploration, then the specification:
+yallaflow requirement record PF-0001 --file requirements.json   # REQ-###/AC-### from the approved specification (agent-extracted)
+yallaflow checkpoint PF-0001 --skill specification --complete --summary "Specification with REQ-001..REQ-008, AC-001..AC-019."
 yallaflow ready PF-0001                               # SPEC_READY once the specification is complete
 yallaflow approve PF-0001 --stage specification       # human review (adaptive mode reviews specification, plan, decomposition)
 # … implementation-planning, then approve --stage plan → PLAN_READY
@@ -56,7 +61,7 @@ yallaflow decompose execute PF-0001
 yallaflow next PF-0001                                # dependency-unblocked children
 ```
 
-Each child then follows the [bounded change](#bounded-change) or [bug](#bug) path.
+Children reference the parent's requirement and criterion IDs (`"acceptanceCriteria": ["AC-004", "AC-005"]`); `decompose propose` refuses references the parent's ledger does not contain, and `decompose validate` reports unassigned criteria. Each child then follows the [bounded feature](#bounded-feature-with-delivery-convergence), [bounded change](#bounded-change), or [bug](#bug) path; a feature child answers for the criteria assigned to it. After every required child is DONE, the parent verifies, records project-level convergence (citing each child's assessment as `convergence:PF-0007/CV-002`, and assessing any criterion no child owned), completes code review, and becomes DONE.
 
 ## Brownfield
 
@@ -144,7 +149,93 @@ yallaflow knowledge review PF-0004 --none
 yallaflow advance PF-0004                             # → DONE
 ```
 
-A bounded feature is the same, minus the planning checkpoint (`yallaflow feature "…" --scope bounded`).
+A bounded change has no delivery-convergence contract: YallaFlow does not ask it for requirement identity or convergence. An architectural change does (see below).
+
+## Bounded feature with delivery convergence
+
+Feature work — even a small one — carries an approved-intent contract: passing tests is not enough, the delivered implementation must match the accepted criteria. Keep it proportional: one requirement with one or two criteria is fine.
+
+```bash
+yallaflow feature "Staff can export the school calendar" --scope bounded
+yallaflow checkpoint PF-0007 --skill context-discovery --complete --summary "Calendar lives in CalendarService."
+yallaflow requirement record PF-0007 --file requirements.json
+yallaflow checkpoint PF-0007 --skill requirement-clarification --complete --summary "Export format confirmed (Q-001)."
+yallaflow advance PF-0007                             # repeat until IMPLEMENTATION
+yallaflow checkpoint PF-0007 --skill implementation --complete --summary "ICS export added."
+yallaflow advance PF-0007                             # → VERIFICATION
+yallaflow verify PF-0007 -- php artisan test --filter=CalendarExport
+yallaflow checkpoint PF-0007 --skill verification --complete --summary "Export tests pass."
+yallaflow convergence record PF-0007 --file convergence.json
+yallaflow convergence status PF-0007                  # satisfied / partial / missing / contradicts, blockers, next action
+yallaflow checkpoint PF-0007 --skill delivery-convergence --complete --summary "Both criteria satisfied."
+yallaflow knowledge review PF-0007 --none
+yallaflow advance PF-0007                             # → DONE
+```
+
+`requirements.json` (the Agent extracts it; YallaFlow validates and records it):
+
+```json
+{
+  "requirements": [{ "id": "REQ-001", "statement": "Staff can export the school calendar.", "provenance": [{ "type": "request" }] }],
+  "acceptanceCriteria": [
+    { "id": "AC-001", "requirement": "REQ-001", "statement": "The export downloads an ICS file.", "provenance": [{ "type": "question", "question": "Q-001" }] },
+    { "id": "AC-002", "requirement": "REQ-001", "statement": "Only the selected term is exported.", "provenance": [{ "type": "request" }] }
+  ]
+}
+```
+
+`convergence.json` (the Agent judges each criterion against the implementation):
+
+```json
+{
+  "findings": [
+    { "criterion": "AC-001", "status": "satisfied", "reason": "Endpoint returns text/calendar.", "evidence": ["app/Http/Controllers/CalendarExportController.php#export", "verification:V-001"] },
+    { "criterion": "AC-002", "status": "partial", "reason": "Term filter is ignored for archived terms.", "evidence": ["app/Services/CalendarService.php:40-62"] }
+  ],
+  "unrequested": [{ "summary": "Also added a CSV export.", "evidence": ["app/Http/Controllers/CalendarExportController.php#csv"] }]
+}
+```
+
+With that assessment `advance` refuses DONE:
+
+```text
+DONE blocked:
+- AC-002 → partial
+- UR-001 → unrequested behavior is open (accept with a reason, or remove it)
+
+Next valid action: resolve the convergence gaps and record a new convergence assessment.
+```
+
+Fix the gap, re-verify, and record a new assessment (only the changed criteria are needed; `UR-001` gets `"disposition": "accepted", "reason": "…"` or `"removed"`). If a cited file changes after an assessment, that finding is reported **stale** — never silently kept, never converted — and must be re-assessed before DONE.
+
+## Intent changes after work has started
+
+A new requirement source arrives while the work is already specified, planned, or being implemented.
+
+```bash
+yallaflow intake add PF-0001 refund-policy-v2.pdf
+# Impact IM-001 pending: source SRC-0004 attached after PF-0001's approved intent was fixed.
+yallaflow impact status PF-0001                       # the completed stages that need a verdict, with a JSON template
+yallaflow impact assess PF-0001 --file impact.json
+yallaflow guide PF-0001                               # stage corrected to the earliest affected stage; next valid action
+```
+
+```json
+{
+  "impact": "IM-001",
+  "summary": "Refunds above 100 now need two approvals.",
+  "stages": {
+    "context-discovery":       { "verdict": "unaffected", "reason": "Same systems." },
+    "requirement-clarification": { "verdict": "unaffected", "reason": "Owner decisions unchanged." },
+    "design-exploration":      { "verdict": "unaffected", "reason": "Same architecture." },
+    "specification":           { "verdict": "affected",   "reason": "Adds the two-approval rule." },
+    "implementation-planning": { "verdict": "affected",   "reason": "Plan needs the approval step." },
+    "implementation":          { "verdict": "affected",   "reason": "RefundService must enforce it." }
+  }
+}
+```
+
+Until the impact is assessed, `advance`, checkpoint completion, and `convergence record` are refused and `guide` reports that code changes are not authorized. YallaFlow does not decide what the source means; it enforces only the mechanical consequences (implementation affected ⇒ verification, convergence, and review affected; any affected stage or changed criterion ⇒ convergence affected) and revises the affected checkpoints through the audited revision path. Verification runs and convergence assessments are kept and reported stale. Changing requirements after the intent checkpoint (`yallaflow requirement record`) raises the same kind of impact. DONE work is not affected: attach a recovered source, or reopen the work.
 
 ## Task with a user-provided screenshot or file
 
@@ -189,7 +280,7 @@ yallaflow handoff PF-0006
 Incoming agent, with no access to the previous chat:
 
 ```bash
-yallaflow brief                                       # one read-only orientation: contract, active/recent work, memory, next command
+yallaflow brief                                       # one read-only orientation: contract, active/recent work, delivery state, memory, next command
 yallaflow agent status                                # is AGENT.md current?
 yallaflow handoff PF-0006                             # PRIMARY UNRESOLVED OBJECTIVE, progress, gates, sources, stale context, next objective
 yallaflow resume PF-0006
@@ -273,3 +364,16 @@ yallaflow doctor
 ```
 
 The result is one canonical current fact per durable truth, with every origin traceable (`yallaflow context show CTX-0001`) and superseded knowledge kept as lineage. Retired legacy sections are archived verbatim in `work/PF-0006/legacy-context.md`, and hand-edited ones are kept for review. No historical work item is edited.
+
+## Setting up Codex or Claude
+
+So that a cold session finds YallaFlow without being told, give the provider's own session-start file a thin pointer to the canonical contract:
+
+```bash
+yallaflow agent setup codex                           # AGENTS.md: managed block → read .yallaflow/AGENT.md, run yallaflow brief
+yallaflow agent setup claude                          # CLAUDE.md: managed block that imports @.yallaflow/AGENT.md
+yallaflow agent status                                # AGENT.md and each provider block: current / outdated / modified / not set up
+yallaflow agent refresh                               # after upgrading YallaFlow: AGENT.md and unmodified outdated blocks
+```
+
+Your existing `AGENTS.md`/`CLAUDE.md` content is kept byte-for-byte; the block is appended and only the block is ever updated. The block holds the session-start sequence and a pointer — never a copy of the YallaFlow rules. Commit it with the project.
