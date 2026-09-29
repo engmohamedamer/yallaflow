@@ -97,13 +97,19 @@ That is the normal setup.
 
 YallaFlow creates `.yallaflow/`, which is durable project state and is intended to be committed with the repository.
 
+Now open **Claude Code, Codex, or another supported coding-agent session from the same project directory**.
+
+> Prompts shown below are written inside the coding-agent session — **not in the terminal**.
+>
+> The agent must be able to access the repository and run the YallaFlow CLI.
+
 ---
 
 # Case A — Existing project
 
 For an existing repository, do not explain the whole system to the agent.
 
-Open your coding agent in the repository and say:
+Inside the coding-agent session, say:
 
 ```text
 Use YallaFlow.
