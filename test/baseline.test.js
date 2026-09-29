@@ -157,6 +157,8 @@ test('PROJECT.md is updated after approval', async () => {
 test('context docs are populated after approval, and prior deterministic content is preserved', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-baseline-'));
   await writeFile(path.join(root, 'package.json'), JSON.stringify({ name: 'demo' }), 'utf8');
+  // v0.3.9: a manifest alone is not Brownfield; one recognized source file corroborates it.
+  await writeFile(path.join(root, 'index.js'), 'export {};\n', 'utf8');
   const init = spawnSync(process.execPath, [cli, 'init'], { cwd: root, encoding: 'utf8' });
   assert.equal(init.status, 0, init.stderr);
   const { meta } = await startBaseline(root);

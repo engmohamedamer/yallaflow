@@ -1,15 +1,16 @@
 # CLI Reference
 
-YallaFlow v0.3.8. Every command also answers `--help` / `-h` (at any position, including sub-actions such as `yallaflow knowledge propose --help`) without changing any state. `[work-id]` defaults to the active work item.
+YallaFlow v0.3.9. Every command also answers `--help` / `-h` (at any position, including sub-actions such as `yallaflow knowledge propose --help`) without changing any state. `[work-id]` defaults to the active work item.
 
 ## Workspace
 
 | Command | Purpose |
 |---|---|
-| `yallaflow init [--name NAME] [--type greenfield\|brownfield] [--mode autonomous\|adaptive\|gated]` | Create `.yallaflow/`. Type is detected when omitted; mode defaults to `adaptive`. Refuses to overwrite an existing, legacy `.projectflow/`, or Git-tracked-but-missing workspace. |
+| `yallaflow init [--name NAME] [--type greenfield\|brownfield] [--mode autonomous\|adaptive\|gated]` | Create `.yallaflow/`. Type is detected from the bounded repository inventory when omitted (Brownfield: a recognized manifest plus at least one recognized source file, at least 10 recognized source files, or meaningful container/CI configuration; a bare `.git` or a manifest alone is Greenfield); `--type` overrides. A new Brownfield init writes repository hints for the meaningful container/CI files the inventory found (Dockerfile, Docker Compose, CI, grouped by kind with paths) and a labelled init-time snapshot of nested manifest framework hints into `context/tech-stack.md` (not approved project memory). Mode defaults to `adaptive`. Refuses to overwrite an existing, legacy `.projectflow/`, or Git-tracked-but-missing workspace. |
 | `yallaflow status` | All work items, stages, write access; warns if `AGENT.md` predates the installed agent contract. |
 | `yallaflow doctor` | Read-only integrity report: workspace files, ledgers, lifecycle consistency, project-context ledger, projection drift, source checksums, reconciliation plans and lineage, legacy sections presented as current truth, delivery state (requirement/criterion references, convergence findings and evidence, impact revisions, a DONE or completed-convergence state the recorded findings never supported). Freshness (including convergence evidence that changed after it was recorded), agent-contract and bootstrap-block, hand-edited legacy sections, work.md lifecycle-record drift, and Git-tracking notes are warnings. Exit code 1 on structural failures. |
-| `yallaflow brief` | Fresh-agent orientation, read-only: agent contract and provider bootstrap blocks, active and most recent work (with its delivery/convergence line and any pending impact), project memory, pending legacy reconciliation, sources, the primary next concern and the command to run next. Never dumps context. |
+| `yallaflow brief` | Fresh-agent orientation, read-only and project-first (at most 45 lines). **Project:** current-fact text in fixed area order and caps (Project 3, Tech Stack 3, Architecture 3, Database 2, Integrations 2, Environments 2, Conventions and Business Rules a count plus one sample), fact-ID order, summaries on one line (≈160 code points); **NEEDS CARE** (up to 5) — facts that are unresolved, disputed, MAY_BE_STALE, or STALE_EVIDENCE, i.e. mechanically known state/freshness, not a risk assessment; without project memory, the inventory headline and the baseline step. **Work:** active and most recent work, delivery line, sources, legacy reconciliation. **YallaFlow:** package, agent contract, bootstrap blocks, integrity. Then the primary next concern and the command to run next. |
+| `yallaflow inspect` | Read-only, bounded, deterministic repository inventory (text only; works without a workspace; writes and persists nothing). Classification with reasons; Git presence; scan bounds and truncation; manifests at any depth within bounds with framework/version hints (`@angular/core`, `react`, `vue`, `next`, `@nestjs/core`, `vite`, `laravel/framework`, `yiisoft/yii2`, Spring Boot) — a major version only when the declared version is a literal; recognized source-file counts; documentation candidates in the formats intake supports, each with its intake handling (preserve-only formats marked), listed but never read; container/CI configuration; one next action (`init`, `baseline start`, the next baseline step, or `brief`). |
 | `yallaflow upgrade status` | Read-only upgrade assessment: installed version, legacy structures, agent contract, canonical and pending legacy facts, reconciliation progress, sources, work history, integrity, Git durability, recommended next action. |
 | `yallaflow upgrade plan` | The ordered upgrade steps as deliberate commands. Never migrates or repairs anything itself. |
 | `yallaflow --version` | Package version. |
@@ -84,10 +85,10 @@ Gates: `discovery`, `clarification`, `design`, `specification`, `plan`, `decompo
 
 | Command | Purpose |
 |---|---|
-| `yallaflow baseline start` | Create (or resume) the read-only baseline work item. Refused once a baseline is approved. |
+| `yallaflow baseline start` | Create (or resume) the baseline work item (read-only for application code). Prints the onboarding steps: `inspect`, `intake add` for material documents, the `repository-baseline` checkpoint, `baseline draft`, then human review and approval. Refused once a baseline is approved. |
 | `yallaflow baseline draft <work-id> --file <baseline.json>` | Record facts and discovery limitations (requires the `repository-baseline` checkpoint). |
-| `yallaflow baseline status [work-id]` · `yallaflow baseline show [work-id]` | Review the draft. |
-| `yallaflow baseline approve [work-id] [--note TEXT]` | Promote facts into the project-context ledger. |
+| `yallaflow baseline status [work-id]` · `yallaflow baseline show [work-id]` | Review the draft; `status` names the next baseline step. |
+| `yallaflow baseline approve [work-id] [--note TEXT]` | Promote facts into the project-context ledger. Human-only: no command or interaction mode approves a baseline automatically. |
 | `yallaflow baseline feedback [work-id] --changes-requested [--note TEXT]` | Request changes. |
 
 ## Project knowledge and memory
@@ -99,7 +100,7 @@ Gates: `discovery`, `clarification`, `design`, `specification`, `plan`, `decompo
 | `yallaflow knowledge promote [work-id] --candidate ID` | Promote into project memory (or an ADR). |
 | `yallaflow knowledge reject [work-id] --candidate ID --reason TEXT` | Reject. |
 | `yallaflow knowledge review [work-id] --none` | Record that no durable knowledge was found. |
-| `yallaflow context status` | Per-area current / may-be-stale / stale-evidence / disputed / unresolved / superseded counts and facts to revalidate. Read-only. |
+| `yallaflow context status` | Per-area current / may-be-stale / stale-evidence / disputed / unresolved / superseded counts and facts to revalidate. In a workspace without a Git commit to compare against, also explains that file evidence is still checked by SHA-256 content hash and that directory evidence is UNKNOWN (not stale). Read-only. |
 | `yallaflow context list [--area AREA] [--all]` | Current facts with freshness; `--all` includes superseded. |
 | `yallaflow context show <CTX-id>` · `yallaflow context history <CTX-id>` | One fact in detail; its lineage and events. |
 | `yallaflow context affected [--since REF] [path ...]` | Facts whose evidence paths changed (working tree, since a ref, or given paths). |

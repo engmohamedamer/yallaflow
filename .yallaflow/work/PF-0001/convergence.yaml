@@ -1,0 +1,2381 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-09-29T13:50:07.783Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 2,
+        "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "Assessed after V-001 (npm run check, 590/590) passed, against every active criterion of requirements revision 2.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "inventoryRepository walks breadth-first over code-point-sorted entries, skips IGNORED_DIRECTORIES, never follows symlinks, enforces INVENTORY_MAX_DEPTH/INVENTORY_MAX_ENTRIES and reports truncation; tested for determinism, ignored dirs, symlink, depth and entry bounds.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/inventory/inventory.js",
+              "symbol": "inventoryRepository",
+              "contentHash": "sha256:d34bc0e6a518102da78bc223b5705643f4cd3aa69f4c902ab230fb1eff05f86c",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/inventory/constants.js",
+              "contentHash": "sha256:3256db6bf60f1c708e60dd8ca2fc7fb99eaea24a35e62f827b05298f4f38dedc",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/inventory.test.js",
+              "contentHash": "sha256:5efb8b912b6b57cb1a798ed495b13ff69c319ae3ca801b0d4a8fc7319c0d3bc4",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Inventory records root and nested manifests, per-extension source counts, documentation candidates, Git presence, container/CI hints; returns an in-memory object only; tree hash unchanged in test.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/inventory/inventory.js",
+              "symbol": "inventoryRepository",
+              "contentHash": "sha256:d34bc0e6a518102da78bc223b5705643f4cd3aa69f4c902ab230fb1eff05f86c",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/inventory.test.js",
+              "contentHash": "sha256:5efb8b912b6b57cb1a798ed495b13ff69c319ae3ca801b0d4a8fc7319c0d3bc4",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "frameworks.js hints exactly @angular/core, react, vue, next, @nestjs/core, vite, laravel/framework, yiisoft/yii2 and Spring Boot (parent, BOM with same-file property, reference, Gradle plugin); majorOf only for literal versions; no other hints or semantic labels (tested incl. nuxt/svelte/express/symfony exclusion).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/inventory/frameworks.js",
+              "contentHash": "sha256:b597b0360a77e84e6fa23c070cc13f0f15eafd94185abbf3c5822b1357ad0401",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/inventory.test.js",
+              "contentHash": "sha256:5efb8b912b6b57cb1a798ed495b13ff69c319ae3ca801b0d4a8fc7319c0d3bc4",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "DOCUMENT_FORMAT_EXTENSIONS/TEXT_DOCUMENT_EXTENSIONS are derived from intake EXTENSION_FORMATS; documentHandling labels intake handling and marks .odg/.epub preserve-only; documents are never opened by inventory or inspect.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/intake/constants.js",
+              "contentHash": "sha256:2e5e0da6bbd9aab502c1cdfaf23ad1f17528f86c573c48a53b4ea019ea7d1bd8",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/inventory/inventory.js",
+              "symbol": "documentHandling",
+              "contentHash": "sha256:d34bc0e6a518102da78bc223b5705643f4cd3aa69f4c902ab230fb1eff05f86c",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/inspect.js",
+              "contentHash": "sha256:b8585c79cd36f8290f68f4619dd9cc727d8538d8562c952e2112d5203ca0505f",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/inventory.test.js",
+              "contentHash": "sha256:5efb8b912b6b57cb1a798ed495b13ff69c319ae3ca801b0d4a8fc7319c0d3bc4",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "classifyProject implements manifest+source / >=10 sources / meaningful container-CI (# and // comment-only ignored, .circleci/config.yml included); bare git init and npm-init-only are greenfield; 9 vs 10 boundary tested via BROWNFIELD_SOURCE_FILE_THRESHOLD.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/inventory/inventory.js",
+              "symbol": "classifyProject",
+              "contentHash": "sha256:d34bc0e6a518102da78bc223b5705643f4cd3aa69f4c902ab230fb1eff05f86c",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/inventory.test.js",
+              "contentHash": "sha256:5efb8b912b6b57cb1a798ed495b13ff69c319ae3ca801b0d4a8fc7319c0d3bc4",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:be7fb9ab0373eede57885a242e5ccf7912601b5bfd739ba39225b1857131bdc2",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "init classifies from the inventory (explicit --type wins); APD-shaped nested-only fixture initializes brownfield; tech-stack.md gains the labelled init-time snapshot section; root lines unchanged; no rewrite on read (v0.3.8 compat test keeps recorded greenfield).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/init.js",
+              "contentHash": "sha256:5753fc8b8f45166184627a0d14f3b994d1ac7032186f5ac1d99692e4d3f14702",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/core/discovery.js",
+              "contentHash": "sha256:36bfca9e3a6c2e8511b4e97fd90f1c586b6500fbad74b80aeb260b9f23b9ab69",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:be7fb9ab0373eede57885a242e5ccf7912601b5bfd739ba39225b1857131bdc2",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "yallaflow inspect is text-only (--json rejected with a usage error), works with and without a workspace, names one next action, and leaves the tree hash unchanged.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/inspect.js",
+              "contentHash": "sha256:b8585c79cd36f8290f68f4619dd9cc727d8538d8562c952e2112d5203ca0505f",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/cli.js",
+              "contentHash": "sha256:d2e867166d7ff3c04b274989fd80f389b135a242a8c472ae367ff5182aa77acd",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:be7fb9ab0373eede57885a242e5ccf7912601b5bfd739ba39225b1857131bdc2",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-008",
+          "status": "satisfied",
+          "reason": "On the APD-shaped fixture inspect reports Angular 16 and Angular 8 for the two nested portals, Spring Boot 2 from parent and BOM plus version-not-declared for the plugin-only module, and all five documentation candidates.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/inspect.js",
+              "contentHash": "sha256:b8585c79cd36f8290f68f4619dd9cc727d8538d8562c952e2112d5203ca0505f",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test-support/apd-fixture.js",
+              "contentHash": "sha256:24f043f17444a18d6fe9b5e468b0a9043d2bac759509c65b341e46409e58ca4c",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:be7fb9ab0373eede57885a242e5ccf7912601b5bfd739ba39225b1857131bdc2",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-009",
+          "status": "satisfied",
+          "reason": "init, inspect and brief point a brownfield workspace without memory to baseline start; baselineNextStep reports discovery → draft → changes requested → awaiting human review; no command approves (onboarding test asserts draft stays draft until baseline approve).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/baseline/store.js",
+              "symbol": "baselineNextStep",
+              "contentHash": "sha256:2b859ee63e0d37853faef00c1721f1ef625c2fa7a5987a6dddf672a54d46518f",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/brief.js",
+              "contentHash": "sha256:78171ef0c3f144f4c3d7b0a2d439b93217c7e7931b4f670482c38c2c3d542c42",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/inspect.js",
+              "contentHash": "sha256:b8585c79cd36f8290f68f4619dd9cc727d8538d8562c952e2112d5203ca0505f",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/baseline.js",
+              "contentHash": "sha256:bd131e66a81753455ca516082308d066d108a766f1a678c0b3622b258c1913d5",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:be7fb9ab0373eede57885a242e5ccf7912601b5bfd739ba39225b1857131bdc2",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-010",
+          "status": "satisfied",
+          "reason": "Agent Contract v5 Brownfield onboarding sequence distinguishes do-not-change-application-code (baseline start, intake add, checkpoint, baseline draft authorized) from explicit read-only (no .yallaflow writes) and requires human approval; asserted in agent-contract test.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agent/contract.js",
+              "symbol": "agentContractBody",
+              "contentHash": "sha256:62d0a02b9e8be51c7d1b2ada352c364d88f4946659129b705682e05caa75d9f0",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-contract.test.js",
+              "contentHash": "sha256:dd0a15a37841172f6c9fda277f495153bc037556286dd14a81f0030b7a911b28",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-011",
+          "status": "satisfied",
+          "reason": "repository-baseline skill and Contract v5 direct reviewing inventory documents, intake add + source show --content, repository-evidence citation, and not-inspected limitations; asserted for both texts.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/skills/repository-baseline.md",
+              "contentHash": "sha256:4bf7cf6816fe0f5cd3de763bb1116af348d9f8bb6d53df1b5e7a2db3b5b906a2",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/agent/contract.js",
+              "symbol": "agentContractBody",
+              "contentHash": "sha256:62d0a02b9e8be51c7d1b2ada352c364d88f4946659129b705682e05caa75d9f0",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:be7fb9ab0373eede57885a242e5ccf7912601b5bfd739ba39225b1857131bdc2",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-contract.test.js",
+              "contentHash": "sha256:dd0a15a37841172f6c9fda277f495153bc037556286dd14a81f0030b7a911b28",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-012",
+          "status": "satisfied",
+          "reason": "brief is project → work → YallaFlow with BRIEF_AREAS/BRIEF_SAMPLED_AREAS caps, fact-ID order, oneLine code-point truncation, BRIEF_MAX_LINES 45; large-baseline test asserts order, caps, line count and zero mutation.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/brief.js",
+              "contentHash": "sha256:78171ef0c3f144f4c3d7b0a2d439b93217c7e7931b4f670482c38c2c3d542c42",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/context/summary.js",
+              "symbol": "oneLine",
+              "contentHash": "sha256:82a328920f4d411320ee90da9daca795b7b691ecf7bdc3acc5380631eb626237",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:be7fb9ab0373eede57885a242e5ccf7912601b5bfd739ba39225b1857131bdc2",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-013",
+          "status": "satisfied",
+          "reason": "needsCare selects exactly non-superseded unresolved, disputed, MAY_BE_STALE, STALE_EVIDENCE facts, labelled as mechanical and not a risk assessment; UNKNOWN excluded; no ledger field or schema change.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/context/summary.js",
+              "symbol": "needsCare",
+              "contentHash": "sha256:82a328920f4d411320ee90da9daca795b7b691ecf7bdc3acc5380631eb626237",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/brief.js",
+              "contentHash": "sha256:78171ef0c3f144f4c3d7b0a2d439b93217c7e7931b4f670482c38c2c3d542c42",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:be7fb9ab0373eede57885a242e5ccf7912601b5bfd739ba39225b1857131bdc2",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-014",
+          "status": "satisfied",
+          "reason": "Contract v5 and the repository-baseline skill state hash freshness without Git, UNKNOWN not stale, MAY_BE_STALE not false, transient runtime state not durable; context status adds the explanation only when gitHead is null (Git-backed output unchanged, tested both ways).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/context.js",
+              "symbol": "contextStatusCommand",
+              "contentHash": "sha256:5caee649098d8af401a16fd51fd6049b8fdcc30e9e4e8a50644acae22413df4f",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/agent/contract.js",
+              "symbol": "agentContractBody",
+              "contentHash": "sha256:62d0a02b9e8be51c7d1b2ada352c364d88f4946659129b705682e05caa75d9f0",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "resources/skills/repository-baseline.md",
+              "contentHash": "sha256:4bf7cf6816fe0f5cd3de763bb1116af348d9f8bb6d53df1b5e7a2db3b5b906a2",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:be7fb9ab0373eede57885a242e5ccf7912601b5bfd739ba39225b1857131bdc2",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-015",
+          "status": "satisfied",
+          "reason": "docs/installation.md Updating YallaFlow section describes target install, --version, upgrade status/plan, explicit agent refresh, doctor and commit, with no self-update or network check; the CLI gained no network code.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "docs/installation.md",
+              "contentHash": "sha256:d4c838a50425b13e225b9449c72078b45fee48b976cee4ed583da0dfad9f4ac2",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "docs/upgrading-to-v0.3.9.md",
+              "contentHash": "sha256:e657d9a2fedcf4ffe1769dffb409aa75bf9b4ea51e678f2157373e7878fd28f4",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-016",
+          "status": "satisfied",
+          "reason": "package.json/src/version.js are 0.3.9-internal.1, AGENT_CONTRACT_VERSION 5, REGISTRY_VERSION 5 unchanged, no schema constant changed; v0.3.8-shaped workspace reads mutate zero bytes; a real v4 AGENT.md is reported outdated and only agent refresh rewrites it.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "package.json",
+              "contentHash": "sha256:0e91f30f32894d3250a768e1c7ba5b8cefec546af5cf06a87d26cd22f2672dd9",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/version.js",
+              "contentHash": "sha256:c0d4e4718e2a29d63b141cbb67afe3bf82c4ee8c3942b35ee068411e16a3e26e",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/agent/contract.js",
+              "contentHash": "sha256:62d0a02b9e8be51c7d1b2ada352c364d88f4946659129b705682e05caa75d9f0",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/skills/constants.js",
+              "contentHash": "sha256:db2ce361d821c712b5f13b84f9ca203f02d4d6d7f1ea11ae5bd6b3921445b1b4",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:be7fb9ab0373eede57885a242e5ccf7912601b5bfd739ba39225b1857131bdc2",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-contract.test.js",
+              "contentHash": "sha256:dd0a15a37841172f6c9fda277f495153bc037556286dd14a81f0030b7a911b28",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/cli.test.js",
+              "contentHash": "sha256:22af2b454458b6591afb48d653ba288b6b600bf5af62ca3222f8e9176e9d9890",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-017",
+          "status": "satisfied",
+          "reason": "The repository .yallaflow passes doctor, contains no secrets or absolute machine paths (scanned), no local-only source artifacts (no sources/ directory) and no transient runtime state; it is not listed in .gitignore.",
+          "evidence": [
+            {
+              "type": "user-confirmed",
+              "description": "agent scan 2026-09-29 of .yallaflow — doctor healthy, secret and /home|/tmp path scans empty"
+            },
+            {
+              "type": "repository",
+              "path": "README.md",
+              "contentHash": "sha256:2ecf5bb063a3ac874e0b11781c19d3ca76b8cf0f3709ef4caa1fd9427f9f4d53",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-001"
+            }
+          ]
+        }
+      ],
+      "unrequested": [
+        {
+          "id": "UR-001",
+          "disposition": "accepted",
+          "summary": "init appends the first classification reason (or \"explicit --type\") to the Project kind line.",
+          "reason": "Makes the intentional v0.3.8 → v0.3.9 classification change visible at the only moment it is decided; no new command or schema.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/init.js",
+              "contentHash": "sha256:5753fc8b8f45166184627a0d14f3b994d1ac7032186f5ac1d99692e4d3f14702",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            }
+          ]
+        },
+        {
+          "id": "UR-002",
+          "disposition": "accepted",
+          "summary": "brief outside a workspace suggests yallaflow inspect before yallaflow init.",
+          "reason": "Points to the approved new command on the onboarding path; wording only.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/brief.js",
+              "contentHash": "sha256:78171ef0c3f144f4c3d7b0a2d439b93217c7e7931b4f670482c38c2c3d542c42",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            }
+          ]
+        },
+        {
+          "id": "UR-003",
+          "disposition": "accepted",
+          "summary": "brief shows Package, Agent contract and Agent bootstrap on one line.",
+          "reason": "Needed to keep the project-first brief within the approved 45-line hard cap; the prior substrings are preserved.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/brief.js",
+              "contentHash": "sha256:78171ef0c3f144f4c3d7b0a2d439b93217c7e7931b4f670482c38c2c3d542c42",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CV-002",
+      "recordedAt": "2026-09-29T14:02:46.793Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 2,
+        "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b",
+        "verificationRunIds": [
+          "V-002"
+        ]
+      },
+      "summary": "Re-assessed after the independent-review revision and V-002 (597/597) passed.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "inventoryRepository walks breadth-first over code-point-sorted entries, skips IGNORED_DIRECTORIES, never follows symlinks, enforces INVENTORY_MAX_DEPTH/INVENTORY_MAX_ENTRIES and reports truncation; tested for determinism, ignored dirs, symlink, depth and entry bounds.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/inventory/inventory.js",
+              "symbol": "inventoryRepository",
+              "contentHash": "sha256:fe2bf7234cf629571890bc66249132ca3f2b5bcbd1b1bec007f01569de2a5930",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/inventory/constants.js",
+              "contentHash": "sha256:e1925621b18695a9843fa6032e82d19b3b11b37818ded0bbc2116c011c70b31b",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/inventory.test.js",
+              "contentHash": "sha256:e5e09fcafdd8bef07a84e2fa612cde7eba64c4904c1733f28e013a9868cc9887",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Inventory records root and nested manifests, per-extension source counts, documentation candidates, Git presence, container/CI hints; returns an in-memory object only; tree hash unchanged in test.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/inventory/inventory.js",
+              "symbol": "inventoryRepository",
+              "contentHash": "sha256:fe2bf7234cf629571890bc66249132ca3f2b5bcbd1b1bec007f01569de2a5930",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/inventory.test.js",
+              "contentHash": "sha256:e5e09fcafdd8bef07a84e2fa612cde7eba64c4904c1733f28e013a9868cc9887",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "frameworks.js hints exactly @angular/core, react, vue, next, @nestjs/core, vite, laravel/framework, yiisoft/yii2 and Spring Boot (parent, BOM with same-file property, reference, Gradle plugin); majorOf only for literal versions; no other hints or semantic labels (tested incl. nuxt/svelte/express/symfony exclusion). Unresolvable Maven ${property} kept as declared with no major; Gradle comments ignored.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/inventory/frameworks.js",
+              "contentHash": "sha256:f6fd29d70b907676f8c276f418b6cf01559eb86df3fb5a7195f764806e82f942",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/inventory.test.js",
+              "contentHash": "sha256:e5e09fcafdd8bef07a84e2fa612cde7eba64c4904c1733f28e013a9868cc9887",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "DOCUMENT_FORMAT_EXTENSIONS/TEXT_DOCUMENT_EXTENSIONS are derived from intake EXTENSION_FORMATS; documentHandling labels intake handling and marks .odg/.epub preserve-only; documents are never opened by inventory or inspect.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/intake/constants.js",
+              "contentHash": "sha256:2e5e0da6bbd9aab502c1cdfaf23ad1f17528f86c573c48a53b4ea019ea7d1bd8",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/inventory/inventory.js",
+              "symbol": "documentHandling",
+              "contentHash": "sha256:fe2bf7234cf629571890bc66249132ca3f2b5bcbd1b1bec007f01569de2a5930",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/inspect.js",
+              "contentHash": "sha256:fc90de0942d21bce75cf55e53615d3029c236544663328174da142080cce85d5",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/inventory.test.js",
+              "contentHash": "sha256:e5e09fcafdd8bef07a84e2fa612cde7eba64c4904c1733f28e013a9868cc9887",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "classifyProject implements manifest+source / >=10 sources / meaningful container-CI (# and // comment-only ignored, .circleci/config.yml included); bare git init and npm-init-only are greenfield; 9 vs 10 boundary tested via BROWNFIELD_SOURCE_FILE_THRESHOLD.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/inventory/inventory.js",
+              "symbol": "classifyProject",
+              "contentHash": "sha256:fe2bf7234cf629571890bc66249132ca3f2b5bcbd1b1bec007f01569de2a5930",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/inventory.test.js",
+              "contentHash": "sha256:e5e09fcafdd8bef07a84e2fa612cde7eba64c4904c1733f28e013a9868cc9887",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:9cf5bdfd0fc577052ff08324ca2802f1210460948cdd0308aea8da4e2c50075e",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "init classifies from the inventory (explicit --type wins); APD-shaped nested-only fixture initializes brownfield; tech-stack.md gains the labelled init-time snapshot section; root lines unchanged; no rewrite on read (v0.3.8 compat test keeps recorded greenfield).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/init.js",
+              "contentHash": "sha256:5753fc8b8f45166184627a0d14f3b994d1ac7032186f5ac1d99692e4d3f14702",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/core/discovery.js",
+              "contentHash": "sha256:edc28df743b3c9c6df57bd996188197fbd8fdde3c347e9b6122ac996bb9b15d1",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:9cf5bdfd0fc577052ff08324ca2802f1210460948cdd0308aea8da4e2c50075e",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "yallaflow inspect is text-only (--json rejected with a usage error), works with and without a workspace, names one next action, and leaves the tree hash unchanged.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/inspect.js",
+              "contentHash": "sha256:fc90de0942d21bce75cf55e53615d3029c236544663328174da142080cce85d5",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/cli.js",
+              "contentHash": "sha256:d2e867166d7ff3c04b274989fd80f389b135a242a8c472ae367ff5182aa77acd",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:9cf5bdfd0fc577052ff08324ca2802f1210460948cdd0308aea8da4e2c50075e",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-008",
+          "status": "satisfied",
+          "reason": "On the APD-shaped fixture inspect reports Angular 16 and Angular 8 for the two nested portals, Spring Boot 2 from parent and BOM plus version-not-declared for the plugin-only module, and all five documentation candidates.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/inspect.js",
+              "contentHash": "sha256:fc90de0942d21bce75cf55e53615d3029c236544663328174da142080cce85d5",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test-support/apd-fixture.js",
+              "contentHash": "sha256:24f043f17444a18d6fe9b5e468b0a9043d2bac759509c65b341e46409e58ca4c",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:9cf5bdfd0fc577052ff08324ca2802f1210460948cdd0308aea8da4e2c50075e",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-009",
+          "status": "satisfied",
+          "reason": "init, inspect and brief point a brownfield workspace without memory to baseline start; baselineNextStep reports discovery → draft → changes requested → awaiting human review; no command approves (onboarding test asserts draft stays draft until baseline approve).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/baseline/store.js",
+              "symbol": "baselineNextStep",
+              "contentHash": "sha256:2eb63f1c13db59eaf15e4b3ca4415456858a326f678055ed413097e60ffde2de",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/brief.js",
+              "contentHash": "sha256:0ae789cb24c9d57dd30d1a95d690ada914f70649d6caefd62f5a8e5ce277cf8c",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/inspect.js",
+              "contentHash": "sha256:fc90de0942d21bce75cf55e53615d3029c236544663328174da142080cce85d5",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/baseline.js",
+              "contentHash": "sha256:bd131e66a81753455ca516082308d066d108a766f1a678c0b3622b258c1913d5",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:9cf5bdfd0fc577052ff08324ca2802f1210460948cdd0308aea8da4e2c50075e",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-010",
+          "status": "satisfied",
+          "reason": "Agent Contract v5 Brownfield onboarding sequence distinguishes do-not-change-application-code (baseline start, intake add, checkpoint, baseline draft authorized) from explicit read-only (no .yallaflow writes) and requires human approval; asserted in agent-contract test.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agent/contract.js",
+              "symbol": "agentContractBody",
+              "contentHash": "sha256:62d0a02b9e8be51c7d1b2ada352c364d88f4946659129b705682e05caa75d9f0",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-contract.test.js",
+              "contentHash": "sha256:dd0a15a37841172f6c9fda277f495153bc037556286dd14a81f0030b7a911b28",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-011",
+          "status": "satisfied",
+          "reason": "repository-baseline skill and Contract v5 direct reviewing inventory documents, intake add + source show --content, repository-evidence citation, and not-inspected limitations; asserted for both texts.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/skills/repository-baseline.md",
+              "contentHash": "sha256:4bf7cf6816fe0f5cd3de763bb1116af348d9f8bb6d53df1b5e7a2db3b5b906a2",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/agent/contract.js",
+              "symbol": "agentContractBody",
+              "contentHash": "sha256:62d0a02b9e8be51c7d1b2ada352c364d88f4946659129b705682e05caa75d9f0",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:9cf5bdfd0fc577052ff08324ca2802f1210460948cdd0308aea8da4e2c50075e",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-contract.test.js",
+              "contentHash": "sha256:dd0a15a37841172f6c9fda277f495153bc037556286dd14a81f0030b7a911b28",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-012",
+          "status": "satisfied",
+          "reason": "brief is project → work → YallaFlow with BRIEF_AREAS/BRIEF_SAMPLED_AREAS caps, fact-ID order, oneLine code-point truncation, BRIEF_MAX_LINES 45; large-baseline test asserts order, caps, line count and zero mutation. Cap counts physical lines (embedded newlines collapsed; concern/next/pointer reserved), regression-tested with a multi-line request.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/brief.js",
+              "contentHash": "sha256:0ae789cb24c9d57dd30d1a95d690ada914f70649d6caefd62f5a8e5ce277cf8c",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/context/summary.js",
+              "symbol": "oneLine",
+              "contentHash": "sha256:82a328920f4d411320ee90da9daca795b7b691ecf7bdc3acc5380631eb626237",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:9cf5bdfd0fc577052ff08324ca2802f1210460948cdd0308aea8da4e2c50075e",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-013",
+          "status": "satisfied",
+          "reason": "needsCare selects exactly non-superseded unresolved, disputed, MAY_BE_STALE, STALE_EVIDENCE facts, labelled as mechanical and not a risk assessment; UNKNOWN excluded; no ledger field or schema change.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/context/summary.js",
+              "symbol": "needsCare",
+              "contentHash": "sha256:82a328920f4d411320ee90da9daca795b7b691ecf7bdc3acc5380631eb626237",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/brief.js",
+              "contentHash": "sha256:0ae789cb24c9d57dd30d1a95d690ada914f70649d6caefd62f5a8e5ce277cf8c",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:9cf5bdfd0fc577052ff08324ca2802f1210460948cdd0308aea8da4e2c50075e",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-014",
+          "status": "satisfied",
+          "reason": "Contract v5 and the repository-baseline skill state hash freshness without Git, UNKNOWN not stale, MAY_BE_STALE not false, transient runtime state not durable; context status adds the explanation only when gitHead is null (Git-backed output unchanged, tested both ways).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/context.js",
+              "symbol": "contextStatusCommand",
+              "contentHash": "sha256:5caee649098d8af401a16fd51fd6049b8fdcc30e9e4e8a50644acae22413df4f",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/agent/contract.js",
+              "symbol": "agentContractBody",
+              "contentHash": "sha256:62d0a02b9e8be51c7d1b2ada352c364d88f4946659129b705682e05caa75d9f0",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "resources/skills/repository-baseline.md",
+              "contentHash": "sha256:4bf7cf6816fe0f5cd3de763bb1116af348d9f8bb6d53df1b5e7a2db3b5b906a2",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:9cf5bdfd0fc577052ff08324ca2802f1210460948cdd0308aea8da4e2c50075e",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-015",
+          "status": "satisfied",
+          "reason": "docs/installation.md Updating YallaFlow section describes target install, --version, upgrade status/plan, explicit agent refresh, doctor and commit, with no self-update or network check; the CLI gained no network code.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "docs/installation.md",
+              "contentHash": "sha256:d4c838a50425b13e225b9449c72078b45fee48b976cee4ed583da0dfad9f4ac2",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "docs/upgrading-to-v0.3.9.md",
+              "contentHash": "sha256:e657d9a2fedcf4ffe1769dffb409aa75bf9b4ea51e678f2157373e7878fd28f4",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-016",
+          "status": "satisfied",
+          "reason": "package.json/src/version.js are 0.3.9-internal.1, AGENT_CONTRACT_VERSION 5, REGISTRY_VERSION 5 unchanged, no schema constant changed; v0.3.8-shaped workspace reads mutate zero bytes; a real v4 AGENT.md is reported outdated and only agent refresh rewrites it.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "package.json",
+              "contentHash": "sha256:0e91f30f32894d3250a768e1c7ba5b8cefec546af5cf06a87d26cd22f2672dd9",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/version.js",
+              "contentHash": "sha256:c0d4e4718e2a29d63b141cbb67afe3bf82c4ee8c3942b35ee068411e16a3e26e",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/agent/contract.js",
+              "contentHash": "sha256:62d0a02b9e8be51c7d1b2ada352c364d88f4946659129b705682e05caa75d9f0",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/skills/constants.js",
+              "contentHash": "sha256:db2ce361d821c712b5f13b84f9ca203f02d4d6d7f1ea11ae5bd6b3921445b1b4",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:9cf5bdfd0fc577052ff08324ca2802f1210460948cdd0308aea8da4e2c50075e",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-contract.test.js",
+              "contentHash": "sha256:dd0a15a37841172f6c9fda277f495153bc037556286dd14a81f0030b7a911b28",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/cli.test.js",
+              "contentHash": "sha256:22af2b454458b6591afb48d653ba288b6b600bf5af62ca3222f8e9176e9d9890",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-017",
+          "status": "satisfied",
+          "reason": "The repository .yallaflow passes doctor, contains no secrets or absolute machine paths (scanned), no local-only source artifacts (no sources/ directory) and no transient runtime state; it is not listed in .gitignore.",
+          "evidence": [
+            {
+              "type": "user-confirmed",
+              "description": "agent scan 2026-09-29 of .yallaflow — doctor healthy, secret and /home|/tmp path scans empty"
+            },
+            {
+              "type": "repository",
+              "path": "README.md",
+              "contentHash": "sha256:2ecf5bb063a3ac874e0b11781c19d3ca76b8cf0f3709ef4caa1fd9427f9f4d53",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-002"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    },
+    {
+      "id": "CV-003",
+      "recordedAt": "2026-09-29T15:24:49.778Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 2,
+        "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b",
+        "verificationRunIds": [
+          "V-003"
+        ]
+      },
+      "summary": "Re-assessed after the pre-freeze correction (container/CI hints from inventory truth; MAX_DEPTH=16 ruling) and V-003 (599/599).",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "inventoryRepository walks breadth-first over code-point-sorted entries, skips IGNORED_DIRECTORIES, never follows symlinks, enforces INVENTORY_MAX_DEPTH/INVENTORY_MAX_ENTRIES and reports truncation; tested for determinism, ignored dirs, symlink, depth and entry bounds. INVENTORY_MAX_DEPTH=16 is the approved final value (ruling recorded pre-freeze).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/inventory/inventory.js",
+              "symbol": "inventoryRepository",
+              "contentHash": "sha256:5518ed2c7a05bba807c0b1b66c62ae048be587bf78f27a00a1b1bd1c92e29d70",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/inventory/constants.js",
+              "contentHash": "sha256:e1925621b18695a9843fa6032e82d19b3b11b37818ded0bbc2116c011c70b31b",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/inventory.test.js",
+              "contentHash": "sha256:e5e09fcafdd8bef07a84e2fa612cde7eba64c4904c1733f28e013a9868cc9887",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Inventory records root and nested manifests, per-extension source counts, documentation candidates, Git presence, container/CI hints; returns an in-memory object only; tree hash unchanged in test.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/inventory/inventory.js",
+              "symbol": "inventoryRepository",
+              "contentHash": "sha256:5518ed2c7a05bba807c0b1b66c62ae048be587bf78f27a00a1b1bd1c92e29d70",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/inventory.test.js",
+              "contentHash": "sha256:e5e09fcafdd8bef07a84e2fa612cde7eba64c4904c1733f28e013a9868cc9887",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "frameworks.js hints exactly @angular/core, react, vue, next, @nestjs/core, vite, laravel/framework, yiisoft/yii2 and Spring Boot (parent, BOM with same-file property, reference, Gradle plugin); majorOf only for literal versions; no other hints or semantic labels (tested incl. nuxt/svelte/express/symfony exclusion). Unresolvable Maven ${property} kept as declared with no major; Gradle comments ignored.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/inventory/frameworks.js",
+              "contentHash": "sha256:f6fd29d70b907676f8c276f418b6cf01559eb86df3fb5a7195f764806e82f942",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/inventory.test.js",
+              "contentHash": "sha256:e5e09fcafdd8bef07a84e2fa612cde7eba64c4904c1733f28e013a9868cc9887",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "DOCUMENT_FORMAT_EXTENSIONS/TEXT_DOCUMENT_EXTENSIONS are derived from intake EXTENSION_FORMATS; documentHandling labels intake handling and marks .odg/.epub preserve-only; documents are never opened by inventory or inspect.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/intake/constants.js",
+              "contentHash": "sha256:2e5e0da6bbd9aab502c1cdfaf23ad1f17528f86c573c48a53b4ea019ea7d1bd8",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/inventory/inventory.js",
+              "symbol": "documentHandling",
+              "contentHash": "sha256:5518ed2c7a05bba807c0b1b66c62ae048be587bf78f27a00a1b1bd1c92e29d70",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/inspect.js",
+              "contentHash": "sha256:4ab3129dddb21d0c143d2a8d1cedc0c3f211bc3a85e0d023f428a2802f8b2f65",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/inventory.test.js",
+              "contentHash": "sha256:e5e09fcafdd8bef07a84e2fa612cde7eba64c4904c1733f28e013a9868cc9887",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "classifyProject implements manifest+source / >=10 sources / meaningful container-CI (# and // comment-only ignored, .circleci/config.yml included); bare git init and npm-init-only are greenfield; 9 vs 10 boundary tested via BROWNFIELD_SOURCE_FILE_THRESHOLD.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/inventory/inventory.js",
+              "symbol": "classifyProject",
+              "contentHash": "sha256:5518ed2c7a05bba807c0b1b66c62ae048be587bf78f27a00a1b1bd1c92e29d70",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/inventory.test.js",
+              "contentHash": "sha256:e5e09fcafdd8bef07a84e2fa612cde7eba64c4904c1733f28e013a9868cc9887",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:d2f63f20f38582075b21918e0800e9437ff5f8df93de27556ffacd1c35199509",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "init classifies from the inventory (explicit --type wins); APD-shaped nested-only fixture initializes brownfield; tech-stack.md gains the labelled init-time snapshot section; root lines unchanged; no rewrite on read (v0.3.8 compat test keeps recorded greenfield). tech-stack.md repository hints use the same meaningful container/CI inventory entries that classify the project (root Dockerfile regression-tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/init.js",
+              "contentHash": "sha256:5753fc8b8f45166184627a0d14f3b994d1ac7032186f5ac1d99692e4d3f14702",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/core/discovery.js",
+              "contentHash": "sha256:b1de14eb3c584ffac7c939e1082565269688e339753e67a1580d7ce6b0de4603",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:d2f63f20f38582075b21918e0800e9437ff5f8df93de27556ffacd1c35199509",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "yallaflow inspect is text-only (--json rejected with a usage error), works with and without a workspace, names one next action, and leaves the tree hash unchanged.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/inspect.js",
+              "contentHash": "sha256:4ab3129dddb21d0c143d2a8d1cedc0c3f211bc3a85e0d023f428a2802f8b2f65",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/cli.js",
+              "contentHash": "sha256:d2e867166d7ff3c04b274989fd80f389b135a242a8c472ae367ff5182aa77acd",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:d2f63f20f38582075b21918e0800e9437ff5f8df93de27556ffacd1c35199509",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-008",
+          "status": "satisfied",
+          "reason": "On the APD-shaped fixture inspect reports Angular 16 and Angular 8 for the two nested portals, Spring Boot 2 from parent and BOM plus version-not-declared for the plugin-only module, and all five documentation candidates.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/inspect.js",
+              "contentHash": "sha256:4ab3129dddb21d0c143d2a8d1cedc0c3f211bc3a85e0d023f428a2802f8b2f65",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test-support/apd-fixture.js",
+              "contentHash": "sha256:24f043f17444a18d6fe9b5e468b0a9043d2bac759509c65b341e46409e58ca4c",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:d2f63f20f38582075b21918e0800e9437ff5f8df93de27556ffacd1c35199509",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-009",
+          "status": "satisfied",
+          "reason": "init, inspect and brief point a brownfield workspace without memory to baseline start; baselineNextStep reports discovery → draft → changes requested → awaiting human review; no command approves (onboarding test asserts draft stays draft until baseline approve).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/baseline/store.js",
+              "symbol": "baselineNextStep",
+              "contentHash": "sha256:2eb63f1c13db59eaf15e4b3ca4415456858a326f678055ed413097e60ffde2de",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/brief.js",
+              "contentHash": "sha256:0ae789cb24c9d57dd30d1a95d690ada914f70649d6caefd62f5a8e5ce277cf8c",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/inspect.js",
+              "contentHash": "sha256:4ab3129dddb21d0c143d2a8d1cedc0c3f211bc3a85e0d023f428a2802f8b2f65",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/baseline.js",
+              "contentHash": "sha256:bd131e66a81753455ca516082308d066d108a766f1a678c0b3622b258c1913d5",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:d2f63f20f38582075b21918e0800e9437ff5f8df93de27556ffacd1c35199509",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-010",
+          "status": "satisfied",
+          "reason": "Agent Contract v5 Brownfield onboarding sequence distinguishes do-not-change-application-code (baseline start, intake add, checkpoint, baseline draft authorized) from explicit read-only (no .yallaflow writes) and requires human approval; asserted in agent-contract test.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agent/contract.js",
+              "symbol": "agentContractBody",
+              "contentHash": "sha256:62d0a02b9e8be51c7d1b2ada352c364d88f4946659129b705682e05caa75d9f0",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-contract.test.js",
+              "contentHash": "sha256:dd0a15a37841172f6c9fda277f495153bc037556286dd14a81f0030b7a911b28",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-011",
+          "status": "satisfied",
+          "reason": "repository-baseline skill and Contract v5 direct reviewing inventory documents, intake add + source show --content, repository-evidence citation, and not-inspected limitations; asserted for both texts.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/skills/repository-baseline.md",
+              "contentHash": "sha256:4bf7cf6816fe0f5cd3de763bb1116af348d9f8bb6d53df1b5e7a2db3b5b906a2",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/agent/contract.js",
+              "symbol": "agentContractBody",
+              "contentHash": "sha256:62d0a02b9e8be51c7d1b2ada352c364d88f4946659129b705682e05caa75d9f0",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:d2f63f20f38582075b21918e0800e9437ff5f8df93de27556ffacd1c35199509",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-contract.test.js",
+              "contentHash": "sha256:dd0a15a37841172f6c9fda277f495153bc037556286dd14a81f0030b7a911b28",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-012",
+          "status": "satisfied",
+          "reason": "brief is project → work → YallaFlow with BRIEF_AREAS/BRIEF_SAMPLED_AREAS caps, fact-ID order, oneLine code-point truncation, BRIEF_MAX_LINES 45; large-baseline test asserts order, caps, line count and zero mutation. Cap counts physical lines (embedded newlines collapsed; concern/next/pointer reserved), regression-tested with a multi-line request.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/brief.js",
+              "contentHash": "sha256:0ae789cb24c9d57dd30d1a95d690ada914f70649d6caefd62f5a8e5ce277cf8c",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/context/summary.js",
+              "symbol": "oneLine",
+              "contentHash": "sha256:82a328920f4d411320ee90da9daca795b7b691ecf7bdc3acc5380631eb626237",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:d2f63f20f38582075b21918e0800e9437ff5f8df93de27556ffacd1c35199509",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-003"
+            },
+            {
+              "type": "user-confirmed",
+              "description": "real APD 57-fact workspace brief acceptance 2026-09-29 — 37 physical lines, project before YallaFlow metadata, overflow marked, zero bytes changed"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-013",
+          "status": "satisfied",
+          "reason": "needsCare selects exactly non-superseded unresolved, disputed, MAY_BE_STALE, STALE_EVIDENCE facts, labelled as mechanical and not a risk assessment; UNKNOWN excluded; no ledger field or schema change.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/context/summary.js",
+              "symbol": "needsCare",
+              "contentHash": "sha256:82a328920f4d411320ee90da9daca795b7b691ecf7bdc3acc5380631eb626237",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/brief.js",
+              "contentHash": "sha256:0ae789cb24c9d57dd30d1a95d690ada914f70649d6caefd62f5a8e5ce277cf8c",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:d2f63f20f38582075b21918e0800e9437ff5f8df93de27556ffacd1c35199509",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-014",
+          "status": "satisfied",
+          "reason": "Contract v5 and the repository-baseline skill state hash freshness without Git, UNKNOWN not stale, MAY_BE_STALE not false, transient runtime state not durable; context status adds the explanation only when gitHead is null (Git-backed output unchanged, tested both ways).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/context.js",
+              "symbol": "contextStatusCommand",
+              "contentHash": "sha256:5caee649098d8af401a16fd51fd6049b8fdcc30e9e4e8a50644acae22413df4f",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/agent/contract.js",
+              "symbol": "agentContractBody",
+              "contentHash": "sha256:62d0a02b9e8be51c7d1b2ada352c364d88f4946659129b705682e05caa75d9f0",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "resources/skills/repository-baseline.md",
+              "contentHash": "sha256:4bf7cf6816fe0f5cd3de763bb1116af348d9f8bb6d53df1b5e7a2db3b5b906a2",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:d2f63f20f38582075b21918e0800e9437ff5f8df93de27556ffacd1c35199509",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-015",
+          "status": "satisfied",
+          "reason": "docs/installation.md Updating YallaFlow section describes target install, --version, upgrade status/plan, explicit agent refresh, doctor and commit, with no self-update or network check; the CLI gained no network code.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "docs/installation.md",
+              "contentHash": "sha256:d4c838a50425b13e225b9449c72078b45fee48b976cee4ed583da0dfad9f4ac2",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "docs/upgrading-to-v0.3.9.md",
+              "contentHash": "sha256:e657d9a2fedcf4ffe1769dffb409aa75bf9b4ea51e678f2157373e7878fd28f4",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-016",
+          "status": "satisfied",
+          "reason": "package.json/src/version.js are 0.3.9-internal.1, AGENT_CONTRACT_VERSION 5, REGISTRY_VERSION 5 unchanged, no schema constant changed; v0.3.8-shaped workspace reads mutate zero bytes; a real v4 AGENT.md is reported outdated and only agent refresh rewrites it.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "package.json",
+              "contentHash": "sha256:0e91f30f32894d3250a768e1c7ba5b8cefec546af5cf06a87d26cd22f2672dd9",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/version.js",
+              "contentHash": "sha256:c0d4e4718e2a29d63b141cbb67afe3bf82c4ee8c3942b35ee068411e16a3e26e",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/agent/contract.js",
+              "contentHash": "sha256:62d0a02b9e8be51c7d1b2ada352c364d88f4946659129b705682e05caa75d9f0",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "src/skills/constants.js",
+              "contentHash": "sha256:db2ce361d821c712b5f13b84f9ca203f02d4d6d7f1ea11ae5bd6b3921445b1b4",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:d2f63f20f38582075b21918e0800e9437ff5f8df93de27556ffacd1c35199509",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-contract.test.js",
+              "contentHash": "sha256:dd0a15a37841172f6c9fda277f495153bc037556286dd14a81f0030b7a911b28",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "repository",
+              "path": "test/cli.test.js",
+              "contentHash": "sha256:22af2b454458b6591afb48d653ba288b6b600bf5af62ca3222f8e9176e9d9890",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-017",
+          "status": "satisfied",
+          "reason": "The repository .yallaflow passes doctor, contains no secrets or absolute machine paths (scanned), no local-only source artifacts (no sources/ directory) and no transient runtime state; it is not listed in .gitignore.",
+          "evidence": [
+            {
+              "type": "user-confirmed",
+              "description": "agent scan 2026-09-29 of .yallaflow — doctor healthy, secret and /home|/tmp path scans empty"
+            },
+            {
+              "type": "repository",
+              "path": "README.md",
+              "contentHash": "sha256:2ecf5bb063a3ac874e0b11781c19d3ca76b8cf0f3709ef4caa1fd9427f9f4d53",
+              "gitCommit": "6727412cb73b76110b9900f6814196380ca4a08b"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-003"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    },
+    {
+      "id": "CV-004",
+      "recordedAt": "2026-09-29T15:44:08.887Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 2,
+        "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be",
+        "verificationRunIds": [
+          "V-004"
+        ]
+      },
+      "summary": "Re-assessed after the reopen for the fresh-clone portability fix and V-004 (602/602).",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "inventoryRepository walks breadth-first over code-point-sorted entries, skips IGNORED_DIRECTORIES, never follows symlinks, enforces INVENTORY_MAX_DEPTH/INVENTORY_MAX_ENTRIES and reports truncation; tested for determinism, ignored dirs, symlink, depth and entry bounds. INVENTORY_MAX_DEPTH=16 is the approved final value (ruling recorded pre-freeze).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/inventory/inventory.js",
+              "symbol": "inventoryRepository",
+              "contentHash": "sha256:5518ed2c7a05bba807c0b1b66c62ae048be587bf78f27a00a1b1bd1c92e29d70",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "src/inventory/constants.js",
+              "contentHash": "sha256:e1925621b18695a9843fa6032e82d19b3b11b37818ded0bbc2116c011c70b31b",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "test/inventory.test.js",
+              "contentHash": "sha256:e5e09fcafdd8bef07a84e2fa612cde7eba64c4904c1733f28e013a9868cc9887",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Inventory records root and nested manifests, per-extension source counts, documentation candidates, Git presence, container/CI hints; returns an in-memory object only; tree hash unchanged in test.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/inventory/inventory.js",
+              "symbol": "inventoryRepository",
+              "contentHash": "sha256:5518ed2c7a05bba807c0b1b66c62ae048be587bf78f27a00a1b1bd1c92e29d70",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "test/inventory.test.js",
+              "contentHash": "sha256:e5e09fcafdd8bef07a84e2fa612cde7eba64c4904c1733f28e013a9868cc9887",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "frameworks.js hints exactly @angular/core, react, vue, next, @nestjs/core, vite, laravel/framework, yiisoft/yii2 and Spring Boot (parent, BOM with same-file property, reference, Gradle plugin); majorOf only for literal versions; no other hints or semantic labels (tested incl. nuxt/svelte/express/symfony exclusion). Unresolvable Maven ${property} kept as declared with no major; Gradle comments ignored.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/inventory/frameworks.js",
+              "contentHash": "sha256:f6fd29d70b907676f8c276f418b6cf01559eb86df3fb5a7195f764806e82f942",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "test/inventory.test.js",
+              "contentHash": "sha256:e5e09fcafdd8bef07a84e2fa612cde7eba64c4904c1733f28e013a9868cc9887",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "DOCUMENT_FORMAT_EXTENSIONS/TEXT_DOCUMENT_EXTENSIONS are derived from intake EXTENSION_FORMATS; documentHandling labels intake handling and marks .odg/.epub preserve-only; documents are never opened by inventory or inspect.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/intake/constants.js",
+              "contentHash": "sha256:2e5e0da6bbd9aab502c1cdfaf23ad1f17528f86c573c48a53b4ea019ea7d1bd8",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "src/inventory/inventory.js",
+              "symbol": "documentHandling",
+              "contentHash": "sha256:5518ed2c7a05bba807c0b1b66c62ae048be587bf78f27a00a1b1bd1c92e29d70",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/inspect.js",
+              "contentHash": "sha256:4ab3129dddb21d0c143d2a8d1cedc0c3f211bc3a85e0d023f428a2802f8b2f65",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "test/inventory.test.js",
+              "contentHash": "sha256:e5e09fcafdd8bef07a84e2fa612cde7eba64c4904c1733f28e013a9868cc9887",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "classifyProject implements manifest+source / >=10 sources / meaningful container-CI (# and // comment-only ignored, .circleci/config.yml included); bare git init and npm-init-only are greenfield; 9 vs 10 boundary tested via BROWNFIELD_SOURCE_FILE_THRESHOLD.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/inventory/inventory.js",
+              "symbol": "classifyProject",
+              "contentHash": "sha256:5518ed2c7a05bba807c0b1b66c62ae048be587bf78f27a00a1b1bd1c92e29d70",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "test/inventory.test.js",
+              "contentHash": "sha256:e5e09fcafdd8bef07a84e2fa612cde7eba64c4904c1733f28e013a9868cc9887",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:d2f63f20f38582075b21918e0800e9437ff5f8df93de27556ffacd1c35199509",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "init classifies from the inventory (explicit --type wins); APD-shaped nested-only fixture initializes brownfield; tech-stack.md gains the labelled init-time snapshot section; root lines unchanged; no rewrite on read (v0.3.8 compat test keeps recorded greenfield). tech-stack.md repository hints use the same meaningful container/CI inventory entries that classify the project (root Dockerfile regression-tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/init.js",
+              "contentHash": "sha256:5753fc8b8f45166184627a0d14f3b994d1ac7032186f5ac1d99692e4d3f14702",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "src/core/discovery.js",
+              "contentHash": "sha256:b1de14eb3c584ffac7c939e1082565269688e339753e67a1580d7ce6b0de4603",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:d2f63f20f38582075b21918e0800e9437ff5f8df93de27556ffacd1c35199509",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "yallaflow inspect is text-only (--json rejected with a usage error), works with and without a workspace, names one next action, and leaves the tree hash unchanged.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/inspect.js",
+              "contentHash": "sha256:4ab3129dddb21d0c143d2a8d1cedc0c3f211bc3a85e0d023f428a2802f8b2f65",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "src/cli.js",
+              "contentHash": "sha256:d2e867166d7ff3c04b274989fd80f389b135a242a8c472ae367ff5182aa77acd",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:d2f63f20f38582075b21918e0800e9437ff5f8df93de27556ffacd1c35199509",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-008",
+          "status": "satisfied",
+          "reason": "On the APD-shaped fixture inspect reports Angular 16 and Angular 8 for the two nested portals, Spring Boot 2 from parent and BOM plus version-not-declared for the plugin-only module, and all five documentation candidates.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/inspect.js",
+              "contentHash": "sha256:4ab3129dddb21d0c143d2a8d1cedc0c3f211bc3a85e0d023f428a2802f8b2f65",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "test-support/apd-fixture.js",
+              "contentHash": "sha256:24f043f17444a18d6fe9b5e468b0a9043d2bac759509c65b341e46409e58ca4c",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:d2f63f20f38582075b21918e0800e9437ff5f8df93de27556ffacd1c35199509",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-009",
+          "status": "satisfied",
+          "reason": "init, inspect and brief point a brownfield workspace without memory to baseline start; baselineNextStep reports discovery → draft → changes requested → awaiting human review; no command approves (onboarding test asserts draft stays draft until baseline approve).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/baseline/store.js",
+              "symbol": "baselineNextStep",
+              "contentHash": "sha256:2eb63f1c13db59eaf15e4b3ca4415456858a326f678055ed413097e60ffde2de",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/brief.js",
+              "contentHash": "sha256:0ae789cb24c9d57dd30d1a95d690ada914f70649d6caefd62f5a8e5ce277cf8c",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/inspect.js",
+              "contentHash": "sha256:4ab3129dddb21d0c143d2a8d1cedc0c3f211bc3a85e0d023f428a2802f8b2f65",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/baseline.js",
+              "contentHash": "sha256:bd131e66a81753455ca516082308d066d108a766f1a678c0b3622b258c1913d5",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:d2f63f20f38582075b21918e0800e9437ff5f8df93de27556ffacd1c35199509",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-010",
+          "status": "satisfied",
+          "reason": "Agent Contract v5 Brownfield onboarding sequence distinguishes do-not-change-application-code (baseline start, intake add, checkpoint, baseline draft authorized) from explicit read-only (no .yallaflow writes) and requires human approval; asserted in agent-contract test.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agent/contract.js",
+              "symbol": "agentContractBody",
+              "contentHash": "sha256:62d0a02b9e8be51c7d1b2ada352c364d88f4946659129b705682e05caa75d9f0",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-contract.test.js",
+              "contentHash": "sha256:dd0a15a37841172f6c9fda277f495153bc037556286dd14a81f0030b7a911b28",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-011",
+          "status": "satisfied",
+          "reason": "repository-baseline skill and Contract v5 direct reviewing inventory documents, intake add + source show --content, repository-evidence citation, and not-inspected limitations; asserted for both texts.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/skills/repository-baseline.md",
+              "contentHash": "sha256:4bf7cf6816fe0f5cd3de763bb1116af348d9f8bb6d53df1b5e7a2db3b5b906a2",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "src/agent/contract.js",
+              "symbol": "agentContractBody",
+              "contentHash": "sha256:62d0a02b9e8be51c7d1b2ada352c364d88f4946659129b705682e05caa75d9f0",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:d2f63f20f38582075b21918e0800e9437ff5f8df93de27556ffacd1c35199509",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-contract.test.js",
+              "contentHash": "sha256:dd0a15a37841172f6c9fda277f495153bc037556286dd14a81f0030b7a911b28",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-012",
+          "status": "satisfied",
+          "reason": "brief is project → work → YallaFlow with BRIEF_AREAS/BRIEF_SAMPLED_AREAS caps, fact-ID order, oneLine code-point truncation, BRIEF_MAX_LINES 45; large-baseline test asserts order, caps, line count and zero mutation. Cap counts physical lines (embedded newlines collapsed; concern/next/pointer reserved), regression-tested with a multi-line request.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/brief.js",
+              "contentHash": "sha256:0ae789cb24c9d57dd30d1a95d690ada914f70649d6caefd62f5a8e5ce277cf8c",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "src/context/summary.js",
+              "symbol": "oneLine",
+              "contentHash": "sha256:82a328920f4d411320ee90da9daca795b7b691ecf7bdc3acc5380631eb626237",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:d2f63f20f38582075b21918e0800e9437ff5f8df93de27556ffacd1c35199509",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "user-confirmed",
+              "description": "real APD 57-fact workspace brief acceptance 2026-09-29 — 37 physical lines, project before YallaFlow metadata, overflow marked, zero bytes changed"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-013",
+          "status": "satisfied",
+          "reason": "needsCare selects exactly non-superseded unresolved, disputed, MAY_BE_STALE, STALE_EVIDENCE facts, labelled as mechanical and not a risk assessment; UNKNOWN excluded; no ledger field or schema change.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/context/summary.js",
+              "symbol": "needsCare",
+              "contentHash": "sha256:82a328920f4d411320ee90da9daca795b7b691ecf7bdc3acc5380631eb626237",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/brief.js",
+              "contentHash": "sha256:0ae789cb24c9d57dd30d1a95d690ada914f70649d6caefd62f5a8e5ce277cf8c",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:d2f63f20f38582075b21918e0800e9437ff5f8df93de27556ffacd1c35199509",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-014",
+          "status": "satisfied",
+          "reason": "Contract v5 and the repository-baseline skill state hash freshness without Git, UNKNOWN not stale, MAY_BE_STALE not false, transient runtime state not durable; context status adds the explanation only when gitHead is null (Git-backed output unchanged, tested both ways).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/context.js",
+              "symbol": "contextStatusCommand",
+              "contentHash": "sha256:5caee649098d8af401a16fd51fd6049b8fdcc30e9e4e8a50644acae22413df4f",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "src/agent/contract.js",
+              "symbol": "agentContractBody",
+              "contentHash": "sha256:62d0a02b9e8be51c7d1b2ada352c364d88f4946659129b705682e05caa75d9f0",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "resources/skills/repository-baseline.md",
+              "contentHash": "sha256:4bf7cf6816fe0f5cd3de763bb1116af348d9f8bb6d53df1b5e7a2db3b5b906a2",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:d2f63f20f38582075b21918e0800e9437ff5f8df93de27556ffacd1c35199509",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-015",
+          "status": "satisfied",
+          "reason": "docs/installation.md Updating YallaFlow section describes target install, --version, upgrade status/plan, explicit agent refresh, doctor and commit, with no self-update or network check; the CLI gained no network code.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "docs/installation.md",
+              "contentHash": "sha256:d4c838a50425b13e225b9449c72078b45fee48b976cee4ed583da0dfad9f4ac2",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "docs/upgrading-to-v0.3.9.md",
+              "contentHash": "sha256:0e7cfff93dcd1a5489f3f13287f3be63a7a9e6e3791fda15e430b2d50b4a8be8",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-016",
+          "status": "satisfied",
+          "reason": "package.json/src/version.js are 0.3.9-internal.1, AGENT_CONTRACT_VERSION 5, REGISTRY_VERSION 5 unchanged, no schema constant changed; v0.3.8-shaped workspace reads mutate zero bytes; a real v4 AGENT.md is reported outdated and only agent refresh rewrites it. Absent lazy directories after a Git clone are a valid state (no schema change); covered by test/workspace-portability.test.js.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "package.json",
+              "contentHash": "sha256:0e91f30f32894d3250a768e1c7ba5b8cefec546af5cf06a87d26cd22f2672dd9",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "src/version.js",
+              "contentHash": "sha256:c0d4e4718e2a29d63b141cbb67afe3bf82c4ee8c3942b35ee068411e16a3e26e",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "src/agent/contract.js",
+              "contentHash": "sha256:62d0a02b9e8be51c7d1b2ada352c364d88f4946659129b705682e05caa75d9f0",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "src/skills/constants.js",
+              "contentHash": "sha256:db2ce361d821c712b5f13b84f9ca203f02d4d6d7f1ea11ae5bd6b3921445b1b4",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "test/onboarding.test.js",
+              "contentHash": "sha256:d2f63f20f38582075b21918e0800e9437ff5f8df93de27556ffacd1c35199509",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-contract.test.js",
+              "contentHash": "sha256:dd0a15a37841172f6c9fda277f495153bc037556286dd14a81f0030b7a911b28",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "test/cli.test.js",
+              "contentHash": "sha256:22af2b454458b6591afb48d653ba288b6b600bf5af62ca3222f8e9176e9d9890",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "repository",
+              "path": "test/workspace-portability.test.js",
+              "contentHash": "sha256:7e9486214e698b5c6c48bcf75ba91b01c5aab8f1b688d9677d691f0f99e4711d",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/doctor.js",
+              "contentHash": "sha256:0513d1842cb1ffefdfe0ade88d6fb5a9812d4248b94fc4610e7a546c7df18434",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-017",
+          "status": "satisfied",
+          "reason": "The repository .yallaflow passes doctor in the working tree and in a fresh clone (absent lazy directories valid), contains no secrets, absolute machine paths, local-only artifacts, or transient state, is not gitignored, and its referenced verification logs are committed via the !.yallaflow/**/*.log exception.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": ".gitignore",
+              "contentHash": "sha256:306ca980194f30b9035c471fd732370bdd7ea3a89eb7eb75ce6f1ed32f764ec1",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/doctor.js",
+              "contentHash": "sha256:0513d1842cb1ffefdfe0ade88d6fb5a9812d4248b94fc4610e7a546c7df18434",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "repository",
+              "path": "test/workspace-portability.test.js",
+              "contentHash": "sha256:7e9486214e698b5c6c48bcf75ba91b01c5aab8f1b688d9677d691f0f99e4711d",
+              "gitCommit": "70e91e025ec2639dbd45de24daacf904db5b84be"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0001",
+              "verificationRunId": "V-004"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-09-29T15:44:08.887Z"
+}

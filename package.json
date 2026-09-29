@@ -1,6 +1,6 @@
 {
   "name": "yallaflow",
-  "version": "0.3.8-internal.1",
+  "version": "0.3.9-internal.1",
   "private": true,
   "description": "AI-agnostic engineering governance layer for coding agents: durable project memory, adaptive workflows, and evidence-backed delivery.",
   "type": "module",

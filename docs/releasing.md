@@ -1,6 +1,6 @@
 # Releasing
 
-YallaFlow has not yet made a public npm release (`package.json` remains `"private": true`; current internal prerelease `0.3.8-internal.1`). This document defines the release policy the project will follow once publishing begins, and the checklist a maintainer runs before cutting a release.
+YallaFlow has not yet made a public npm release (`package.json` remains `"private": true`; current internal prerelease `0.3.9-internal.1`). This document defines the release policy the project will follow once publishing begins, and the checklist a maintainer runs before cutting a release.
 
 ## Versioning model
 

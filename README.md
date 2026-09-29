@@ -178,6 +178,8 @@ YallaFlow can establish a reviewed Brownfield Baseline with:
 
 Approved baseline knowledge becomes durable project memory that future work can reuse instead of rediscovering the repository from scratch.
 
+Onboarding starts with `yallaflow inspect`: a bounded, read-only repository inventory that recognizes nested applications (manifests with deterministic framework/version hints such as two Angular portals on different majors), recognized source files, documentation candidates, and container/CI configuration — and classifies the repository as Brownfield or Greenfield with its reasons. `yallaflow brief` then proposes the baseline and reports each step until a human approves it.
+
 ### 7. Agent and session continuity
 
 YallaFlow work state is independent of the previous chat.
@@ -192,7 +194,7 @@ A new session or a different coding agent can use durable state, Git, project co
 - what project knowledge is relevant
 - what the next valid action is
 
-`yallaflow handoff` and `yallaflow resume` are designed around this recovery model. A fresh agent starts with `yallaflow brief` — a read-only orientation that points at the next valid action — and `yallaflow agent setup codex|claude` gives Codex (`AGENTS.md`) or Claude (`CLAUDE.md`) a thin, versioned pointer to the one canonical contract, so a cold session finds YallaFlow on its own.
+`yallaflow handoff` and `yallaflow resume` are designed around this recovery model. A fresh agent starts with `yallaflow brief` — a read-only, project-first orientation: what project memory says about the project (bounded per area), what knowledge NEEDS CARE (unresolved, disputed, or with changed/missing evidence), then the work and the next valid action — and `yallaflow agent setup codex|claude` gives Codex (`AGENTS.md`) or Claude (`CLAUDE.md`) a thin, versioned pointer to the one canonical contract, so a cold session finds YallaFlow on its own.
 
 ---
 
@@ -268,7 +270,7 @@ yallaflow agent setup codex     # or: yallaflow agent setup claude
 
 This adds a small managed block to `AGENTS.md` / `CLAUDE.md` (your own content is kept) that tells the agent to follow `.yallaflow/AGENT.md` and run `yallaflow brief` first. Commit `.yallaflow/` (and that file) with the project.
 
-Upgrading an existing workspace? Run `yallaflow upgrade status` — see [`docs/upgrading-to-v0.3.8.md`](docs/upgrading-to-v0.3.8.md).
+Upgrading an existing workspace? Run `yallaflow upgrade status` — see [`docs/upgrading-to-v0.3.9.md`](docs/upgrading-to-v0.3.9.md).
 
 For legacy repositories, install YallaFlow as an isolated CLI rather than adding it to the application's dependency tree.
 
@@ -393,6 +395,7 @@ Optional directories are created lazily only when they are needed. Structured st
 
 ```text
 yallaflow init
+yallaflow inspect
 yallaflow brief
 yallaflow upgrade
 yallaflow start
@@ -486,7 +489,7 @@ Those rules are intentionally simple. The value is that YallaFlow makes them dur
 
 ## Status
 
-Current version: **`0.3.8-internal.1` — Delivery Convergence & Agent Continuity** (internal prerelease; `package.json` is `private`, nothing is published to npm). Upgrading: run `yallaflow upgrade status`, then see [`docs/upgrading-to-v0.3.8.md`](docs/upgrading-to-v0.3.8.md).
+Current version: **`0.3.9-internal.1` — Frictionless Project Onboarding & Context UX** (internal prerelease; `package.json` is `private`, nothing is published to npm). Upgrading: run `yallaflow upgrade status`, then see [`docs/upgrading-to-v0.3.9.md`](docs/upgrading-to-v0.3.9.md).
 
 YallaFlow is under active development and its workspace/package contracts have not reached 1.0 stability yet.
 
@@ -501,6 +504,7 @@ YallaFlow is under active development and its workspace/package contracts have n
 | [`docs/cli.md`](docs/cli.md) | Complete CLI reference |
 | [`docs/guide.md`](docs/guide.md) | Feature and behavior guide |
 | [`docs/project-memory.md`](docs/project-memory.md) | Living project memory and artifact model |
+| [`docs/upgrading-to-v0.3.9.md`](docs/upgrading-to-v0.3.9.md) | Upgrading to v0.3.9: inspect, Brownfield classification, project-first brief, updating YallaFlow |
 | [`docs/upgrading-to-v0.3.8.md`](docs/upgrading-to-v0.3.8.md) | Upgrading to v0.3.8: delivery convergence, agent bootstrap |
 | [`docs/upgrading-to-v0.3.7.md`](docs/upgrading-to-v0.3.7.md) | Upgrading to v0.3.7: `upgrade status`, reconciling legacy context |
 | [`docs/upgrading-to-v0.3.6.md`](docs/upgrading-to-v0.3.6.md) | Upgrading a v0.3.5 workspace to v0.3.6 |

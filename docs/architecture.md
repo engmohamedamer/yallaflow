@@ -268,12 +268,14 @@ A pilot found that a replacement agent could recover stage/state after a reopen 
 
 ### Brownfield Baseline (v0.3.5)
 
-Deterministic bootstrap (`core/discovery.js`, run at `yallaflow init` for a brownfield project) is cheap, mechanical seed data — package-manager/framework markers, CI/container hints. It is not, and was never meant to be, a reviewed project understanding. Before v0.3.5, an agent could reconstruct a rich understanding of an undocumented repository during a session, but nothing durable captured it unless a later feature happened to promote knowledge — a new agent session had to rediscover the same ground.
+Deterministic bootstrap (`core/discovery.js`, run at `yallaflow init` for a brownfield project; since v0.3.9 it also lists nested manifest hints from the repository inventory under an *init-time snapshot* label) is cheap, mechanical seed data — package-manager/framework markers, CI/container hints. It is not, and was never meant to be, a reviewed project understanding. Before v0.3.5, an agent could reconstruct a rich understanding of an undocumented repository during a session, but nothing durable captured it unless a later feature happened to promote knowledge — a new agent session had to rediscover the same ground.
 
 ```text
 Existing repository
+→ yallaflow inspect                  (v0.3.9: bounded read-only inventory; never persisted)
 → deterministic bootstrap (seeds, does not replace, the baseline)
 → yallaflow baseline start           (read-only investigation work item)
+→ material documents: yallaflow intake add <id> <doc>
 → repository/runtime discovery
 → yallaflow baseline draft --file    (evidence-backed facts: confirmed/inferred/unresolved)
 → human review (yallaflow baseline show/status)
@@ -598,3 +600,41 @@ The following contracts are **Core-stable** entering v0.3. "Stable" here means v
 - the knowledge model (`knowledge.yaml`, promotion targets, source distinction)
 
 v0.3 integrations (tracker/source intake adapters, agent bootstrap) are expected to read and write through these contracts, not introduce parallel state.
+
+## Repository inventory and project-first orientation (v0.3.9)
+
+**Inventory** (`src/inventory/`). `inventoryRepository(root)` is the one new primitive: an in-memory, deterministic, bounded walk that is never persisted.
+- **Walk:** breadth-first over entries sorted by code point, never following symlinks, skipping `IGNORED_DIRECTORIES`, bounded by `INVENTORY_MAX_DEPTH` and `INVENTORY_MAX_ENTRIES` (truncation is reported).
+- **What it records:**
+  - recognized manifests (`MANIFEST_FILES`, `MANIFEST_EXTENSIONS`) at any depth;
+  - recognized source files counted by extension (`SOURCE_CODE_EXTENSIONS`, never read);
+  - documentation candidates, whose extensions are exported by `src/intake/constants.js` (`DOCUMENT_FORMAT_EXTENSIONS`, derived from `EXTENSION_FORMATS`) so inventory and intake never disagree;
+  - container/CI files.
+- **Bytes read:** only manifests and container/CI files, size-capped.
+- **Framework hints** (`src/inventory/frameworks.js`): read from manifest text alone, with no lockfiles and no cross-file POM resolution.
+
+`classifyProject(inventory)` is the deterministic Brownfield rule, and `detectProjectKind` and `init` delegate to it. Brownfield requires one of:
+- a manifest plus at least one recognized source file;
+- at least `BROWNFIELD_SOURCE_FILE_THRESHOLD` (10) recognized source files;
+- meaningful container/CI configuration: a non-whitespace line that is not a full-line `#` or `//` comment.
+
+`yallaflow inspect` renders the inventory as text and derives one next action from workspace state. Its baseline steps come from `baselineNextStep` in `src/baseline/store.js`, which `brief` and `baseline status` share.
+
+**Brief** (`src/commands/brief.js`). `brief` reads in this order: project, then work, then YallaFlow.
+- **Project block:** current facts in a fixed area order with fixed caps (`BRIEF_AREAS`, `BRIEF_SAMPLED_AREAS`), in fact-ID order, each rendered by `oneLine` (whitespace collapsed; truncated with an ellipsis only beyond 160 code points).
+- **NEEDS CARE** (`needsCare` in `src/context/summary.js`): exactly the non-superseded facts that are unresolved, disputed, `MAY_BE_STALE`, or `STALE_EVIDENCE`. It is mechanical state, not risk; there is no ledger field and no schema change.
+- **Without memory:** only then does `brief` run the inventory and show the baseline step.
+- **Cap:** `BRIEF_MAX_LINES` (45).
+
+`context status` adds its freshness explanation only when `gitHead(root)` is null.
+
+**Versions.**
+
+| Item | Version |
+|---|---|
+| Package | `0.3.9-internal.1` |
+| Agent Contract | **v5** |
+| Skill Registry | v5 (unchanged; only the `repository-baseline` instruction text was refined) |
+| Provider bootstrap block | v1 |
+
+No workspace schema changed, and the inventory has no on-disk form.

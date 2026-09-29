@@ -79,19 +79,23 @@ test('49. a fully current workspace reports no upgrade action', async () => {
   assert.match(cli(root, ['upgrade', 'plan']).stdout, /No upgrade actions required\. The workspace is current\./);
 });
 
-test('50 + 52. brief is a concise orientation: no context dump, sources surfaced', async () => {
+test('50 + 52. brief is a concise, project-first orientation: bounded current facts, no legacy dump, sources surfaced', async () => {
   const { root } = await yaschoolsWorkspace();
   await writeFile(path.join(root, 'request.txt'), 'Add a school calendar export.\n');
   cli(root, ['intake', 'request.txt']);
   const brief = cli(root, ['brief']).stdout;
   const lines = brief.trim().split('\n');
-  assert.ok(lines.length <= 16, `brief stays short (${lines.length} lines)`);
+  assert.ok(lines.length <= 45, `brief stays within its hard cap (${lines.length} lines)`);
   assert.match(brief, /^YallaFlow Brief — legacy \(brownfield\)/);
   assert.match(brief, new RegExp(`Agent contract: v${AGENT_CONTRACT_VERSION} current`));
   assert.match(brief, /Project memory: 1 current \(1 fresh\) · 0 disputed · 0 to revalidate/);
   assert.match(brief, /Legacy context: 10 fact\(s\) pending reconciliation/);
   assert.match(brief, /Sources: 1 \(latest SRC-0001\)/);
-  assert.doesNotMatch(brief, /Root codeception\.yml enables only the api and apps/, 'never dumps project facts');
+  // v0.3.9: the brief explains the project from current canonical facts (bounded per
+  // area) before YallaFlow status; pending legacy knowledge is counted, never listed.
+  assert.match(brief, /Conventions \(1\): CTX-0001 Root codeception\.yml enables only the api and apps Codeception suites\./);
+  assert.equal((brief.match(/CTX-\d{4}/g) ?? []).length, 1, 'only current ledger facts appear');
+  assert.ok(brief.indexOf('Project memory:') < brief.indexOf('Active work:') && brief.indexOf('Active work:') < brief.indexOf('Package:'), 'project → work → YallaFlow order');
   assert.match(brief, /never edit \.yallaflow structured state by hand/);
 });
 

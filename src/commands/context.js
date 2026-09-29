@@ -1,5 +1,5 @@
 import { findProjectRoot } from '../core/workspace.js';
-import { gitChangedPaths } from '../core/git.js';
+import { gitChangedPaths, gitHead } from '../core/git.js';
 import { factOrigins, findFact, lineageOf, loadContextLedger, validateContextLedger } from '../context/ledger.js';
 import { factFreshness, factsAffectedByPaths } from '../context/freshness.js';
 import { writeContextProjection } from '../context/projection.js';
@@ -38,6 +38,13 @@ export async function contextStatusCommand() {
   const { totals } = summary;
   console.log(`\nTotals: ${totals.current} current · ${totals.disputed} disputed · ${totals.superseded} superseded (historical)`);
   console.log(`Freshness: ${totals.fresh} fresh · ${totals.mayBeStale} may be stale · ${totals.staleEvidence} stale evidence · ${totals.unknown} unknown (no verification point)`);
+  // Contextual (v0.3.9): only where there is no Git commit to compare against, which is
+  // exactly when freshness behaves differently from the Git-backed case.
+  if (!gitHead(root)) {
+    console.log('This workspace is not Git-backed (no Git commit to compare evidence against):');
+    console.log('  - repository file evidence is still checked by SHA-256 content hash: a changed file becomes MAY_BE_STALE, a missing file STALE_EVIDENCE;');
+    console.log('  - directory evidence has no content hash, so without Git it is UNKNOWN (no verification point) — UNKNOWN does not mean stale.');
+  }
   if (summary.revalidate.length) {
     console.log(`\nNext: ${summary.revalidate.length} fact(s) should be revalidated before relying on them for affected work.`);
     for (const fact of summary.revalidate) console.log(`  ${describe(fact, summary.freshness.get(fact.id))}`);

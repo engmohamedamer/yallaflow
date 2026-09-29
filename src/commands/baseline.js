@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { findProjectRoot, loadWorkMetaOrThrow } from '../core/workspace.js';
-import { approveBaseline, draftBaseline, feedbackBaseline, findBaselineWork, loadBaseline, startBaseline, summarizeBaseline } from '../baseline/store.js';
+import { approveBaseline, baselineNextStep, draftBaseline, feedbackBaseline, findBaselineWork, loadBaseline, startBaseline, summarizeBaseline } from '../baseline/store.js';
 
 export async function baselineStartCommand() {
   const root = await findProjectRoot();
@@ -12,10 +12,13 @@ export async function baselineStartCommand() {
     console.log(`Run \`yallaflow baseline status ${meta.id}\` to see its current state.`);
     return;
   }
-  console.log(`${meta.id} — Repository Baseline started (read-only).`);
-  console.log('Next: complete repository discovery, then:');
+  console.log(`${meta.id} — Repository Baseline started (read-only: no application code changes).`);
+  console.log('Next: complete repository discovery (follow `yallaflow skill repository-baseline`), then:');
+  console.log('  yallaflow inspect   (bounded repository inventory: manifests, framework hints, documentation candidates)');
+  console.log(`  yallaflow intake add ${meta.id} <document>   (material documents; read extracted text with \`yallaflow source show SRC-#### --content\`)`);
   console.log(`  yallaflow checkpoint ${meta.id} --skill repository-baseline --complete --summary "..."`);
   console.log(`  yallaflow baseline draft ${meta.id} --file <baseline.json>`);
+  console.log(`A human then reviews (yallaflow baseline show ${meta.id}) and approves (yallaflow baseline approve ${meta.id}).`);
 }
 
 async function readBaselineFile(filePath) {
@@ -45,7 +48,7 @@ export async function baselineDraftCommand(workId, input) {
     console.log(`${status}: ${summary.byStatus[status].length}`);
   }
   if (summary.limitations.length) console.log(`discovery limitations: ${summary.limitations.length} (work-scoped, never promoted)`);
-  console.log(`\nNext: yallaflow baseline approve ${workId} (or \`baseline feedback ${workId} --changes-requested\`).`);
+  console.log(`\nNext: a human reviews the draft (yallaflow baseline show ${workId}) and approves it with \`yallaflow baseline approve ${workId}\` (or \`baseline feedback ${workId} --changes-requested\`). The Agent never approves a baseline.`);
 }
 
 async function resolveWorkId(root, requestedWorkId) {
@@ -63,8 +66,10 @@ export async function baselineStatusCommand(requestedWorkId) {
   const { exists: hasBaseline, ledger } = await loadBaseline(root, workId);
   console.log(`${workId} — Repository Baseline`);
   console.log(`Work stage: ${meta.status}`);
+  const step = await baselineNextStep(root, meta);
   if (!hasBaseline) {
     console.log('Baseline draft: none yet.');
+    console.log(`Next: ${step.command}`);
     return;
   }
   console.log(`Baseline status: ${ledger.status}`);
@@ -74,6 +79,7 @@ export async function baselineStatusCommand(requestedWorkId) {
     if (facts.length) console.log(`  ${area}: ${facts.length}`);
   }
   if (summary.limitations.length) console.log(`Discovery limitations: ${summary.limitations.length} (work-scoped, never promoted)`);
+  if (step.state !== 'approved') console.log(`Next: ${step.command}`);
 }
 
 export async function baselineShowCommand(requestedWorkId) {

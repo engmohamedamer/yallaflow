@@ -1,0 +1,752 @@
+{
+  "schemaVersion": 1,
+  "revision": 2,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "Bounded deterministic in-memory repository inventory (manifests, source counts, documentation candidates, Git presence, hints); never persisted.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Functional Requirements and Business Rules"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T11:13:29.630Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "Brownfield when (recognized manifest and >= 1 recognized source file), or >= 10 recognized source files, or meaningful container/CI configuration; a manifest alone or bare .git never classifies; init --type overrides.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Functional Requirements and Business Rules"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T12:56:34.631Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "Public read-only yallaflow inspect (text output only) with classification reasons, framework/version hints for exactly @angular/core, react, vue, next, @nestjs/core, laravel/framework, Spring Boot plus vite and yiisoft/yii2, and one next action.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Functional Requirements and Business Rules"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T12:56:34.631Z"
+    },
+    {
+      "id": "REQ-004",
+      "statement": "Brownfield onboarding through the existing baseline lifecycle, with Agent Contract v5 distinguishing app-code-only restriction from explicit read-only; human baseline approval mandatory.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Functional Requirements and Business Rules"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T11:13:29.630Z"
+    },
+    {
+      "id": "REQ-005",
+      "statement": "Documentation candidates recognized via intake-owned format constants and labelled with intake handling (preserve-only marked no text extraction); Agent guided to register and read material documents; inspect never reads them.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Functional Requirements and Business Rules"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T12:56:34.631Z"
+    },
+    {
+      "id": "REQ-006",
+      "statement": "Project-first brief: current-fact text per area in fixed order with per-area bounds and fact-ID order under a hard overall cap, plus mechanical NEEDS CARE (unresolved, disputed, MAY_BE_STALE, STALE_EVIDENCE only).",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Functional Requirements and Business Rules"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T12:56:34.631Z"
+    },
+    {
+      "id": "REQ-007",
+      "statement": "Freshness and durability guidance: content-hash freshness without Git, UNKNOWN is not stale, transient runtime state is not durable memory; context status explains non-Git freshness only when not Git-backed.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Functional Requirements and Business Rules"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T12:56:34.631Z"
+    },
+    {
+      "id": "REQ-008",
+      "statement": "Documented update path with no self-update or network mechanism.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Functional Requirements and Business Rules"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T11:13:29.630Z"
+    },
+    {
+      "id": "REQ-009",
+      "statement": "Package 0.3.9-internal.1, Agent Contract v5, Skill Registry v5, schemas unchanged, zero-byte reads on v0.3.8 workspaces, no silent AGENT.md/bootstrap rewrite.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Functional Requirements and Business Rules"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T11:13:29.630Z"
+    },
+    {
+      "id": "REQ-010",
+      "statement": "YallaFlow own .yallaflow committed and durable-clean (doctor, no secrets, no absolute paths, no local-only or transient state).",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Functional Requirements and Business Rules"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T11:13:29.630Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "Traversal is sorted, skips IGNORED_DIRECTORIES, never follows symlinks, enforces INVENTORY_MAX_DEPTH/INVENTORY_MAX_ENTRIES, and reports truncation.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T11:13:29.630Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "Inventory reports root and nested manifests, per-extension source counts, documentation candidates, Git presence, and repository hints, and persists nothing.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T11:13:29.630Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-003",
+      "statement": "Framework hints report declared version and major only when deterministic for exactly @angular/core, react, vue, next, @nestjs/core, laravel/framework, Spring Boot, plus vite and yiisoft/yii2; no other hints, no semantic labels.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T12:56:34.631Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-005",
+      "statement": "Documentation candidates derive from intake package-owned format constants (PDF, DOCX, XLSX, PPTX, text documents), labelled with intake handling, preserve-only formats marked no text extraction; inspect never reads them.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T12:56:34.631Z"
+    },
+    {
+      "id": "AC-005",
+      "requirement": "REQ-002",
+      "statement": "Bare .git and npm-init-only or source-less manifest are greenfield; manifest + 1 source file brownfield; 9 source files greenfield, 10 brownfield; meaningful container/CI config brownfield, empty/comment-only none; threshold is BROWNFIELD_SOURCE_FILE_THRESHOLD.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T12:56:34.631Z"
+    },
+    {
+      "id": "AC-006",
+      "requirement": "REQ-002",
+      "statement": "init uses the classification (--type wins); APD-shaped nested-only tree initializes as brownfield with nested hints in tech-stack.md labelled as an init-time bootstrap snapshot, not approved memory; no rewrite on read.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T12:56:34.631Z"
+    },
+    {
+      "id": "AC-007",
+      "requirement": "REQ-003",
+      "statement": "inspect works with and without a workspace, prints text only (no --json), names one next action, and writes zero bytes.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T12:56:34.631Z"
+    },
+    {
+      "id": "AC-008",
+      "requirement": "REQ-003",
+      "statement": "APD-shaped fixture: inspect reports both nested Angular apps with distinct majors, the Spring Boot manifests, and documentation candidates.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T11:13:29.630Z"
+    },
+    {
+      "id": "AC-009",
+      "requirement": "REQ-004",
+      "statement": "Brownfield workspace without memory is pointed to baseline start by init, inspect, and brief; in-progress baseline reports its next step to human approval; nothing auto-approves.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T11:13:29.630Z"
+    },
+    {
+      "id": "AC-010",
+      "requirement": "REQ-004",
+      "statement": "Agent Contract v5 distinguishes do-not-change-application-code (onboarding writes allowed) from explicit read-only (no .yallaflow writes) and requires human baseline approval.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T11:13:29.630Z"
+    },
+    {
+      "id": "AC-011",
+      "requirement": "REQ-005",
+      "statement": "repository-baseline skill and Contract v5 direct reviewing doc candidates, intake add plus source show --content for material documents, repository evidence citation, and limitations for unread documents.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T11:13:29.630Z"
+    },
+    {
+      "id": "AC-012",
+      "requirement": "REQ-006",
+      "statement": "brief leads with project block: fixed area order and caps (Project 3, Tech Stack 3, Architecture 3, Database 2, Integrations 2, Environments 2, Conventions/Business Rules count + 1 sample), NEEDS CARE up to 5, fact-ID order, at most 45 lines, read-only.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T12:56:34.631Z"
+    },
+    {
+      "id": "AC-013",
+      "requirement": "REQ-006",
+      "statement": "NEEDS CARE lists exactly non-superseded unresolved, disputed, MAY_BE_STALE, STALE_EVIDENCE facts, labelled as mechanical state, with no ledger field or schema change.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T11:13:29.630Z"
+    },
+    {
+      "id": "AC-014",
+      "requirement": "REQ-007",
+      "statement": "Contract v5 and repository-baseline skill state hash freshness without Git, UNKNOWN not stale, MAY_BE_STALE not false, transient state not durable; context status explains non-Git freshness only when not Git-backed.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T12:56:34.631Z"
+    },
+    {
+      "id": "AC-015",
+      "requirement": "REQ-008",
+      "statement": "Docs describe updating YallaFlow (target tag, version check, upgrade status/plan, explicit agent refresh, doctor) with no network mechanism.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T11:13:29.630Z"
+    },
+    {
+      "id": "AC-016",
+      "requirement": "REQ-009",
+      "statement": "Package 0.3.9-internal.1, Contract v5, Registry v5, schemas unchanged, v0.3.8 reads mutate zero bytes, v4 AGENT.md reported outdated and never rewritten without agent refresh.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T11:13:29.630Z"
+    },
+    {
+      "id": "AC-017",
+      "requirement": "REQ-010",
+      "statement": "YallaFlow own .yallaflow passes doctor, has no secrets, absolute machine paths, local-only artifacts, or transient state, and is not gitignored.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-09-29T11:13:29.630Z",
+      "updatedAt": "2026-09-29T11:13:29.630Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-004",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-005",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-006",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-007",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-008",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-009",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-010",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-005",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-006",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-007",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-008",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-009",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-010",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-011",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-012",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-013",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-014",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-015",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-016",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-017",
+      "at": "2026-09-29T11:13:29.630Z",
+      "revision": 1
+    },
+    {
+      "action": "revised",
+      "id": "REQ-002",
+      "at": "2026-09-29T12:56:34.631Z",
+      "revision": 2,
+      "previous": {
+        "id": "REQ-002",
+        "statement": "Brownfield classification by recognized manifest or >= 10 recognized source files; bare .git never classifies; init --type overrides.",
+        "provenance": [
+          {
+            "type": "specification",
+            "section": "Functional Requirements and Business Rules"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "REQ-003",
+      "at": "2026-09-29T12:56:34.631Z",
+      "revision": 2,
+      "previous": {
+        "id": "REQ-003",
+        "statement": "Public read-only yallaflow inspect [--json] with classification reasons, deterministic framework/version hints, and one next action.",
+        "provenance": [
+          {
+            "type": "specification",
+            "section": "Functional Requirements and Business Rules"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "REQ-005",
+      "at": "2026-09-29T12:56:34.631Z",
+      "revision": 2,
+      "previous": {
+        "id": "REQ-005",
+        "statement": "Documentation candidates recognized via intake-owned format constants; Agent guided to register and read material documents; inspect never reads them.",
+        "provenance": [
+          {
+            "type": "specification",
+            "section": "Functional Requirements and Business Rules"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "REQ-006",
+      "at": "2026-09-29T12:56:34.631Z",
+      "revision": 2,
+      "previous": {
+        "id": "REQ-006",
+        "statement": "Project-first brief with mechanical NEEDS CARE (unresolved, disputed, MAY_BE_STALE, STALE_EVIDENCE only).",
+        "provenance": [
+          {
+            "type": "specification",
+            "section": "Functional Requirements and Business Rules"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "REQ-007",
+      "at": "2026-09-29T12:56:34.631Z",
+      "revision": 2,
+      "previous": {
+        "id": "REQ-007",
+        "statement": "Freshness and durability guidance: content-hash freshness without Git, UNKNOWN is not stale, transient runtime state is not durable memory.",
+        "provenance": [
+          {
+            "type": "specification",
+            "section": "Functional Requirements and Business Rules"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "AC-003",
+      "at": "2026-09-29T12:56:34.631Z",
+      "revision": 2,
+      "previous": {
+        "id": "AC-003",
+        "requirement": "REQ-003",
+        "statement": "Framework hints report declared version and major only when deterministic for @angular/core, react, vue, next, @nestjs/core, laravel/framework, and Spring Boot; no semantic labels.",
+        "provenance": [
+          {
+            "type": "specification",
+            "section": "Acceptance Criteria"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "AC-004",
+      "at": "2026-09-29T12:56:34.631Z",
+      "revision": 2,
+      "previous": {
+        "id": "AC-004",
+        "requirement": "REQ-005",
+        "statement": "Documentation candidates derive from intake package-owned format constants (PDF, DOCX, XLSX, PPTX, text documents); inspect never reads them.",
+        "provenance": [
+          {
+            "type": "specification",
+            "section": "Acceptance Criteria"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "AC-005",
+      "at": "2026-09-29T12:56:34.631Z",
+      "revision": 2,
+      "previous": {
+        "id": "AC-005",
+        "requirement": "REQ-002",
+        "statement": "Bare .git/empty git init is greenfield; 9 source files greenfield, 10 brownfield; any recognized manifest brownfield; threshold is BROWNFIELD_SOURCE_FILE_THRESHOLD.",
+        "provenance": [
+          {
+            "type": "specification",
+            "section": "Acceptance Criteria"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "AC-006",
+      "at": "2026-09-29T12:56:34.631Z",
+      "revision": 2,
+      "previous": {
+        "id": "AC-006",
+        "requirement": "REQ-002",
+        "statement": "init uses the classification (explicit --type wins); an APD-shaped tree with only nested apps initializes as brownfield.",
+        "provenance": [
+          {
+            "type": "specification",
+            "section": "Acceptance Criteria"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "AC-007",
+      "at": "2026-09-29T12:56:34.631Z",
+      "revision": 2,
+      "previous": {
+        "id": "AC-007",
+        "requirement": "REQ-003",
+        "statement": "inspect and inspect --json work with and without a workspace, name one next action, and write zero bytes.",
+        "provenance": [
+          {
+            "type": "specification",
+            "section": "Acceptance Criteria"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "AC-012",
+      "at": "2026-09-29T12:56:34.631Z",
+      "revision": 2,
+      "previous": {
+        "id": "AC-012",
+        "requirement": "REQ-006",
+        "statement": "brief leads with a project block before work and YallaFlow status, stays compact, and stays read-only.",
+        "provenance": [
+          {
+            "type": "specification",
+            "section": "Acceptance Criteria"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "AC-014",
+      "at": "2026-09-29T12:56:34.631Z",
+      "revision": 2,
+      "previous": {
+        "id": "AC-014",
+        "requirement": "REQ-007",
+        "statement": "Contract v5, repository-baseline skill, and context status state hash freshness without Git, UNKNOWN is not stale, MAY_BE_STALE is not false, transient runtime state is not durable.",
+        "provenance": [
+          {
+            "type": "specification",
+            "section": "Acceptance Criteria"
+          }
+        ],
+        "status": "active"
+      }
+    }
+  ],
+  "updatedAt": "2026-09-29T12:56:34.631Z"
+}

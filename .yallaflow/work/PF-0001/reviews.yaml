@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "gates": {
+    "specification": {
+      "status": "approved",
+      "respondedAt": "2026-09-29T13:18:29.152Z",
+      "note": "Approved by the user in session on 2026-09-29 (revised specification incl. final decisions on container/CI meaningfulness, [needs care] marker, 160-code-point cap); recorded by the Agent on explicit user instruction.",
+      "history": [
+        {
+          "status": "awaiting_review",
+          "at": "2026-09-29T11:13:54.300Z"
+        },
+        {
+          "status": "changes_requested",
+          "at": "2026-09-29T12:55:03.238Z",
+          "note": "User review 2026-09-29: Risk 1 alternative (b) refined (manifest alone not Brownfield; manifest+>=1 source, or >=10 sources, or meaningful container/CI config); strike inspect --json; strike extra framework hints (keep vite, yii2); keep wider manifest list as inventory-only; keep preserve-only doc formats labelled; keep nested tech-stack hints labelled as init-time bootstrap snapshot; revise brief to per-area bounded fact text; contextual non-Git freshness note."
+        },
+        {
+          "status": "approved",
+          "at": "2026-09-29T13:18:29.152Z",
+          "note": "Approved by the user in session on 2026-09-29 (revised specification incl. final decisions on container/CI meaningfulness, [needs care] marker, 160-code-point cap); recorded by the Agent on explicit user instruction."
+        }
+      ]
+    },
+    "plan": {
+      "status": "approved",
+      "respondedAt": "2026-09-29T13:18:29.582Z",
+      "note": "Approved by the user in session on 2026-09-29 together with the revised specification; recorded by the Agent on explicit user instruction.",
+      "history": [
+        {
+          "status": "approved",
+          "at": "2026-09-29T13:18:29.582Z",
+          "note": "Approved by the user in session on 2026-09-29 together with the revised specification; recorded by the Agent on explicit user instruction."
+        }
+      ]
+    }
+  },
+  "updatedAt": "2026-09-29T13:18:29.582Z"
+}

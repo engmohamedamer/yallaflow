@@ -1,0 +1,69 @@
+{
+  "id": "PF-0001",
+  "type": "feature",
+  "scope": "architectural",
+  "routingStatus": "routed",
+  "rawRequest": "v0.3.9 — Frictionless Project Onboarding & Context UX: bounded nested Brownfield detection and deterministic repository inventory, frictionless Brownfield baseline orchestration, material documentation discovery via existing sources, project-first brief, accurate freshness guidance, update-UX decision",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-09-29T08:37:20.531Z",
+  "updatedAt": "2026-09-29T15:44:20.764Z",
+  "title": "v0.3.9 Frictionless Project Onboarding & Context UX",
+  "routingConfidence": "high",
+  "routingReason": "New user-facing capability across init (project-kind detection), a new deterministic repository-inventory primitive, brief output, and the versioned Agent Contract; changes public CLI behavior and agent-facing contracts that pinned workspaces depend on, so it needs specification and planning review gates rather than bounded depth.",
+  "routedAt": "2026-09-29T08:37:26.404Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "brainstorm",
+    "specify",
+    "plan",
+    "implement",
+    "verify",
+    "converge",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 5,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "design-exploration",
+      "specification",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "delivery-convergence",
+      "code-review"
+    ]
+  },
+  "lastInvalidationAt": "2026-09-29T15:38:42.987Z",
+  "completionHistory": [
+    {
+      "completedAt": "2026-09-29T15:25:14.412Z",
+      "verificationRunIds": [
+        "V-003"
+      ]
+    },
+    {
+      "completedAt": "2026-09-29T15:44:20.764Z",
+      "verificationRunIds": [
+        "V-004"
+      ]
+    }
+  ],
+  "lifecycleHistory": [
+    {
+      "action": "reopen",
+      "fromStage": "DONE",
+      "toStage": "IMPLEMENTATION",
+      "reason": "Pre-freeze fresh-clone acceptance failed: Git does not store the empty lazy directories init creates (work/, decisions/, releases/), so a clone of a fresh workspace fails doctor, and listWork/nextWorkId readdir an absent work/. Absent lazy directories must be a valid state. Also commit the referenced verification logs (repo .gitignore *.log exception).",
+      "changedAt": "2026-09-29T15:38:42.987Z"
+    }
+  ]
+}

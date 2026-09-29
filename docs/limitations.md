@@ -1,4 +1,4 @@
-# Current Limitations (v0.3.8)
+# Current Limitations (v0.3.9)
 
 Known gaps and deliberate boundaries. Planned work is tracked in [`roadmap.md`](roadmap.md).
 
@@ -21,6 +21,21 @@ Known gaps and deliberate boundaries. Planned work is tracked in [`roadmap.md`](
 - **Investigations cannot be reopened.** New proof after an investigation is DONE belongs in a new work item.
 - **No execution engine yet.** Execution contracts and reviewed/multi-agent execution policies are future work.
 
+## Onboarding and inventory
+
+- **Classification is a deterministic heuristic.** Brownfield means a recognized manifest plus at least one recognized source file, at least 10 recognized source files (`BROWNFIELD_SOURCE_FILE_THRESHOLD`), or meaningful container/CI configuration. The threshold was chosen, not measured, and will be tuned from dogfood evidence. Example or generated code outside the ignored directories counts, and sources in an unrecognized language do not. `init --type` overrides.
+- **Bounded, so possibly partial.** The inventory never follows symlinks and skips a fixed set of dependency, build, cache, and IDE directories. It stops at depth 16 or 50,000 entries, and a truncated scan says so. It never reads `.gitignore`.
+- **Framework hints come from manifest declarations only.** The hinted frameworks are Angular, React, Vue, Next.js, NestJS, Vite, Laravel, Yii2, and Spring Boot.
+  - The version shown is what the manifest declares; lockfiles and installed packages are not read.
+  - A major version appears only when the declared version is a literal.
+  - Maven `${property}` versions resolve only from a literal, project-level `<properties>` entry in the same file; parent POMs in other files are not followed. An unresolvable reference is shown as declared (for example `${project.parent.version}`), without a major version. A module that references Spring Boot with no version at all shows *version not declared in this manifest*.
+  - Gradle `//` and `/* */` comments are ignored, but hints are otherwise pattern-matched, not parsed.
+  - At most 40 nested hints are written into `tech-stack.md` (`TECH_STACK_HINT_LIMIT`), plus a "+N more" line.
+  - No semantic labels such as "microservice" are inferred.
+- **Documents are listed, never read.** `inspect` names documentation candidates in the formats intake supports. Reading them is the Agent's job, through `intake add` and `source show --content`.
+- **The recorded project kind is never rewritten.** A workspace classified differently by an earlier version keeps its `config.yaml` kind; `inspect` and `brief` report the difference.
+- **`tech-stack.md`'s nested hints are an init-time snapshot.** They are not refreshed and are not approved project memory.
+
 ## Project memory
 
 - **No semantic judgment.** YallaFlow never detects duplicate or contradictory prose. The agent must declare `--reconfirms`, `--supersedes`, or `--disputes` — and, for legacy knowledge, an explicit reconciliation action per candidate. The only automatic comparison is exact textual identity (`exactDuplicateOf`), which is reported, never acted on.
@@ -28,7 +43,11 @@ Known gaps and deliberate boundaries. Planned work is tracked in [`roadmap.md`](
 - **Reconciled legacy facts have `UNKNOWN` freshness.** Their original verification point is unknown; reconfirm them with fresh evidence through normal work.
 - **Hand-edited legacy sections are never removed automatically.** After reconciliation they remain outside the managed block until a human removes them (`doctor` warns).
 - **State ownership is not enforced by locks.** Agents are told not to edit CLI-owned files, and `doctor` detects what is deterministic (schemas, fingerprints, drift, checksums, the `work.md` Routing Decision); free-form edits to narrative text are not detectable, by design.
-- **Freshness is mechanical and coarse.** Only repository evidence has a verification point; runtime and user-confirmed facts show `UNKNOWN`. Any change under a cited directory marks the fact `MAY_BE_STALE`.
+- **Freshness is mechanical and coarse.** Only repository evidence has a verification point; runtime and user-confirmed facts show `UNKNOWN`.
+  - File evidence is compared by SHA-256 content hash, with or without Git.
+  - Directory evidence needs a Git commit, and is `UNKNOWN` without one. With Git, any change under a cited directory marks the fact `MAY_BE_STALE`.
+- **NEEDS CARE is not a risk register.** It lists only facts that are unresolved, disputed, `MAY_BE_STALE`, or `STALE_EVIDENCE`. A confirmed, fresh fact about a security or architectural risk is ordinary knowledge the Agent interprets; the ledger has no risk or importance field.
+- **The brief is bounded.** It shows at most a few facts per area in fact-ID order, with no ranking, and truncates each summary to about 160 code points. `yallaflow context list` shows everything.
 - **Limitation detection is exact-text only.** A limitation reworded as a fact is not caught.
 - **No baseline refresh.** Only one approved baseline per workspace; living memory keeps it current.
 - **Ledger and Markdown projection are not one transaction.** A rendering failure leaves canonical knowledge intact; `yallaflow context render` repairs the Markdown.
@@ -53,6 +72,7 @@ Known gaps and deliberate boundaries. Planned work is tracked in [`roadmap.md`](
 ## Upgrades
 
 - **`AGENT.md` refresh is manual.** Existing workspaces keep their old agent guidance until `yallaflow agent refresh` is run (`yallaflow upgrade status` reports it). The same holds for provider bootstrap blocks.
-- **No automatic upgrade.** `upgrade status|plan` only report; each step is a deliberate command.
-- **No downgrades or mixed versions** once a newer version has written to a workspace ([upgrading-to-v0.3.8.md](upgrading-to-v0.3.8.md#mixed-versions-and-downgrades), [upgrading-to-v0.3.7.md](upgrading-to-v0.3.7.md#mixed-versions-and-downgrades)).
+- **No automatic upgrade.** `upgrade status|plan` only report; each step is a deliberate command. There is no self-update or network version check ([installation.md](installation.md#updating-yallaflow)).
+- **No downgrades or mixed versions** once a newer version has written to a workspace ([upgrading-to-v0.3.9.md](upgrading-to-v0.3.9.md#mixed-versions-and-downgrades), [upgrading-to-v0.3.8.md](upgrading-to-v0.3.8.md#mixed-versions-and-downgrades), [upgrading-to-v0.3.7.md](upgrading-to-v0.3.7.md#mixed-versions-and-downgrades)).
+- **Clone portability depends on your `.gitignore`.** Absent lazy directories are healthy, but a repository-wide `*.log` ignore rule drops verification logs unless you add `!.yallaflow/**/*.log`.
 - **Legacy `.projectflow/` workspaces** are not migrated automatically, and the `PF-####` work ID format is unchanged.

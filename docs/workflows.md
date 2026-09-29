@@ -68,12 +68,14 @@ Children reference the parent's requirement and criterion IDs (`"acceptanceCrite
 An existing repository with no durable project context yet. Install the CLI globally or in a tools prefix — not into the application's `package.json` ([installation.md](installation.md#legacy-and-brownfield-repositories)).
 
 ```bash
-yallaflow init                                        # detects brownfield; records deterministic stack hints
-yallaflow baseline start                              # read-only investigation work item, e.g. PF-0001
+yallaflow inspect                                     # read-only inventory: classification, nested manifests + framework hints, documents (works before init)
+yallaflow init                                        # classifies from the inventory; records deterministic stack hints
+yallaflow baseline start                              # investigation work item (read-only for application code), e.g. PF-0001
 # agent: repository/runtime discovery (yallaflow skill repository-baseline)
+yallaflow intake add PF-0001 docs/APD_LLD.pdf         # material documents become sources; read: yallaflow source show SRC-0001 --content
 yallaflow checkpoint PF-0001 --skill repository-baseline --complete --summary "Repository discovered."
 yallaflow baseline draft PF-0001 --file baseline.json # facts + discovery limitations, every fact with evidence
-yallaflow baseline show PF-0001                       # human review
+yallaflow baseline show PF-0001                       # human review — the Agent never approves
 yallaflow baseline feedback PF-0001 --changes-requested --note "Add database evidence."   # or:
 yallaflow baseline approve PF-0001 --note "Reviewed."
 yallaflow context status                              # CTX-#### facts now back PROJECT.md and context/*.md
@@ -81,6 +83,8 @@ git add .yallaflow && git commit -m "Add YallaFlow baseline"
 ```
 
 From then on, each request is ordinary work that reads relevant current context first and keeps it current ([freshness](#context-freshness-and-revalidation)). There is no baseline refresh.
+
+"Understand this project, but do not change application code" authorizes the agent to run the YallaFlow onboarding steps above, up to `baseline draft`, without asking again. "Read-only, do not write anything" authorizes only `inspect`, `brief`, `status`, `context status`, and `baseline status/show`.
 
 ## Bug
 
@@ -280,7 +284,7 @@ yallaflow handoff PF-0006
 Incoming agent, with no access to the previous chat:
 
 ```bash
-yallaflow brief                                       # one read-only orientation: contract, active/recent work, delivery state, memory, next command
+yallaflow brief                                       # read-only, project-first: facts per area, NEEDS CARE, work, contract, next command
 yallaflow agent status                                # is AGENT.md current?
 yallaflow handoff PF-0006                             # PRIMARY UNRESOLVED OBJECTIVE, progress, gates, sources, stale context, next objective
 yallaflow resume PF-0006

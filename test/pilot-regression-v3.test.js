@@ -22,6 +22,8 @@ function run(root, args) {
 test('Scenario A — Brownfield: undocumented repo -> baseline -> changes requested -> approved -> new bounded feature -> DONE', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-pilot-a-'));
   await writeFile(path.join(root, 'package.json'), JSON.stringify({ name: 'nice-day', dependencies: { vue: '^3.0.0' } }), 'utf8');
+  // v0.3.9: a manifest alone is not Brownfield; one recognized source file corroborates it.
+  await writeFile(path.join(root, 'main.js'), 'export {};\n', 'utf8');
 
   const init = run(root, ['init']);
   assert.match(init.stdout, /Project kind: brownfield/);

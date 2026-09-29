@@ -57,7 +57,7 @@ test('help is non-mutating across every command namespace', async () => {
     'checkpoint', 'question', 'knowledge', 'decompose', 'progress', 'next', 'approve', 'feedback',
     'handoff', 'feature', 'bug', 'investigate', 'change', 'refactor', 'release',
     'status', 'resume', 'doctor', 'advance', 'verify', 'reopen',
-    'context', 'agent', 'limitation', 'upgrade', 'brief'
+    'context', 'agent', 'limitation', 'upgrade', 'brief', 'inspect'
   ];
   for (const command of commands) {
     const result = spawnSync(process.execPath, [cli, command, '--help'], { cwd: root, encoding: 'utf8' });

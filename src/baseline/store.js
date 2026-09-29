@@ -250,3 +250,43 @@ function validateFacts(facts) {
 function isNonEmptyString(value) {
   return typeof value === 'string' && value.trim().length > 0;
 }
+
+// Read-only: where an existing Brownfield Baseline stands and the one next step, for
+// `brief`, `inspect`, and `baseline status`. It never advances anything; the last step
+// is always a human running `yallaflow baseline approve`.
+export async function baselineNextStep(root, meta) {
+  try {
+    return await resolveBaselineNextStep(root, meta);
+  } catch {
+    // A malformed baseline/progress ledger (e.g. an unresolved merge) must not break
+    // read-only orientation; doctor reports the structural problem.
+    return { state: 'unreadable', text: `baseline ${meta.id} state could not be read`, command: 'yallaflow doctor' };
+  }
+}
+
+async function resolveBaselineNextStep(root, meta) {
+  const id = meta.id;
+  const { exists: hasBaseline, ledger } = await loadBaseline(root, id);
+  if (hasBaseline && ledger.status === 'approved') {
+    return { state: 'approved', text: `baseline ${id} approved`, command: 'yallaflow brief' };
+  }
+  const progress = await loadWorkProgress(root, meta);
+  if (progress.ledger.skills['repository-baseline']?.status !== 'completed') {
+    return {
+      state: 'discovery',
+      text: `baseline ${id} in progress — complete repository discovery (yallaflow inspect; register material documents with yallaflow intake add ${id} <path>)`,
+      command: `yallaflow checkpoint ${id} --skill repository-baseline --complete --summary "..."`
+    };
+  }
+  if (!hasBaseline) {
+    return { state: 'draft', text: `baseline ${id} discovery complete — record the evidence-backed draft`, command: `yallaflow baseline draft ${id} --file <baseline.json>` };
+  }
+  if (ledger.history.at(-1)?.action === 'changes_requested') {
+    return { state: 'changes-requested', text: `baseline ${id}: changes requested by the reviewer — revise the draft`, command: `yallaflow baseline draft ${id} --file <baseline.json>` };
+  }
+  return {
+    state: 'awaiting-review',
+    text: `baseline ${id} draft (${ledger.facts.length} fact(s)) awaits human review — a human approves it; the Agent never does`,
+    command: `yallaflow baseline show ${id}   (then, by a human: yallaflow baseline approve ${id} | baseline feedback ${id} --changes-requested)`
+  };
+}

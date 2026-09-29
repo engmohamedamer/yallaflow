@@ -153,6 +153,31 @@ Passing tests did not prove that the delivered implementation matched the approv
 
 Deliberately not in scope: team mode, locking, remote sync, tracker/email intake, dashboards, semantic inference or LLM calls in the CLI, an execution engine, multi-agent orchestration, model-tier routing.
 
+### v0.3.9 — Frictionless Project Onboarding & Context UX
+
+Dogfooding on an APD-shaped repository showed that v0.3.8's `init` called it Greenfield. That repository has no root manifest, no Git, two nested Angular portals on different majors, Spring Boot backend modules, and design documents. Separately, a bare `.git` was enough to call an empty directory Brownfield. And a fresh session learned YallaFlow's bookkeeping before it learned the project:
+
+- A bounded, deterministic, in-memory repository inventory (`src/inventory/`). It never follows symlinks, respects fixed depth and entry bounds and reports truncation, and is never persisted. It covers:
+  - nested manifests with deterministic framework/version hints;
+  - recognized source files;
+  - documentation candidates in intake's own formats;
+  - container/CI configuration.
+- Brownfield classification from that inventory:
+  - a manifest plus source, 10 or more source files, or meaningful container/CI configuration;
+  - a bare `.git` or a manifest alone is Greenfield;
+  - `--type` still overrides.
+- `yallaflow inspect` — read-only, text only, works before `init`, and names one next action.
+- Frictionless Brownfield onboarding through the existing baseline lifecycle, with no new workflow. `init`, `inspect`, `brief`, and `baseline` name every step up to human approval. Agent Contract v5 separates "do not change application code" (onboarding writes to `.yallaflow` allowed) from "read-only" (no writes).
+- Material documentation guidance: register material documents as sources and read their extracted text, without the CLI ever reading documents itself.
+- A project-first `brief`:
+  - current-fact text per area, with fixed caps;
+  - a mechanical NEEDS CARE list (unresolved, disputed, MAY_BE_STALE, STALE_EVIDENCE), which is not a risk register;
+  - a hard 45-line cap.
+- Freshness guidance: content-hash freshness without Git, and a contextual `context status` note only when there is no Git commit to compare against. Transient runtime state is never durable memory.
+- Documented update procedure; no self-update.
+
+Deliberately not in scope: `inspect --json`, persisted inventory, schema changes, ledger risk/importance fields, LLM calls, embeddings or search in the CLI, automatic baseline approval, self-update or network checks, team mode, v0.4 execution work.
+
 ## v0.4 — Execution
 - Execution contracts
 - Reviewed/native/multi-agent policies

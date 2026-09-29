@@ -226,8 +226,8 @@ test('a real v0.3.6 (v2) managed block upgrades to the installed contract in pla
 // Contract v4 (v0.3.8): delivery convergence — requirement identity, evidence-backed
 // convergence (verification ≠ review ≠ convergence), change impact. The fixture is the
 // exact v3 managed block v0.3.7 generated, which must upgrade in place.
-test('agent contract v4 teaches requirement identity, convergence, and change impact', async () => {
-  assert.equal(AGENT_CONTRACT_VERSION, 4);
+test('agent contract v4+ teaches requirement identity, convergence, and change impact', async () => {
+  assert.ok(AGENT_CONTRACT_VERSION >= 4);
   const body = agentContractBody();
   assert.match(body, /## Delivery intent and convergence sequence/);
   assert.match(body, /Verification asks whether the recorded technical checks pass; code review asks whether the implementation is technically acceptable; convergence asks whether the delivered implementation satisfies the approved requirements and acceptance criteria/);
@@ -240,13 +240,48 @@ test('agent contract v4 teaches requirement identity, convergence, and change im
   for (const file of ['requirements.yaml', 'convergence.yaml', 'impact.yaml']) assert.ok(body.includes(file), `contract names CLI-owned ${file}`);
 });
 
-test('a real v0.3.7 (v3) managed block upgrades to v4 in place and keeps project text', async () => {
+test('a real v0.3.7 (v3) managed block upgrades to the current contract in place and keeps project text', async () => {
   const v3 = await fixture('v3-managed.md');
   assert.match(v3, /^<!-- yallaflow-agent-contract:begin version=3 /);
   const extra = '\n## Project notes\n\nRun the PHP suite with composer test.\n';
   const { root, file } = await workspaceWithAgent(`${v3}${extra}`);
-  assert.deepEqual(await inspectAgentContract(root), { state: 'outdated', installed: 4, version: 3 });
+  assert.deepEqual(await inspectAgentContract(root), { state: 'outdated', installed: AGENT_CONTRACT_VERSION, version: 3 });
   assert.match(run(root, ['upgrade', 'plan']).stdout, /Refresh the Agent Contract/);
+  run(root, ['agent', 'refresh']);
+  assert.equal(await readFile(file, 'utf8'), `${renderAgentContractBlock()}${extra}`);
+  assert.equal((await inspectAgentContract(root)).state, 'current');
+});
+
+test('v0.3.9: agent contract v5 teaches Brownfield onboarding, the app-code vs read-only distinction, documents, NEEDS CARE, and Git-free freshness', async () => {
+  assert.equal(AGENT_CONTRACT_VERSION, 5);
+  const body = agentContractBody();
+  assert.match(body, /## Brownfield onboarding sequence/);
+  assert.doesNotMatch(body, /## Brownfield baseline sequence/);
+  assert.match(body, /yallaflow inspect gives a bounded, read-only repository inventory/);
+  // Refinement D: "do not change application code" is not "read-only".
+  assert.match(body, /"Do not change application code" and "read-only \/ do not write anything" are different instructions/);
+  assert.match(body, /onboarding YallaFlow workspace writes are authorized and need no further permission: yallaflow baseline start, registering material documents with yallaflow intake add, completing the repository-baseline checkpoint, and yallaflow baseline draft/);
+  assert.match(body, /explicitly asks for a completely read-only or no-write operation, do not mutate \.yallaflow either/);
+  assert.match(body, /Never approve a baseline yourself/);
+  // Material documents (M3).
+  assert.match(body, /yallaflow intake add <baseline-work-id> <path> and read its extracted text with yallaflow source show SRC-#### --content/);
+  assert.match(body, /A document is evidence of what the document says, not proof of what the code does/);
+  // Durable vs transient, freshness without Git, NEEDS CARE (M5/M4).
+  assert.match(body, /Transient runtime state .* is never a durable fact/);
+  assert.match(body, /SHA-256 content hash, which works without Git/);
+  assert.match(body, /UNKNOWN means there is no verification point .* and does not mean stale/);
+  assert.match(body, /NEEDS CARE: facts that are unresolved, disputed, MAY_BE_STALE, or STALE_EVIDENCE/);
+  assert.match(body, /It is not a risk list/);
+});
+
+test('v0.3.9: a real v0.3.8 (v4) managed block is reported outdated, never rewritten on read, and upgrades to v5 only on explicit refresh', async () => {
+  const v4 = await fixture('v4-managed.md');
+  assert.match(v4, /^<!-- yallaflow-agent-contract:begin version=4 /);
+  const extra = '\n## Project notes\n\nKeep this text.\n';
+  const { root, file } = await workspaceWithAgent(`${v4}${extra}`);
+  assert.deepEqual(await inspectAgentContract(root), { state: 'outdated', installed: 5, version: 4 });
+  for (const args of [['brief'], ['status'], ['doctor'], ['upgrade', 'status'], ['upgrade', 'plan'], ['agent', 'status'], ['inspect']]) run(root, args);
+  assert.equal(await readFile(file, 'utf8'), `${v4}${extra}`, 'read commands never rewrite AGENT.md');
   run(root, ['agent', 'refresh']);
   assert.equal(await readFile(file, 'utf8'), `${renderAgentContractBlock()}${extra}`);
   assert.equal((await inspectAgentContract(root)).state, 'current');

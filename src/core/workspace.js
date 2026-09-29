@@ -5,8 +5,13 @@ import { exists, ensureDir, writeText } from '../utils/fs.js';
 import { readYaml, writeYaml } from './yaml.js';
 import { KNOWLEDGE_POLICY_VERSION } from '../knowledge/constants.js';
 import { renderAgentContractFile } from '../agent/contract.js';
+import { classifyProject, inventoryRepository } from '../inventory/inventory.js';
 
 export const WORKSPACE_DIR = '.yallaflow';
+// Directories `init` creates empty and fills lazily. Git does not store empty
+// directories, so a fresh clone of a committed workspace legitimately lacks them: an
+// absent lazy directory means "nothing recorded yet", never corruption (v0.3.9).
+export const LAZY_WORKSPACE_DIRS = Object.freeze(['work', 'decisions', 'releases']);
 const LEGACY_WORKSPACE_DIR = '.projectflow';
 
 export function workspacePath(root) {
@@ -23,10 +28,10 @@ export async function findProjectRoot(start = process.cwd()) {
   }
 }
 
+// v0.3.9: classified from the bounded repository inventory (src/inventory/). A bare
+// `.git` or a manifest without any recognized source file is no longer Brownfield.
 export async function detectProjectKind(root) {
-  const markers = ['.git', 'package.json', 'composer.json', 'pyproject.toml', 'go.mod', 'Cargo.toml', 'pom.xml'];
-  const results = await Promise.all(markers.map((marker) => exists(path.join(root, marker))));
-  return results.some(Boolean) ? 'brownfield' : 'greenfield';
+  return classifyProject(await inventoryRepository(root)).kind;
 }
 
 // GAP-INIT-001: a `.yallaflow` removed from the working tree but still tracked by Git
@@ -109,6 +114,7 @@ function projectTemplate(name, kind) {
 
 export async function nextWorkId(root) {
   const workDir = path.join(workspacePath(root), 'work');
+  if (!await exists(workDir)) return 'PF-0001';
   const entries = await readdir(workDir, { withFileTypes: true });
   const ids = entries
     .filter((entry) => entry.isDirectory())
@@ -150,6 +156,7 @@ export async function loadWorkMetaOrThrow(root, workId) {
 
 export async function listWork(root) {
   const workDir = path.join(workspacePath(root), 'work');
+  if (!await exists(workDir)) return [];
   const entries = await readdir(workDir, { withFileTypes: true });
   const items = [];
   for (const entry of entries) {

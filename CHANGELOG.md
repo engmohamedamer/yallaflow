@@ -8,6 +8,128 @@ YallaFlow has not yet made a public npm release (`package.json` remains `"privat
 
 Nothing yet.
 
+## [0.3.9-internal.1] - 2026-09-29 — Frictionless Project Onboarding & Context UX
+
+**Internal prerelease. Not published to npm.** Three problems drove this release:
+
+- **APD was classified Greenfield.** On an APD-shaped repository (no root manifest and no Git; two nested Angular portals on Angular 16 and 8; Spring Boot backend modules; container files; design PDFs), v0.3.8's `init` recorded `greenfield`, so no baseline was ever proposed.
+- **A bare `.git` meant Brownfield.** An empty `git init` directory was classified Brownfield.
+- **The brief led with bookkeeping.** A fresh session's `brief` described YallaFlow's own state before it described the project.
+
+> **Give the agent the project first.** YallaFlow inventories deterministically; the Agent interprets; a human approves the baseline.
+
+#### Added — Bounded repository inventory (`src/inventory/`)
+- `inventoryRepository(root)` is an in-memory, deterministic walk:
+  - Breadth-first over code-point-sorted entries. It never follows symlinks and skips `IGNORED_DIRECTORIES` (VCS, `.yallaflow`, dependency installs, build output, caches, IDE state).
+  - Bounded by `INVENTORY_MAX_DEPTH` (16; a pre-freeze refinement over the originally reviewed 6, for deep Java/package trees) and `INVENTORY_MAX_ENTRIES` (50,000). Truncation is reported.
+  - Records recognized manifests at any depth, recognized source files counted by extension, documentation candidates, container/CI files, and Git presence.
+  - Reads only manifest and container/CI bytes (size-capped) and is never persisted.
+- Documentation candidates use intake's package-owned formats: new `DOCUMENT_FORMAT_EXTENSIONS` / `TEXT_DOCUMENT_EXTENSIONS` in `src/intake/constants.js`, derived from `EXTENSION_FORMATS`. Each candidate is labelled with its intake handling; `.odg` and `.epub` are marked *preserve-only, no text extraction*.
+- Deterministic framework/version hints from manifest text:
+  - `@angular/core`, `react`, `vue`, `next`, `@nestjs/core`, `vite` (package.json).
+  - `laravel/framework`, `yiisoft/yii2` (composer.json).
+  - Spring Boot: the Maven `spring-boot-starter-parent`, a `spring-boot-dependencies` BOM (with a same-file `${property}` resolved), a bare `org.springframework.boot` reference, or the Gradle plugin.
+  - A major version is shown only when the declared version is a literal. No semantic labels. Malformed manifests are reported, never thrown.
+
+#### Added — `yallaflow inspect`
+- Read-only, text-only, and works with or without a workspace; writes nothing.
+- Prints:
+  - the classification with its reasons;
+  - Git presence;
+  - workspace state, including a recorded kind that differs from the inventory's;
+  - scan bounds and truncation;
+  - manifests with hints;
+  - source-file counts;
+  - bounded documentation candidates;
+  - container/CI configuration;
+  - one next action (`init`, `baseline start`, the next baseline step, or `brief`).
+
+#### Changed — Brownfield classification (intentional correction)
+- `init` and `detectProjectKind` classify from the inventory. Brownfield means one of:
+  - a recognized manifest **and** at least one recognized source file;
+  - at least `BROWNFIELD_SOURCE_FILE_THRESHOLD` (10) recognized source files;
+  - meaningful container/CI configuration, i.e. at least one non-whitespace line that is not a full-line `#` or `//` comment, in `Dockerfile*`, compose files, `.gitlab-ci.yml`, `azure-pipelines.yml`, `bitbucket-pipelines.yml`, `Jenkinsfile`, `.circleci/config.yml`, or `.github/workflows/*.yml|yaml`.
+- Otherwise the project is Greenfield. A bare `.git` and an `npm init`-only `package.json` are Greenfield now. The wider manifest list (`requirements.txt`, Gradle, .NET, Flutter, Ruby, …) is discoverable, but on its own never classifies. `--type` still overrides.
+- `init` prints the classification reason. A new Brownfield `init` writes nested manifest hints into `tech-stack.md` under an *init-time deterministic bootstrap snapshot — NOT approved project memory* label. Root-level stack lines are unchanged, and existing workspaces are never rewritten.
+
+#### Changed — Frictionless Brownfield onboarding (no new workflow)
+- `init`, `inspect`, and `brief` point a Brownfield workspace without project memory to `yallaflow baseline start`.
+- `brief`, `inspect`, and `baseline status` share one read-only `baselineNextStep`: discovery checkpoint → draft → changes requested → awaiting human review. Nothing approves a baseline automatically.
+- `baseline start` and `baseline draft` name the inventory, source registration (`intake add` + `source show --content`), and human approval.
+
+#### Changed — Project-first brief
+- `brief` reads Project → Work → YallaFlow and is capped at 45 lines (`BRIEF_MAX_LINES`).
+- Current-fact text is shown in fixed area order with fixed caps:
+
+  | Area | Facts shown |
+  |---|---|
+  | Project | 3 |
+  | Tech Stack | 3 |
+  | Architecture | 3 |
+  | Database | 2 |
+  | Integrations | 2 |
+  | Environments | 2 |
+  | Conventions | count + 1 sample |
+  | Business Rules | count + 1 sample |
+
+  Facts appear in fact-ID order. Summaries are whitespace-normalized and truncated with an ellipsis only beyond about 160 Unicode code points.
+- **NEEDS CARE** (up to 5, via the shared `needsCare`) lists exactly the non-superseded facts that are unresolved, disputed, `MAY_BE_STALE`, or `STALE_EVIDENCE`. It is labelled as mechanical state/freshness, not a risk assessment. Such facts also carry `[needs care]` in their area entry. There is no ledger field and no schema change.
+- Without project memory, `brief` shows the inventory headline and the baseline step. Package, contract, and bootstrap share one line.
+
+#### Changed — Freshness guidance
+- `context status` explains hash-based freshness only when the workspace has no Git commit to compare against:
+  - file evidence is still checked by SHA-256 content hash (a changed file becomes MAY_BE_STALE, a missing one STALE_EVIDENCE);
+  - directory evidence is UNKNOWN, which is not stale.
+
+  The Git-backed output is unchanged.
+- The `repository-baseline` skill text (Skill Registry unchanged) adds:
+  - starting from `inspect`;
+  - material documents;
+  - durable vs. transient runtime state;
+  - Git-free freshness;
+  - the distinction between application-code and YallaFlow-workspace writes.
+
+#### Changed — Agent Contract v5
+- A **Brownfield onboarding sequence** replaces the baseline sequence. "Do not change application code" authorizes the onboarding YallaFlow writes (`baseline start`, `intake add`, the checkpoint, `baseline draft`); an explicit read-only / no-write request forbids `.yallaflow` writes too. A human always approves the baseline.
+- Material-document discovery and source use are part of that sequence.
+- NEEDS CARE semantics, with an explicit "not a risk list".
+- Content-hash freshness without Git, and UNKNOWN is not stale.
+- Transient runtime state is never a durable fact.
+- The start sequence says `brief` is project-first.
+
+#### Fixed — pre-freeze independent review
+Each fix has a regression test.
+- **Brief line cap.** The 45-line cap counts physical lines: embedded newlines in stored text (such as a pasted multi-line request) are collapsed, and the primary concern, next command, and contract pointer are reserved, so they are never truncated away.
+- **Malformed baseline ledgers.** A malformed baseline or progress ledger no longer crashes `brief` or `inspect`; both point to `yallaflow doctor`, as v0.3.8's brief did.
+- **Unreadable container/CI files** are reported as unreadable, not as empty.
+- **Unresolvable Maven versions.** An unresolvable Maven `${property}` version is kept as declared (without a major version); resolution reads project-level `<properties>` only, not profile properties.
+- **Bounded snapshot.** The nested hints written into `tech-stack.md` are capped at 40.
+- **A committed workspace survives `git clone`.** This was found by the required fresh-clone acceptance check.
+  - `init` creates empty `work/`, `decisions/`, and `releases/` directories, which Git does not store. A clone of a fresh workspace therefore failed `doctor`, and `listWork`/`nextWorkId` tried to read an absent `work/`.
+  - These lazy directories (`LAZY_WORKSPACE_DIRS`) are now valid when absent, like `sources/`: `doctor` reports them as "absent — created when first needed", `work/` listing returns nothing, and the first work item recreates `work/`.
+  - `doctor` still fails when a lazy path exists but is not a directory, or when `work/` is missing while `state/current.yaml` names active work.
+  - No `.gitkeep` files are added; the product accepts the cloned state.
+- **Container/CI hints match the classification.** `tech-stack.md`'s repository hints at `init` come from the same inventory that classifies the project: meaningful `Dockerfile`/`Dockerfile.*`/`*.Dockerfile`, Docker Compose, GitHub Actions, GitLab CI, Azure Pipelines, Bitbucket Pipelines, Jenkins, and CircleCI files, grouped by kind with their paths. Empty or comment-only files are not hinted. Before this fix, a root `Dockerfile` could make a project Brownfield while the hints said "No CI/container marker detected yet". The kind comes from the file name and location only, and nothing new is persisted.
+- **Gradle comments** are ignored.
+- **JSON manifests.** A BOM-prefixed JSON manifest parses. A parse failure reports a fixed reason and never echoes manifest content.
+
+#### Documentation
+- `docs/upgrading-to-v0.3.9.md`.
+- An "Updating YallaFlow" procedure in `docs/installation.md`: install the target version, `--version`, `upgrade status|plan`, explicit `agent refresh`, `doctor`, commit. There is no self-update or network version check.
+- Acceptance Scenario C (APD-shaped onboarding).
+- Updated CLI reference, workflows, guide, architecture, project memory, limitations, and roadmap.
+
+#### Compatibility
+- Read commands on v0.3.5–v0.3.8 workspaces mutate zero bytes (tested, including `inspect` and `brief` on a v0.3.8-shaped workspace with a v4 contract).
+- The recorded project kind is never rewritten.
+- A v4 `AGENT.md` is reported as outdated and changes only through `yallaflow agent refresh`.
+- No workspace schema changed, so v0.3.8 can still operate on a v0.3.9 workspace. After `agent refresh`, v0.3.8 reports the v5 block as *newer* and refuses to downgrade it.
+
+#### Versions
+- Package `0.3.9-internal.1`; Agent Contract **v5**.
+- Skill Registry v5 (unchanged); provider bootstrap block v1 (unchanged).
+- Context ledger, baseline, sources, reviews, delivery ledgers, knowledge policy, config, and state are all unchanged. See [`docs/upgrading-to-v0.3.9.md`](docs/upgrading-to-v0.3.9.md).
+
 ## [0.3.8-internal.1] - 2026-09-28 — Delivery Convergence & Agent Continuity
 
 **Internal prerelease. Not published to npm.** Passing tests did not prove that the delivered implementation matched the approved intent; a requirement source attached mid-implementation left an approved specification and plan standing; and a cold Codex or Claude session still relied on the developer to point it at YallaFlow.

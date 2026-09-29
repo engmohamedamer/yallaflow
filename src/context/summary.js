@@ -80,3 +80,32 @@ export function describe(fact, freshness) {
       : `MAY_BE_STALE (${freshness.changed.join(', ')} changed)`;
   return `${fact.id} [${fact.area}] ${flag} — ${fact.summary}`;
 }
+
+// NEEDS CARE (v0.3.9): knowledge whose recorded state or evidence freshness is
+// mechanically known to need attention — exactly unresolved, disputed, MAY_BE_STALE,
+// and STALE_EVIDENCE, over non-superseded facts, in fact-ID order. It is not a risk
+// register: a confirmed, fresh fact about a security or architectural risk is ordinary
+// project knowledge the Agent interprets. UNKNOWN (no verification point) is not here.
+export function needsCare(summary) {
+  if (!summary.exists) return [];
+  const entries = [];
+  for (const fact of summary.ledger.facts) {
+    if (fact.state === 'superseded') continue;
+    const freshness = summary.freshness.get(fact.id);
+    const flags = [];
+    if (fact.confidence === 'unresolved') flags.push('UNRESOLVED');
+    if (fact.state === 'disputed') flags.push('DISPUTED');
+    if (freshness?.status === FRESHNESS.STALE_EVIDENCE) flags.push(`STALE_EVIDENCE (${freshness.missing.join(', ')} missing)`);
+    if (freshness?.status === FRESHNESS.MAY_BE_STALE) flags.push(`MAY_BE_STALE (${freshness.changed.join(', ')} changed)`);
+    if (flags.length) entries.push({ fact, flags });
+  }
+  return entries.sort((a, b) => Number(a.fact.id.slice(4)) - Number(b.fact.id.slice(4)));
+}
+
+// One-line rendering of a stored summary: embedded whitespace collapsed; truncated
+// with an ellipsis only when longer than `limit` Unicode code points.
+export function oneLine(text, limit = 160) {
+  const normalized = String(text ?? '').replace(/\s+/g, ' ').trim();
+  const points = Array.from(normalized);
+  return points.length > limit ? `${points.slice(0, limit - 1).join('').trimEnd()}…` : normalized;
+}

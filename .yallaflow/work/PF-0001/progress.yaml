@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 5
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-09-29T08:37:34.894Z",
+      "completedAt": "2026-09-29T08:37:34.894Z",
+      "summary": "Phase A baseline: HEAD 6727412 = v0.3.8-internal.1 (tag on HEAD, pushed), clean tree, package/CLI 0.3.8-internal.1, 563/563 tests pass. Root causes: detectProjectKind (src/core/workspace.js:26) and deterministicDiscovery (src/core/discovery.js) check root markers only (and .git alone => brownfield); brief (src/commands/brief.js) prints only YallaFlow status and primaryConcern never proposes a baseline for brownfield-without-memory; Agent Contract v4 baseline sequence and repository-baseline skill do not authorize autonomous start/draft, do not require material-doc discovery, and do not separate durable vs transient runtime state; freshness guidance never states contentHash works without Git (src/context/freshness.js already does). Reusable: freshness/evidence hashing, sources/intake, baseline store, context summary/ledger, assessment."
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-09-29T11:12:03.106Z",
+      "completedAt": "2026-09-29T11:12:03.106Z",
+      "summary": "Material decisions resolved by the user on 2026-09-29 design review: command name 'yallaflow inspect'; bare .git is not Brownfield; 10-source-file threshold as a named constant with 9/10 boundary tests; NEEDS CARE = unresolved/disputed/MAY_BE_STALE/STALE_EVIDENCE only, no ledger risk designation, no schema bump; Agent Contract v5; Skill Registry stays v5; commit the repo's own .yallaflow after doctor/secret/path/transient checks. Refinements A-D recorded in work.md Confirmed Decisions."
+    },
+    "design-exploration": {
+      "status": "completed",
+      "startedAt": "2026-09-29T11:12:35.118Z",
+      "completedAt": "2026-09-29T11:12:35.118Z",
+      "summary": "Approved design recorded in work.md Design: M1 bounded deterministic in-memory inventory (src/inventory/) + read-only 'yallaflow inspect [--json]' + manifest/source-threshold classification (bare .git never classifies); M2 onboarding through existing baseline lifecycle with Contract v5 app-code vs read-only distinction; M3 doc candidates from intake-owned format constants, registered via intake add, never read by inspect; M4 project-first brief with mechanical NEEDS CARE; M5 hash-freshness and transient-runtime guidance; M6 update docs only. Rejected: persisted inventory, ledger risk field, heuristic weighting, new workflow, auto ingestion."
+    },
+    "specification": {
+      "status": "completed",
+      "startedAt": "2026-09-29T11:13:54.157Z",
+      "completedAt": "2026-09-29T12:56:44.595Z",
+      "summary": "Specification revised per 2026-09-29 review: Risk 1 (b) refined classification incl. meaningful container/CI; no inspect --json; framework hints limited to approved list + vite/yii2; wider manifests inventory-only; preserve-only doc labelling; tech-stack.md snapshot label; per-area bounded project-first brief (<=45 lines); contextual non-Git freshness note. requirements.yaml revision 2 (REQ-002/003/005/006/007, AC-003/004/005/006/007/012/014 revised)."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-09-29T13:18:29.440Z",
+      "completedAt": "2026-09-29T13:18:29.440Z",
+      "summary": "Reviewed implementation plan recorded in work.md Implementation Plan (steps 1-9: shared document formats, src/inventory primitive, classification wiring, inspect command, brief/baseline orchestration, Contract v5 + repository-baseline skill + context status note, versions/docs, tests, verification). Reviewed and approved by the user with the specification on 2026-09-29."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-09-29T15:38:42.987Z",
+      "completedAt": "2026-09-29T15:39:57.698Z",
+      "summary": "Pre-freeze portability fix: LAZY_WORKSPACE_DIRS (work, decisions, releases) are valid when absent — doctor passes them as 'absent — created when first needed', fails if a lazy path is not a directory or work/ is missing while state names active work; listWork/nextWorkId treat absent work/ as empty (like sources/). Repo .gitignore adds !.yallaflow/**/*.log so referenced verification logs are committed. test/workspace-portability.test.js: real init → commit → clone → doctor healthy → start; negative cases. Docs: CHANGELOG, upgrading-to-v0.3.9, limitations."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-09-29T15:44:08.730Z",
+      "completedAt": "2026-09-29T15:44:08.730Z",
+      "summary": "V-004 npm run check PASSED after the portability fix: syntax + 602/602 tests (incl. 3 new workspace-portability tests exercising a real git init → commit → clone → doctor).",
+      "evidence": [
+        "verification:V-004"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-09-29T15:44:09.212Z",
+      "completedAt": "2026-09-29T15:44:09.212Z",
+      "summary": "CV-004 after the portability reopen: 17/17 active criteria satisfied with V-004 evidence; AC-016/AC-017 now also cover fresh-clone portability and committed verification logs; UR-001..UR-003 accepted; no pending impact."
+    },
+    "code-review": {
+      "status": "completed",
+      "startedAt": "2026-09-29T15:44:09.369Z",
+      "completedAt": "2026-09-29T15:44:09.369Z",
+      "summary": "Portability delta reviewed: only work/, decisions/, releases/ become absent-tolerant (LAZY_WORKSPACE_DIRS), mirroring the existing sources/ pattern; required files (config, PROJECT, AGENT, state, context/*.md) still hard-required; doctor keeps failing a non-directory lazy path and a missing work/ with active work; readers that enumerate work/ (listWork, nextWorkId) return empty; writers already create parents. No .gitkeep. No blocking issue."
+    }
+  },
+  "rulings": [
+    {
+      "decision": "INVENTORY_MAX_DEPTH = 16 is the final v0.3.9 value (approved by the user 2026-09-29, replacing the originally reviewed 6)",
+      "reason": "Still deterministically bounded by depth and INVENTORY_MAX_ENTRIES (50,000, truncation reported); depth 6 is too shallow for real Brownfield layouts with deep Java/package trees (real APD needed >12). No schema or architecture change.",
+      "costIfWrong": "Low: a larger tree walk on very deep repositories, still capped by MAX_ENTRIES; tunable constant.",
+      "createdAt": "2026-09-29T15:16:57.380Z"
+    }
+  ],
+  "history": [
+    {
+      "skill": "specification",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Specification changes requested at review (Risk 1 classification, additions 1-7); revising before re-review.",
+      "changedAt": "2026-09-29T12:55:03.378Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Independent code review found: brief 45-line cap violable by multi-line titles (blocking); brief/inspect crash on malformed baseline YAML (regression); unreadable CI file misreported; unresolved ${property} version dropped; unbounded nested hints in tech-stack.md; plus optional Gradle comments, BOM manifests, AREA_LABELS reuse.",
+      "changedAt": "2026-09-29T13:58:34.923Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Downstream of implementation revision: Independent code review found: brief 45-line cap violable by multi-line titles (blocking); brief/inspect crash on malformed baseline YAML (regression); unreadable CI file misreported; unresolved ${property} version dropped; unbounded nested hints in tech-stack.md; plus optional Gradle comments, BOM manifests, AREA_LABELS reuse.",
+      "changedAt": "2026-09-29T13:58:34.923Z"
+    },
+    {
+      "skill": "delivery-convergence",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Downstream of implementation revision: Independent code review found: brief 45-line cap violable by multi-line titles (blocking); brief/inspect crash on malformed baseline YAML (regression); unreadable CI file misreported; unresolved ${property} version dropped; unbounded nested hints in tech-stack.md; plus optional Gradle comments, BOM manifests, AREA_LABELS reuse.",
+      "changedAt": "2026-09-29T13:58:34.923Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Pre-freeze correction requested by the user: init-time tech-stack snapshot must surface the same deterministic container/CI truth used for Brownfield classification (Dockerfile/Dockerfile.*, Docker Compose, recognized CI).",
+      "changedAt": "2026-09-29T15:16:57.547Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Downstream of implementation revision: Pre-freeze correction requested by the user: init-time tech-stack snapshot must surface the same deterministic container/CI truth used for Brownfield classification (Dockerfile/Dockerfile.*, Docker Compose, recognized CI).",
+      "changedAt": "2026-09-29T15:16:57.547Z"
+    },
+    {
+      "skill": "delivery-convergence",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Downstream of implementation revision: Pre-freeze correction requested by the user: init-time tech-stack snapshot must surface the same deterministic container/CI truth used for Brownfield classification (Dockerfile/Dockerfile.*, Docker Compose, recognized CI).",
+      "changedAt": "2026-09-29T15:16:57.547Z"
+    },
+    {
+      "skill": "code-review",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Downstream of implementation revision: Pre-freeze correction requested by the user: init-time tech-stack snapshot must surface the same deterministic container/CI truth used for Brownfield classification (Dockerfile/Dockerfile.*, Docker Compose, recognized CI).",
+      "changedAt": "2026-09-29T15:16:57.547Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Pre-freeze fresh-clone acceptance failed: Git does not store the empty lazy directories init creates (work/, decisions/, releases/), so a clone of a fresh workspace fails doctor, and listWork/nextWorkId readdir an absent work/. Absent lazy directories must be a valid state. Also commit the referenced verification logs (repo .gitignore *.log exception).",
+      "changedAt": "2026-09-29T15:38:42.987Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Pre-freeze fresh-clone acceptance failed: Git does not store the empty lazy directories init creates (work/, decisions/, releases/), so a clone of a fresh workspace fails doctor, and listWork/nextWorkId readdir an absent work/. Absent lazy directories must be a valid state. Also commit the referenced verification logs (repo .gitignore *.log exception).",
+      "changedAt": "2026-09-29T15:38:42.987Z"
+    },
+    {
+      "skill": "delivery-convergence",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Pre-freeze fresh-clone acceptance failed: Git does not store the empty lazy directories init creates (work/, decisions/, releases/), so a clone of a fresh workspace fails doctor, and listWork/nextWorkId readdir an absent work/. Absent lazy directories must be a valid state. Also commit the referenced verification logs (repo .gitignore *.log exception).",
+      "changedAt": "2026-09-29T15:38:42.987Z"
+    },
+    {
+      "skill": "code-review",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Pre-freeze fresh-clone acceptance failed: Git does not store the empty lazy directories init creates (work/, decisions/, releases/), so a clone of a fresh workspace fails doctor, and listWork/nextWorkId readdir an absent work/. Absent lazy directories must be a valid state. Also commit the referenced verification logs (repo .gitignore *.log exception).",
+      "changedAt": "2026-09-29T15:38:42.987Z"
+    }
+  ],
+  "updatedAt": "2026-09-29T15:44:09.369Z"
+}

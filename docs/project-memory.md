@@ -117,6 +117,10 @@ yallaflow context history CTX-0017          # lineage and events
 
 `doctor` reports stale and disputed facts as warnings, and `handoff`/`resume` show the stale or disputed facts relevant to the work.
 
+**Without Git.** File evidence is still compared by SHA-256 content hash, so a changed file becomes `MAY_BE_STALE` and a missing one `STALE_EVIDENCE`. Directory evidence has no content hash; without a Git commit to compare against it is `UNKNOWN`, which is not stale. `context status` says so only in a workspace without a Git commit. Prefer file evidence for facts that should stay checkable.
+
+**NEEDS CARE** (in `yallaflow brief`, v0.3.9) lists exactly the non-superseded facts that are unresolved, disputed, `MAY_BE_STALE`, or `STALE_EVIDENCE`. These are facts whose recorded state or freshness is mechanically known to need care. It is not a risk register: a confirmed, fresh fact about a security weakness or an architectural constraint is ordinary project knowledge, and interpreting it is the agent's job. The ledger has no risk or importance field.
+
 ## Markdown projection
 
 Each context document (`PROJECT.md`, `context/*.md`) holds exactly one managed block rendered deterministically from the ledger: current facts, then disputed facts under an explicit warning. Superseded facts never appear there. Content outside the block — your notes, bootstrap hints, pre-v0.3.6 sections — is preserved. Freshness is deliberately not rendered, so the Markdown changes only when the ledger does.
@@ -186,7 +190,7 @@ Deterministic tamper checks include strict schema validation of every ledger (in
 
 ## Agent contract
 
-`.yallaflow/AGENT.md` tells agents how to work with YallaFlow: the project memory sequence (read relevant context, check freshness, rediscover only what changed, relate new knowledge to existing facts), the delivery intent and convergence sequence, legacy reconciliation, state ownership, and `yallaflow brief` as the first command of a fresh session. It carries a versioned managed block (v4 since v0.3.8). `doctor` and `status` warn when it predates the installed contract, and `yallaflow agent refresh` updates it deliberately. Provider session files (`AGENTS.md`, `CLAUDE.md`) may carry a thin bootstrap block pointing to it (`yallaflow agent setup`); they never restate it. See [`upgrading-to-v0.3.8.md`](upgrading-to-v0.3.8.md).
+`.yallaflow/AGENT.md` tells agents how to work with YallaFlow: the project memory sequence (read relevant context, check freshness, rediscover only what changed, relate new knowledge to existing facts), the delivery intent and convergence sequence, legacy reconciliation, state ownership, and `yallaflow brief` as the first command of a fresh session. It carries a versioned managed block (v5 since v0.3.9: Brownfield onboarding sequence, "do not change application code" vs explicit read-only, material documents, NEEDS CARE, content-hash freshness without Git). `doctor` and `status` warn when it predates the installed contract, and `yallaflow agent refresh` updates it deliberately. Provider session files (`AGENTS.md`, `CLAUDE.md`) may carry a thin bootstrap block pointing to it (`yallaflow agent setup`); they never restate it. See [`upgrading-to-v0.3.9.md`](upgrading-to-v0.3.9.md).
 
 ## No baseline refresh
 

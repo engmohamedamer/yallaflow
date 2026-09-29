@@ -296,10 +296,19 @@ yallaflow agent refresh
 
 ## Brownfield bootstrap and baseline
 
-`yallaflow init` in an existing repository records deterministic stack hints (package managers, framework markers, CI/container files) in `context/tech-stack.md`. This seeds, but does not replace, a reviewed baseline:
+`yallaflow inspect` (read-only, works before `init`) shows how YallaFlow sees the repository:
+- the Brownfield/Greenfield classification and its reasons;
+- nested manifests with framework/version hints;
+- recognized source files;
+- documentation candidates, each with the intake handling it would get;
+- container/CI configuration.
+
+`yallaflow init` in an existing repository records deterministic stack hints (package managers, framework markers, CI/container files, and a labelled init-time snapshot of nested manifest hints) in `context/tech-stack.md`. This seeds, but does not replace, a reviewed baseline. `yallaflow brief` proposes the baseline when there is no project memory yet, and names each next step until a human approves:
 
 ```bash
+yallaflow inspect
 yallaflow baseline start                             # read-only investigation work item
+yallaflow intake add PF-0001 docs/design.pdf          # material documents; read back with yallaflow source show SRC-0001 --content
 yallaflow checkpoint PF-0001 --skill repository-baseline --complete --summary "Repository discovered."
 yallaflow baseline draft PF-0001 --file baseline.json
 yallaflow baseline status PF-0001
@@ -352,4 +361,4 @@ A work item stores intake, facts, questions, evidence, a scope-appropriate speci
 
 ## Compatibility with older workspaces
 
-Reads never migrate or create files. Older work keeps loading: v0.1 contract-less items (also those created by pre-v0.3.6 direct commands) keep their stage-only behavior; v0.2.1 capabilities derive an unpinned contract; v0.2.2 contracts without `progress.yaml` show all skills pending; v0.2.3 work has no required knowledge policy; registry-v1 work keeps its contract. A legacy `.projectflow/` workspace is not migrated — `yallaflow init` stops with a message instead of creating a parallel workspace, and it refuses to reinitialize over a Git-tracked `.yallaflow` missing from the working tree. For the v0.3.5 → v0.3.6 upgrade see [`upgrading-to-v0.3.6.md`](upgrading-to-v0.3.6.md); for v0.3.7 (reconciling legacy context, `upgrade status`, `brief`) see [`upgrading-to-v0.3.7.md`](upgrading-to-v0.3.7.md); for v0.3.8 (delivery convergence, agent bootstrap) see [`upgrading-to-v0.3.8.md`](upgrading-to-v0.3.8.md). Work routed before v0.3.8 keeps its pinned registry ≤ v4 contract and never acquires requirement, convergence, or impact gates.
+Reads never migrate or create files. Older work keeps loading: v0.1 contract-less items (also those created by pre-v0.3.6 direct commands) keep their stage-only behavior; v0.2.1 capabilities derive an unpinned contract; v0.2.2 contracts without `progress.yaml` show all skills pending; v0.2.3 work has no required knowledge policy; registry-v1 work keeps its contract. A legacy `.projectflow/` workspace is not migrated — `yallaflow init` stops with a message instead of creating a parallel workspace, and it refuses to reinitialize over a Git-tracked `.yallaflow` missing from the working tree. For the v0.3.5 → v0.3.6 upgrade see [`upgrading-to-v0.3.6.md`](upgrading-to-v0.3.6.md); for v0.3.7 (reconciling legacy context, `upgrade status`, `brief`) see [`upgrading-to-v0.3.7.md`](upgrading-to-v0.3.7.md); for v0.3.8 (delivery convergence, agent bootstrap) see [`upgrading-to-v0.3.8.md`](upgrading-to-v0.3.8.md); for v0.3.9 (inspect, Brownfield classification, project-first brief) see [`upgrading-to-v0.3.9.md`](upgrading-to-v0.3.9.md). Work routed before v0.3.8 keeps its pinned registry ≤ v4 contract and never acquires requirement, convergence, or impact gates.

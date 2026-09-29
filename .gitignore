@@ -4,5 +4,7 @@ coverage/
 .DS_Store
 *.log
 !test/fixtures/**/*.log
+# Verification logs are durable YallaFlow evidence referenced by evidence/verification.json.
+!.yallaflow/**/*.log
 .idea/
 yallaflow-*.tgz

@@ -135,6 +135,19 @@ export const EXTENSION_FORMATS = Object.freeze(
   ])
 );
 
+// Document formats (v0.3.9), derived from the tables above so repository inventory and
+// intake never disagree about what a document is. Prose text formats are the subset of
+// native text that is written for people rather than parsed as data or code; every
+// office and PDF format intake recognizes (including preserve-only ones) is a document.
+export const TEXT_DOCUMENT_EXTENSIONS = Object.freeze(['.md', '.markdown', '.rst', '.txt']);
+
+export const DOCUMENT_FORMAT_EXTENSIONS = Object.freeze([
+  ...TEXT_DOCUMENT_EXTENSIONS,
+  ...Object.entries(EXTENSION_FORMATS)
+    .filter(([, format]) => format.tier === SUPPORT_TIERS.OFFICE || format.tier === SUPPORT_TIERS.PDF)
+    .map(([ext]) => ext)
+]);
+
 // File-signature ("magic bytes") checks used to confirm a detected format actually
 // matches its extension, independent of what the filename claims. Never trusted alone.
 export const SIGNATURES = Object.freeze({

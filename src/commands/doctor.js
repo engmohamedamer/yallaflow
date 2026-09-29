@@ -1,6 +1,7 @@
 import path from 'node:path';
+import { stat } from 'node:fs/promises';
 import { exists } from '../utils/fs.js';
-import { findProjectRoot, listWork, workspacePath } from '../core/workspace.js';
+import { LAZY_WORKSPACE_DIRS, findProjectRoot, listWork, workspacePath } from '../core/workspace.js';
 import { readYaml } from '../core/yaml.js';
 import { validateSkillRegistry } from '../skills/validation.js';
 import { loadWorkProgress } from '../core/progress.js';
@@ -39,9 +40,23 @@ export async function collectDoctorReport(root) {
   for (const relative of [
     'config.yaml', 'PROJECT.md', 'AGENT.md', 'state/current.yaml',
     'context/architecture.md', 'context/tech-stack.md', 'context/database.md',
-    'context/integrations.md', 'context/environments.md', 'context/conventions.md', 'context/business-rules.md',
-    'work', 'decisions', 'releases'
+    'context/integrations.md', 'context/environments.md', 'context/conventions.md', 'context/business-rules.md'
   ]) checks.push([relative, await exists(path.join(base, relative))]);
+  // Lazy directories (v0.3.9): absent is valid — nothing recorded yet, or a fresh Git
+  // clone of a workspace whose directories were empty. Present, it must be a directory;
+  // absent work/ is a failure only when durable state names active work.
+  let activeWork = null;
+  try {
+    activeWork = (await readYaml(path.join(base, 'state/current.yaml'))).activeWork ?? null;
+  } catch {
+    activeWork = null; // reported by schema parsing below
+  }
+  for (const dir of LAZY_WORKSPACE_DIRS) {
+    const info = await stat(path.join(base, dir)).catch(() => null);
+    if (info) checks.push([dir, info.isDirectory()]);
+    else if (dir === 'work' && activeWork) checks.push([`work (missing, but state/current.yaml names active work ${activeWork})`, false]);
+    else checks.push([`${dir} (absent — created when first needed)`, true]);
+  }
 
   let parseOk = true;
   try {
