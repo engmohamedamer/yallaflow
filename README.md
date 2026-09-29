@@ -42,9 +42,17 @@ yallaflow init && yallaflow agent setup claude
 yallaflow init && yallaflow agent setup codex
 ~~~
 
-### 3. Tell the AI what you want
+### 3. Open your AI coding session
 
-Existing project:
+Open **Claude Code, Codex, or another supported coding agent from the same project directory**.
+
+> The next lines are prompts for your AI coding agent — **not terminal commands**.
+>
+> YallaFlow works with coding agents that can access your project files and run the YallaFlow CLI.
+
+Then simply tell the agent what you want.
+
+**Existing project**
 
 ~~~text
 Use YallaFlow.
@@ -52,7 +60,7 @@ Use YallaFlow.
 Understand this project.
 ~~~
 
-Or go directly to real work:
+**Or go directly to real work**
 
 ~~~text
 Use YallaFlow.
@@ -60,7 +68,7 @@ Use YallaFlow.
 Fix beneficiary registration.
 ~~~
 
-New project:
+**New project**
 
 ~~~text
 Use YallaFlow.
@@ -68,7 +76,7 @@ Use YallaFlow.
 Build an anonymous employee survey platform.
 ~~~
 
-**That's the normal experience.**
+**That's it. YallaFlow and your coding agent handle the engineering workflow from here.**
 
 You do not need to explain the architecture, repeat old decisions, choose a workflow, or tell the agent to create specifications and verification evidence by hand.
 
