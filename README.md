@@ -2,520 +2,400 @@
 
 > **Give AI your project, not just your prompt.**
 
-**YallaFlow is an AI-agnostic engineering governance and project-memory layer for coding agents.**
+Your coding agent is already smart.
 
-It gives tools like Claude, Codex, and other coding agents durable project context, adaptive engineering workflows, and evidence-backed delivery — so a new session can continue from what the project knows, not from what the previous chat remembered.
+**YallaFlow gives it durable project memory, the right engineering workflow, and evidence that the work is actually done — without making you carry all of that in every prompt.**
 
-```text
-Agent reasons.   YallaFlow governs.   Project memory persists.
-
-Understand → Decide → Change → Verify → Remember → Revalidate
-```
-
-YallaFlow is built around one idea:
-
-> **The project — not the chat session — should be the durable unit of AI-assisted software development.**
+> **You describe the intent. YallaFlow supplies the project.**
 
 ---
 
-## Why YallaFlow exists
+## Start in under a minute
 
-AI coding agents are already very good at individual tasks.
+### 1. Install
 
-The hard part begins after the first task:
+YallaFlow requires **Node.js >= 20.16.0**.
 
-- requirements arrive through prompts, SRS files, screenshots, and tickets
-- project knowledge gets scattered across chats, code, documents, and people's memory
-- a new session repeats discovery because the previous conversation is gone
-- one agent makes a decision that the next agent cannot explain
-- a bug gets fixed before its root cause is established
-- tests pass, but nobody proves that every requested requirement was actually delivered
-- old project knowledge stays around after the code that supported it has changed
+~~~bash
+npm install -g git+https://github.com/engmohamedamer/yallaflow.git#v0.3.9-internal.1
+~~~
 
-YallaFlow turns those problems into durable project state.
+Check it:
 
-```text
-                     PROJECT
-                        │
-          ┌─────────────┼─────────────┐
-          │             │             │
-       Sources         Work        Context
-        SRC-*          PF-*         CTX-*
-          │             │             │
-   original intent   history     current truth
-                        │
-                     evidence
-```
-
-Instead of asking the AI to remember the project, YallaFlow makes the project remember itself.
-
----
-
-## What makes YallaFlow different
-
-### 1. Project memory, not chat memory
-
-YallaFlow keeps a durable, evidence-backed model of what is currently believed to be true about the project.
-
-A project fact is not just prose. It can carry:
-
-- a stable `CTX-####` identity
-- current / superseded / disputed state
-- confirmed / inferred / unresolved confidence
-- provenance and originating work
-- repository evidence
-- content hashes and Git verification points
-- freshness status when supporting evidence changes
-
-```text
-Work records preserve history.
-Project memory preserves current understanding.
-```
-
-If a file supporting a project fact changes, YallaFlow can surface that the knowledge may now be stale instead of silently trusting it forever.
-
-### 2. Agent intelligence + deterministic governance
-
-YallaFlow does **not** try to replace the reasoning capability of modern coding agents.
-
-The agent decides semantic questions such as:
-
-- Is this a bug, feature, investigation, refactor, or release?
-- Is the change bounded or architectural?
-- What does the evidence mean?
-- Which project fact supersedes another?
-
-YallaFlow owns the deterministic part:
-
-- workflow selection
-- state transitions
-- write-authorization guidance
-- checkpoints
-- review gates
-- verification evidence
-- lifecycle integrity
-- durable history
-
-```text
-AI reasons.
-YallaFlow validates, records, and governs.
-```
-
-### 3. Adaptive Spec-Driven Development
-
-YallaFlow uses specifications when the work needs them — not as ceremony for every task.
-
-| Work type | Typical path |
-| --- | --- |
-| Bounded feature | discover → clarify → implement → verify |
-| Architectural feature | discover → clarify → design → specify → plan → implement → verify → review |
-| Bug | discover → root cause → implement → verify |
-| Investigation | discover → evidence → conclusion → verify — read-only |
-| Change / refactor / release | discover → plan → implement → verify |
-| Brownfield | baseline → reviewed project memory → incremental work |
-
-A specification is one engineering artifact inside the lifecycle. It is not the lifecycle itself.
-
-### 4. Evidence-backed completion
-
-In a normal AI session, `Done ✅` is just a statement.
-
-In YallaFlow, completion is a state that must be supported by the workflow:
-
-- required checkpoints must be complete
-- unresolved material questions can block readiness
-- verification runs are recorded as append-only evidence
-- review gates remain auditable
-- for feature work and architectural changes, every active acceptance criterion must be shown — with evidence — to be delivered (**convergence**), not just tested
-- downstream verification/review/convergence can be invalidated when earlier work is revised or the approved intent changes
-- `doctor` checks for impossible or contradictory lifecycle states
-
-YallaFlow distinguishes:
-
-```text
-Verification  = do the recorded technical checks pass?
-Review        = is the implementation technically acceptable?
-Convergence   = does the delivered implementation satisfy the approved intent?
-```
-
-and:
-
-- `SPEC_READY` — specification is reviewable
-- `PLAN_READY` — specification and implementation plan are reviewable
-- `DONE` — the requested lifecycle has actually completed
-
-### 5. Original intent stays traceable
-
-YallaFlow keeps original requirement sources separate from their extracted or interpreted forms.
-
-```text
-Original Source
-      ≠
-Extracted Representation
-      ≠
-Specification
-      ≠
-Implementation
-```
-
-`yallaflow intake` can preserve local files such as DOCX, XLSX, PPTX, PDF, text files, and images as immutable `SRC-####` sources, with checksums and work-item linkage.
-
-Approved intent gets stable identity: the agent extracts requirements and acceptance criteria (`REQ-###`, `AC-###`) from the specification or clarified request, each traced to where it came from; YallaFlow validates and records them. If a new source arrives, or the requirements change, after the intent was fixed, YallaFlow raises an **impact assessment**: the agent decides which completed stages are affected, and YallaFlow invalidates them through its audited revision path, never deleting evidence.
-
-That means a future session can answer not only **what did we build?**, but also **what were we originally given?**, **does the delivery match it?**, and **what became stale when it changed?**
-
-### 6. Brownfield is a first-class workflow
-
-Most real software work does not begin in an empty repository.
-
-YallaFlow can establish a reviewed Brownfield Baseline with:
-
-- confirmed facts
-- inferred facts
-- unresolved facts
-- evidence
-- explicit discovery limitations
-
-Approved baseline knowledge becomes durable project memory that future work can reuse instead of rediscovering the repository from scratch.
-
-Onboarding starts with `yallaflow inspect`: a bounded, read-only repository inventory that recognizes nested applications (manifests with deterministic framework/version hints such as two Angular portals on different majors), recognized source files, documentation candidates, and container/CI configuration — and classifies the repository as Brownfield or Greenfield with its reasons. `yallaflow brief` then proposes the baseline and reports each step until a human approves it.
-
-### 7. Agent and session continuity
-
-YallaFlow work state is independent of the previous chat.
-
-A new session or a different coding agent can use durable state, Git, project context, and recorded evidence to understand:
-
-- what was requested
-- what was decided
-- what stage the work reached
-- what is still blocked
-- what evidence exists
-- what project knowledge is relevant
-- what the next valid action is
-
-`yallaflow handoff` and `yallaflow resume` are designed around this recovery model. A fresh agent starts with `yallaflow brief` — a read-only, project-first orientation: what project memory says about the project (bounded per area), what knowledge NEEDS CARE (unresolved, disputed, or with changed/missing evidence), then the work and the next valid action — and `yallaflow agent setup codex|claude` gives Codex (`AGENTS.md`) or Claude (`CLAUDE.md`) a thin, versioned pointer to the one canonical contract, so a cold session finds YallaFlow on its own.
-
----
-
-## How it works
-
-```text
-Raw request / files
-        │
-        ▼
-     Intake ───────────────► SRC-#### sources
-        │
-        ▼
- Pending work
-        │
-        ▼
- Route by type + scope
-        │
-        ▼
- Pinned Behavior Contract
-        │
-        ▼
- Discover / Clarify / Design / Specify / Plan
-        │
-        ▼
-     Implement
-        │
-        ▼
- Verify + Convergence + Review
-        │
-        ▼
- Knowledge review
-        │
-        ▼
- CTX-#### project memory
-        │
-        └──────────────► future sessions
-```
-
-YallaFlow never needs the previous chat to reconstruct the engineering state.
-
----
-
-## Quick start
-
-YallaFlow currently requires **Node.js ≥ 20.16.0** for the CLI itself.
-
-It is an internal prerelease and is not yet published to npm.
-
-```bash
-# From a release tarball
-npm install -g /path/to/yallaflow-<version>.tgz
-
+~~~bash
 yallaflow --version
+~~~
 
-cd your-project
-yallaflow init
+### 2. Initialize your project
 
-# Start from text
-yallaflow start "Production upload returns 500"
+Open the project root and run one setup line.
 
-# Or start from one or more files
-yallaflow intake requirements.docx architecture.pdf
+**Claude**
 
-# Ask YallaFlow what the current work requires
-yallaflow guide PF-0001
-```
+~~~bash
+yallaflow init && yallaflow agent setup claude
+~~~
 
-Then connect your coding agent and open it in the repository:
+**Codex**
 
-```bash
-yallaflow agent setup codex     # or: yallaflow agent setup claude
-```
+~~~bash
+yallaflow init && yallaflow agent setup codex
+~~~
 
-This adds a small managed block to `AGENTS.md` / `CLAUDE.md` (your own content is kept) that tells the agent to follow `.yallaflow/AGENT.md` and run `yallaflow brief` first. Commit `.yallaflow/` (and that file) with the project.
+### 3. Tell the AI what you want
 
-Upgrading an existing workspace? Run `yallaflow upgrade status` — see [`docs/upgrading-to-v0.3.9.md`](docs/upgrading-to-v0.3.9.md).
+Existing project:
 
-For legacy repositories, install YallaFlow as an isolated CLI rather than adding it to the application's dependency tree.
+~~~text
+Use YallaFlow.
 
-See [`docs/installation.md`](docs/installation.md) for the supported installation model.
+Understand this project.
+~~~
 
----
+Or go directly to real work:
 
-## Example: a bug
+~~~text
+Use YallaFlow.
 
-```bash
-yallaflow start "Production uploads return HTTP 500"
-```
+Fix beneficiary registration.
+~~~
 
-The agent classifies the request and routes it. YallaFlow pins the required behavior contract.
+New project:
 
-```text
-Discover
-   ↓
-Establish root cause with evidence
-   ↓
-Authorize implementation
-   ↓
-Implement fix
-   ↓
-Record verification
-   ↓
-Review durable knowledge
-   ↓
-DONE
-```
+~~~text
+Use YallaFlow.
 
-An investigation follows a different contract and never authorizes application-code changes.
+Build an anonymous employee survey platform.
+~~~
+
+**That's the normal experience.**
+
+You do not need to explain the architecture, repeat old decisions, choose a workflow, or tell the agent to create specifications and verification evidence by hand.
 
 ---
 
-## Example: a new project from an SRS
+## What happens behind that simple prompt?
 
-```bash
+~~~mermaid
+flowchart LR
+    U["You<br/><b>Describe the intent</b>"]
+    A["Coding Agent<br/>Claude / Codex"]
+    Y["YallaFlow"]
+
+    M["Project Memory<br/>architecture · rules · decisions"]
+    W["Adaptive Workflow<br/>bug · feature · investigation"]
+    E["Evidence<br/>verification · review · convergence"]
+
+    D["Delivered Change"]
+    N["Next Session<br/>starts with project context"]
+
+    U --> A
+    A --> Y
+    Y --> M
+    Y --> W
+    Y --> E
+
+    M --> A
+    W --> A
+    E --> D
+    D --> N
+    N --> A
+~~~
+
+> **The complexity stays inside YallaFlow — not inside your prompt.**
+
+---
+
+## New project or existing project? Same start.
+
+~~~mermaid
+flowchart TD
+    I["yallaflow init"]
+    Q{"What is already here?"}
+
+    B["Existing repository<br/><b>Brownfield</b>"]
+    G["New repository<br/><b>Greenfield</b>"]
+
+    BM["Understand existing code,<br/>docs and architecture"]
+    GI["Build from product intent"]
+
+    P["Durable project state"]
+    R["Describe the next change"]
+
+    I --> Q
+    Q --> B
+    Q --> G
+    B --> BM
+    G --> GI
+    BM --> P
+    GI --> P
+    P --> R
+~~~
+
+YallaFlow performs bounded repository inspection and classifies the project automatically. You can override the classification when needed.
+
+---
+
+## Why use YallaFlow?
+
+### 🧠 Project memory
+
+A new AI session does not have to start from zero.
+
+YallaFlow keeps reviewed project knowledge with evidence, provenance, and freshness information so future work can reuse what the project already knows.
+
+### 🧭 The right workflow for the work
+
+A bug is not a feature. An investigation is not an implementation task.
+
+YallaFlow lets the coding agent reason about the request, then governs the appropriate lifecycle around it.
+
+### ✅ "Done" needs evidence
+
+YallaFlow separates:
+
+~~~text
+Implementation
+      ↓
+Verification
+      ↓
+Delivery Convergence
+      ↓
+Code Review
+      ↓
+Durable Project Knowledge
+~~~
+
+Passing tests matters. Matching the approved intent matters too.
+
+### 🔄 Session and agent continuity
+
+Close the chat. Open a fresh session. Switch between supported coding agents.
+
+The durable engineering state stays with the project.
+
+### 📎 Original requirements stay traceable
+
+SRS files, PDFs, spreadsheets, presentations, and other inputs can be preserved as sources instead of disappearing into chat history.
+
+### 🌱 Brownfield is first-class
+
+Existing systems are not treated like blank projects.
+
+YallaFlow can establish a reviewed baseline before the agent starts changing a codebase it does not yet understand.
+
+---
+
+## Existing project: the first useful interaction
+
+After setup, tell the agent:
+
+~~~text
+Use YallaFlow.
+
+Understand this project.
+~~~
+
+For an existing repository, YallaFlow can help the agent build an evidence-backed baseline from:
+
+- repository structure,
+- frameworks and versions,
+- architecture,
+- database and integrations,
+- project conventions,
+- important documents,
+- business rules,
+- unresolved facts and discovery limitations.
+
+The agent can prepare the baseline without changing application code.
+
+**A human approves the baseline before it becomes durable project memory.**
+
+After that, a fresh session can start with:
+
+~~~text
+Use YallaFlow.
+
+What should I know before changing beneficiary registration?
+~~~
+
+instead of rediscovering the whole repository.
+
+---
+
+## New project: just describe the product
+
+After setup:
+
+~~~text
+Use YallaFlow.
+
+I want to build a contract management system.
+
+Admins create contracts, clients review and sign them, and payments are tracked.
+~~~
+
+You do **not** need to tell the agent:
+
+- "use SDD",
+- "create acceptance criteria",
+- "make an implementation plan",
+- "decide whether this is architectural",
+- "create verification evidence".
+
+YallaFlow keeps that engineering process proportional to the work.
+
+---
+
+## Already have an SRS or project files?
+
+Start from the original material:
+
+~~~bash
 yallaflow intake Product_SRS.docx
-```
+~~~
 
-YallaFlow preserves the original file, extracts supported content, creates a traceable source, and opens a pending work item.
+Or several sources:
 
-An architectural feature can then move through:
+~~~bash
+yallaflow intake requirements.docx architecture.pdf payment-rules.xlsx
+~~~
 
-```text
-Discovery
-→ Clarification
-→ Design
-→ Specification
-→ Planning
-→ Implementation
-→ Verification
-→ Review
-→ Knowledge
-```
+Then:
 
-The specification's requirements and acceptance criteria are recorded as `REQ-###`/`AC-###`. Large plans can be decomposed into dependency-aware child work items that reference those IDs — YallaFlow refuses references not recorded in the parent's requirements ledger and reports unassigned criteria — and each feature child must show convergence on the criteria assigned to it before it is DONE. The parent's final convergence can cite the children's assessments and must assess any criterion no child owned.
+~~~text
+Use YallaFlow and continue from the supplied requirements.
+~~~
 
----
+YallaFlow deliberately keeps these distinct:
 
-## Project memory
+~~~text
+Original Source
+      !=
+Extracted Representation
+      !=
+Specification
+      !=
+Implementation
+~~~
 
-YallaFlow separates different kinds of memory deliberately.
-
-| Memory | Question | Location |
-| --- | --- | --- |
-| Work history | What happened during this work item? | `.yallaflow/work/PF-####/` — immutable, never rewritten |
-| Project memory | What is currently believed true? | `.yallaflow/context/index.yaml` |
-| Human-readable context | What should a person or agent quickly read? | `.yallaflow/PROJECT.md`, `.yallaflow/context/*.md` |
-| Historical knowledge | What was previously believed? | superseded/disputed `CTX-####` facts |
-| Source memory | What original input did the work come from? | `.yallaflow/sources/SRC-####/` |
-| Decisions | What architectural decisions were accepted? | `.yallaflow/decisions/` |
-| Delivery intent and evidence | What was this work asked to deliver, and does it? | the work item's `requirements.yaml`, `convergence.yaml`, `impact.yaml` — work-delivery state, never project facts |
-| Reconciliation history | How did legacy (v0.3.5) knowledge become current memory? | the reconciliation work item's `reconciliation.yaml` |
-
-Project facts evolve by explicit relationships such as reconfirm, supersede, and dispute. Work history remains immutable.
-
-Old knowledge is reviewed before it becomes current truth: legacy project context from earlier workspaces is reconciled through explicit, human-approved relationships (`yallaflow context reconcile`), never imported blindly. Details: [`docs/project-memory.md`](docs/project-memory.md).
+So later you can still answer: **What were we originally given, and did we actually deliver it?**
 
 ---
 
-## The `.yallaflow/` workspace
+## Coming back tomorrow
 
-```text
-.yallaflow/
-├── config.yaml
-├── PROJECT.md
-├── AGENT.md
-├── context/
-│   ├── index.yaml
-│   └── architecture.md …
-├── work/
-│   └── PF-0001/
-│       ├── meta.yaml
-│       ├── work.md
-│       ├── progress.md
-│       ├── questions.yaml
-│       ├── discovery.yaml
-│       ├── knowledge.yaml
-│       ├── reviews.yaml
-│       ├── requirements.yaml     # REQ-### / AC-### (feature and architectural-change work)
-│       ├── convergence.yaml      # append-only convergence assessments
-│       ├── impact.yaml           # change-impact assessments
-│       ├── reconciliation.yaml   # reconciliation work items only
-│       └── evidence/
-├── sources/
-│   └── SRC-0001/
-├── decisions/
-├── releases/
-└── state/
-    └── current.yaml
-```
+You do not need yesterday's chat.
 
-The workspace is project-owned and intended to be versioned with the repository.
-
-Optional directories are created lazily only when they are needed. Structured state is CLI-owned: agents change it through `yallaflow` commands, never by hand ([state ownership](docs/project-memory.md#state-ownership)).
-
----
-
-## Core commands
-
-```text
-yallaflow init
-yallaflow inspect
+~~~bash
 yallaflow brief
-yallaflow upgrade
-yallaflow start
-yallaflow intake
-yallaflow route
-yallaflow guide
-yallaflow status
-yallaflow resume
-yallaflow handoff
-yallaflow checkpoint
-yallaflow question
-yallaflow ready
-yallaflow advance
-yallaflow verify
-yallaflow requirement
-yallaflow convergence
-yallaflow impact
-yallaflow agent
-yallaflow reopen
-yallaflow decompose
-yallaflow progress
-yallaflow next
-yallaflow baseline
-yallaflow context
-yallaflow knowledge
-yallaflow limitation
-yallaflow doctor
-```
+~~~
 
-See [`docs/cli.md`](docs/cli.md) for the complete command reference.
+Then open your coding agent:
+
+~~~text
+Use YallaFlow and continue the current work.
+~~~
+
+That is one of the main ideas behind YallaFlow:
+
+> **The project — not the chat session — is the durable unit of AI-assisted software development.**
 
 ---
 
-## What YallaFlow is not
+## The few commands worth remembering
 
-YallaFlow is deliberately **not**:
+Most lifecycle commands are for the coding agent. As a developer, these cover most day-to-day needs:
 
-- a coding agent or model provider
-- a replacement for Claude, Codex, or other coding agents
-- a prompt pack
-- a fixed specification template
-- a project-management system
-- an automatic semantic truth engine
-- a knowledge graph or vector database
-- a multi-user collaboration platform — yet
+~~~bash
+yallaflow init                    # initialize once
+yallaflow inspect                 # read-only repository inventory
+yallaflow brief                   # project + current-work orientation
+yallaflow status                  # workflow state
+yallaflow resume                  # continue current work
+yallaflow doctor                  # integrity check
 
-YallaFlow does not call an LLM to decide what your project means. The coding agent does the semantic reasoning; YallaFlow governs the durable engineering state around that reasoning.
+yallaflow agent setup claude      # connect Claude
+yallaflow agent setup codex       # connect Codex
+
+yallaflow intake requirements.pdf # start from a file
+~~~
+
+The rest of the CLI is there when you want explicit control.
 
 ---
 
-## Current scope
+## Before YallaFlow / with YallaFlow
+
+Without durable project state:
+
+~~~text
+"This project uses Spring Boot 2.7..."
+"The frontend is Angular 16..."
+"The payment rules are in this document..."
+"Read these six files first..."
+"Last time we decided..."
+"Please follow SDD..."
+~~~
+
+With YallaFlow:
+
+~~~text
+Use YallaFlow.
+
+Add partial payments.
+~~~
+
+That difference is the product.
+
+---
+
+## Want the details?
+
+The README is intentionally the shortest path into YallaFlow.
+
+If you want the practical end-to-end guide, start here:
+
+### 👉 [Using YallaFlow](docs/using-yallaflow.md)
+
+Then go deeper only where you need to:
+
+| Documentation | Purpose |
+| --- | --- |
+| [Installation](docs/installation.md) | installation, legacy projects, upgrades |
+| [Canonical workflows](docs/workflows.md) | Greenfield, Brownfield, bugs, investigations, features |
+| [Feature guide](docs/guide.md) | detailed YallaFlow behavior |
+| [Project memory](docs/project-memory.md) | durable context, evidence and freshness |
+| [CLI reference](docs/cli.md) | every command and flag |
+| [Architecture](docs/architecture.md) | internal concepts and design |
+| [Security](docs/security.md) | handling project sources safely |
+| [Limitations](docs/limitations.md) | current boundaries |
+| [Roadmap](docs/roadmap.md) | what comes next |
+
+---
+
+## Current status
+
+Current version: **v0.3.9-internal.1 — Frictionless Project Onboarding & Context UX**
 
 YallaFlow is currently:
 
-- **single-user**
-- **local-first**
-- **agent-agnostic**
-- **Git-friendly**
-- an **internal prerelease**
+- single-user,
+- local-first,
+- AI-agent agnostic,
+- Git-friendly,
+- pre-1.0 and under active development.
 
-Team mode, locking, multi-user ownership, and collaborative execution are intentionally deferred until the single-developer model is stable.
-
-See [`docs/limitations.md`](docs/limitations.md) for explicit current boundaries.
+It does not call an LLM itself. The coding agent does the semantic reasoning; YallaFlow provides deterministic governance and durable engineering state around that reasoning.
 
 ---
 
-## From "tests passed" to "intent delivered"
+## The idea
 
-v0.3.8 closed the gap between **"tests passed"** and **"the requested intent was actually delivered"**: stable requirement and acceptance-criteria identity, evidence-backed convergence as a delivery gate, explicit change-impact assessment, and first-party Codex/Claude bootstrap.
+**Agent reasons. YallaFlow governs. Project memory persists.**
 
-```text
-Original Intent → Requirements / Acceptance Criteria → Specification → Implementation
-  → Verification → Convergence → Durable Project Knowledge → Next Agent Session
-```
+~~~text
+Understand → Decide → Change → Verify → Remember → Revalidate
+~~~
 
-Next: execution policies, multi-agent orchestration, and tracker intake remain separate future work, and team mode stays deliberately out of scope for now — see [`docs/roadmap.md`](docs/roadmap.md).
-
----
-
-## Design principles
-
-1. **Discover before asking.**
-2. **Understand before changing.**
-3. **Prove before claiming.**
-4. **Remember after finishing.**
-5. **Revalidate before trusting stale knowledge.**
-
-Those rules are intentionally simple. The value is that YallaFlow makes them durable and enforceable across sessions.
-
----
-
-## Status
-
-Current version: **`0.3.9-internal.1` — Frictionless Project Onboarding & Context UX** (internal prerelease; `package.json` is `private`, nothing is published to npm). Upgrading: run `yallaflow upgrade status`, then see [`docs/upgrading-to-v0.3.9.md`](docs/upgrading-to-v0.3.9.md).
-
-YallaFlow is under active development and its workspace/package contracts have not reached 1.0 stability yet.
-
----
-
-## Documentation
-
-| Document | Purpose |
-| --- | --- |
-| [`docs/installation.md`](docs/installation.md) | Safe installation, including legacy repositories |
-| [`docs/workflows.md`](docs/workflows.md) | Canonical end-to-end workflows |
-| [`docs/cli.md`](docs/cli.md) | Complete CLI reference |
-| [`docs/guide.md`](docs/guide.md) | Feature and behavior guide |
-| [`docs/project-memory.md`](docs/project-memory.md) | Living project memory and artifact model |
-| [`docs/upgrading-to-v0.3.9.md`](docs/upgrading-to-v0.3.9.md) | Upgrading to v0.3.9: inspect, Brownfield classification, project-first brief, updating YallaFlow |
-| [`docs/upgrading-to-v0.3.8.md`](docs/upgrading-to-v0.3.8.md) | Upgrading to v0.3.8: delivery convergence, agent bootstrap |
-| [`docs/upgrading-to-v0.3.7.md`](docs/upgrading-to-v0.3.7.md) | Upgrading to v0.3.7: `upgrade status`, reconciling legacy context |
-| [`docs/upgrading-to-v0.3.6.md`](docs/upgrading-to-v0.3.6.md) | Upgrading a v0.3.5 workspace to v0.3.6 |
-| [`docs/architecture.md`](docs/architecture.md) | Internal architecture and invariants |
-| [`docs/security.md`](docs/security.md) | Security and trust model |
-| [`docs/limitations.md`](docs/limitations.md) | Known boundaries |
-| [`docs/roadmap.md`](docs/roadmap.md) | Product roadmap |
-| [`CHANGELOG.md`](CHANGELOG.md) | Release history |
-
----
-
-## License
-
-MIT.
+> **Give AI your project, not just your prompt.**
