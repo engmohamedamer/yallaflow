@@ -44,7 +44,7 @@ test('2. `baseline start --help` shows the baseline-start usage line and mutates
   const before = await stateSnapshot(root);
   const result = spawnSync(process.execPath, [cli, 'baseline', 'start', '--help'], { cwd: root, encoding: 'utf8' });
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /Usage:\n\s*yallaflow baseline start\s*$/m);
+  assert.match(result.stdout, /Usage:\n\s*yallaflow baseline start( \[--objective TEXT\] \[--preserve TEXT\]\.\.\. \[--focus TEXT\]\.\.\.)?\s*$/m);
   assert.equal(await stateSnapshot(root), before);
 });
 

@@ -1,3 +1,4 @@
+import { WORK_ID_SOURCE } from '../core/ids.js';
 // Work-delivery state (v0.3.8): approved intent (requirements.yaml), convergence
 // findings (convergence.yaml), and change-impact assessments (impact.yaml). These are
 // work-scoped delivery records under work/<id>/ — never project-memory facts, and
@@ -17,7 +18,7 @@ export const ASSESSMENT_ID = /^CV-\d{3,}$/;
 export const UNREQUESTED_ID = /^UR-\d{3,}$/;
 export const IMPACT_ID = /^IM-\d{3,}$/;
 // PF-0001/AC-004 — a criterion owned by another work item.
-export const QUALIFIED_REF = /^(PF-\d+)\/((?:REQ|AC)-\d{3,})$/;
+export const QUALIFIED_REF = new RegExp(`^(${WORK_ID_SOURCE})/((?:REQ|AC)-\\d{3,})$`);
 
 export const REQUIREMENT_STATUSES = Object.freeze(['active', 'withdrawn', 'deferred']);
 export const PROVENANCE_TYPES = Object.freeze(['request', 'specification', 'source', 'question']);

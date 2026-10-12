@@ -1,6 +1,8 @@
 import { findProjectRoot } from '../core/workspace.js';
 import { assessWorkspace } from '../core/assessment.js';
 import { describeAgentContractState } from '../agent/contract.js';
+import { WORK_ID_SOURCE } from '../core/ids.js';
+import { checkProjectCompatibility, loadSharedPolicy } from '../shared/config.js';
 
 async function requireRoot() {
   const root = await findProjectRoot();
@@ -17,6 +19,10 @@ export async function upgradeStatusCommand() {
   const { memory, reconciliation } = report;
   console.log('YallaFlow Workspace Upgrade Status');
   console.log(`\nInstalled package: ${report.packageVersion}`);
+  const compat = await checkProjectCompatibility(root);
+  const policy = await loadSharedPolicy(root);
+  console.log(`Project requires: ${compat.required ? `>= ${compat.required}${compat.compatible ? ' (compatible)' : ` — INCOMPATIBLE: ${compat.reason}; install a compatible YallaFlow before changing project state`}` : 'no minimum recorded (single-user)'}`);
+  if (policy.enabled) console.log(`Shared Project: integration branch ${policy.integrationBranch} (yallaflow shared status)`);
   console.log(`Workspace: ${report.legacyStructures.length ? 'legacy structures present' : 'current structures'}`);
   for (const entry of report.legacyStructures) console.log(`  - ${entry}`);
   console.log(`\nAgent contract: ${report.agent.state === 'current' ? `v${report.agent.version} / current` : describeAgentContractState(report.agent)}`);
@@ -32,7 +38,7 @@ export async function upgradeStatusCommand() {
   if (reconciliation) console.log(`  reconciliation ${reconciliation.meta.id}: ${reconciliation.counts.decided}/${reconciliation.counts.total} decided, ${reconciliation.counts.applied} applied, review ${reconciliation.review}`);
   const sourceIssues = report.doctor.failures.filter((name) => /source/i.test(name));
   console.log(`\nSources: ${report.sources.length} · ${sourceIssues.length ? `${sourceIssues.length} issue(s)` : 'healthy'}`);
-  const workIssues = report.doctor.failures.filter((name) => /^PF-\d+:/.test(name));
+  const workIssues = report.doctor.failures.filter((name) => new RegExp(`^${WORK_ID_SOURCE}:`).test(name));
   console.log(`Work history: ${report.work.length} item(s) · ${workIssues.length ? `${workIssues.length} issue(s)` : 'healthy'}`);
   console.log(`Integrity: ${report.doctor.failures.length ? `${report.doctor.failures.length} doctor check(s) failing` : 'doctor healthy'}`);
   console.log(`\nRecommended next action:\n  ${report.plan.length ? report.plan[0].command ?? report.plan[0].title : 'none — the workspace is current'}`);

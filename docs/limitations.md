@@ -1,12 +1,25 @@
-# Current Limitations (v0.3.9)
+# Current Limitations (v0.3.10)
 
 Known gaps and deliberate boundaries. Planned work is tracked in [`roadmap.md`](roadmap.md).
 
 ## Scope and distribution
 
 - **Internal prerelease.** Not published to npm; install from a tarball or checkout.
-- **Single-user, local-first.** No team mode, locking, or multi-user ownership. Concurrent edits to `.yallaflow/` from different branches are reconciled only by Git merge.
+- **Local-first; teams share through Git.** A single-user workspace is the default. A Shared Project ([`shared-projects.md`](shared-projects.md)) shares project memory through ordinary Git; there is no server, locking, real-time visibility, accounts, or permissions.
 - **Platform coverage.** The regression suite runs in POSIX environments; Windows has not been verified in this release.
+
+## Shared Projects
+
+- **The first-use gate uses the recorded project kind.** A repository recorded Greenfield (e.g. misclassified by v0.3.8 `init`) is not gated, even if it later grows Brownfield-sized; `inspect` reports such a mismatch. There is no audited waiver: an urgent change to an un-understood Brownfield project needs an approved baseline first.
+- **Pre-v6 skill-text drift is not recoverable.** Registry v1–v5 now resolve the v0.3.9 instruction bytes. Work created by v0.3.8 under v5 originally read an earlier `repository-baseline` text that v0.3.9 had replaced in place; the pin cannot tell which, so such work now gets the v0.3.9 text.
+
+- **Git is the transport, not a live server.** `shared status` sees only work present in the current checkout; unfetched or unmerged branches are invisible.
+- **Integration is a deliberate step on the integration branch.** Merged knowledge waits as staged deltas until someone runs `yallaflow shared integrate` on an up-to-date checkout of the integration branch and commits the result. With a protected integration branch, that commit goes through a short PR.
+- **A v0.3.9 CLI predates the version check.** It cannot refuse a Shared Project on its own. Its `doctor` fails on config schema v2, and `shared check` in CI flags the sequential IDs or ungoverned ledger writes it may produce. Upgrade every teammate together.
+- **Checkout-tag collisions are negligible, not impossible.** Each checkout draws a 10-character Crockford-base32 tag from `crypto.randomBytes` (50 bits): about 1 in 10^15 per pair, roughly a 1-in-a-billion chance even across 50,000 checkouts. A collision would surface as a Git merge conflict on that work's files, never as a silent merge. Copying a checkout regenerates the tag, but restoring an identical copy of `local/` into the same path does not.
+- **Semantic duplicates are not detected.** Only exact statements in the same area merge mechanically. Judging that two differently worded facts are the same is the agent's job.
+- **`external` source storage is a declared policy only.** Sources stay in Git; Git LFS is your choice; no storage service is built.
+- **Single-user knowledge proposed before sharing** must be re-proposed to relate to an existing fact after sharing (no fingerprint was recorded).
 
 ## Intake
 

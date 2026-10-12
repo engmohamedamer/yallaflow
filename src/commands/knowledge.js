@@ -39,7 +39,9 @@ export async function knowledgeCommand(action, requestedWorkId, options = {}) {
   }
   if (action === 'promote') {
     const result = await promoteKnowledge(root, workId, options.candidateId);
-    console.log(`Promoted ${result.candidate.id} to .yallaflow/${result.target}`);
+    if (result.blocked) console.log(`Staged ${result.candidate.id}, but it cannot integrate yet: the fact it relates to changed in parallel. Revalidate it (yallaflow shared status --verbose).`);
+    else if (result.staged) console.log(`Staged ${result.candidate.id} as this work's shared-memory delta; it integrates into .yallaflow/${result.target} on the integration branch after merge.`);
+    else console.log(`Promoted ${result.candidate.id} to .yallaflow/${result.target}`);
     console.log(`Review: ${result.ledger.reviewStatus}`);
     return;
   }

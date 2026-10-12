@@ -14,7 +14,7 @@ import { createPendingIntake, routeWorkItem } from '../src/behavior/routing.js';
 import { advanceActiveWork } from '../src/core/transitions.js';
 import { proposeKnowledge } from '../src/knowledge/store.js';
 import { promoteKnowledge } from '../src/knowledge/promotion.js';
-import { renderAgentContractBlock, agentContractBody } from '../src/agent/contract.js';
+import { AGENT_CONTRACT_VERSION, renderAgentContractBlock, agentContractBody } from '../src/agent/contract.js';
 import { BRIEF_MAX_LINES } from '../src/commands/brief.js';
 import { oneLine } from '../src/context/summary.js';
 import { apdFixture } from '../test-support/apd-fixture.js';
@@ -117,7 +117,7 @@ test('AC-005/AC-006: init boundaries — bare git and npm-init are greenfield, -
   const npm = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-npm-init-'));
   await writeFile(path.join(npm, 'package.json'), JSON.stringify({ name: 'x', version: '1.0.0' }));
   assert.match(run(npm, ['init']).stdout, /Project kind: greenfield \(1 recognized manifest\(s\) but no recognized source file/);
-  assert.equal(await readFile(path.join(workspacePath(npm), 'context', 'tech-stack.md'), 'utf8'), '# Tech Stack\n\n', 'greenfield init writes no discovery');
+  assert.equal(await readFile(path.join(workspacePath(npm), 'context', 'tech-stack.md'), 'utf8'), '# Tech Stack\n', 'greenfield init writes no discovery');
 
   const forced = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-forced-'));
   assert.match(run(forced, ['init', '--type', 'brownfield']).stdout, /Project kind: brownfield \(explicit --type\)/);
@@ -378,7 +378,7 @@ test('AC-016: every read command on a v0.3.8-shaped workspace (contract v4, pend
   assert.equal(config.project.kind, 'greenfield');
   const brief = run(root, ['brief']).stdout;
   assert.match(brief, /Repository: brownfield by inventory .*; recorded kind greenfield/);
-  assert.match(brief, /Agent contract: outdated \(v4 → v5\); run `yallaflow agent refresh`/);
+  assert.match(brief, new RegExp(`Agent contract: outdated \\(v4 → v${AGENT_CONTRACT_VERSION}\\); run \`yallaflow agent refresh\``));
 });
 
 // ---------------------------------------------------------------------------
@@ -389,7 +389,7 @@ test('AC-011/AC-014: the repository-baseline skill guides inspect, material docu
   const root = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-skill-'));
   await initWorkspace(root, 'demo', 'brownfield');
   const skill = run(root, ['skill', 'repository-baseline']).stdout;
-  assert.match(skill, /Version: 1/, 'skill version unchanged (Skill Registry v5)');
+  assert.match(skill, /Version: 2/, 'v0.3.10: instruction v2 under Skill Registry v6 (v1 stays pinned for earlier work)');
   assert.match(skill, /Start from `yallaflow inspect`/);
   assert.match(skill, /register it with `yallaflow intake add <baseline-work-id> <path>` and read the extracted text with `yallaflow source show SRC-#### --content`/);
   assert.match(skill, /Cite a document inside the repository by its path \(repository evidence\)/);

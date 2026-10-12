@@ -8,6 +8,13 @@ import { BOOTSTRAP_PROVIDERS } from '../agent/bootstrap.js';
 import { loadDeliverySummary } from '../delivery/summary.js';
 import { baselineNextStep, findBaselineWork } from '../baseline/store.js';
 import { classifyProject, inventoryRepository } from '../inventory/inventory.js';
+import { assessProjectUnderstanding, UNDERSTANDING } from '../baseline/understanding.js';
+import { checkProjectCompatibility, describeCompatibility, loadSharedPolicy } from '../shared/config.js';
+import { currentBranch } from '../shared/git.js';
+import { planSharedIntegration } from '../shared/memory.js';
+import { ledgerFingerprint, shortFingerprint } from '../shared/fingerprint.js';
+import { loadContextLedger } from '../context/ledger.js';
+import { describePurpose, loadWorkPurpose } from '../purpose/store.js';
 
 // Project-first brief (v0.3.9): fixed area order, fixed per-area caps, fact-ID order
 // within an area, no ranking, no ledger field. Conventions and business rules show a
@@ -43,10 +50,16 @@ export async function briefCommand() {
   const title = (item) => oneLine(item.title ?? item.rawRequest ?? item.type ?? 'work');
 
   out(`YallaFlow Brief — ${report.project.name ?? 'project'}${report.project.kind ? ` (${report.project.kind})` : ''}`);
+  // v0.3.10: is the project understood yet, is it shared, and can this CLI change it?
+  const onboardingEarly = report.memory.exists || report.memory.unreadable ? null : await onboardingState(root, report);
+  const understanding = report.memory.unreadable ? null : await assessProjectUnderstanding(root, { kind: report.project.kind, inventoryKind: onboardingEarly?.classification.kind });
+  if (understanding) out(`Project understanding: ${understanding.state === UNDERSTANDING.REQUIRED ? `${UNDERSTANDING.REQUIRED} — ` : ''}${understanding.label}`);
+  const shared = await sharedState(root);
+  if (shared) out(shared.line);
   out('');
 
   // Project knowledge first.
-  const onboarding = memory.exists || memory.unreadable ? null : await onboardingState(root, report);
+  const onboarding = onboardingEarly;
   if (memory.unreadable) {
     out(`Project memory: not read — ${report.plan[0].detail}`);
   } else if (memory.exists) {
@@ -64,6 +77,8 @@ export async function briefCommand() {
   if (recent) out(`Most recent work: ${recent.id} ${recent.status ?? (recent.routingStatus === 'pending' ? 'PENDING' : '')} — ${title(recent)}`);
   out(`Work items: ${work.length} (${done} DONE) · Sources: ${report.sources.length}${report.sources.length ? ` (latest ${report.sources.at(-1).id})` : ''}`);
   const delivery = active ? await loadDeliverySummary(root, active) : { applies: false, lines: [] };
+  const lens = active ? describePurpose(await loadWorkPurpose(root, active.id).catch(() => null)) : null;
+  if (lens) out(`Discovery lens (${active.id}): ${lens}`);
   if (delivery.applies) out(`Delivery (${active.id}): ${delivery.lines.slice(0, 2).join(' — ').replace(/^Delivery intent: /, '')}${delivery.pendingImpact ? ` — impact ${delivery.pendingImpact.id} pending` : ''}`);
   if (reconciliation) out(`Reconciliation: ${reconciliation.meta.id} — ${reconciliation.counts.decided}/${reconciliation.counts.total} decided, ${reconciliation.counts.applied} applied, review ${reconciliation.review}${reconciliation.blockers.length ? `; blockers: ${reconciliation.blockers.join('; ')}` : ''}`);
   else if (report.pendingLegacy.length) out(`Legacy context: ${report.pendingLegacy.length} fact(s) pending reconciliation`);
@@ -73,7 +88,7 @@ export async function briefCommand() {
   out(`Package: ${report.packageVersion} · Agent contract: ${report.agent.state === 'current' ? `v${report.agent.version} current` : describeAgentContractState(report.agent)} · Agent bootstrap: ${installed.length ? installed.map((item) => `${item.file} ${item.state}`).join(', ') : `none (optional: yallaflow agent setup ${Object.keys(BOOTSTRAP_PROVIDERS).join('|')})`}`);
   if (report.doctor.failures.length) out(`Integrity: ${report.doctor.failures.length} doctor check(s) failing`);
 
-  const concern = await primaryConcern(root, report, active, delivery, onboarding);
+  const concern = await primaryConcern(root, report, active, delivery, onboarding, shared);
   const body = lines.splice(0);
   out('');
   out(`Primary next concern: ${concern.text}`);
@@ -124,7 +139,30 @@ async function onboardingState(root) {
   return { inventory, classification, baseline };
 }
 
-async function primaryConcern(root, report, active, delivery, onboarding) {
+// Shared Project orientation, one line. Only what this checkout knows — never a claim
+// about branches that are not fetched or merged here.
+async function sharedState(root) {
+  const policy = await loadSharedPolicy(root);
+  const compat = await checkProjectCompatibility(root);
+  if (!policy.enabled) return compat.compatible ? null : { compat, line: `YallaFlow version: ${describeCompatibility(compat)}` };
+  const branch = currentBranch(root);
+  let pending = { items: [], applicable: [], blocked: [] };
+  let fingerprint = 'unreadable';
+  try {
+    ({ plan: pending } = await planSharedIntegration(root));
+    fingerprint = shortFingerprint(ledgerFingerprint((await loadContextLedger(root)).ledger));
+  } catch {
+    // reported by doctor
+  }
+  const onIntegration = branch === policy.integrationBranch;
+  return {
+    policy, compat, branch, pending, onIntegration,
+    line: `Shared project: on — integration branch ${policy.integrationBranch}; this checkout: ${branch ?? 'detached HEAD'} · memory ${fingerprint} · pending knowledge integrations: ${pending.items.length}${pending.blocked.length ? ` (${pending.blocked.length} need reconciliation)` : ''} · ${describeCompatibility(compat)}`
+  };
+}
+
+async function primaryConcern(root, report, active, delivery, onboarding, shared = null) {
+  if (shared && !shared.compat.compatible) return { text: `this project requires a different YallaFlow (${describeCompatibility(shared.compat)}) — stop before changing project state`, command: 'install a compatible YallaFlow (docs/installation.md), then yallaflow brief' };
   if (report.memory.unreadable) return { text: 'the project context ledger uses a schema this CLI does not support', command: 'upgrade YallaFlow, then yallaflow doctor' };
   if (report.doctor.failures.length) return { text: `${report.doctor.failures.length} structural integrity failure(s)`, command: 'yallaflow doctor' };
   if (active?.reconciliation && report.reconciliation) return { text: 'reconcile legacy project context', command: report.reconciliation.nextAction };
@@ -134,6 +172,8 @@ async function primaryConcern(root, report, active, delivery, onboarding) {
     return { text: step.text, command: step.command };
   }
   if (active) return { text: `continue ${active.id}`, command: `yallaflow resume ${active.id}` };
+  if (shared?.pending?.blocked.length) return { text: `${shared.pending.blocked.length} pending shared knowledge update(s) changed in parallel and need reconciliation`, command: 'yallaflow shared status --verbose' };
+  if (shared?.onIntegration && shared.pending.applicable.length) return { text: `integrate ${shared.pending.applicable.length} knowledge update(s) from merged work into shared project memory`, command: 'yallaflow shared integrate (then commit .yallaflow/)' };
   if (report.agent.state !== 'current') return { text: 'agent contract is not current', command: report.plan.find((step) => step.title.includes('Agent') || step.title.includes('package'))?.command ?? 'yallaflow agent status' };
   const staleBootstrap = report.bootstraps.find((item) => ['outdated', 'modified', 'newer'].includes(item.state));
   if (staleBootstrap) return { text: `${staleBootstrap.file} agent bootstrap is ${staleBootstrap.state}`, command: report.plan.find((step) => step.title.includes(staleBootstrap.file) || step.title.includes('package'))?.command ?? 'yallaflow agent status' };
@@ -141,7 +181,7 @@ async function primaryConcern(root, report, active, delivery, onboarding) {
   if (report.pendingLegacy.length) return { text: 'legacy context reconciliation available', command: 'yallaflow context reconcile start' };
   if (onboarding?.baseline && onboarding.baseline.step.state !== 'approved') return { text: onboarding.baseline.step.text, command: onboarding.baseline.step.command };
   if (onboarding && !onboarding.baseline && (onboarding.classification.kind === 'brownfield' || report.project.kind === 'brownfield')) {
-    return { text: 'no project memory yet — establish an evidence-backed Brownfield baseline (yallaflow inspect first; a human approves the draft)', command: 'yallaflow baseline start' };
+    return { text: `no project memory yet — establish an evidence-backed Brownfield baseline (yallaflow inspect first; a human approves the draft) before substantial work, then continue with the request [${UNDERSTANDING.REQUIRED}]`, command: 'yallaflow baseline start' };
   }
   if (report.memory.exists && report.memory.revalidate.length) return { text: `${report.memory.revalidate.length} project fact(s) may be stale or disputed`, command: 'yallaflow context status' };
   return { text: 'none — ready for new work', command: 'yallaflow start "<request>"' };

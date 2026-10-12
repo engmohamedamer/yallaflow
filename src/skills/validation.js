@@ -3,6 +3,7 @@ import { access } from 'node:fs/promises';
 import { CAPABILITIES } from '../behavior/constants.js';
 import { REGISTRY_VERSION, SKILL_MODES, SKILL_PHASES } from './constants.js';
 import { instructionFilePath, PACKAGE_ROOT, SKILL_REGISTRY } from './registry.js';
+import { latestInstructionVersion, loadSkillInstructions, SKILL_INSTRUCTION_VERSIONS } from './instructions.js';
 
 const REQUIRED_FIELDS = Object.freeze([
   'id',
@@ -73,6 +74,18 @@ export async function validateSkillRegistry(registry = SKILL_REGISTRY, options =
       await access(file);
     } catch {
       throw new Error(`Skill ${entry.id} instruction file is missing: ${entry.instructionPath}.`);
+    }
+  }
+  // Immutability (v0.3.10): every released instruction version still has its exact
+  // bytes, and the registry's current entry is the newest released version.
+  if (registry === SKILL_REGISTRY) {
+    for (const entry of registry) {
+      const versions = SKILL_INSTRUCTION_VERSIONS[entry.id];
+      if (!versions) throw new Error(`Skill ${entry.id} has no released instruction versions.`);
+      if (entry.version !== latestInstructionVersion(entry.id) || versions[entry.version].path !== entry.instructionPath) {
+        throw new Error(`Skill ${entry.id} v${entry.version} does not match its newest released instruction version.`);
+      }
+      for (const version of Object.keys(versions)) await loadSkillInstructions(entry.id, Number(version), packageRoot);
     }
   }
   return { registryVersion: REGISTRY_VERSION, skillCount: registry.length };

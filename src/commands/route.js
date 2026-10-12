@@ -1,5 +1,6 @@
 import { routeWorkItem } from '../behavior/routing.js';
-import { findProjectRoot } from '../core/workspace.js';
+import { findProjectRoot, getConfig } from '../core/workspace.js';
+import { understandingNotice } from '../baseline/understanding.js';
 
 export async function routeCommand(workId, decision) {
   const root = await findProjectRoot();
@@ -15,4 +16,6 @@ export async function routeCommand(workId, decision) {
   console.log(`Behavior contract: registry v${item.behaviorContract.registryVersion} (pinned)`);
   if (item.readOnly) console.log('Safety: read-only; application code changes are not authorized by this route.');
   console.log('Next: yallaflow resume');
+  const notice = await understandingNotice(root, { kind: (await getConfig(root)).project?.kind, workMeta: item });
+  if (notice.length) console.log(`\n${notice.join('\n')}`);
 }

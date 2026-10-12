@@ -4,6 +4,7 @@ import { exists } from '../utils/fs.js';
 import { readYaml, writeYamlAtomic } from '../core/yaml.js';
 import { workspacePath } from '../core/workspace.js';
 import { IMPACT_ID, IMPACT_SCHEMA_VERSION, IMPACT_VERDICTS } from './constants.js';
+import { isSourceId } from '../core/ids.js';
 
 // Change-impact records (v0.3.8). When the approved intent of in-flight work changes
 // after it was fixed — a new source is attached, or its requirements change — YallaFlow
@@ -58,7 +59,7 @@ export function validateImpactLedger(ledger) {
     if (!Array.isArray(impact.triggers) || !impact.triggers.length) errors.push(`${label} requires at least one trigger`);
     else for (const trigger of impact.triggers) {
       if (!TRIGGER_TYPES.has(trigger?.type)) errors.push(`${label} has a trigger of unknown type ${JSON.stringify(trigger?.type)}`);
-      if (trigger?.type === 'source' && !/^SRC-\d+$/.test(trigger.source ?? '')) errors.push(`${label} source trigger requires a source SRC-####`);
+      if (trigger?.type === 'source' && !isSourceId(trigger.source)) errors.push(`${label} source trigger requires a source SRC-####`);
       if (trigger?.type === 'requirements' && (!Array.isArray(trigger.changes) || !trigger.changes.length)) errors.push(`${label} requirements trigger requires changes`);
       if (typeof trigger?.at !== 'string') errors.push(`${label} trigger requires an at timestamp`);
     }

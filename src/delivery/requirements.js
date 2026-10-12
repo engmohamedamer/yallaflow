@@ -12,6 +12,7 @@ import {
   REQUIREMENT_STATUSES
 } from './constants.js';
 import { convergenceRequired } from './policy.js';
+import { isSourceId } from '../core/ids.js';
 
 // Stable requirement and acceptance-criterion identity (v0.3.8).
 //
@@ -119,7 +120,7 @@ function provenanceErrors(item, label) {
   const errors = [];
   unknownFields(item, PROVENANCE_FIELDS[item.type], label, errors);
   if (item.type === 'specification' && !nonEmpty(item.section)) errors.push(`${label} (specification) requires the section of the approved specification it comes from`);
-  if (item.type === 'source' && !/^SRC-\d+$/.test(item.source ?? '')) errors.push(`${label} (source) requires a source SRC-####`);
+  if (item.type === 'source' && !isSourceId(item.source)) errors.push(`${label} (source) requires a source SRC-####`);
   if (item.type === 'source' && item.locator !== undefined && !nonEmpty(item.locator)) errors.push(`${label} locator must be non-empty when present`);
   if (item.type === 'question' && !/^Q-\d+$/.test(item.question ?? '')) errors.push(`${label} (question) requires a question Q-###`);
   return errors;
@@ -334,7 +335,7 @@ async function assignedCriterionErrors(root, workId, ledger, changes) {
 
 function provenanceReferenceErrors(item, label, context) {
   if (!item || typeof item !== 'object') return [];
-  if (item.type === 'source' && /^SRC-\d+$/.test(item.source ?? '') && !context.sources.has(item.source)) {
+  if (item.type === 'source' && isSourceId(item.source) && !context.sources.has(item.source)) {
     return [`${label}: source ${item.source} is not linked to this work item (attach it with yallaflow intake add)`];
   }
   if (item.type === 'question' && /^Q-\d+$/.test(item.question ?? '') && !context.questions.has(item.question)) {

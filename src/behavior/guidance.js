@@ -5,14 +5,17 @@ import { WRITE_STAGES } from './constants.js';
 
 // `delivery.pendingImpact` (v0.3.8, from src/delivery/summary.js): a change of approved
 // intent awaiting assessment closes the write gate and becomes the objective.
-export function buildBehaviorGuidance(meta, stage, ledger, delivery = {}) {
+// `understanding` (v0.3.10, from projectUnderstandingGate): an un-understood Brownfield
+// project closes the write gate for every work item.
+export function buildBehaviorGuidance(meta, stage, ledger, delivery = {}, { understanding = null } = {}) {
   const workflow = meta.workflow ?? meta.type;
   const contract = resolveBehaviorContract(meta);
   const progress = summarizeProgress(contract, ledger);
   const pending = delivery.pendingImpact ?? null;
-  const gate = pending
+  let gate = pending
     ? { authorized: false, reason: `impact ${pending.id} is pending: the approved intent changed and must be assessed before implementation continues` }
     : resolveModificationGate(meta, workflow, stage, contract, ledger);
+  if (understanding && gate.authorized) gate = { authorized: false, reason: understanding.reason };
   const guidance = [];
 
   if (progress.current) guidance.push(skillGuidance(progress.current.skillId, progress.current.status));

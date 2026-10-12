@@ -7,6 +7,7 @@ import { checkReconciliationIntegrity } from '../reconciliation/integrity.js';
 import { ledgerFreshness } from './freshness.js';
 import { listAllLimitations, sameStatement } from '../limitations/store.js';
 import { FRESHNESS } from './constants.js';
+import { isWorkId } from '../core/ids.js';
 
 // Workspace-level project-memory integrity, reported by `doctor` (never repaired).
 // errors   — structural corruption: malformed ledger, broken lineage, impossible
@@ -29,7 +30,7 @@ export async function checkContextIntegrity(root) {
     for (const fact of ledger.facts) {
       for (const origin of ledgerValid ? factOrigins(fact) : [fact?.origin]) {
         const workId = origin?.workId;
-        if (workId && /^PF-\d+$/.test(workId) && !await exists(path.join(workspacePath(root), 'work', workId, 'meta.yaml'))) {
+        if (workId && isWorkId(workId) && !await exists(path.join(workspacePath(root), 'work', workId, 'meta.yaml'))) {
           errors.push(`context ledger: ${fact.id} originates from work item ${workId}, which does not exist.`);
         }
       }

@@ -8,6 +8,89 @@ YallaFlow has not yet made a public npm release (`package.json` remains `"privat
 
 Nothing yet.
 
+## [0.3.10-internal.1] - 2026-10-12 — Shared Project Intelligence
+
+**Internal prerelease. Not published to npm.**
+
+> **Understand once. Share automatically. Revalidate precisely.** Developers work with Git; agents work with YallaFlow.
+
+Two connected goals: understand an existing project deeply once, and let a whole engineering team reuse and evolve that understanding through ordinary Git work, without learning YallaFlow internals. Before this release, the sequential ID model was single-writer: two developers branching from the same base both allocated `PF-0043`, `SRC-0012`, and `CTX-0058`, and both rewrote the one ledger file.
+
+#### Added — First-use project bootstrap
+- `PROJECT_UNDERSTANDING_REQUIRED` is derived mechanically (`src/baseline/understanding.js`). `brief`, `start`, `route`, `guide`, and the direct work commands report it for a Brownfield project without approved understanding, so the agent runs the baseline first and then continues the request.
+- **First-use Brownfield write gate.** While a project recorded as Brownfield has no approved understanding:
+  - no work item can enter or continue an application-writing stage (`advance`), and `reopen --to implementation` is refused;
+  - `guide`, `handoff`, `resume`, and `status` report write access NOT AUTHORIZED, and the NEXT VALID ACTION is the next baseline step (start → discovery → draft → human approval).
+  - It reuses the existing baseline lifecycle; diagnosis and read-only work proceed, and Greenfield is never gated.
+- An approved baseline unlocks normal work; fresh developers read approved memory and never re-baseline. Greenfield is never scanned.
+
+#### Added — Purpose-aware discovery
+- `baseline start --objective TEXT [--preserve TEXT]... [--focus TEXT]...` and `purpose set|show` record a discovery lens and preservation intent in `work/<id>/purpose.yaml`. These are work intent and never project truth; baseline approval never promotes them.
+- There are three discovery modes: `bootstrap`, `intent`, and `freshness`.
+- `CORE_COVERAGE` defines the canonical core of a first baseline. The `repository-baseline` and `context-discovery` skill texts teach the core, the lens, and the modes; no CLI keyword matching is involved.
+
+#### Added — Shared Project Mode
+- `yallaflow shared enable [--integration-branch B] [--dry-run]` is an explicit, one-time maintainer step.
+  - It inspects Git tracking, project understanding, memory health and schema, adapters, and source sizes. It refuses an unhealthy, non-Git, or gitignored workspace.
+  - The integration branch comes from `origin/HEAD` or `init.defaultBranch`, or must be named. It is never assumed to be `main` and no remote is contacted.
+  - It writes config schema v2, `yallaflow.minimumVersion`, and `.yallaflow/.gitignore` (`local/`), and moves the active-work pointer to `.yallaflow/local/`. It never commits or pushes.
+- No join command. Personal runtime state (`local/identity.yaml`, `local/state/current.yaml`) is gitignored; project truth is shared.
+- **Branch-safe IDs** (`src/core/ids.js`):
+  - `PF-<clone tag>-####` and `SRC-<clone tag>-####`. The per-checkout sequence is remembered in `local/identity.yaml`, so a branch switch or stash never reuses a number, and a copied checkout gets a new tag.
+  - CTX IDs are allocated only at canonical integration.
+  - Every hardcoded `PF-`/`SRC-` pattern (41 sites) now uses one definition. Legacy IDs stay readable forever.
+- **Memory base** (`work/<id>/memory.yaml`): a deterministic content fingerprint of the ledger plus per-fact fingerprints, the Git actor, the clone tag, and the branch. It works without Git.
+- **Work-local memory delta**:
+  - On a feature branch, `knowledge promote` stages a reviewed context candidate (`staged`, a completed disposition: DONE does not wait).
+  - Relations carry `factFingerprint` captured at proposal; staging refuses a fact that changed since.
+  - ADRs stay direct (work-scoped paths).
+- **Canonical integration**: `yallaflow shared integrate [--dry-run]` runs on the integration branch only.
+  - One atomic ledger write, deterministic (same merge → identical files), and idempotent (an interrupted run finishes its bookkeeping without re-applying).
+  - Exact duplicates become extra origins.
+  - A changed referenced fact (`changed-since-base`) or competing supersede/dispute claims (`competing-update`) block; they are never guessed.
+  - Provenance runs fact → work and candidate → actor, memory base, and integration record.
+- The single-writer guard in `mutateContextLedger` refuses every canonical write (baseline approval, reconciliation apply, adoption) off the integration branch in a Shared Project.
+- `yallaflow shared status [--verbose]`: a concise, read-only, checkout-scoped summary.
+- `yallaflow shared check`: a provider-neutral, read-only CI gate. It makes no network or LLM calls and exits 1 with actionable output. GitHub Actions, Azure Pipelines, and GitLab examples are in `docs/shared-projects.md`.
+
+#### Added — Finish protocol and developer language
+- `yallaflow finish [work-id] [--verbose]` is a read-only completion check: lifecycle, integrity, compatibility, and shared-memory drift. It prints "Implemented and verified. … Ready to push." with no internal IDs; the agent steps and the `--verbose` audit stay available.
+- `handoff` and `resume` show the memory base and staged or integrated knowledge; `knowledge promote` reports staging.
+
+#### Added — Version consistency
+- A Shared Project records `yallaflow.minimumVersion`. Every state-changing command stops before mutation on an incompatible CLI; `brief`, `doctor`, `upgrade status`, and `shared check` report `Installed … · Project requires …`. There is no self-update.
+
+#### Added — Doctor / integrity
+- Shared Project failures:
+  - incompatible version, and config schema and shape;
+  - sequential IDs created after sharing;
+  - local state committed, or shared paths gitignored;
+  - shared state stored under `local/`;
+  - malformed memory records or actor metadata, and impossible memory bases;
+  - staged deltas referencing missing CTX facts, and staged candidates without delta records;
+  - canonical memory written without an integration record.
+- Warnings: pending deltas needing reconciliation, incomplete integration bookkeeping, identical sources captured in parallel, sources above the size threshold, and a still-tracked `state/current.yaml`.
+
+#### Changed
+- Agent Contract **v6** and provider bootstrap block **v2**: automatic orientation, understanding first, purpose-aware discovery, the Shared Project sequence, the finish protocol, and developer language. The state ownership list includes `memory.yaml`, `purpose.yaml`, and `local/`.
+- `brief` adds `Project understanding:` and, in a Shared Project, one shared line (integration branch, current branch, memory fingerprint, pending integrations, versions). The primary concern covers an incompatible version, blocked deltas, and integration-branch work.
+- Generated `context/*.md` and `work.md` templates end with a single newline (the v0.3.9 `git diff --check` known issue).
+- README, architecture, CLI, workflows, project-memory, installation, security, limitations, and roadmap docs; new `docs/shared-projects.md` and `docs/upgrading-to-v0.3.10.md`.
+
+#### Versions
+- Package `0.3.10-internal.1`; Agent Contract v6; bootstrap block v2.
+- Config schema v2 only for Shared Projects (v1 unchanged).
+- **Knowledge ledger schema v2.** It is written only when a ledger holds Shared Project shapes (`staged`, `stagedAt`, `relation.factFingerprint`). The frozen v0.3.9 reader rejects those fields, so v2 makes it refuse ("must use version 1") instead of misreading; every other ledger stays v1 and byte-readable by v0.3.9.
+- **Skill Registry v6 with immutable instructions.**
+  - The audit found that pins never covered instruction bytes: `yallaflow skill` served the installed text, and v0.3.9 had already refined `repository-baseline` in place under v5.
+  - Every released instruction version now has fixed bytes and a SHA-256 (`src/skills/instructions.js`). Registry v1–v5 pin instruction v1 (the v0.3.9 bytes, archived); v6 pins `repository-baseline` and `context-discovery` v2.
+  - `yallaflow skill <id> [--work <work-id>]` (default: the active work's pin) serves the exact pinned version. Editing a released version fails `doctor`.
+- Context ledger and source schemas are unchanged.
+- Checkout tags are 10 Crockford-base32 characters (50 bits, `crypto.randomBytes`).
+
+#### Deliberately not in scope
+Hosted/cloud YallaFlow, accounts, RBAC, invitations, real-time locks, a daemon, automatic commit/push/pull/rebase/merge, tracker integration, sprints, task assignment, dashboards, LLM calls or embeddings in the CLI, semantic auto-resolution, and the v0.4 execution engine.
+
 ## [0.3.9-internal.1] - 2026-09-29 — Frictionless Project Onboarding & Context UX
 
 **Internal prerelease. Not published to npm.** Three problems drove this release:

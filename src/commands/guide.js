@@ -1,7 +1,10 @@
 import path from 'node:path';
 import { exists } from '../utils/fs.js';
+import { projectUnderstandingGate } from '../baseline/understanding.js';
 import { buildBehaviorGuidance } from '../behavior/guidance.js';
-import { findProjectRoot, getCurrentState, workspacePath } from '../core/workspace.js';
+import { findProjectRoot, getConfig, getCurrentState, workspacePath } from '../core/workspace.js';
+import { understandingNotice } from '../baseline/understanding.js';
+import { describePurpose, loadWorkPurpose } from '../purpose/store.js';
 import { readYaml } from '../core/yaml.js';
 import { loadWorkProgress } from '../core/progress.js';
 import { isKnowledgeReviewRelevant, isKnowledgeReviewStage, loadWorkKnowledge, summarizeKnowledge } from '../knowledge/store.js';
@@ -33,7 +36,7 @@ export async function guideCommand(requestedWorkId) {
   const stage = workId === state.activeWork ? state.stage : meta.status;
   const progress = await loadWorkProgress(root, meta);
   const delivery = await loadDeliverySummary(root, meta);
-  const result = buildBehaviorGuidance(meta, stage, progress.ledger, delivery);
+  const result = buildBehaviorGuidance(meta, stage, progress.ledger, delivery, { understanding: await projectUnderstandingGate(root) });
   const questions = await loadWorkQuestions(root, meta);
   const readiness = evaluateReadiness(meta, progress, questions);
   const knowledge = await loadWorkKnowledge(root, meta);
@@ -47,6 +50,12 @@ export async function guideCommand(requestedWorkId) {
   console.log(`Stage: ${result.stage ?? 'none'}`);
   printReopenContext(meta);
   console.log(`Delivery status: ${readiness.deliveryStatus ?? 'NOT_READY'}`);
+  const lens = describePurpose(await loadWorkPurpose(root, meta.id));
+  if (lens) console.log(`Discovery lens: ${lens}`);
+  if (meta.status !== 'DONE') {
+    const notice = await understandingNotice(root, { kind: (await getConfig(root)).project?.kind, workMeta: meta });
+    if (notice.length) console.log(`\n${notice.join('\n')}`);
+  }
   console.log(`\nBehavior contract: ${result.contract.label}`);
   if (result.progress.entries.length) {
     result.progress.entries.forEach((entry) => console.log(`${statusSymbol(entry.status)} ${entry.skillId}`));

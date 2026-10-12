@@ -3,7 +3,7 @@ import { appendFile } from 'node:fs/promises';
 import { CONFIDENCE_LEVELS, SCOPES, WORK_TYPES } from './constants.js';
 import { resolveWorkflowPolicy } from './policy.js';
 import { exists, readText, writeText } from '../utils/fs.js';
-import { nextWorkId, workSections, workspacePath } from '../core/workspace.js';
+import { getCurrentState, nextWorkId, workSections, workspacePath, writeCurrentState } from '../core/workspace.js';
 import { readYaml, writeYaml } from '../core/yaml.js';
 import { REGISTRY_VERSION } from '../skills/constants.js';
 import { resolveSkills } from '../skills/resolver.js';
@@ -11,6 +11,7 @@ import { KNOWLEDGE_POLICY_VERSION } from '../knowledge/constants.js';
 import { loadWorkProgress } from '../core/progress.js';
 import { intentFixed } from '../delivery/policy.js';
 import { raiseImpact } from '../delivery/impact.js';
+import { recordWorkMemoryBase } from '../shared/memory.js';
 
 const ROUTING_FIELDS = new Set(['work_type', 'scope', 'confidence', 'reason', 'title']);
 
@@ -97,7 +98,9 @@ export async function createPendingIntake(root, rawRequest, options = {}) {
   await writeYaml(path.join(workDir, 'meta.yaml'), meta);
   await writeText(path.join(workDir, 'work.md'), pendingWorkTemplate(meta));
   await writeText(path.join(workDir, 'progress.md'), `# Work Ledger — ${id}\n\nCreated: ${now}\n\n- ${now} Routing: pending\n`);
-  await writeYaml(path.join(workspacePath(root), 'state', 'current.yaml'), {
+  // Shared Project: the project-memory state this work starts from (no-op otherwise).
+  await recordWorkMemoryBase(root, id, now);
+  await writeCurrentState(root, {
     schemaVersion: 1,
     activeWork: id,
     stage: null,
@@ -145,7 +148,7 @@ export async function routeWorkItem(root, workId, input) {
   await writeText(workFile, currentWork.replace(/^# .*$/m, `# ${meta.id} — ${title}`));
   await appendFile(workFile, routedWorkAppendix(meta), 'utf8');
   await appendFile(path.join(workDir, 'progress.md'), `- ${now} Routing: routed as ${meta.type} + ${meta.scope} (${meta.routingConfidence})\n`, 'utf8');
-  await writeYaml(path.join(workspacePath(root), 'state', 'current.yaml'), {
+  await writeCurrentState(root, {
     schemaVersion: 1,
     activeWork: workId,
     stage: policy.initialStage,

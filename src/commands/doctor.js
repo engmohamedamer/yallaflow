@@ -1,7 +1,9 @@
 import path from 'node:path';
 import { stat } from 'node:fs/promises';
 import { exists } from '../utils/fs.js';
-import { LAZY_WORKSPACE_DIRS, findProjectRoot, listWork, workspacePath } from '../core/workspace.js';
+import { LAZY_WORKSPACE_DIRS, currentStatePath, findProjectRoot, getCurrentState, isSharedWorkspace, listWork, workspacePath } from '../core/workspace.js';
+import { SUPPORTED_CONFIG_SCHEMAS } from '../shared/config.js';
+import { collectSharedIntegrity } from '../shared/integrity.js';
 import { readYaml } from '../core/yaml.js';
 import { validateSkillRegistry } from '../skills/validation.js';
 import { loadWorkProgress } from '../core/progress.js';
@@ -37,8 +39,11 @@ export async function doctorCommand() {
 export async function collectDoctorReport(root) {
   const base = workspacePath(root);
   const checks = [];
+  // A Shared Project keeps active-work focus in the gitignored local/ directory; a
+  // fresh clone legitimately has none yet.
+  const shared = await isSharedWorkspace(root);
   for (const relative of [
-    'config.yaml', 'PROJECT.md', 'AGENT.md', 'state/current.yaml',
+    'config.yaml', 'PROJECT.md', 'AGENT.md', ...(shared ? [] : ['state/current.yaml']),
     'context/architecture.md', 'context/tech-stack.md', 'context/database.md',
     'context/integrations.md', 'context/environments.md', 'context/conventions.md', 'context/business-rules.md'
   ]) checks.push([relative, await exists(path.join(base, relative))]);
@@ -47,22 +52,22 @@ export async function collectDoctorReport(root) {
   // absent work/ is a failure only when durable state names active work.
   let activeWork = null;
   try {
-    activeWork = (await readYaml(path.join(base, 'state/current.yaml'))).activeWork ?? null;
+    activeWork = (await getCurrentState(root)).activeWork ?? null;
   } catch {
     activeWork = null; // reported by schema parsing below
   }
   for (const dir of LAZY_WORKSPACE_DIRS) {
     const info = await stat(path.join(base, dir)).catch(() => null);
     if (info) checks.push([dir, info.isDirectory()]);
-    else if (dir === 'work' && activeWork) checks.push([`work (missing, but state/current.yaml names active work ${activeWork})`, false]);
+    else if (dir === 'work' && activeWork) checks.push([`work (missing, but ${path.relative(base, await currentStatePath(root))} names active work ${activeWork})`, false]);
     else checks.push([`${dir} (absent — created when first needed)`, true]);
   }
 
   let parseOk = true;
   try {
     const config = await readYaml(path.join(base, 'config.yaml'));
-    const state = await readYaml(path.join(base, 'state/current.yaml'));
-    parseOk = config.schemaVersion === 1 && state.schemaVersion === 1;
+    const state = await getCurrentState(root);
+    parseOk = SUPPORTED_CONFIG_SCHEMAS.includes(config.schemaVersion) && state.schemaVersion === 1;
   } catch {
     parseOk = false;
   }
@@ -164,6 +169,20 @@ export async function collectDoctorReport(root) {
     warnings.push(...context.warnings);
   } catch (error) {
     checks.push([`project context ledger: ${error instanceof Error ? error.message : String(error)}`, false]);
+  }
+
+  // Shared Project integrity (v0.3.10): version compatibility, branch-safe identity,
+  // local-vs-shared state placement, memory bases, staged deltas, and integration
+  // provenance fail; pending deltas that need reconciliation are warnings here (they
+  // fail `yallaflow shared check`, the CI gate).
+  try {
+    const sharedReport = await collectSharedIntegrity(root);
+    for (const error of sharedReport.errors) checks.push([error, false]);
+    if (sharedReport.enabled && !sharedReport.errors.length) checks.push([`shared project integrity (integration branch ${sharedReport.policy.integrationBranch})`, true]);
+    warnings.push(...sharedReport.warnings);
+    for (const blocked of sharedReport.blockers) warnings.push(`pending memory delta ${blocked.workId} ${blocked.candidateId} needs reconciliation: ${blocked.blockers.map((entry) => entry.message).join('; ')}`);
+  } catch (error) {
+    checks.push([`shared project integrity: ${error instanceof Error ? error.message : String(error)}`, false]);
   }
 
   // Agent guidance that predates the installed package contract is a warning — doctor

@@ -15,7 +15,9 @@ import { exists, readText, writeText } from '../utils/fs.js';
 //
 // Bump BOOTSTRAP_VERSION whenever bootstrapBody() changes meaningfully.
 //   1 — v0.3.8: detect → AGENT.md → brief → resume/guide → contract → record.
-export const BOOTSTRAP_VERSION = 1;
+//   2 — v0.3.10: orient automatically before the first request (the developer never
+//       has to say "use YallaFlow"); finish with `yallaflow finish`.
+export const BOOTSTRAP_VERSION = 2;
 
 export const BOOTSTRAP_PROVIDERS = Object.freeze({
   codex: Object.freeze({ id: 'codex', label: 'Codex', file: 'AGENTS.md' }),
@@ -46,14 +48,15 @@ export function bootstrapBody(provider) {
     'This repository uses YallaFlow: engineering governance and durable project memory for coding agents. ' +
     'This block only points to the YallaFlow contract; it does not restate it.\n\n' +
     `${load}\n` +
-    'At the start of every session:\n\n' +
+    'At the start of every session — automatically, before handling the first request; the developer does not need to say "use YallaFlow":\n\n' +
     '1. Confirm `.yallaflow/` exists. If it does not, ignore this section.\n' +
     '2. Follow `.yallaflow/AGENT.md` — it is the only YallaFlow behavioral contract.\n' +
-    '3. Run `yallaflow brief` for a read-only orientation and the next command to run.\n' +
+    '3. Run `yallaflow brief` for a read-only orientation and the next command to run, then handle the request.\n' +
     '4. For active or resumable work, run `yallaflow resume <work-id>` (or `yallaflow handoff <work-id>`).\n' +
     '5. Run `yallaflow guide <work-id>` for the current objective, blocker, and next valid action.\n' +
     '6. Follow the pinned Behavior Contract (`yallaflow skill <skill-id>`); never modify application code while guidance says it is not authorized.\n' +
-    '7. Record progress, decisions, and evidence only through `yallaflow` commands — never edit `.yallaflow/` structured state by hand.\n';
+    '7. Record progress, decisions, and evidence only through `yallaflow` commands — never edit `.yallaflow/` structured state by hand.\n' +
+    '8. Before saying a task is done, run `yallaflow finish <work-id>` and relay its outcome.\n';
 }
 
 export function renderBootstrapBlock(provider, version = BOOTSTRAP_VERSION, body = bootstrapBody(provider)) {

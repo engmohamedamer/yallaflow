@@ -2,7 +2,8 @@ import path from 'node:path';
 import { appendFile } from 'node:fs/promises';
 import { exists, readText, writeText } from '../utils/fs.js';
 import { readYaml, writeYaml } from '../core/yaml.js';
-import { getCurrentState, listWork, nextWorkId, workspacePath } from '../core/workspace.js';
+import { getCurrentState, listWork, nextWorkId, workspacePath, writeCurrentState } from '../core/workspace.js';
+import { recordWorkMemoryBase } from '../shared/memory.js';
 import { loadWorkProgress } from '../core/progress.js';
 import {
   appliedTransition,
@@ -194,11 +195,11 @@ export async function startReconciliation(root, now = new Date().toISOString()) 
   await writePlan(root, id, plan);
   await writeText(path.join(dir, 'work.md'), reconciliationWorkTemplate(meta, candidates.length));
   await writeText(path.join(dir, 'progress.md'), `# Work Ledger — ${id}\n\nCreated: ${now}\nKind: legacy project-context reconciliation\n\n- ${now} Reconciliation started (${candidates.length} legacy candidate(s)).\n`);
+  await recordWorkMemoryBase(root, id, now);
   // Never steals focus from work already in progress.
-  const stateFile = path.join(workspacePath(root), 'state', 'current.yaml');
   const state = await getCurrentState(root);
   const becameActive = !state.activeWork;
-  if (becameActive) await writeYaml(stateFile, { schemaVersion: 1, activeWork: id, stage: 'INTAKE', updatedAt: now });
+  if (becameActive) await writeCurrentState(root, { schemaVersion: 1, activeWork: id, stage: 'INTAKE', updatedAt: now });
   return { meta, plan, created: true, becameActive, previousActive: state.activeWork ?? null };
 }
 
@@ -590,9 +591,8 @@ async function completeReconciliationWork(root, meta, now) {
   current.status = 'DONE';
   current.updatedAt = now;
   await writeYaml(metaFile, current);
-  const stateFile = path.join(workspacePath(root), 'state', 'current.yaml');
-  const state = await readYaml(stateFile);
-  if (state.activeWork === meta.id) await writeYaml(stateFile, { schemaVersion: 1, activeWork: null, stage: null, updatedAt: now });
+  const state = await getCurrentState(root);
+  if (state.activeWork === meta.id) await writeCurrentState(root, { schemaVersion: 1, activeWork: null, stage: null, updatedAt: now });
 }
 
 // ---------------------------------------------------------------------------

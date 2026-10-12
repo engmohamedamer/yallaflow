@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { exists, writeText } from '../utils/fs.js';
 import { readYaml, writeYaml } from '../core/yaml.js';
-import { nextWorkId, workSections, workspacePath } from '../core/workspace.js';
+import { getCurrentState, nextWorkId, workSections, workspacePath, writeCurrentState } from '../core/workspace.js';
 import { loadWorkReadiness } from '../behavior/readiness.js';
 import { resolveWorkflowPolicy } from '../behavior/policy.js';
 import { WORK_TYPES, SCOPES } from '../behavior/constants.js';
@@ -11,6 +11,7 @@ import { KNOWLEDGE_POLICY_VERSION } from '../knowledge/constants.js';
 import { invalidateGateIfApproved } from '../reviews/store.js';
 import { DECOMPOSITION_SCHEMA_VERSION } from './constants.js';
 import { bareRef, loadWorkRequirements } from '../delivery/requirements.js';
+import { recordWorkMemoryBase } from '../shared/memory.js';
 
 function decompositionFilePath(root, workId) {
   return path.join(workspacePath(root), 'work', workId, 'decomposition.yaml');
@@ -136,7 +137,7 @@ export async function decompositionBlockers(root, meta) {
 }
 
 export async function childProgressView(root, ledger) {
-  const state = await readYaml(path.join(workspacePath(root), 'state', 'current.yaml'));
+  const state = await getCurrentState(root);
   const results = [];
   for (const child of ledger.children) {
     if (!child.workId) {
@@ -232,6 +233,7 @@ async function createChildWorkItem(root, parentId, child, now) {
   await writeYaml(path.join(dir, 'meta.yaml'), meta);
   await writeText(path.join(dir, 'work.md'), childWorkTemplate(meta, parentId));
   await writeText(path.join(dir, 'progress.md'), `# Work Ledger — ${id}\n\nCreated: ${now}\nDecomposed from: ${parentId}\n\n`);
+  await recordWorkMemoryBase(root, id, now);
   return meta;
 }
 

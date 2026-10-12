@@ -14,7 +14,8 @@ import { reviewKnowledgeNone } from '../src/knowledge/store.js';
 test('bug follows deterministic workflow and DONE requires verification', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-transition-'));
   const item = await (async () => {
-    await initWorkspace(root, 'demo', 'brownfield');
+    // Greenfield: this test is about the stage sequence, not first-use understanding.
+    await initWorkspace(root, 'demo', 'greenfield');
     return createWorkItem(root, 'bug', 'broken login', 'bounded');
   })();
   const expected = ['REPRODUCE', 'EVIDENCE', 'TRACE', 'HYPOTHESIS', 'ROOT_CAUSE', 'FIX_PLAN', 'IMPLEMENTATION', 'VERIFICATION'];

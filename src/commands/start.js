@@ -1,4 +1,5 @@
-import { findProjectRoot, getCurrentState } from '../core/workspace.js';
+import { findProjectRoot, getConfig, getCurrentState } from '../core/workspace.js';
+import { understandingNotice } from '../baseline/understanding.js';
 import { createPendingIntake } from '../behavior/routing.js';
 import { CONFIDENCE_LEVELS, SCOPES, WORK_TYPES } from '../behavior/constants.js';
 
@@ -16,6 +17,8 @@ export async function startCommand(rawRequest = '') {
     console.log(`  confidence: ${CONFIDENCE_LEVELS.join(' | ')}`);
     console.log('  reason: non-empty explanation');
     console.log(`\nNext: yallaflow route ${item.id} --type TYPE --scope SCOPE --confidence LEVEL --reason "REASON" --title "CONCISE TITLE"`);
+    const notice = await understandingNotice(root, { kind: (await getConfig(root)).project?.kind });
+    if (notice.length) console.log(`\n${notice.join('\n')}`);
     return;
   }
   const state = await getCurrentState(root);

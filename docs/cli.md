@@ -1,6 +1,6 @@
 # CLI Reference
 
-YallaFlow v0.3.9. Every command also answers `--help` / `-h` (at any position, including sub-actions such as `yallaflow knowledge propose --help`) without changing any state. `[work-id]` defaults to the active work item.
+YallaFlow v0.3.10. Every command also answers `--help` / `-h` (at any position, including sub-actions such as `yallaflow knowledge propose --help`) without changing any state. `[work-id]` defaults to the active work item.
 
 ## Workspace
 
@@ -14,6 +14,32 @@ YallaFlow v0.3.9. Every command also answers `--help` / `-h` (at any position, i
 | `yallaflow upgrade status` | Read-only upgrade assessment: installed version, legacy structures, agent contract, canonical and pending legacy facts, reconciliation progress, sources, work history, integrity, Git durability, recommended next action. |
 | `yallaflow upgrade plan` | The ordered upgrade steps as deliberate commands. Never migrates or repairs anything itself. |
 | `yallaflow --version` | Package version. |
+| `yallaflow finish [work-id] [--verbose]` | The Agent's completion protocol, read-only: may the developer be told the work is ready to push? Checks lifecycle (DONE), workspace integrity, project compatibility, and — in a Shared Project — whether shared memory changed under the work's staged knowledge. Default output is developer language with no internal IDs (`Implemented and verified. … Ready to push.`); exact steps for the agent follow only when not ready; `--verbose` adds the audit (work, verification, memory base, staged/integrated knowledge). Exit code 1 when not ready. Never commits or pushes. |
+
+In a Shared Project (`config.yaml` `yallaflow.minimumVersion`), every state-changing command first checks the installed version and stops with `Installed: … · Project requires: >= … — INCOMPATIBLE` and no change; read-only orientation and integrity commands still run.
+
+## Project understanding and discovery purpose
+
+| Command | Purpose |
+|---|---|
+| `yallaflow baseline start [--objective TEXT] [--preserve TEXT]... [--focus TEXT]...` | Start (or resume) the Brownfield baseline, optionally with a discovery lens: what the understanding is for, what must be preserved, and where to go deeper. Prints the canonical core coverage. |
+| `yallaflow purpose set [work-id] --objective TEXT [--mode bootstrap\|intent\|freshness] [--preserve TEXT]... [--focus TEXT]...` | Record or replace (with history) a work item's discovery purpose in `work/<id>/purpose.yaml`. Work intent only — never promoted into project memory. |
+| `yallaflow purpose show [work-id]` | Show it. |
+
+`brief`, `start`, `route`, `guide`, and the direct work commands report `PROJECT_UNDERSTANDING_REQUIRED` for an existing (Brownfield) project without approved understanding. Until the baseline is approved, no work item can enter or continue an application-writing stage (`advance` refuses, `reopen --to implementation` refuses, write access reports NOT AUTHORIZED); the NEXT VALID ACTION is the next baseline step. Greenfield projects are never scanned or gated.
+
+## Shared Projects
+
+See [`shared-projects.md`](shared-projects.md).
+
+| Command | Purpose |
+|---|---|
+| `yallaflow shared enable [--integration-branch BRANCH] [--dry-run]` | One-time, explicit maintainer step. Inspects and explains (Git tracking, project understanding, memory health and schema, integration branch from `origin/HEAD` or `init.defaultBranch` when locally available — otherwise required, agent adapters, source sizes, required version), refuses an unhealthy or non-Git workspace, then writes `config.yaml` schema v2, `.yallaflow/.gitignore` (`local/`), and moves the active-work pointer to `.yallaflow/local/`. Never commits or pushes. |
+| `yallaflow shared status [--verbose]` | Read-only: integration and current branch, version requirement, actor (from `git config`), memory fingerprint, open work and pending integrations in this checkout, integrity. Never claims to see unfetched or unmerged branches. |
+| `yallaflow shared check` | Provider-neutral, read-only CI gate (exit code 1 on failure; no network, no LLM): doctor integrity plus Shared Project integrity, and whether every pending memory delta integrates safely against the checked-out memory. |
+| `yallaflow shared integrate [--dry-run] [--verbose]` | The one canonical memory integration boundary — integration branch only (`--dry-run` previews anywhere). Applies every safe staged update in one atomic, deterministic ledger write; holds blocked ones (changed referenced fact, competing updates) for reconciliation (exit code 1). Idempotent. Never commits. |
+
+In a Shared Project, `yallaflow knowledge promote` stages a reviewed context candidate as the work's memory delta (on the integration branch it integrates immediately); work and source IDs are branch-safe (`PF-<tag>-####`, `SRC-<tag>-####`).
 
 ## Intake and routing
 
@@ -46,7 +72,9 @@ Types: `feature`, `bug`, `investigation`, `change`, `refactor`, `release`. Scope
 | `yallaflow handoff [work-id]` | Compact, read-only context for another agent or session. |
 | `yallaflow reopen <work-id> --to implementation\|verification\|review --reason REASON` | Reactivate DONE work auditably. Resets the post-implementation chain from the target (implementation → verification → delivery-convergence → code-review); evidence and convergence history are kept, and reopening to implementation or verification makes them stale. Reopening to review resets only code review and leaves verification and convergence current. |
 
-Skills (Skill Registry v5): `context-discovery`, `requirement-clarification`, `design-exploration`, `specification`, `implementation-planning`, `systematic-debugging`, `implementation`, `verification`, `delivery-convergence`, `code-review`, `repository-baseline`, `context-reconciliation`. Work pinned to an earlier registry version keeps its recorded skills.
+`yallaflow skill <skill-id> [--work <work-id>]` prints the exact, immutable instruction version a work item's Behavior Contract pinned (default: the active work item when it pins the skill; otherwise the installed registry).
+
+Skills (Skill Registry v6): `context-discovery`, `requirement-clarification`, `design-exploration`, `specification`, `implementation-planning`, `systematic-debugging`, `implementation`, `verification`, `delivery-convergence`, `code-review`, `repository-baseline`, `context-reconciliation`. Work pinned to an earlier registry version keeps its recorded skills.
 
 ## Verification
 

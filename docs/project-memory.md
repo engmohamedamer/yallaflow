@@ -181,17 +181,30 @@ Agents never edit YallaFlow-owned structured or history state directly when a su
 
 | Owner | Files | Changed only by |
 |---|---|---|
-| **CLI** | `work/<id>/meta.yaml`, `progress.yaml`, `progress.md`, `knowledge.yaml`, `reviews.yaml`, `questions.yaml`, `baseline.yaml`, `discovery.yaml`, `decomposition.yaml`, `reconciliation.yaml`, `legacy-context.md`, `requirements.yaml`, `convergence.yaml`, `impact.yaml`, `evidence/` (verification ledger); `context/index.yaml`; `sources/SRC-####/` (originals + metadata); `state/current.yaml`; generated `decisions/ADR-*.md` | the matching `yallaflow` command |
+| **CLI** | `work/<id>/meta.yaml`, `progress.yaml`, `progress.md`, `knowledge.yaml`, `reviews.yaml`, `questions.yaml`, `baseline.yaml`, `discovery.yaml`, `decomposition.yaml`, `reconciliation.yaml`, `legacy-context.md`, `requirements.yaml`, `convergence.yaml`, `impact.yaml`, `evidence/` (verification ledger); `context/index.yaml`; `sources/SRC-####/` (originals + metadata); `state/current.yaml` (in a Shared Project: `local/state/current.yaml` and `local/identity.yaml`, personal and never committed); `work/<id>/memory.yaml` (Shared Project memory base, staged delta, integration record); `work/<id>/purpose.yaml` (discovery purpose and preservation intent); generated `decisions/ADR-*.md` | the matching `yallaflow` command |
 | **Projection** | the managed blocks in `PROJECT.md`, `context/*.md`, `AGENT.md`; outside `.yallaflow/`, the bootstrap block in a repository-root `AGENTS.md`/`CLAUDE.md` | `yallaflow context render`, `yallaflow agent refresh`, `yallaflow agent setup` |
 | **Shared** | `work/<id>/work.md` | the Agent writes the narrative sections (discovery notes, specification, plan, findings, result); CLI-appended lifecycle records (Routing Decision, Source Added, Request Revised) are history and are never edited |
-| **Human** | `config.yaml`; content outside managed blocks | deliberate human edits |
+| **Human** | `config.yaml`; `.yallaflow/.gitignore` (written once by `shared enable`); content outside managed blocks | deliberate human edits |
 
 Deterministic tamper checks include strict schema validation of every ledger (including the delivery ledgers and their references), the reconciliation plan's approval fingerprint, projection drift, source checksums, and (a warning) a Routing Decision in `work.md` that no longer matches `meta.yaml`.
 
 ## Agent contract
 
-`.yallaflow/AGENT.md` tells agents how to work with YallaFlow: the project memory sequence (read relevant context, check freshness, rediscover only what changed, relate new knowledge to existing facts), the delivery intent and convergence sequence, legacy reconciliation, state ownership, and `yallaflow brief` as the first command of a fresh session. It carries a versioned managed block (v5 since v0.3.9: Brownfield onboarding sequence, "do not change application code" vs explicit read-only, material documents, NEEDS CARE, content-hash freshness without Git). `doctor` and `status` warn when it predates the installed contract, and `yallaflow agent refresh` updates it deliberately. Provider session files (`AGENTS.md`, `CLAUDE.md`) may carry a thin bootstrap block pointing to it (`yallaflow agent setup`); they never restate it. See [`upgrading-to-v0.3.9.md`](upgrading-to-v0.3.9.md).
+`.yallaflow/AGENT.md` tells agents how to work with YallaFlow: the project memory sequence (read relevant context, check freshness, rediscover only what changed, relate new knowledge to existing facts), the delivery intent and convergence sequence, legacy reconciliation, state ownership, and `yallaflow brief` as the first command of a fresh session. It carries a versioned managed block (v6 since v0.3.10: automatic orientation, project understanding first, purpose-aware discovery, the Shared Project sequence, the finish protocol; v5 added the Brownfield onboarding sequence, "do not change application code" vs explicit read-only, material documents, NEEDS CARE, content-hash freshness without Git). `doctor` and `status` warn when it predates the installed contract, and `yallaflow agent refresh` updates it deliberately. Provider session files (`AGENTS.md`, `CLAUDE.md`) may carry a thin bootstrap block pointing to it (`yallaflow agent setup`); they never restate it. See [`upgrading-to-v0.3.9.md`](upgrading-to-v0.3.9.md).
 
 ## No baseline refresh
 
 A Brownfield baseline is the initial foundation. A second approved baseline is refused; normal work keeps memory current by reconfirming, superseding, or disputing facts.
+
+## Shared project memory (v0.3.10)
+
+In a [Shared Project](shared-projects.md) there is still exactly one canonical ledger and one writer, but writes happen in one place only: the integration branch.
+
+- **Memory base.** Every work item records the memory state it started from (`work/<id>/memory.yaml` `contextBase`): a content fingerprint of the ledger plus per-fact fingerprints, deterministic across clones and independent of Git.
+- **Work-local delta.** On a feature branch, `knowledge promote` stages a reviewed context candidate (`staged`) instead of writing the ledger. A relation to an existing fact records that fact's fingerprint as the agent saw it.
+- **Integration.** `yallaflow shared integrate`, on the integration branch:
+  - applies safe updates atomically and deterministically;
+  - records exact duplicates as additional origins;
+  - blocks updates whose referenced fact changed, or that compete with another work's update — never guessing.
+- **Provenance.** Fact → origin work and candidate → `memory.yaml` (actor, memory base, integration record).
+- **Purpose is not memory.** A discovery purpose and preservation intent (`purpose.yaml`) are work intent and never enter the ledger or its projection.

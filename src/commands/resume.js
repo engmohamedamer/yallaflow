@@ -1,8 +1,11 @@
 import path from 'node:path';
 import { exists } from '../utils/fs.js';
 import { findProjectRoot, getCurrentState, workspacePath } from '../core/workspace.js';
+import { describeWorkSharedMemory } from '../shared/memory.js';
+import { describePurpose, loadWorkPurpose } from '../purpose/store.js';
 import { readYaml } from '../core/yaml.js';
 import { loadWorkProgress } from '../core/progress.js';
+import { projectUnderstandingGate } from '../baseline/understanding.js';
 import { buildBehaviorGuidance } from '../behavior/guidance.js';
 import { latestVerification } from '../core/evidence.js';
 import { discoverGitState } from '../core/git.js';
@@ -44,7 +47,7 @@ export async function resumeCommand(requestedWorkId) {
   const stage = isActive ? state.stage : meta.status;
   const progress = await loadWorkProgress(root, meta);
   const delivery = await loadDeliverySummary(root, meta);
-  const guidance = buildBehaviorGuidance(meta, stage, progress.ledger, delivery);
+  const guidance = buildBehaviorGuidance(meta, stage, progress.ledger, delivery, { understanding: await projectUnderstandingGate(root) });
   const questions = await loadWorkQuestions(root, meta);
   const readiness = evaluateReadiness(meta, progress, questions);
   const verification = await latestVerification(root, meta.id);
@@ -82,6 +85,10 @@ export async function resumeCommand(requestedWorkId) {
   console.log(`\nVerification: ${verification ? (verification.success ? 'passed' : 'failed') : 'not recorded'}`);
   if (delivery.lines.length) console.log(`\n${delivery.lines.join('\n')}`);
   if (knowledgeRelevant) printKnowledge(knowledgeSummary);
+  const sharedLines = await describeWorkSharedMemory(root, meta);
+  if (sharedLines.length) console.log(`\n${sharedLines.join('\n')}`);
+  const lens = describePurpose(await loadWorkPurpose(root, meta.id));
+  if (lens) console.log(`Discovery lens: ${lens}`);
   printOpenQuestions(readiness.questions);
   await printProjectMemory(root, meta, knowledge.ledger);
   console.log(`Git: ${git.summary}`);
@@ -141,6 +148,7 @@ function printKnowledge(summary) {
   }
   console.log('\nProject knowledge: ✓ reviewed');
   console.log(`${summary.promoted.length} candidate${summary.promoted.length === 1 ? '' : 's'} promoted`);
+  if (summary.staged?.length) console.log(`${summary.staged.length} staged for shared project memory (integrated on the integration branch)`);
   console.log(`${summary.rejected.length} rejected`);
 }
 

@@ -12,6 +12,12 @@ Agent reasons.   YallaFlow governs.   Project memory persists.
 Understand → Decide → Change → Verify → Remember → Revalidate
 ```
 
+> **You describe the intent. YallaFlow supplies the project.**
+>
+> **Understand once. Share automatically. Revalidate precisely.**
+>
+> **Developers work with Git. Agents work with YallaFlow.**
+
 YallaFlow is built around one idea:
 
 > **The project — not the chat session — should be the durable unit of AI-assisted software development.**
@@ -196,6 +202,24 @@ A new session or a different coding agent can use durable state, Git, project co
 
 `yallaflow handoff` and `yallaflow resume` are designed around this recovery model. A fresh agent starts with `yallaflow brief` — a read-only, project-first orientation: what project memory says about the project (bounded per area), what knowledge NEEDS CARE (unresolved, disputed, or with changed/missing evidence), then the work and the next valid action — and `yallaflow agent setup codex|claude` gives Codex (`AGENTS.md`) or Claude (`CLAUDE.md`) a thin, versioned pointer to the one canonical contract, so a cold session finds YallaFlow on its own.
 
+### 8. Shared project intelligence
+
+The first meaningful use of YallaFlow on an existing repository establishes deep, evidence-backed project understanding **once**. If you just ask for real work ("Fix invoice totals."), the agent notices the project is not yet understood (`PROJECT_UNDERSTANDING_REQUIRED`), runs the Brownfield baseline, and continues your request after a human approves it. You can say what the understanding is *for* ("we will redesign the whole UI while preserving business behavior"). That becomes a discovery lens that deepens the relevant areas, kept as work intent and never as project truth.
+
+Then a whole team can reuse and evolve that understanding through ordinary Git:
+
+```text
+git pull → open your coding agent → describe the task → review → git push
+```
+
+- Nobody runs a join command, re-baselines, or types "use YallaFlow".
+- Work and source IDs are branch-safe, and every work item remembers the memory state it started from.
+- Knowledge learned on a feature branch is staged with the work and integrated into the one canonical project memory on the integration branch — atomically, deterministically, and never by silently overwriting a parallel change.
+- `yallaflow shared check` is the read-only CI gate.
+- The agent finishes with `yallaflow finish` and tells you, in plain language: *"Implemented and verified. Ready to push."*
+
+See [`docs/shared-projects.md`](docs/shared-projects.md).
+
 ---
 
 ## How it works
@@ -270,7 +294,7 @@ yallaflow agent setup codex     # or: yallaflow agent setup claude
 
 This adds a small managed block to `AGENTS.md` / `CLAUDE.md` (your own content is kept) that tells the agent to follow `.yallaflow/AGENT.md` and run `yallaflow brief` first. Commit `.yallaflow/` (and that file) with the project.
 
-Upgrading an existing workspace? Run `yallaflow upgrade status` — see [`docs/upgrading-to-v0.3.9.md`](docs/upgrading-to-v0.3.9.md).
+Upgrading an existing workspace? Run `yallaflow upgrade status` — see [`docs/upgrading-to-v0.3.10.md`](docs/upgrading-to-v0.3.10.md).
 
 For legacy repositories, install YallaFlow as an isolated CLI rather than adding it to the application's dependency tree.
 
@@ -376,14 +400,22 @@ Old knowledge is reviewed before it becomes current truth: legacy project contex
 │       ├── convergence.yaml      # append-only convergence assessments
 │       ├── impact.yaml           # change-impact assessments
 │       ├── reconciliation.yaml   # reconciliation work items only
+│       ├── purpose.yaml          # discovery purpose / preservation intent (work intent, never project truth)
+│       ├── memory.yaml           # Shared Project: memory base, staged knowledge, integration record
 │       └── evidence/
 ├── sources/
 │   └── SRC-0001/
 ├── decisions/
 ├── releases/
-└── state/
-    └── current.yaml
+├── state/
+│   └── current.yaml          # single-user active work
+├── .gitignore                # Shared Project: ignores local/
+└── local/                    # Shared Project: personal, never committed
+    ├── identity.yaml         #   this checkout's clone tag (branch-safe IDs)
+    └── state/current.yaml    #   this developer's active work
 ```
+
+In a Shared Project, work and sources use branch-safe IDs (`PF-K7M2QX4N8P-0001`, `SRC-K7M2QX4N8P-0001`); existing `PF-####`/`SRC-####` stay valid.
 
 The workspace is project-owned and intended to be versioned with the repository.
 
@@ -422,6 +454,9 @@ yallaflow baseline
 yallaflow context
 yallaflow knowledge
 yallaflow limitation
+yallaflow purpose
+yallaflow finish
+yallaflow shared
 yallaflow doctor
 ```
 
@@ -437,10 +472,11 @@ YallaFlow is deliberately **not**:
 - a replacement for Claude, Codex, or other coding agents
 - a prompt pack
 - a fixed specification template
-- a project-management system
+- a project-management system (no Jira, sprints, assignment, workload, or dashboards)
 - an automatic semantic truth engine
 - a knowledge graph or vector database
-- a multi-user collaboration platform — yet
+- a real-time collaboration server, cloud service, or background daemon — teams share through Git
+- a bot that commits, pushes, pulls, rebases, or merges for you
 
 YallaFlow does not call an LLM to decide what your project means. The coding agent does the semantic reasoning; YallaFlow governs the durable engineering state around that reasoning.
 
@@ -450,13 +486,12 @@ YallaFlow does not call an LLM to decide what your project means. The coding age
 
 YallaFlow is currently:
 
-- **single-user**
-- **local-first**
+- **local-first**, single-user by default
+- **Git-shared** for teams when a maintainer enables a Shared Project
 - **agent-agnostic**
-- **Git-friendly**
 - an **internal prerelease**
 
-Team mode, locking, multi-user ownership, and collaborative execution are intentionally deferred until the single-developer model is stable.
+Accounts, permissions, locking, real-time collaboration, and collaborative execution are intentionally out of scope.
 
 See [`docs/limitations.md`](docs/limitations.md) for explicit current boundaries.
 
@@ -471,7 +506,9 @@ Original Intent → Requirements / Acceptance Criteria → Specification → Imp
   → Verification → Convergence → Durable Project Knowledge → Next Agent Session
 ```
 
-Next: execution policies, multi-agent orchestration, and tracker intake remain separate future work, and team mode stays deliberately out of scope for now — see [`docs/roadmap.md`](docs/roadmap.md).
+v0.3.10 makes that understanding shared: one deep, reviewed project understanding per project, reused by every developer and agent through Git, and revalidated precisely where evidence changes.
+
+Next: execution policies, multi-agent orchestration, and tracker intake remain separate future work (v0.4) — see [`docs/roadmap.md`](docs/roadmap.md).
 
 ---
 
@@ -489,7 +526,7 @@ Those rules are intentionally simple. The value is that YallaFlow makes them dur
 
 ## Status
 
-Current version: **`0.3.9-internal.1` — Frictionless Project Onboarding & Context UX** (internal prerelease; `package.json` is `private`, nothing is published to npm). Upgrading: run `yallaflow upgrade status`, then see [`docs/upgrading-to-v0.3.9.md`](docs/upgrading-to-v0.3.9.md).
+Current version: **`0.3.10-internal.1` — Shared Project Intelligence** (internal prerelease; `package.json` is `private`, nothing is published to npm). Upgrading: run `yallaflow upgrade status`, then see [`docs/upgrading-to-v0.3.10.md`](docs/upgrading-to-v0.3.10.md).
 
 YallaFlow is under active development and its workspace/package contracts have not reached 1.0 stability yet.
 
@@ -504,6 +541,8 @@ YallaFlow is under active development and its workspace/package contracts have n
 | [`docs/cli.md`](docs/cli.md) | Complete CLI reference |
 | [`docs/guide.md`](docs/guide.md) | Feature and behavior guide |
 | [`docs/project-memory.md`](docs/project-memory.md) | Living project memory and artifact model |
+| [`docs/shared-projects.md`](docs/shared-projects.md) | Shared Projects: the team flow, and what YallaFlow does underneath |
+| [`docs/upgrading-to-v0.3.10.md`](docs/upgrading-to-v0.3.10.md) | Upgrading to v0.3.10: project understanding, discovery purpose, Shared Projects |
 | [`docs/upgrading-to-v0.3.9.md`](docs/upgrading-to-v0.3.9.md) | Upgrading to v0.3.9: inspect, Brownfield classification, project-first brief, updating YallaFlow |
 | [`docs/upgrading-to-v0.3.8.md`](docs/upgrading-to-v0.3.8.md) | Upgrading to v0.3.8: delivery convergence, agent bootstrap |
 | [`docs/upgrading-to-v0.3.7.md`](docs/upgrading-to-v0.3.7.md) | Upgrading to v0.3.7: `upgrade status`, reconciling legacy context |

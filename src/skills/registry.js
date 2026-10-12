@@ -13,7 +13,7 @@ function skill(definition) {
 export const SKILL_REGISTRY = Object.freeze([
   skill({
     id: 'context-discovery',
-    version: 1,
+    version: 2,
     capability: 'discover',
     title: 'Context Discovery',
     phase: 'discovery',
@@ -113,7 +113,7 @@ export const SKILL_REGISTRY = Object.freeze([
   }),
   skill({
     id: 'repository-baseline',
-    version: 1,
+    version: 2,
     capability: 'baseline',
     title: 'Repository Baseline Discovery',
     phase: 'discovery',

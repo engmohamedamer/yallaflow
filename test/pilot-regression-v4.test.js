@@ -159,6 +159,9 @@ test('Scenario 3 — production DB unavailable: runtime-unavailable limitation s
 
 test('Scenario 4 — new bounded task: no empty artifact directories; first verify creates evidence/', async () => {
   const root = await yaSchools();
+  // v0.3.10: a Brownfield project's application work starts from approved project
+  // understanding (the real pilot had an approved baseline).
+  await approveBaseline(root, [{ area: 'database', status: 'confirmed', summary: 'Replica configuration lives in common/config/db.php.', evidence: ['common/config/db.php'], source: 'repository' }]);
   const start = run(root, ['start', 'Show replica lag on the admin dashboard']);
   const workId = /Created (PF-\d+)/.exec(start.stdout)[1];
   run(root, ['route', workId, '--type', 'feature', '--scope', 'bounded', '--confidence', 'high', '--reason', 'Small UI addition.']);

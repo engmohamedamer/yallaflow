@@ -41,13 +41,13 @@ git add .yallaflow && git commit -m "Initialize YallaFlow"
 
 `.yallaflow/` is durable project state and is meant to be committed; `doctor` warns when it is neither tracked nor deliberately ignored. Review [`security.md`](security.md) before capturing files that might contain sensitive data.
 
-Upgrading an existing workspace: run `yallaflow upgrade status`, then see [`upgrading-to-v0.3.9.md`](upgrading-to-v0.3.9.md) (and [`upgrading-to-v0.3.8.md`](upgrading-to-v0.3.8.md), [`upgrading-to-v0.3.7.md`](upgrading-to-v0.3.7.md), [`upgrading-to-v0.3.6.md`](upgrading-to-v0.3.6.md) for earlier changes).
+Upgrading an existing workspace: run `yallaflow upgrade status`, then see [`upgrading-to-v0.3.10.md`](upgrading-to-v0.3.10.md) (and [`upgrading-to-v0.3.9.md`](upgrading-to-v0.3.9.md), [`upgrading-to-v0.3.8.md`](upgrading-to-v0.3.8.md), [`upgrading-to-v0.3.7.md`](upgrading-to-v0.3.7.md), [`upgrading-to-v0.3.6.md`](upgrading-to-v0.3.6.md) for earlier changes).
 
 ## Updating YallaFlow
 
 YallaFlow never checks for, downloads, or installs updates by itself — there is no self-update and no network version check. Updating is a deliberate, local sequence:
 
-1. **Install the target version.** Use the release tarball, or a checkout of the target tag (for example `git checkout v0.3.9-internal.1 && npm install && npm link`):
+1. **Install the target version.** Use the release tarball, or a checkout of the target tag (for example `git checkout v0.3.10-internal.1 && npm install && npm link`):
 
    ```bash
    npm install -g /path/to/yallaflow-<version>.tgz
@@ -82,3 +82,13 @@ YallaFlow never checks for, downloads, or installs updates by itself — there i
 6. **Commit** the updated `.yallaflow/` (and `AGENTS.md` / `CLAUDE.md`, if refreshed).
 
 Read the version's `upgrading-to-<version>.md` for behavior changes. Downgrades are not supported once a newer version has written to a workspace.
+
+## Shared Projects: one compatible version per team
+
+A Shared Project records the minimum YallaFlow it needs (`config.yaml` → `yallaflow.minimumVersion`). `brief`, `doctor`, `upgrade status`, and `shared check` report it:
+
+```text
+Installed: 0.3.10-internal.1 · Project requires: >= 0.3.10-internal.1
+```
+
+An older CLI stops before changing any project state; YallaFlow never downloads or self-updates. Install the same version on every developer machine and in CI (pin the tarball or tag in your CI job), and upgrade them together. Teammates need nothing else — no join command, no per-developer setup. See [`shared-projects.md`](shared-projects.md).

@@ -43,7 +43,7 @@ test('AC-102/AC-104: setup is idempotent and --dry-run writes nothing', async ()
   assert.deepEqual((await readdir(root)).filter((name) => name.endsWith('.md')), []);
   cli(root, ['agent', 'setup', 'claude']);
   const first = await read(root, 'CLAUDE.md');
-  assert.match(cli(root, ['agent', 'setup', 'claude']).stdout, /already has the current YallaFlow bootstrap block \(v1\); nothing changed/);
+  assert.match(cli(root, ['agent', 'setup', 'claude']).stdout, new RegExp(`already has the current YallaFlow bootstrap block \\(v${BOOTSTRAP_VERSION}\\); nothing changed`));
   assert.equal(await read(root, 'CLAUDE.md'), first);
 });
 
@@ -80,7 +80,7 @@ test('AC-105/AC-106: status reads state from markers; refresh updates only unmod
   assert.equal((await inspectBootstrap(root, codex)).state, 'outdated');
   assert.equal((await inspectBootstrap(root, claude)).state, 'newer');
   const doctor = cli(root, ['doctor']).stdout;
-  assert.match(doctor, /WARN AGENTS\.md agent bootstrap: outdated \(v0 → v1\)/);
+  assert.match(doctor, new RegExp(`WARN AGENTS\\.md agent bootstrap: outdated \\(v0 → v${BOOTSTRAP_VERSION}\\)`));
   assert.match(doctor, /WARN CLAUDE\.md agent bootstrap: written by a newer YallaFlow/);
   assert.match(doctor, /Workspace healthy\./);
   assert.match(cli(root, ['upgrade', 'plan']).stdout, /Refresh the AGENTS\.md agent bootstrap/);
@@ -89,7 +89,7 @@ test('AC-105/AC-106: status reads state from markers; refresh updates only unmod
   const refused = cli(root, ['agent', 'setup', 'claude'], false);
   assert.match(refused.stderr, /refusing to downgrade/);
 
-  assert.match(cli(root, ['agent', 'refresh', '--dry-run']).stdout, /AGENTS\.md: would update only the YallaFlow bootstrap block \(v0 → v1\)/);
+  assert.match(cli(root, ['agent', 'refresh', '--dry-run']).stdout, new RegExp(`AGENTS\\.md: would update only the YallaFlow bootstrap block \\(v0 → v${BOOTSTRAP_VERSION}\\)`));
   assert.match(await read(root, 'AGENTS.md'), /old pointer/, 'dry-run wrote nothing');
   const refresh = cli(root, ['agent', 'refresh']).stdout;
   assert.match(refresh, /AGENTS\.md: updated only the YallaFlow bootstrap block/);

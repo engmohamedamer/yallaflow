@@ -638,3 +638,81 @@ v0.3 integrations (tracker/source intake adapters, agent bootstrap) are expected
 | Provider bootstrap block | v1 |
 
 No workspace schema changed, and the inventory has no on-disk form.
+
+## Shared Project Intelligence (v0.3.10)
+
+Two connected goals: understand an existing project deeply once, and let a team reuse and evolve that understanding through ordinary Git work. Developers work with Git; agents work with YallaFlow. Everything below is opt-in (`yallaflow shared enable`); a single-user workspace behaves exactly as in v0.3.9.
+
+**Project understanding** (`src/baseline/understanding.js`). `assessProjectUnderstanding` derives a state mechanically from durable state:
+
+| State | Meaning |
+|---|---|
+| `PROJECT_UNDERSTANDING_ESTABLISHED` | current facts exist, or the baseline is approved |
+| `…_IN_PROGRESS` / `…_AWAITING_REVIEW` | a baseline exists but is not yet approved |
+| `PROJECT_UNDERSTANDING_REQUIRED` | Brownfield (recorded kind or inventory) and nothing yet |
+| `GREENFIELD_UNDERSTANDING_FROM_INTENT` | never scanned |
+
+`brief`, `start`, `route`, `guide`, and the direct work commands print the notice.
+
+**First-use write gate.** `projectUnderstandingGate` applies when the recorded kind is Brownfield and understanding is not established.
+- `evaluateAdvance` (the one transition resolver behind `advance`/`guide`) refuses any transition into or out of an application-writing stage (`WRITE_STAGES`); `reopenWork` refuses reopening into one.
+- `buildBehaviorGuidance` closes write authorization (`guide`, `handoff`, `resume`, `status`).
+- The NEXT VALID ACTION is the next baseline step, so the gate reuses the baseline lifecycle and is no second lifecycle.
+- Greenfield (recorded kind) is never gated, and read-only and diagnosis stages are unaffected.
+
+**Discovery purpose** (`src/purpose/store.js`). This is work intent in `work/<id>/purpose.yaml`:
+- mode: `bootstrap`, `intent`, or `freshness`;
+- objective, preservation intent, and focus;
+- history.
+
+It is never read by the ledger, projection, or baseline approval. `CORE_COVERAGE` (`src/baseline/constants.js`) lists the canonical core a first baseline covers; it is agent guidance, not a semantic grader.
+
+**Identifiers** (`src/core/ids.js`). These are the one definition of path-backed global IDs:
+- legacy `PF-####` and `SRC-####`;
+- branch-safe `PF-<tag>-####` and `SRC-<tag>-####`, where the tag is 10 Crockford-base32 characters (50 bits) drawn from `crypto.randomBytes`.
+
+`nextScopedId` is pure. In a Shared Project, `allocateCheckoutId` (`src/shared/identity.js`) takes the larger of the on-disk sequence and the sequence remembered in `local/identity.yaml`, so a branch switch or a stash never reuses a number. A copied checkout (path fingerprint mismatch) gets a new tag. CTX IDs stay sequential and are allocated only by the single canonical writer.
+
+**Personal state.** `currentStatePath` resolves to `local/state/current.yaml` in a Shared Project, which is gitignored by `.yallaflow/.gitignore`. A fresh clone simply has no active work.
+
+**Memory base, delta, and integration** (`src/shared/memory.js`, `src/shared/fingerprint.js`):
+
+- **Fingerprints.** `ledgerFingerprint` is the SHA-256 of canonical JSON of the schema and facts (`updatedAt` excluded). `factFingerprint` normalizes `origin`/`origins`.
+- **Memory base.** `work/<id>/memory.yaml` holds `contextBase` (ledger fingerprint, per-fact fingerprints of non-superseded facts, schema, informational Git commit and branch, time), `createdBy` (Git actor, clone tag, branch), `staged[]`, and `integrations[]`.
+- **Staging.** In a Shared Project, `promoteKnowledge` stages context candidates. Knowledge status `staged` is a completed disposition, and the relation carries `factFingerprint` captured at proposal. Staging re-checks the fingerprint, so a fact that changed between proposal and promotion is refused. ADRs are promoted directly because their path is scoped by work ID.
+- **Plan.** `planIntegration(ledger, pending)` is pure. It classifies each staged candidate: `already-applied`, `introduce`, `duplicate` (same area + `sameStatement`), `supersede`/`reconfirm`/`dispute`, or `blocked`. Blocked codes are `missing-fact`, `changed-since-base`, `competing-update`, `no-base`, and `missing-staging`.
+- **Integration.** `integrateSharedMemory` runs on the integration branch only:
+  - one `mutateContextLedger` call (atomic);
+  - timestamp = the latest `stagedAt` applied (deterministic);
+  - then bookkeeping: knowledge `staged → promoted` plus the `memory.yaml` integration record;
+  - a retry derives already-applied actions from the ledger itself.
+- **Guard.** `mutateContextLedger` calls `assertCanonicalMemoryWritable`, so every canonical write (baseline approval, reconciliation apply, adoption, integration) is refused off the integration branch in a Shared Project.
+
+**Integrity** (`src/shared/integrity.js`). `doctor` failures:
+- incompatible version;
+- config schema;
+- legacy IDs created after `enabledAt`;
+- committed or ignored-incorrectly local state;
+- shared state under `local/`;
+- malformed memory records and actors;
+- an impossible memory base;
+- staged deltas referring to missing CTX facts;
+- promoted context knowledge without an integration record.
+
+Pending deltas that need reconciliation are doctor warnings and `shared check` failures.
+
+**Git.** `src/shared/git.js` runs local, read-only probes: `symbolic-ref`, `ls-files`, `check-ignore`, `config`, `status`. YallaFlow never commits, pushes, pulls, fetches, rebases, or merges, and has no network access.
+
+**Versions.**
+
+| Item | Version | Why |
+|---|---|---|
+| Package | `0.3.10-internal.1` | |
+| Agent Contract | **v6** | automatic orientation, project understanding first, purpose-aware discovery, Shared Project sequence, finish protocol and developer language |
+| Provider bootstrap block | **v2** | orient before the first request without being asked; finish with `yallaflow finish` |
+| Workspace config | v1 single-user; **v2 only when shared** | a v0.3.9 `doctor` fails on v2 instead of calling a shared workspace healthy |
+| Context ledger schema | v1/v2, unchanged | integration uses existing operations; duplicates use v2 multi-origin |
+| Knowledge ledger | **v2 only when needed** | the frozen v0.3.9 reader rejects `staged`, `stagedAt`, and `relation.factFingerprint` (strict validation), so a ledger holding them is written as v2, which v0.3.9 refuses rather than misreads; `writeKnowledgeLedger` picks the lowest representable version and never downgrades; all other ledgers stay v1 |
+| Source schema | v2, unchanged | only the ID form differs |
+| Skill Registry | **v6** | pins never covered instruction bytes (v0.3.9 had already edited `repository-baseline` under v5). `src/skills/instructions.js` fixes every released instruction version by SHA-256; registry v1–v5 → instruction v1 (archived v0.3.9 bytes), v6 → `repository-baseline`/`context-discovery` v2; `yallaflow skill --work` serves the pinned version; `doctor` fails on in-place edits |
+| New records | `memory.yaml` v1, `purpose.yaml` v1, `local/identity.yaml` v1 | |

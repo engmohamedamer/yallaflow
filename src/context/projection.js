@@ -5,6 +5,7 @@ import { CONTEXT_HEADINGS, CONTEXT_TARGETS } from '../knowledge/constants.js';
 import { formatEvidence } from './evidence.js';
 import { factOrigins } from './ledger.js';
 import { CONTEXT_AREAS } from './constants.js';
+import { WORK_ID_SOURCE } from '../core/ids.js';
 
 // Markdown projection of the canonical ledger. Each durable document owns exactly one
 // managed block, rewritten deterministically from the ledger's current (and disputed)
@@ -15,7 +16,7 @@ import { CONTEXT_AREAS } from './constants.js';
 export const BLOCK_BEGIN = '<!-- yallaflow-context:begin -->';
 export const BLOCK_END = '<!-- yallaflow-context:end -->';
 const FACT_MARKER = /<!-- yallaflow-fact:(CTX-\d+) -->/g;
-const LEGACY_MARKER = /<!-- yallaflow-(baseline|knowledge):(PF-\d+):((?:BF|K)-\d+) -->/g;
+const LEGACY_MARKER = new RegExp(`<!-- yallaflow-(baseline|knowledge):(${WORK_ID_SOURCE}):((?:BF|K)-\\d+) -->`, 'g');
 
 export function contextDocPath(root, area) {
   return path.join(workspacePath(root), CONTEXT_TARGETS[area]);

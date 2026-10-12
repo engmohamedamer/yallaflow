@@ -1,8 +1,11 @@
 import path from 'node:path';
 import { exists } from '../utils/fs.js';
 import { findProjectRoot, getCurrentState, workspacePath } from '../core/workspace.js';
+import { describeWorkSharedMemory } from '../shared/memory.js';
+import { describePurpose, loadWorkPurpose } from '../purpose/store.js';
 import { readYaml } from '../core/yaml.js';
 import { loadWorkProgress } from '../core/progress.js';
+import { projectUnderstandingGate } from '../baseline/understanding.js';
 import { buildBehaviorGuidance } from '../behavior/guidance.js';
 import { evaluateReadiness } from '../behavior/readiness.js';
 import { loadWorkQuestions } from '../questions/store.js';
@@ -56,7 +59,7 @@ export async function handoffCommand(requestedWorkId) {
 
   const progress = await loadWorkProgress(root, meta);
   const delivery = await loadDeliverySummary(root, meta);
-  const guidance = buildBehaviorGuidance(meta, stage, progress.ledger, delivery);
+  const guidance = buildBehaviorGuidance(meta, stage, progress.ledger, delivery, { understanding: await projectUnderstandingGate(root) });
   const questions = await loadWorkQuestions(root, meta);
   const readiness = evaluateReadiness(meta, progress, questions);
   const verification = await latestVerification(root, meta.id);
@@ -102,6 +105,9 @@ export async function handoffCommand(requestedWorkId) {
   if (delivery.lines.length) console.log(delivery.lines.join('\n'));
   const knowledgeSummary = summarizeKnowledge(knowledge.ledger);
   console.log(`Knowledge review: ${knowledgeSummary.reviewStatus}`);
+  for (const line of await describeWorkSharedMemory(root, meta)) console.log(line);
+  const lens = describePurpose(await loadWorkPurpose(root, meta.id));
+  if (lens) console.log(`Discovery lens: ${lens}`);
   await printProjectMemory(root, meta, knowledge.ledger);
   console.log(`\nGit: ${git.summary}`);
 

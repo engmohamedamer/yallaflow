@@ -6,6 +6,8 @@ import { readYaml, writeYaml } from './yaml.js';
 import { KNOWLEDGE_POLICY_VERSION } from '../knowledge/constants.js';
 import { renderAgentContractFile } from '../agent/contract.js';
 import { classifyProject, inventoryRepository } from '../inventory/inventory.js';
+import { isWorkId, nextScopedId } from './ids.js';
+import { allocateCheckoutId, localDirPath } from '../shared/identity.js';
 
 export const WORKSPACE_DIR = '.yallaflow';
 // Directories `init` creates empty and fills lazily. Git does not store empty
@@ -99,12 +101,12 @@ export async function initWorkspace(root, name, kind, mode = 'adaptive') {
   await writeYaml(path.join(base, 'state', 'current.yaml'), state);
   await writeText(path.join(base, 'PROJECT.md'), projectTemplate(name, kind));
   await writeText(path.join(base, 'context', 'architecture.md'), '# Architecture\n\n> YallaFlow-maintained project knowledge. Update only with durable facts.\n');
-  await writeText(path.join(base, 'context', 'tech-stack.md'), '# Tech Stack\n\n');
-  await writeText(path.join(base, 'context', 'database.md'), '# Database\n\n');
-  await writeText(path.join(base, 'context', 'integrations.md'), '# Integrations\n\n');
-  await writeText(path.join(base, 'context', 'environments.md'), '# Environments\n\n');
-  await writeText(path.join(base, 'context', 'conventions.md'), '# Engineering Conventions\n\n');
-  await writeText(path.join(base, 'context', 'business-rules.md'), '# Business Rules\n\n');
+  await writeText(path.join(base, 'context', 'tech-stack.md'), '# Tech Stack\n');
+  await writeText(path.join(base, 'context', 'database.md'), '# Database\n');
+  await writeText(path.join(base, 'context', 'integrations.md'), '# Integrations\n');
+  await writeText(path.join(base, 'context', 'environments.md'), '# Environments\n');
+  await writeText(path.join(base, 'context', 'conventions.md'), '# Engineering Conventions\n');
+  await writeText(path.join(base, 'context', 'business-rules.md'), '# Business Rules\n');
   await writeText(path.join(base, 'AGENT.md'), renderAgentContractFile());
 }
 
@@ -112,17 +114,48 @@ function projectTemplate(name, kind) {
   return `# ${name}\n\n## Project Kind\n\n${kind}\n\n## Purpose\n\n> Describe what the system does and who it serves.\n\n## Success Criteria\n\n> Add durable product-level success criteria here.\n\n## Core Modules\n\n> Populated progressively by bootstrap and completed work.\n`;
 }
 
+// Single-user workspaces keep the sequential PF-#### form. A Shared Project (v0.3.10)
+// allocates branch-safe PF-<clone tag>-#### IDs, so two developers starting from the
+// same Git base never create the same work directory (see core/ids.js).
+// In a Shared Project this allocates (reserves) the ID for this checkout.
 export async function nextWorkId(root) {
-  const workDir = path.join(workspacePath(root), 'work');
-  if (!await exists(workDir)) return 'PF-0001';
-  const entries = await readdir(workDir, { withFileTypes: true });
-  const ids = entries
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => /^PF-(\d+)$/.exec(entry.name)?.[1])
-    .filter(Boolean)
-    .map(Number);
-  const next = (ids.length ? Math.max(...ids) : 0) + 1;
-  return `PF-${String(next).padStart(4, '0')}`;
+  return allocateScopedId(root, 'PF', await directoryNames(path.join(workspacePath(root), 'work')));
+}
+
+export async function allocateScopedId(root, prefix, existingNames) {
+  return await isSharedWorkspace(root) ? allocateCheckoutId(root, prefix, existingNames, nextScopedId) : nextScopedId(prefix, existingNames);
+}
+
+export async function directoryNames(dir) {
+  if (!await exists(dir)) return [];
+  return (await readdir(dir, { withFileTypes: true })).filter((entry) => entry.isDirectory()).map((entry) => entry.name);
+}
+
+// Shared Project Mode is opt-in and explicit (`yallaflow shared enable`). Never throws:
+// an unreadable config is reported by doctor, and reads here fall back to single-user.
+export async function isSharedWorkspace(root) {
+  try {
+    return (await readYaml(path.join(workspacePath(root), 'config.yaml')))?.shared?.enabled === true;
+  } catch {
+    return false;
+  }
+}
+
+// Where this developer's active-work focus lives: the tracked state/current.yaml for a
+// single-user workspace, the gitignored local/state/current.yaml in a Shared Project —
+// one developer's focus is never another developer's project state.
+export async function currentStatePath(root) {
+  return await isSharedWorkspace(root)
+    ? path.join(localDirPath(root), 'state', 'current.yaml')
+    : path.join(workspacePath(root), 'state', 'current.yaml');
+}
+
+export function emptyCurrentState(now = new Date().toISOString()) {
+  return { schemaVersion: 1, activeWork: null, stage: null, updatedAt: now };
+}
+
+export async function writeCurrentState(root, state) {
+  await writeYaml(await currentStatePath(root), state);
 }
 
 export function workSections(type, scope = null) {
@@ -133,15 +166,19 @@ export function workSections(type, scope = null) {
       ? '## Investigation Question\n\n## Evidence\n\n## Findings\n\n## Conclusion\n\n'
       : '## Requirement\n\n## Business Rules\n\n## Acceptance Criteria\n\n';
 
-  return `## Intake\n\n## Known Facts\n\n## Open Questions\n\n${specific}## Discovery\n\n## Specification / Expected Behavior\n\n## Implementation Plan\n\n## Verification Evidence\n\n## Decisions / Rulings\n\n## Knowledge Updates\n\n## Result\n\n`;
+  return `## Intake\n\n## Known Facts\n\n## Open Questions\n\n${specific}## Discovery\n\n## Specification / Expected Behavior\n\n## Implementation Plan\n\n## Verification Evidence\n\n## Decisions / Rulings\n\n## Knowledge Updates\n\n## Result\n`;
 }
 
 function architecturalFeatureSections() {
-  return `## Intake\n\n## Known Facts\n\n## Open Questions\n\nStructured material questions are authoritative in \`questions.yaml\`.\n\n## Confirmed Decisions\n\n## Discovery\n\n## Architecture / Technical Decisions\n\nClassify only relevant decisions as confirmed, proposed, unresolved, or not applicable.\n\n## Design\n\n## Specification\n\n### Goal and Scope\n\n### Actors and Permissions\n\n### Functional Requirements and Business Rules\n\n### Workflows and Lifecycle\n\n### Data and Integrations\n\n### Validation and Error Behavior\n\n### Security and Privacy\n\n### UI / Screens\n\n### Acceptance Criteria\n\n### Unresolved Items\n\n## Implementation Plan\n\n## Verification Evidence\n\n## Decisions / Rulings\n\n## Knowledge Updates\n\n## Result\n\n`;
+  return `## Intake\n\n## Known Facts\n\n## Open Questions\n\nStructured material questions are authoritative in \`questions.yaml\`.\n\n## Confirmed Decisions\n\n## Discovery\n\n## Architecture / Technical Decisions\n\nClassify only relevant decisions as confirmed, proposed, unresolved, or not applicable.\n\n## Design\n\n## Specification\n\n### Goal and Scope\n\n### Actors and Permissions\n\n### Functional Requirements and Business Rules\n\n### Workflows and Lifecycle\n\n### Data and Integrations\n\n### Validation and Error Behavior\n\n### Security and Privacy\n\n### UI / Screens\n\n### Acceptance Criteria\n\n### Unresolved Items\n\n## Implementation Plan\n\n## Verification Evidence\n\n## Decisions / Rulings\n\n## Knowledge Updates\n\n## Result\n`;
 }
 
+// A fresh clone of a Shared Project has no local focus yet: that is "no active work",
+// never an error. A single-user workspace still requires its tracked state file.
 export async function getCurrentState(root) {
-  return readYaml(path.join(workspacePath(root), 'state', 'current.yaml'));
+  const file = await currentStatePath(root);
+  if (await isSharedWorkspace(root) && !await exists(file)) return emptyCurrentState(null);
+  return readYaml(file);
 }
 
 export async function getConfig(root) {
@@ -160,7 +197,7 @@ export async function listWork(root) {
   const entries = await readdir(workDir, { withFileTypes: true });
   const items = [];
   for (const entry of entries) {
-    if (!entry.isDirectory() || !entry.name.startsWith('PF-')) continue;
+    if (!entry.isDirectory() || !isWorkId(entry.name)) continue;
     const metaFile = path.join(workDir, entry.name, 'meta.yaml');
     if (await exists(metaFile)) items.push(await readYaml(metaFile));
   }

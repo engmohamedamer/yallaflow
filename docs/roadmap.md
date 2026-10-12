@@ -178,6 +178,34 @@ Dogfooding on an APD-shaped repository showed that v0.3.8's `init` called it Gre
 
 Deliberately not in scope: `inspect --json`, persisted inventory, schema changes, ledger risk/importance fields, LLM calls, embeddings or search in the CLI, automatic baseline approval, self-update or network checks, team mode, v0.4 execution work.
 
+### v0.3.10 — Shared Project Intelligence
+
+> Understand once. Share automatically. Revalidate precisely. Developers work with Git; agents work with YallaFlow.
+
+Two connected goals: understand an existing project deeply once, and let a whole team reuse and evolve that understanding through ordinary Git work, without learning YallaFlow internals.
+
+- First-use project bootstrap. An existing repository without approved understanding reports `PROJECT_UNDERSTANDING_REQUIRED` in `brief`, `start`, `route`, and `guide`. A write gate enforces it: no Brownfield work item enters an application-writing stage until the baseline is approved. The agent establishes the baseline, then continues the developer's request; the developer never has to ask for it, only to approve. Greenfield is never scanned or gated.
+- Skill Registry v6: immutable, hash-pinned skill instruction versions, so pinned work always resolves the exact instructions it was created with. Knowledge ledger schema v2 is used only for Shared Project shapes.
+- Deep canonical core baseline coverage, plus a **purpose-aware discovery lens**: `baseline start --objective/--preserve/--focus` and `purpose set|show`. There are three discovery modes: bootstrap, intent, and freshness. Purpose and preservation intent are work intent in `purpose.yaml` and never project truth.
+- **Shared Project Mode** (`yallaflow shared enable|status|check|integrate`). A maintainer enables it once, explicitly, and nothing is committed. Teammates need no join command; project truth is shared and personal runtime state lives in the gitignored `.yallaflow/local/`.
+- **Branch-safe IDs**:
+  - `PF-<clone tag>-####` and `SRC-<clone tag>-####`, with the per-checkout sequence remembered across branch switches.
+  - `CTX-####` is allocated only at integration.
+  - Legacy IDs stay readable.
+- **Memory base**: a content fingerprint of the ledger plus per-fact fingerprints in `work/<id>/memory.yaml`, deterministic and Git-free.
+- **Work-local memory deltas**. On a feature branch, reviewed knowledge is `staged` with its work item; canonical memory is never written there.
+- **One canonical integration boundary** on the integration branch:
+  - atomic, deterministic, and idempotent;
+  - exact duplicates merged mechanically;
+  - changed referenced facts and competing updates block and are never guessed;
+  - provenance through origin, actor, and memory base.
+- **Finish protocol**: `yallaflow finish` gives developer-facing outcome language ("Ready to push."), with the audit kept in `--verbose`.
+- **Provider-neutral, read-only CI gate**: `yallaflow shared check` (no network, no LLM).
+- **Version compatibility**: `yallaflow.minimumVersion`. An incompatible CLI stops before any state change, with no self-update.
+- Doctor: Shared Project integrity. Agent Contract v6 and bootstrap v2 (automatic orientation).
+
+Deliberately not in scope: hosted or cloud YallaFlow, accounts, RBAC, invitations, real-time locks, a daemon, automatic commit/push/pull/rebase/merge, tracker integration, sprints, task assignment, dashboards, LLM calls or embeddings in the CLI, semantic auto-resolution, and v0.4 execution.
+
 ## v0.4 — Execution
 - Execution contracts
 - Reviewed/native/multi-agent policies

@@ -5,6 +5,7 @@ import { workspacePath } from '../core/workspace.js';
 import { gitHead } from '../core/git.js';
 import { deriveProvenance, validateEvidenceEntry } from './evidence.js';
 import { writeContextProjection } from './projection.js';
+import { assertCanonicalMemoryWritable } from '../shared/config.js';
 import {
   CONFIDENCE_LEVELS,
   CONTEXT_AREAS,
@@ -18,6 +19,7 @@ import {
   SUPPORTED_CONTEXT_SCHEMAS,
   V1_HISTORY_ACTIONS
 } from './constants.js';
+import { isWorkId } from '../core/ids.js';
 
 // The one canonical, structured source of truth for durable project knowledge.
 // Markdown under context/ and PROJECT.md is a projection of this ledger's current
@@ -100,6 +102,7 @@ export function currentFacts(ledger) {
 // `minSchema` lets a deliberate path (reconciliation apply) require schema v2; any
 // mutation whose result needs v2 upgrades the ledger to v2 regardless.
 export async function mutateContextLedger(root, mutator, now = new Date().toISOString(), { minSchema = CONTEXT_SCHEMA_V1 } = {}) {
+  await assertCanonicalMemoryWritable(root);
   const { ledger } = await loadContextLedger(root);
   const { result, touchedAreas } = await applyToDraft(ledger, mutator, { now, head: gitHead(root), minSchema });
   ledger.updatedAt = now;
@@ -477,7 +480,7 @@ function validateProvenance(fact, version) {
 }
 
 function isOriginObject(origin) {
-  return Boolean(origin) && typeof origin === 'object' && !Array.isArray(origin) && /^PF-\d+$/.test(origin.workId ?? '');
+  return Boolean(origin) && typeof origin === 'object' && !Array.isArray(origin) && isWorkId(origin.workId);
 }
 
 function validateOrigin(origin, label, allowed) {
@@ -487,7 +490,7 @@ function validateOrigin(origin, label, allowed) {
   if (origin.reconciliation !== undefined) {
     const ref = origin.reconciliation;
     if (!ref || typeof ref !== 'object' || Array.isArray(ref) || Object.keys(ref).some((field) => !RECONCILIATION_REF_FIELDS.has(field)) ||
-      !/^PF-\d+$/.test(ref.workId ?? '') || !/^RC-\d{4,}$/.test(ref.candidate ?? '')) {
+      !isWorkId(ref.workId) || !/^RC-\d{4,}$/.test(ref.candidate ?? '')) {
       errors.push(`${label} has a malformed reconciliation reference.`);
     }
   }

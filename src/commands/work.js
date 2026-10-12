@@ -1,4 +1,5 @@
-import { findProjectRoot } from '../core/workspace.js';
+import { findProjectRoot, getConfig } from '../core/workspace.js';
+import { understandingNotice } from '../baseline/understanding.js';
 import { createRoutedWork } from '../behavior/routing.js';
 import { resolveWorkflowPolicy } from '../behavior/policy.js';
 
@@ -32,4 +33,6 @@ export async function newWorkCommand(type, title, scope, commandName = type) {
   if (meta.readOnly) console.log('Safety: read-only; application code changes are not authorized by this workflow.');
   console.log(`Path: .yallaflow/work/${meta.id}/work.md`);
   console.log(`Next: yallaflow guide ${meta.id}`);
+  const notice = await understandingNotice(root, { kind: (await getConfig(root)).project?.kind, workMeta: meta });
+  if (notice.length) console.log(`\n${notice.join('\n')}`);
 }

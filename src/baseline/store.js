@@ -2,7 +2,7 @@ import path from 'node:path';
 import { appendFile } from 'node:fs/promises';
 import { exists, writeText } from '../utils/fs.js';
 import { readYaml, writeYaml } from '../core/yaml.js';
-import { listWork, nextWorkId, workspacePath } from '../core/workspace.js';
+import { getCurrentState, listWork, nextWorkId, workspacePath, writeCurrentState } from '../core/workspace.js';
 import { loadWorkProgress } from '../core/progress.js';
 import { appliedTransition, loadContextLedger, mutateContextLedger } from '../context/ledger.js';
 import { normalizeEvidenceRefs } from '../context/evidence.js';
@@ -10,6 +10,7 @@ import { nextLimitationId, normalizeLimitation, sameStatement, validateLimitatio
 import { invalidateGateIfApproved, setGateStatus } from '../reviews/store.js';
 import { KNOWLEDGE_POLICY_VERSION } from '../knowledge/constants.js';
 import { REGISTRY_VERSION } from '../skills/constants.js';
+import { recordWorkMemoryBase } from '../shared/memory.js';
 import { BASELINE_AREAS, BASELINE_FACT_SOURCES, BASELINE_FACT_STATUSES, BASELINE_SCHEMA_VERSION } from './constants.js';
 
 function baselineFilePath(root, workId) {
@@ -71,7 +72,8 @@ export async function startBaseline(root, now = new Date().toISOString()) {
   await writeYaml(path.join(dir, 'meta.yaml'), meta);
   await writeText(path.join(dir, 'work.md'), baselineWorkTemplate(meta));
   await writeText(path.join(dir, 'progress.md'), `# Work Ledger — ${id}\n\nCreated: ${now}\nKind: brownfield baseline discovery\n\n`);
-  await writeYaml(path.join(workspacePath(root), 'state', 'current.yaml'), {
+  await recordWorkMemoryBase(root, id, now);
+  await writeCurrentState(root, {
     schemaVersion: 1, activeWork: id, stage: 'INTAKE', updatedAt: now
   });
   return { meta, created: true };
@@ -198,10 +200,9 @@ export async function approveBaseline(root, workId, note, now = new Date().toISO
   meta.status = 'DONE';
   meta.updatedAt = now;
   await writeYaml(metaFile, meta);
-  const stateFile = path.join(workspacePath(root), 'state', 'current.yaml');
-  const state = await readYaml(stateFile);
+  const state = await getCurrentState(root);
   if (state.activeWork === workId) {
-    await writeYaml(stateFile, { schemaVersion: 1, activeWork: null, stage: null, updatedAt: now });
+    await writeCurrentState(root, { schemaVersion: 1, activeWork: null, stage: null, updatedAt: now });
   }
   await appendFile(path.join(workspacePath(root), 'work', workId, 'progress.md'), `- ${now} Baseline approved and promoted (${ledger.facts.length} fact(s)).\n`, 'utf8');
   return { meta, ledger };

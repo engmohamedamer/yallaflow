@@ -253,7 +253,7 @@ test('a real v0.3.7 (v3) managed block upgrades to the current contract in place
 });
 
 test('v0.3.9: agent contract v5 teaches Brownfield onboarding, the app-code vs read-only distinction, documents, NEEDS CARE, and Git-free freshness', async () => {
-  assert.equal(AGENT_CONTRACT_VERSION, 5);
+  assert.ok(AGENT_CONTRACT_VERSION >= 5);
   const body = agentContractBody();
   assert.match(body, /## Brownfield onboarding sequence/);
   assert.doesNotMatch(body, /## Brownfield baseline sequence/);
@@ -279,7 +279,7 @@ test('v0.3.9: a real v0.3.8 (v4) managed block is reported outdated, never rewri
   assert.match(v4, /^<!-- yallaflow-agent-contract:begin version=4 /);
   const extra = '\n## Project notes\n\nKeep this text.\n';
   const { root, file } = await workspaceWithAgent(`${v4}${extra}`);
-  assert.deepEqual(await inspectAgentContract(root), { state: 'outdated', installed: 5, version: 4 });
+  assert.deepEqual(await inspectAgentContract(root), { state: 'outdated', installed: AGENT_CONTRACT_VERSION, version: 4 });
   for (const args of [['brief'], ['status'], ['doctor'], ['upgrade', 'status'], ['upgrade', 'plan'], ['agent', 'status'], ['inspect']]) run(root, args);
   assert.equal(await readFile(file, 'utf8'), `${v4}${extra}`, 'read commands never rewrite AGENT.md');
   run(root, ['agent', 'refresh']);

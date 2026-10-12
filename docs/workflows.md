@@ -381,3 +381,39 @@ yallaflow agent refresh                               # after upgrading YallaFlo
 ```
 
 Your existing `AGENTS.md`/`CLAUDE.md` content is kept byte-for-byte; the block is appended and only the block is ever updated. The block holds the session-start sequence and a pointer — never a copy of the YallaFlow rules. Commit it with the project.
+
+## First request on an existing project
+
+The developer asks for real work ("Fix invoice totals.") in a Brownfield repository that has no approved project understanding yet. `brief` (run automatically by the agent) and `start` report `PROJECT_UNDERSTANDING_REQUIRED`, and the agent handles it without being asked:
+
+```bash
+yallaflow start "Fix invoice totals"            # preserved; reports PROJECT_UNDERSTANDING_REQUIRED
+yallaflow baseline start --objective "Fix invoice totals; later redesign the invoice UI" --preserve "invoice calculation behavior"
+# agent: Brownfield discovery across the canonical core, deeper where the lens points
+yallaflow checkpoint PF-0002 --skill repository-baseline --complete --summary "..."
+yallaflow baseline draft PF-0002 --file baseline.json
+# human: yallaflow baseline approve PF-0002
+yallaflow route PF-0001 --type bug --scope bounded --confidence high --reason "..." --title "Invoice totals"
+# … the normal bug workflow continues from approved project memory
+```
+
+## Shared Project (team)
+
+```text
+Maintainer (once):  init → baseline (human approves) → agent setup claude|codex → shared enable → commit, push
+Every developer:    git pull → open the coding agent → describe the task → review → git push
+```
+
+Underneath, on a developer's feature branch:
+
+```bash
+yallaflow brief                                  # automatic orientation (shared project, memory, versions)
+yallaflow start "Partial refunds"                # → PF-K7M2QX4N8P-0001 (branch-safe); memory base recorded
+# … normal workflow …
+yallaflow knowledge propose PF-K7M2QX4N8P-0001 --kind business-rule --source implementation-runtime \
+  --summary "Refunds may be partial." --evidence backend/refunds/refunds.js
+yallaflow knowledge promote PF-K7M2QX4N8P-0001 --candidate K-001   # staged — canonical memory untouched on this branch
+yallaflow finish PF-K7M2QX4N8P-0001                   # "Implemented and verified. … Ready to push."
+```
+
+CI on the pull request: `yallaflow shared check`. After merge, on the integration branch: `yallaflow shared integrate`, then commit. When a parallel change touched the same fact, `finish`/`shared check` say so, and the agent revalidates (reject the stale candidate with a reason, propose again against the current fact) — shared knowledge is never overwritten silently. See [`shared-projects.md`](shared-projects.md).

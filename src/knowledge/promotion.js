@@ -1,6 +1,11 @@
 import path from 'node:path';
 import { exists, readText, writeText } from '../utils/fs.js';
-import { workspacePath } from '../core/workspace.js';
+import { isSharedWorkspace, workspacePath } from '../core/workspace.js';
+import { integrateSharedMemory, stageCandidateDelta } from '../shared/memory.js';
+import { loadSharedPolicy } from '../shared/config.js';
+import { currentBranch } from '../shared/git.js';
+import { factFingerprint } from '../shared/fingerprint.js';
+import { findFact } from '../context/ledger.js';
 import { listVerificationRuns } from '../core/evidence.js';
 import { appliedTransition, loadContextLedger, mutateContextLedger, validateContextLedger } from '../context/ledger.js';
 import { writeContextProjection } from '../context/projection.js';
@@ -22,6 +27,8 @@ export async function promoteKnowledge(root, workId, candidateId, now = new Date
   await assertKnowledgeReviewAllowed(root, meta, candidate);
   if (candidate.status === 'rejected') throw new Error(`Candidate ${candidateId} was rejected and cannot be promoted.`);
   if (candidate.status === 'promoted') throw new Error(`Candidate ${candidateId} is already promoted to ${candidate.target}.`);
+  if (candidate.kind !== 'decision' && await isSharedWorkspace(root)) return stageKnowledge(root, meta, loaded, candidate, now);
+  if (candidate.status === 'staged') throw new Error(`Candidate ${candidateId} is staged for shared project memory; \`yallaflow shared integrate\` integrates it.`);
 
   let target;
   if (candidate.kind === 'decision') {
@@ -37,6 +44,54 @@ export async function promoteKnowledge(root, workId, candidateId, now = new Date
   updateReviewStatus(loaded.ledger, now);
   await writeKnowledgeLedger(root, workId, loaded.ledger);
   return { meta, candidate, target, ledger: loaded.ledger };
+}
+
+// Shared Project (v0.3.10): a reviewed context candidate becomes part of the work
+// item's memory delta ('staged') instead of being written into canonical memory from
+// whatever branch the work is on. On the integration branch it is integrated at once,
+// through the one integration boundary; elsewhere it integrates after the work is
+// merged. ADRs (decisions/ADR-<work>-<K>.md) are already branch-safe and are promoted
+// directly.
+async function stageKnowledge(root, meta, loaded, candidate, now) {
+  const workId = meta.id;
+  if (!CONTEXT_TARGETS[candidate.kind]) throw new Error(`No project-memory target exists for knowledge kind ${candidate.kind}.`);
+  if (candidate.status === 'proposed') {
+    const relation = candidate.relation;
+    if (relation) {
+      const evidence = await normalizeEvidenceRefs(root, candidate.evidence, { workId, verificationRuns: await listVerificationRuns(root, workId) });
+      if (!hasResolvableEvidence(evidence)) {
+        throw new Error(
+          `Candidate ${candidate.id} ${relation.type} ${relation.factId} but cites no resolvable evidence. ` +
+          'Knowledge evolution requires at least one existing repository path, runtime:<observation>, verification:V-###, or user:<confirmation> reference.'
+        );
+      }
+      if (!relation.factFingerprint) {
+        throw new Error(`Candidate ${candidate.id} was proposed before this project became shared, so a parallel change to ${relation.factId} cannot be ruled out. Reject it and propose it again against the current fact. Nothing was changed.`);
+      }
+      const { ledger } = await loadContextLedger(root);
+      const fact = findFact(ledger, relation.factId);
+      if (!fact || factFingerprint(fact) !== relation.factFingerprint) {
+        throw new Error(
+          `${relation.factId} changed after ${candidate.id} was proposed${fact?.state === 'superseded' ? ` (superseded by ${fact.supersededBy})` : ''}. ` +
+          `Revalidate against the current fact: reject ${candidate.id} (yallaflow knowledge reject ${workId} --candidate ${candidate.id} --reason "...") and propose again. Nothing was changed.`
+        );
+      }
+    }
+    await stageCandidateDelta(root, meta, candidate, now);
+    candidate.status = 'staged';
+    candidate.stagedAt = now;
+    updateReviewStatus(loaded.ledger, now);
+    await writeKnowledgeLedger(root, workId, loaded.ledger);
+  }
+  const policy = await loadSharedPolicy(root);
+  if (currentBranch(root) === policy.integrationBranch) {
+    await integrateSharedMemory(root, { onlyWorkIds: [workId] });
+    const reloaded = await loadWorkKnowledge(root, meta);
+    const current = requireCandidate(reloaded.ledger, candidate.id);
+    if (current.status === 'promoted') return { meta, candidate: current, target: current.target, ledger: reloaded.ledger, integrated: true };
+    return { meta, candidate: current, target: CONTEXT_TARGETS[current.kind], ledger: reloaded.ledger, staged: true, blocked: true };
+  }
+  return { meta, candidate, target: CONTEXT_TARGETS[candidate.kind], ledger: loaded.ledger, staged: true };
 }
 
 // Context knowledge enters (or evolves) the canonical project-context ledger, whose

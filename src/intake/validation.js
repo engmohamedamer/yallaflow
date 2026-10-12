@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { CONTENT_AVAILABILITY, LEGACY_SOURCE_SCHEMA_VERSION, SOURCE_SCHEMA_VERSION, SOURCE_TYPES } from './constants.js';
+import { STORED_SOURCE_ID_PATTERN, STORED_WORK_ID_PATTERN } from '../core/ids.js';
 
 const V1_RECORD_FIELDS = new Set([
   'schemaVersion', 'id', 'sourceType', 'sourceName', 'sourceRef',
@@ -46,7 +47,7 @@ export function validateSourceRecord(record, label = '<unknown>') {
 
 function validateV1Record(record, label) {
   rejectUnknownFields(record, V1_RECORD_FIELDS, `source record ${label}`);
-  if (!/^SRC-\d{4,}$/.test(record.id)) throw new Error(`Invalid source ID ${JSON.stringify(record.id)}.`);
+  if (!STORED_SOURCE_ID_PATTERN.test(record.id)) throw new Error(`Invalid source ID ${JSON.stringify(record.id)}.`);
   if (!SOURCE_TYPES.includes(record.sourceType)) {
     throw new Error(`Source record ${label} has unsupported sourceType ${JSON.stringify(record.sourceType)}.`);
   }
@@ -71,7 +72,7 @@ function validateV1Record(record, label) {
 
 function validateV2Record(record, label) {
   rejectUnknownFields(record, V2_RECORD_FIELDS, `source record ${label}`);
-  if (!/^SRC-\d{4,}$/.test(record.id)) throw new Error(`Invalid source ID ${JSON.stringify(record.id)}.`);
+  if (!STORED_SOURCE_ID_PATTERN.test(record.id)) throw new Error(`Invalid source ID ${JSON.stringify(record.id)}.`);
   if (!SOURCE_TYPES.includes(record.sourceType)) {
     throw new Error(`Source record ${label} has unsupported sourceType ${JSON.stringify(record.sourceType)}.`);
   }
@@ -131,7 +132,7 @@ function assertSha256(value, label) {
 }
 
 function assertLinkedWork(linkedWork, label) {
-  if (!Array.isArray(linkedWork) || linkedWork.some((id) => !/^PF-\d{4,}$/.test(id))) {
+  if (!Array.isArray(linkedWork) || linkedWork.some((id) => !STORED_WORK_ID_PATTERN.test(id))) {
     throw new Error(`Source record ${label} linkedWork must be an array of work IDs.`);
   }
 }

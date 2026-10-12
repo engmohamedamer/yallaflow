@@ -17,6 +17,7 @@ import {
 import { activeCriteria, bareRef, resolveDeliveryCriteria } from './requirements.js';
 import { convergenceImpactBoundary, loadWorkImpacts, pendingImpact, pendingImpactMessage } from './impact.js';
 import { convergenceRequired } from './policy.js';
+import { WORK_ID_SOURCE, isWorkId } from '../core/ids.js';
 
 // Delivery convergence (v0.3.8): does the delivered implementation match the approved
 // intent? Distinct from verification (do the recorded technical checks pass?) and
@@ -38,7 +39,7 @@ const ASSESSMENT_FIELDS = new Set(['id', 'recordedAt', 'stage', 'basis', 'summar
 const FINDING_FIELDS = new Set(['criterion', 'status', 'reason', 'evidence']);
 const UNREQUESTED_FIELDS = new Set(['id', 'disposition', 'summary', 'reason', 'evidence']);
 const INPUT_FIELDS = new Set(['summary', 'findings', 'unrequested']);
-const CONVERGENCE_EVIDENCE = /^convergence:\s*(PF-\d+)\/(CV-\d{3,})$/i;
+const CONVERGENCE_EVIDENCE = new RegExp(`^convergence:\\s*(${WORK_ID_SOURCE})/(CV-\\d{3,})$`, 'i');
 
 export function convergenceFilePath(root, workId) {
   return path.join(workspacePath(root), 'work', workId, 'convergence.yaml');
@@ -116,7 +117,7 @@ function evidenceErrors(evidence, label) {
   const errors = [];
   for (const entry of evidence) {
     if (entry?.type === 'convergence') {
-      if (!/^PF-\d+$/.test(entry.workId ?? '') || !ASSESSMENT_ID.test(entry.assessmentId ?? '')) errors.push(`${label} has malformed convergence evidence`);
+      if (!isWorkId(entry.workId) || !ASSESSMENT_ID.test(entry.assessmentId ?? '')) errors.push(`${label} has malformed convergence evidence`);
       continue;
     }
     const problem = validateEvidenceEntry(entry);

@@ -12,6 +12,7 @@ import {
   RECONCILIATION_SCHEMA_VERSION,
   TARGETED_ACTIONS
 } from './constants.js';
+import { isWorkId } from '../core/ids.js';
 
 // Pure model of a reconciliation plan (work/<id>/reconciliation.yaml): structure,
 // approval fingerprint, and the relationship graph the Agent declared. No filesystem.
@@ -53,7 +54,7 @@ export function validatePlanStructure(plan) {
     ids.add(candidate.id);
 
     const origin = candidate.origin;
-    if (!origin || typeof origin !== 'object' || !/^PF-\d+$/.test(origin.workId ?? '') ||
+    if (!origin || typeof origin !== 'object' || !isWorkId(origin.workId) ||
       Boolean(origin.baselineFactId) === Boolean(origin.candidateId) ||
       Object.keys(origin).some((field) => !ORIGIN_FIELDS.has(field))) {
       errors.push(`${label} is missing its origin (work item plus exactly one baselineFactId or candidateId).`);

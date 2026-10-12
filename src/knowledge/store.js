@@ -9,11 +9,16 @@ import { usesArchitecturalReadiness } from '../core/workflows.js';
 import { loadContextLedger, findFact } from '../context/ledger.js';
 import { CONFIDENCE_LEVELS, PROVENANCE_VALUES, RELATION_TYPES } from '../context/constants.js';
 import { loadWorkLimitations, sameStatement } from '../limitations/store.js';
+import { isSharedWorkspace } from '../core/workspace.js';
+import { factFingerprint } from '../shared/fingerprint.js';
 import {
   CANDIDATE_STATUSES,
   KNOWLEDGE_KINDS,
   KNOWLEDGE_POLICY_VERSION,
+  KNOWLEDGE_SCHEMA_V1,
+  KNOWLEDGE_SCHEMA_V2,
   KNOWLEDGE_SCHEMA_VERSION,
+  SUPPORTED_KNOWLEDGE_SCHEMAS,
   KNOWLEDGE_SOURCES,
   REVIEW_STATUSES
 } from './constants.js';
@@ -23,9 +28,13 @@ const CANDIDATE_FIELDS = new Set([
   'id', 'kind', 'source', 'summary', 'evidence', 'status', 'createdAt', 'decisionDetails',
   'promotedAt', 'target', 'rejectedAt', 'rejectionReason',
   // v0.3.6 living project memory (all optional; absent on earlier candidates):
-  'confidence', 'provenance', 'relation', 'factId'
+  'confidence', 'provenance', 'relation', 'factId',
+  // v0.3.10 Shared Projects: when a reviewed context candidate was staged as a memory delta.
+  'stagedAt'
 ]);
-const RELATION_FIELDS = new Set(['type', 'factId']);
+// factFingerprint (v0.3.10, Shared Projects only): the related fact exactly as the Agent
+// saw it when proposing, so integration can tell whether it changed in parallel.
+const RELATION_FIELDS = new Set(['type', 'factId', 'factFingerprint']);
 const DECISION_FIELDS = new Set(['context', 'decision', 'reason', 'costIfWrong', 'sourceRuling']);
 const POLICY_FIELDS = new Set(['version', 'reviewRequired']);
 
@@ -131,6 +140,9 @@ export async function rejectKnowledge(root, workId, candidateId, reason, now = n
   const candidate = requireCandidate(loaded.ledger, candidateId);
   await assertKnowledgeReviewAllowed(root, meta, candidate);
   if (candidate.status === 'promoted') throw new Error(`Candidate ${candidateId} is already promoted and cannot be rejected.`);
+  // A staged candidate (Shared Projects) can still be withdrawn before integration —
+  // the reconciliation path when the fact it relates to changed in parallel.
+  if (candidate.status === 'staged') delete candidate.stagedAt;
   if (candidate.status === 'rejected') throw new Error(`Candidate ${candidateId} is already rejected.`);
   candidate.status = 'rejected';
   candidate.rejectedAt = now;
@@ -157,11 +169,13 @@ export async function reviewKnowledgeNone(root, workId, now = new Date().toISOSt
 export function summarizeKnowledge(ledger) {
   const proposed = ledger.candidates.filter((candidate) => candidate.status === 'proposed');
   const promoted = ledger.candidates.filter((candidate) => candidate.status === 'promoted');
+  const staged = ledger.candidates.filter((candidate) => candidate.status === 'staged');
   const rejected = ledger.candidates.filter((candidate) => candidate.status === 'rejected');
   return {
     reviewStatus: ledger.reviewStatus,
     proposed,
     promoted,
+    staged,
     rejected,
     totalCount: ledger.candidates.length
   };
@@ -219,9 +233,16 @@ export function updateReviewStatus(ledger, now) {
   ledger.updatedAt = now;
 }
 
+// Written at the lowest schema that can represent it, never below what it already is.
 export async function writeKnowledgeLedger(root, workId, ledger) {
+  if (requiresKnowledgeSchemaV2(ledger) && ledger.version < KNOWLEDGE_SCHEMA_V2) ledger.version = KNOWLEDGE_SCHEMA_V2;
   validateKnowledgeLedger(ledger, workId);
   await writeYaml(knowledgeFilePath(root, workId), ledger);
+}
+
+// Shapes the frozen v0.3.9 reader cannot read (see knowledge/constants.js).
+export function requiresKnowledgeSchemaV2(ledger) {
+  return (ledger.candidates ?? []).some((candidate) => candidate?.status === 'staged' || candidate?.stagedAt !== undefined || candidate?.relation?.factFingerprint !== undefined);
 }
 
 export async function loadWorkMeta(root, workId) {
@@ -235,8 +256,13 @@ export function validateKnowledgeLedger(ledger, workId = '<unknown>') {
     throw new Error(`Knowledge ledger for ${workId} must be an object.`);
   }
   rejectUnknownFields(ledger, LEDGER_FIELDS, `knowledge ledger for ${workId}`);
-  if (ledger.version !== KNOWLEDGE_SCHEMA_VERSION) {
-    throw new Error(`Knowledge ledger for ${workId} must use version ${KNOWLEDGE_SCHEMA_VERSION}.`);
+  if (!SUPPORTED_KNOWLEDGE_SCHEMAS.includes(ledger.version)) {
+    throw new Error(Number.isInteger(ledger.version) && ledger.version > KNOWLEDGE_SCHEMA_VERSION
+      ? `Knowledge ledger for ${workId} uses schema v${ledger.version}, written by a newer YallaFlow; this CLI supports v${SUPPORTED_KNOWLEDGE_SCHEMAS.join(' and v')}. Upgrade YallaFlow — nothing was read or changed.`
+      : `Knowledge ledger for ${workId} must use version ${SUPPORTED_KNOWLEDGE_SCHEMAS.join(' or ')}.`);
+  }
+  if (ledger.version === KNOWLEDGE_SCHEMA_V1 && Array.isArray(ledger.candidates) && requiresKnowledgeSchemaV2(ledger)) {
+    throw new Error(`Knowledge ledger for ${workId} holds Shared Project fields (staged, stagedAt, relation.factFingerprint) that require knowledge schema v2, but declares v1.`);
   }
   if (!REVIEW_STATUSES.includes(ledger.reviewStatus)) {
     throw new Error(`Knowledge ledger for ${workId} has unsupported reviewStatus ${JSON.stringify(ledger.reviewStatus)}.`);
@@ -266,7 +292,7 @@ export function validateKnowledgeLedger(ledger, workId = '<unknown>') {
 
 function emptyKnowledgeLedger() {
   return {
-    version: KNOWLEDGE_SCHEMA_VERSION,
+    version: KNOWLEDGE_SCHEMA_V1,
     reviewStatus: 'pending',
     candidates: [],
     updatedAt: null
@@ -332,7 +358,7 @@ async function resolveRelation(root, input) {
   if (!allowed.includes(fact.state)) {
     throw new Error(`--${type} ${factId}: ${factId} is ${fact.state}${fact.supersededBy ? ` (superseded by ${fact.supersededBy})` : ''} and cannot be ${type === 'supersedes' ? 'superseded' : type === 'reconfirms' ? 'reconfirmed' : 'disputed'}.`);
   }
-  return { type, factId, area: fact.area };
+  return { type, factId, area: fact.area, ...(await isSharedWorkspace(root) ? { factFingerprint: factFingerprint(fact) } : {}) };
 }
 
 async function assertNotDiscoveryLimitation(root, workId, summary) {
@@ -375,7 +401,8 @@ function validateCandidate(candidate) {
     const relation = candidate.relation;
     if (!relation || typeof relation !== 'object' || Array.isArray(relation)) throw new Error(`Knowledge candidate ${candidate.id} has an invalid relation.`);
     rejectUnknownFields(relation, RELATION_FIELDS, `relation of knowledge candidate ${candidate.id}`);
-    if (!RELATION_TYPES.includes(relation.type) || !/^CTX-\d{4,}$/.test(relation.factId ?? '')) {
+    if (!RELATION_TYPES.includes(relation.type) || !/^CTX-\d{4,}$/.test(relation.factId ?? '') ||
+      (relation.factFingerprint !== undefined && !/^[0-9a-f]{16}$/.test(relation.factFingerprint))) {
       throw new Error(`Knowledge candidate ${candidate.id} has an invalid relation.`);
     }
     if (candidate.kind === 'decision') throw new Error(`Decision candidate ${candidate.id} cannot relate to a project context fact.`);
@@ -383,7 +410,11 @@ function validateCandidate(candidate) {
   if (candidate.factId !== undefined && (candidate.status !== 'promoted' || !/^CTX-\d{4,}$/.test(candidate.factId))) {
     throw new Error(`Knowledge candidate ${candidate.id} has an invalid factId.`);
   }
-  if (candidate.status === 'proposed' && ['promotedAt', 'target', 'rejectedAt', 'rejectionReason'].some((field) => candidate[field] !== undefined)) {
+  if (candidate.status === 'staged' && (!isNonEmptyString(candidate.stagedAt) || ['promotedAt', 'target', 'factId', 'rejectedAt', 'rejectionReason'].some((field) => candidate[field] !== undefined))) {
+    throw new Error(`Staged candidate ${candidate.id} requires stagedAt and cannot contain promotion or rejection fields.`);
+  }
+  if (candidate.kind === 'decision' && candidate.status === 'staged') throw new Error(`Decision candidate ${candidate.id} cannot be staged; ADRs are promoted directly.`);
+  if (candidate.status === 'proposed' && ['promotedAt', 'target', 'rejectedAt', 'rejectionReason', 'stagedAt'].some((field) => candidate[field] !== undefined)) {
     throw new Error(`Proposed candidate ${candidate.id} cannot contain disposition fields.`);
   }
   if (candidate.status === 'promoted' && ['rejectedAt', 'rejectionReason'].some((field) => candidate[field] !== undefined)) {

@@ -2,7 +2,8 @@ import path from 'node:path';
 import { readdir, rm, writeFile } from 'node:fs/promises';
 import { ensureDir, exists, readText } from '../utils/fs.js';
 import { readYaml, writeYaml } from './yaml.js';
-import { workspacePath } from './workspace.js';
+import { allocateScopedId, directoryNames, workspacePath } from './workspace.js';
+import { isSourceId } from './ids.js';
 import { SOURCE_SCHEMA_VERSION } from '../intake/constants.js';
 import { assertWithinDirectory, validateSourceRecord } from '../intake/validation.js';
 
@@ -20,17 +21,9 @@ export function sourceRecordPath(root, sourceId) {
 
 // Scans the sources/ directory the same way nextWorkId scans work/. Never creates
 // sources/ merely by computing the next ID — an absent directory just means SRC-0001.
+// A Shared Project allocates branch-safe SRC-<clone tag>-#### IDs (core/ids.js).
 export async function nextSourceId(root) {
-  const dir = sourcesDirPath(root);
-  if (!await exists(dir)) return 'SRC-0001';
-  const entries = await readdir(dir, { withFileTypes: true });
-  const ids = entries
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => /^SRC-(\d+)$/.exec(entry.name)?.[1])
-    .filter(Boolean)
-    .map(Number);
-  const next = (ids.length ? Math.max(...ids) : 0) + 1;
-  return `SRC-${String(next).padStart(4, '0')}`;
+  return allocateScopedId(root, 'SRC', await directoryNames(sourcesDirPath(root)));
 }
 
 export async function findSourceByChecksum(root, sha256) {
@@ -113,7 +106,7 @@ export async function listSources(root) {
   const entries = await readdir(dir, { withFileTypes: true });
   const records = [];
   for (const entry of entries) {
-    if (!entry.isDirectory() || !entry.name.startsWith('SRC-')) continue;
+    if (!entry.isDirectory() || !isSourceId(entry.name)) continue;
     const file = path.join(dir, entry.name, 'source.json');
     if (await exists(file)) {
       const record = await readYaml(file);

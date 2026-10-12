@@ -1,18 +1,28 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { findProjectRoot, loadWorkMetaOrThrow } from '../core/workspace.js';
+import { describePurpose, loadWorkPurpose, setWorkPurpose } from '../purpose/store.js';
+import { CORE_COVERAGE } from '../baseline/constants.js';
 import { approveBaseline, baselineNextStep, draftBaseline, feedbackBaseline, findBaselineWork, loadBaseline, startBaseline, summarizeBaseline } from '../baseline/store.js';
 
-export async function baselineStartCommand() {
+// `purpose` (v0.3.10, optional): what the understanding is for — a discovery lens on
+// top of the canonical core baseline, stored as work intent (purpose.yaml), never as a
+// project fact.
+export async function baselineStartCommand(purpose) {
   const root = await findProjectRoot();
   if (!root) throw new Error('No .yallaflow workspace found. Run `yallaflow init` first.');
   const { meta, created } = await startBaseline(root);
+  if (purpose) await setWorkPurpose(root, meta.id, { ...purpose, mode: 'bootstrap' });
+  const lens = describePurpose(await loadWorkPurpose(root, meta.id));
   if (!created) {
     console.log(`${meta.id} — existing baseline work item (created earlier).`);
+    if (lens) console.log(`Discovery lens: ${lens}`);
     console.log(`Run \`yallaflow baseline status ${meta.id}\` to see its current state.`);
     return;
   }
   console.log(`${meta.id} — Repository Baseline started (read-only: no application code changes).`);
+  if (lens) console.log(`Discovery lens: ${lens} (work intent — never promoted as project truth)`);
+  console.log(`Canonical core coverage: ${CORE_COVERAGE.join(', ')} — plus extra depth where the discovery lens points.`);
   console.log('Next: complete repository discovery (follow `yallaflow skill repository-baseline`), then:');
   console.log('  yallaflow inspect   (bounded repository inventory: manifests, framework hints, documentation candidates)');
   console.log(`  yallaflow intake add ${meta.id} <document>   (material documents; read extracted text with \`yallaflow source show SRC-#### --content\`)`);

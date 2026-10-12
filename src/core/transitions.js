@@ -4,7 +4,7 @@ import { exists } from '../utils/fs.js';
 import { readYaml, writeYaml } from './yaml.js';
 import { latestVerification, listVerificationRuns } from './evidence.js';
 import { nextStageForWork, requiredSkillForStage, stageForSkill, workflowStagesFor } from './workflows.js';
-import { getConfig, workspacePath } from './workspace.js';
+import { getConfig, getCurrentState, workspacePath, writeCurrentState } from './workspace.js';
 import { incompleteImplementationSkills, loadWorkProgress, progressFilePath } from './progress.js';
 import { loadWorkKnowledge, writeKnowledgeLedger } from '../knowledge/store.js';
 import { loadWorkQuestions, summarizeQuestions } from '../questions/store.js';
@@ -17,6 +17,7 @@ import { CONVERGENCE_SKILL } from '../delivery/constants.js';
 import { convergenceRequired } from '../delivery/policy.js';
 import { loadWorkImpacts, pendingImpact } from '../delivery/impact.js';
 import { evaluateConvergence } from '../delivery/convergence.js';
+import { projectUnderstandingGate } from '../baseline/understanding.js';
 
 // Skills whose revision/reopening invalidates completed work later in the chain (see
 // core/progress.js's CASCADE_ORDER and reopenWork below). Kept in one place so the
@@ -26,8 +27,7 @@ const REOPEN_TARGETS = Object.freeze(['implementation', 'verification', 'review'
 
 export async function advanceActiveWork(root, requestedWorkId) {
   const base = workspacePath(root);
-  const stateFile = path.join(base, 'state', 'current.yaml');
-  const state = await readYaml(stateFile);
+  const state = await getCurrentState(root);
   const workId = requestedWorkId ?? state.activeWork;
   if (!workId) throw new Error('No active work item.');
 
@@ -60,7 +60,7 @@ export async function advanceActiveWork(root, requestedWorkId) {
     state.stage = next;
     state.updatedAt = now;
     if (next === 'DONE') state.activeWork = null;
-    await writeYaml(stateFile, state);
+    await writeCurrentState(root, state);
   }
   await appendFile(path.join(workDir, 'progress.md'), `- ${now} Stage: ${current} → ${next}\n`, 'utf8');
   return { id: meta.id, from: current, to: next, type: meta.type };
@@ -83,6 +83,19 @@ export async function evaluateAdvance(root, meta, current, { mutate = false } = 
   if (meta.reconciliation) {
     const text = `${id} is a legacy-context reconciliation; it completes only through \`yallaflow context reconcile apply\` once every candidate is reconciled.`;
     return blocked(text, text, `yallaflow context reconcile status ${id}`);
+  }
+  // First-use Brownfield gate (v0.3.10): no application-writing stage — entering it or
+  // working through it — until project understanding is approved.
+  const writeStages = WRITE_STAGES[workflow] ?? [];
+  if (writeStages.includes(next) || writeStages.includes(current)) {
+    const gate = await projectUnderstandingGate(root);
+    if (gate) {
+      return blocked(
+        `Cannot advance from ${current} to ${next}: ${gate.reason}.\n\nThe Agent establishes it through the Brownfield baseline (a human approves it), then continues this work. Nothing was changed.`,
+        gate.blocker,
+        gate.action
+      );
+    }
   }
 
   const progress = await loadWorkProgress(root, meta);
@@ -237,12 +250,11 @@ export async function reconcileStageAfterCheckpointRevision(root, meta, skillId,
   await invalidateAffectedGates(root, meta.id, skillId, reason ?? `${skillId} revised`, now);
 
   if (!needsStageCorrection) return null;
-  const stateFile = path.join(base, 'state', 'current.yaml');
-  const state = await readYaml(stateFile);
+  const state = await getCurrentState(root);
   if (state.activeWork === meta.id) {
     state.stage = targetStage;
     state.updatedAt = now;
-    await writeYaml(stateFile, state);
+    await writeCurrentState(root, state);
   }
   await appendFile(path.join(base, 'work', meta.id, 'progress.md'), `- ${now} Stage corrected: ${from} → ${targetStage}\n`, 'utf8');
   return { from, to: targetStage };
@@ -280,6 +292,10 @@ export async function reopenWork(root, workId, input, now = new Date().toISOStri
   const targetStage = { implementation: writeStage, verification: 'VERIFICATION', review: 'VERIFICATION' }[input.toStage];
   if (!targetStage || !workflowStagesFor(meta).includes(targetStage)) {
     throw new Error(`${workId}'s workflow (${workflow}) has no ${input.toStage} stage to reopen into.`);
+  }
+  if (targetStage === writeStage) {
+    const gate = await projectUnderstandingGate(root);
+    if (gate) throw new Error(`Cannot reopen ${workId} into ${targetStage}: ${gate.reason}.\n\nNext: ${gate.action}\n\nNo files were changed.`);
   }
 
   const contract = resolveBehaviorContract(meta);
@@ -336,7 +352,7 @@ export async function reopenWork(root, workId, input, now = new Date().toISOStri
   }];
   await writeYaml(metaFile, meta);
 
-  await writeYaml(path.join(base, 'state', 'current.yaml'), {
+  await writeCurrentState(root, {
     schemaVersion: 1, activeWork: workId, stage: targetStage, updatedAt: now
   });
   await appendFile(path.join(base, 'work', workId, 'progress.md'), `- ${now} Reopened: DONE → ${targetStage} (${reason})\n`, 'utf8');
