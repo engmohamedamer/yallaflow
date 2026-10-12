@@ -285,6 +285,8 @@ yallaflow handoff PF-0004
 
 A cold agent session should find YallaFlow without the developer explaining it again. `.yallaflow/AGENT.md` remains the one behavioral contract; provider files only point to it.
 
+`yallaflow init` installs both blocks (v0.3.10-internal.3); the explicit commands remain for recovery and manual control:
+
 ```bash
 yallaflow agent setup codex     # repository-root AGENTS.md
 yallaflow agent setup claude    # repository-root CLAUDE.md (imports @.yallaflow/AGENT.md)
@@ -292,7 +294,7 @@ yallaflow agent status
 yallaflow agent refresh
 ```
 
-`agent setup` appends one versioned, hash-checked block holding the session-start sequence — confirm `.yallaflow/` exists, follow AGENT.md, run `yallaflow brief`, `resume`/`handoff` the active work, `guide` for the next valid action, follow the pinned contract, record through YallaFlow commands. Existing file content is kept byte-for-byte. Setup is idempotent and supports `--dry-run`; a hand-edited block is refused unless `--preserve-existing`; a block from a newer YallaFlow is never downgraded. `agent status`, `brief`, `upgrade plan`, and `doctor` (as a warning) report outdated or edited blocks; `agent refresh` updates only unmodified, outdated ones. No provider file is written unless you run `agent setup`.
+`agent setup` appends one versioned, hash-checked block holding the session-start sequence — confirm `.yallaflow/` exists, follow AGENT.md, run `yallaflow brief`, `resume`/`handoff` the active work, `guide` for the next valid action, follow the pinned contract, record through YallaFlow commands. Existing file content is kept byte-for-byte. Setup is idempotent and supports `--dry-run`; a hand-edited block is refused unless `--preserve-existing`; a block from a newer YallaFlow is never downgraded. `agent status`, `brief`, `upgrade plan`, and `doctor` (as a warning) report outdated or edited blocks; `agent refresh` updates only unmodified, outdated ones. Provider files are written only by `init` and `agent setup`, through the same installer: `init` refuses (writing nothing) when a block is hand-edited, newer, or malformed, and rolls back on failure.
 
 ## Brownfield bootstrap and baseline
 
@@ -313,7 +315,7 @@ yallaflow checkpoint PF-0001 --skill repository-baseline --complete --summary "R
 yallaflow baseline draft PF-0001 --file baseline.json
 yallaflow baseline status PF-0001
 yallaflow baseline show PF-0001
-yallaflow baseline approve PF-0001 --note "Looks complete."
+yallaflow baseline approve PF-0001 --note "Approved by Dana in the agent session: 'Looks complete.'"   # the developer's explicit approval, recorded by the agent
 yallaflow baseline feedback PF-0001 --changes-requested --note "Add database evidence."
 ```
 

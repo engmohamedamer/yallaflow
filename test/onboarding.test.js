@@ -100,7 +100,11 @@ test('AC-006: init classifies an APD-shaped tree as brownfield and writes a labe
   const root = await apdFixture();
   const init = run(root, ['init']).stdout;
   assert.match(init, /Project kind: brownfield \(8 recognized manifest\(s\) with 9 recognized source file\(s\)\)/);
-  assert.match(init, /Next: run `yallaflow inspect` .* then `yallaflow baseline start`/);
+  // v0.3.10-internal.3: init installs the agent bootstrap and points to the agent; the
+  // manual inventory/baseline commands remain listed.
+  assert.match(init, /Agent bootstrap: CLAUDE\.md created, AGENTS\.md created — each points to \.yallaflow\/AGENT\.md/);
+  assert.match(init, /Next: open Claude Code or Codex in this repository and describe the work/);
+  assert.match(init, /Existing project: before changing application code the agent establishes an evidence-backed project understanding and asks you to approve it\. \(Manual: `yallaflow inspect`, `yallaflow baseline start`\.\)/);
   const techStack = await readFile(path.join(workspacePath(root), 'context', 'tech-stack.md'), 'utf8');
   assert.match(techStack, /## Nested manifest framework hints\n\n> Init-time deterministic bootstrap snapshot of manifest declarations — NOT approved project memory\./);
   assert.match(techStack, /- Angular 16 \(@angular\/core \^16\.2\.12\) — frontend-beneficiary\/package\.json/);
@@ -131,7 +135,8 @@ test('AC-009/AC-011: APD-shaped onboarding through the existing baseline lifecyc
   const root = await apdFixture();
   run(root, ['init']);
   let brief = run(root, ['brief']).stdout;
-  assert.match(brief, /Project memory: no canonical ledger yet\nRepository: brownfield by inventory — 8 manifest\(s\), 9 recognized source file\(s\), 5 documentation candidate\(s\) \(details: yallaflow inspect\)/);
+  // 7 = the fixture's 5 documents + CLAUDE.md and AGENTS.md, which `init` now creates (v0.3.10-internal.3).
+  assert.match(brief, /Project memory: no canonical ledger yet\nRepository: brownfield by inventory — 8 manifest\(s\), 9 recognized source file\(s\), 7 documentation candidate\(s\) \(details: yallaflow inspect\)/);
   assert.match(brief, /Primary next concern: no project memory yet — establish an evidence-backed Brownfield baseline .*\nNext: yallaflow baseline start/);
   assert.match(run(root, ['inspect']).stdout, /\nNext: yallaflow baseline start\n/);
 
@@ -161,10 +166,11 @@ test('AC-009/AC-011: APD-shaped onboarding through the existing baseline lifecyc
     limitations: [{ type: 'not-inspected', area: 'architecture', summary: 'docs/APD_LLD.pdf was not read in this session.', reason: 'Fixture bytes are not a real PDF.' }]
   });
   const draft = run(root, ['baseline', 'draft', 'PF-0001', '--file', draftFile]).stdout;
-  assert.match(draft, /a human reviews the draft .* The Agent never approves a baseline\./);
+  assert.match(draft, /Next: present the draft to the developer \(yallaflow baseline show PF-0001\) and ask them to review it\. Only after they explicitly approve, record it: .*The Agent never approves on its own judgment\./);
   brief = run(root, ['brief']).stdout;
-  assert.match(brief, /Baseline: baseline PF-0001 draft \(4 fact\(s\)\) awaits human review — a human approves it; the Agent never does/);
-  assert.match(brief, /Next: yallaflow baseline show PF-0001 {3}\(then, by a human: yallaflow baseline approve PF-0001/);
+  // v0.3.10-internal.3: conversational approval — the developer approves; the Agent only records it.
+  assert.match(brief, /Baseline: baseline PF-0001 draft \(4 fact\(s\)\) awaits the developer's review — present it and ask; approval is theirs, never the Agent's own judgment/);
+  assert.match(brief, /Next: yallaflow baseline show PF-0001 {3}\(after the developer explicitly approves: yallaflow baseline approve PF-0001 --note "<their approval>"/);
   assert.match(run(root, ['baseline', 'status']).stdout, /Baseline status: draft/, 'nothing approves automatically');
   assert.match(run(root, ['context', 'status']).stdout, /No canonical project-context ledger yet/, 'an unapproved draft is not project memory');
 
@@ -389,7 +395,7 @@ test('AC-011/AC-014: the repository-baseline skill guides inspect, material docu
   const root = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-skill-'));
   await initWorkspace(root, 'demo', 'brownfield');
   const skill = run(root, ['skill', 'repository-baseline']).stdout;
-  assert.match(skill, /Version: 2/, 'v0.3.10: instruction v2 under Skill Registry v6 (v1 stays pinned for earlier work)');
+  assert.match(skill, /Version: 3/, 'v0.3.10-internal.3: instruction v3 under Skill Registry v7 (v1/v2 stay pinned for earlier work)');
   assert.match(skill, /Start from `yallaflow inspect`/);
   assert.match(skill, /register it with `yallaflow intake add <baseline-work-id> <path>` and read the extracted text with `yallaflow source show SRC-#### --content`/);
   assert.match(skill, /Cite a document inside the repository by its path \(repository evidence\)/);
@@ -398,7 +404,7 @@ test('AC-011/AC-014: the repository-baseline skill guides inspect, material docu
   assert.match(skill, /Record durable truth, not transient runtime state/);
   assert.match(skill, /re-checked by SHA-256 content hash .* directory evidence needs a Git commit and is otherwise UNKNOWN, which is not stale/);
   assert.match(skill, /if the user asked for a completely read-only \/ no-write operation, make none of them/);
-  assert.match(skill, /Never approve the baseline: a human runs `yallaflow baseline approve`/);
+  assert.match(skill, /Approval belongs to the developer\..*Only after they explicitly approve in the conversation .*Never approve on your own judgment/);
 });
 
 // --- Independent-review regressions (pre-freeze) ---------------------------------

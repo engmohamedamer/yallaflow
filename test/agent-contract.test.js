@@ -262,7 +262,9 @@ test('v0.3.9: agent contract v5 teaches Brownfield onboarding, the app-code vs r
   assert.match(body, /"Do not change application code" and "read-only \/ do not write anything" are different instructions/);
   assert.match(body, /onboarding YallaFlow workspace writes are authorized and need no further permission: yallaflow baseline start, registering material documents with yallaflow intake add, completing the repository-baseline checkpoint, and yallaflow baseline draft/);
   assert.match(body, /explicitly asks for a completely read-only or no-write operation, do not mutate \.yallaflow either/);
-  assert.match(body, /Never approve a baseline yourself/);
+  // v7 (v0.3.10-internal.3): approval stays the developer's; the Agent records an explicit approval only.
+  assert.match(body, /Approval is the developer's decision, never yours: only when they explicitly approve it in the conversation \(for example they reply "Approve"\) record it with yallaflow baseline approve <work-id> --note/);
+  assert.match(body, /Never infer approval from silence, a general "ok", or an instruction to get on with other work/);
   // Material documents (M3).
   assert.match(body, /yallaflow intake add <baseline-work-id> <path> and read its extracted text with yallaflow source show SRC-#### --content/);
   assert.match(body, /A document is evidence of what the document says, not proof of what the code does/);

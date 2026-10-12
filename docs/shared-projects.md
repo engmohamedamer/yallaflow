@@ -37,11 +37,10 @@ YallaFlow never commits, pushes, pulls, rebases, or merges on your behalf. You s
 
 ```text
 install YallaFlow
-→ yallaflow init                     (inside the repository)
-→ deep Brownfield baseline           (the agent does the discovery; you approve it)
-→ yallaflow agent setup claude|codex (so every session orients automatically)
+→ yallaflow init                     (inside the repository; also connects Claude Code and Codex)
+→ approve the initial project understanding (the agent builds it and asks; you reply "Approve")
 → yallaflow shared enable            (explicit; previews with --dry-run)
-→ git add .yallaflow plus CLAUDE.md and/or AGENTS.md (whichever exist) → git commit → git push
+→ git add .yallaflow CLAUDE.md AGENTS.md → git commit → git push
 ```
 
 `yallaflow shared enable` inspects and explains before it writes anything:

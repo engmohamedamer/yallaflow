@@ -8,6 +8,10 @@ Known gaps and deliberate boundaries. Planned work is tracked in [`roadmap.md`](
 - **Local-first; teams share through Git.** A single-user workspace is the default. A Shared Project ([`shared-projects.md`](shared-projects.md)) shares project memory through ordinary Git; there is no server, locking, real-time visibility, accounts, or permissions.
 - **Platform coverage.** The regression suite runs in POSIX environments; Windows has not been verified in this release.
 
+## Setup
+
+- **`init` always writes both agent pointers.** It adds the managed block to `CLAUDE.md` and `AGENTS.md`, even if your team uses only one agent. The blocks are small and inert for other tools; there is no opt-out flag yet, so delete the unused file if you do not want it (`agent setup` re-creates it).
+
 ## Shared Projects
 
 - **The first-use gate uses the recorded project kind.** A repository recorded Greenfield (e.g. misclassified by v0.3.8 `init`) is not gated, even if it later grows Brownfield-sized; `inspect` reports such a mismatch. There is no audited waiver: an urgent change to an un-understood Brownfield project needs an approved baseline first.

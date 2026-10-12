@@ -8,6 +8,23 @@ YallaFlow has not yet made a public npm release (`package.json` remains `"privat
 
 Nothing yet.
 
+## [0.3.10-internal.3] - 2026-10-12 — One setup command
+
+**Internal prerelease. Not published to npm.** A runtime onboarding fix on top of the immutable `0.3.10-internal.2`.
+
+- **`yallaflow init` installs the agent bootstrap for both first-party agents** (`CLAUDE.md` for Claude, `AGENTS.md` for Codex), so `init` is the only setup command.
+  - It reuses the `agent setup` installer: existing content is kept byte-for-byte and only the managed block is added or updated; a symlinked shared file gets one block.
+  - A hand-edited, newer, or malformed block makes `init` refuse before writing anything.
+  - A failure after the workspace was created rolls back `.yallaflow/` and every agent file it touched.
+  - `yallaflow agent setup claude|codex` remains, for recovery and manual control.
+- **Conversational baseline approval.** The agent presents the project understanding; the developer replies (e.g. "Approve"); the agent records that explicit approval with `baseline approve --note "<their words>"`. It never approves on its own judgment or infers approval. This ships as Agent Contract **v7** and `repository-baseline` instruction **v3** under Skill Registry **v7**; work pinned to v6 keeps instruction v2 (archived byte-for-byte).
+- `init` output points to the agent ("open Claude Code or Codex and describe the work"); baseline next-step text describes the conversational approval.
+- **Docs.**
+  - The README and `docs/using-yallaflow.md` lead with install → `yallaflow init` → describe the work, task-first ("Fix invoice totals."), with the purpose-specific understanding request as an optional deeper step.
+  - Commands are separated into developer / maintainer / manual-advanced, and the maintainer and developer team roles are shown explicitly.
+  - Raw baseline commands remain only in the CLI, workflows, and guide references.
+- Package `0.3.10-internal.3`. Config, context, knowledge, and source schemas are unchanged. Bootstrap block v2 is unchanged.
+
 ## [0.3.10-internal.2] - 2026-10-12 — Shared Project Intelligence (corrective re-release)
 
 **Internal prerelease. Not published to npm.** The published `v0.3.10-internal.1` tag is immutable. This corrective release reconciles it with two documentation commits that landed on `main` after v0.3.9 ("docs: simplify first-use experience", "docs: clarify AI coding session in first-use flow"). The runtime behavior is identical to `0.3.10-internal.1` below; only the package version changes.

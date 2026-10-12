@@ -708,11 +708,15 @@ Pending deltas that need reconciliation are doctor warnings and `shared check` f
 | Item | Version | Why |
 |---|---|---|
 | Package | `0.3.10-internal.2` | corrective re-release of the immutable `0.3.10-internal.1` tag with reconciled docs; identical runtime |
-| Agent Contract | **v6** | automatic orientation, project understanding first, purpose-aware discovery, Shared Project sequence, finish protocol and developer language |
+| Agent Contract | **v7** (v6 in internal.1/.2) | automatic orientation, project understanding first, purpose-aware discovery, Shared Project sequence, finish protocol and developer language |
 | Provider bootstrap block | **v2** | orient before the first request without being asked; finish with `yallaflow finish` |
 | Workspace config | v1 single-user; **v2 only when shared** | a v0.3.9 `doctor` fails on v2 instead of calling a shared workspace healthy |
 | Context ledger schema | v1/v2, unchanged | integration uses existing operations; duplicates use v2 multi-origin |
 | Knowledge ledger | **v2 only when needed** | the frozen v0.3.9 reader rejects `staged`, `stagedAt`, and `relation.factFingerprint` (strict validation), so a ledger holding them is written as v2, which v0.3.9 refuses rather than misreads; `writeKnowledgeLedger` picks the lowest representable version and never downgrades; all other ledgers stay v1 |
 | Source schema | v2, unchanged | only the ID form differs |
-| Skill Registry | **v6** | pins never covered instruction bytes (v0.3.9 had already edited `repository-baseline` under v5). `src/skills/instructions.js` fixes every released instruction version by SHA-256; registry v1–v5 → instruction v1 (archived v0.3.9 bytes), v6 → `repository-baseline`/`context-discovery` v2; `yallaflow skill --work` serves the pinned version; `doctor` fails on in-place edits |
+| Skill Registry | **v7** (v6 in internal.1/.2; v7 pins `repository-baseline` instruction v3) | pins never covered instruction bytes (v0.3.9 had already edited `repository-baseline` under v5). `src/skills/instructions.js` fixes every released instruction version by SHA-256; registry v1–v5 → instruction v1 (archived v0.3.9 bytes), v6 → `repository-baseline`/`context-discovery` v2; `yallaflow skill --work` serves the pinned version; `doctor` fails on in-place edits |
 | New records | `memory.yaml` v1, `purpose.yaml` v1, `local/identity.yaml` v1 | |
+
+**One setup command (v0.3.10-internal.3).** `yallaflow init` installs the repository bootstrap for every first-party provider via `assertAllBootstrapsInstallable` → `snapshotBootstrapFiles` → `initWorkspace` → `installAllBootstraps` (`src/agent/bootstrap.js`; the same `setupBootstrap` as `agent setup`). A hand-edited, newer, or malformed managed block stops init before anything is written. A failure after the workspace is created removes `.yallaflow/` and restores each agent file to its snapshot bytes. Provider knowledge stays in `src/agent/`.
+
+**Conversational baseline approval (Agent Contract v7, `repository-baseline` instruction v3, Skill Registry v7).** Approval is still the developer's decision; the Agent records an explicit approval given in the conversation (`baseline approve --note "<their words>"`) and never infers one. As before, approvals are workflow evidence, not authentication.

@@ -58,7 +58,7 @@ export async function baselineDraftCommand(workId, input) {
     console.log(`${status}: ${summary.byStatus[status].length}`);
   }
   if (summary.limitations.length) console.log(`discovery limitations: ${summary.limitations.length} (work-scoped, never promoted)`);
-  console.log(`\nNext: a human reviews the draft (yallaflow baseline show ${workId}) and approves it with \`yallaflow baseline approve ${workId}\` (or \`baseline feedback ${workId} --changes-requested\`). The Agent never approves a baseline.`);
+  console.log(`\nNext: present the draft to the developer (yallaflow baseline show ${workId}) and ask them to review it. Only after they explicitly approve, record it: \`yallaflow baseline approve ${workId} --note "<their approval>"\` (changes: \`baseline feedback ${workId} --changes-requested\`). The Agent never approves on its own judgment.`);
 }
 
 async function resolveWorkId(root, requestedWorkId) {

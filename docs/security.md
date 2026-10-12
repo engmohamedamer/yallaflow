@@ -37,6 +37,7 @@ YallaFlow has no secrets store. Credential integration for trackers or providers
 - **Write authorization is guidance.** `guide` reports whether the workflow authorizes application-code changes, and the agent contract tells agents to obey it. YallaFlow cannot stop an agent or person from editing files directly.
 - **`verify` is not a sandbox.** Argv, `--shell`, and `--script` modes run the command in your environment with your privileges. Only run commands you would run yourself. Argv mode avoids shell interpretation, not side effects.
 - **Shared Projects have no permissions system.** Roles are not modeled and the integration branch is a policy, not access control; use your Git hosting's branch protection and review rules.
+- **Baseline approval is conversational.** The agent records the developer's explicit approval with their words in `--note`; the contract forbids approving on its own judgment, but YallaFlow cannot verify who typed the reply.
 - **Approvals are workflow evidence, not authentication.** Anyone who can run the CLI can `approve` a gate. Use your code-review and branch-protection process for real authorization.
 - **Evidence proves what was recorded, not that a claim is true.** A passing run proves the command exited 0; a cited file proves it existed with that content. YallaFlow never judges whether prose, summaries, or knowledge are correct.
 - **Direct edits bypass validation.** Hand-editing files under `.yallaflow/` skips the CLI's checks; `doctor` catches many, not all, resulting inconsistencies.

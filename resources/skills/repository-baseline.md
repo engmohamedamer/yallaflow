@@ -24,7 +24,9 @@ Build a durable, evidence-backed understanding of an existing (brownfield) repos
 
 ## Guard
 
-This skill is read-only for application code: no application code modification is authorized while establishing the baseline. The onboarding YallaFlow writes — `baseline start`, `intake add` for material documents, this checkpoint, and `baseline draft` — are authorized when the user asked to understand or onboard the project; if the user asked for a completely read-only / no-write operation, make none of them. Never approve the baseline: a human runs `yallaflow baseline approve`.
+This skill is read-only for application code: no application code modification is authorized while establishing the baseline. The onboarding YallaFlow writes — `baseline start`, `intake add` for material documents, this checkpoint, and `baseline draft` — are authorized when the user asked to understand or onboard the project, or asked for work that requires project understanding first; if the user asked for a completely read-only / no-write operation, make none of them.
+
+Approval belongs to the developer. Present the draft in plain language (what was established, what is unresolved, what could not be inspected) and ask them to review it. Only after they explicitly approve in the conversation (for example "Approve") record it with `yallaflow baseline approve <work-id> --note "Approved by <who> in the agent session: <their words>"`; for requested changes, record `yallaflow baseline feedback <work-id> --changes-requested --note "..."` and revise. Never approve on your own judgment and never infer approval from silence or a general "ok".
 
 ## Result
 

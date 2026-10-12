@@ -7,9 +7,8 @@ This is the practical guide for developers who want to use YallaFlow without lea
 YallaFlow is designed so that normal use stays small:
 
 1. install the CLI,
-2. initialize it once in the repository,
-3. connect your coding agent,
-4. describe what you want.
+2. run `yallaflow init` once in the repository,
+3. open Claude Code or Codex and describe what you want.
 
 The deeper workflow, project memory, evidence, review gates, and delivery checks stay behind that simple interaction.
 
@@ -32,7 +31,7 @@ Your application can use any language or framework. YallaFlow is installed as a 
 ### Fastest install from the current Git tag
 
 ```bash
-npm install -g git+https://github.com/engmohamedamer/yallaflow.git#v0.3.10-internal.2
+npm install -g git+https://github.com/engmohamedamer/yallaflow.git#v0.3.10-internal.3
 ```
 
 Verify:
@@ -44,7 +43,7 @@ yallaflow --version
 Expected:
 
 ```text
-0.3.10-internal.2
+0.3.10-internal.3
 ```
 
 ### Install from a release tarball
@@ -62,7 +61,7 @@ Useful when developing YallaFlow itself:
 ```bash
 git clone https://github.com/engmohamedamer/yallaflow.git
 cd yallaflow
-git checkout v0.3.10-internal.2
+git checkout v0.3.10-internal.3
 npm ci
 npm link
 ```
@@ -73,98 +72,73 @@ More installation and update details: [installation.md](installation.md).
 
 ## 3. First use
 
-Go to the root of your project:
+Go to the root of your project and initialize it once:
 
 ```bash
 cd /path/to/your-project
+yallaflow init
 ```
 
-Initialize YallaFlow and connect your agent.
+That is the whole setup. `init` creates `.yallaflow/` (durable project state, meant to be committed). It also connects both Claude Code and Codex by adding a short pointer to `CLAUDE.md` and `AGENTS.md`; anything already in those files is kept.
 
-### Claude
-
-```bash
-yallaflow init && yallaflow agent setup claude
-```
-
-### Codex
-
-```bash
-yallaflow init && yallaflow agent setup codex
-```
-
-That is the normal setup.
-
-YallaFlow creates `.yallaflow/`, which is durable project state and is intended to be committed with the repository.
-
-Now open **Claude Code, Codex, or another supported coding-agent session from the same project directory**.
+Now open **Claude Code or Codex in the same project directory** and describe what you want.
 
 > Prompts shown below are written inside the coding-agent session — **not in the terminal**.
 >
 > The agent must be able to access the repository and run the YallaFlow CLI.
 
-Because you ran `yallaflow agent setup`, every session starts with YallaFlow automatically. You do not need to say "Use YallaFlow" — just describe the task. Saying it still works, for example with an agent you have not set up.
+Every session starts with YallaFlow automatically. You do not need to say "Use YallaFlow" — just describe the task. Saying it still works, for example with an agent other than Claude Code or Codex.
 
 ---
 
 # Case A — Existing project
 
-For an existing repository, do not explain the whole system to the agent.
-
-Inside the coding-agent session, say:
+Do not explain the whole system to the agent. Just ask for the work:
 
 ```text
-Understand this project.
+Fix invoice totals.
 ```
 
-If you already know what the understanding is for, say so. The agent then goes deeper where it matters, for example screens, forms and workflows for a UI redesign:
-
-```text
-Understand this project. We are going to redesign the whole UI
-without changing business behavior.
-```
-
-YallaFlow can give the agent a bounded repository inventory and guide it through a Brownfield baseline.
-
-The baseline can include:
+The first time, the agent notices that YallaFlow does not understand this project yet. Before changing any code, it builds an evidence-backed understanding of the repository:
 
 - application structure,
 - frameworks and versions,
 - architecture,
 - database facts,
 - integrations,
-- engineering conventions,
 - authentication, roles and permissions,
 - routes, APIs and important workflows,
+- engineering conventions,
 - business rules,
 - important project documents,
 - known unknowns and limitations.
 
-The agent may prepare all of that without changing application code.
+It does not change application code while doing this.
 
-Before baseline facts become permanent project memory, YallaFlow stops at a human review boundary.
+Then the agent shows you what it found and asks you to review it. If it is right, reply:
 
-When the agent asks you to review the baseline:
-
-```bash
-yallaflow baseline show PF-0001
+```text
+Approve
 ```
 
-If it is correct:
+If something is wrong or missing, say so in your own words. The agent corrects it and asks again.
 
-```bash
-yallaflow baseline approve PF-0001
+When you approve, the agent records your approval and continues with your original request. **Until you approve, YallaFlow does not authorize application code changes.** That is how YallaFlow makes sure the agent understands a codebase before it changes it.
+
+This happens once per project. From then on, future sessions — and teammates — reuse that understanding instead of rediscovering the repository.
+
+### Deeper understanding for a bigger goal
+
+If you are planning something larger, say what the understanding is for. The agent goes deeper where that goal needs it, for example screens, forms and workflows for a UI redesign:
+
+```text
+Understand this project. We are going to redesign the whole UI
+without changing business behavior.
 ```
 
-From then on, future sessions can reuse that project knowledge instead of rediscovering the repository.
+What you want preserved ("without changing business behavior") is kept as the goal of that work, never as a fact about the project.
 
-You do not have to start with "Understand this project". If your first request is real work ("Fix invoice totals."), the agent builds the baseline itself, asks you to approve it, and then continues with your request. Until a baseline is approved on an existing project, YallaFlow does not authorize application code changes. That is how it makes sure the agent understands a codebase before changing it.
-
-Check the project orientation at any time:
-
-```bash
-yallaflow brief
-```
+> Prefer to inspect the raw draft yourself? `yallaflow baseline show` prints it. The approval and feedback commands are listed in the [CLI reference](cli.md#brownfield-baseline).
 
 ---
 
@@ -173,7 +147,7 @@ yallaflow brief
 Initialize exactly the same way:
 
 ```bash
-yallaflow init && yallaflow agent setup claude
+yallaflow init
 ```
 
 Then describe the product you want.
@@ -200,23 +174,13 @@ YallaFlow guides the agent through the amount of engineering process appropriate
 
 # Case C — Start from an SRS, PDF, DOCX, XLSX or PPTX
 
-Preserve the original requirement source:
-
-```bash
-yallaflow intake Product_SRS.docx
-```
-
-Multiple sources can start one work item:
-
-```bash
-yallaflow intake requirements.docx architecture.pdf payment-rules.xlsx
-```
-
-Then tell the agent:
+Hand the files to the agent:
 
 ```text
-Continue from the supplied requirements.
+Build this from docs/Product_SRS.docx, docs/architecture.pdf and docs/payment-rules.xlsx.
 ```
+
+The agent preserves each original as a source linked to the work. You can also capture files yourself with `yallaflow intake <file> [<file> ...]` and then tell the agent to continue from the supplied requirements.
 
 YallaFlow keeps the original source distinct from:
 
@@ -313,52 +277,27 @@ You can close the chat, open a fresh session, or switch between supported coding
 
 ## 5. Coming back later
 
-You do not need the previous chat.
-
-Start with:
-
-```bash
-yallaflow brief
-```
-
-Then tell your agent:
+You do not need the previous chat. Open your agent and say:
 
 ```text
 Continue the current work.
 ```
 
-For more detail:
-
-```bash
-yallaflow status
-yallaflow resume
-```
+The agent orients itself from the project state. To look yourself, `yallaflow brief` prints the same orientation.
 
 ---
 
 ## 6. Switching between Claude and Codex
 
-YallaFlow state is independent of the provider.
-
-Set up Claude:
-
-```bash
-yallaflow agent setup claude
-```
-
-Or Codex:
-
-```bash
-yallaflow agent setup codex
-```
-
-Then open the new agent and say:
+Nothing to set up: `yallaflow init` already connected both. Open the other agent in the same directory and say:
 
 ```text
 Continue the current work.
 ```
 
-The project state remains in `.yallaflow/`.
+The project state lives in `.yallaflow/`, not in either provider's chat.
+
+If a pointer file was deleted or damaged, re-create it with `yallaflow agent setup claude` or `yallaflow agent setup codex`.
 
 ---
 
@@ -366,21 +305,35 @@ The project state remains in `.yallaflow/`.
 
 YallaFlow can share one project understanding with your whole team through ordinary Git. There is no server, no accounts, and no join command.
 
-**Once, by a maintainer** (after the baseline is approved):
+```text
+Maintainer — once
+  install YallaFlow
+  → yallaflow init
+  → approve the initial project understanding (the agent asks)
+  → yallaflow shared enable
+  → commit and push the project state
+
+Developer — every day
+  git pull
+  → open your coding agent
+  → describe the task
+  → review
+  → git push
+```
+
+The maintainer's commands:
 
 ```bash
+yallaflow init
+# … open the agent, ask for work, approve the project understanding when asked …
 yallaflow shared enable --dry-run     # explains what it will do
 yallaflow shared enable
-git add .yallaflow CLAUDE.md             # and/or AGENTS.md — whichever exist
+git add .yallaflow CLAUDE.md AGENTS.md
 git commit -m "Share YallaFlow project memory"
 git push
 ```
 
-**Every developer, every day:**
-
-```text
-git pull → open your coding agent → describe the task → review → git push
-```
+Developers do not run `yallaflow init`, agent setup, or any join command. They only need a compatible YallaFlow CLI installed.
 
 What happens underneath:
 
@@ -394,48 +347,34 @@ Details: [Shared Projects](shared-projects.md).
 
 ---
 
-## 8. The commands most users need
+## 8. Who runs what
 
-You do not need to memorize the entire CLI.
+**Developers** describe the work to the coding agent, review the result, and use Git as usual (`git pull`, `git push`). No YallaFlow commands are needed.
+
+**Project maintainers** run:
 
 ```bash
-# Initialize once
-yallaflow init
-
-# Connect Claude or Codex
-yallaflow agent setup claude
-yallaflow agent setup codex
-
-# Understand a repository without writing anything
-yallaflow inspect
-
-# Quick project + current-work orientation
-yallaflow brief
-
-# Current workflow state
-yallaflow status
-
-# Continue current work
-yallaflow resume
-
-# Is the current work ready to push?
-yallaflow finish
-
-# Workspace integrity
-yallaflow doctor
-
-# Team: share once, then see what this checkout knows
-yallaflow shared enable
-yallaflow shared status
-
-# Start work manually if you want to
-yallaflow start "Add password reset"
-
-# Start from files
-yallaflow intake requirements.docx architecture.pdf
+yallaflow init            # once per project
+yallaflow shared enable   # once, when the team should share project memory
 ```
 
-The coding agent normally drives the lower-level lifecycle commands for you.
+**Manual / advanced** — the agent normally runs these; use them to look under the hood or to recover:
+
+```bash
+yallaflow brief                  # project + current-work orientation
+yallaflow status                 # workflow state
+yallaflow resume                 # current work in detail
+yallaflow finish                 # is the current work ready to push?
+yallaflow doctor                 # workspace integrity
+yallaflow inspect                # read-only repository inventory
+yallaflow agent setup claude     # re-create the Claude pointer (CLAUDE.md)
+yallaflow agent setup codex      # re-create the Codex pointer (AGENTS.md)
+yallaflow baseline show          # the project-understanding draft
+yallaflow shared status          # what this checkout knows about shared work
+yallaflow intake <file>          # capture a requirements file yourself
+```
+
+Every command and flag: [CLI reference](cli.md).
 
 ---
 
@@ -445,7 +384,7 @@ YallaFlow intentionally keeps some decisions human-controlled. These are the mom
 
 Examples include:
 
-- approving a Brownfield baseline,
+- approving the initial project understanding (you reply "Approve" when the agent asks),
 - review gates configured by the project's interaction mode,
 - business or architecture questions that need a real decision.
 
@@ -455,19 +394,14 @@ YallaFlow tries to remove mechanical ceremony, not remove meaningful human judgm
 
 ## 10. Commit YallaFlow state
 
-The `.yallaflow/` directory is project-owned state.
-
-After initialization or meaningful workflow changes:
+The `.yallaflow/` directory and the two agent pointer files are project-owned state. Commit them with your code:
 
 ```bash
-git add .yallaflow
+git add .yallaflow CLAUDE.md AGENTS.md
 git commit -m "Update YallaFlow project state"
 ```
 
-If you installed a provider bootstrap, also commit the relevant file when appropriate:
-
-- `CLAUDE.md`
-- `AGENTS.md`
+YallaFlow never commits or pushes for you.
 
 ---
 

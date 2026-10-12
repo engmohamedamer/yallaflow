@@ -117,12 +117,12 @@ test('11. an incompatible YallaFlow stops before any project-state mutation; rea
   for (const args of [['start', 'Fix invoice totals'], ['bug', 'Totals', '--scope', 'bounded'], ['shared', 'integrate'], ['knowledge', 'review', 'PF-0001', '--none'], ['context', 'render']]) {
     const result = cli(team.maintainer, args, false);
     assert.notEqual(result.status, 0, args.join(' '));
-    assert.match(result.stderr, /Installed: 0\.3\.10-internal\.2 · Project requires: >= 9\.0\.0 — INCOMPATIBLE[\s\S]*No files were changed/);
+    assert.match(result.stderr, /Installed: 0\.3\.10-internal\.3 · Project requires: >= 9\.0\.0 — INCOMPATIBLE[\s\S]*No files were changed/);
   }
   assert.equal(await treeHash(team.maintainer), before);
   const brief = cli(team.maintainer, ['brief']).stdout;
   assert.match(brief, /Primary next concern: this project requires a different YallaFlow/);
-  assert.match(cli(team.maintainer, ['doctor'], false).stdout, /FAIL YallaFlow version: Installed: 0\.3\.10-internal\.2 · Project requires: >= 9\.0\.0/);
+  assert.match(cli(team.maintainer, ['doctor'], false).stdout, /FAIL YallaFlow version: Installed: 0\.3\.10-internal\.3 · Project requires: >= 9\.0\.0/);
   assert.equal(cli(team.maintainer, ['shared', 'check'], false).status, 1);
   assert.equal(compareVersions('0.3.10-internal.1', '0.3.9-internal.1'), 1);
   assert.equal(compareVersions('0.3.10-internal.1', '0.3.10'), -1);

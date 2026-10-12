@@ -12,12 +12,15 @@ import { cli } from '../test-support/legacy-context.js';
 import { BOOTSTRAP_PROVIDERS, BOOTSTRAP_VERSION, bootstrapBody, inspectBootstrap, renderBootstrapBlock } from '../src/agent/bootstrap.js';
 import { agentContractBody } from '../src/agent/contract.js';
 import { ownershipOf } from '../src/core/ownership.js';
+import { initWorkspace } from '../src/core/workspace.js';
 
 const { claude, codex } = BOOTSTRAP_PROVIDERS;
 
+// A workspace without provider bootstrap blocks — what `yallaflow init` produced before
+// v0.3.10-internal.3 (init now installs them; these tests exercise `agent setup`).
 async function workspace() {
   const root = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-bootstrap-'));
-  cli(root, ['init', '--type', 'greenfield']);
+  await initWorkspace(root, path.basename(root), 'greenfield');
   return root;
 }
 

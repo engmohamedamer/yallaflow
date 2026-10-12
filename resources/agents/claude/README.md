@@ -4,6 +4,8 @@ YallaFlow is agent-agnostic: the only behavioral contract is the workspace's `.y
 
 ## Setup
 
+`yallaflow init` installs this block automatically (v0.3.10-internal.3), together with the other first-party provider's. The explicit commands are for recovery and manual control:
+
 ```bash
 yallaflow agent setup claude      # adds a managed bootstrap block to the repository-root CLAUDE.md
 yallaflow agent status             # AGENT.md and bootstrap block: current / outdated / modified / not set up

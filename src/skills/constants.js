@@ -6,7 +6,10 @@
 //     Same skills and capability pins as v5; context-discovery and repository-baseline
 //     move to instruction v2 (discovery modes, canonical core coverage, discovery
 //     lens). Work pinned to v1–v5 keeps resolving instruction v1.
-export const REGISTRY_VERSION = 6;
+// 7 — v0.3.10-internal.3: repository-baseline instruction v3 (conversational baseline
+//     approval: the Agent records the developer's explicit approval). Same skills and
+//     capability pins; work pinned to v6 keeps instruction v2.
+export const REGISTRY_VERSION = 7;
 
 export const SKILL_PHASES = Object.freeze([
   'discovery',

@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { realpath } from 'node:fs/promises';
+import { lstat, readFile, realpath, rm, writeFile } from 'node:fs/promises';
 import { exists, readText, writeText } from '../utils/fs.js';
 
 // First-party agent bootstrap (v0.3.8). A provider's own session-start file in the
@@ -194,4 +194,80 @@ export async function refreshBootstraps(root, { dryRun = false } = {}) {
     else if (!['not-installed', 'shared'].includes(status.state)) results.push({ status, action: status.state === 'current' ? 'unchanged' : 'skipped', written: false });
   }
   return results;
+}
+
+// ---------------------------------------------------------------------------
+// All first-party providers at once (v0.3.10-internal.3, used by `yallaflow init`):
+// the same per-provider installer as `agent setup`, plus a read-only preflight and a
+// byte-exact snapshot so a failed init can restore every file it touched.
+
+// Claude first, then Codex — the order onboarding text and init output use.
+function onboardingProviders() {
+  return [BOOTSTRAP_PROVIDERS.claude, BOOTSTRAP_PROVIDERS.codex];
+}
+
+export function agentLabels() {
+  return onboardingProviders().map((provider) => ({ claude: 'Claude Code', codex: 'Codex' }[provider.id])).join(' or ');
+}
+
+export function bootstrapFileNames() {
+  return onboardingProviders().map((provider) => provider.file).join(' and ');
+}
+
+const UNSAFE_BOOTSTRAP_STATES = Object.freeze(['modified', 'newer', 'broken']);
+
+export async function assertAllBootstrapsInstallable(root) {
+  const problems = [];
+  for (const provider of Object.values(BOOTSTRAP_PROVIDERS)) {
+    const status = await inspectBootstrap(root, provider);
+    if (UNSAFE_BOOTSTRAP_STATES.includes(status.state)) problems.push(`${provider.file}: ${describeBootstrapState(status)}`);
+  }
+  if (problems.length) {
+    throw new Error(
+      `YallaFlow cannot install the agent bootstrap safely:\n${problems.map((entry) => `- ${entry}`).join('\n')}\n\n` +
+      'Fix the file(s) above (YallaFlow never overwrites edited content), then run the command again.\n\nNo files were changed.'
+    );
+  }
+}
+
+// The same installer as `yallaflow agent setup`: append a managed block to existing
+// content, update an outdated unmodified block, leave a current block or a file that
+// already serves another provider (symlinked CLAUDE.md/AGENTS.md) untouched.
+export async function installAllBootstraps(root) {
+  const results = [];
+  for (const provider of onboardingProviders()) {
+    const status = await inspectBootstrap(root, provider);
+    if (status.state === 'shared') {
+      results.push({ file: provider.file, action: `shared with ${status.sharedWith}` });
+      continue;
+    }
+    const result = await setupBootstrap(root, provider);
+    results.push({ file: provider.file, action: { created: 'created', appended: 'block added (existing content kept)', 'updated-managed-block': 'block updated', unchanged: 'already current' }[result.action] ?? result.action });
+  }
+  return results;
+}
+
+export async function snapshotBootstrapFiles(root) {
+  const files = [];
+  for (const provider of Object.values(BOOTSTRAP_PROVIDERS)) {
+    const file = path.join(root, provider.file);
+    const info = await lstat(file).catch(() => null);
+    // readFile/writeFile follow a symlink, so a linked CLAUDE.md/AGENTS.md restores its target.
+    files.push({ file, existed: Boolean(info), content: info ? await readFile(file).catch(() => null) : null });
+  }
+  return files;
+}
+
+export async function restoreBootstrapFiles(snapshot) {
+  for (const entry of snapshot) {
+    if (!entry.existed) {
+      await rm(entry.file, { force: true });
+      continue;
+    }
+    if (entry.content === null) continue;
+    // Rewrite only what actually changed, so an untouched (even read-only) file never
+    // turns a rollback into a second failure.
+    const current = await readFile(entry.file).catch(() => null);
+    if (!current || !current.equals(entry.content)) await writeFile(entry.file, entry.content);
+  }
 }

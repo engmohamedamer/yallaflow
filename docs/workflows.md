@@ -20,7 +20,7 @@ Stage counts below are illustrative — `guide` and `advance` always name the ne
 - [Cross-agent handoff](#cross-agent-handoff)
 - [Context freshness and revalidation](#context-freshness-and-revalidation)
 - [Upgrading a legacy workspace (reconciliation)](#upgrading-a-legacy-workspace-reconciliation)
-- [Setting up Codex or Claude](#setting-up-codex-or-claude)
+- [Codex and Claude bootstrap](#codex-and-claude-bootstrap)
 
 ## Greenfield
 
@@ -75,9 +75,10 @@ yallaflow baseline start                              # investigation work item 
 yallaflow intake add PF-0001 docs/APD_LLD.pdf         # material documents become sources; read: yallaflow source show SRC-0001 --content
 yallaflow checkpoint PF-0001 --skill repository-baseline --complete --summary "Repository discovered."
 yallaflow baseline draft PF-0001 --file baseline.json # facts + discovery limitations, every fact with evidence
-yallaflow baseline show PF-0001                       # human review — the Agent never approves
-yallaflow baseline feedback PF-0001 --changes-requested --note "Add database evidence."   # or:
-yallaflow baseline approve PF-0001 --note "Reviewed."
+yallaflow baseline show PF-0001                       # agent presents the draft; the developer reviews it
+# developer replies "Approve" (or asks for changes) — the Agent records exactly that, never on its own judgment:
+yallaflow baseline approve PF-0001 --note "Approved by Dana in the agent session: 'Approve'"
+#   (changes: yallaflow baseline feedback PF-0001 --changes-requested --note "Add database evidence.")
 yallaflow context status                              # CTX-#### facts now back PROJECT.md and context/*.md
 git add .yallaflow && git commit -m "Add YallaFlow baseline"
 ```
@@ -369,9 +370,9 @@ yallaflow doctor
 
 The result is one canonical current fact per durable truth, with every origin traceable (`yallaflow context show CTX-0001`) and superseded knowledge kept as lineage. Retired legacy sections are archived verbatim in `work/PF-0006/legacy-context.md`, and hand-edited ones are kept for review. No historical work item is edited.
 
-## Setting up Codex or Claude
+## Codex and Claude bootstrap
 
-So that a cold session finds YallaFlow without being told, give the provider's own session-start file a thin pointer to the canonical contract:
+`yallaflow init` gives both providers' session-start files a thin pointer to the canonical contract, so a cold session finds YallaFlow without being told. The explicit commands remain for recovery and manual control:
 
 ```bash
 yallaflow agent setup codex                           # AGENTS.md: managed block → read .yallaflow/AGENT.md, run yallaflow brief
@@ -392,7 +393,7 @@ yallaflow baseline start --objective "Fix invoice totals; later redesign the inv
 # agent: Brownfield discovery across the canonical core, deeper where the lens points
 yallaflow checkpoint PF-0002 --skill repository-baseline --complete --summary "..."
 yallaflow baseline draft PF-0002 --file baseline.json
-# human: yallaflow baseline approve PF-0002
+# agent presents the draft; developer replies "Approve" → yallaflow baseline approve PF-0002 --note "<their approval>"
 yallaflow route PF-0001 --type bug --scope bounded --confidence high --reason "..." --title "Invoice totals"
 # … the normal bug workflow continues from approved project memory
 ```
@@ -400,7 +401,7 @@ yallaflow route PF-0001 --type bug --scope bounded --confidence high --reason ".
 ## Shared Project (team)
 
 ```text
-Maintainer (once):  init → baseline (human approves) → agent setup claude|codex → shared enable → commit, push
+Maintainer (once):  init → approve the project understanding when the agent asks → shared enable → commit, push
 Every developer:    git pull → open the coding agent → describe the task → review → git push
 ```
 

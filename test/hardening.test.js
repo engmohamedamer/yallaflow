@@ -39,9 +39,9 @@ async function workspaceWithPinnedWork(registryVersion) {
 // ---------------------------------------------------------------------------
 // Skill Registry immutability
 
-test('every released skill instruction version is immutable bytes with a recorded hash; the registry is v6', async () => {
-  assert.equal(REGISTRY_VERSION, 6);
-  assert.deepEqual(await validateSkillRegistry(), { registryVersion: 6, skillCount: 12 });
+test('every released skill instruction version is immutable bytes with a recorded hash; the registry is v7', async () => {
+  assert.equal(REGISTRY_VERSION, 7);
+  assert.deepEqual(await validateSkillRegistry(), { registryVersion: 7, skillCount: 12 });
   for (const [skillId, versions] of Object.entries(SKILL_INSTRUCTION_VERSIONS)) {
     for (const [version, entry] of Object.entries(versions)) {
       assert.equal(sha(await readFile(path.join(repo, entry.path), 'utf8')), entry.sha256, `${skillId} v${version}`);
@@ -53,6 +53,8 @@ test('every released skill instruction version is immutable bytes with a recorde
   assert.equal(pinnedInstructionVersion(6, 'repository-baseline'), 2);
   assert.equal(pinnedInstructionVersion(6, 'context-discovery'), 2);
   assert.equal(pinnedInstructionVersion(6, 'verification'), 1);
+  assert.equal(pinnedInstructionVersion(7, 'repository-baseline'), 3, 'v7: conversational baseline approval');
+  assert.equal(pinnedInstructionVersion(7, 'context-discovery'), 2);
 });
 
 test('editing a released instruction in place is detected (doctor / skill fail), never silently served', async () => {
@@ -133,7 +135,7 @@ test('first-use gate: an un-understood Brownfield project cannot authorize appli
   cli(root, ['checkpoint', 'PF-0002', '--skill', 'repository-baseline', '--complete', '--summary', 'Discovery complete.']);
   await writeFile(path.join(root, 'b.json'), JSON.stringify({ facts: [{ area: 'business-rule', status: 'confirmed', summary: 'Invoice totals are the sum of line amounts.', evidence: ['backend/invoices/totals.js'], source: 'repository' }] }));
   cli(root, ['baseline', 'draft', 'PF-0002', '--file', 'b.json']);
-  assert.match(cli(root, ['guide', 'PF-0001']).stdout, /BLOCKER:\nPROJECT_UNDERSTANDING_AWAITING_REVIEW[\s\S]*NEXT VALID ACTION:\nyallaflow baseline show PF-0002 +\(then, by a human: yallaflow baseline approve PF-0002/);
+  assert.match(cli(root, ['guide', 'PF-0001']).stdout, /BLOCKER:\nPROJECT_UNDERSTANDING_AWAITING_REVIEW[\s\S]*NEXT VALID ACTION:\nyallaflow baseline show PF-0002 +\(after the developer explicitly approves: yallaflow baseline approve PF-0002 --note/);
   assert.equal(cli(root, ['advance', 'PF-0001'], false).status, 1);
 
   // Human approval is the only way through; the original work then continues.

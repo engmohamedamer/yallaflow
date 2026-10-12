@@ -113,7 +113,7 @@ export const SKILL_REGISTRY = Object.freeze([
   }),
   skill({
     id: 'repository-baseline',
-    version: 2,
+    version: 3,
     capability: 'baseline',
     title: 'Repository Baseline Discovery',
     phase: 'discovery',

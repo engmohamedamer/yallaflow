@@ -287,7 +287,7 @@ async function resolveBaselineNextStep(root, meta) {
   }
   return {
     state: 'awaiting-review',
-    text: `baseline ${id} draft (${ledger.facts.length} fact(s)) awaits human review — a human approves it; the Agent never does`,
-    command: `yallaflow baseline show ${id}   (then, by a human: yallaflow baseline approve ${id} | baseline feedback ${id} --changes-requested)`
+    text: `baseline ${id} draft (${ledger.facts.length} fact(s)) awaits the developer's review — present it and ask; approval is theirs, never the Agent's own judgment`,
+    command: `yallaflow baseline show ${id}   (after the developer explicitly approves: yallaflow baseline approve ${id} --note "<their approval>" | changes: baseline feedback ${id} --changes-requested)`
   };
 }

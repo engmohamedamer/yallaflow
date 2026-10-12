@@ -7,8 +7,8 @@ v0.3.10 reads v0.3.5–v0.3.9 workspaces as-is: **nothing is migrated on read**.
 ## 1. Install the new CLI
 
 ```bash
-npm install -g git+https://github.com/engmohamedamer/yallaflow.git#v0.3.10-internal.2   # or a release tarball
-yallaflow --version                  # 0.3.10-internal.2
+npm install -g git+https://github.com/engmohamedamer/yallaflow.git#v0.3.10-internal.3   # or a release tarball
+yallaflow --version                  # 0.3.10-internal.3
 yallaflow upgrade status             # read-only: what the workspace needs
 ```
 
@@ -43,13 +43,19 @@ yallaflow agent refresh               # updates AGENT.md and installed, unmodifi
 
 Nothing else changes until you enable sharing.
 
+## 3a. From internal.1/internal.2 to internal.3
+
+- `yallaflow init` also installs the thin agent bootstrap in `CLAUDE.md` and `AGENTS.md` — one setup command. Existing content in those files is kept; an edited, newer, or malformed managed block makes `init` refuse with nothing written; a failure rolls back. Workspaces initialized earlier are unaffected: run `yallaflow agent setup claude` / `codex` once if a pointer file is missing.
+- Baseline approval is conversational: the agent presents the project understanding, the developer replies (for example "Approve"), and the agent records that explicit approval with `yallaflow baseline approve --note "<their words>"`. It never approves on its own judgment. Run `yallaflow agent refresh` to install Agent Contract v7.
+
 ## 4. Turning a project into a Shared Project (optional)
 
 A maintainer does this once. See [shared-projects.md](shared-projects.md).
 
 ```bash
 yallaflow baseline status              # recommended: an approved baseline before sharing
-yallaflow agent setup claude           # and/or codex — so teammates' sessions orient automatically
+yallaflow agent setup claude           # only for a workspace initialized before internal.3 (init now installs both)
+yallaflow agent setup codex
 yallaflow shared enable --dry-run      # inspect and explain; writes nothing
 yallaflow shared enable                # [--integration-branch <branch>] when it cannot be determined locally
 git add .yallaflow CLAUDE.md             # and/or AGENTS.md — whichever exist
@@ -78,14 +84,14 @@ Existing work, sources, and facts are never renamed or rewritten.
 
 | Item | Change |
 |---|---|
-| Package | `0.3.10-internal.2` (corrective re-release of `0.3.10-internal.1`; identical runtime) |
-| Agent Contract | v5 → **v6** |
+| Package | `0.3.10-internal.3` (internal.2: docs-only re-release of internal.1; internal.3: `init` installs both agent bootstraps, conversational baseline approval) |
+| Agent Contract | v5 → **v6** (internal.1) → **v7** (internal.3: the Agent records the developer's explicit baseline approval) |
 | Provider bootstrap block | v1 → **v2** |
 | Config schema | v1 unchanged; **v2 only for Shared Projects** |
 | Context ledger schema | unchanged (v1/v2) |
 | Knowledge ledger | v1 unchanged; **v2** only for ledgers holding Shared Project shapes (`staged`, `stagedAt`, `relation.factFingerprint`) — the frozen v0.3.9 reader refuses v2 instead of misreading it |
 | Source schema | v2 unchanged |
-| Skill Registry | v5 → **v6**: immutable, hash-pinned instruction versions; work pinned to v1–v5 keeps the v0.3.9 instruction bytes |
+| Skill Registry | v5 → **v6**: immutable, hash-pinned instruction versions; work pinned to v1–v5 keeps the v0.3.9 instruction bytes → **v7** (internal.3): `repository-baseline` instruction v3 (conversational approval); v6 work keeps v2 |
 | Checkout tag | 10 Crockford-base32 characters (50 bits) |
 
 Downgrades are not supported once a v0.3.10 CLI has enabled sharing or written shared state.
