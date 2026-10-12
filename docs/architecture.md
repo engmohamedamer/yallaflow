@@ -707,7 +707,7 @@ Pending deltas that need reconciliation are doctor warnings and `shared check` f
 
 | Item | Version | Why |
 |---|---|---|
-| Package | `0.3.10-internal.1` | |
+| Package | `0.3.10-internal.2` | corrective re-release of the immutable `0.3.10-internal.1` tag with reconciled docs; identical runtime |
 | Agent Contract | **v6** | automatic orientation, project understanding first, purpose-aware discovery, Shared Project sequence, finish protocol and developer language |
 | Provider bootstrap block | **v2** | orient before the first request without being asked; finish with `yallaflow finish` |
 | Workspace config | v1 single-user; **v2 only when shared** | a v0.3.9 `doctor` fails on v2 instead of calling a shared workspace healthy |

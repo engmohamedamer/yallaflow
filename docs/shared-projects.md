@@ -16,7 +16,7 @@ git pull
 → git push
 ```
 
-That is the whole daily flow. You do not run a join command, re-baseline the project, explain the architecture again, or type "use YallaFlow". You only need a compatible `yallaflow` CLI on your PATH (see [installation](installation.md)).
+That is the whole daily flow. New to YallaFlow itself? Start with [Using YallaFlow](using-yallaflow.md). You do not run a join command, re-baseline the project, explain the architecture again, or type "use YallaFlow". You only need a compatible `yallaflow` CLI on your PATH (see [installation](installation.md)).
 
 When the work is ready, the agent tells you in plain language:
 
@@ -41,7 +41,7 @@ install YallaFlow
 → deep Brownfield baseline           (the agent does the discovery; you approve it)
 → yallaflow agent setup claude|codex (so every session orients automatically)
 → yallaflow shared enable            (explicit; previews with --dry-run)
-→ git add .yallaflow CLAUDE.md AGENTS.md && git commit && git push
+→ git add .yallaflow plus CLAUDE.md and/or AGENTS.md (whichever exist) → git commit → git push
 ```
 
 `yallaflow shared enable` inspects and explains before it writes anything:

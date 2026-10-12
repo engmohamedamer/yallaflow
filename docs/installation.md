@@ -4,11 +4,17 @@ YallaFlow is a Node.js CLI. It needs **Node.js ≥ 20.16.0** to run — this is 
 
 ## Recommended: an isolated CLI
 
-Install YallaFlow as a tool, separate from any project's dependencies:
+Install YallaFlow as a tool, separate from any project's dependencies. From a release tag:
+
+```bash
+npm install -g git+https://github.com/engmohamedamer/yallaflow.git#v0.3.10-internal.2
+yallaflow --version
+```
+
+Or from a release tarball:
 
 ```bash
 npm install -g /path/to/yallaflow-<version>.tgz
-yallaflow --version
 ```
 
 If you prefer not to install globally, use a dedicated tools prefix and put its `bin` on your `PATH`:
@@ -47,7 +53,7 @@ Upgrading an existing workspace: run `yallaflow upgrade status`, then see [`upgr
 
 YallaFlow never checks for, downloads, or installs updates by itself — there is no self-update and no network version check. Updating is a deliberate, local sequence:
 
-1. **Install the target version.** Use the release tarball, or a checkout of the target tag (for example `git checkout v0.3.10-internal.1 && npm install && npm link`):
+1. **Install the target version.** Use the release tarball, or a checkout of the target tag (for example `git checkout v0.3.10-internal.2 && npm install && npm link`):
 
    ```bash
    npm install -g /path/to/yallaflow-<version>.tgz
@@ -88,7 +94,7 @@ Read the version's `upgrading-to-<version>.md` for behavior changes. Downgrades 
 A Shared Project records the minimum YallaFlow it needs (`config.yaml` → `yallaflow.minimumVersion`). `brief`, `doctor`, `upgrade status`, and `shared check` report it:
 
 ```text
-Installed: 0.3.10-internal.1 · Project requires: >= 0.3.10-internal.1
+Installed: 0.3.10-internal.2 · Project requires: >= 0.3.10-internal.1
 ```
 
 An older CLI stops before changing any project state; YallaFlow never downloads or self-updates. Install the same version on every developer machine and in CI (pin the tarball or tag in your CI job), and upgrade them together. Teammates need nothing else — no join command, no per-developer setup. See [`shared-projects.md`](shared-projects.md).

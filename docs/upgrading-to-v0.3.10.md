@@ -7,8 +7,8 @@ v0.3.10 reads v0.3.5–v0.3.9 workspaces as-is: **nothing is migrated on read**.
 ## 1. Install the new CLI
 
 ```bash
-npm install -g /path/to/yallaflow-0.3.10-internal.1.tgz
-yallaflow --version                  # 0.3.10-internal.1
+npm install -g git+https://github.com/engmohamedamer/yallaflow.git#v0.3.10-internal.2   # or a release tarball
+yallaflow --version                  # 0.3.10-internal.2
 yallaflow upgrade status             # read-only: what the workspace needs
 ```
 
@@ -52,7 +52,7 @@ yallaflow baseline status              # recommended: an approved baseline befor
 yallaflow agent setup claude           # and/or codex — so teammates' sessions orient automatically
 yallaflow shared enable --dry-run      # inspect and explain; writes nothing
 yallaflow shared enable                # [--integration-branch <branch>] when it cannot be determined locally
-git add .yallaflow CLAUDE.md AGENTS.md
+git add .yallaflow CLAUDE.md             # and/or AGENTS.md — whichever exist
 git commit -m "Share YallaFlow project memory"
 git push
 ```
@@ -78,7 +78,7 @@ Existing work, sources, and facts are never renamed or rewritten.
 
 | Item | Change |
 |---|---|
-| Package | `0.3.10-internal.1` |
+| Package | `0.3.10-internal.2` (corrective re-release of `0.3.10-internal.1`; identical runtime) |
 | Agent Contract | v5 → **v6** |
 | Provider bootstrap block | v1 → **v2** |
 | Config schema | v1 unchanged; **v2 only for Shared Projects** |

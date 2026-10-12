@@ -8,6 +8,19 @@ YallaFlow has not yet made a public npm release (`package.json` remains `"privat
 
 Nothing yet.
 
+## [0.3.10-internal.2] - 2026-10-12 — Shared Project Intelligence (corrective re-release)
+
+**Internal prerelease. Not published to npm.** The published `v0.3.10-internal.1` tag is immutable. This corrective release reconciles it with two documentation commits that landed on `main` after v0.3.9 ("docs: simplify first-use experience", "docs: clarify AI coding session in first-use flow"). The runtime behavior is identical to `0.3.10-internal.1` below; only the package version changes.
+
+- The README keeps the rewritten first-use structure and adds the v0.3.10 messaging:
+  - the setup line removes the need to say "Use YallaFlow";
+  - real work on an existing project triggers the baseline automatically, and code changes wait for its approval;
+  - the purpose-aware "Understand this project" example;
+  - a "Working as a team" section and `yallaflow finish`;
+  - links to Shared Projects and the upgrade guide.
+- `docs/using-yallaflow.md` (new on `main`) is kept and updated for v0.3.10: install tag, automatic orientation, the Brownfield gate and discovery lens, the finish protocol, a team section, and commands.
+- The install commands point at `v0.3.10-internal.2`. A Shared Project still requires `>= 0.3.10-internal.1` (unchanged).
+
 ## [0.3.10-internal.1] - 2026-10-12 — Shared Project Intelligence
 
 **Internal prerelease. Not published to npm.**
