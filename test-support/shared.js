@@ -143,18 +143,21 @@ export async function complete(root, workId) {
   return advanceActiveWork(root, workId);
 }
 
-// The real frozen v0.3.9 CLI, extracted from its Git tag (node_modules linked), or null
-// when the tag is not available (e.g. a source tarball without Git history).
-let frozenCache;
+// The real frozen CLI of a released tag (default v0.3.9-internal.1), extracted from Git
+// (node_modules linked), or null when the tag is not available (e.g. a source tarball
+// without Git history). Cached per tag.
+const frozenCache = new Map();
 export async function frozenCli(tag = 'v0.3.9-internal.1') {
-  if (frozenCache !== undefined) return frozenCache;
+  if (frozenCache.has(tag)) return frozenCache.get(tag);
   const repo = fileURLToPath(new URL('../', import.meta.url));
-  if (spawnSync('git', ['rev-parse', '--verify', '-q', `${tag}^{commit}`], { cwd: repo }).status !== 0) return (frozenCache = null);
+  const unavailable = () => (frozenCache.set(tag, null), null);
+  if (spawnSync('git', ['rev-parse', '--verify', '-q', `${tag}^{commit}`], { cwd: repo }).status !== 0) return unavailable();
   const dir = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-frozen-'));
   const archive = spawnSync('bash', ['-c', `git archive ${tag} | tar -x -C "${dir}"`], { cwd: repo });
-  if (archive.status !== 0) return (frozenCache = null);
+  if (archive.status !== 0) return unavailable();
   const { symlink } = await import('node:fs/promises');
   await symlink(path.join(repo, 'node_modules'), path.join(dir, 'node_modules'));
-  frozenCache = (root, args) => spawnSync(process.execPath, [path.join(dir, 'src', 'cli.js'), ...args], { cwd: root, encoding: 'utf8' });
-  return frozenCache;
+  const run = (root, args) => spawnSync(process.execPath, [path.join(dir, 'src', 'cli.js'), ...args], { cwd: root, encoding: 'utf8' });
+  frozenCache.set(tag, run);
+  return run;
 }

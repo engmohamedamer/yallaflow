@@ -1,8 +1,8 @@
 import path from 'node:path';
-import { appendFile } from 'node:fs/promises';
 import { exists } from '../utils/fs.js';
 import { readYaml, writeYaml } from '../core/yaml.js';
 import { loadWorkMetaOrThrow, workspacePath } from '../core/workspace.js';
+import { appendRedactedText } from '../security/redact.js';
 
 // Discovery purpose and preservation intent (v0.3.10) — work/bootstrap intent, never
 // timeless project truth. A baseline (or any work item) can record WHAT the
@@ -70,7 +70,7 @@ export async function setWorkPurpose(root, workId, input, now = new Date().toISO
   const errors = validatePurpose(record, workId);
   if (errors.length) throw new Error(errors.join('\n'));
   await writeYaml(purposeFilePath(root, workId), record);
-  await appendFile(path.join(workspacePath(root), 'work', workId, 'progress.md'), `- ${now} Discovery purpose ${previous ? 'updated' : 'recorded'} (${mode}): ${objective}\n`, 'utf8');
+  await appendRedactedText(path.join(workspacePath(root), 'work', workId, 'progress.md'), `- ${now} Discovery purpose ${previous ? 'updated' : 'recorded'} (${mode}): ${objective}\n`, 'utf8');
   return { meta, purpose: record, replaced: Boolean(previous) };
 }
 

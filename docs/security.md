@@ -14,23 +14,24 @@ A local CLI that reads and writes files under `.yallaflow/` in your repository, 
 - **Help never mutates state.** `--help`/`-h` on any command is read-only.
 - **Reads never migrate.** Inspection commands (`status`, `guide`, `resume`, `handoff`, `doctor`, `context status`, `agent status`, …) do not change files.
 - **Evidence references record location, not content.** A repository path cited as evidence is stored as path + SHA-256 hash + Git commit. File contents are never copied into the project-context ledger.
+- **Secret values are redacted before they are persisted (internal.4).** One sanitizer (`src/security/redact.js`) runs at YallaFlow's persistence boundary — every structured state file, the project-context ledger and its projection, work records (`work.md`, `progress.md`), generated ADRs, verification logs and command lines, and extracted source text. It replaces the *value* of recognizable secrets and keeps the name: secret-named assignments (`DB_PASSWORD=…`, `"api_key": "…"`, `*_TOKEN`, `*_SECRET`, `*_PASSWORD`, …), `Authorization`/`Bearer`/`Basic` values, cookies, PEM private keys, credentials embedded in URLs, and well-known token formats (GitHub, GitLab, Slack, AWS, Google, Stripe, npm, `sk-…`, JWTs). `DB_PASSWORD=real-secret` is stored as `DB_PASSWORD=<redacted>`; the path `.env` stays valid evidence. It is conservative and pattern-based: it does not modify your files, and it cannot recognize a secret with no recognizable name or format.
 - **Tamper detection, not tamper proofing.** `doctor` detects a source whose preserved original no longer matches its capture checksum, broken project-memory lineage, projection drift, and lifecycle contradictions. Nothing is cryptographically signed; Git history is the audit trail.
 
 ## What is stored, and where
 
 | Data | Location | Sensitivity note |
 |---|---|---|
-| Captured sources | `.yallaflow/sources/SRC-####/` — the original file byte-for-byte, extracted text, and (for text files) the text in `source.json` | **Full contents are stored.** Do not capture files that contain credentials or personal data you would not commit. |
-| Verification logs | `.yallaflow/work/<id>/evidence/V-###-verification.log` | Everything the command printed to stdout/stderr. Do not verify with commands that print secrets. |
-| Summaries, rulings, questions, knowledge | `work/<id>/*.yaml`, `context/index.yaml`, `*.md` | Written by your agent; review before committing. |
-| Command lines | `verification.json` | The exact command recorded for each run. Avoid secrets in arguments. |
+| Captured sources | `.yallaflow/sources/SRC-####/` — the original file byte-for-byte, extracted text, and (for text files) the text in `source.json` | **The preserved original keeps its full contents byte-for-byte** (YallaFlow never alters it); extracted text and `source.json` text are redacted, and `intake` warns when a captured original appears to contain secret values. Do not capture files that contain credentials or personal data you would not commit. |
+| Verification logs | `.yallaflow/work/<id>/evidence/V-###-verification.log` | Everything the command printed to stdout/stderr, with recognizable secret values redacted. Still avoid commands that print secrets. |
+| Summaries, rulings, questions, knowledge, baseline facts | `work/<id>/*.yaml`, `context/index.yaml`, `*.md` | Written by your agent; recognizable secret values are redacted. Review before committing. |
+| Command lines | `verification.json` | The command recorded for each run, with recognizable secret values redacted (the command itself runs unchanged). Avoid secrets in arguments. |
 
 | Actor metadata (Shared Projects) | `work/<id>/memory.yaml` | `git config user.name` / `user.email` at work creation and staging — the same values your commits publish. No accounts, roles, or tokens. |
 | Local identity (Shared Projects) | `.yallaflow/local/identity.yaml` (gitignored) | A random clone tag, a one-way fingerprint of the checkout path (never the path), a timestamp, and the last allocated sequence. Never committed; `doctor` fails if it is tracked. |
 
 `.yallaflow/` is designed to be committed. Treat it with the same care as the rest of the repository: anything captured there is shared with everyone who can read the repository and its history.
 
-YallaFlow has no secrets store. Credential integration for trackers or providers is intentionally not implemented.
+YallaFlow has no secrets store. Credential integration for trackers or providers is intentionally not implemented. Redaction applies to what is written from internal.4 on; state an earlier release already wrote is not rewritten (the projection never repeats a recognizable secret value, though).
 
 ## What YallaFlow does not enforce
 

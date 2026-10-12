@@ -5,6 +5,8 @@ import { findSourceByChecksum, linkSourceToWork, persistSource, removeSourceDir 
 import { addSourceToWork, assertSourceLinkAllowed, createPendingIntake } from '../behavior/routing.js';
 import { loadWorkMetaOrThrow } from '../core/workspace.js';
 import { describeTrigger, loadWorkImpacts, pendingImpact } from '../delivery/impact.js';
+import { assertEngineeringWorkAllowed } from '../baseline/understanding.js';
+import { containsSecret } from '../security/redact.js';
 
 // Creates a new pending work item from one or more source files:
 //   yallaflow intake SRS.docx
@@ -13,6 +15,10 @@ export async function intakeCommand(filePaths, options = {}) {
   const root = await findProjectRoot();
   if (!root) throw new Error('No .yallaflow workspace found. Run `yallaflow init` first.');
   if (!filePaths?.length) throw new Error('Usage: yallaflow intake <file> [<file> ...] [--title TITLE]');
+  // New work from files is normal engineering work: refused before any source is
+  // persisted while a Brownfield project has no approved understanding. (Material
+  // documents for the baseline itself go through `yallaflow intake add <baseline-id>`.)
+  await assertEngineeringWorkAllowed(root, { request: options.title?.trim() || `File intake: ${filePaths.join(', ')}` });
 
   const sources = await captureSources(root, filePaths);
   const titleHint = options.title?.trim() || defaultTitleFromFilename(sources[0].sourceName);
@@ -79,7 +85,13 @@ async function captureSources(root, filePaths) {
     const normalized = await prepareFileIntake(filePath);
     const duplicate = await findSourceByChecksum(root, normalized.metadata.sha256);
     if (duplicate) console.log(`This file matches existing source ${duplicate.id}.`);
-    sources.push(await persistSource(root, normalized));
+    const source = await persistSource(root, normalized);
+    // The preserved original is byte-for-byte what the developer supplied; YallaFlow's
+    // own text representation of it is redacted. Say so instead of staying silent.
+    if (containsSecret(normalized.rawText)) {
+      console.log(`Warning: ${source.id} (${source.sourceName}) appears to contain secret values. YallaFlow's text of it is redacted, but the preserved original under .yallaflow/sources/${source.id}/ keeps them byte-for-byte — do not commit it; capture a copy without the secrets instead.`);
+    }
+    sources.push(source);
   }
   return sources;
 }

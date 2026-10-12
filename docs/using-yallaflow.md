@@ -31,7 +31,7 @@ Your application can use any language or framework. YallaFlow is installed as a 
 ### Fastest install from the current Git tag
 
 ```bash
-npm install -g git+https://github.com/engmohamedamer/yallaflow.git#v0.3.10-internal.3
+npm install -g git+https://github.com/engmohamedamer/yallaflow.git#v0.3.10-internal.4
 ```
 
 Verify:
@@ -43,7 +43,7 @@ yallaflow --version
 Expected:
 
 ```text
-0.3.10-internal.3
+0.3.10-internal.4
 ```
 
 ### Install from a release tarball
@@ -61,7 +61,7 @@ Useful when developing YallaFlow itself:
 ```bash
 git clone https://github.com/engmohamedamer/yallaflow.git
 cd yallaflow
-git checkout v0.3.10-internal.3
+git checkout v0.3.10-internal.4
 npm ci
 npm link
 ```
@@ -99,7 +99,13 @@ Do not explain the whole system to the agent. Just ask for the work:
 Fix invoice totals.
 ```
 
-The first time, the agent notices that YallaFlow does not understand this project yet. Before changing any code, it builds an evidence-backed understanding of the repository:
+A question works the same way:
+
+```text
+How does subscription renewal work?
+```
+
+The first time, the agent notices that YallaFlow does not understand this project yet. Before any engineering work starts — a fix, a feature, or even a read-only investigation — it builds an evidence-backed understanding of the repository, going deeper where your request points:
 
 - application structure,
 - frameworks and versions,
@@ -113,9 +119,9 @@ The first time, the agent notices that YallaFlow does not understand this projec
 - important project documents,
 - known unknowns and limitations.
 
-It does not change application code while doing this.
+It does not change application code while doing this, and it never copies secret values (for example from `.env`) into YallaFlow's records.
 
-Then the agent shows you what it found and asks you to review it. If it is right, reply:
+Then the agent shows you what it found — and what it inspected, only sampled, or could not inspect — and asks you to review it. If it is right, reply:
 
 ```text
 Approve
@@ -123,7 +129,9 @@ Approve
 
 If something is wrong or missing, say so in your own words. The agent corrects it and asks again.
 
-When you approve, the agent records your approval and continues with your original request. **Until you approve, YallaFlow does not authorize application code changes.** That is how YallaFlow makes sure the agent understands a codebase before it changes it.
+When you approve, the agent records your approval and continues with your original request — you do not repeat it. **Until you approve, YallaFlow does not start engineering work on the project.** That is how YallaFlow makes sure the agent understands a codebase before it works on it.
+
+Quick operational help is the exception and never waits for this: starting Docker or a dev server, opening the app, showing logs, or checking `git status`.
 
 This happens once per project. From then on, future sessions — and teammates — reuse that understanding instead of rediscovering the repository.
 

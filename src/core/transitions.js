@@ -1,5 +1,4 @@
 import path from 'node:path';
-import { appendFile } from 'node:fs/promises';
 import { exists } from '../utils/fs.js';
 import { readYaml, writeYaml } from './yaml.js';
 import { latestVerification, listVerificationRuns } from './evidence.js';
@@ -18,6 +17,7 @@ import { convergenceRequired } from '../delivery/policy.js';
 import { loadWorkImpacts, pendingImpact } from '../delivery/impact.js';
 import { evaluateConvergence } from '../delivery/convergence.js';
 import { projectUnderstandingGate } from '../baseline/understanding.js';
+import { appendRedactedText } from '../security/redact.js';
 
 // Skills whose revision/reopening invalidates completed work later in the chain (see
 // core/progress.js's CASCADE_ORDER and reopenWork below). Kept in one place so the
@@ -62,7 +62,7 @@ export async function advanceActiveWork(root, requestedWorkId) {
     if (next === 'DONE') state.activeWork = null;
     await writeCurrentState(root, state);
   }
-  await appendFile(path.join(workDir, 'progress.md'), `- ${now} Stage: ${current} → ${next}\n`, 'utf8');
+  await appendRedactedText(path.join(workDir, 'progress.md'), `- ${now} Stage: ${current} → ${next}\n`, 'utf8');
   return { id: meta.id, from: current, to: next, type: meta.type };
 }
 
@@ -256,7 +256,7 @@ export async function reconcileStageAfterCheckpointRevision(root, meta, skillId,
     state.updatedAt = now;
     await writeCurrentState(root, state);
   }
-  await appendFile(path.join(base, 'work', meta.id, 'progress.md'), `- ${now} Stage corrected: ${from} → ${targetStage}\n`, 'utf8');
+  await appendRedactedText(path.join(base, 'work', meta.id, 'progress.md'), `- ${now} Stage corrected: ${from} → ${targetStage}\n`, 'utf8');
   return { from, to: targetStage };
 }
 
@@ -355,7 +355,7 @@ export async function reopenWork(root, workId, input, now = new Date().toISOStri
   await writeCurrentState(root, {
     schemaVersion: 1, activeWork: workId, stage: targetStage, updatedAt: now
   });
-  await appendFile(path.join(base, 'work', workId, 'progress.md'), `- ${now} Reopened: DONE → ${targetStage} (${reason})\n`, 'utf8');
+  await appendRedactedText(path.join(base, 'work', workId, 'progress.md'), `- ${now} Reopened: DONE → ${targetStage} (${reason})\n`, 'utf8');
 
   return { id: workId, from, to: targetStage, reason };
 }

@@ -2,6 +2,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { writeFile } from 'node:fs/promises';
 import { ensureDir } from '../utils/fs.js';
+import { redactSecrets } from '../security/redact.js';
 import { nextVerificationRunId, recordVerification, listVerificationRuns } from '../core/evidence.js';
 import { findProjectRoot, getCurrentState, workspacePath } from '../core/workspace.js';
 import { readYaml } from '../core/yaml.js';
@@ -62,7 +63,8 @@ async function runVerification(root, workId, execution) {
   const evidenceDir = path.join(workspacePath(root), 'work', resolvedWorkId, 'evidence');
   await ensureDir(evidenceDir); // created lazily by the first verification run
   const logFile = path.join(evidenceDir, logName);
-  await writeFile(logFile, output, 'utf8');
+  // The log is durable YallaFlow evidence: a secret a command printed is not kept.
+  await writeFile(logFile, redactSecrets(output), 'utf8');
   const record = {
     command: displayCommand,
     executionMode,

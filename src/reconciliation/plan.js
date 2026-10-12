@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { redactDeep } from '../security/redact.js';
 import { appliedTransition, findFact } from '../context/ledger.js';
 import { CONFIDENCE_LEVELS, CONTEXT_AREAS, FACT_ID_PATTERN, LIMITATION_TYPES } from '../context/constants.js';
 import {
@@ -173,7 +174,9 @@ export function planHash(plan) {
     evidence: candidate.evidence,
     decision: candidate.decision ? stripTimestamp(candidate.decision) : null
   }));
-  return `sha256:${createHash('sha256').update(stableJson(material)).digest('hex')}`;
+  // Hashed as persisted: the plan file is written through the redacting writer
+  // (v0.3.10-internal.4), so the approval fingerprint covers the stored content.
+  return `sha256:${createHash('sha256').update(stableJson(redactDeep(material))).digest('hex')}`;
 }
 
 export function decisionsEqual(a, b) {

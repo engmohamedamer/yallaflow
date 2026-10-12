@@ -19,7 +19,7 @@ Your coding agent is already smart.
 YallaFlow requires **Node.js >= 20.16.0**.
 
 ~~~bash
-npm install -g git+https://github.com/engmohamedamer/yallaflow.git#v0.3.10-internal.3
+npm install -g git+https://github.com/engmohamedamer/yallaflow.git#v0.3.10-internal.4
 ~~~
 
 Check it:
@@ -188,7 +188,13 @@ Just ask for the work you need:
 Fix invoice totals.
 ~~~
 
-The first time, the agent notices that YallaFlow does not understand this project yet. Before it changes any code, it builds an evidence-backed understanding of the repository:
+Or ask a question about it:
+
+~~~text
+How does subscription renewal work?
+~~~
+
+The first time, the agent notices that YallaFlow does not understand this project yet. Before any engineering work starts — a fix, a feature, or even a read-only investigation — it builds an evidence-backed understanding of the repository, using your request as its focus:
 
 - repository structure,
 - frameworks and versions,
@@ -201,7 +207,7 @@ The first time, the agent notices that YallaFlow does not understand this projec
 - business rules,
 - unresolved facts and discovery limitations.
 
-It does not change application code while doing this. Then it shows you what it found and asks you to review it.
+It does not change application code while doing this, and it never copies secret values (from `.env` files, for example) into YallaFlow's records. Then it shows you what it found — and what it did *not* inspect — and asks you to review it.
 
 If it looks right, reply:
 
@@ -209,7 +215,9 @@ If it looks right, reply:
 Approve
 ~~~
 
-If something is wrong, say what, and the agent corrects it. Once you approve, the agent records your approval and continues with your request. **Until you approve, YallaFlow does not authorize changes to application code.**
+If something is wrong, say what, and the agent corrects it. Once you approve, the agent records your approval and continues with your original request — you do not have to repeat it. **Until you approve, YallaFlow does not start engineering work on the project.**
+
+Quick operational help is the exception: starting Docker or a dev server, opening the app, showing logs, or checking `git status` just happens — no project understanding needed.
 
 This happens once per project. After that, every session and every teammate starts from the same approved understanding:
 
@@ -419,7 +427,7 @@ Then go deeper only where you need to:
 
 ## Current status
 
-Current version: **v0.3.10-internal.3 — Shared Project Intelligence**
+Current version: **v0.3.10-internal.4 — Shared Project Intelligence (pilot hardening)**
 
 YallaFlow is currently:
 

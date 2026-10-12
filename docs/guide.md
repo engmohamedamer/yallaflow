@@ -285,7 +285,7 @@ yallaflow handoff PF-0004
 
 A cold agent session should find YallaFlow without the developer explaining it again. `.yallaflow/AGENT.md` remains the one behavioral contract; provider files only point to it.
 
-`yallaflow init` installs both blocks (v0.3.10-internal.3); the explicit commands remain for recovery and manual control:
+`yallaflow init` installs both blocks (since v0.3.10-internal.3); the explicit commands remain for recovery and manual control:
 
 ```bash
 yallaflow agent setup codex     # repository-root AGENTS.md

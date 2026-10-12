@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { exists, writeText } from '../utils/fs.js';
+import { exists } from '../utils/fs.js';
 import { readYaml, writeYaml } from '../core/yaml.js';
 import { getCurrentState, nextWorkId, workSections, workspacePath, writeCurrentState } from '../core/workspace.js';
 import { loadWorkReadiness } from '../behavior/readiness.js';
@@ -12,6 +12,8 @@ import { invalidateGateIfApproved } from '../reviews/store.js';
 import { DECOMPOSITION_SCHEMA_VERSION } from './constants.js';
 import { bareRef, loadWorkRequirements } from '../delivery/requirements.js';
 import { recordWorkMemoryBase } from '../shared/memory.js';
+import { writeRedactedText } from '../security/redact.js';
+import { assertEngineeringWorkAllowed } from '../baseline/understanding.js';
 
 function decompositionFilePath(root, workId) {
   return path.join(workspacePath(root), 'work', workId, 'decomposition.yaml');
@@ -28,6 +30,9 @@ export async function loadDecomposition(root, workId) {
 // notion of "ready"). Decomposition itself never invents feature boundaries: the
 // agent supplies the children; this only validates and persists them.
 export async function proposeDecomposition(root, parentId, input, now = new Date().toISOString()) {
+  // Children are normal engineering work: none before Brownfield understanding is
+  // approved, even for a parent an earlier release routed (v0.3.10-internal.4).
+  await assertEngineeringWorkAllowed(root);
   const meta = await loadMeta(root, parentId);
   if (meta.routingStatus === 'pending') throw new Error(`${parentId} is awaiting routing.`);
   const readiness = await loadWorkReadiness(root, meta);
@@ -99,6 +104,7 @@ export async function validateDecomposition(root, parentId, now = new Date().toI
 // this is the only place children are created, and only once (defensive against
 // re-invocation — a child already assigned a workId is left untouched).
 export async function executeDecomposition(root, parentId, now = new Date().toISOString()) {
+  await assertEngineeringWorkAllowed(root);
   const meta = await loadMeta(root, parentId);
   const existing = await loadDecomposition(root, parentId);
   if (!existing.exists) throw new Error(`${parentId} has no decomposition to execute.`);
@@ -231,8 +237,8 @@ async function createChildWorkItem(root, parentId, child, now) {
   // Sparse workspace (v0.3.6): no optional artifact directory (evidence/, attachments/,
   // execution/) exists until the first artifact that needs it is written.
   await writeYaml(path.join(dir, 'meta.yaml'), meta);
-  await writeText(path.join(dir, 'work.md'), childWorkTemplate(meta, parentId));
-  await writeText(path.join(dir, 'progress.md'), `# Work Ledger — ${id}\n\nCreated: ${now}\nDecomposed from: ${parentId}\n\n`);
+  await writeRedactedText(path.join(dir, 'work.md'), childWorkTemplate(meta, parentId));
+  await writeRedactedText(path.join(dir, 'progress.md'), `# Work Ledger — ${id}\n\nCreated: ${now}\nDecomposed from: ${parentId}\n\n`);
   await recordWorkMemoryBase(root, id, now);
   return meta;
 }

@@ -1,0 +1,636 @@
+{
+  "schemaVersion": 1,
+  "status": "approved",
+  "facts": [
+    {
+      "id": "BF-001",
+      "area": "project",
+      "status": "confirmed",
+      "summary": "YallaFlow is an AI-agnostic engineering governance layer for coding agents (Claude Code, Codex): it gives the agent durable project memory, an adaptive workflow per request, and evidence that work is actually done, so the developer describes intent instead of repeating project context in every prompt.",
+      "evidence": [
+        "package.json",
+        "README.md",
+        "docs/architecture.md"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-002",
+      "area": "project",
+      "status": "confirmed",
+      "summary": "It serves developers who use AI coding agents on Greenfield and Brownfield repositories, alone or as a team sharing one project through ordinary Git (Shared Projects). The normal journey is install, then `yallaflow init`, then open the agent and describe the work; the agent orients itself through YallaFlow automatically.",
+      "evidence": [
+        "README.md",
+        "docs/using-yallaflow.md",
+        "docs/shared-projects.md"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-003",
+      "area": "project",
+      "status": "confirmed",
+      "summary": "Core product principles: discover before asking; understand before changing; prove before claiming; remember after finishing; revalidate before trusting stale knowledge. Work history is immutable while project memory evolves. Durable state beats conversational memory. Investigation is read-only.",
+      "evidence": [
+        "docs/architecture.md",
+        ".yallaflow/AGENT.md"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-004",
+      "area": "project",
+      "status": "confirmed",
+      "summary": "YallaFlow is distributed only as internal prereleases installed from Git tags (npm install -g git+https://github.com/engmohamedamer/yallaflow.git#<tag>). package.json is private, nothing is published to npm, and each internal prerelease tag is immutable once released.",
+      "evidence": [
+        "package.json",
+        "README.md",
+        "docs/installation.md",
+        "CHANGELOG.md"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-005",
+      "area": "project",
+      "status": "confirmed",
+      "summary": "Core modules: CLI entry and argument parsing (src/cli.js); command handlers (src/commands/); workspace, IDs, lifecycle, progress and verification evidence (src/core/); routing and guidance (src/behavior/); Skill Registry (src/skills/); Agent Contract and bootstraps (src/agent/); project-memory ledger (src/context/); knowledge promotion (src/knowledge/); Brownfield baseline (src/baseline/); delivery convergence (src/delivery/); Shared Projects (src/shared/); source intake (src/intake/); repository inventory (src/inventory/); discovery purpose (src/purpose/); decomposition, questions, reviews, reconciliation, and limitations.",
+      "evidence": [
+        "src/cli.js",
+        "src/core/workspace.js",
+        "src/behavior/routing.js",
+        "src/context/ledger.js",
+        "src/shared/memory.js",
+        "src/intake/registry.js",
+        "src/inventory/inventory.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-006",
+      "area": "tech-stack",
+      "status": "confirmed",
+      "summary": "A Node.js (>= 20.16.0) ES-module CLI written in plain JavaScript with no build step and no TypeScript. The bin entry is src/cli.js and argument parsing uses node:util parseArgs.",
+      "evidence": [
+        "package.json",
+        "src/cli.js:1-3"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-007",
+      "area": "tech-stack",
+      "status": "confirmed",
+      "summary": "There are only four runtime dependencies, all for source intake: officeparser 5.2.2 (office documents), pdfjs-dist 5.4.624 (PDF, pinned through overrides), yauzl (zip reading), and @xmldom/xmldom. Everything else uses Node built-ins. YAML files are written as JSON (JSON is valid YAML 1.2), so no YAML library is needed.",
+      "evidence": [
+        "package.json",
+        "src/core/yaml.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-008",
+      "area": "tech-stack",
+      "status": "confirmed",
+      "summary": "There is no frontend. YallaFlow is a terminal CLI plus Markdown/YAML files it maintains inside the target repository.",
+      "evidence": [
+        "package.json",
+        "src/cli.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-009",
+      "area": "architecture",
+      "status": "confirmed",
+      "summary": "Command layer: src/cli.js parses arguments and dispatches each command to a handler in src/commands/<name>.js. Handlers find the project root and print outcome text, and domain logic lives in the domain modules. Help output never mutates YallaFlow state, in any command namespace.",
+      "evidence": [
+        "src/cli.js",
+        "src/commands/start.js",
+        "src/commands/baseline.js",
+        "test/recursive-help-safety.test.js",
+        "docs/architecture.md"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-010",
+      "area": "architecture",
+      "status": "confirmed",
+      "summary": "Workspace and state model:\n- .yallaflow/ holds config.yaml, PROJECT.md, AGENT.md, context/ (index.yaml ledger plus Markdown projections), work/<id>/, sources/SRC-*/, decisions/, releases/, and state/current.yaml (active work).\n- work/, decisions/ and releases/ are created lazily, and when absent they are a valid state.\n- In a Shared Project, personal state lives in the gitignored .yallaflow/local/.",
+      "evidence": [
+        "src/core/workspace.js",
+        "src/core/ownership.js",
+        "src/shared/identity.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-011",
+      "area": "architecture",
+      "status": "confirmed",
+      "summary": "State ownership: STATE_OWNERSHIP maps every .yallaflow path to an owner (cli, projection, shared, human) and the commands allowed to write it. Agents must change CLI-owned state only through yallaflow commands. Enforcement is guidance plus doctor integrity checks, not file locking.",
+      "evidence": [
+        "src/core/ownership.js",
+        "src/core/integrity.js",
+        ".yallaflow/AGENT.md"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-012",
+      "area": "architecture",
+      "status": "confirmed",
+      "summary": "Work lifecycle:\n- Work types: feature, bug, investigation, change, refactor, release.\n- Scopes: spike, bounded, architectural.\n- Each type and scope resolves to a workflow with a fixed stage list (e.g. feature: INTAKE through DONE via DISCOVERY, CLARIFICATION, SPEC, PLAN, IMPLEMENTATION, VERIFICATION).\n- There is one canonical creation path: start then route, which direct commands and intake reuse. The CLI validates the classification but never classifies semantically; the Agent does.",
+      "evidence": [
+        "src/behavior/constants.js",
+        "src/core/workflows.js",
+        "src/behavior/routing.js#createRoutedWork",
+        "src/behavior/policy.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-013",
+      "area": "architecture",
+      "status": "confirmed",
+      "summary": "Rules for reaching DONE (evaluateAdvance):\n- all required checkpoints are complete;\n- non-investigation work has fresh, successful verification evidence newer than the last invalidation;\n- convergence is complete where the contract requires it;\n- code review is complete where pinned;\n- knowledge review is complete.\nReopen (DONE to implementation, verification or review, with a reason) cascades checkpoint invalidation and keeps the evidence.",
+      "evidence": [
+        "src/core/transitions.js",
+        "src/core/progress.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-014",
+      "area": "architecture",
+      "status": "confirmed",
+      "summary": "Agent Contract architecture:\n- .yallaflow/AGENT.md is the single canonical agent contract, held in a managed block versioned by AGENT_CONTRACT_VERSION (currently 7) and sealed with a SHA-256 of its body.\n- Repository-root CLAUDE.md and AGENTS.md carry only a thin pointer block (BOOTSTRAP_VERSION 2).\n- yallaflow agent refresh/setup update those blocks idempotently, refuse hand-edited or newer blocks, and preserve content outside the blocks.",
+      "evidence": [
+        "src/agent/contract.js",
+        "src/agent/bootstrap.js",
+        "src/commands/agent.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-015",
+      "area": "architecture",
+      "status": "confirmed",
+      "summary": "Skill Registry and immutable instructions:\n- Engineering behavior is defined by package-owned skills (Skill Registry version 7, 12 skills).\n- Every work item pins behaviorContract {registryVersion, skills} at creation.\n- Every instruction version has a fixed SHA-256 and path. Older bytes are archived byte-for-byte in resources/skills/archive/, and a work item always receives the instruction version its registry pinned.\n- A changed instruction semantic requires a new instruction version and a registry bump, never an in-place edit.",
+      "evidence": [
+        "src/skills/constants.js",
+        "src/skills/instructions.js",
+        "src/skills/validation.js",
+        "src/skills/registry.js",
+        "resources/skills/archive/repository-baseline.v2.md"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-016",
+      "area": "architecture",
+      "status": "confirmed",
+      "summary": "Brownfield and Greenfield are classified by a bounded, read-only inventory, recorded as config project.kind at init:\n- Brownfield means at least one manifest with at least one recognized source file, or at least 10 recognized source files, or meaningful container/CI config.\n- The inventory walk is breadth-first, does not follow symlinks, is bounded at depth 16 and 50,000 entries, and skips vendor/build/VCS/.yallaflow directories.",
+      "evidence": [
+        "src/inventory/constants.js",
+        "src/inventory/inventory.js",
+        "src/commands/init.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-017",
+      "area": "architecture",
+      "status": "confirmed",
+      "summary": "Project understanding:\n- A Brownfield repository establishes it once through the Brownfield baseline: a read-only investigation work item with a repository-baseline checkpoint, a structured draft (baseline.yaml) with per-fact status, evidence and source plus discovery limitations, and human approval.\n- Approval promotes every fact into the context ledger.\n- Greenfield understanding comes from intent and approved work, never a repository scan.\n- There is no baseline refresh.",
+      "evidence": [
+        "src/baseline/store.js",
+        "src/baseline/understanding.js",
+        "src/commands/baseline.js",
+        "resources/skills/repository-baseline.md"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-018",
+      "area": "architecture",
+      "status": "confirmed",
+      "summary": "In v0.3.10-internal.3, a Brownfield project without approved understanding is reported as PROJECT_UNDERSTANDING_REQUIRED/IN_PROGRESS/AWAITING_REVIEW. projectUnderstandingGate blocks only entering or working in application-writing stages (advance, reopen, guidance). start, route and direct work commands still create work items and print only a notice.",
+      "evidence": [
+        "src/baseline/understanding.js#projectUnderstandingGate",
+        "src/core/transitions.js",
+        "src/commands/start.js",
+        "src/commands/work.js",
+        "src/commands/route.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-019",
+      "area": "architecture",
+      "status": "confirmed",
+      "summary": "Purpose-aware discovery: a work item (including a baseline) can record a discovery purpose in work/<id>/purpose.yaml, made up of objective, preservation intent, focus, and mode (bootstrap, intent, or freshness). It is work intent only and is never promoted into project memory.",
+      "evidence": [
+        "src/purpose/store.js",
+        "src/commands/purpose.js",
+        "src/commands/baseline.js#baselineStartCommand"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-020",
+      "area": "architecture",
+      "status": "confirmed",
+      "summary": "Project memory:\n- The canonical ledger is .yallaflow/context/index.yaml. It holds CTX-#### facts, each with a state (current, superseded, disputed), a confidence (confirmed, inferred, unresolved), provenance, structured evidence, and origins.\n- mutateContextLedger is the single writer: it validates, writes atomically, then re-renders the projection.\n- The ledger schema is v1/v2, written at the lowest version that can represent its content and never migrated on read.",
+      "evidence": [
+        "src/context/ledger.js",
+        "src/context/constants.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-021",
+      "area": "architecture",
+      "status": "confirmed",
+      "summary": "Projection: PROJECT.md and context/*.md are projections. Each document owns exactly one managed block rendered from the ledger for its area, and content outside the block is preserved byte for byte. As a result, the init-time PROJECT.md starter placeholders ('Describe what the system does…') survive after approved project facts are projected.",
+      "evidence": [
+        "src/context/projection.js#writeContextProjection",
+        "src/core/workspace.js",
+        "src/knowledge/constants.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-022",
+      "area": "architecture",
+      "status": "confirmed",
+      "summary": "Evidence and freshness:\n- Evidence references are normalized into repository paths (with optional #symbol or :range, a SHA-256 contentHash for files, and the gitCommit at verification time), runtime:, user:, verification:V-### or free-text references.\n- Freshness is computed mechanically, never stored. The content hash is authoritative and works without Git; Git is only a fallback for directory evidence.\n- Freshness states: FRESH, MAY_BE_STALE, STALE_EVIDENCE, UNKNOWN, HISTORICAL.",
+      "evidence": [
+        "src/context/evidence.js",
+        "src/context/freshness.js",
+        "src/core/git.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-023",
+      "area": "architecture",
+      "status": "confirmed",
+      "summary": "Knowledge promotion: near completion, work proposes candidates (work/<id>/knowledge.yaml) that are reviewed and then promoted, staged, or rejected. A candidate can reconfirm, supersede, or dispute an existing CTX fact. Promotion goes through the ledger's single writer; ADR decisions go to decisions/.",
+      "evidence": [
+        "src/knowledge/store.js",
+        "src/knowledge/promotion.js",
+        "src/knowledge/constants.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-024",
+      "area": "architecture",
+      "status": "confirmed",
+      "summary": "Delivery convergence:\n- When the pinned contract includes the delivery-convergence skill (registry 5 or later; feature bounded/architectural and change/architectural work), approved intent is recorded as REQ/AC.\n- Each active criterion gets an evidence-backed convergence finding.\n- An intent change after it was fixed raises an impact assessment.\n- These are work-delivery records (requirements.yaml, convergence.yaml, impact.yaml) and never project facts.",
+      "evidence": [
+        "src/delivery/policy.js",
+        "src/delivery/convergence.js",
+        "src/delivery/requirements.js",
+        "src/delivery/impact.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-025",
+      "area": "architecture",
+      "status": "confirmed",
+      "summary": "Shared Project architecture:\n- Opt-in with `yallaflow shared enable` (config schema 2 with a minimumVersion).\n- Branch-safe IDs PF-<10-char clone tag>-#### and SRC-<tag>-####, with the tag and sequence in the gitignored local/identity.yaml.\n- Each work item records the memory base it started from and its staged knowledge delta in work/<id>/memory.yaml.\n- Canonical CTX writes happen only on the integration branch (shared integrate).\n- Legacy PF-####/SRC-#### IDs stay valid.",
+      "evidence": [
+        "src/core/ids.js",
+        "src/shared/identity.js",
+        "src/shared/memory.js",
+        "src/shared/config.js",
+        "src/commands/shared.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-026",
+      "area": "architecture",
+      "status": "confirmed",
+      "summary": "`yallaflow finish` is the read-only completion check the Agent runs before saying a task is ready. It checks lifecycle, project integrity and, in a Shared Project, whether shared memory changed under the work's delta. It prints developer-language outcome lines, keeps a --verbose audit, and never commits or pushes.",
+      "evidence": [
+        "src/commands/finish.js",
+        ".yallaflow/AGENT.md"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-027",
+      "area": "architecture",
+      "status": "confirmed",
+      "summary": "Source intake:\n- Material user artifacts are registered as immutable sources under .yallaflow/sources/SRC-*/: the original bytes are copied unchanged, and source.json records format, metadata and links.\n- Native-text sources are inlined as rawText, and extracted text is written to extracted.txt.\n- Formats: office and PDF are extracted, images get no OCR, and archives are never unpacked.\n- Format is detected from content, and writes are confined to the source directory.",
+      "evidence": [
+        "src/core/sources.js",
+        "src/intake/constants.js",
+        "src/intake/registry.js",
+        "src/intake/validation.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-028",
+      "area": "architecture",
+      "status": "confirmed",
+      "summary": "Verification evidence: `yallaflow verify` runs argv commands by default (spawnSync with shell:false); --shell and --script are explicit alternatives. Each run is appended to work/<id>/evidence/verification.json together with its full stdout/stderr log file. Failed runs are kept.",
+      "evidence": [
+        "src/commands/verify.js",
+        "src/core/evidence.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-029",
+      "area": "architecture",
+      "status": "confirmed",
+      "summary": "Legacy (v0.3.5 append-only) project knowledge becomes canonical only through reviewed context reconciliation: start, plan, preview, human approve, then apply. Migration is never reconciliation, and historical work records are never rewritten.",
+      "evidence": [
+        "src/reconciliation/store.js",
+        "src/reconciliation/plan.js",
+        "src/commands/reconcile.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-030",
+      "area": "database",
+      "status": "confirmed",
+      "summary": "YallaFlow has no database. All durable state is JSON-formatted *.yaml and Markdown files inside the target repository's .yallaflow/ directory, written with Node fs (atomic temp-file-and-rename for the context ledger).",
+      "evidence": [
+        "src/core/yaml.js",
+        "src/utils/fs.js",
+        "src/context/ledger.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-031",
+      "area": "integration",
+      "status": "confirmed",
+      "summary": "There are no network integrations: YallaFlow makes no network calls, no model or provider calls, and no telemetry. The only external tool it invokes is local Git, read-only, for HEAD, diffs, tracked paths and identity; it never commits, pushes or rewrites branches.",
+      "evidence": [
+        "docs/security.md",
+        "src/core/git.js",
+        "src/shared/git.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-032",
+      "area": "integration",
+      "status": "confirmed",
+      "summary": "Agent integration is through instruction files only. Claude Code imports @.yallaflow/AGENT.md from CLAUDE.md, and Codex is pointed to it from AGENTS.md. YallaFlow never runs the agent itself.",
+      "evidence": [
+        "src/agent/bootstrap.js",
+        "resources/agents/claude/README.md",
+        "resources/agents/codex/README.md",
+        "docs/limitations.md"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-033",
+      "area": "environment",
+      "status": "confirmed",
+      "summary": "The runtime requirement is Node.js >= 20.16.0 (package.json engines). Windows support is not verified.",
+      "evidence": [
+        "package.json",
+        "docs/limitations.md"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-034",
+      "area": "environment",
+      "status": "inferred",
+      "summary": "The repository declares no CI pipeline or container configuration. Validation and release checks are run locally by the maintainer following docs/releasing.md.",
+      "evidence": [
+        "docs/releasing.md",
+        "runtime:yallaflow inspect reported no recognized container/CI configuration and no .github directory exists"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-035",
+      "area": "convention",
+      "status": "confirmed",
+      "summary": "Tests:\n- Tests use the built-in node:test runner (npm test = node --test) and live as flat test/*.test.js files, with fixtures under test/fixtures/.\n- Shared helpers live in test-support/ because node --test loads every file under test/.\n- npm run check = a node --check syntax pass over src, test and test-support, then the full suite.",
+      "evidence": [
+        "package.json",
+        "test-support/shared.js",
+        "test-support/delivery.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-036",
+      "area": "convention",
+      "status": "confirmed",
+      "summary": "Compatibility is tested against real frozen releases: test-support frozenCli(tag) extracts a released tag's CLI with git archive into a temp directory (symlinking node_modules) and returns null when Git history is unavailable. Mixed-version tests use it.",
+      "evidence": [
+        "test-support/shared.js#frozenCli",
+        "test/hardening.test.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-037",
+      "area": "convention",
+      "status": "confirmed",
+      "summary": "Versioning and compatibility:\n- The package version (src/version.js), Agent Contract, bootstrap, Skill Registry, knowledge policy and each per-file schemaVersion are independent; one is never inferred from another.\n- Persisted schemas are bumped only when the stored shape truly requires it, written at the lowest version that can represent the content, and never migrated on read.\n- Work-item pins are never rewritten by upgrades.",
+      "evidence": [
+        "docs/releasing.md",
+        "src/version.js",
+        "src/context/constants.js",
+        "src/knowledge/constants.js",
+        "docs/upgrading-to-v0.3.10.md"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-038",
+      "area": "convention",
+      "status": "confirmed",
+      "summary": "Code style: ES modules with named exports, async/await over node:fs/promises, Object.freeze constant vocabularies in per-domain constants.js files, and validation that runs before any write so an invalid input mutates nothing. Comments explain intent and the version that introduced a behavior.",
+      "evidence": [
+        "src/behavior/routing.js",
+        "src/baseline/constants.js",
+        "src/context/constants.js",
+        "src/baseline/store.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-039",
+      "area": "convention",
+      "status": "confirmed",
+      "summary": "Release process:\n- Internal prereleases X.Y.Z-internal.N are each a single commit with an annotated tag v<version>.\n- Before a release: syntax check, full suite, npm pack --dry-run, secrets scan, git diff --check and git status.\n- CHANGELOG.md and per-version docs/upgrading-to-*.md are updated with each release.\n- package.json files ships src, resources, docs, README.md, CHANGELOG.md and LICENSE.",
+      "evidence": [
+        "docs/releasing.md",
+        "CHANGELOG.md",
+        "package.json"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-040",
+      "area": "convention",
+      "status": "confirmed",
+      "summary": "Documentation set:\n- README.md is the simple first-use journey; docs/using-yallaflow.md is the practical developer guide.\n- docs/cli.md is the command reference.\n- docs/architecture.md, docs/project-memory.md and docs/shared-projects.md cover the design.\n- docs/security.md and docs/limitations.md cover trust boundaries and gaps; docs/releasing.md covers the release policy.\n- docs/upgrading-to-*.md are per-version upgrade notes.",
+      "evidence": [
+        "README.md",
+        "docs/using-yallaflow.md",
+        "docs/cli.md",
+        "docs/architecture.md",
+        "docs/limitations.md"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-041",
+      "area": "business-rule",
+      "status": "confirmed",
+      "summary": "Human review boundaries: baseline approval, reconciliation approval and configured review gates are human decisions. The Agent records them only after explicit approval in the conversation and never infers approval from silence or a general 'ok'.",
+      "evidence": [
+        ".yallaflow/AGENT.md",
+        "resources/skills/repository-baseline.md",
+        "src/baseline/store.js#approveBaseline"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-042",
+      "area": "business-rule",
+      "status": "confirmed",
+      "summary": "No work item may become DONE without fresh, successful verification evidence (investigations excepted), and failed verification runs stay in the append-only ledger.",
+      "evidence": [
+        "src/core/transitions.js",
+        "src/core/evidence.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-043",
+      "area": "business-rule",
+      "status": "confirmed",
+      "summary": "Discovery limitations, purpose and preservation intent, requirements, convergence and impact are work-scoped records and are never promoted as project facts. Only reviewed durable knowledge (baseline approval, knowledge promotion, reconciliation) enters the context ledger.",
+      "evidence": [
+        "src/limitations/store.js",
+        "src/purpose/store.js",
+        "src/delivery/constants.js",
+        "src/baseline/store.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-044",
+      "area": "architecture",
+      "status": "confirmed",
+      "summary": "Security boundaries:\n- Repository evidence must be a relative path inside the root.\n- Source writes are confined to their directory.\n- verify is not a sandbox: commands run with the user's privileges.\n- Write authorization, approvals and Shared Project roles are workflow guidance, not access control.\n- YallaFlow has no secrets store. Captured sources, verification logs and command lines can contain secrets, and users are told not to capture or verify them.",
+      "evidence": [
+        "SECURITY.md",
+        "docs/security.md",
+        "src/context/evidence.js",
+        "src/intake/validation.js"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-045",
+      "area": "architecture",
+      "status": "inferred",
+      "summary": "Free-text durable fields are written without any secret redaction: baseline fact summaries, notes and free-text evidence references, limitations, knowledge candidates, raw requests, purpose, checkpoint summaries and source rawText. writeYaml and writeText persist values verbatim, so a credential an Agent copies into one of them becomes committed YallaFlow state.",
+      "evidence": [
+        "src/core/yaml.js",
+        "src/utils/fs.js",
+        "src/baseline/store.js#normalizeFact",
+        "src/core/sources.js#persistSource"
+      ],
+      "source": "repository"
+    },
+    {
+      "id": "BF-046",
+      "area": "architecture",
+      "status": "unresolved",
+      "summary": "docs/architecture.md describes an 'Execution Engine' (native, reviewed or multi-agent execution policy). The repository evidence shows only guidance and verification execution, with no agent execution, so how much of that engine exists versus is planned cannot be settled from code alone.",
+      "evidence": [
+        "docs/architecture.md",
+        "docs/limitations.md"
+      ],
+      "source": "repository"
+    }
+  ],
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "testing",
+      "summary": "Individual test files were sampled (test-support helpers, hardening frozen-CLI usage), not read one by one; the 68 test files' scenarios are not individually summarized.",
+      "reason": "Bounded bootstrap discovery; tests are verified by running the suite rather than reading each file.",
+      "recordedAt": "2026-10-12T20:00:55.871Z"
+    },
+    {
+      "id": "DL-002",
+      "type": "not-inspected",
+      "area": "other",
+      "summary": "CHANGELOG.md was read only at its newest section; older version entries were not inspected.",
+      "reason": "History is preserved in Git and work records; only current behavior matters to the baseline.",
+      "recordedAt": "2026-10-12T20:00:55.871Z"
+    },
+    {
+      "id": "DL-003",
+      "type": "not-inspected",
+      "area": "other",
+      "summary": "docs/roadmap.md, docs/inspiration.md, docs/guide.md, docs/workflows.md, docs/acceptance-scenarios.md, docs/internal-pilot.md and docs/upgrading-to-v0.3.6..v0.3.9.md were listed but not read in full (workflows.md version header was sampled).",
+      "reason": "Not material to current architecture; the code is authoritative.",
+      "recordedAt": "2026-10-12T20:00:55.871Z"
+    },
+    {
+      "id": "DL-004",
+      "type": "not-inspected",
+      "area": "architecture",
+      "summary": "Internals of decomposition (src/decomposition/), questions (src/questions/), handoff/resume orientation, and the individual intake extractors were not inspected in depth.",
+      "reason": "Outside the discovery lens; module boundaries were confirmed from file layout only.",
+      "recordedAt": "2026-10-12T20:00:55.871Z"
+    },
+    {
+      "id": "DL-005",
+      "type": "out-of-scope",
+      "area": "other",
+      "summary": "node_modules/, .idea/ and test/fixtures/ contents were not inspected.",
+      "reason": "Third-party, IDE-local, or synthetic fixture content — not project architecture.",
+      "recordedAt": "2026-10-12T20:00:55.871Z"
+    },
+    {
+      "id": "DL-006",
+      "type": "runtime-unavailable",
+      "area": "environment",
+      "summary": "Behavior on Windows and on Node versions other than the locally installed v20.19.0 was not observed.",
+      "reason": "Only the local Linux/Node 20.19.0 environment was available.",
+      "recordedAt": "2026-10-12T20:00:55.871Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "drafted",
+      "at": "2026-10-12T20:00:55.871Z",
+      "factCount": 46
+    },
+    {
+      "action": "approved",
+      "at": "2026-10-12T20:06:11.387Z",
+      "note": "Approved by the developer in the agent session: \"Approve.\""
+    }
+  ],
+  "draftedAt": "2026-10-12T20:00:55.871Z",
+  "updatedAt": "2026-10-12T20:06:11.387Z",
+  "approvedAt": "2026-10-12T20:06:11.387Z"
+}

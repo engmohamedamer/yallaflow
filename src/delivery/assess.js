@@ -1,5 +1,4 @@
 import path from 'node:path';
-import { appendFile } from 'node:fs/promises';
 import { loadWorkMetaOrThrow, workspacePath } from '../core/workspace.js';
 import { loadWorkProgress, reviseCheckpoint } from '../core/progress.js';
 import { reconcileStageAfterCheckpointRevision } from '../core/transitions.js';
@@ -8,6 +7,7 @@ import { convergenceRequired, intentFixed } from './policy.js';
 import { loadWorkImpacts, pendingImpact, raiseImpact, writeImpactLedger } from './impact.js';
 import { recordRequirements } from './requirements.js';
 import { evaluateConvergence, loadWorkConvergence, recordConvergence } from './convergence.js';
+import { appendRedactedText } from '../security/redact.js';
 
 // Applies the Agent's impact assessment (v0.3.8). The Agent decides, per completed
 // stage, whether the changed intent affects it; YallaFlow validates the verdicts
@@ -107,7 +107,7 @@ export async function assessImpact(root, workId, input, now = new Date().toISOSt
   ledger.updatedAt = now;
   await writeImpactLedger(root, workId, ledger);
   const unaffected = Object.keys(verdicts).filter((skill) => verdicts[skill].verdict === 'unaffected');
-  await appendFile(path.join(workspacePath(root), 'work', workId, 'progress.md'),
+  await appendRedactedText(path.join(workspacePath(root), 'work', workId, 'progress.md'),
     `- ${now} Impact ${pending.id} assessed: affected ${affected.join(', ') || 'none'}; unaffected ${unaffected.join(', ') || 'none'}\n`, 'utf8');
   return { meta, impact: pending, revised, affected, unaffected, stage: pending.assessment.applied.stage ?? null };
 }

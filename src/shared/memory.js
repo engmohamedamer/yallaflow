@@ -1,5 +1,4 @@
 import path from 'node:path';
-import { appendFile } from 'node:fs/promises';
 import { exists } from '../utils/fs.js';
 import { readYaml, writeYaml } from '../core/yaml.js';
 import { isSharedWorkspace, listWork, workspacePath } from '../core/workspace.js';
@@ -16,6 +15,7 @@ import { currentBranch } from './git.js';
 import { ensureLocalIdentity, gitActor, validateActor } from './identity.js';
 import { loadSharedPolicy } from './config.js';
 import { factFingerprint, ledgerFingerprint } from './fingerprint.js';
+import { appendRedactedText } from '../security/redact.js';
 
 // Shared Project memory flow (v0.3.10):
 //
@@ -378,7 +378,7 @@ export async function integrateSharedMemory(root, { onlyWorkIds = null, dryRun =
       record.updatedAt = at;
       await writeWorkMemory(root, record);
     }
-    await appendFile(path.join(workspacePath(root), 'work', workId, 'progress.md'),
+    await appendRedactedText(path.join(workspacePath(root), 'work', workId, 'progress.md'),
       `- ${at} Shared memory integrated: ${entries.map((entry) => `${entry.item.candidateId} → ${entry.factId}`).join(', ')}\n`, 'utf8');
     result.applied.push(...entries.map((entry) => ({ workId, candidateId: entry.item.candidateId, factId: entry.factId, action: entry.action ?? 'introduced' })));
   }

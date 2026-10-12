@@ -1,0 +1,5 @@
+packed: yallaflow-0.3.10-internal.4.tgz
+installed: 0.3.10-internal.4 at /tmp/yallaflow-packed-QEirMm/prefix/bin/yallaflow
+brownfield pilot: ok
+greenfield: ok
+PACKED CANDIDATE E2E PASSED (yallaflow-0.3.10-internal.4.tgz)

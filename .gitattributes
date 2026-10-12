@@ -1,0 +1,3 @@
+# Verification logs are verbatim captured command output (durable YallaFlow evidence);
+# whitespace rules do not apply to them.
+.yallaflow/**/*.log -whitespace

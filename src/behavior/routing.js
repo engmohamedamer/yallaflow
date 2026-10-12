@@ -1,8 +1,7 @@
 import path from 'node:path';
-import { appendFile } from 'node:fs/promises';
 import { CONFIDENCE_LEVELS, SCOPES, WORK_TYPES } from './constants.js';
 import { resolveWorkflowPolicy } from './policy.js';
-import { exists, readText, writeText } from '../utils/fs.js';
+import { exists, readText } from '../utils/fs.js';
 import { getCurrentState, nextWorkId, workSections, workspacePath, writeCurrentState } from '../core/workspace.js';
 import { readYaml, writeYaml } from '../core/yaml.js';
 import { REGISTRY_VERSION } from '../skills/constants.js';
@@ -12,6 +11,8 @@ import { loadWorkProgress } from '../core/progress.js';
 import { intentFixed } from '../delivery/policy.js';
 import { raiseImpact } from '../delivery/impact.js';
 import { recordWorkMemoryBase } from '../shared/memory.js';
+import { assertEngineeringWorkAllowed } from '../baseline/understanding.js';
+import { appendRedactedText, writeRedactedText } from '../security/redact.js';
 
 const ROUTING_FIELDS = new Set(['work_type', 'scope', 'confidence', 'reason', 'title']);
 
@@ -64,6 +65,9 @@ export async function createPendingIntake(root, rawRequest, options = {}) {
   if (typeof rawRequest !== 'string' || !rawRequest.trim()) {
     throw new Error('A non-empty raw request is required.');
   }
+  // v0.3.10-internal.4: no normal engineering work before Brownfield understanding is
+  // approved — refused here, before an ID is allocated or anything is written.
+  await assertEngineeringWorkAllowed(root, { request: options.titleHint ?? rawRequest });
   // A work item may reference more than one source at once (`yallaflow intake
   // file1.docx file2.xlsx`) and more over time (`yallaflow intake add`); `sources`
   // is therefore always an array.
@@ -96,8 +100,8 @@ export async function createPendingIntake(root, rawRequest, options = {}) {
   // Sparse workspace (v0.3.6): no optional artifact directory (evidence/, attachments/,
   // execution/) exists until the first artifact that needs it is written.
   await writeYaml(path.join(workDir, 'meta.yaml'), meta);
-  await writeText(path.join(workDir, 'work.md'), pendingWorkTemplate(meta));
-  await writeText(path.join(workDir, 'progress.md'), `# Work Ledger — ${id}\n\nCreated: ${now}\n\n- ${now} Routing: pending\n`);
+  await writeRedactedText(path.join(workDir, 'work.md'), pendingWorkTemplate(meta));
+  await writeRedactedText(path.join(workDir, 'progress.md'), `# Work Ledger — ${id}\n\nCreated: ${now}\n\n- ${now} Routing: pending\n`);
   // Shared Project: the project-memory state this work starts from (no-op otherwise).
   await recordWorkMemoryBase(root, id, now);
   await writeCurrentState(root, {
@@ -120,6 +124,9 @@ export async function routeWorkItem(root, workId, input) {
   if (meta.routingStatus !== 'pending') {
     throw new Error(`${workId} is not awaiting routing.`);
   }
+  // A pending intake created before the gate (or by an older YallaFlow) is not routed
+  // into normal engineering work until project understanding is approved.
+  await assertEngineeringWorkAllowed(root, { request: meta.rawRequest });
 
   const now = new Date().toISOString();
   const behaviorContract = {
@@ -145,9 +152,9 @@ export async function routeWorkItem(root, workId, input) {
   await writeYaml(metaFile, meta);
   const workFile = path.join(workDir, 'work.md');
   const currentWork = await readText(workFile);
-  await writeText(workFile, currentWork.replace(/^# .*$/m, `# ${meta.id} — ${title}`));
-  await appendFile(workFile, routedWorkAppendix(meta), 'utf8');
-  await appendFile(path.join(workDir, 'progress.md'), `- ${now} Routing: routed as ${meta.type} + ${meta.scope} (${meta.routingConfidence})\n`, 'utf8');
+  await writeRedactedText(workFile, currentWork.replace(/^# .*$/m, `# ${meta.id} — ${title}`));
+  await appendRedactedText(workFile, routedWorkAppendix(meta), 'utf8');
+  await appendRedactedText(path.join(workDir, 'progress.md'), `- ${now} Routing: routed as ${meta.type} + ${meta.scope} (${meta.routingConfidence})\n`, 'utf8');
   await writeCurrentState(root, {
     schemaVersion: 1,
     activeWork: workId,
@@ -202,10 +209,10 @@ export async function addSourceToWork(root, workId, source, now = new Date().toI
   meta.updatedAt = now;
   await writeYaml(metaFile, meta);
   if (recovered) {
-    await appendFile(path.join(workDir, 'progress.md'), `- ${now} Recovered source attached after DONE: ${validated.id} (${validated.name}) — ${validated.reason}\n`, 'utf8');
+    await appendRedactedText(path.join(workDir, 'progress.md'), `- ${now} Recovered source attached after DONE: ${validated.id} (${validated.name}) — ${validated.reason}\n`, 'utf8');
   } else {
-    await appendFile(path.join(workDir, 'work.md'), sourceAddedSection(validated), 'utf8');
-    await appendFile(path.join(workDir, 'progress.md'), `- ${now} Source attached: ${validated.id} (${validated.name})\n`, 'utf8');
+    await appendRedactedText(path.join(workDir, 'work.md'), sourceAddedSection(validated), 'utf8');
+    await appendRedactedText(path.join(workDir, 'progress.md'), `- ${now} Source attached: ${validated.id} (${validated.name})\n`, 'utf8');
   }
   return meta;
 }
@@ -231,8 +238,8 @@ export async function reviseRequest(root, workId, input, now = new Date().toISOS
   meta.rawRequest = nextRequest;
   meta.updatedAt = now;
   await writeYaml(metaFile, meta);
-  await appendFile(path.join(workDir, 'work.md'), requestRevisedSection(previousRequest, nextRequest, input.reason, now), 'utf8');
-  await appendFile(path.join(workDir, 'progress.md'), `- ${now} Request revised: ${input.reason.trim()}\n`, 'utf8');
+  await appendRedactedText(path.join(workDir, 'work.md'), requestRevisedSection(previousRequest, nextRequest, input.reason, now), 'utf8');
+  await appendRedactedText(path.join(workDir, 'progress.md'), `- ${now} Request revised: ${input.reason.trim()}\n`, 'utf8');
   return meta;
 }
 

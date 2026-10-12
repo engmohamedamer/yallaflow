@@ -4,6 +4,7 @@ import { ensureDir, exists, readText } from '../utils/fs.js';
 import { readYaml, writeYaml } from './yaml.js';
 import { allocateScopedId, directoryNames, workspacePath } from './workspace.js';
 import { isSourceId } from './ids.js';
+import { redactSecrets } from '../security/redact.js';
 import { SOURCE_SCHEMA_VERSION } from '../intake/constants.js';
 import { assertWithinDirectory, validateSourceRecord } from '../intake/validation.js';
 
@@ -68,15 +69,18 @@ export async function persistSource(root, normalizedIntake, now = new Date().toI
     linkedWork: []
   };
 
+  // The original bytes are preserved exactly as supplied; YallaFlow's own text
+  // representations of them (inline rawText, extracted.txt) never keep a secret value.
+  const representationText = redactSecrets(normalizedIntake.rawText);
   if (normalizedIntake.contentAvailability === 'native-text') {
-    record.rawText = normalizedIntake.rawText;
+    record.rawText = representationText;
   } else if (normalizedIntake.contentAvailability === 'extracted') {
     const representationFile = path.join(dir, 'extracted.txt');
     assertWithinDirectory(representationFile, dir);
     record.representation = {
       type: 'text',
       path: path.posix.join('sources', id, 'extracted.txt'),
-      sizeBytes: Buffer.byteLength(normalizedIntake.rawText, 'utf8')
+      sizeBytes: Buffer.byteLength(representationText, 'utf8')
     };
   }
 
@@ -85,7 +89,7 @@ export async function persistSource(root, normalizedIntake, now = new Date().toI
   await ensureDir(dir);
   await writeFile(originalFile, normalizedIntake.buffer ?? Buffer.from(normalizedIntake.rawText ?? '', 'utf8'));
   if (record.representation) {
-    await writeFile(path.join(dir, 'extracted.txt'), normalizedIntake.rawText, 'utf8');
+    await writeFile(path.join(dir, 'extracted.txt'), representationText, 'utf8');
   }
   await writeYaml(sourceRecordPath(root, id), record);
   return record;

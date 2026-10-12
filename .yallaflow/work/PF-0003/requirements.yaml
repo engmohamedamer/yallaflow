@@ -1,0 +1,346 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "In a Brownfield project without approved project understanding, normal engineering work (feature, bug, investigation, change, refactor, release, unclassified start) cannot be created or routed; the CLI returns PROJECT_UNDERSTANDING_REQUIRED and names the baseline as the next valid action. Read-only orientation, the baseline lifecycle, intake for baseline discovery and transient operational assistance remain allowed; Greenfield and approved Brownfield are unchanged.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-12T20:12:08.469Z",
+      "updatedAt": "2026-10-12T20:12:08.469Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "The original request that made the baseline necessary survives it as the baseline's discovery lens and is continued automatically after explicit approval, without asking the developer to repeat it and without a second repository-wide bootstrap.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-12T20:12:08.469Z",
+      "updatedAt": "2026-10-12T20:12:08.469Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "Secret and credential values are never copied into YallaFlow-owned durable state; sanitization is centralized, conservative, never modifies developer files or source originals, and does not over-redact ordinary technical evidence.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-12T20:12:08.469Z",
+      "updatedAt": "2026-10-12T20:12:08.469Z"
+    },
+    {
+      "id": "REQ-004",
+      "statement": "After approved project understanding exists, PROJECT.md is a real projection: no starter placeholders remain; known durable information renders; unknown information is neutral or omitted; context/index.yaml stays canonical.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-12T20:12:08.469Z",
+      "updatedAt": "2026-10-12T20:12:08.469Z"
+    },
+    {
+      "id": "REQ-005",
+      "statement": "Baseline review makes discovery coverage transparent (inspected, sampled, not inspected, unavailable, unresolved) using existing structures, and never claims completeness without evidence.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-12T20:12:08.469Z",
+      "updatedAt": "2026-10-12T20:12:08.469Z"
+    },
+    {
+      "id": "REQ-006",
+      "statement": "When Git is available and it is low-risk, repository evidence records whether its content was committed HEAD content, modified working-tree content or untracked content, as additional provenance only; content hashes stay authoritative and Git stays optional.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-12T20:12:08.469Z",
+      "updatedAt": "2026-10-12T20:12:08.469Z"
+    },
+    {
+      "id": "REQ-007",
+      "statement": "Behavioral changes ship as new immutable versions (Agent Contract, Skill Registry with archived instruction bytes), internal.1–.3 stay immutable, existing workspaces stay readable, and the package is prepared as 0.3.10-internal.4 with docs updated after runtime behavior is proven — without commit, tag or push.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-12T20:12:08.469Z",
+      "updatedAt": "2026-10-12T20:12:08.469Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "yallaflow start \"<request>\", direct feature/bug/investigate/change/refactor/release commands, file intake for new work, and route of a pending intake fail with PROJECT_UNDERSTANDING_REQUIRED in an un-understood Brownfield project, create no work item or source, and print the baseline start command as the next valid action — including while a baseline draft awaits human approval.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-12T20:12:08.469Z",
+      "updatedAt": "2026-10-12T20:12:08.469Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "brief, inspect, status, doctor, agent status, context status/read, baseline start/status/show/draft/feedback/approve, source reads and intake add to the baseline work item keep working before the baseline; Greenfield projects and approved Brownfield projects create work exactly as before.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-12T20:12:08.469Z",
+      "updatedAt": "2026-10-12T20:12:08.469Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-001",
+      "statement": "The Agent Contract (new version) distinguishes transient operational assistance (start Docker or a dev server, open the app, show logs, git status, local processes) — handled without a work item and without a baseline — from project-semantic engineering work, which goes through the CLI and its pre-baseline refusal.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-12T20:12:08.469Z",
+      "updatedAt": "2026-10-12T20:12:08.469Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-002",
+      "statement": "The refusal names the original request as the baseline objective (baseline start --objective), the baseline work records it, and after approval baseline approve and brief name the original request as the next work to continue; the following work reuses approved memory with targeted intent/freshness discovery only.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-12T20:12:08.469Z",
+      "updatedAt": "2026-10-12T20:12:08.469Z"
+    },
+    {
+      "id": "AC-005",
+      "requirement": "REQ-003",
+      "statement": "A central sanitizer redacts PASSWORD/*_PASSWORD and other secret-named assignments, API keys and access tokens, Authorization/Bearer values, private key blocks, cookie/session secrets and credential-bearing database URLs (e.g. DB_PASSWORD=real-secret → DB_PASSWORD=<redacted>), while ordinary evidence such as the path .env, TOKEN_TTL=3600 or prose about passwords is unchanged; redaction is idempotent.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-12T20:12:08.469Z",
+      "updatedAt": "2026-10-12T20:12:08.469Z"
+    },
+    {
+      "id": "AC-006",
+      "requirement": "REQ-003",
+      "statement": "Every YallaFlow-owned durable path that can hold arbitrary text — structured YAML state (baseline facts/evidence/notes/limitations, checkpoint summaries, rulings, knowledge candidates, purpose, requests, questions, requirements, convergence, source metadata and native-text rawText, verification metadata, the context ledger and its projection), Markdown work records, ADRs, verification logs and extracted source text — persists redacted values; developer files and source originals are byte-for-byte unchanged.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-12T20:12:08.469Z",
+      "updatedAt": "2026-10-12T20:12:08.469Z"
+    },
+    {
+      "id": "AC-007",
+      "requirement": "REQ-004",
+      "statement": "Once the context ledger holds current facts, PROJECT.md no longer contains the init starter placeholders (exact, untouched template text only); human-written content is preserved; the canonical ledger and projection drift checks stay consistent; this repository's own PROJECT.md demonstrates it.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-12T20:12:08.469Z",
+      "updatedAt": "2026-10-12T20:12:08.469Z"
+    },
+    {
+      "id": "AC-008",
+      "requirement": "REQ-005",
+      "statement": "baseline show and baseline status report coverage: declared inspected and sampled areas, not-inspected/out-of-scope and unavailable limitations, unresolved facts, and the number of distinct repository paths the evidence cites relative to the inventory, stating that fact counts do not imply complete reading; a draft without declared coverage is reported as such.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-12T20:12:08.469Z",
+      "updatedAt": "2026-10-12T20:12:08.469Z"
+    },
+    {
+      "id": "AC-009",
+      "requirement": "REQ-006",
+      "statement": "Repository file evidence normalized in a Git work tree records workingTree head|modified|untracked; outside Git nothing changes and freshness still uses content hashes; existing ledgers stay valid and the projection output is unchanged.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-12T20:12:08.469Z",
+      "updatedAt": "2026-10-12T20:12:08.469Z"
+    },
+    {
+      "id": "AC-010",
+      "requirement": "REQ-007",
+      "statement": "Agent Contract and Skill Registry versions are bumped where semantics changed, the released repository-baseline instruction bytes are archived byte-for-byte with SHA-256 pins, old work still receives its pinned instruction version, the frozen internal.3 CLI can read an internal.4 workspace, and package/CLI report 0.3.10-internal.4 with nothing committed, tagged or pushed.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-12T20:12:08.469Z",
+      "updatedAt": "2026-10-12T20:12:08.469Z"
+    },
+    {
+      "id": "AC-011",
+      "requirement": "REQ-007",
+      "statement": "An end-to-end synthetic pilot regression (init → refused start → baseline with the original request as objective → draft → still refused while awaiting approval → approve → original request continues with memory reused → another task) passes from the source checkout and from the packed package, and the README keeps the simple journey with the Brownfield approval flow and the transient-assistance exception.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-12T20:12:08.469Z",
+      "updatedAt": "2026-10-12T20:12:08.469Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-10-12T20:12:08.469Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-10-12T20:12:08.469Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-10-12T20:12:08.469Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-004",
+      "at": "2026-10-12T20:12:08.469Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-005",
+      "at": "2026-10-12T20:12:08.469Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-006",
+      "at": "2026-10-12T20:12:08.469Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-007",
+      "at": "2026-10-12T20:12:08.469Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-10-12T20:12:08.469Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-10-12T20:12:08.469Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-10-12T20:12:08.469Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-10-12T20:12:08.469Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-005",
+      "at": "2026-10-12T20:12:08.469Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-006",
+      "at": "2026-10-12T20:12:08.469Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-007",
+      "at": "2026-10-12T20:12:08.469Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-008",
+      "at": "2026-10-12T20:12:08.469Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-009",
+      "at": "2026-10-12T20:12:08.469Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-010",
+      "at": "2026-10-12T20:12:08.469Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-011",
+      "at": "2026-10-12T20:12:08.469Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-10-12T20:12:08.469Z"
+}

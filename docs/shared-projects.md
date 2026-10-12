@@ -92,7 +92,7 @@ The agent adapter (`CLAUDE.md` / `AGENTS.md`) tells every session to run `yallaf
 
 ### 2. Project understanding first
 
-An existing repository without approved understanding reports `PROJECT_UNDERSTANDING_REQUIRED`. YallaFlow enforces it: no application change is authorized until project understanding is approved. The agent establishes the understanding once — one deep Brownfield baseline that a human approves — and then continues with the developer's request; the developer is asked only to approve. Every later session and every teammate reads the approved memory; nobody rescans the repository. See [Purpose-aware discovery](#purpose-aware-discovery).
+An existing repository without approved understanding reports `PROJECT_UNDERSTANDING_REQUIRED`. YallaFlow enforces it: no normal engineering work item is created or routed (and no application change is authorized) until project understanding is approved. The agent establishes the understanding once — one deep Brownfield baseline that a human approves — and then continues with the developer's request; the developer is asked only to approve. Every later session and every teammate reads the approved memory; nobody rescans the repository. See [Purpose-aware discovery](#purpose-aware-discovery).
 
 ### 3. Branch-safe identifiers
 

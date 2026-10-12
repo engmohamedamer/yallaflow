@@ -1,6 +1,6 @@
 # CLI Reference
 
-YallaFlow v0.3.10 (internal.3). Every command also answers `--help` / `-h` (at any position, including sub-actions such as `yallaflow knowledge propose --help`) without changing any state. `[work-id]` defaults to the active work item.
+YallaFlow v0.3.10 (internal.4). Every command also answers `--help` / `-h` (at any position, including sub-actions such as `yallaflow knowledge propose --help`) without changing any state. `[work-id]` defaults to the active work item.
 
 ## Workspace
 
@@ -26,7 +26,7 @@ In a Shared Project (`config.yaml` `yallaflow.minimumVersion`), every state-chan
 | `yallaflow purpose set [work-id] --objective TEXT [--mode bootstrap\|intent\|freshness] [--preserve TEXT]... [--focus TEXT]...` | Record or replace (with history) a work item's discovery purpose in `work/<id>/purpose.yaml`. Work intent only — never promoted into project memory. |
 | `yallaflow purpose show [work-id]` | Show it. |
 
-`brief`, `start`, `route`, `guide`, and the direct work commands report `PROJECT_UNDERSTANDING_REQUIRED` for an existing (Brownfield) project without approved understanding. Until the baseline is approved, no work item can enter or continue an application-writing stage (`advance` refuses, `reopen --to implementation` refuses, write access reports NOT AUTHORIZED); the NEXT VALID ACTION is the next baseline step. Greenfield projects are never scanned or gated.
+`brief`, `status`, and `guide` report `PROJECT_UNDERSTANDING_REQUIRED` for an existing (Brownfield) project without approved understanding. **Pre-baseline engineering gate (internal.4):** until the baseline is approved — including while a draft awaits review — `start "<request>"`, the direct work commands (`feature`, `bug`, `investigate`, `change`, `refactor`, `release`), `intake <file>` for new work, and `route` refuse with `PROJECT_UNDERSTANDING_REQUIRED` (exit 1), create nothing, and print the NEXT VALID ACTION — `yallaflow baseline start --objective "<the request>"`, or the current baseline step. Read-only orientation (`brief`, `inspect`, `status`, `doctor`, `agent status`, `context` reads, `source` reads, `skill`), the baseline lifecycle, and `intake add <baseline-id>` stay available. Work that already existed (created by an earlier release) still cannot enter or continue an application-writing stage (`advance` and `reopen --to implementation` refuse; write access reports NOT AUTHORIZED). After `baseline approve`, the original request (the baseline objective) is named as the next work — by `baseline approve` and by `brief` until a later work item exists. Greenfield projects and Brownfield projects with approved understanding are never scanned or gated.
 
 ## Shared Projects
 
@@ -114,8 +114,8 @@ Gates: `discovery`, `clarification`, `design`, `specification`, `plan`, `decompo
 | Command | Purpose |
 |---|---|
 | `yallaflow baseline start` | Create (or resume) the baseline work item (read-only for application code). Prints the onboarding steps: `inspect`, `intake add` for material documents, the `repository-baseline` checkpoint, `baseline draft`, then human review and approval. Refused once a baseline is approved. |
-| `yallaflow baseline draft <work-id> --file <baseline.json>` | Record facts and discovery limitations (requires the `repository-baseline` checkpoint). |
-| `yallaflow baseline status [work-id]` · `yallaflow baseline show [work-id]` | Review the draft; `status` names the next baseline step. |
+| `yallaflow baseline draft <work-id> --file <baseline.json>` | Record facts, discovery limitations, and (optional, internal.4) declared `coverage: { "inspected": [...], "sampled": [...] }` (requires the `repository-baseline` checkpoint). Secret values are redacted before anything is persisted. |
+| `yallaflow baseline status [work-id]` · `yallaflow baseline show [work-id]` | Review the draft; `status` names the next baseline step. Both print **Discovery coverage**: declared inspected and sampled areas, not-inspected/out-of-scope and unavailable limitations, unresolved facts, and how many distinct repository paths the evidence cites against the inventory — never a completeness claim. `show` also marks cited files with uncommitted working-tree changes or untracked content. |
 | `yallaflow baseline approve [work-id] [--note TEXT]` | Promote facts into the project-context ledger. Only on the developer's explicit approval: the Agent presents the draft, and when the developer approves in the conversation it records that approval here with `--note` (their words); it never approves on its own judgment. No interaction mode approves automatically. |
 | `yallaflow baseline feedback [work-id] --changes-requested [--note TEXT]` | Request changes. |
 
@@ -130,10 +130,10 @@ Gates: `discovery`, `clarification`, `design`, `specification`, `plan`, `decompo
 | `yallaflow knowledge review [work-id] --none` | Record that no durable knowledge was found. |
 | `yallaflow context status` | Per-area current / may-be-stale / stale-evidence / disputed / unresolved / superseded counts and facts to revalidate. In a workspace without a Git commit to compare against, also explains that file evidence is still checked by SHA-256 content hash and that directory evidence is UNKNOWN (not stale). Read-only. |
 | `yallaflow context list [--area AREA] [--all]` | Current facts with freshness; `--all` includes superseded. |
-| `yallaflow context show <CTX-id>` · `yallaflow context history <CTX-id>` | One fact in detail; its lineage and events. |
+| `yallaflow context show <CTX-id>` · `yallaflow context history <CTX-id>` | One fact in detail; its lineage and events. Repository evidence shows its working-tree provenance when recorded (committed HEAD content, uncommitted changes, or untracked file). |
 | `yallaflow context affected [--since REF] [path ...]` | Facts whose evidence paths changed (working tree, since a ref, or given paths). |
 | `yallaflow context adopt [--dry-run]` | `--dry-run` lists legacy v0.3.5 items not yet governed (read-only). Without it, imports only when provably duplicate-free (one legacy item, no current facts); otherwise refused — use reconciliation. |
-| `yallaflow context render` | Regenerate managed Markdown blocks from the ledger. |
+| `yallaflow context render` | Regenerate managed Markdown blocks from the ledger. Once project memory holds current facts it also retires PROJECT.md's untouched init starter prompts (human-written sections stay); `doctor` warns while they remain. |
 | `yallaflow limitation add [work-id] --type TYPE --area AREA --summary TEXT --reason TEXT` · `yallaflow limitation list [work-id]` | Work-scoped discovery limitations. |
 
 Knowledge kinds: `architecture`, `database`, `integration`, `environment`, `convention`, `business-rule`, `project`, `tech-stack`, `decision`. Limitation types: `not-inspected`, `unavailable`, `out-of-scope`, `runtime-unavailable`, `insufficient-evidence`, `uncaptured-artifact`. Limitation areas: the eight context areas plus `requirement`, `testing`, `security`, `other`.

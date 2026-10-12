@@ -77,12 +77,31 @@ export async function legacyWorkspace({ baseline = DEFAULT_BASELINE, knowledge =
   return { root, baselineId, workIds, workId: workIds[0] ?? null };
 }
 
+// Work that an older YallaFlow created in a Brownfield workspace whose understanding
+// predates the canonical ledger (v0.3.5 sections, or before any fact existed). Since
+// v0.3.10-internal.4 the CLI refuses to create work in that state, so the historical
+// state is reproduced by creating it while the project is recorded as Greenfield.
+export async function asOlderYallaFlow(root, create) {
+  const file = path.join(workspacePath(root), 'config.yaml');
+  const original = await readFile(file, 'utf8');
+  const config = JSON.parse(original);
+  await writeFile(file, JSON.stringify({ ...config, project: { ...config.project, kind: 'greenfield' } }, null, 2));
+  try {
+    return await create();
+  } finally {
+    await writeFile(file, original);
+  }
+}
+
 // One investigation whose knowledge candidates were promoted the v0.3.5 way (append-only
 // Markdown sections, no CTX fact) — usable on any workspace, including the v0.3.6 fixture.
 export async function addLegacyKnowledge(root, candidates, title = 'Legacy investigation') {
   const base = workspacePath(root);
-  const pending = await createPendingIntake(root, title);
-  await routeWorkItem(root, pending.id, { work_type: 'investigation', scope: 'bounded', confidence: 'high', reason: 'Read-only.' });
+  const pending = await asOlderYallaFlow(root, async () => {
+    const created = await createPendingIntake(root, title);
+    await routeWorkItem(root, created.id, { work_type: 'investigation', scope: 'bounded', confidence: 'high', reason: 'Read-only.' });
+    return created;
+  });
   for (let i = 0; i < 6; i++) await advanceActiveWork(root, pending.id);
   for (const candidate of candidates) await proposeKnowledge(root, pending.id, { source: 'implementation-runtime', ...candidate });
   const file = knowledgeFilePath(root, pending.id);
@@ -99,8 +118,11 @@ export async function addLegacyKnowledge(root, candidates, title = 'Legacy inves
 // A v0.3.6-native CTX fact produced by ordinary work (the "CTX-0001 already exists"
 // situation of an upgraded workspace).
 export async function promoteCurrentFact(root, input) {
-  const pending = await createPendingIntake(root, `Current work: ${input.summary}`);
-  await routeWorkItem(root, pending.id, { work_type: 'investigation', scope: 'bounded', confidence: 'high', reason: 'Read-only.' });
+  const pending = await asOlderYallaFlow(root, async () => {
+    const created = await createPendingIntake(root, `Current work: ${input.summary}`);
+    await routeWorkItem(root, created.id, { work_type: 'investigation', scope: 'bounded', confidence: 'high', reason: 'Read-only.' });
+    return created;
+  });
   for (let i = 0; i < 6; i++) await advanceActiveWork(root, pending.id);
   const { candidate } = await proposeKnowledge(root, pending.id, { source: 'implementation-runtime', ...input });
   await promoteKnowledge(root, pending.id, candidate.id);

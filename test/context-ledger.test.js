@@ -34,7 +34,9 @@ async function repoRoot() {
   await writeFile(path.join(root, '.env'), 'DB_PASSWORD=super-secret-value\n');
   git(root, ['add', '-A']);
   git(root, ['commit', '-qm', 'init']);
-  await initWorkspace(root, 'demo', 'brownfield');
+  // The project kind is incidental here; a Brownfield workspace would first need an
+  // approved baseline before any work item exists (v0.3.10-internal.4 pre-baseline gate).
+  await initWorkspace(root, 'demo', 'greenfield');
   return root;
 }
 

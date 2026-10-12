@@ -8,6 +8,33 @@ YallaFlow has not yet made a public npm release (`package.json` remains `"privat
 
 Nothing yet.
 
+## [0.3.10-internal.4] - 2026-10-12 — Pilot hardening
+
+**Internal prerelease. Not published to npm.** Focused hardening from a real Brownfield pilot, on top of the immutable `0.3.10-internal.3`. Developed as a YallaFlow-governed work item in YallaFlow's own repository, which now has an approved self-baseline.
+
+- **Pre-baseline engineering gate.** In a Brownfield project without approved understanding (including while a draft awaits approval), normal engineering work is refused before anything is written.
+  - `start "<request>"`, `feature`/`bug`/`investigate`/`change`/`refactor`/`release`, `intake <file>`, and `route` fail with `PROJECT_UNDERSTANDING_REQUIRED` (exit 1), create no work item or source, and name `yallaflow baseline start --objective "<the request>"` (or the current baseline step) as the next valid action.
+  - A read-only question is engineering work too: understand deeply once, revalidate precisely afterwards.
+  - Read-only orientation, the baseline lifecycle, `intake add` to the baseline, and source reads stay available. Greenfield and approved Brownfield projects are unchanged.
+  - Work created before the gate by an earlier release keeps the internal.3 write gate and cannot be routed until the baseline is approved.
+- **The original request survives the baseline.** It becomes the baseline objective. After approval, `baseline approve` and `brief` name it as the next work (`yallaflow start "<request>"`) until a later work item exists, so the agent continues it without asking again and without a second repository-wide discovery.
+- **Durable secret redaction.**
+  - One sanitizer (`src/security/redact.js`) runs at YallaFlow's persistence boundary: structured state, the context ledger and its projection, work records, ADRs, verification logs and command lines, and extracted source text.
+  - It covers secret-named assignments, Authorization/Bearer/Basic values, cookies, private keys, URL credentials, and well-known token formats. `DB_PASSWORD=real-secret` is stored as `DB_PASSWORD=<redacted>`; `.env` stays valid evidence.
+  - It is conservative and idempotent. Developer files and preserved source originals are never modified; `intake` warns when a captured original appears to contain secrets.
+- **PROJECT.md is a real projection.** Once project memory holds a current fact, the untouched init starter prompts are retired; human-written sections stay and nothing is invented. `doctor` warns when an earlier approval left them; `yallaflow context render` repairs it.
+- **Baseline coverage transparency.** `baseline draft` accepts an optional `coverage: { "inspected": [...], "sampled": [...] }` (an additive `baseline.yaml` field). `baseline draft`/`status`/`show` print inspected, sampled, not inspected, unavailable, and unresolved coverage plus the repository paths the evidence cites against the inventory, and never claim completeness.
+- **Working-tree evidence provenance.** In a Git work tree, newly normalized repository evidence records `workingTree: head | modified | untracked` (an additive evidence field). Content hashes still decide freshness and work without Git, and the projection output is unchanged.
+- **Agent Contract v8** covers:
+  - the pre-baseline refusal and the original request as the baseline objective, continued automatically after approval;
+  - transient operational assistance (Docker, dev server, logs, `git status`, processes) versus project-semantic engineering work;
+  - declared coverage, and never copying secret values into YallaFlow state.
+- **Skill Registry v8** ships `repository-baseline` instruction **v4**. v3 is archived byte-for-byte, so work pinned to v7 keeps v3.
+- **Docs.**
+  - The README and the practical guide explain the Brownfield first request (fix or question), approval, and continuation, plus the operational-help exception.
+  - The CLI, security, limitations, upgrade, installation, and releasing docs are updated.
+- Package `0.3.10-internal.4`. No persisted schema version changes: config, context ledger, knowledge, baseline, purpose, and source schemas are unchanged. Bootstrap block v2 is unchanged. The frozen internal.3 CLI reads an internal.4 workspace.
+
 ## [0.3.10-internal.3] - 2026-10-12 — One setup command
 
 **Internal prerelease. Not published to npm.** A runtime onboarding fix on top of the immutable `0.3.10-internal.2`.

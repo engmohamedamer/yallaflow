@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { readFile, stat } from 'node:fs/promises';
-import { gitHead } from '../core/git.js';
+import { gitHead, gitWorkingTreeStates, WORKING_TREE_STATES } from '../core/git.js';
 import { EVIDENCE_TYPES } from './constants.js';
 
 // Normalizes the agent's `--evidence` references into structured, freshness-capable
@@ -19,6 +19,12 @@ export async function normalizeEvidenceRefs(root, refs, { workId = null, verific
   const head = adopted ? null : gitHead(root);
   const entries = [];
   for (const raw of refs) entries.push(await normalizeOne(root, String(raw).trim(), { workId, verificationRuns, head, adopted }));
+  // v0.3.10-internal.4: where Git is available, also record whether the hashed content
+  // was the committed HEAD content, uncommitted working-tree content, or untracked.
+  // Provenance only — freshness stays on the content hash, which needs no Git.
+  const files = entries.filter((entry) => entry.type === 'repository' && entry.contentHash);
+  const states = head && files.length ? gitWorkingTreeStates(root, files.map((entry) => entry.path)) : null;
+  if (states) for (const entry of files) entry.workingTree = states.get(entry.path);
   return entries;
 }
 
@@ -117,6 +123,18 @@ export function formatEvidence(entry) {
   return `${entry.ref} (reference)`;
 }
 
+// Working-tree provenance for display outside the projection (formatEvidence feeds the
+// projection drift check, so its output stays unchanged).
+export const WORKING_TREE_LABELS = Object.freeze({
+  head: 'committed HEAD content',
+  modified: 'uncommitted working-tree changes',
+  untracked: 'untracked file'
+});
+
+export function describeWorkingTree(entry) {
+  return entry?.workingTree ? ` [${WORKING_TREE_LABELS[entry.workingTree] ?? entry.workingTree}]` : '';
+}
+
 export function validateEvidenceEntry(entry) {
   if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return 'evidence entry must be an object';
   if (!EVIDENCE_TYPES.includes(entry.type)) return `evidence entry has unknown type ${JSON.stringify(entry.type)}`;
@@ -125,6 +143,7 @@ export function validateEvidenceEntry(entry) {
     if (path.isAbsolute(entry.path) || entry.path.split('/').includes('..')) return `repository evidence path ${JSON.stringify(entry.path)} must be relative to the project root`;
     if (entry.contentHash !== undefined && !/^sha256:[0-9a-f]{64}$/.test(entry.contentHash)) return `repository evidence ${entry.path} has a malformed contentHash`;
     if (entry.gitCommit !== undefined && !/^[0-9a-f]{7,64}$/.test(entry.gitCommit)) return `repository evidence ${entry.path} has a malformed gitCommit`;
+    if (entry.workingTree !== undefined && !WORKING_TREE_STATES.includes(entry.workingTree)) return `repository evidence ${entry.path} has an unknown workingTree ${JSON.stringify(entry.workingTree)}`;
   }
   if (['runtime', 'user-confirmed'].includes(entry.type) && !isNonEmptyString(entry.description)) return `${entry.type} evidence requires a description`;
   if (entry.type === 'reference' && !isNonEmptyString(entry.ref)) return 'reference evidence requires a ref';

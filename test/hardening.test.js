@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import os from 'node:os';
 import path from 'node:path';
 import { initWorkspace, workspacePath } from '../src/core/workspace.js';
+import { exists } from '../src/utils/fs.js';
 import { REGISTRY_VERSION } from '../src/skills/constants.js';
 import { SKILL_REGISTRY } from '../src/skills/registry.js';
 import { validateSkillRegistry } from '../src/skills/validation.js';
@@ -39,9 +40,9 @@ async function workspaceWithPinnedWork(registryVersion) {
 // ---------------------------------------------------------------------------
 // Skill Registry immutability
 
-test('every released skill instruction version is immutable bytes with a recorded hash; the registry is v7', async () => {
-  assert.equal(REGISTRY_VERSION, 7);
-  assert.deepEqual(await validateSkillRegistry(), { registryVersion: 7, skillCount: 12 });
+test('every released skill instruction version is immutable bytes with a recorded hash; the registry is v8', async () => {
+  assert.equal(REGISTRY_VERSION, 8);
+  assert.deepEqual(await validateSkillRegistry(), { registryVersion: 8, skillCount: 12 });
   for (const [skillId, versions] of Object.entries(SKILL_INSTRUCTION_VERSIONS)) {
     for (const [version, entry] of Object.entries(versions)) {
       assert.equal(sha(await readFile(path.join(repo, entry.path), 'utf8')), entry.sha256, `${skillId} v${version}`);
@@ -113,54 +114,88 @@ function toImplementationGate(root, id) {
   for (let i = 0; i < 6; i += 1) cli(root, ['advance', id]);
 }
 
-test('first-use gate: an un-understood Brownfield project cannot authorize application writes; the baseline step is the next valid action', async () => {
+// Work an older YallaFlow (internal.1–.3) created before the baseline existed: those
+// releases allowed creating work in an un-understood Brownfield project. Simulated by
+// running the command while the project is recorded as Greenfield, then restoring.
+async function preGateWork(root, args) {
+  const file = path.join(workspacePath(root), 'config.yaml');
+  const original = await readFile(file, 'utf8');
+  const config = JSON.parse(original);
+  await writeFile(file, JSON.stringify({ ...config, project: { ...config.project, kind: 'greenfield' } }, null, 2));
+  try {
+    return cli(root, args);
+  } finally {
+    await writeFile(file, original);
+  }
+}
+
+test('first-use gate: an un-understood Brownfield project refuses normal work outright; the baseline is the next valid action, then work continues', async () => {
   const root = await brownfield();
-  cli(root, ['start', 'Fix invoice totals']);
-  cli(root, ['route', 'PF-0001', '--type', 'bug', '--scope', 'bounded', '--confidence', 'high', '--reason', 'Totals wrong.', '--title', 'Invoice totals']);
-  toImplementationGate(root, 'PF-0001');
-  const meta = JSON.parse(await readFile(path.join(workspacePath(root), 'work', 'PF-0001', 'meta.yaml'), 'utf8'));
-  assert.equal(meta.status, 'FIX_PLAN', 'diagnosis stages are not gated');
-  const before = await readFile(path.join(workspacePath(root), 'work', 'PF-0001', 'meta.yaml'), 'utf8');
+  // v0.3.10-internal.4: no normal work item is created before understanding is approved.
+  for (const args of [['start', 'Fix invoice totals'], ['bug', 'Invoice totals', '--scope', 'bounded'], ['investigate', 'Why are totals wrong?', '--scope', 'bounded']]) {
+    const refused = cli(root, args, false);
+    assert.equal(refused.status, 1, args.join(' '));
+    assert.match(refused.stderr, /^PROJECT_UNDERSTANDING_REQUIRED: [\s\S]*No work item was created\.[\s\S]*NEXT VALID ACTION: yallaflow baseline start --objective '/);
+  }
+  await writeFile(path.join(root, 'notes.md'), '# Totals\n');
+  assert.match(cli(root, ['intake', 'notes.md'], false).stderr, /PROJECT_UNDERSTANDING_REQUIRED/);
+  assert.equal(await exists(path.join(workspacePath(root), 'sources')), false, 'a refused intake persists no source');
+  assert.equal(await exists(path.join(workspacePath(root), 'work')), true);
+  assert.equal(cli(root, ['status']).stdout.includes('Work items: 0'), true);
+
+  // The Agent runs the baseline with the original request as its objective; while it
+  // is in progress or awaiting review, normal work is still refused.
+  cli(root, ['baseline', 'start', '--objective', 'Fix invoice totals']);
+  assert.match(cli(root, ['start', 'Fix invoice totals'], false).stderr, /PROJECT_UNDERSTANDING_IN_PROGRESS[\s\S]*NEXT VALID ACTION: yallaflow checkpoint PF-0001 --skill repository-baseline/);
+  cli(root, ['checkpoint', 'PF-0001', '--skill', 'repository-baseline', '--complete', '--summary', 'Discovery complete.']);
+  await writeFile(path.join(root, 'b.json'), JSON.stringify({ facts: [{ area: 'business-rule', status: 'confirmed', summary: 'Invoice totals are the sum of line amounts.', evidence: ['backend/invoices/totals.js'], source: 'repository' }] }));
+  cli(root, ['baseline', 'draft', 'PF-0001', '--file', 'b.json']);
+  assert.match(cli(root, ['start', 'Fix invoice totals'], false).stderr, /PROJECT_UNDERSTANDING_AWAITING_REVIEW[\s\S]*NEXT VALID ACTION: yallaflow baseline show PF-0001/);
+
+  // Human approval is the only way through; the original request then continues.
+  const approved = cli(root, ['baseline', 'approve', 'PF-0001']).stdout;
+  assert.match(approved, /Continue the original request now[\s\S]*Fix invoice totals[\s\S]*Next: yallaflow start 'Fix invoice totals'/);
+  assert.match(cli(root, ['start', 'Fix invoice totals']).stdout, /Created PF-0002/);
+  cli(root, ['route', 'PF-0002', '--type', 'bug', '--scope', 'bounded', '--confidence', 'high', '--reason', 'Totals wrong.', '--title', 'Invoice totals']);
+  toImplementationGate(root, 'PF-0002');
+  assert.match(cli(root, ['advance', 'PF-0002']).stdout, /FIX_PLAN → IMPLEMENTATION/);
+  assert.match(cli(root, ['guide', 'PF-0002']).stdout, /Application code modification: AUTHORIZED|Implementation is authorized/);
+});
+
+test('first-use gate: work created before the gate (an older YallaFlow) cannot write, reopen, or be routed; read-only work proceeds; Greenfield is never gated', async () => {
+  const root = await brownfield();
+  await preGateWork(root, ['bug', 'Totals', '--scope', 'bounded']);
+  const metaFile = path.join(workspacePath(root), 'work', 'PF-0001', 'meta.yaml');
+  const meta = JSON.parse(await readFile(metaFile, 'utf8'));
+  await preGateWork(root, ['checkpoint', 'PF-0001', '--skill', 'context-discovery', '--complete', '--summary', 'ok']);
+  await preGateWork(root, ['checkpoint', 'PF-0001', '--skill', 'systematic-debugging', '--complete', '--summary', 'ok', '--evidence', 'backend/invoices/totals.js']);
+  for (let i = 0; i < 6; i += 1) cli(root, ['advance', 'PF-0001']);
+  assert.equal(JSON.parse(await readFile(metaFile, 'utf8')).status, 'FIX_PLAN', 'diagnosis stages are not gated');
+  const before = await readFile(metaFile, 'utf8');
   const refused = cli(root, ['advance', 'PF-0001'], false);
-  assert.equal(refused.status, 1);
   assert.match(refused.stderr, /Cannot advance from FIX_PLAN to IMPLEMENTATION: PROJECT_UNDERSTANDING_REQUIRED[\s\S]*Nothing was changed/);
-  assert.equal(await readFile(path.join(workspacePath(root), 'work', 'PF-0001', 'meta.yaml'), 'utf8'), before);
+  assert.equal(await readFile(metaFile, 'utf8'), before);
   const guide = cli(root, ['guide', 'PF-0001']).stdout;
   assert.match(guide, /BLOCKER:\nPROJECT_UNDERSTANDING_REQUIRED — establish and approve project understanding before application changes/);
   assert.match(guide, /NEXT VALID ACTION:\nyallaflow baseline start/);
 
-  // The Agent runs the baseline (no new lifecycle); while it awaits review, still gated.
-  cli(root, ['baseline', 'start']);
-  assert.match(cli(root, ['guide', 'PF-0001']).stdout, /BLOCKER:\nPROJECT_UNDERSTANDING_IN_PROGRESS[\s\S]*NEXT VALID ACTION:\nyallaflow checkpoint PF-0002 --skill repository-baseline/);
-  cli(root, ['checkpoint', 'PF-0002', '--skill', 'repository-baseline', '--complete', '--summary', 'Discovery complete.']);
-  await writeFile(path.join(root, 'b.json'), JSON.stringify({ facts: [{ area: 'business-rule', status: 'confirmed', summary: 'Invoice totals are the sum of line amounts.', evidence: ['backend/invoices/totals.js'], source: 'repository' }] }));
-  cli(root, ['baseline', 'draft', 'PF-0002', '--file', 'b.json']);
-  assert.match(cli(root, ['guide', 'PF-0001']).stdout, /BLOCKER:\nPROJECT_UNDERSTANDING_AWAITING_REVIEW[\s\S]*NEXT VALID ACTION:\nyallaflow baseline show PF-0002 +\(after the developer explicitly approves: yallaflow baseline approve PF-0002 --note/);
-  assert.equal(cli(root, ['advance', 'PF-0001'], false).status, 1);
-
-  // Human approval is the only way through; the original work then continues.
-  cli(root, ['baseline', 'approve', 'PF-0002']);
-  assert.match(cli(root, ['advance', 'PF-0001']).stdout, /FIX_PLAN → IMPLEMENTATION/);
-  assert.match(cli(root, ['guide', 'PF-0001']).stdout, /Application code modification: AUTHORIZED|Implementation is authorized/);
-});
-
-test('first-use gate: in-flight writes and reopen are closed too; read-only work and Greenfield are never gated', async () => {
-  const root = await brownfield();
-  // Work that reached IMPLEMENTATION before the gate (e.g. created by v0.3.9).
-  cli(root, ['bug', 'Totals', '--scope', 'bounded']);
-  const metaFile = path.join(workspacePath(root), 'work', 'PF-0001', 'meta.yaml');
-  const meta = JSON.parse(await readFile(metaFile, 'utf8'));
+  // In-flight writes (work already in IMPLEMENTATION) and reopen are closed too.
   await writeFile(metaFile, JSON.stringify({ ...meta, status: 'IMPLEMENTATION' }, null, 2));
   await writeFile(path.join(workspacePath(root), 'state', 'current.yaml'), JSON.stringify({ schemaVersion: 1, activeWork: 'PF-0001', stage: 'IMPLEMENTATION', updatedAt: null }));
-  cli(root, ['checkpoint', 'PF-0001', '--skill', 'context-discovery', '--complete', '--summary', 'ok']);
-  cli(root, ['checkpoint', 'PF-0001', '--skill', 'systematic-debugging', '--complete', '--summary', 'ok', '--evidence', 'backend/invoices/totals.js']);
-  const handoff = cli(root, ['handoff', 'PF-0001']).stdout;
-  assert.match(handoff, /Application code modification: NOT AUTHORIZED\nReason: PROJECT_UNDERSTANDING_REQUIRED/);
+  assert.match(cli(root, ['handoff', 'PF-0001']).stdout, /Application code modification: NOT AUTHORIZED\nReason: PROJECT_UNDERSTANDING_REQUIRED/);
   assert.match(cli(root, ['advance', 'PF-0001'], false).stderr, /Cannot advance from IMPLEMENTATION to VERIFICATION: PROJECT_UNDERSTANDING_REQUIRED/);
   await writeFile(metaFile, JSON.stringify({ ...meta, status: 'DONE' }, null, 2));
   assert.match(cli(root, ['reopen', 'PF-0001', '--to', 'implementation', '--reason', 'Regression'], false).stderr, /Cannot reopen PF-0001 into IMPLEMENTATION: PROJECT_UNDERSTANDING_REQUIRED[\s\S]*No files were changed/);
-  // Read-only investigation proceeds.
-  const created = cli(root, ['investigate', 'Why are totals wrong?', '--scope', 'bounded']).stdout;
+
+  // A pending intake an older YallaFlow created is not routed into normal work.
+  await preGateWork(root, ['start', 'Refund rounding']);
+  const pendingMeta = path.join(workspacePath(root), 'work', 'PF-0002', 'meta.yaml');
+  const pending = await readFile(pendingMeta, 'utf8');
+  assert.match(cli(root, ['route', 'PF-0002', '--type', 'bug', '--scope', 'bounded', '--confidence', 'high', '--reason', 'x'], false).stderr, /PROJECT_UNDERSTANDING_REQUIRED[\s\S]*Original request \(keep it[\s\S]*Refund rounding/);
+  assert.equal(await readFile(pendingMeta, 'utf8'), pending, 'a refused route changes nothing');
+
+  // A read-only investigation that already exists proceeds.
+  const created = (await preGateWork(root, ['investigate', 'Why are totals wrong?', '--scope', 'bounded'])).stdout;
   const id = /Created (PF-\d+)/.exec(created)[1];
   for (let i = 0; i < 3; i += 1) cli(root, ['advance', id]);
 

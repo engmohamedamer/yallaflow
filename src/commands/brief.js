@@ -6,7 +6,7 @@ import { needsCare, oneLine } from '../context/summary.js';
 import { AREA_LABELS } from '../context/constants.js';
 import { BOOTSTRAP_PROVIDERS } from '../agent/bootstrap.js';
 import { loadDeliverySummary } from '../delivery/summary.js';
-import { baselineNextStep, findBaselineWork } from '../baseline/store.js';
+import { baselineNextStep, findBaselineWork, pendingOriginalRequest } from '../baseline/store.js';
 import { classifyProject, inventoryRepository } from '../inventory/inventory.js';
 import { assessProjectUnderstanding, UNDERSTANDING } from '../baseline/understanding.js';
 import { checkProjectCompatibility, describeCompatibility, loadSharedPolicy } from '../shared/config.js';
@@ -15,6 +15,7 @@ import { planSharedIntegration } from '../shared/memory.js';
 import { ledgerFingerprint, shortFingerprint } from '../shared/fingerprint.js';
 import { loadContextLedger } from '../context/ledger.js';
 import { describePurpose, loadWorkPurpose } from '../purpose/store.js';
+import { shellQuote } from '../security/redact.js';
 
 // Project-first brief (v0.3.9): fixed area order, fixed per-area caps, fact-ID order
 // within an area, no ranking, no ledger field. Conventions and business rules show a
@@ -129,6 +130,10 @@ function projectBlock(memory) {
   return lines;
 }
 
+function understandingEstablished(report) {
+  return report.memory.exists && !report.memory.unreadable;
+}
+
 // Only computed when there is no project memory yet: the bounded inventory and any
 // existing baseline, so the brief can say what the repository is and how to onboard.
 async function onboardingState(root) {
@@ -183,6 +188,9 @@ async function primaryConcern(root, report, active, delivery, onboarding, shared
   if (onboarding && !onboarding.baseline && (onboarding.classification.kind === 'brownfield' || report.project.kind === 'brownfield')) {
     return { text: `no project memory yet — establish an evidence-backed Brownfield baseline (yallaflow inspect first; a human approves the draft) before substantial work, then continue with the request [${UNDERSTANDING.REQUIRED}]`, command: 'yallaflow baseline start' };
   }
+  // v0.3.10-internal.4: the request that made the baseline necessary continues next.
+  const original = understandingEstablished(report) ? await pendingOriginalRequest(root) : null;
+  if (original) return { text: `project understanding approved — continue the original request that started the Brownfield baseline (${original.baselineId}) without asking the developer to repeat it: ${oneLine(original.objective)}`, command: `yallaflow start ${shellQuote(original.objective)}` };
   if (report.memory.exists && report.memory.revalidate.length) return { text: `${report.memory.revalidate.length} project fact(s) may be stale or disputed`, command: 'yallaflow context status' };
   return { text: 'none — ready for new work', command: 'yallaflow start "<request>"' };
 }

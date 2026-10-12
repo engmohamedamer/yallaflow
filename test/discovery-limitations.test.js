@@ -26,7 +26,9 @@ function run(root, args) {
 async function investigation() {
   const root = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-limit-'));
   await writeFile(path.join(root, 'schema.sql'), 'create table users(id int);\n');
-  await initWorkspace(root, 'demo', 'brownfield');
+  // The project kind is incidental here; a Brownfield workspace would first need an
+  // approved baseline before any work item exists (v0.3.10-internal.4 pre-baseline gate).
+  await initWorkspace(root, 'demo', 'greenfield');
   const pending = await createPendingIntake(root, 'Investigate reporting data source');
   await routeWorkItem(root, pending.id, { work_type: 'investigation', scope: 'bounded', confidence: 'high', reason: 'Read-only.' });
   return { root, workId: pending.id };
@@ -88,7 +90,9 @@ test('limitations appear in handoff as work-scoped, not as project facts', async
 test('a baseline records runtime-unavailable limitations for review but never promotes them', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-limit-baseline-'));
   await writeFile(path.join(root, 'schema.sql'), 'create table users(id int);\n');
-  await initWorkspace(root, 'demo', 'brownfield');
+  // The project kind is incidental here; a Brownfield workspace would first need an
+  // approved baseline before any work item exists (v0.3.10-internal.4 pre-baseline gate).
+  await initWorkspace(root, 'demo', 'greenfield');
   const { meta } = await startBaseline(root);
   await checkpointWork(root, meta.id, { skillId: 'repository-baseline', status: 'completed', summary: 'Discovered.', evidence: [] });
   await draftBaseline(root, meta.id, {
@@ -117,7 +121,9 @@ test('a baseline records runtime-unavailable limitations for review but never pr
 
 test('a baseline fact may not restate one of its own discovery limitations', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-limit-baseline-'));
-  await initWorkspace(root, 'demo', 'brownfield');
+  // The project kind is incidental here; a Brownfield workspace would first need an
+  // approved baseline before any work item exists (v0.3.10-internal.4 pre-baseline gate).
+  await initWorkspace(root, 'demo', 'greenfield');
   const { meta } = await startBaseline(root);
   await checkpointWork(root, meta.id, { skillId: 'repository-baseline', status: 'completed', summary: 'Discovered.', evidence: [] });
   await assert.rejects(() => draftBaseline(root, meta.id, {

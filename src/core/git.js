@@ -42,3 +42,23 @@ export function gitChangedPaths(root, ref = 'HEAD') {
   if (untracked.status === 0) for (const line of untracked.stdout.split('\n')) if (line.trim()) paths.add(line.trim());
   return [...paths].sort();
 }
+
+// Working-tree provenance (v0.3.10-internal.4), additional to content hashes — never a
+// replacement for them, and never required. For repository file paths (relative to
+// root) returns a Map path → 'head' (identical to the committed HEAD content),
+// 'modified' (uncommitted changes relative to HEAD, including newly staged files), or
+// 'untracked' (not tracked by Git, including ignored files). Returns null outside a Git
+// work tree, without a HEAD commit, or if Git fails — callers then record nothing.
+export const WORKING_TREE_STATES = Object.freeze(['head', 'modified', 'untracked']);
+
+export function gitWorkingTreeStates(root, relativePaths) {
+  const paths = [...new Set(relativePaths)];
+  if (!paths.length || !gitHead(root)) return null;
+  const changed = spawnSync('git', ['diff', '--name-only', '-z', '--relative', 'HEAD', '--', ...paths], { cwd: root, encoding: 'utf8' });
+  const untracked = spawnSync('git', ['ls-files', '-z', '--others', '--', ...paths], { cwd: root, encoding: 'utf8' });
+  if (changed.status !== 0 || untracked.status !== 0) return null;
+  const split = (output) => new Set(output.split('\0').filter(Boolean));
+  const modified = split(changed.stdout);
+  const others = split(untracked.stdout);
+  return new Map(paths.map((entry) => [entry, others.has(entry) ? 'untracked' : modified.has(entry) ? 'modified' : 'head']));
+}

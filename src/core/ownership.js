@@ -3,6 +3,7 @@ import { exists, readText } from '../utils/fs.js';
 import { workspacePath } from './workspace.js';
 import { BOOTSTRAP_PROVIDERS } from '../agent/bootstrap.js';
 import { SOURCE_ID_SOURCE, WORK_ID_SOURCE } from './ids.js';
+import { redactSecrets } from '../security/redact.js';
 
 // Who may write each part of .yallaflow/ (v0.3.7). The invariant: an Agent never
 // edits YallaFlow-owned structured or history state directly when a supported CLI
@@ -71,6 +72,8 @@ export async function checkWorkRecordOwnership(root, meta) {
   const content = await readText(file);
   if (!content.includes('\n## Routing Decision\n')) return [];
   const expected = `\n## Routing Decision\n\n**Status:** routed\n**Work type:** ${meta.type}\n**Scope:** ${meta.scope}\n**Confidence:** ${meta.routingConfidence}\n**Reason:** ${meta.routingReason}\n**Timestamp:** ${meta.routedAt}\n`;
-  if (content.includes(expected)) return [];
+  // Redaction-invariant (v0.3.10-internal.4): a record written before redaction existed
+  // still matches meta.yaml once either side has had a secret value redacted.
+  if (content.includes(expected) || redactSecrets(content).includes(redactSecrets(expected))) return [];
   return [`${meta.id}: work.md's CLI-recorded Routing Decision no longer matches meta.yaml (edited by hand?). Lifecycle records in work.md are history written by YallaFlow; change classification only through supported commands.`];
 }

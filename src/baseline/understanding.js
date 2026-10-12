@@ -4,6 +4,7 @@ import { workspacePath } from '../core/workspace.js';
 import { loadContextLedger } from '../context/ledger.js';
 import { classifyProject, inventoryRepository } from '../inventory/inventory.js';
 import { baselineNextStep, findBaselineWork } from './store.js';
+import { shellQuote } from '../security/redact.js';
 
 // Project understanding (v0.3.10): every YallaFlow project establishes durable,
 // evidence-backed understanding before substantial work — but the evidence differs:
@@ -125,4 +126,43 @@ export async function projectUnderstandingGate(root) {
     blocker: `${assessment.state} — establish and approve project understanding before application changes`,
     action: step
   };
+}
+
+// The pre-baseline engineering gate (v0.3.10-internal.4). The internal.3 gate above
+// only blocks application-writing stages, so in a real pilot the first project
+// question ("How does subscription renewal work?") became a narrow read-only
+// investigation that bypassed the initial project understanding. Understand deeply
+// once, then revalidate precisely: while a Brownfield project (recorded kind) has no
+// approved understanding, no normal engineering work item — feature, bug,
+// investigation, change, refactor, release, or an unclassified `start` intake — may
+// be created or routed. The only way through is the existing baseline lifecycle.
+// Checked before anything is written. Greenfield and approved Brownfield projects
+// are never affected; read-only orientation, the baseline itself, intake into the
+// baseline, and transient operational help (which never creates work) stay allowed.
+// `request` is the developer's original request: it is named as the baseline's
+// discovery objective so it survives the baseline and continues after approval.
+export async function assertEngineeringWorkAllowed(root, { request = null } = {}) {
+  const gate = await projectUnderstandingGate(root);
+  if (!gate) return;
+  const original = typeof request === 'string' && request.trim() ? request.trim().replace(/\s+/g, ' ') : null;
+  const lines = [
+    `${UNDERSTANDING.REQUIRED}: this existing project has no approved project understanding yet, so normal engineering work cannot start. No work item was created.`
+  ];
+  if (gate.state === UNDERSTANDING.REQUIRED) {
+    lines.push(
+      'Establish it once first — Brownfield baseline discovery, a draft, and the developer\'s explicit approval — then continue with this request.',
+      ...(original ? [`Original request (keep it: it is the baseline's discovery objective and continues after approval): ${original}`] : []),
+      `NEXT VALID ACTION: yallaflow baseline start${original ? ` --objective ${shellQuote(original.slice(0, 500))}` : ''}`
+    );
+  } else {
+    const assessment = await assessProjectUnderstanding(root, { kind: 'brownfield' });
+    lines.push(
+      `Baseline status: ${assessment.detail ?? assessment.label} (${gate.state}).`,
+      ...(original ? [`Original request (continues after the baseline is approved): ${original}`] : []),
+      `NEXT VALID ACTION: ${gate.action}`
+    );
+  }
+  const error = new Error(lines.join('\n'));
+  error.code = UNDERSTANDING.REQUIRED;
+  throw error;
 }

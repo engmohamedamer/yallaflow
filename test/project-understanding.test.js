@@ -37,21 +37,22 @@ test('1. an existing meaningful repository without an approved baseline reports 
   assert.match(brief, /Next: yallaflow baseline start/);
 });
 
-test('2. a real work request on an un-understood project routes the Agent to the baseline first — without the developer asking', async () => {
+test('2. a real work request on an un-understood project is refused and routes the Agent to the baseline first — without the developer asking', async () => {
   const root = await brownfield();
-  const start = cli(root, ['start', 'Fix invoice totals']).stdout;
-  assert.match(start, /PROJECT_UNDERSTANDING_REQUIRED: this existing project has no approved project understanding yet\./);
-  assert.match(start, /establish it once before substantial work — yallaflow baseline start.*continue with this request after approval\. The developer does not need to ask for it\./);
-  const route = cli(root, ['route', 'PF-0001', '--type', 'bug', '--scope', 'bounded', '--confidence', 'high', '--reason', 'Totals wrong.', '--title', 'Invoice totals']).stdout;
-  assert.match(route, /PROJECT_UNDERSTANDING_REQUIRED/);
-  assert.match(cli(root, ['guide', 'PF-0001']).stdout, /PROJECT_UNDERSTANDING_REQUIRED/);
-  // Guidance, not a gate: work state is unchanged and the request is preserved.
-  assert.match(cli(root, ['status']).stdout, /PF-0001/);
-  // Once the baseline is in progress, the notice names where it stands instead.
-  cli(root, ['baseline', 'start']);
-  assert.match(cli(root, ['guide', 'PF-0001']).stdout, /PROJECT_UNDERSTANDING_IN_PROGRESS: baseline PF-0002 in progress/);
+  // v0.3.10-internal.4: the pre-baseline engineering gate refuses normal work outright
+  // (internal.3 created the item and only printed a notice).
+  const start = cli(root, ['start', 'Fix invoice totals'], false);
+  assert.equal(start.status, 1);
+  assert.match(start.stderr, /^PROJECT_UNDERSTANDING_REQUIRED: this existing project has no approved project understanding yet, so normal engineering work cannot start\. No work item was created\./);
+  assert.match(start.stderr, /NEXT VALID ACTION: yallaflow baseline start --objective 'Fix invoice totals'/);
+  assert.match(cli(root, ['status']).stdout, /Work items: 0/);
+  // Once the baseline is in progress, the refusal names where it stands instead.
+  cli(root, ['baseline', 'start', '--objective', 'Fix invoice totals']);
+  const again = cli(root, ['start', 'Fix invoice totals'], false);
+  assert.equal(again.status, 1);
+  assert.match(again.stderr, /Baseline status: baseline PF-0001 in progress[\s\S]*\(PROJECT_UNDERSTANDING_IN_PROGRESS\)[\s\S]*NEXT VALID ACTION: yallaflow checkpoint PF-0001 --skill repository-baseline/);
   // The baseline itself never gets the notice.
-  assert.doesNotMatch(cli(root, ['guide', 'PF-0002']).stdout, /PROJECT_UNDERSTANDING_/);
+  assert.doesNotMatch(cli(root, ['guide', 'PF-0001']).stdout, /PROJECT_UNDERSTANDING_/);
 });
 
 test('3. an approved baseline unlocks normal work: no understanding notice, established state', async () => {

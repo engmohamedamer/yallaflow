@@ -9,7 +9,11 @@
 // 7 — v0.3.10-internal.3: repository-baseline instruction v3 (conversational baseline
 //     approval: the Agent records the developer's explicit approval). Same skills and
 //     capability pins; work pinned to v6 keeps instruction v2.
-export const REGISTRY_VERSION = 7;
+// 8 — v0.3.10-internal.4: repository-baseline instruction v4 (the developer's original
+//     request as the baseline objective and its automatic continuation after approval,
+//     declared discovery coverage, never copying secret values). Same skills and
+//     capability pins; work pinned to v7 keeps instruction v3.
+export const REGISTRY_VERSION = 8;
 
 export const SKILL_PHASES = Object.freeze([
   'discovery',

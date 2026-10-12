@@ -123,7 +123,7 @@ yallaflow context history CTX-0017          # lineage and events
 
 ## Markdown projection
 
-Each context document (`PROJECT.md`, `context/*.md`) holds exactly one managed block rendered deterministically from the ledger: current facts, then disputed facts under an explicit warning. Superseded facts never appear there. Content outside the block — your notes, bootstrap hints, pre-v0.3.6 sections — is preserved. Freshness is deliberately not rendered, so the Markdown changes only when the ledger does.
+Each context document (`PROJECT.md`, `context/*.md`) holds exactly one managed block rendered deterministically from the ledger: current facts, then disputed facts under an explicit warning. Superseded facts never appear there. Content outside the block — your notes, bootstrap hints, pre-v0.3.6 sections — is preserved, with one exception: once the ledger holds a current fact, PROJECT.md's untouched `yallaflow init` starter prompts ("Describe what the system does…") are retired, so an onboarded project never reads like the template (internal.4; nothing is invented in their place). Freshness is deliberately not rendered, so the Markdown changes only when the ledger does. Recognizable secret values are never rendered or stored ([security](security.md)).
 
 Do not edit inside the block. `doctor` reports drift; `yallaflow context render` regenerates the blocks.
 

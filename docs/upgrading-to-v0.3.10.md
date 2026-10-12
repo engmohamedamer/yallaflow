@@ -7,8 +7,8 @@ v0.3.10 reads v0.3.5–v0.3.9 workspaces as-is: **nothing is migrated on read**.
 ## 1. Install the new CLI
 
 ```bash
-npm install -g git+https://github.com/engmohamedamer/yallaflow.git#v0.3.10-internal.3   # or a release tarball
-yallaflow --version                  # 0.3.10-internal.3
+npm install -g git+https://github.com/engmohamedamer/yallaflow.git#v0.3.10-internal.4   # or a release tarball
+yallaflow --version                  # 0.3.10-internal.4
 yallaflow upgrade status             # read-only: what the workspace needs
 ```
 
@@ -48,6 +48,18 @@ Nothing else changes until you enable sharing.
 - `yallaflow init` also installs the thin agent bootstrap in `CLAUDE.md` and `AGENTS.md` — one setup command. Existing content in those files is kept; an edited, newer, or malformed managed block makes `init` refuse with nothing written; a failure rolls back. Workspaces initialized earlier are unaffected: run `yallaflow agent setup claude` / `codex` once if a pointer file is missing.
 - Baseline approval is conversational: the agent presents the project understanding, the developer replies (for example "Approve"), and the agent records that explicit approval with `yallaflow baseline approve --note "<their words>"`. It never approves on its own judgment. Run `yallaflow agent refresh` to install Agent Contract v7.
 
+## 3b. From internal.3 to internal.4 (pilot hardening)
+
+Found by a real Brownfield pilot. No persisted schema changes: every internal.1–.3 workspace reads as-is, and the frozen internal.3 CLI reads an internal.4 workspace.
+
+- **Pre-baseline engineering gate.** In a Brownfield project without approved understanding — including while a baseline draft awaits approval — `start "<request>"`, `feature`/`bug`/`investigate`/`change`/`refactor`/`release`, `intake <file>` for new work, and `route` refuse with `PROJECT_UNDERSTANDING_REQUIRED`, create nothing, and name `yallaflow baseline start --objective "<the request>"` (or the current baseline step) as the next valid action. A read-only question is engineering work too. Read-only orientation, the baseline itself, `intake add <baseline-id>`, and transient operational help (start a dev server, show logs, `git status`) are unaffected. Greenfield and approved Brownfield projects are unchanged. Pending or in-flight work an earlier release created before the baseline stays readable but cannot be routed or write until the baseline is approved.
+- **The original request survives the baseline.** It becomes the baseline objective; after approval, `baseline approve` and `brief` name it as the next work so the agent continues it without asking you to repeat it — and without another repository-wide discovery.
+- **Secret values are never persisted.** Recognizable secret values are redacted (`DB_PASSWORD=<redacted>`) in every YallaFlow-owned durable record. Developer files and preserved source originals are never modified; `intake` warns when a captured original appears to contain secrets. Earlier state is not rewritten — review existing `.yallaflow/` history if a credential may have been recorded.
+- **PROJECT.md is a real projection.** Once project memory holds a fact, the untouched init starter prompts are retired. A workspace approved by internal.3 still shows them: `doctor` warns, and `yallaflow context render` fixes it (human-written sections stay).
+- **Baseline coverage is transparent.** `baseline draft` accepts an optional `coverage: { "inspected": [...], "sampled": [...] }`; `baseline status`/`show` report inspected, sampled, not inspected, unavailable, and unresolved coverage plus the repository paths the evidence cites.
+- **Working-tree provenance.** In a Git work tree, newly recorded repository evidence notes whether the content was committed (`head`), uncommitted (`modified`), or `untracked`. Content hashes still decide freshness; outside Git nothing changes.
+- **Versions.** Agent Contract **v8** and Skill Registry **v8** (`repository-baseline` instruction v4; v3 archived byte-for-byte, so work pinned to v7 keeps v3). Run `yallaflow agent refresh` to install the contract.
+
 ## 4. Turning a project into a Shared Project (optional)
 
 A maintainer does this once. See [shared-projects.md](shared-projects.md).
@@ -84,14 +96,14 @@ Existing work, sources, and facts are never renamed or rewritten.
 
 | Item | Change |
 |---|---|
-| Package | `0.3.10-internal.3` (internal.2: docs-only re-release of internal.1; internal.3: `init` installs both agent bootstraps, conversational baseline approval) |
-| Agent Contract | v5 → **v6** (internal.1) → **v7** (internal.3: the Agent records the developer's explicit baseline approval) |
+| Package | `0.3.10-internal.4` (internal.2: docs-only re-release of internal.1; internal.3: `init` installs both agent bootstraps, conversational baseline approval; internal.4: pilot hardening — pre-baseline gate, original-request continuity, secret redaction, real PROJECT.md, coverage, provenance) |
+| Agent Contract | v5 → **v6** (internal.1) → **v7** (internal.3: the Agent records the developer's explicit baseline approval) → **v8** (internal.4: pre-baseline refusal, original-request continuity, transient operational assistance vs engineering work, declared coverage, never copy secret values) |
 | Provider bootstrap block | v1 → **v2** |
 | Config schema | v1 unchanged; **v2 only for Shared Projects** |
 | Context ledger schema | unchanged (v1/v2) |
 | Knowledge ledger | v1 unchanged; **v2** only for ledgers holding Shared Project shapes (`staged`, `stagedAt`, `relation.factFingerprint`) — the frozen v0.3.9 reader refuses v2 instead of misreading it |
 | Source schema | v2 unchanged |
-| Skill Registry | v5 → **v6**: immutable, hash-pinned instruction versions; work pinned to v1–v5 keeps the v0.3.9 instruction bytes → **v7** (internal.3): `repository-baseline` instruction v3 (conversational approval); v6 work keeps v2 |
+| Skill Registry | v5 → **v6**: immutable, hash-pinned instruction versions; work pinned to v1–v5 keeps the v0.3.9 instruction bytes → **v7** (internal.3): `repository-baseline` instruction v3 (conversational approval); v6 work keeps v2 → **v8** (internal.4): `repository-baseline` instruction v4 (original request as objective, declared coverage, no secret values); v7 work keeps v3 |
 | Checkout tag | 10 Crockford-base32 characters (50 bits) |
 
 Downgrades are not supported once a v0.3.10 CLI has enabled sharing or written shared state.

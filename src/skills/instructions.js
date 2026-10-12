@@ -34,7 +34,8 @@ export const SKILL_INSTRUCTION_VERSIONS = Object.freeze({
   'repository-baseline': {
     1: { path: 'resources/skills/archive/repository-baseline.v1.md', sha256: '4bf7cf6816fe0f5cd3de763bb1116af348d9f8bb6d53df1b5e7a2db3b5b906a2' },
     2: { path: 'resources/skills/archive/repository-baseline.v2.md', sha256: '6a169a7dfb07ef8b77ef85bafb1fc657433f777571c7e683a095be276e7a3ee5' },
-    3: { path: 'resources/skills/repository-baseline.md', sha256: '67f5c0cfa5b9aeee15bf20c1173477c6471ed9d5ce8d42bd59fa50db9a9a9972' }
+    3: { path: 'resources/skills/archive/repository-baseline.v3.md', sha256: '67f5c0cfa5b9aeee15bf20c1173477c6471ed9d5ce8d42bd59fa50db9a9a9972' },
+    4: { path: 'resources/skills/repository-baseline.md', sha256: '99b749b793155306078cf5ee1c574e8a6d3ee72489bf4850c56d5556319728ae' }
   },
   'requirement-clarification': { 1: { path: 'resources/skills/requirement-clarification.md', sha256: '6e980db5f14632b56b158f12c4720c022710b8fe0b499bb3fb26692c451c72af' } },
   specification: { 1: { path: 'resources/skills/specification.md', sha256: '2e5427c9767a8ebbf73d6c5cdc1024f8fbd0aafe6191bf2bac1c09b13f478702' } },
@@ -46,7 +47,8 @@ export const SKILL_INSTRUCTION_VERSIONS = Object.freeze({
 // introduced them. A registry version pins the newest entry at or below it.
 export const REGISTRY_INSTRUCTION_VERSIONS = Object.freeze({
   6: Object.freeze({ 'context-discovery': 2, 'repository-baseline': 2 }),
-  7: Object.freeze({ 'repository-baseline': 3 })
+  7: Object.freeze({ 'repository-baseline': 3 }),
+  8: Object.freeze({ 'repository-baseline': 4 })
 });
 
 export function pinnedInstructionVersion(registryVersion, skillId) {

@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { appendFile } from 'node:fs/promises';
+import { appendRedactedText, writeRedactedText } from '../security/redact.js';
 import { exists, readText, writeText } from '../utils/fs.js';
 import { readYaml, writeYaml } from '../core/yaml.js';
 import { getCurrentState, listWork, nextWorkId, workspacePath, writeCurrentState } from '../core/workspace.js';
@@ -193,8 +193,8 @@ export async function startReconciliation(root, now = new Date().toISOString()) 
   const dir = path.join(workspacePath(root), 'work', id);
   await writeYaml(path.join(dir, 'meta.yaml'), meta);
   await writePlan(root, id, plan);
-  await writeText(path.join(dir, 'work.md'), reconciliationWorkTemplate(meta, candidates.length));
-  await writeText(path.join(dir, 'progress.md'), `# Work Ledger — ${id}\n\nCreated: ${now}\nKind: legacy project-context reconciliation\n\n- ${now} Reconciliation started (${candidates.length} legacy candidate(s)).\n`);
+  await writeRedactedText(path.join(dir, 'work.md'), reconciliationWorkTemplate(meta, candidates.length));
+  await writeRedactedText(path.join(dir, 'progress.md'), `# Work Ledger — ${id}\n\nCreated: ${now}\nKind: legacy project-context reconciliation\n\n- ${now} Reconciliation started (${candidates.length} legacy candidate(s)).\n`);
   await recordWorkMemoryBase(root, id, now);
   // Never steals focus from work already in progress.
   const state = await getCurrentState(root);
@@ -534,7 +534,7 @@ export async function applyReconciliation(root, requestedWorkId, now = new Date(
   await writePlan(root, meta.id, plan);
 
   const progressFile = path.join(workspacePath(root), 'work', meta.id, 'progress.md');
-  await appendFile(progressFile, `- ${now} Reconciliation applied: ${newlyApplied.length} candidate(s)${settled ? '; all candidates reconciled' : `; ${plan.candidates.filter((candidate) => !candidate.applied).length} pending`}.\n`, 'utf8');
+  await appendRedactedText(progressFile, `- ${now} Reconciliation applied: ${newlyApplied.length} candidate(s)${settled ? '; all candidates reconciled' : `; ${plan.candidates.filter((candidate) => !candidate.applied).length} pending`}.\n`, 'utf8');
   if (settled) await completeReconciliationWork(root, meta, now);
   return { meta, plan, newlyApplied, leftInPlace, archived: archive.length, completed: settled, ledger: current };
 }
@@ -576,9 +576,11 @@ async function retireLegacySection(root, workId, candidate, archive) {
   if (state === 'absent') return 'absent';
   if (state === 'edited') return 'left-in-place';
   const archiveFile = path.join(workspacePath(root), 'work', workId, RECONCILIATION_ARCHIVE_FILE);
-  const archived = await exists(archiveFile) ? await readText(archiveFile) : `# Retired legacy context sections — ${workId}\n\nVerbatim copies of v0.3.5 append-only sections retired from durable project documents by reconciliation. Historical record only; current project memory is .yallaflow/context/index.yaml.\n`;
+  const archived = await exists(archiveFile) ? await readText(archiveFile) : `# Retired legacy context sections — ${workId}\n\nVerbatim copies (recognizable secret values redacted) of v0.3.5 append-only sections retired from durable project documents by reconciliation. Historical record only; current project memory is .yallaflow/context/index.yaml.\n`;
   if (!archived.includes(`${marker}\n`)) {
-    await writeText(archiveFile, `${archived}\n## ${candidate.id} — from ${file}\n${section.startsWith('\n') ? section : `\n${section}`}`);
+    // The archive is YallaFlow-owned history: recognizable secret values a legacy
+    // section carried are not copied into it (v0.3.10-internal.4).
+    await writeRedactedText(archiveFile, `${archived}\n## ${candidate.id} — from ${file}\n${section.startsWith('\n') ? section : `\n${section}`}`);
   }
   await writeText(absolute, content.replace(section, ''));
   archive.push(candidate.id);

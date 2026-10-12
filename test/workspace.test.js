@@ -29,7 +29,7 @@ test('refuses to create a parallel workspace beside a legacy workspace', async (
 
 test('creates sequential work items and investigation is read-only', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-'));
-  await initWorkspace(root, 'demo', 'brownfield');
+  await initWorkspace(root, 'demo', 'greenfield'); // kind incidental (Brownfield work needs an approved baseline first)
   const one = await createRoutedWork(root, 'One', { work_type: 'feature', scope: 'bounded', confidence: 'high', reason: 'Test fixture.', title: 'One' });
   const two = await createRoutedWork(root, 'Two', { work_type: 'investigation', scope: 'spike', confidence: 'high', reason: 'Test fixture.', title: 'Two' });
   assert.equal(one.id, 'PF-0001');

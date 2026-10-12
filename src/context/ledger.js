@@ -5,6 +5,7 @@ import { workspacePath } from '../core/workspace.js';
 import { gitHead } from '../core/git.js';
 import { deriveProvenance, validateEvidenceEntry } from './evidence.js';
 import { writeContextProjection } from './projection.js';
+import { redactDeep } from '../security/redact.js';
 import { assertCanonicalMemoryWritable } from '../shared/config.js';
 import {
   CONFIDENCE_LEVELS,
@@ -106,6 +107,8 @@ export async function mutateContextLedger(root, mutator, now = new Date().toISOS
   const { ledger } = await loadContextLedger(root);
   const { result, touchedAreas } = await applyToDraft(ledger, mutator, { now, head: gitHead(root), minSchema });
   ledger.updatedAt = now;
+  // Secret values never reach canonical memory or its projection (src/security/redact.js).
+  redactInPlace(ledger);
   await writeLedgerAtomically(root, ledger);
   try {
     await writeContextProjection(root, ledger, [...touchedAreas]);
@@ -176,7 +179,13 @@ function renameKey(object, from, to, value) {
 }
 
 async function writeLedgerAtomically(root, ledger) {
-  await writeTextAtomic(contextLedgerPath(root), `${JSON.stringify(ledger, null, 2)}\n`);
+  await writeTextAtomic(contextLedgerPath(root), `${JSON.stringify(redactDeep(ledger), null, 2)}\n`);
+}
+
+function redactInPlace(ledger) {
+  const clean = redactDeep(ledger);
+  for (const name of Object.keys(ledger)) delete ledger[name];
+  Object.assign(ledger, clean);
 }
 
 // Every historical origin a fact carries, introducing origin first: `origins` (schema

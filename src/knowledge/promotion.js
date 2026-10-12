@@ -1,5 +1,6 @@
 import path from 'node:path';
-import { exists, readText, writeText } from '../utils/fs.js';
+import { writeRedactedText } from '../security/redact.js';
+import { exists, readText } from '../utils/fs.js';
 import { isSharedWorkspace, workspacePath } from '../core/workspace.js';
 import { integrateSharedMemory, stageCandidateDelta } from '../shared/memory.js';
 import { loadSharedPolicy } from '../shared/config.js';
@@ -148,7 +149,7 @@ async function promoteDecision(root, workId, candidate, now) {
     if (!current.includes(marker)) throw new Error(`Refusing to overwrite existing ADR at ${relative}.`);
     return relative;
   }
-  await writeText(file, adrDocument(workId, candidate, now, marker));
+  await writeRedactedText(file, adrDocument(workId, candidate, now, marker));
   return relative;
 }
 

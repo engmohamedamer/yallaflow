@@ -385,18 +385,23 @@ Your existing `AGENTS.md`/`CLAUDE.md` content is kept byte-for-byte; the block i
 
 ## First request on an existing project
 
-The developer asks for real work ("Fix invoice totals.") in a Brownfield repository that has no approved project understanding yet. `brief` (run automatically by the agent) and `start` report `PROJECT_UNDERSTANDING_REQUIRED`, and the agent handles it without being asked:
+The developer asks for real work ("Fix invoice totals.") — or a question ("How does subscription renewal work?") — in a Brownfield repository that has no approved project understanding yet. `brief` (run automatically by the agent) reports `PROJECT_UNDERSTANDING_REQUIRED`, and `start` refuses normal work until the baseline is approved (internal.4); the agent handles it without being asked:
 
 ```bash
-yallaflow start "Fix invoice totals"            # preserved; reports PROJECT_UNDERSTANDING_REQUIRED
-yallaflow baseline start --objective "Fix invoice totals; later redesign the invoice UI" --preserve "invoice calculation behavior"
-# agent: Brownfield discovery across the canonical core, deeper where the lens points
-yallaflow checkpoint PF-0002 --skill repository-baseline --complete --summary "..."
-yallaflow baseline draft PF-0002 --file baseline.json
-# agent presents the draft; developer replies "Approve" → yallaflow baseline approve PF-0002 --note "<their approval>"
-yallaflow route PF-0001 --type bug --scope bounded --confidence high --reason "..." --title "Invoice totals"
-# … the normal bug workflow continues from approved project memory
+yallaflow start "Fix invoice totals"            # refused: PROJECT_UNDERSTANDING_REQUIRED — nothing created
+                                                # NEXT VALID ACTION: yallaflow baseline start --objective "Fix invoice totals"
+yallaflow baseline start --objective "Fix invoice totals" --preserve "invoice calculation behavior"
+# agent: Brownfield discovery across the canonical core, deeper where the request points
+yallaflow checkpoint PF-0001 --skill repository-baseline --complete --summary "..."
+yallaflow baseline draft PF-0001 --file baseline.json     # facts, limitations, and declared coverage
+# agent presents the draft and its coverage; developer replies "Approve" →
+yallaflow baseline approve PF-0001 --note "<their approval>"   # names the original request as the next work
+yallaflow start "Fix invoice totals"            # the original request continues — the developer does not repeat it
+yallaflow route PF-0002 --type bug --scope bounded --confidence high --reason "..." --title "Invoice totals"
+# … the normal bug workflow continues from approved project memory (no second repository-wide discovery)
 ```
+
+Transient operational help — starting Docker or a dev server, showing logs, `git status` — never creates a work item and never waits for the baseline.
 
 ## Shared Project (team)
 

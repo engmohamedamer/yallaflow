@@ -1,10 +1,10 @@
 import path from 'node:path';
-import { appendFile } from 'node:fs/promises';
 import { exists } from '../utils/fs.js';
 import { readYaml, writeYamlAtomic } from '../core/yaml.js';
 import { workspacePath } from '../core/workspace.js';
 import { IMPACT_ID, IMPACT_SCHEMA_VERSION, IMPACT_VERDICTS } from './constants.js';
 import { isSourceId } from '../core/ids.js';
+import { appendRedactedText } from '../security/redact.js';
 
 // Change-impact records (v0.3.8). When the approved intent of in-flight work changes
 // after it was fixed — a new source is attached, or its requirements change — YallaFlow
@@ -111,7 +111,7 @@ export async function raiseImpact(root, meta, trigger, now = new Date().toISOStr
   }
   ledger.updatedAt = now;
   await writeYamlAtomic(impactFilePath(root, meta.id), ledger);
-  await appendFile(path.join(workspacePath(root), 'work', meta.id, 'progress.md'), `- ${now} Impact ${impact.id} pending: ${describeTrigger(entry)} changed approved intent after it was fixed\n`, 'utf8');
+  await appendRedactedText(path.join(workspacePath(root), 'work', meta.id, 'progress.md'), `- ${now} Impact ${impact.id} pending: ${describeTrigger(entry)} changed approved intent after it was fixed\n`, 'utf8');
   return impact;
 }
 

@@ -1,6 +1,5 @@
 import path from 'node:path';
-import { appendFile } from 'node:fs/promises';
-import { exists, writeText } from '../utils/fs.js';
+import { exists } from '../utils/fs.js';
 import { readYaml, writeYaml } from '../core/yaml.js';
 import { getCurrentState, listWork, nextWorkId, workspacePath, writeCurrentState } from '../core/workspace.js';
 import { loadWorkProgress } from '../core/progress.js';
@@ -12,6 +11,7 @@ import { KNOWLEDGE_POLICY_VERSION } from '../knowledge/constants.js';
 import { REGISTRY_VERSION } from '../skills/constants.js';
 import { recordWorkMemoryBase } from '../shared/memory.js';
 import { BASELINE_AREAS, BASELINE_FACT_SOURCES, BASELINE_FACT_STATUSES, BASELINE_SCHEMA_VERSION } from './constants.js';
+import { appendRedactedText, writeRedactedText } from '../security/redact.js';
 
 function baselineFilePath(root, workId) {
   return path.join(workspacePath(root), 'work', workId, 'baseline.yaml');
@@ -70,8 +70,8 @@ export async function startBaseline(root, now = new Date().toISOString()) {
   // first artifact that needs them, never eagerly.
   const dir = path.join(workspacePath(root), 'work', id);
   await writeYaml(path.join(dir, 'meta.yaml'), meta);
-  await writeText(path.join(dir, 'work.md'), baselineWorkTemplate(meta));
-  await writeText(path.join(dir, 'progress.md'), `# Work Ledger — ${id}\n\nCreated: ${now}\nKind: brownfield baseline discovery\n\n`);
+  await writeRedactedText(path.join(dir, 'work.md'), baselineWorkTemplate(meta));
+  await writeRedactedText(path.join(dir, 'progress.md'), `# Work Ledger — ${id}\n\nCreated: ${now}\nKind: brownfield baseline discovery\n\n`);
   await recordWorkMemoryBase(root, id, now);
   await writeCurrentState(root, {
     schemaVersion: 1, activeWork: id, stage: 'INTAKE', updatedAt: now
@@ -80,7 +80,7 @@ export async function startBaseline(root, now = new Date().toISOString()) {
 }
 
 function baselineWorkTemplate(meta) {
-  return `# ${meta.id} — Repository Baseline\n\n**Type:** ${meta.type} (read-only)\n**Status:** ${meta.status}\n\nBuild an evidence-backed understanding of this repository (tech stack, architecture, database, auth, integrations, environments, testing, conventions, business rules). Record findings as a structured draft with \`yallaflow baseline draft ${meta.id} --file <baseline.json>\`, complete the \`repository-baseline\` checkpoint, then request review with \`yallaflow baseline approve ${meta.id}\` once ready.\n\n## Discovery Notes\n\n`;
+  return `# ${meta.id} — Repository Baseline\n\n**Type:** ${meta.type} (read-only)\n**Status:** ${meta.status}\n\nBuild an evidence-backed understanding of this repository (tech stack, architecture, database, auth, integrations, environments, testing, conventions, business rules). Record findings as a structured draft with \`yallaflow baseline draft ${meta.id} --file <baseline.json>\`, complete the \`repository-baseline\` checkpoint, then request review with \`yallaflow baseline approve ${meta.id}\` once ready.\n\n## Discovery Notes\n`;
 }
 
 export async function loadBaseline(root, workId) {
@@ -123,6 +123,9 @@ export async function draftBaseline(root, workId, input, now = new Date().toISOS
     errors.push(...validateLimitation(entry, `limitation ${index + 1}`));
     limitations.push(entry);
   }
+  // Coverage (v0.3.10-internal.4): what the discovery actually read, declared by the
+  // Agent — so a long fact list is never mistaken for a complete reading.
+  const coverage = normalizeCoverage(input.coverage, errors);
   for (const fact of facts) {
     const clash = limitations.find((entry) => sameStatement(entry.summary, fact.summary));
     if (clash) errors.push(`fact ${fact.id} repeats discovery limitation ${clash.id}; a discovery limitation is not a project fact — keep it only under limitations.`);
@@ -134,6 +137,7 @@ export async function draftBaseline(root, workId, input, now = new Date().toISOS
     status: 'draft',
     facts,
     ...(limitations.length ? { limitations } : {}),
+    ...(coverage ? { coverage } : {}),
     history: [...(existing.exists ? existing.ledger.history : []), { action: 'drafted', at: now, factCount: facts.length }],
     draftedAt: now,
     updatedAt: now
@@ -204,7 +208,7 @@ export async function approveBaseline(root, workId, note, now = new Date().toISO
   if (state.activeWork === workId) {
     await writeCurrentState(root, { schemaVersion: 1, activeWork: null, stage: null, updatedAt: now });
   }
-  await appendFile(path.join(workspacePath(root), 'work', workId, 'progress.md'), `- ${now} Baseline approved and promoted (${ledger.facts.length} fact(s)).\n`, 'utf8');
+  await appendRedactedText(path.join(workspacePath(root), 'work', workId, 'progress.md'), `- ${now} Baseline approved and promoted (${ledger.facts.length} fact(s)).\n`, 'utf8');
   return { meta, ledger };
 }
 
@@ -217,6 +221,79 @@ export async function feedbackBaseline(root, workId, note, now = new Date().toIS
   ledger.updatedAt = now;
   await writeYaml(baselineFilePath(root, workId), ledger);
   return { meta, ledger };
+}
+
+// Optional, additive baseline.yaml field (no schema bump: earlier readers ignore it).
+//   inspected  areas/paths the discovery read directly
+//   sampled    areas/paths it inspected selectively (some files, not all)
+// What was NOT inspected or was unavailable stays in `limitations` (not-inspected,
+// out-of-scope, unavailable, runtime-unavailable, insufficient-evidence); what could
+// not be established stays an `unresolved` fact.
+export const COVERAGE_KINDS = Object.freeze(['inspected', 'sampled']);
+const MAX_COVERAGE_ENTRIES = 200;
+const MAX_COVERAGE_TEXT = 500;
+
+function normalizeCoverage(raw, errors) {
+  if (raw === undefined) return null;
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    errors.push('coverage must be an object: { "inspected": [...], "sampled": [...] }.');
+    return null;
+  }
+  const unknown = Object.keys(raw).filter((key) => !COVERAGE_KINDS.includes(key));
+  if (unknown.length) errors.push(`coverage has unknown field(s): ${unknown.join(', ')} (allowed: ${COVERAGE_KINDS.join(', ')}; record what was not inspected or unavailable under limitations).`);
+  const coverage = {};
+  for (const kind of COVERAGE_KINDS) {
+    if (raw[kind] === undefined) continue;
+    const list = raw[kind];
+    if (!Array.isArray(list) || list.some((entry) => typeof entry !== 'string' || !entry.trim() || entry.trim().length > MAX_COVERAGE_TEXT) || list.length > MAX_COVERAGE_ENTRIES) {
+      errors.push(`coverage.${kind} must be a list of at most ${MAX_COVERAGE_ENTRIES} non-empty entries of at most ${MAX_COVERAGE_TEXT} characters.`);
+      continue;
+    }
+    coverage[kind] = [...new Set(list.map((entry) => entry.trim().replace(/\s+/g, ' ')))];
+  }
+  if (!Object.keys(coverage).length) {
+    errors.push('coverage must declare at least one of: inspected, sampled.');
+    return null;
+  }
+  return coverage;
+}
+
+// Read-only coverage view for review: declared coverage, limitation categories,
+// unresolved facts, and the repository paths the evidence actually cites. Never a
+// completeness claim.
+const NOT_INSPECTED_TYPES = Object.freeze(['not-inspected', 'out-of-scope']);
+const UNAVAILABLE_TYPES = Object.freeze(['unavailable', 'runtime-unavailable', 'insufficient-evidence', 'uncaptured-artifact']);
+
+export async function summarizeCoverage(root, ledger) {
+  const limitations = ledger.limitations ?? [];
+  const cited = new Set();
+  for (const fact of ledger.facts) {
+    for (const ref of fact.evidence ?? []) {
+      const candidate = repositoryPathOf(ref);
+      if (candidate && await exists(path.join(root, candidate))) cited.add(candidate);
+    }
+  }
+  return {
+    declared: Boolean(ledger.coverage),
+    inspected: ledger.coverage?.inspected ?? [],
+    sampled: ledger.coverage?.sampled ?? [],
+    notInspected: limitations.filter((entry) => NOT_INSPECTED_TYPES.includes(entry.type)),
+    unavailable: limitations.filter((entry) => UNAVAILABLE_TYPES.includes(entry.type)),
+    unresolved: ledger.facts.filter((fact) => fact.status === 'unresolved'),
+    citedPaths: [...cited].sort()
+  };
+}
+
+// The repository path an evidence reference names (path, path#symbol, path:12-40),
+// or null for runtime:/user:/verification: and free-text references.
+export function repositoryPathOf(ref) {
+  if (typeof ref !== 'string') return null;
+  const value = ref.trim();
+  if (!value || /\s/.test(value) || /^(?:runtime|user|user-confirmed|verification):/i.test(value)) return null;
+  const candidate = value.replace(/#.*$/, '').replace(/:\d+(?:-\d+)?$/, '');
+  if (!candidate || path.isAbsolute(candidate)) return null;
+  const normalized = path.posix.normalize(candidate.split(path.sep).join('/'));
+  return normalized.startsWith('..') ? null : normalized.replace(/\/$/, '');
 }
 
 function normalizeFact(fact, index) {
@@ -290,4 +367,29 @@ async function resolveBaselineNextStep(root, meta) {
     text: `baseline ${id} draft (${ledger.facts.length} fact(s)) awaits the developer's review — present it and ask; approval is theirs, never the Agent's own judgment`,
     command: `yallaflow baseline show ${id}   (after the developer explicitly approves: yallaflow baseline approve ${id} --note "<their approval>" | changes: baseline feedback ${id} --changes-requested)`
   };
+}
+
+// Original-request continuity (v0.3.10-internal.4). When a developer's first request
+// made the Brownfield baseline necessary, that request is the baseline's discovery
+// objective (purpose.yaml). After approval it is the next work to continue — without
+// asking the developer to repeat it and without another repository-wide bootstrap —
+// until some later work item exists. Derived from durable state; nothing new stored.
+export async function pendingOriginalRequest(root) {
+  const work = await listWork(root);
+  const baseline = work.find((item) => item.baseline === true);
+  if (!baseline) return null;
+  const { exists: hasBaseline, ledger } = await loadBaseline(root, baseline.id);
+  if (!hasBaseline || ledger.status !== 'approved') return null;
+  const purposeFile = path.join(workspacePath(root), 'work', baseline.id, 'purpose.yaml');
+  if (!await exists(purposeFile)) return null;
+  let objective = null;
+  try {
+    objective = (await readYaml(purposeFile))?.objective ?? null;
+  } catch {
+    return null; // doctor reports an unreadable purpose
+  }
+  if (typeof objective !== 'string' || !objective.trim()) return null;
+  const approvedAt = ledger.approvedAt ?? baseline.updatedAt ?? '';
+  const continued = work.some((item) => item.id !== baseline.id && !item.reconciliation && (item.createdAt ?? '') >= approvedAt);
+  return continued ? null : { baselineId: baseline.id, objective: objective.trim() };
 }

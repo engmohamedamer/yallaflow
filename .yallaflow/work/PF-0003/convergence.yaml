@@ -1,0 +1,547 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-10-12T22:02:07.367Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+        "verificationRunIds": [
+          "V-013",
+          "V-014",
+          "V-015",
+          "V-016"
+        ]
+      },
+      "summary": "Assessed after final verification V-013..V-017 (post-review fixes).",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "start/direct commands/file intake/route refuse with PROJECT_UNDERSTANDING_REQUIRED before any write (no work dir, no ID, no source), naming baseline start --objective as next action, including in-progress and awaiting-review states.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/baseline/understanding.js",
+              "symbol": "assertEngineeringWorkAllowed",
+              "contentHash": "sha256:531efec216216c7a23503044ac985c4f565c851554ef7ef7e791a0653af9d161",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/behavior/routing.js",
+              "symbol": "createPendingIntake",
+              "contentHash": "sha256:cd94e9face7b2668278c074b642aa069032229f587195e3819a3f9577cd3db05",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/intake.js",
+              "symbol": "intakeCommand",
+              "contentHash": "sha256:25b9a43bcede1ffbc689c44e43811f86872a2f1771c232d19b93066c5f4f2a68",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/pilot-hardening.test.js",
+              "contentHash": "sha256:d822643a4ad749556c4b8042a339d871cfb3f690e8058c2b65687bb0a213b98d",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/hardening.test.js",
+              "contentHash": "sha256:745ff21e94e27542df4cf808e22fc3ace5562fbf65d8252bea20e7703d1e616f",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0003",
+              "verificationRunId": "V-013"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/e42baab8-6517-47a0-afd6-5c090ac66b1a/scratchpad/packed-e2e.sh /home/engamer/Amasi/YallaFlow (passed)",
+              "workId": "PF-0003",
+              "verificationRunId": "V-014"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Orientation commands, baseline lifecycle and intake add to the baseline work before the baseline and write nothing; Greenfield and approved Brownfield create work as before.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/pilot-hardening.test.js",
+              "contentHash": "sha256:d822643a4ad749556c4b8042a339d871cfb3f690e8058c2b65687bb0a213b98d",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/project-understanding.test.js",
+              "contentHash": "sha256:24199fc0650ad77a8e14d7fc9ee73031cf19f4eb28d1ad730fbd30a572849cc5",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0003",
+              "verificationRunId": "V-013"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "Agent Contract v8 distinguishes transient operational assistance (no work item, no baseline wait) from project-semantic engineering work under the deterministic gate.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agent/contract.js",
+              "symbol": "agentContractBody",
+              "contentHash": "sha256:35bbc48cd6daf436c40814fdfdc19cc00aafb1fd6246b540ddf9a42726b2d516",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/pilot-hardening.test.js",
+              "contentHash": "sha256:d822643a4ad749556c4b8042a339d871cfb3f690e8058c2b65687bb0a213b98d",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0003",
+              "verificationRunId": "V-013"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "The refusal names the request as baseline objective; purpose.yaml keeps it; baseline approve and brief name it (shell-safe) until a later work item exists; the continued work reuses approved memory, a second baseline is refused, and later work sees only targeted MAY_BE_STALE revalidation.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/baseline/store.js",
+              "symbol": "pendingOriginalRequest",
+              "contentHash": "sha256:87b61139e99cbbf9d19197aeeb4c808e158fbf9885cc4eb2840f767190ee48fd",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/baseline.js",
+              "symbol": "baselineApproveCommand",
+              "contentHash": "sha256:713bee8fc77d2dc98cfce22e6c98a84d0afe1142bdb19e525c54a97b1ca14470",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/brief.js",
+              "contentHash": "sha256:009ee9385c04eea5e685da1f3b09820e6aead71e1920dbc883c1d1f1b49a03e4",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/pilot-hardening.test.js",
+              "contentHash": "sha256:d822643a4ad749556c4b8042a339d871cfb3f690e8058c2b65687bb0a213b98d",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/e42baab8-6517-47a0-afd6-5c090ac66b1a/scratchpad/packed-e2e.sh /home/engamer/Amasi/YallaFlow (passed)",
+              "workId": "PF-0003",
+              "verificationRunId": "V-014"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "Central sanitizer covers secret-named assignments (incl. =>, :=, flags), Authorization/Bearer/Basic, cookies, private keys, URL credentials and token formats; ordinary evidence (.env path, TOKEN_TTL, tests pass, type annotations, code references) unchanged; fixed-point idempotent; linear time.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/security/redact.js",
+              "symbol": "redactSecrets",
+              "contentHash": "sha256:682b24df5bc11cb32f3b3958f2d394c6d59acfbd3b4adc819cad78657b866b40",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/pilot-hardening.test.js",
+              "contentHash": "sha256:d822643a4ad749556c4b8042a339d871cfb3f690e8058c2b65687bb0a213b98d",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0003",
+              "verificationRunId": "V-013"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "Redaction is applied at writeYaml/writeYamlAtomic (all structured state incl. source.json rawText, verification.json, purpose, questions, rulings, knowledge, baseline, reconciliation), the ledger writer and projection renderer, Markdown work-record writers, ADRs, the reconciliation archive, verification logs and extracted.txt; preserved originals and developer files stay byte-for-byte (intake warns). End-to-end tests grep all .yallaflow state for synthetic secrets.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/core/yaml.js",
+              "contentHash": "sha256:22d507352494586a6a5893965235788c38eb08c63d52741a7c5d1549299b73de",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/context/ledger.js",
+              "contentHash": "sha256:2f0e2db60052798222fc0e68d180019e75fc2390b1235624ec899e2f32ede8d0",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/context/projection.js",
+              "contentHash": "sha256:eb6adc05d757a621acdf9f010991b8b5bfe0a434c9a0654b037ea61177cada8c",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/verify.js",
+              "contentHash": "sha256:b1260dc9419280576ac7c1ec648913d4b8315056314ec20d26f7726b6d27b6a4",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/core/sources.js",
+              "contentHash": "sha256:ee24a15554ca5dfeb23d3d89c027d7f1385eb784da518178a387fcf1fe820b7e",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/reconciliation/store.js",
+              "contentHash": "sha256:8cc0b9f4c8c9232e8592770b442b42e3bbe4acae5642932bdf4d9780911c4639",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/pilot-hardening.test.js",
+              "contentHash": "sha256:d822643a4ad749556c4b8042a339d871cfb3f690e8058c2b65687bb0a213b98d",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0003",
+              "verificationRunId": "V-013"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/e42baab8-6517-47a0-afd6-5c090ac66b1a/scratchpad/packed-e2e.sh /home/engamer/Amasi/YallaFlow (passed)",
+              "workId": "PF-0003",
+              "verificationRunId": "V-014"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "Projection retires only exact untouched init prompts once the ledger holds a current fact; human sections stay; doctor warns otherwise; this repository's PROJECT.md was repaired by context render.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/context/projection.js",
+              "symbol": "stripStarterPlaceholders",
+              "contentHash": "sha256:eb6adc05d757a621acdf9f010991b8b5bfe0a434c9a0654b037ea61177cada8c",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/context/integrity.js",
+              "contentHash": "sha256:afb1bf9a42d21b2dff8472c8168810e11bff0ffb52efcd42a0fa631b8d001276",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "on this repository doctor warned about PROJECT.md starter placeholders after the internal.3 approval and yallaflow context render retired them"
+            },
+            {
+              "type": "repository",
+              "path": "test/pilot-hardening.test.js",
+              "contentHash": "sha256:d822643a4ad749556c4b8042a339d871cfb3f690e8058c2b65687bb0a213b98d",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0003",
+              "verificationRunId": "V-013"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-008",
+          "status": "satisfied",
+          "reason": "baseline draft/status/show print declared inspected and sampled coverage, not-inspected and unavailable limitations, unresolved facts, cited repository paths vs inventory, and an explicit not-a-completeness-claim line; undeclared coverage is reported as such; coverage input validated.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/baseline/store.js",
+              "symbol": "summarizeCoverage",
+              "contentHash": "sha256:87b61139e99cbbf9d19197aeeb4c808e158fbf9885cc4eb2840f767190ee48fd",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/baseline.js",
+              "contentHash": "sha256:713bee8fc77d2dc98cfce22e6c98a84d0afe1142bdb19e525c54a97b1ca14470",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/pilot-hardening.test.js",
+              "contentHash": "sha256:d822643a4ad749556c4b8042a339d871cfb3f690e8058c2b65687bb0a213b98d",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0003",
+              "verificationRunId": "V-013"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-009",
+          "status": "satisfied",
+          "reason": "Repository file evidence records workingTree head/modified/untracked in Git; nothing recorded outside Git and content hashes still decide freshness; formatEvidence/projection unchanged; frozen internal.3 reads the ledger.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/core/git.js",
+              "symbol": "gitWorkingTreeStates",
+              "contentHash": "sha256:a542365abed560ba8997526bbf942a9796a87bd571aa0baf4bdae6f212ab2666",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/context/evidence.js",
+              "symbol": "normalizeEvidenceRefs",
+              "contentHash": "sha256:bef1a0f700b898197faf2d686c2a931199cfb81ff1ce9357fe47f6bfb4c0b6ad",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/pilot-hardening.test.js",
+              "contentHash": "sha256:d822643a4ad749556c4b8042a339d871cfb3f690e8058c2b65687bb0a213b98d",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0003",
+              "verificationRunId": "V-013"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-010",
+          "status": "satisfied",
+          "reason": "Agent Contract v8, Skill Registry v8 with repository-baseline v4; v3 archived byte-for-byte (sha unchanged) and served to v7-pinned work; frozen internal.3 reads an internal.4 workspace; package/CLI 0.3.10-internal.4; nothing committed, tagged or pushed.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/skills/instructions.js",
+              "contentHash": "sha256:89755682008ca0d19a863b66a221c4e81509909e59caea774ca4d28601d061a9",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/skills/archive/repository-baseline.v3.md",
+              "contentHash": "sha256:67f5c0cfa5b9aeee15bf20c1173477c6471ed9d5ce8d42bd59fa50db9a9a9972",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/version.js",
+              "contentHash": "sha256:f404228a30e013dc3511fd660e5624fefee83bbc54ba1ac8e37df9fdfbbfec52",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "package.json",
+              "contentHash": "sha256:2954a6d306e16988a72862d6cd55200d1d4f685995c285d5aabc78b316774464",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/pilot-hardening.test.js",
+              "contentHash": "sha256:d822643a4ad749556c4b8042a339d871cfb3f690e8058c2b65687bb0a213b98d",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0003",
+              "verificationRunId": "V-013"
+            },
+            {
+              "type": "runtime",
+              "description": "npm pack --dry-run (passed)",
+              "workId": "PF-0003",
+              "verificationRunId": "V-015"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-011",
+          "status": "satisfied",
+          "reason": "The end-to-end pilot passes from the source checkout and from the packed npm tarball; README keeps install → init → describe, explains the Brownfield first request, approval and continuation, and the operational-help exception.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/pilot-hardening.test.js",
+              "contentHash": "sha256:d822643a4ad749556c4b8042a339d871cfb3f690e8058c2b65687bb0a213b98d",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "README.md",
+              "contentHash": "sha256:528aff1b4b970cd2cffd68e27617afd3561a6417126b54506123ef572c81cd5b",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "docs/using-yallaflow.md",
+              "contentHash": "sha256:bcea1705d2e504620ba9ec9f98dfdf8deb9fd440fe14549bda2aab1ab86d33d3",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0003",
+              "verificationRunId": "V-013"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/e42baab8-6517-47a0-afd6-5c090ac66b1a/scratchpad/packed-e2e.sh /home/engamer/Amasi/YallaFlow (passed)",
+              "workId": "PF-0003",
+              "verificationRunId": "V-014"
+            },
+            {
+              "type": "runtime",
+              "description": "node /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/e42baab8-6517-47a0-afd6-5c090ac66b1a/scratchpad/doc-links.mjs . (passed)",
+              "workId": "PF-0003",
+              "verificationRunId": "V-016"
+            }
+          ]
+        }
+      ],
+      "unrequested": [
+        {
+          "id": "UR-001",
+          "disposition": "accepted",
+          "summary": "intake warns when a captured original appears to contain secret values.",
+          "reason": "Necessary to keep the byte-for-byte original requirement honest instead of silently storing a secret.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/intake.js",
+              "contentHash": "sha256:25b9a43bcede1ffbc689c44e43811f86872a2f1771c232d19b93066c5f4f2a68",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            }
+          ]
+        },
+        {
+          "id": "UR-002",
+          "disposition": "accepted",
+          "summary": "Decomposition propose/execute are gated too.",
+          "reason": "Closes a gate bypass found in review; children are normal engineering work (REQ-001).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/decomposition/store.js",
+              "contentHash": "sha256:fe5c50a2e71320294b153003e630ab23336b14a69c1a60bfbaa845c7c2563af4",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            }
+          ]
+        },
+        {
+          "id": "UR-003",
+          "disposition": "accepted",
+          "summary": "baseline work.md template no longer ends with a blank line.",
+          "reason": "Pre-existing defect found by self-dogfood (git diff --check); one-character template fix.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/baseline/store.js",
+              "contentHash": "sha256:87b61139e99cbbf9d19197aeeb4c808e158fbf9885cc4eb2840f767190ee48fd",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            }
+          ]
+        },
+        {
+          "id": "UR-004",
+          "disposition": "accepted",
+          "summary": "frozenCli test helper caches per tag.",
+          "reason": "Needed to test against frozen internal.3 alongside v0.3.9.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test-support/shared.js",
+              "contentHash": "sha256:be5385ab58f4924fe9ce60a00d0d4f46b5b41bff34e49e4720718d44ab9f529c",
+              "gitCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
+              "workingTree": "modified"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "updatedAt": "2026-10-12T22:02:07.367Z"
+}

@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "workId": "PF-0003",
+  "mode": "intent",
+  "objective": "Harden YallaFlow against the real Brownfield pilot failures (A pre-baseline engineering gate, B original-request continuity, C durable secret redaction, D real PROJECT.md projection, E baseline coverage transparency, F optional working-tree evidence provenance) as v0.3.10-internal.4, reusing the approved self-baseline (PF-0002) instead of re-scanning.",
+  "preservation": [
+    "released v0.3.10-internal.1/.2/.3 behavior and immutable tags",
+    "pinned instruction bytes and SHA-256 pins of existing work",
+    "Greenfield behavior and already-approved Brownfield behavior",
+    "existing workspaces stay readable; no schema bump unless the stored shape requires it"
+  ],
+  "focus": [
+    "src/commands/start.js, work.js, route.js, intake.js and src/baseline/understanding.js",
+    "src/baseline/store.js, src/commands/baseline.js, src/purpose/store.js",
+    "all writeYaml/writeText/appendFile durable paths",
+    "src/context/projection.js, src/core/workspace.js projectTemplate",
+    "src/context/evidence.js, src/core/git.js",
+    "src/agent/contract.js, src/skills/instructions.js, resources/skills/repository-baseline.md"
+  ],
+  "history": [
+    {
+      "action": "recorded",
+      "at": "2026-10-12T20:06:34.775Z"
+    }
+  ],
+  "recordedAt": "2026-10-12T20:06:34.775Z",
+  "updatedAt": "2026-10-12T20:06:34.775Z"
+}

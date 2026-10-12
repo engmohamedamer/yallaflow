@@ -156,5 +156,8 @@ test('team: the maintainer runs init once and commits; a teammate clone needs no
   const brief = cli(teammate, ['brief']).stdout;
   assert.match(brief, /Agent bootstrap: .*CLAUDE\.md current/);
   assert.match(brief, /Agent bootstrap: .*AGENTS\.md current/);
-  assert.match(cli(teammate, ['start', 'Fix invoice totals']).stdout, /Created PF-0001/);
+  // The teammate's agent is oriented: until the maintainer's team approves a baseline,
+  // normal work is refused with the baseline as the next action (v0.3.10-internal.4).
+  assert.match(brief, /PROJECT_UNDERSTANDING_REQUIRED/);
+  assert.match(cli(teammate, ['start', 'Fix invoice totals'], false).stderr, /PROJECT_UNDERSTANDING_REQUIRED[\s\S]*NEXT VALID ACTION: yallaflow baseline start/);
 });

@@ -5,7 +5,7 @@ import { factFreshness, factsAffectedByPaths } from '../context/freshness.js';
 import { writeContextProjection } from '../context/projection.js';
 import { adoptLegacyContext, adoptionRefusal } from '../context/adopt.js';
 import { findActiveReconciliation, pendingLegacyCandidates } from '../reconciliation/store.js';
-import { formatEvidence } from '../context/evidence.js';
+import { describeWorkingTree, formatEvidence } from '../context/evidence.js';
 import { describe, summarizeProjectContext } from '../context/summary.js';
 import { CONTEXT_AREAS, FRESHNESS_LABELS } from '../context/constants.js';
 
@@ -106,7 +106,7 @@ export async function contextShowCommand(factId) {
   if (freshness.changed.length) console.log(`  changed since verification: ${freshness.changed.join(', ')}`);
   if (freshness.missing.length) console.log(`  missing: ${freshness.missing.join(', ')}`);
   console.log('Evidence:');
-  for (const entry of fact.evidence) console.log(`  - ${formatEvidence(entry)}`);
+  for (const entry of fact.evidence) console.log(`  - ${formatEvidence(entry)}${describeWorkingTree(entry)}`);
   if (fact.note) console.log(`Note: ${fact.note}`);
   if (fact.supersedes?.length) console.log(`Supersedes: ${fact.supersedes.join(', ')}`);
   if (fact.supersededBy) console.log(`Superseded by: ${fact.supersededBy}`);
@@ -196,7 +196,8 @@ export async function contextAdoptCommand({ dryRun } = {}) {
 }
 
 // Explicit repair of managed Markdown blocks from the canonical ledger. Content
-// outside the managed blocks is never touched.
+// outside the managed blocks is never touched — except PROJECT.md's untouched init
+// starter prompts, which are retired once project memory exists (v0.3.10-internal.4).
 export async function contextRenderCommand() {
   const root = await requireRoot();
   const { exists, ledger } = await loadContextLedger(root);

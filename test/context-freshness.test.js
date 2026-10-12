@@ -38,7 +38,9 @@ async function setup({ useGit = true } = {}) {
     git(root, ['add', '-A']);
     git(root, ['commit', '-qm', 'init']);
   }
-  await initWorkspace(root, 'demo', 'brownfield');
+  // The project kind is incidental here; a Brownfield workspace would first need an
+  // approved baseline before any work item exists (v0.3.10-internal.4 pre-baseline gate).
+  await initWorkspace(root, 'demo', 'greenfield');
   const pending = await createPendingIntake(root, 'Investigate');
   await routeWorkItem(root, pending.id, { work_type: 'investigation', scope: 'bounded', confidence: 'high', reason: 'Read-only.' });
   for (let i = 0; i < 6; i++) await advanceActiveWork(root, pending.id);

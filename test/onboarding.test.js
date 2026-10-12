@@ -395,7 +395,7 @@ test('AC-011/AC-014: the repository-baseline skill guides inspect, material docu
   const root = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-skill-'));
   await initWorkspace(root, 'demo', 'brownfield');
   const skill = run(root, ['skill', 'repository-baseline']).stdout;
-  assert.match(skill, /Version: 3/, 'v0.3.10-internal.3: instruction v3 under Skill Registry v7 (v1/v2 stay pinned for earlier work)');
+  assert.match(skill, /Version: 4/, 'v0.3.10-internal.4: instruction v4 under Skill Registry v8 (v1–v3 stay pinned for earlier work)');
   assert.match(skill, /Start from `yallaflow inspect`/);
   assert.match(skill, /register it with `yallaflow intake add <baseline-work-id> <path>` and read the extracted text with `yallaflow source show SRC-#### --content`/);
   assert.match(skill, /Cite a document inside the repository by its path \(repository evidence\)/);

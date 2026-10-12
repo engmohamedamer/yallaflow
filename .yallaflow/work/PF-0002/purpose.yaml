@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "workId": "PF-0002",
+  "mode": "bootstrap",
+  "objective": "v0.3.10-internal.4 pilot hardening from a real Brownfield pilot: (A) pre-baseline Brownfield engineering gate returning PROJECT_UNDERSTANDING_REQUIRED for normal work; (B) the original request survives the baseline and continues after approval; (C) durable secret/credential redaction in YallaFlow-owned state; (D) a real PROJECT.md projection; (E) baseline coverage transparency; (F) optional Git working-tree evidence provenance. No unrelated features or redesign.",
+  "preservation": [
+    "released v0.3.10-internal.1/.2/.3 behavior and immutable tags",
+    "immutable pinned instruction bytes and SHA-256 pins for existing work",
+    "Greenfield behavior",
+    "existing workspaces stay readable; content-hash freshness stays authoritative without Git"
+  ],
+  "focus": [
+    "work creation and routing entry points (start, route, direct commands, intake) and the project-understanding gate",
+    "baseline lifecycle, purpose/discovery lens, approval and continuation",
+    "every durable persistence path that stores arbitrary text or evidence",
+    "context ledger projection into PROJECT.md and context docs",
+    "evidence normalization and freshness",
+    "Agent Contract and Skill Registry versioning and archives",
+    "tests, frozen-CLI compatibility harness, release/packaging"
+  ],
+  "history": [
+    {
+      "action": "recorded",
+      "at": "2026-10-12T19:57:53.919Z"
+    }
+  ],
+  "recordedAt": "2026-10-12T19:57:53.919Z",
+  "updatedAt": "2026-10-12T19:57:53.919Z"
+}

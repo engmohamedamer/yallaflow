@@ -6,6 +6,7 @@ import { formatEvidence } from './evidence.js';
 import { factOrigins } from './ledger.js';
 import { CONTEXT_AREAS } from './constants.js';
 import { WORK_ID_SOURCE } from '../core/ids.js';
+import { redactSecrets } from '../security/redact.js';
 
 // Markdown projection of the canonical ledger. Each durable document owns exactly one
 // managed block, rewritten deterministically from the ledger's current (and disputed)
@@ -42,7 +43,9 @@ export function renderAreaBlock(ledger, area) {
     for (const fact of disputed) lines.push(...renderFact(fact));
   }
   lines.push(BLOCK_END);
-  return lines.join('\n');
+  // A ledger written before v0.3.10-internal.4 may still hold a secret value; the
+  // projection never repeats it (src/security/redact.js).
+  return redactSecrets(lines.join('\n'));
 }
 
 function renderFact(fact) {
@@ -117,6 +120,49 @@ export async function writeContextProjection(root, ledger, areas = null) {
       : `${content}${separatorFor(content)}${rendered}\n`;
     if (next !== content) await writeText(file, next);
   }
+  await retireProjectPlaceholders(root, ledger);
+}
+
+// The prompts `yallaflow init` writes into PROJECT.md (core/workspace.js
+// projectTemplate). They are placeholders, not knowledge: once project memory holds a
+// current fact (an approved baseline, a promoted candidate, an applied
+// reconciliation), PROJECT.md must not still read like the starter template
+// (v0.3.10-internal.4). Only the exact, untouched template text is removed — a section
+// a human has written stays — and nothing is invented in its place: known durable
+// knowledge renders in the managed block; a section nobody established is omitted.
+export const PROJECT_STARTER_PLACEHOLDERS = Object.freeze([
+  ['## Purpose', '> Describe what the system does and who it serves.'],
+  ['## Success Criteria', '> Add durable product-level success criteria here.'],
+  ['## Core Modules', '> Populated progressively by bootstrap and completed work.']
+]);
+
+export function stripStarterPlaceholders(content) {
+  let next = content;
+  for (const [heading, prompt] of PROJECT_STARTER_PLACEHOLDERS) {
+    next = next.replace(`${heading}\n\n${prompt}\n\n`, '').replace(new RegExp(`${escapeRegExp(`${heading}\n\n${prompt}\n`)}$`), '');
+  }
+  return next === content ? content : next.replace(/\n{2,}$/, '\n');
+}
+
+export function hasStarterPlaceholders(content) {
+  return PROJECT_STARTER_PLACEHOLDERS.some(([heading, prompt]) => content.includes(`${heading}\n\n${prompt}\n`));
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+export function ledgerHasKnowledge(ledger) {
+  return ledger.facts.some((fact) => fact.state !== 'superseded');
+}
+
+async function retireProjectPlaceholders(root, ledger) {
+  if (!ledgerHasKnowledge(ledger)) return;
+  const file = contextDocPath(root, 'project');
+  if (!await exists(file)) return;
+  const content = await readText(file);
+  const next = stripStarterPlaceholders(content);
+  if (next !== content) await writeText(file, next);
 }
 
 function separatorFor(content) {

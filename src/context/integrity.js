@@ -1,8 +1,8 @@
 import path from 'node:path';
-import { exists } from '../utils/fs.js';
+import { exists, readText } from '../utils/fs.js';
 import { workspacePath } from '../core/workspace.js';
 import { factOrigins, loadContextLedger, validateContextLedger } from './ledger.js';
-import { projectionIssues } from './projection.js';
+import { contextDocPath, hasStarterPlaceholders, ledgerHasKnowledge, projectionIssues } from './projection.js';
 import { checkReconciliationIntegrity } from '../reconciliation/integrity.js';
 import { ledgerFreshness } from './freshness.js';
 import { listAllLimitations, sameStatement } from '../limitations/store.js';
@@ -44,6 +44,15 @@ export async function checkContextIntegrity(root) {
 
     // Projection drift is only deterministic once the ledger itself is sound.
     if (ledgerValid) errors.push(...(await projectionIssues(root, ledger)).map((entry) => `context projection: ${entry}`));
+
+    // v0.3.10-internal.4: PROJECT.md must not read like the starter template once
+    // project memory exists (an internal.3 approval left the prompts in place).
+    if (ledgerValid && ledgerHasKnowledge(ledger)) {
+      const projectFile = contextDocPath(root, 'project');
+      if (await exists(projectFile) && hasStarterPlaceholders(await readText(projectFile))) {
+        warnings.push('PROJECT.md still shows init starter placeholders although project memory holds current facts. Run `yallaflow context render` to retire them (canonical memory is unchanged).');
+      }
+    }
 
     if (ledgerValid) {
       const freshness = await ledgerFreshness(root, ledger);

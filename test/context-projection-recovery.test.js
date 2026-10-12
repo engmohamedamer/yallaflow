@@ -27,7 +27,9 @@ function run(root, args) {
 async function setup() {
   const root = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-recover-'));
   await writeFile(path.join(root, 'db.yml'), 'replica: false\n');
-  await initWorkspace(root, 'demo', 'brownfield');
+  // The project kind is incidental here; a Brownfield workspace would first need an
+  // approved baseline before any work item exists (v0.3.10-internal.4 pre-baseline gate).
+  await initWorkspace(root, 'demo', 'greenfield');
   const pending = await createPendingIntake(root, 'Investigate');
   await routeWorkItem(root, pending.id, { work_type: 'investigation', scope: 'bounded', confidence: 'high', reason: 'Read-only.' });
   for (let i = 0; i < 6; i++) await advanceActiveWork(root, pending.id);
@@ -130,7 +132,9 @@ test('a failed reconfirm is not applied twice on retry', async () => {
 test('a failed baseline approval keeps its facts; retry approves without duplicating them', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-recover-baseline-'));
   await writeFile(path.join(root, 'db.yml'), 'replica: false\n');
-  await initWorkspace(root, 'demo', 'brownfield');
+  // The project kind is incidental here; a Brownfield workspace would first need an
+  // approved baseline before any work item exists (v0.3.10-internal.4 pre-baseline gate).
+  await initWorkspace(root, 'demo', 'greenfield');
   const { meta } = await startBaseline(root);
   await checkpointWork(root, meta.id, { skillId: 'repository-baseline', status: 'completed', summary: 'Discovered.', evidence: [] });
   await draftBaseline(root, meta.id, { facts: [
