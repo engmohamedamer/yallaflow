@@ -1,0 +1,58 @@
+{
+  "id": "PF-0004",
+  "type": "release",
+  "scope": "architectural",
+  "routingStatus": "routed",
+  "rawRequest": "Prepare YallaFlow v1.0.0 first public stable npm release: declare the 1.0 stability/compatibility contract, prepare public npm package metadata (remove private), audit packed contents and security/privacy, update README/docs/CHANGELOG for npm install, prepare GitHub release notes and trusted-publishing automation; stop before commit/tag/push/publish.",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-10-13T11:20:48.474Z",
+  "updatedAt": "2026-10-13T12:26:10.818Z",
+  "title": "v1.0.0 First Public Stable Release",
+  "routingConfidence": "high",
+  "routingReason": "A release, not a product change: no new features. Architectural scope because it declares the public 1.0 compatibility contract (SemVer promise over CLI and durable workspace behavior), is the first irreversible public npm publication (security boundary over packed contents), and touches packaging, docs, and release automation across the project.",
+  "routedAt": "2026-10-13T11:20:52.360Z",
+  "workflow": "release",
+  "requiredCapabilities": [
+    "discover",
+    "plan",
+    "implement",
+    "verify",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 8,
+    "skills": [
+      "context-discovery",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "code-review"
+    ]
+  },
+  "lastInvalidationAt": "2026-10-13T12:01:47.768Z",
+  "completionHistory": [
+    {
+      "completedAt": "2026-10-13T12:26:10.818Z",
+      "verificationRunIds": [
+        "V-012",
+        "V-013",
+        "V-014",
+        "V-015",
+        "V-016",
+        "V-017",
+        "V-018",
+        "V-019",
+        "V-020",
+        "V-021",
+        "V-022",
+        "V-023",
+        "V-024"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+
+> yallaflow@1.0.0 check:syntax
+> find src test test-support -name '*.js' -print0 | xargs -0 -n1 node --check
+

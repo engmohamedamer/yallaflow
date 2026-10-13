@@ -1,8 +1,29 @@
 {
   "name": "yallaflow",
-  "version": "0.3.10-internal.4",
-  "private": true,
+  "version": "1.0.0",
   "description": "AI-agnostic engineering governance layer for coding agents: durable project memory, adaptive workflows, and evidence-backed delivery.",
+  "keywords": [
+    "ai",
+    "coding-agent",
+    "claude-code",
+    "codex",
+    "agents",
+    "project-memory",
+    "engineering-governance",
+    "spec-driven-development",
+    "workflow",
+    "cli",
+    "developer-tools"
+  ],
+  "homepage": "https://github.com/engmohamedamer/yallaflow#readme",
+  "bugs": {
+    "url": "https://github.com/engmohamedamer/yallaflow/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/engmohamedamer/yallaflow.git"
+  },
+  "license": "MIT",
   "type": "module",
   "bin": {
     "yallaflow": "src/cli.js"
@@ -22,6 +43,9 @@
   },
   "engines": {
     "node": ">=20.16.0"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "@xmldom/xmldom": "^0.8.10",

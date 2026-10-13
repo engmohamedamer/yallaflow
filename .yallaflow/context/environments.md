@@ -13,22 +13,25 @@
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-033)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-12T22:03:31.390Z (commit b181dc0)
+- **Verified:** 2026-10-13T12:25:56.783Z (commit c433e61)
 - **Evidence:**
-  - package.json (repository @ b181dc0)
-  - docs/limitations.md (repository @ b181dc0)
+  - package.json (repository @ c433e61)
+  - docs/limitations.md (repository @ c433e61)
 
-<!-- yallaflow-fact:CTX-0034 -->
-### CTX-0034 — The repository declares no CI pipeline or container configuration. Validation and release checks are run locally by the maintainer following docs/releasing.md.
+<!-- yallaflow-fact:CTX-0059 -->
+### CTX-0059 — The only CI is .github/workflows/release.yml, triggered when a GitHub Release is published: a guard job (tag = v+package version, prerelease flag matches, tag on main, version not already on npm — an already-published version ends the run with a notice), a test job running npm ci and npm run check on Node 20, 22 and 24 with full Git history, and a publish job on Node 24 that smoke-tests the packed tarball and runs npm publish with provenance through npm Trusted Publishing (OIDC id-token, no stored npm token). There is no pull-request CI and no container configuration; day-to-day validation is local per docs/releasing.md.
 
 - **State:** current
-- **Confidence:** inferred
+- **Confidence:** confirmed
 - **Provenance:** repository
-- **From baseline:** PF-0002 (BF-034)
-- **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-12T22:03:31.610Z (commit b181dc0)
+- **Source work:** PF-0004
+- **Knowledge ID:** K-002
+- **Promoted at:** 2026-10-13T12:25:22.356Z
+- **Supersedes:** CTX-0034
+- **Verified:** 2026-10-13T12:25:22.356Z (commit c433e61)
 - **Evidence:**
-  - docs/releasing.md (repository @ b181dc0)
-  - yallaflow inspect reported no recognized container/CI configuration and no .github directory exists (runtime)
+  - .github/workflows/release.yml (repository @ c433e61)
+  - docs/releasing.md (repository @ c433e61)
+  - PATH=/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/d1aeff28-7394-41fa-aeea-ba8a14616a0b/scratchpad/node/node-v24.21.0-linux-x64/bin:$PATH; node --version && npm test (passed) (runtime, PF-0004 V-015)
 
 <!-- yallaflow-context:end -->

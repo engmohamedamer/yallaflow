@@ -1,0 +1,20 @@
+PASS yallaflow --version = 1.0.0
+PASS Claude bootstrap (CLAUDE.md imports AGENT.md)
+PASS Codex bootstrap (AGENTS.md)
+PASS agent contract v8 current
+PASS greenfield doctor healthy
+PASS greenfield accepts first request
+PASS brownfield classified
+PASS existing CLAUDE.md/AGENTS.md content kept
+PASS first Brownfield request gated with baseline as next action
+PASS no work item created before understanding
+PASS original request carried as baseline objective
+PASS no secret value persisted in .yallaflow
+PASS .env untouched
+PASS 1.0.0 satisfies shared minimumVersion
+PASS branch-safe work ID in clone
+PASS shared check PASS
+PASS upgrade from 0.3.10-internal.4: workspace current
+PASS internal.4 workspace doctor healthy under 1.0.0
+PASS reads never mutate the upgraded workspace
+ALL PACKED-CANDIDATE SMOKE TESTS PASSED

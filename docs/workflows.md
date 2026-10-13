@@ -1,6 +1,6 @@
 # Canonical Workflows
 
-Command-accurate, end-to-end workflows for YallaFlow v0.3.8. In practice your coding agent runs these commands (guided by `.yallaflow/AGENT.md`); you review, answer business questions, and approve gates. At any point:
+Command-accurate, end-to-end workflows for YallaFlow 1.0. In practice your coding agent runs these commands (guided by `.yallaflow/AGENT.md`); you review, answer business questions, and approve gates. At any point:
 
 ```bash
 yallaflow guide <work-id>     # CURRENT OBJECTIVE, BLOCKER, NEXT VALID ACTION

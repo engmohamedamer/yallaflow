@@ -23,10 +23,10 @@
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-006)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-12T22:03:25.750Z (commit b181dc0)
+- **Verified:** 2026-10-13T12:25:54.773Z (commit c433e61)
 - **Evidence:**
-  - package.json (repository @ b181dc0)
-  - src/cli.js:1-3 (repository @ b181dc0)
+  - package.json (repository @ c433e61)
+  - src/cli.js (repository @ c433e61)
 
 <!-- yallaflow-fact:CTX-0007 -->
 ### CTX-0007 — There are only four runtime dependencies, all for source intake: officeparser 5.2.2 (office documents), pdfjs-dist 5.4.624 (PDF, pinned through overrides), yauzl (zip reading), and @xmldom/xmldom. Everything else uses Node built-ins. YAML files are written as JSON (JSON is valid YAML 1.2), so no YAML library is needed.
@@ -36,10 +36,10 @@
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-007)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-12T22:03:25.951Z (commit b181dc0)
+- **Verified:** 2026-10-13T12:25:55.124Z (commit c433e61)
 - **Evidence:**
-  - package.json (repository @ b181dc0)
-  - src/core/yaml.js (repository @ b181dc0)
+  - package.json (repository @ c433e61)
+  - src/core/yaml.js (repository @ c433e61)
 
 <!-- yallaflow-fact:CTX-0008 -->
 ### CTX-0008 — There is no frontend. YallaFlow is a terminal CLI plus Markdown/YAML files it maintains inside the target repository.
@@ -49,9 +49,9 @@
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-008)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-12T22:03:26.160Z (commit b181dc0)
+- **Verified:** 2026-10-13T12:25:55.442Z (commit c433e61)
 - **Evidence:**
-  - package.json (repository @ b181dc0)
-  - src/cli.js (repository @ b181dc0)
+  - package.json (repository @ c433e61)
+  - src/cli.js (repository @ c433e61)
 
 <!-- yallaflow-context:end -->

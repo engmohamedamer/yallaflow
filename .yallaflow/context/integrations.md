@@ -13,11 +13,11 @@
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-031)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-12T22:03:30.962Z (commit b181dc0)
+- **Verified:** 2026-10-13T12:25:56.101Z (commit c433e61)
 - **Evidence:**
-  - docs/security.md (repository @ b181dc0)
-  - src/core/git.js (repository @ b181dc0)
-  - src/shared/git.js (repository @ b181dc0)
+  - docs/security.md (repository @ c433e61)
+  - src/core/git.js (repository @ c433e61)
+  - src/shared/git.js (repository @ c433e61)
 
 <!-- yallaflow-fact:CTX-0032 -->
 ### CTX-0032 — Agent integration is through instruction files only. Claude Code imports @.yallaflow/AGENT.md from CLAUDE.md, and Codex is pointed to it from AGENTS.md. YallaFlow never runs the agent itself.
@@ -27,11 +27,11 @@
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-032)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-12T22:03:31.186Z (commit b181dc0)
+- **Verified:** 2026-10-13T12:25:56.442Z (commit c433e61)
 - **Evidence:**
-  - src/agent/bootstrap.js (repository @ b181dc0)
-  - resources/agents/claude/README.md (repository @ b181dc0)
-  - resources/agents/codex/README.md (repository @ b181dc0)
-  - docs/limitations.md (repository @ b181dc0)
+  - src/agent/bootstrap.js (repository @ c433e61)
+  - resources/agents/claude/README.md (repository @ c433e61)
+  - resources/agents/codex/README.md (repository @ c433e61)
+  - docs/limitations.md (repository @ c433e61)
 
 <!-- yallaflow-context:end -->

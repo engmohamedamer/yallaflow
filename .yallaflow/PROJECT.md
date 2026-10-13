@@ -17,11 +17,11 @@ brownfield
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-001)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-12T22:03:24.745Z (commit b181dc0)
+- **Verified:** 2026-10-13T12:25:53.748Z (commit c433e61)
 - **Evidence:**
-  - package.json (repository @ b181dc0)
-  - README.md (repository @ b181dc0)
-  - docs/architecture.md (repository @ b181dc0)
+  - package.json (repository @ c433e61)
+  - README.md (repository @ c433e61)
+  - docs/architecture.md (repository @ c433e61)
 
 <!-- yallaflow-fact:CTX-0002 -->
 ### CTX-0002 — It serves developers who use AI coding agents on Greenfield and Brownfield repositories, alone or as a team sharing one project through ordinary Git (Shared Projects). The normal journey is install, then `yallaflow init`, then open the agent and describe the work; the agent orients itself through YallaFlow automatically.
@@ -31,11 +31,11 @@ brownfield
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-002)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-12T22:03:24.948Z (commit b181dc0)
+- **Verified:** 2026-10-13T12:25:54.077Z (commit c433e61)
 - **Evidence:**
-  - README.md (repository @ b181dc0)
-  - docs/using-yallaflow.md (repository @ b181dc0)
-  - docs/shared-projects.md (repository @ b181dc0)
+  - README.md (repository @ c433e61)
+  - docs/using-yallaflow.md (repository @ c433e61)
+  - docs/shared-projects.md (repository @ c433e61)
 
 <!-- yallaflow-fact:CTX-0003 -->
 ### CTX-0003 — Core product principles: discover before asking; understand before changing; prove before claiming; remember after finishing; revalidate before trusting stale knowledge. Work history is immutable while project memory evolves. Durable state beats conversational memory. Investigation is read-only.
@@ -45,25 +45,10 @@ brownfield
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-003)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-12T22:03:25.146Z (commit b181dc0)
+- **Verified:** 2026-10-13T12:25:54.417Z (commit c433e61)
 - **Evidence:**
-  - docs/architecture.md (repository @ b181dc0)
-  - src/agent/contract.js (repository @ b181dc0)
-
-<!-- yallaflow-fact:CTX-0004 -->
-### CTX-0004 — YallaFlow is distributed only as internal prereleases installed from Git tags (npm install -g git+https://github.com/engmohamedamer/yallaflow.git#<tag>). package.json is private, nothing is published to npm, and each internal prerelease tag is immutable once released.
-
-- **State:** current
-- **Confidence:** confirmed
-- **Provenance:** repository
-- **From baseline:** PF-0002 (BF-004)
-- **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-12T22:03:25.348Z (commit b181dc0)
-- **Evidence:**
-  - package.json (repository @ b181dc0)
-  - README.md (repository @ b181dc0)
-  - docs/installation.md (repository @ b181dc0)
-  - CHANGELOG.md (repository @ b181dc0)
+  - docs/architecture.md (repository @ c433e61)
+  - src/agent/contract.js (repository @ c433e61)
 
 <!-- yallaflow-fact:CTX-0047 -->
 ### CTX-0047 — Core modules: CLI entry and argument parsing (src/cli.js); command handlers (src/commands/); workspace, IDs, lifecycle, progress and verification evidence (src/core/); routing and guidance (src/behavior/); Skill Registry (src/skills/); Agent Contract and bootstraps (src/agent/); project-memory ledger (src/context/); knowledge promotion (src/knowledge/); Brownfield baseline and the project-understanding gate (src/baseline/); delivery convergence (src/delivery/); Shared Projects (src/shared/); source intake (src/intake/); repository inventory (src/inventory/); discovery purpose (src/purpose/); durable secret redaction (src/security/); decomposition, questions, reviews, reconciliation, and limitations.
@@ -84,5 +69,23 @@ brownfield
   - src/security/redact.js (repository @ b181dc0)
   - src/baseline/understanding.js (repository @ b181dc0)
   - src/inventory/inventory.js (repository @ b181dc0)
+
+<!-- yallaflow-fact:CTX-0058 -->
+### CTX-0058 — From 1.0.0 YallaFlow is a public npm package: package.json names `yallaflow` (no private flag, MIT, publishConfig.access public) and the primary documented install is `npm install -g yallaflow`; Git-tag and tarball installs remain documented alternatives. The 0.2.0-internal.1 … 0.3.10-internal.4 versions were internal prereleases, git-tagged only and never published to npm; every released tag is immutable. 1.0.0 is published manually by the package owner; later versions are published by the release workflow.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0004
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-10-13T12:25:21.927Z
+- **Supersedes:** CTX-0004
+- **Verified:** 2026-10-13T12:25:21.927Z (commit c433e61)
+- **Evidence:**
+  - package.json (repository @ c433e61)
+  - README.md (repository @ c433e61)
+  - docs/installation.md (repository @ c433e61)
+  - docs/releasing.md (repository @ c433e61)
+  - bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/d1aeff28-7394-41fa-aeea-ba8a14616a0b/scratchpad/pack-audit.sh /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/d1aeff28-7394-41fa-aeea-ba8a14616a0b/scratchpad/final/yallaflow-1.0.0.tgz (passed) (runtime, PF-0004 V-016)
 
 <!-- yallaflow-context:end -->

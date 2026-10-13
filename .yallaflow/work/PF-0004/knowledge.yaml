@@ -1,0 +1,413 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "project",
+      "source": "implementation-runtime",
+      "summary": "From 1.0.0 YallaFlow is a public npm package: package.json names `yallaflow` (no private flag, MIT, publishConfig.access public) and the primary documented install is `npm install -g yallaflow`; Git-tag and tarball installs remain documented alternatives. The 0.2.0-internal.1 … 0.3.10-internal.4 versions were internal prereleases, git-tagged only and never published to npm; every released tag is immutable. 1.0.0 is published manually by the package owner; later versions are published by the release workflow.",
+      "evidence": [
+        "package.json",
+        "README.md",
+        "docs/installation.md",
+        "docs/releasing.md",
+        "verification:V-016"
+      ],
+      "confidence": "confirmed",
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0004"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-13T12:25:12.932Z",
+      "factId": "CTX-0058",
+      "promotedAt": "2026-10-13T12:25:21.927Z",
+      "target": "PROJECT.md"
+    },
+    {
+      "id": "K-002",
+      "kind": "environment",
+      "source": "implementation-runtime",
+      "summary": "The only CI is .github/workflows/release.yml, triggered when a GitHub Release is published: a guard job (tag = v+package version, prerelease flag matches, tag on main, version not already on npm — an already-published version ends the run with a notice), a test job running npm ci and npm run check on Node 20, 22 and 24 with full Git history, and a publish job on Node 24 that smoke-tests the packed tarball and runs npm publish with provenance through npm Trusted Publishing (OIDC id-token, no stored npm token). There is no pull-request CI and no container configuration; day-to-day validation is local per docs/releasing.md.",
+      "evidence": [
+        ".github/workflows/release.yml",
+        "docs/releasing.md",
+        "verification:V-015"
+      ],
+      "confidence": "confirmed",
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0034"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-13T12:25:13.190Z",
+      "factId": "CTX-0059",
+      "promotedAt": "2026-10-13T12:25:22.356Z",
+      "target": "context/environments.md"
+    },
+    {
+      "id": "K-003",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Release process (from 1.0.0): - The package follows SemVer; each release is one commit with an annotated tag vX.Y.Z matching package.json and src/version.js; tags are never moved. - Before release: npm ci + npm run check, doctor on the self-dogfood workspace, npm audit with every finding classified, npm pack --dry-run plus inspection and secret scan of the real tarball, a packed-candidate smoke test from an isolated prefix, provider/network scan, git diff --check. - CHANGELOG.md and docs/upgrading-to-*.md are updated per release; GitHub release notes live in .github/release-notes/. - Publishing: GitHub Release -> release.yml -> npm Trusted Publishing with provenance; the trusted publisher is created when the first automated release is ready because npm expires an unused configuration after 2 days. - package.json files ships src, resources, docs, README.md, CHANGELOG.md and LICENSE. - Nothing is committed, tagged, pushed or published without the maintainer's explicit approval.",
+      "evidence": [
+        "docs/releasing.md",
+        "package.json",
+        ".github/workflows/release.yml",
+        "CHANGELOG.md"
+      ],
+      "confidence": "confirmed",
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0039"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-13T12:25:13.456Z",
+      "factId": "CTX-0060",
+      "promotedAt": "2026-10-13T12:25:22.722Z",
+      "target": "context/conventions.md"
+    },
+    {
+      "id": "K-004",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Versioning and compatibility: - The package version (src/version.js), Agent Contract, bootstrap, Skill Registry, knowledge policy and each per-file schemaVersion are independent; one is never inferred from another, and 1.0.0 bumped only the package version. - From 1.0.0 the package follows SemVer: PATCH = backward-compatible fixes and docs; MINOR = backward-compatible functionality; MAJOR = incompatible public CLI behavior, incompatible durable workspace behavior, or any break not handled by backward-compatible reads/migrations. - Work items keep their pinned behavior, released skill instructions are immutable, supported workspaces stay readable without migration on read, and historical work is never silently rewritten. - Persisted schemas are bumped only when the stored shape truly requires it, written at the lowest version that can represent the content.",
+      "evidence": [
+        "docs/releasing.md",
+        "src/version.js",
+        "src/context/constants.js",
+        "src/knowledge/constants.js",
+        "docs/upgrading-to-v1.0.md"
+      ],
+      "confidence": "confirmed",
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0037"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-13T12:25:13.720Z",
+      "factId": "CTX-0061",
+      "promotedAt": "2026-10-13T12:25:23.073Z",
+      "target": "context/conventions.md"
+    },
+    {
+      "id": "K-005",
+      "kind": "project",
+      "source": "implementation-runtime",
+      "summary": "YallaFlow is an AI-agnostic engineering governance layer for coding agents (Claude Code, Codex): it gives the agent durable project memory, an adaptive workflow per request, and evidence that work is actually done, so the developer describes intent instead of repeating project context in every prompt.",
+      "evidence": [
+        "package.json",
+        "README.md",
+        "docs/architecture.md"
+      ],
+      "confidence": "confirmed",
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0001"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-13T12:25:46.370Z",
+      "factId": "CTX-0001",
+      "promotedAt": "2026-10-13T12:25:53.748Z",
+      "target": "PROJECT.md"
+    },
+    {
+      "id": "K-006",
+      "kind": "project",
+      "source": "implementation-runtime",
+      "summary": "It serves developers who use AI coding agents on Greenfield and Brownfield repositories, alone or as a team sharing one project through ordinary Git (Shared Projects). The normal journey is install, then `yallaflow init`, then open the agent and describe the work; the agent orients itself through YallaFlow automatically.",
+      "evidence": [
+        "README.md",
+        "docs/using-yallaflow.md",
+        "docs/shared-projects.md"
+      ],
+      "confidence": "confirmed",
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0002"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-13T12:25:46.597Z",
+      "factId": "CTX-0002",
+      "promotedAt": "2026-10-13T12:25:54.077Z",
+      "target": "PROJECT.md"
+    },
+    {
+      "id": "K-007",
+      "kind": "project",
+      "source": "implementation-runtime",
+      "summary": "Core product principles: discover before asking; understand before changing; prove before claiming; remember after finishing; revalidate before trusting stale knowledge. Work history is immutable while project memory evolves. Durable state beats conversational memory. Investigation is read-only.",
+      "evidence": [
+        "docs/architecture.md",
+        "src/agent/contract.js"
+      ],
+      "confidence": "confirmed",
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0003"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-13T12:25:46.862Z",
+      "factId": "CTX-0003",
+      "promotedAt": "2026-10-13T12:25:54.417Z",
+      "target": "PROJECT.md"
+    },
+    {
+      "id": "K-008",
+      "kind": "tech-stack",
+      "source": "implementation-runtime",
+      "summary": "A Node.js (>= 20.16.0) ES-module CLI written in plain JavaScript with no build step and no TypeScript. The bin entry is src/cli.js and argument parsing uses node:util parseArgs.",
+      "evidence": [
+        "package.json",
+        "src/cli.js"
+      ],
+      "confidence": "confirmed",
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0006"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-13T12:25:47.104Z",
+      "factId": "CTX-0006",
+      "promotedAt": "2026-10-13T12:25:54.773Z",
+      "target": "context/tech-stack.md"
+    },
+    {
+      "id": "K-009",
+      "kind": "tech-stack",
+      "source": "implementation-runtime",
+      "summary": "There are only four runtime dependencies, all for source intake: officeparser 5.2.2 (office documents), pdfjs-dist 5.4.624 (PDF, pinned through overrides), yauzl (zip reading), and @xmldom/xmldom. Everything else uses Node built-ins. YAML files are written as JSON (JSON is valid YAML 1.2), so no YAML library is needed.",
+      "evidence": [
+        "package.json",
+        "src/core/yaml.js"
+      ],
+      "confidence": "confirmed",
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0007"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-13T12:25:47.347Z",
+      "factId": "CTX-0007",
+      "promotedAt": "2026-10-13T12:25:55.124Z",
+      "target": "context/tech-stack.md"
+    },
+    {
+      "id": "K-010",
+      "kind": "tech-stack",
+      "source": "implementation-runtime",
+      "summary": "There is no frontend. YallaFlow is a terminal CLI plus Markdown/YAML files it maintains inside the target repository.",
+      "evidence": [
+        "package.json",
+        "src/cli.js"
+      ],
+      "confidence": "confirmed",
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0008"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-13T12:25:47.607Z",
+      "factId": "CTX-0008",
+      "promotedAt": "2026-10-13T12:25:55.442Z",
+      "target": "context/tech-stack.md"
+    },
+    {
+      "id": "K-011",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Command layer: src/cli.js parses arguments and dispatches each command to a handler in src/commands/<name>.js. Handlers find the project root and print outcome text, and domain logic lives in the domain modules. Help output never mutates YallaFlow state, in any command namespace.",
+      "evidence": [
+        "src/cli.js",
+        "src/commands/start.js",
+        "src/commands/baseline.js",
+        "test/recursive-help-safety.test.js",
+        "docs/architecture.md"
+      ],
+      "confidence": "confirmed",
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0009"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-13T12:25:47.854Z",
+      "factId": "CTX-0009",
+      "promotedAt": "2026-10-13T12:25:55.771Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-012",
+      "kind": "integration",
+      "source": "implementation-runtime",
+      "summary": "There are no network integrations: YallaFlow makes no network calls, no model or provider calls, and no telemetry. The only external tool it invokes is local Git, read-only, for HEAD, diffs, tracked paths and identity; it never commits, pushes or rewrites branches.",
+      "evidence": [
+        "docs/security.md",
+        "src/core/git.js",
+        "src/shared/git.js"
+      ],
+      "confidence": "confirmed",
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0031"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-13T12:25:48.094Z",
+      "factId": "CTX-0031",
+      "promotedAt": "2026-10-13T12:25:56.101Z",
+      "target": "context/integrations.md"
+    },
+    {
+      "id": "K-013",
+      "kind": "integration",
+      "source": "implementation-runtime",
+      "summary": "Agent integration is through instruction files only. Claude Code imports @.yallaflow/AGENT.md from CLAUDE.md, and Codex is pointed to it from AGENTS.md. YallaFlow never runs the agent itself.",
+      "evidence": [
+        "src/agent/bootstrap.js",
+        "resources/agents/claude/README.md",
+        "resources/agents/codex/README.md",
+        "docs/limitations.md"
+      ],
+      "confidence": "confirmed",
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0032"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-13T12:25:48.321Z",
+      "factId": "CTX-0032",
+      "promotedAt": "2026-10-13T12:25:56.442Z",
+      "target": "context/integrations.md"
+    },
+    {
+      "id": "K-014",
+      "kind": "environment",
+      "source": "implementation-runtime",
+      "summary": "The runtime requirement is Node.js >= 20.16.0 (package.json engines). Windows support is not verified.",
+      "evidence": [
+        "package.json",
+        "docs/limitations.md"
+      ],
+      "confidence": "confirmed",
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0033"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-13T12:25:48.569Z",
+      "factId": "CTX-0033",
+      "promotedAt": "2026-10-13T12:25:56.783Z",
+      "target": "context/environments.md"
+    },
+    {
+      "id": "K-015",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Tests: - Tests use the built-in node:test runner (npm test = node --test) and live as flat test/*.test.js files, with fixtures under test/fixtures/. - Shared helpers live in test-support/ because node --test loads every file under test/. - npm run check = a node --check syntax pass over src, test and test-support, then the full suite.",
+      "evidence": [
+        "package.json",
+        "test-support/shared.js",
+        "test-support/delivery.js"
+      ],
+      "confidence": "confirmed",
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0035"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-13T12:25:48.811Z",
+      "factId": "CTX-0035",
+      "promotedAt": "2026-10-13T12:25:57.121Z",
+      "target": "context/conventions.md"
+    },
+    {
+      "id": "K-016",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Documentation set: - README.md is the simple first-use journey; docs/using-yallaflow.md is the practical developer guide. - docs/cli.md is the command reference. - docs/architecture.md, docs/project-memory.md and docs/shared-projects.md cover the design. - docs/security.md and docs/limitations.md cover trust boundaries and gaps; docs/releasing.md covers the release policy. - docs/upgrading-to-*.md are per-version upgrade notes.",
+      "evidence": [
+        "README.md",
+        "docs/using-yallaflow.md",
+        "docs/cli.md",
+        "docs/architecture.md",
+        "docs/limitations.md"
+      ],
+      "confidence": "confirmed",
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0040"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-13T12:25:49.053Z",
+      "factId": "CTX-0040",
+      "promotedAt": "2026-10-13T12:25:57.446Z",
+      "target": "context/conventions.md"
+    },
+    {
+      "id": "K-017",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "docs/architecture.md describes an 'Execution Engine' (native, reviewed or multi-agent execution policy). The repository evidence shows only guidance and verification execution, with no agent execution, so how much of that engine exists versus is planned cannot be settled from code alone.",
+      "evidence": [
+        "docs/architecture.md",
+        "docs/limitations.md"
+      ],
+      "confidence": "unresolved",
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0046"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-13T12:25:49.294Z",
+      "factId": "CTX-0046",
+      "promotedAt": "2026-10-13T12:25:57.795Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-018",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Security boundaries: - Repository evidence must be a relative path inside the root. - Source writes are confined to their directory. - verify is not a sandbox. - Write authorization, approvals and Shared Project roles are workflow guidance, not access control. - There is no secrets store. Instead, one pattern-based sanitizer (src/security/redact.js) redacts recognizable secret values at YallaFlow's persistence boundary: structured state, the ledger and its projection, work records, ADRs, logs, and source text representations. It never modifies developer files or preserved source originals.",
+      "evidence": [
+        "SECURITY.md",
+        "docs/security.md",
+        "src/security/redact.js",
+        "src/context/evidence.js"
+      ],
+      "confidence": "confirmed",
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0056"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-13T12:25:49.531Z",
+      "factId": "CTX-0056",
+      "promotedAt": "2026-10-13T12:25:58.140Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-019",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Durable secret redaction (v0.3.10-internal.4): - writeYaml/writeYamlAtomic, the context-ledger writer, renderAreaBlock, the work-record writers (appendRedactedText/writeRedactedText), the reconciliation archive, verification logs and extracted source text all pass through redactSecrets/redactDeep. - Values are replaced by <redacted> while names stay, e.g. DB_PASSWORD=<redacted>. - It handles secret-named assignments (=, :, =>, :=), Authorization/Bearer/Basic values, cookies, PEM keys, URL credentials, CLI flags, and well-known token formats. - It is linear-time and idempotent.",
+      "evidence": [
+        "src/security/redact.js",
+        "src/core/yaml.js",
+        "src/context/ledger.js",
+        "test/pilot-hardening.test.js"
+      ],
+      "confidence": "confirmed",
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0057"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-13T12:25:49.773Z",
+      "factId": "CTX-0057",
+      "promotedAt": "2026-10-13T12:25:58.471Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-10-13T12:25:58.471Z",
+  "reviewedAt": "2026-10-13T12:25:58.471Z"
+}

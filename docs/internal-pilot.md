@@ -1,6 +1,6 @@
 # Internal Pilot
 
-This is the pilot guide for the internal prerelease baseline. It is for humans using YallaFlow on real engineering work, not for the coding agent.
+This is the pilot guide for teams trying YallaFlow on real engineering work. It is for humans using YallaFlow on real engineering work, not for the coding agent.
 
 ## Goal
 
@@ -11,12 +11,12 @@ Use YallaFlow on real engineering work and report friction.
 Use the normal public CLI, exactly as any first-time user would:
 
 ```bash
-npm install -g /path/to/yallaflow-<version>.tgz   # isolated CLI; or: npm link, from a checkout
+npm install -g yallaflow                          # isolated CLI; or a candidate tarball / npm link, from a checkout
 yallaflow init
 yallaflow --help
 ```
 
-On a legacy repository, never add YallaFlow to the application's `package.json` — it can make npm rewrite an old lockfile. See [`installation.md`](installation.md#legacy-and-brownfield-repositories). Upgrading an existing pilot workspace: `yallaflow upgrade status`, then [`upgrading-to-v0.3.8.md`](upgrading-to-v0.3.8.md). Connect the pilot agent with `yallaflow agent setup codex|claude`.
+On a legacy repository, never add YallaFlow to the application's `package.json` — it can make npm rewrite an old lockfile. See [`installation.md`](installation.md#legacy-and-brownfield-repositories). Upgrading an existing pilot workspace: `yallaflow upgrade status`, then [`upgrading-to-v1.0.md`](upgrading-to-v1.0.md). `yallaflow init` connects Claude Code and Codex; `yallaflow agent setup codex|claude` re-creates a pointer manually.
 
 If you have an existing requirements document, use it directly instead of retyping it into a prompt — the same command handles text, Office/OpenDocument, PDF, and image files:
 

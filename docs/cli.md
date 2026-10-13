@@ -1,6 +1,6 @@
 # CLI Reference
 
-YallaFlow v0.3.10 (internal.4). Every command also answers `--help` / `-h` (at any position, including sub-actions such as `yallaflow knowledge propose --help`) without changing any state. `[work-id]` defaults to the active work item.
+YallaFlow 1.0.0. Every command also answers `--help` / `-h` (at any position, including sub-actions such as `yallaflow knowledge propose --help`) without changing any state. `[work-id]` defaults to the active work item.
 
 ## Workspace
 

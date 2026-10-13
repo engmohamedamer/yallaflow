@@ -206,17 +206,19 @@ Two connected goals: understand an existing project deeply once, and let a whole
 
 Deliberately not in scope: hosted or cloud YallaFlow, accounts, RBAC, invitations, real-time locks, a daemon, automatic commit/push/pull/rebase/merge, tracker integration, sprints, task assignment, dashboards, LLM calls or embeddings in the CLI, semantic auto-resolution, and v0.4 execution.
 
-## v0.4 — Execution
-- Execution contracts
-- Reviewed/native/multi-agent policies
-- Model-tier routing
-- Reviewer packages and durable rulings
+## 1.0.0 — First public release
 
-## v1.0
+The v0.3.10 product declared stable and published to npm (`npm install -g yallaflow`). No new runtime behavior; the SemVer compatibility promise for the CLI, durable workspaces, pinned behavior, and immutable instructions is defined in [`releasing.md`](releasing.md#semantic-versioning-and-the-10-compatibility-promise).
+
+## Future directions (not committed, not scheduled)
+
+Ideas recorded before 1.0. Each would ship as a backward-compatible MINOR release, or as a MAJOR release only if it cannot keep the 1.0 compatibility promise.
+
+- Execution: execution contracts; reviewed/native/multi-agent policies; model-tier routing; reviewer packages and durable rulings
 - Stable plugin API
-- Migration system
+- Migration system (explicit, documented migrations beyond today's backward-compatible reads)
 - Console / optional UI
-- Evaluation harness and documented behavior guarantees
+- Evaluation harness
 
 ## Rename follow-up
 - Define the supported migration path from `.projectflow/` to `.yallaflow/`.

@@ -1,12 +1,13 @@
-# Current Limitations (v0.3.10)
+# Current Limitations (1.0)
 
 Known gaps and deliberate boundaries. Planned work is tracked in [`roadmap.md`](roadmap.md).
 
 ## Scope and distribution
 
-- **Internal prerelease.** Not published to npm; install from a tarball or checkout.
+- **Node.js CLI.** Requires Node.js ≥ 20.16.0 on the developer's machine and in CI (not in your application). Install from npm (`npm install -g yallaflow`).
 - **Local-first; teams share through Git.** A single-user workspace is the default. A Shared Project ([`shared-projects.md`](shared-projects.md)) shares project memory through ordinary Git; there is no server, locking, real-time visibility, accounts, or permissions.
-- **Platform coverage.** The regression suite runs in POSIX environments; Windows has not been verified in this release.
+- **Platform coverage.** The regression suite runs in POSIX environments (developed and released on Linux); Windows has not been verified.
+- **Agent compliance is guidance.** YallaFlow governs through its Agent Contract and deterministic CLI gates; it cannot stop an agent or person from editing files directly (see [`security.md`](security.md#what-yallaflow-does-not-enforce)). First-party agent setup covers Claude Code and Codex; other agents can follow `.yallaflow/AGENT.md` when pointed to it.
 
 ## Setup
 
@@ -15,7 +16,7 @@ Known gaps and deliberate boundaries. Planned work is tracked in [`roadmap.md`](
 ## Shared Projects
 
 - **The first-use gate uses the recorded project kind.** A repository recorded Greenfield (e.g. misclassified by v0.3.8 `init`) is not gated, even if it later grows Brownfield-sized; `inspect` reports such a mismatch. There is no audited waiver: an urgent change to an un-understood Brownfield project needs an approved baseline first.
-- **The pre-baseline gate blocks work creation, not conversation (internal.4).** Until a Brownfield baseline is approved, `start`, the direct work commands, file `intake`, and `route` refuse normal engineering work. Whether a request is transient operational help (start a dev server, show logs, `git status`) or project-semantic engineering work is the Agent's interpretation; YallaFlow only enforces the boundary when work is created. A pending or routed work item an earlier release created before the baseline stays readable; it cannot be routed or enter an application-writing stage until the baseline is approved.
+- **The pre-baseline gate blocks work creation, not conversation.** Until a Brownfield baseline is approved, `start`, the direct work commands, file `intake`, and `route` refuse normal engineering work. Whether a request is transient operational help (start a dev server, show logs, `git status`) or project-semantic engineering work is the Agent's interpretation; YallaFlow only enforces the boundary when work is created. A pending or routed work item an earlier release created before the baseline stays readable; it cannot be routed or enter an application-writing stage until the baseline is approved.
 - **The original request is carried as the baseline objective.** It is shown again after approval (by `baseline approve` and `brief`, until a later work item exists); YallaFlow does not create the continued work item itself — the Agent starts it.
 - **Secret redaction is pattern-based.** It recognizes secret-named assignments, Authorization/Bearer/Basic values, cookies, private keys, URL credentials, and well-known token formats. A secret with no recognizable name or format is not detected, and a few ordinary values in secret positions (for example `password: hunter2` in an example) are redacted too. The preserved original of a captured source is never altered; `intake` warns when it appears to contain secrets. State written by earlier releases is not rewritten until YallaFlow next writes that file — and then only its recognizable secret values change. Consequences in that rare case (an earlier record that held a secret): a v0.3.5 legacy context section containing one is kept for manual review instead of being retired automatically; in a Shared Project, the first internal.4 write of such a fact changes its fingerprint, so it can be reported as changed in parallel once; an internal.3 `doctor` reading an internal.4-rendered projection of such a fact reports projection drift. The `work.md` Routing Decision check and reconciliation approval fingerprints are redaction-invariant.
 - **Coverage is declared, not measured.** `baseline show` reports what the Agent declared it inspected and sampled, the recorded limitations, unresolved facts, and the repository paths its evidence cites; YallaFlow does not observe which files the Agent actually read.

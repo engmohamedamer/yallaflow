@@ -6,10 +6,14 @@ import { readFile } from 'node:fs/promises';
 test('exposes the YallaFlow product and CLI identity', async () => {
   const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
   assert.equal(pkg.name, 'yallaflow');
-  assert.equal(pkg.private, true);
+  assert.equal(pkg.private, undefined, '1.0.0 is a public npm package');
+  assert.equal(pkg.license, 'MIT');
+  assert.deepEqual(pkg.repository, { type: 'git', url: 'git+https://github.com/engmohamedamer/yallaflow.git' });
+  assert.deepEqual(pkg.publishConfig, { access: 'public' });
+  assert.deepEqual(pkg.files, ['src', 'resources', 'docs', 'README.md', 'CHANGELOG.md', 'LICENSE']);
   assert.equal(pkg.description, 'AI-agnostic engineering governance layer for coding agents: durable project memory, adaptive workflows, and evidence-backed delivery.');
   assert.deepEqual(pkg.bin, { yallaflow: 'src/cli.js' });
-  assert.equal(pkg.version, '0.3.10-internal.4');
+  assert.equal(pkg.version, '1.0.0');
 
   const result = spawnSync(process.execPath, ['src/cli.js', '--help'], { encoding: 'utf8' });
   assert.equal(result.status, 0);

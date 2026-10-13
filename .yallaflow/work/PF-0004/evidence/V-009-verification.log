@@ -1,0 +1,8 @@
+Agent contract (.yallaflow/AGENT.md): current
+Installed package contract: v8
+Workspace contract: v8
+current (agent contract v8)
+
+Agent bootstrap (repository-root session files pointing to AGENT.md):
+- codex (AGENTS.md): current (bootstrap v2)
+- claude (CLAUDE.md): current (bootstrap v2)

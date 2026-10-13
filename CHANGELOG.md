@@ -2,11 +2,60 @@
 
 All notable changes to YallaFlow are documented here. The format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-YallaFlow has not yet made a public npm release (`package.json` remains `"private": true`). Every version below is an **internal-only prerelease**, git-tagged for internal use and never published to the npm registry. See [`docs/releasing.md`](docs/releasing.md) for the versioning policy that will apply once a public release begins, and [`docs/roadmap.md`](docs/roadmap.md) for planned work.
+**1.0.0 is the first public release**, published to npm as `yallaflow`. From 1.0.0 the package follows Semantic Versioning with the compatibility promise in [`docs/releasing.md`](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise). Every earlier version below is an **internal prerelease**: git-tagged, never published to npm, and kept here as history.
 
 ## [Unreleased]
 
 Nothing yet.
+
+## [1.0.0] - 2026-10-13 — First public release
+
+Give AI your project, not just your prompt.
+
+YallaFlow is an AI-agnostic engineering governance layer for coding agents: durable project memory, adaptive workflows, and evidence-backed delivery. You describe the intent; YallaFlow supplies the project.
+
+```bash
+npm install -g yallaflow
+cd your-project
+yallaflow init
+```
+
+Then open Claude Code or Codex and describe what you want.
+
+### What you get
+
+- **One-command onboarding.** `yallaflow init` sets up `.yallaflow/` and connects Claude Code and Codex by adding a small pointer to `CLAUDE.md` and `AGENTS.md`, keeping anything already there.
+- **Automatic agent bootstrapping.** Every session orients itself from project state. Nobody has to say "use YallaFlow", choose a workflow, or carry the project in the prompt.
+- **Brownfield project understanding.** On an existing repository, the first meaningful request triggers one deep, evidence-backed understanding of the project — focused by that request — which the developer reviews. Reply "Approve" and the original request continues. No engineering work starts on a project YallaFlow does not yet understand.
+- **Greenfield support.** A new project is never scanned; understanding grows from the product intent, supplied requirements, and approved decisions.
+- **Durable, evidence-backed project memory.** Facts carry status, provenance, evidence, and freshness. Memory evolves by reconfirming, superseding, or disputing facts — history is never rewritten.
+- **Purpose-aware discovery.** "We will redesign the UI without changing business behavior" focuses discovery where that goal needs it; the purpose stays work intent, never a project fact.
+- **Freshness and precise revalidation.** Evidence is content-hashed; stale or disputed knowledge is revalidated where it changed instead of rescanning the repository. Understand once, revalidate precisely.
+- **An adaptive work lifecycle.** Features, bugs, investigations, changes, refactors, and releases each get a workflow proportional to their type and scope, with pinned, immutable skill instructions.
+- **Verification and delivery convergence.** "Done" requires fresh verification evidence; feature work is also checked against its approved requirements and acceptance criteria.
+- **Evidence-backed DONE.** `yallaflow finish` checks lifecycle, knowledge review, and integrity before the agent says the work is ready.
+- **Source and SRS intake.** Text, Office/OpenDocument, PDF, and image inputs are preserved as immutable, traceable sources with safe text extraction (no macros, scripts, or external fetches).
+- **Agent and session continuity.** Close the chat, switch agents; the engineering state lives with the project (`brief`, `resume`, `handoff`).
+- **Shared Projects through Git.** A team shares one reviewed project understanding through ordinary commits, with branch-safe work and source IDs, branch-local knowledge deltas, one canonical integration point, and a read-only CI gate (`yallaflow shared check`). Developers work with Git; agents work with YallaFlow.
+- **Conversational human approvals.** Review gates such as the project baseline are approved in the agent conversation and recorded with the developer's own words; the agent never approves on its own.
+- **Secret redaction.** Recognizable secret values are redacted before anything is persisted to YallaFlow state; your own files and preserved originals are never modified.
+- **Local-first, no YallaFlow cloud.** No server, no account, no telemetry, no LLM calls. YallaFlow never commits, pushes, or merges for you.
+
+### Why 1.0 now
+
+The product has been exercised through real Brownfield projects, fresh-user onboarding, self-dogfooding (YallaFlow's own development, including this release, is governed by YallaFlow), multiple coding agents, and multi-developer pilot use. Its CLI surface, durable workspace format, and Behavior Contract model are now stable enough to promise standard Semantic Versioning compatibility.
+
+### Compatibility
+
+- 1.0.0 is the `0.3.10-internal.4` runtime, unchanged: Agent Contract v8, bootstrap block v2, Skill Registry v8, Knowledge Policy v1, and all workspace/schema versions are the same. Upgrading from `0.3.10-internal.4` needs no action; earlier prerelease workspaces are read as-is — see [`docs/upgrading-to-v1.0.md`](docs/upgrading-to-v1.0.md).
+- Shared Projects that require `>= 0.3.10-internal.1` accept 1.0.0.
+- Requires Node.js >= 20.16.0. Windows is not verified yet. Known dependency advisory: one moderate, mitigated `file-type` advisory via `officeparser` (see [`docs/security.md`](docs/security.md#dependencies)).
+
+### Release changes
+
+- `package.json`: removed `"private": true`; added license, repository, homepage, bugs, keywords, and `publishConfig.access: public`. Package version `1.0.0`.
+- npm publishing through GitHub Actions with npm Trusted Publishing and provenance (`.github/workflows/release.yml`); no long-lived npm token. Each release is validated (tag = version, on `main`), tested on Node 20, 22, and 24, smoke-tested from the packed tarball, and published at most once. `1.0.0` itself is published manually by the package owner, because npm configures trusted publishers in an existing package's settings (see `docs/releasing.md`).
+- Documentation: npm as the primary install, the 1.0 compatibility promise (`docs/releasing.md`), `docs/upgrading-to-v1.0.md`, and updated installation, security, limitations, roadmap, CLI, and Shared Project CI examples.
 
 ## [0.3.10-internal.4] - 2026-10-12 — Pilot hardening
 

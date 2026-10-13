@@ -224,7 +224,7 @@ GitHub Actions:
 ```yaml
 - uses: actions/setup-node@v4
   with: { node-version: 20 }
-- run: npm install -g <your yallaflow tarball or registry package>
+- run: npm install -g yallaflow@1.0.0   # the version your team uses
 - run: yallaflow shared check
 ```
 
@@ -233,7 +233,7 @@ Azure Pipelines:
 ```yaml
 - task: NodeTool@0
   inputs: { versionSpec: '20.x' }
-- script: npm install -g <your yallaflow tarball or registry package>
+- script: npm install -g yallaflow@1.0.0
 - script: yallaflow shared check
 ```
 
@@ -243,7 +243,7 @@ GitLab CI:
 yallaflow:
   image: node:20
   script:
-    - npm install -g <your yallaflow tarball or registry package>
+    - npm install -g yallaflow@1.0.0
     - yallaflow shared check
 ```
 

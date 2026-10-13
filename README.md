@@ -19,7 +19,7 @@ Your coding agent is already smart.
 YallaFlow requires **Node.js >= 20.16.0**.
 
 ~~~bash
-npm install -g git+https://github.com/engmohamedamer/yallaflow.git#v0.3.10-internal.4
+npm install -g yallaflow
 ~~~
 
 Check it:
@@ -27,6 +27,8 @@ Check it:
 ~~~bash
 yallaflow --version
 ~~~
+
+Other options — a tools prefix, a Git tag, or a checkout — are in [Installation](docs/installation.md).
 
 ### 2. Initialize your project — once
 
@@ -410,33 +412,34 @@ Then go deeper only where you need to:
 
 | Documentation | Purpose |
 | --- | --- |
-| [Installation](docs/installation.md) | installation, legacy projects, upgrades |
+| [Installation](docs/installation.md) | installation options, legacy projects, upgrades |
 | [Shared Projects](docs/shared-projects.md) | one project understanding for the whole team, through Git |
 | [Canonical workflows](docs/workflows.md) | Greenfield, Brownfield, bugs, investigations, features, teams |
 | [Feature guide](docs/guide.md) | detailed YallaFlow behavior |
 | [Project memory](docs/project-memory.md) | durable context, evidence and freshness |
 | [CLI reference](docs/cli.md) | every command and flag |
 | [Architecture](docs/architecture.md) | internal concepts and design |
-| [Security](docs/security.md) | handling project sources safely |
+| [Security](docs/security.md) | local-first trust model, secret redaction, sources |
 | [Limitations](docs/limitations.md) | current boundaries |
 | [Roadmap](docs/roadmap.md) | what comes next |
-| [Upgrading to v0.3.10](docs/upgrading-to-v0.3.10.md) | what changes when you upgrade |
+| [Upgrading to 1.0](docs/upgrading-to-v1.0.md) | upgrading from a 0.3.x prerelease |
+| [Releasing & compatibility](docs/releasing.md) | versioning and the 1.0 compatibility promise |
 | [Changelog](CHANGELOG.md) | release history |
 
 ---
 
 ## Current status
 
-Current version: **v0.3.10-internal.4 — Shared Project Intelligence (pilot hardening)**
+Current version: **1.0.0** — the first public, stable release.
 
-YallaFlow is currently:
+YallaFlow is:
 
-- local-first, and single-user by default,
-- shareable with a team through ordinary Git, once a maintainer enables a Shared Project,
-- AI-agent agnostic,
-- pre-1.0 and under active development.
+- local-first: no YallaFlow server, account, or cloud service — your project memory stays in your repository,
+- single-user by default, and shareable with a team through ordinary Git once a maintainer enables a Shared Project,
+- AI-agent agnostic, with first-party setup for Claude Code and Codex,
+- stable: from 1.0.0 it follows Semantic Versioning, keeps existing workspaces readable, and never silently rewrites historical work ([compatibility promise](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise)).
 
-It does not call an LLM itself. The coding agent does the semantic reasoning; YallaFlow provides deterministic governance and durable engineering state around that reasoning.
+It does not call an LLM itself and sends no telemetry. The coding agent does the semantic reasoning; YallaFlow provides deterministic governance and durable engineering state around that reasoning.
 
 It is not a cloud service, a real-time collaboration server, a project-management tool, or a bot that commits or pushes for you.
 

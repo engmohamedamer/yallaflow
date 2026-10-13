@@ -15,6 +15,7 @@ import { contextLedgerPath, loadContextLedger, mutateContextLedger } from '../sr
 import { captureContextBase, diffAgainstBase, loadWorkMemory, planIntegration } from '../src/shared/memory.js';
 import { ledgerFingerprint, factFingerprint } from '../src/shared/fingerprint.js';
 import { compareVersions } from '../src/shared/config.js';
+import { PACKAGE_VERSION } from '../src/version.js';
 import { normalizeEvidenceRefs } from '../src/context/evidence.js';
 import { allocateCheckoutId, readLocalIdentity, ensureLocalIdentity, generateCloneTag, writeLocalIdentity } from '../src/shared/identity.js';
 import { proposeKnowledge, rejectKnowledge } from '../src/knowledge/store.js';
@@ -117,15 +118,16 @@ test('11. an incompatible YallaFlow stops before any project-state mutation; rea
   for (const args of [['start', 'Fix invoice totals'], ['bug', 'Totals', '--scope', 'bounded'], ['shared', 'integrate'], ['knowledge', 'review', 'PF-0001', '--none'], ['context', 'render']]) {
     const result = cli(team.maintainer, args, false);
     assert.notEqual(result.status, 0, args.join(' '));
-    assert.match(result.stderr, /Installed: 0\.3\.10-internal\.4 · Project requires: >= 9\.0\.0 — INCOMPATIBLE[\s\S]*No files were changed/);
+    assert.match(result.stderr, new RegExp(`Installed: ${escapeRegExp(PACKAGE_VERSION)} · Project requires: >= 9\\.0\\.0 — INCOMPATIBLE[\\s\\S]*No files were changed`));
   }
   assert.equal(await treeHash(team.maintainer), before);
   const brief = cli(team.maintainer, ['brief']).stdout;
   assert.match(brief, /Primary next concern: this project requires a different YallaFlow/);
-  assert.match(cli(team.maintainer, ['doctor'], false).stdout, /FAIL YallaFlow version: Installed: 0\.3\.10-internal\.4 · Project requires: >= 9\.0\.0/);
+  assert.match(cli(team.maintainer, ['doctor'], false).stdout, new RegExp(`FAIL YallaFlow version: Installed: ${escapeRegExp(PACKAGE_VERSION)} · Project requires: >= 9\\.0\\.0`));
   assert.equal(cli(team.maintainer, ['shared', 'check'], false).status, 1);
   assert.equal(compareVersions('0.3.10-internal.1', '0.3.9-internal.1'), 1);
   assert.equal(compareVersions('0.3.10-internal.1', '0.3.10'), -1);
+  assert.equal(compareVersions('1.0.0', '0.3.10-internal.1'), 1, '1.0.0 satisfies every 0.3.10 Shared Project minimum');
   assert.equal(compareVersions('0.3.10-internal.2', '0.3.10-internal.10'), -1);
 });
 
@@ -782,3 +784,7 @@ test('read commands never write in a Shared Project — not even a fresh clone\'
   }
   assert.equal(await exists(path.join(workspacePath(fresh), 'local')), false);
 });
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}

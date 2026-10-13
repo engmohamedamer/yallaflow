@@ -15,13 +15,13 @@
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-009)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-12T22:03:26.359Z (commit b181dc0)
+- **Verified:** 2026-10-13T12:25:55.771Z (commit c433e61)
 - **Evidence:**
-  - src/cli.js (repository @ b181dc0)
-  - src/commands/start.js (repository @ b181dc0)
-  - src/commands/baseline.js (repository @ b181dc0)
-  - test/recursive-help-safety.test.js (repository @ b181dc0)
-  - docs/architecture.md (repository @ b181dc0)
+  - src/cli.js (repository @ c433e61)
+  - src/commands/start.js (repository @ c433e61)
+  - src/commands/baseline.js (repository @ c433e61)
+  - test/recursive-help-safety.test.js (repository @ c433e61)
+  - docs/architecture.md (repository @ c433e61)
 
 <!-- yallaflow-fact:CTX-0010 -->
 ### CTX-0010 — Workspace and state model:
@@ -227,10 +227,10 @@ Reopen (DONE to implementation, verification or review, with a reason) cascades 
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-046)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-12T22:03:34.209Z (commit b181dc0)
+- **Verified:** 2026-10-13T12:25:57.795Z (commit c433e61)
 - **Evidence:**
-  - docs/architecture.md (repository @ b181dc0)
-  - docs/limitations.md (repository @ b181dc0)
+  - docs/architecture.md (repository @ c433e61)
+  - docs/limitations.md (repository @ c433e61)
 
 <!-- yallaflow-fact:CTX-0048 -->
 ### CTX-0048 — Agent Contract architecture: - .yallaflow/AGENT.md is the single canonical agent contract, held in a managed block versioned by AGENT_CONTRACT_VERSION (currently 8, v0.3.10-internal.4) and sealed with a SHA-256 of its body. - v8 adds the pre-baseline refusal and the original request as the baseline objective (continued automatically after approval), transient operational assistance versus project-semantic engineering work, declared baseline coverage, and never copying secret values into YallaFlow state. - Repository-root CLAUDE.md and AGENTS.md carry only a thin pointer block (BOOTSTRAP_VERSION 2). - yallaflow agent refresh/setup update those blocks idempotently, refuse hand-edited or newer blocks, and preserve content outside the blocks.
@@ -375,12 +375,12 @@ Reopen (DONE to implementation, verification or review, with a reason) cascades 
 - **Knowledge ID:** K-044
 - **Promoted at:** 2026-10-12T22:03:33.767Z
 - **Supersedes:** CTX-0044
-- **Verified:** 2026-10-12T22:03:33.767Z (commit b181dc0)
+- **Verified:** 2026-10-13T12:25:58.140Z (commit c433e61)
 - **Evidence:**
-  - SECURITY.md (repository @ b181dc0)
-  - docs/security.md (repository @ b181dc0)
-  - src/security/redact.js (repository @ b181dc0)
-  - src/context/evidence.js (repository @ b181dc0)
+  - SECURITY.md (repository @ c433e61)
+  - docs/security.md (repository @ c433e61)
+  - src/security/redact.js (repository @ c433e61)
+  - src/context/evidence.js (repository @ c433e61)
 
 <!-- yallaflow-fact:CTX-0057 -->
 ### CTX-0057 — Durable secret redaction (v0.3.10-internal.4): - writeYaml/writeYamlAtomic, the context-ledger writer, renderAreaBlock, the work-record writers (appendRedactedText/writeRedactedText), the reconciliation archive, verification logs and extracted source text all pass through redactSecrets/redactDeep. - Values are replaced by <redacted> while names stay, e.g. DB_PASSWORD=<redacted>. - It handles secret-named assignments (=, :, =>, :=), Authorization/Bearer/Basic values, cookies, PEM keys, URL credentials, CLI flags, and well-known token formats. - It is linear-time and idempotent.
@@ -392,11 +392,11 @@ Reopen (DONE to implementation, verification or review, with a reason) cascades 
 - **Knowledge ID:** K-045
 - **Promoted at:** 2026-10-12T22:03:33.984Z
 - **Supersedes:** CTX-0045
-- **Verified:** 2026-10-12T22:03:33.984Z (commit b181dc0)
+- **Verified:** 2026-10-13T12:25:58.471Z (commit c433e61)
 - **Evidence:**
-  - src/security/redact.js#redactSecrets (repository @ b181dc0)
-  - src/core/yaml.js (repository @ b181dc0)
-  - src/context/ledger.js (repository @ b181dc0)
-  - test/pilot-hardening.test.js (repository @ b181dc0)
+  - src/security/redact.js (repository @ c433e61)
+  - src/core/yaml.js (repository @ c433e61)
+  - src/context/ledger.js (repository @ c433e61)
+  - test/pilot-hardening.test.js (repository @ c433e61)
 
 <!-- yallaflow-context:end -->

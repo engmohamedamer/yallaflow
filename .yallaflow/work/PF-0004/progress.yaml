@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 8
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-10-13T11:22:14.552Z",
+      "completedAt": "2026-10-13T11:22:45.483Z",
+      "summary": "Release base c433e61=v0.3.10-internal.4, tree clean, 664/664 tests, doctor healthy. npm name yallaflow unclaimed (E404, no similar names); npm not authenticated. Pack allowlist already excludes workspace/test/agent files. 1.0.0 satisfies shared minimumVersion 0.3.10-internal.1. No network/telemetry code; one documented mitigated audit advisory. Docs with internal-version primary paths identified.",
+      "evidence": [
+        "package.json",
+        "src/shared/config.js",
+        "docs/releasing.md"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-10-13T11:22:45.833Z",
+      "completedAt": "2026-10-13T11:22:45.992Z",
+      "summary": "Plan recorded in work.md: version 1.0.0 (no contract/registry/policy/schema bumps), public package metadata, 1.0 SemVer/compatibility contract in releasing.md, npm-first docs, CHANGELOG 1.0.0, OIDC trusted-publishing workflow, release notes draft, packed-candidate verification.",
+      "evidence": [
+        ".yallaflow/work/PF-0004/work.md"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-10-13T11:22:51.249Z",
+      "completedAt": "2026-10-13T12:01:57.193Z",
+      "summary": "Review fixes applied: release.yml split into guard (tag=version, prerelease flag, tag on main, version-not-on-npm check — skips with a notice when already published, fails on registry errors), test matrix Node 20/22/24, publish on Node 24 (npm>=11.5.1 asserted, OIDC id-token only in publish job, provenance, dist-tag latest/next); actions pinned by SHA (checkout v7.0.1, setup-node v7.1.0), persist-credentials false, concurrency. releasing.md documents the first-publication bootstrap order. security.md redaction wording corrected (append-only records keep earlier content). Release notes limit 'nothing to do' to internal.4. Architecture v0.3.10 version table labeled.",
+      "evidence": [
+        "package.json",
+        "docs/releasing.md",
+        ".github/workflows/release.yml",
+        "CHANGELOG.md",
+        "docs/security.md",
+        ".github/release-notes/v1.0.0.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-10-13T12:24:57.868Z",
+      "completedAt": "2026-10-13T12:24:57.868Z",
+      "summary": "Fresh evidence after review fixes: syntax V-012; full suite 664/664 on Node 20.19.0 V-013, Node 22.23.3 V-014, Node 24.21.0 V-015 (official checksum-verified binaries); final tarball yallaflow-1.0.0.tgz (176 files, sha1 8e43e49d5f3f1f46eced8821113891a496cd53d4) audit: allowlist only, no forbidden paths, no secrets/machine paths V-016; packed-candidate first-user smoke from isolated npm -g prefix, 19 checks V-017; npm pack --dry-run V-018; git diff --check V-019 (new files checked separately); doc links/anchors V-020; doctor healthy V-021; agent contract v8/bootstrap v2 current V-022; npm audit no high/critical, one known moderate advisory V-023; no network/provider/telemetry code V-024. Workflow guard cases simulated against the live registry (absent, published, missing version, registry error).",
+      "evidence": [
+        "verification:V-013",
+        "verification:V-014",
+        "verification:V-015",
+        "verification:V-016",
+        "verification:V-017"
+      ]
+    },
+    "code-review": {
+      "status": "completed",
+      "startedAt": "2026-10-13T12:24:58.090Z",
+      "completedAt": "2026-10-13T12:24:58.317Z",
+      "summary": "Independent read-only review by a separate agent: no blocking issues; domain versions unchanged, only src/version.js changed under src/, no network code, compatibility claims hold. Should-fix findings all resolved: (1) workflow republish/first-release failure -> guard job skips already-published versions; (2) Node 20-only -> test matrix 20/22/24, publish on 24 (all three verified locally); (3) security.md redaction overstatement -> corrected (append-only records keep earlier content); (4) release notes 'nothing to migrate' -> limited to internal.4. Optional: SHA-pinned actions v7, persist-credentials false, tag-on-main and prerelease-flag checks, public-repo/repository.url preconditions documented, architecture version table labeled. Usage claims kept per owner wording (ruling).",
+      "evidence": [
+        ".github/workflows/release.yml",
+        "docs/security.md",
+        "verification:V-015"
+      ]
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Package version 1.0.0 only; Agent Contract v8, bootstrap v2, Skill Registry v8, Knowledge Policy v1 and all schema versions stay unchanged",
+      "reason": "No behavior or durable-shape change ships in 1.0.0; the version domains are independent and the user forbade bumps without behavior change",
+      "costIfWrong": "Workspaces would be told to refresh agent guidance or re-pin for no reason",
+      "createdAt": "2026-10-13T11:22:51.470Z"
+    },
+    {
+      "decision": "Keep the CHANGELOG 'Why 1.0 now' usage statements (real Brownfield projects, fresh-user onboarding, self-dogfooding, multiple coding agents, multi-developer pilot use) without numbers",
+      "reason": "The release owner supplied that wording in the release request; no usage numbers are claimed",
+      "costIfWrong": "A public claim the owner cannot back; owner reviews the CHANGELOG before publication",
+      "createdAt": "2026-10-13T12:01:26.298Z"
+    },
+    {
+      "decision": "During verification, documented the Trusted Publishing bootstrap as: manual 1.0.0, lock publishing access, publish GitHub Release v1.0.0 (workflow skips), and create the trusted publisher only when the first automated release is ready",
+      "reason": "npm docs (docs.npmjs.com/trusted-publishers, read 2026-10-13): a new trusted publisher configuration expires unless it completes a successful publish within 2 days; publishing needs npm >= 11.5.1 and Node >= 22.14. Docs-only change (releasing.md, CHANGELOG, workflow comment); no workflow logic change",
+      "costIfWrong": "Owner configures the trusted publisher too early, it expires, and must be recreated",
+      "createdAt": "2026-10-13T12:03:21.476Z"
+    }
+  ],
+  "history": [
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Independent code review (should-fix): release workflow would fail or try to republish when 1.0.0 is published manually first; workflow tested only Node 20 (EOL); security.md overstated retroactive redaction of append-only records; release notes overstated 'nothing to migrate' for all 0.3.10-internal.N; first-publication order undocumented.",
+      "changedAt": "2026-10-13T12:01:47.762Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Downstream of implementation revision: Independent code review (should-fix): release workflow would fail or try to republish when 1.0.0 is published manually first; workflow tested only Node 20 (EOL); security.md overstated retroactive redaction of append-only records; release notes overstated 'nothing to migrate' for all 0.3.10-internal.N; first-publication order undocumented.",
+      "changedAt": "2026-10-13T12:01:47.762Z"
+    }
+  ],
+  "updatedAt": "2026-10-13T12:24:58.317Z"
+}

@@ -703,7 +703,7 @@ Pending deltas that need reconciliation are doctor warnings and `shared check` f
 
 **Git.** `src/shared/git.js` runs local, read-only probes: `symbolic-ref`, `ls-files`, `check-ignore`, `config`, `status`. YallaFlow never commits, pushes, pulls, fetches, rebases, or merges, and has no network access.
 
-**Versions.**
+**Versions (at v0.3.10; for 1.0.0 see below).**
 
 | Item | Version | Why |
 |---|---|---|
@@ -735,3 +735,7 @@ Pending deltas that need reconciliation are doctor warnings and `shared check` f
 - *Projection.* `writeContextProjection` retires PROJECT.md's exact, untouched init prompts once the ledger holds a current fact (`stripStarterPlaceholders`); context integrity warns while they remain.
 - *Coverage.* An optional `baseline.yaml` `coverage` (`inspected`, `sampled`) is combined with limitation types, unresolved facts, and the evidence's cited repository paths by `summarizeCoverage`.
 - *Provenance.* `normalizeEvidenceRefs` adds `workingTree` (`head`/`modified`/`untracked`, from `gitWorkingTreeStates`) to hashed repository file evidence when Git has a HEAD. `formatEvidence`, and therefore the projection, are unchanged, so older readers see no drift.
+
+## 1.0.0 — first public release
+
+`1.0.0` is the `0.3.10-internal.4` runtime declared stable and published to npm. No runtime behavior changed: Agent Contract v8, bootstrap block v2, Skill Registry v8, Knowledge Policy v1, and every workspace/schema version are unchanged. `package.json` drops `"private": true` and gains public metadata; `src/version.js` reports `1.0.0`. `compareVersions('1.0.0', '0.3.10-internal.1') > 0`, so a Shared Project's recorded `yallaflow.minimumVersion` accepts 1.0.0 and `SHARED_MINIMUM_VERSION` stays `0.3.10-internal.1`. Publishing is automated by `.github/workflows/release.yml` (npm Trusted Publishing, provenance). The SemVer compatibility promise is in [`releasing.md`](releasing.md#semantic-versioning-and-the-10-compatibility-promise).

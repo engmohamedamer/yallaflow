@@ -28,10 +28,8 @@ Your application can use any language or framework. YallaFlow is installed as a 
 
 ## 2. Install
 
-### Fastest install from the current Git tag
-
 ```bash
-npm install -g git+https://github.com/engmohamedamer/yallaflow.git#v0.3.10-internal.4
+npm install -g yallaflow
 ```
 
 Verify:
@@ -43,15 +41,15 @@ yallaflow --version
 Expected:
 
 ```text
-0.3.10-internal.4
+1.0.0
 ```
 
-### Install from a release tarball
+### Install a specific Git tag
 
-If you already have `yallaflow-<version>.tgz`:
+Every release is also a Git tag:
 
 ```bash
-npm install -g /path/to/yallaflow-<version>.tgz
+npm install -g git+https://github.com/engmohamedamer/yallaflow.git#v1.0.0
 ```
 
 ### Install from a checkout
@@ -61,7 +59,6 @@ Useful when developing YallaFlow itself:
 ```bash
 git clone https://github.com/engmohamedamer/yallaflow.git
 cd yallaflow
-git checkout v0.3.10-internal.4
 npm ci
 npm link
 ```
@@ -420,6 +417,7 @@ YallaFlow does not silently update itself.
 Install the target version, then inspect compatibility:
 
 ```bash
+npm install -g yallaflow@latest
 yallaflow upgrade status
 yallaflow upgrade plan
 ```
@@ -439,7 +437,7 @@ yallaflow doctor
 
 In a Shared Project, upgrade every teammate and CI job together. An older YallaFlow stops before changing project state and tells you which version the project requires.
 
-Full update procedure: [installation.md#updating-yallaflow](installation.md#updating-yallaflow). What changed in this release: [upgrading-to-v0.3.10.md](upgrading-to-v0.3.10.md).
+Full update procedure: [installation.md#updating-yallaflow](installation.md#updating-yallaflow). Upgrading from a 0.3.x prerelease: [upgrading-to-v1.0.md](upgrading-to-v1.0.md).
 
 ---
 

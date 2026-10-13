@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "unavailable",
+      "area": "environment",
+      "summary": "npm registry account state (login, 2FA, publish rights, trusted publisher config) could not be inspected",
+      "reason": "npm whoami returns ENEEDAUTH on this machine; no npm credentials are available to the agent",
+      "recordedAt": "2026-10-13T11:22:19.556Z"
+    },
+    {
+      "id": "DL-002",
+      "type": "unavailable",
+      "area": "environment",
+      "summary": "GitHub repository settings (private vulnerability reporting, Actions environments, branch protection) could not be inspected",
+      "reason": "gh CLI is not installed and no GitHub credentials are available; only the public API confirmed the repository is public with issues enabled",
+      "recordedAt": "2026-10-13T11:22:19.816Z"
+    }
+  ],
+  "updatedAt": "2026-10-13T11:22:19.816Z"
+}
