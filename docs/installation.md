@@ -18,14 +18,14 @@ npm install --prefix ~/.local/yallaflow yallaflow
 export PATH="$HOME/.local/yallaflow/node_modules/.bin:$PATH"
 ```
 
-To pin an exact version (for example in CI or on a team that upgrades together): `npm install -g yallaflow@1.0.0`.
+To pin an exact version (for example in CI or on a team that upgrades together): `npm install -g yallaflow@1.0.1`.
 
 ### Alternatives
 
 From a Git release tag (every npm release is tagged):
 
 ```bash
-npm install -g git+https://github.com/engmohamedamer/yallaflow.git#v1.0.0
+npm install -g git+https://github.com/engmohamedamer/yallaflow.git#v1.0.1
 ```
 
 From a packed tarball (`npm pack` output, for example to test a candidate before it is released):
@@ -58,7 +58,7 @@ Then open Claude Code or Codex in the repository and describe the work. `yallafl
 
 `.yallaflow/` is durable project state and is meant to be committed; `doctor` warns when it is neither tracked nor deliberately ignored. Review [`security.md`](security.md) before capturing files that might contain sensitive data.
 
-Upgrading an existing workspace: run `yallaflow upgrade status`, then see [`upgrading-to-v1.0.md`](upgrading-to-v1.0.md) (and [`upgrading-to-v0.3.10.md`](upgrading-to-v0.3.10.md), [`upgrading-to-v0.3.9.md`](upgrading-to-v0.3.9.md), [`upgrading-to-v0.3.8.md`](upgrading-to-v0.3.8.md), [`upgrading-to-v0.3.7.md`](upgrading-to-v0.3.7.md), [`upgrading-to-v0.3.6.md`](upgrading-to-v0.3.6.md) for earlier changes).
+Upgrading an existing workspace: run `yallaflow upgrade status`, then see [`upgrading-to-v1.0.1.md`](upgrading-to-v1.0.1.md) and [`upgrading-to-v1.0.md`](upgrading-to-v1.0.md) (and [`upgrading-to-v0.3.10.md`](upgrading-to-v0.3.10.md), [`upgrading-to-v0.3.9.md`](upgrading-to-v0.3.9.md), [`upgrading-to-v0.3.8.md`](upgrading-to-v0.3.8.md), [`upgrading-to-v0.3.7.md`](upgrading-to-v0.3.7.md), [`upgrading-to-v0.3.6.md`](upgrading-to-v0.3.6.md) for earlier changes).
 
 ## Updating YallaFlow
 
@@ -67,7 +67,7 @@ YallaFlow never checks for, downloads, or installs updates by itself — there i
 1. **Install the target version** from npm (or one of the [alternatives](#alternatives)):
 
    ```bash
-   npm install -g yallaflow@latest     # or an exact version: yallaflow@1.0.0
+   npm install -g yallaflow@latest     # or an exact version: yallaflow@1.0.1
    ```
 
 2. **Confirm the installed version.** Update every machine and CI job that operates on the same workspace together.
@@ -105,7 +105,7 @@ Read the version's `upgrading-to-<version>.md` for behavior changes. Downgrades 
 A Shared Project records the minimum YallaFlow it needs (`config.yaml` → `yallaflow.minimumVersion`). `brief`, `doctor`, `upgrade status`, and `shared check` report it:
 
 ```text
-Installed: 1.0.0 · Project requires: >= 0.3.10-internal.1
+Installed: 1.0.1 · Project requires: >= 0.3.10-internal.1
 ```
 
-An older CLI stops before changing any project state; YallaFlow never downloads or self-updates. Install the same version on every developer machine and in CI (pin the exact version in your CI job, for example `npm install -g yallaflow@1.0.0`), and upgrade them together. Teammates need nothing else — no join command, no per-developer setup. See [`shared-projects.md`](shared-projects.md).
+An older CLI stops before changing any project state; YallaFlow never downloads or self-updates. Install the same version on every developer machine and in CI (pin the exact version in your CI job, for example `npm install -g yallaflow@1.0.1`), and upgrade them together. Teammates need nothing else — no join command, no per-developer setup. See [`shared-projects.md`](shared-projects.md).

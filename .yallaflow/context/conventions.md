@@ -16,11 +16,11 @@
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-035)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-13T12:25:57.121Z (commit c433e61)
+- **Verified:** 2026-10-15T09:44:36.554Z (commit 6c01a54)
 - **Evidence:**
-  - package.json (repository @ c433e61)
-  - test-support/shared.js (repository @ c433e61)
-  - test-support/delivery.js (repository @ c433e61)
+  - package.json (repository @ 6c01a54)
+  - test-support/shared.js (repository @ 6c01a54)
+  - test-support/delivery.js (repository @ 6c01a54)
 
 <!-- yallaflow-fact:CTX-0036 -->
 ### CTX-0036 — Compatibility is tested against real frozen releases: test-support frozenCli(tag) extracts a released tag's CLI with git archive into a temp directory (symlinking node_modules) and returns null when Git history is unavailable. Mixed-version tests use it.
@@ -63,13 +63,13 @@
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-040)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-13T12:25:57.446Z (commit c433e61)
+- **Verified:** 2026-10-15T09:44:36.900Z (commit 6c01a54)
 - **Evidence:**
-  - README.md (repository @ c433e61)
-  - docs/using-yallaflow.md (repository @ c433e61)
-  - docs/cli.md (repository @ c433e61)
-  - docs/architecture.md (repository @ c433e61)
-  - docs/limitations.md (repository @ c433e61)
+  - README.md (repository @ 6c01a54)
+  - docs/using-yallaflow.md (repository @ 6c01a54)
+  - docs/cli.md (repository @ 6c01a54)
+  - docs/architecture.md (repository @ 6c01a54)
+  - docs/limitations.md (repository @ 6c01a54)
 
 <!-- yallaflow-fact:CTX-0060 -->
 ### CTX-0060 — Release process (from 1.0.0): - The package follows SemVer; each release is one commit with an annotated tag vX.Y.Z matching package.json and src/version.js; tags are never moved. - Before release: npm ci + npm run check, doctor on the self-dogfood workspace, npm audit with every finding classified, npm pack --dry-run plus inspection and secret scan of the real tarball, a packed-candidate smoke test from an isolated prefix, provider/network scan, git diff --check. - CHANGELOG.md and docs/upgrading-to-*.md are updated per release; GitHub release notes live in .github/release-notes/. - Publishing: GitHub Release -> release.yml -> npm Trusted Publishing with provenance; the trusted publisher is created when the first automated release is ready because npm expires an unused configuration after 2 days. - package.json files ships src, resources, docs, README.md, CHANGELOG.md and LICENSE. - Nothing is committed, tagged, pushed or published without the maintainer's explicit approval.
@@ -81,12 +81,12 @@
 - **Knowledge ID:** K-003
 - **Promoted at:** 2026-10-13T12:25:22.722Z
 - **Supersedes:** CTX-0039
-- **Verified:** 2026-10-13T12:25:22.722Z (commit c433e61)
+- **Verified:** 2026-10-15T09:44:38.262Z (commit 6c01a54)
 - **Evidence:**
-  - docs/releasing.md (repository @ c433e61)
-  - package.json (repository @ c433e61)
-  - .github/workflows/release.yml (repository @ c433e61)
-  - CHANGELOG.md (repository @ c433e61)
+  - docs/releasing.md (repository @ 6c01a54)
+  - package.json (repository @ 6c01a54)
+  - .github/workflows/release.yml (repository @ 6c01a54)
+  - CHANGELOG.md (repository @ 6c01a54)
 
 <!-- yallaflow-fact:CTX-0061 -->
 ### CTX-0061 — Versioning and compatibility: - The package version (src/version.js), Agent Contract, bootstrap, Skill Registry, knowledge policy and each per-file schemaVersion are independent; one is never inferred from another, and 1.0.0 bumped only the package version. - From 1.0.0 the package follows SemVer: PATCH = backward-compatible fixes and docs; MINOR = backward-compatible functionality; MAJOR = incompatible public CLI behavior, incompatible durable workspace behavior, or any break not handled by backward-compatible reads/migrations. - Work items keep their pinned behavior, released skill instructions are immutable, supported workspaces stay readable without migration on read, and historical work is never silently rewritten. - Persisted schemas are bumped only when the stored shape truly requires it, written at the lowest version that can represent the content.
@@ -98,12 +98,12 @@
 - **Knowledge ID:** K-004
 - **Promoted at:** 2026-10-13T12:25:23.073Z
 - **Supersedes:** CTX-0037
-- **Verified:** 2026-10-13T12:25:23.073Z (commit c433e61)
+- **Verified:** 2026-10-15T09:44:38.580Z (commit 6c01a54)
 - **Evidence:**
-  - docs/releasing.md (repository @ c433e61)
-  - src/version.js (repository @ c433e61)
-  - src/context/constants.js (repository @ c433e61)
-  - src/knowledge/constants.js (repository @ c433e61)
-  - docs/upgrading-to-v1.0.md (repository @ c433e61)
+  - docs/releasing.md (repository @ 6c01a54)
+  - src/version.js (repository @ 6c01a54)
+  - src/context/constants.js (repository @ 6c01a54)
+  - src/knowledge/constants.js (repository @ 6c01a54)
+  - docs/upgrading-to-v1.0.md (repository @ 6c01a54)
 
 <!-- yallaflow-context:end -->

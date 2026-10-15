@@ -8,6 +8,25 @@ All notable changes to YallaFlow are documented here. The format loosely follows
 
 Nothing yet.
 
+## [1.0.1] - 2026-10-15 — Route engineering work before the first edit
+
+### Fixed
+
+- **Work-routing bypass.** In 1.0.0 an agent could load project memory, edit application code without a work item, and then offer YallaFlow tracking as optional. The only edit rule was "do not modify code while guidance says it is not authorized", and that rule says nothing when no work item exists. **Agent Contract v9** now requires a routed work item, at a stage whose guidance authorizes modification, before the first intentional edit to source, tests, migrations, configuration, or any other engineering artifact. The developer never has to ask for this.
+  - An active work item that covers the request is reused, never duplicated.
+  - Small changes route as bounded work: in the default adaptive mode, no specification or plan review and no lengthy specification. Review gates that a project's interaction mode enables still apply, and the agent never approves them itself.
+  - Operational help (dev server, logs, `git status`) still needs no work item.
+  - The agent never asks whether to track a change, and never offers tracking after the fact.
+  - Edits already made without a work item are recovered: kept, disclosed, routed, and recorded as a ruling. They are verified fresh and never backdated.
+- **Bootstrap block v3** in `CLAUDE.md`/`AGENTS.md` carries the same precondition as a numbered step.
+- `yallaflow brief`, when no work is active, says to route an engineering change before its first edit.
+
+### Compatibility
+
+- Existing projects upgrade explicitly with `yallaflow agent refresh`, which rewrites only the YallaFlow-managed blocks. Nothing is rewritten on read, and work items and project memory are untouched. A 1.0.0 CLI reports a v9 contract as newer and never downgrades it. See [`docs/upgrading-to-v1.0.1.md`](docs/upgrading-to-v1.0.1.md), which also covers recovery of untracked changes.
+- Skill Registry v8, Knowledge Policy v1, and all workspace/schema versions are unchanged. The Shared Project minimum stays `0.3.10-internal.1`.
+- The contract is guidance, not a technical lock: YallaFlow cannot stop a direct file write by itself. Git drift detection and optional provider hooks are possible follow-ups.
+
 ## [1.0.0] - 2026-10-13 — First public release
 
 Give AI your project, not just your prompt.

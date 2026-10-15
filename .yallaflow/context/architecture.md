@@ -15,13 +15,13 @@
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-009)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-13T12:25:55.771Z (commit c433e61)
+- **Verified:** 2026-10-15T09:44:34.843Z (commit 6c01a54)
 - **Evidence:**
-  - src/cli.js (repository @ c433e61)
-  - src/commands/start.js (repository @ c433e61)
-  - src/commands/baseline.js (repository @ c433e61)
-  - test/recursive-help-safety.test.js (repository @ c433e61)
-  - docs/architecture.md (repository @ c433e61)
+  - src/cli.js (repository @ 6c01a54)
+  - src/commands/start.js (repository @ 6c01a54)
+  - src/commands/baseline.js (repository @ 6c01a54)
+  - test/recursive-help-safety.test.js (repository @ 6c01a54)
+  - docs/architecture.md (repository @ 6c01a54)
 
 <!-- yallaflow-fact:CTX-0010 -->
 ### CTX-0010 — Workspace and state model:
@@ -48,11 +48,11 @@
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-011)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-12T22:03:26.768Z (commit b181dc0)
+- **Verified:** 2026-10-15T09:44:35.193Z (commit 6c01a54)
 - **Evidence:**
-  - src/core/ownership.js (repository @ b181dc0)
-  - src/core/integrity.js (repository @ b181dc0)
-  - src/agent/contract.js (repository @ b181dc0)
+  - src/core/ownership.js (repository @ 6c01a54)
+  - src/core/integrity.js (repository @ 6c01a54)
+  - src/agent/contract.js (repository @ 6c01a54)
 
 <!-- yallaflow-fact:CTX-0012 -->
 ### CTX-0012 — Work lifecycle:
@@ -200,10 +200,10 @@ Reopen (DONE to implementation, verification or review, with a reason) cascades 
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-026)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-12T22:03:29.923Z (commit b181dc0)
+- **Verified:** 2026-10-15T09:44:35.525Z (commit 6c01a54)
 - **Evidence:**
-  - src/commands/finish.js (repository @ b181dc0)
-  - src/agent/contract.js (repository @ b181dc0)
+  - src/commands/finish.js (repository @ 6c01a54)
+  - src/agent/contract.js (repository @ 6c01a54)
 
 <!-- yallaflow-fact:CTX-0029 -->
 ### CTX-0029 — Legacy (v0.3.5 append-only) project knowledge becomes canonical only through reviewed context reconciliation: start, plan, preview, human approve, then apply. Migration is never reconciliation, and historical work records are never rewritten.
@@ -231,22 +231,6 @@ Reopen (DONE to implementation, verification or review, with a reason) cascades 
 - **Evidence:**
   - docs/architecture.md (repository @ c433e61)
   - docs/limitations.md (repository @ c433e61)
-
-<!-- yallaflow-fact:CTX-0048 -->
-### CTX-0048 — Agent Contract architecture: - .yallaflow/AGENT.md is the single canonical agent contract, held in a managed block versioned by AGENT_CONTRACT_VERSION (currently 8, v0.3.10-internal.4) and sealed with a SHA-256 of its body. - v8 adds the pre-baseline refusal and the original request as the baseline objective (continued automatically after approval), transient operational assistance versus project-semantic engineering work, declared baseline coverage, and never copying secret values into YallaFlow state. - Repository-root CLAUDE.md and AGENTS.md carry only a thin pointer block (BOOTSTRAP_VERSION 2). - yallaflow agent refresh/setup update those blocks idempotently, refuse hand-edited or newer blocks, and preserve content outside the blocks.
-
-- **State:** current
-- **Confidence:** confirmed
-- **Provenance:** repository
-- **Source work:** PF-0003
-- **Knowledge ID:** K-014
-- **Promoted at:** 2026-10-12T22:03:27.382Z
-- **Supersedes:** CTX-0014
-- **Verified:** 2026-10-12T22:03:27.382Z (commit b181dc0)
-- **Evidence:**
-  - src/agent/contract.js (repository @ b181dc0)
-  - src/agent/bootstrap.js (repository @ b181dc0)
-  - src/commands/agent.js (repository @ b181dc0)
 
 <!-- yallaflow-fact:CTX-0049 -->
 ### CTX-0049 — Skill Registry and immutable instructions: - Engineering behavior is defined by package-owned skills (Skill Registry version 8, 12 skills). - Every work item pins behaviorContract {registryVersion, skills} at creation. - Every instruction version has a fixed SHA-256 and path. Older bytes are archived byte-for-byte in resources/skills/archive/ (repository-baseline v1–v3), and a work item always receives the instruction version its registry pinned: v6 gets repository-baseline v2, v7 gets v3, v8 gets v4. - A changed instruction semantic requires a new instruction version and a registry bump, never an in-place edit.
@@ -392,11 +376,28 @@ Reopen (DONE to implementation, verification or review, with a reason) cascades 
 - **Knowledge ID:** K-045
 - **Promoted at:** 2026-10-12T22:03:33.984Z
 - **Supersedes:** CTX-0045
-- **Verified:** 2026-10-13T12:25:58.471Z (commit c433e61)
+- **Verified:** 2026-10-15T09:44:37.582Z (commit 6c01a54)
 - **Evidence:**
-  - src/security/redact.js (repository @ c433e61)
-  - src/core/yaml.js (repository @ c433e61)
-  - src/context/ledger.js (repository @ c433e61)
-  - test/pilot-hardening.test.js (repository @ c433e61)
+  - src/security/redact.js (repository @ 6c01a54)
+  - src/core/yaml.js (repository @ 6c01a54)
+  - src/context/ledger.js (repository @ 6c01a54)
+  - test/pilot-hardening.test.js (repository @ 6c01a54)
+
+<!-- yallaflow-fact:CTX-0062 -->
+### CTX-0062 — Agent Contract architecture: - .yallaflow/AGENT.md is the single canonical agent contract, held in a managed block versioned by AGENT_CONTRACT_VERSION (currently 9, v1.0.1) and sealed with a SHA-256 of its body. - v8 added the pre-baseline refusal, the original request as the baseline objective, operational assistance versus engineering work, baseline coverage, and no secret values; v9 adds work routing before editing. - Repository-root CLAUDE.md and AGENTS.md carry only a thin pointer block (BOOTSTRAP_VERSION 3, which repeats the route-before-edit precondition as a numbered step; its length is capped by test at 1800 characters and it copies no contract heading). - yallaflow agent refresh/setup update those blocks idempotently, refuse hand-edited or newer blocks, and preserve content outside the blocks.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0005
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-10-15T09:44:32.428Z
+- **Supersedes:** CTX-0048
+- **Verified:** 2026-10-15T09:44:32.428Z (commit 6c01a54)
+- **Evidence:**
+  - src/agent/contract.js (repository @ 6c01a54)
+  - src/agent/bootstrap.js (repository @ 6c01a54)
+  - src/commands/agent.js (repository @ 6c01a54)
+  - test/agent-bootstrap.test.js (repository @ 6c01a54)
 
 <!-- yallaflow-context:end -->

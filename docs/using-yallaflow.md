@@ -41,7 +41,7 @@ yallaflow --version
 Expected:
 
 ```text
-1.0.0
+1.0.1
 ```
 
 ### Install a specific Git tag
@@ -49,7 +49,7 @@ Expected:
 Every release is also a Git tag:
 
 ```bash
-npm install -g git+https://github.com/engmohamedamer/yallaflow.git#v1.0.0
+npm install -g git+https://github.com/engmohamedamer/yallaflow.git#v1.0.1
 ```
 
 ### Install from a checkout
@@ -437,7 +437,7 @@ yallaflow doctor
 
 In a Shared Project, upgrade every teammate and CI job together. An older YallaFlow stops before changing project state and tells you which version the project requires.
 
-Full update procedure: [installation.md#updating-yallaflow](installation.md#updating-yallaflow). Upgrading from a 0.3.x prerelease: [upgrading-to-v1.0.md](upgrading-to-v1.0.md).
+Full update procedure: [installation.md#updating-yallaflow](installation.md#updating-yallaflow). Upgrading from 1.0.0: [upgrading-to-v1.0.1.md](upgrading-to-v1.0.1.md). Upgrading from a 0.3.x prerelease: [upgrading-to-v1.0.md](upgrading-to-v1.0.md).
 
 ---
 

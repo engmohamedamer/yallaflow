@@ -1,0 +1,43 @@
+{
+  "id": "PF-0005",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Fix v1.0.0 automatic work-routing bypass: agents must route engineering edits through YallaFlow before the first edit, never offer tracking as optional afterwards; keep small changes lightweight and operational help frictionless; document recovery of untracked edits (target v1.0.1)",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-10-15T09:12:52.651Z",
+  "updatedAt": "2026-10-15T09:44:42.265Z",
+  "title": "Route engineering work before the first edit (v1.0.1)",
+  "routingConfidence": "high",
+  "routingReason": "Defect in the agent-facing contract: v1.0.0 AGENT.md/bootstrap never require a routed work item before the first engineering edit, so a Sekaya agent edited code untracked and offered tracking afterwards as optional. The fix is confined to contract/bootstrap text, its versioning, recovery docs and regression tests; existing refresh/upgrade paths carry it, no schema, data-model or lifecycle-semantics change.",
+  "routedAt": "2026-10-15T09:13:06.429Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 8,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-10-15T09:44:42.265Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

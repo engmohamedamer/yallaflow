@@ -13,11 +13,11 @@
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-041)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-12T22:03:33.123Z (commit b181dc0)
+- **Verified:** 2026-10-15T09:44:37.241Z (commit 6c01a54)
 - **Evidence:**
-  - src/agent/contract.js (repository @ b181dc0)
-  - resources/skills/repository-baseline.md (repository @ b181dc0)
-  - src/baseline/store.js#approveBaseline (repository @ b181dc0)
+  - src/agent/contract.js (repository @ 6c01a54)
+  - resources/skills/repository-baseline.md (repository @ 6c01a54)
+  - src/baseline/store.js (repository @ 6c01a54)
 
 <!-- yallaflow-fact:CTX-0042 -->
 ### CTX-0042 — No work item may become DONE without fresh, successful verification evidence (investigations excepted), and failed verification runs stay in the append-only ledger.
@@ -46,5 +46,21 @@
   - src/purpose/store.js (repository @ b181dc0)
   - src/delivery/constants.js (repository @ b181dc0)
   - src/baseline/store.js (repository @ b181dc0)
+
+<!-- yallaflow-fact:CTX-0063 -->
+### CTX-0063 — Work routing before editing (Agent Contract v9): every intentional edit to an engineering artifact (any tracked project file other than YallaFlow state, including docs, temporary debug edits and command-generated changes) happens inside a routed work item whose guidance authorizes modification. A covering active item is reused, never duplicated. Small changes route as bounded work: in adaptive mode there is no spec or plan review, and mode-enabled gates stay human decisions. Operational help creates no work item. Tracking is never offered as optional. Untracked edits are recovered (kept, disclosed, routed with a ruling, verified fresh, never backdated). The rule is guidance only: no CLI gate or hook stops a direct write.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0005
+- **Knowledge ID:** K-002
+- **Promoted at:** 2026-10-15T09:44:32.654Z
+- **Verified:** 2026-10-15T09:44:32.654Z (commit 6c01a54)
+- **Evidence:**
+  - src/agent/contract.js (repository @ 6c01a54)
+  - src/agent/bootstrap.js (repository @ 6c01a54)
+  - test/work-routing.test.js (repository @ 6c01a54)
+  - docs/upgrading-to-v1.0.1.md (repository @ 6c01a54)
 
 <!-- yallaflow-context:end -->

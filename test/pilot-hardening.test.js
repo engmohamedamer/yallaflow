@@ -407,10 +407,10 @@ test('F: provenance distinguishes HEAD, modified, and untracked content; outside
 // ---------------------------------------------------------------------------
 // Versions and compatibility
 
-test('versions: package 1.0.0, Agent Contract v8, Skill Registry v8 with repository-baseline v4; released v3 bytes archived; old pins keep their bytes', async () => {
-  assert.equal(PACKAGE_VERSION, '1.0.0');
+test('versions: package 1.0.1, Agent Contract v9, Skill Registry v8 with repository-baseline v4; released v3 bytes archived; old pins keep their bytes', async () => {
+  assert.equal(PACKAGE_VERSION, '1.0.1');
   assert.equal(JSON.parse(await readFile(path.join(repo, 'package.json'), 'utf8')).version, PACKAGE_VERSION);
-  assert.equal(AGENT_CONTRACT_VERSION, 8);
+  assert.equal(AGENT_CONTRACT_VERSION, 9);
   assert.equal(REGISTRY_VERSION, 8);
   assert.equal(pinnedInstructionVersion(7, 'repository-baseline'), 3);
   assert.equal(pinnedInstructionVersion(8, 'repository-baseline'), 4);

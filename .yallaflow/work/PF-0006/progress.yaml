@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 8
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-10-15T10:45:04.802Z",
+      "completedAt": "2026-10-15T10:45:04.802Z",
+      "summary": "origin/main = HEAD = 6c01a54 (v1.0.0); npm latest = 1.0.0; PF-0005 DONE with approved fix uncommitted (30 files); release procedure docs/releasing.md; Trusted Publisher not yet configured; gh CLI unavailable",
+      "evidence": [
+        "docs/releasing.md",
+        ".github/workflows/release.yml"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-10-15T10:45:04.972Z",
+      "completedAt": "2026-10-15T10:45:04.972Z",
+      "summary": "Update version mentions (README, installation, using-yallaflow), date CHANGELOG 1.0.1, add .github/release-notes/v1.0.1.md; full release checklist; one release commit; annotated tag v1.0.1; push main+tag without force; verify remote tag; stop for Trusted Publisher config",
+      "evidence": [
+        "docs/releasing.md"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-10-15T10:54:21.530Z",
+      "completedAt": "2026-10-15T10:54:21.530Z",
+      "summary": "Version mentions updated to 1.0.1 (README, installation, using-yallaflow), CHANGELOG 1.0.1 dated 2026-10-15, release notes .github/release-notes/v1.0.1.md",
+      "evidence": [
+        "CHANGELOG.md",
+        ".github/release-notes/v1.0.1.md",
+        "docs/installation.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-10-15T11:00:45.070Z",
+      "completedAt": "2026-10-15T11:00:45.070Z",
+      "summary": "npm run check 680/680 (V-004), diff --check (V-001), doctor (V-002), pack 1.0.1/177 (V-003); audit known advisory only; tarball inspected and smoke-tested from isolated prefix",
+      "evidence": [
+        "verification:V-004",
+        "verification:V-003"
+      ]
+    },
+    "code-review": {
+      "status": "completed",
+      "startedAt": "2026-10-15T11:00:45.230Z",
+      "completedAt": "2026-10-15T11:00:45.230Z",
+      "summary": "Release scope reviewed: src diff limited to contract.js, bootstrap.js, brief.js, version.js (the approved fix, independently reviewed in PF-0005); remaining changes are tests, fixtures, docs, CHANGELOG, release notes, refreshed agent instructions and YallaFlow records; no unrelated changes",
+      "evidence": [
+        "src/agent/contract.js",
+        "CHANGELOG.md"
+      ]
+    }
+  },
+  "rulings": [
+    {
+      "decision": "PF-0006 closes DONE inside the release commit; the tag, push, GitHub Release and npm publication are verified after it against GitHub and npm",
+      "reason": "Same pattern as PF-0004 (v1.0.0). Recording post-push results in the work item would need a second commit after the tag, and the tag must point at the release commit",
+      "costIfWrong": "The publication outcome is not in the YallaFlow record; it stays verifiable from the tag, the GitHub Release, the workflow run and npm provenance",
+      "createdAt": "2026-10-15T10:54:20.291Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-10-15T11:00:45.230Z"
+}

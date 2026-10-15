@@ -27,11 +27,11 @@
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-032)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-13T12:25:56.442Z (commit c433e61)
+- **Verified:** 2026-10-15T09:44:35.856Z (commit 6c01a54)
 - **Evidence:**
-  - src/agent/bootstrap.js (repository @ c433e61)
-  - resources/agents/claude/README.md (repository @ c433e61)
-  - resources/agents/codex/README.md (repository @ c433e61)
-  - docs/limitations.md (repository @ c433e61)
+  - src/agent/bootstrap.js (repository @ 6c01a54)
+  - resources/agents/claude/README.md (repository @ 6c01a54)
+  - resources/agents/codex/README.md (repository @ 6c01a54)
+  - docs/limitations.md (repository @ 6c01a54)
 
 <!-- yallaflow-context:end -->

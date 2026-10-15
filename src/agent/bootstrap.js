@@ -17,7 +17,10 @@ import { exists, readText, writeText } from '../utils/fs.js';
 //   1 — v0.3.8: detect → AGENT.md → brief → resume/guide → contract → record.
 //   2 — v0.3.10: orient automatically before the first request (the developer never
 //       has to say "use YallaFlow"); finish with `yallaflow finish`.
-export const BOOTSTRAP_VERSION = 2;
+//   3 — v1.0.1: route engineering work before the first edit (reuse a covering active
+//       work item; small changes are bounded and gate-free; operational help needs no
+//       work item); tracking is never optional, and untracked edits are recovered.
+export const BOOTSTRAP_VERSION = 3;
 
 export const BOOTSTRAP_PROVIDERS = Object.freeze({
   codex: Object.freeze({ id: 'codex', label: 'Codex', file: 'AGENTS.md' }),
@@ -54,9 +57,10 @@ export function bootstrapBody(provider) {
     '3. Run `yallaflow brief` for a read-only orientation and the next command to run, then handle the request.\n' +
     '4. For active or resumable work, run `yallaflow resume <work-id>` (or `yallaflow handoff <work-id>`).\n' +
     '5. Run `yallaflow guide <work-id>` for the current objective, blocker, and next valid action.\n' +
-    '6. Follow the pinned Behavior Contract (`yallaflow skill <skill-id>`); never modify application code while guidance says it is not authorized.\n' +
-    '7. Record progress, decisions, and evidence only through `yallaflow` commands — never edit `.yallaflow/` structured state by hand.\n' +
-    '8. Before saying a task is done, run `yallaflow finish <work-id>` and relay its outcome.\n';
+    '6. Before the first edit to source, tests, migrations, configuration, or any engineering artifact, even a small one: continue the active work item that covers the request or route one (`yallaflow start`), and edit only once `yallaflow guide` authorizes it. Small changes route as bounded work: no spec or plan review by default. Operational help needs no work item.\n' +
+    '7. Follow the pinned Behavior Contract (`yallaflow skill <skill-id>`); never edit engineering artifacts while guidance says it is not authorized.\n' +
+    '8. Record progress, decisions, and evidence only through `yallaflow` commands — never edit `.yallaflow/` structured state by hand.\n' +
+    '9. Before saying a task is done, run `yallaflow finish <work-id>`. Tracking is never optional and never offered after the fact. Recover untracked edits as AGENT.md describes.\n';
 }
 
 export function renderBootstrapBlock(provider, version = BOOTSTRAP_VERSION, body = bootstrapBody(provider)) {

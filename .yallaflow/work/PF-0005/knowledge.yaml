@@ -1,0 +1,410 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Agent Contract architecture: - .yallaflow/AGENT.md is the single canonical agent contract, held in a managed block versioned by AGENT_CONTRACT_VERSION (currently 9, v1.0.1) and sealed with a SHA-256 of its body. - v8 added the pre-baseline refusal, the original request as the baseline objective, operational assistance versus engineering work, baseline coverage, and no secret values; v9 adds work routing before editing. - Repository-root CLAUDE.md and AGENTS.md carry only a thin pointer block (BOOTSTRAP_VERSION 3, which repeats the route-before-edit precondition as a numbered step; its length is capped by test at 1800 characters and it copies no contract heading). - yallaflow agent refresh/setup update those blocks idempotently, refuse hand-edited or newer blocks, and preserve content outside the blocks.",
+      "evidence": [
+        "src/agent/contract.js",
+        "src/agent/bootstrap.js",
+        "src/commands/agent.js",
+        "test/agent-bootstrap.test.js"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0048"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-15T09:39:09.807Z",
+      "factId": "CTX-0062",
+      "promotedAt": "2026-10-15T09:44:32.428Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-002",
+      "kind": "business-rule",
+      "source": "implementation-runtime",
+      "summary": "Work routing before editing (Agent Contract v9): every intentional edit to an engineering artifact (any tracked project file other than YallaFlow state, including docs, temporary debug edits and command-generated changes) happens inside a routed work item whose guidance authorizes modification. A covering active item is reused, never duplicated. Small changes route as bounded work: in adaptive mode there is no spec or plan review, and mode-enabled gates stay human decisions. Operational help creates no work item. Tracking is never offered as optional. Untracked edits are recovered (kept, disclosed, routed with a ruling, verified fresh, never backdated). The rule is guidance only: no CLI gate or hook stops a direct write.",
+      "evidence": [
+        "src/agent/contract.js",
+        "src/agent/bootstrap.js",
+        "test/work-routing.test.js",
+        "docs/upgrading-to-v1.0.1.md"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-10-15T09:39:10.971Z",
+      "factId": "CTX-0063",
+      "promotedAt": "2026-10-15T09:44:32.654Z",
+      "target": "context/business-rules.md"
+    },
+    {
+      "id": "K-003",
+      "kind": "project",
+      "source": "implementation-runtime",
+      "summary": "YallaFlow is an AI-agnostic engineering governance layer for coding agents (Claude Code, Codex): it gives the agent durable project memory, an adaptive workflow per request, and evidence that work is actually done, so the developer describes intent instead of repeating project context in every prompt.",
+      "evidence": [
+        "package.json",
+        "README.md",
+        "docs/architecture.md"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0001"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-15T09:39:25.486Z",
+      "factId": "CTX-0001",
+      "promotedAt": "2026-10-15T09:44:32.913Z",
+      "target": "PROJECT.md"
+    },
+    {
+      "id": "K-004",
+      "kind": "project",
+      "source": "implementation-runtime",
+      "summary": "It serves developers who use AI coding agents on Greenfield and Brownfield repositories, alone or as a team sharing one project through ordinary Git (Shared Projects). The normal journey is install, then `yallaflow init`, then open the agent and describe the work; the agent orients itself through YallaFlow automatically.",
+      "evidence": [
+        "README.md",
+        "docs/using-yallaflow.md",
+        "docs/shared-projects.md"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0002"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-15T09:39:26.409Z",
+      "factId": "CTX-0002",
+      "promotedAt": "2026-10-15T09:44:33.205Z",
+      "target": "PROJECT.md"
+    },
+    {
+      "id": "K-005",
+      "kind": "project",
+      "source": "implementation-runtime",
+      "summary": "Core product principles: discover before asking; understand before changing; prove before claiming; remember after finishing; revalidate before trusting stale knowledge. Work history is immutable while project memory evolves. Durable state beats conversational memory. Investigation is read-only.",
+      "evidence": [
+        "docs/architecture.md",
+        "src/agent/contract.js"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0003"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-15T09:39:27.617Z",
+      "factId": "CTX-0003",
+      "promotedAt": "2026-10-15T09:44:33.528Z",
+      "target": "PROJECT.md"
+    },
+    {
+      "id": "K-006",
+      "kind": "tech-stack",
+      "source": "implementation-runtime",
+      "summary": "A Node.js (>= 20.16.0) ES-module CLI written in plain JavaScript with no build step and no TypeScript. The bin entry is src/cli.js and argument parsing uses node:util parseArgs.",
+      "evidence": [
+        "package.json",
+        "src/cli.js"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0006"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-15T09:39:28.741Z",
+      "factId": "CTX-0006",
+      "promotedAt": "2026-10-15T09:44:33.849Z",
+      "target": "context/tech-stack.md"
+    },
+    {
+      "id": "K-007",
+      "kind": "tech-stack",
+      "source": "implementation-runtime",
+      "summary": "There are only four runtime dependencies, all for source intake: officeparser 5.2.2 (office documents), pdfjs-dist 5.4.624 (PDF, pinned through overrides), yauzl (zip reading), and @xmldom/xmldom. Everything else uses Node built-ins. YAML files are written as JSON (JSON is valid YAML 1.2), so no YAML library is needed.",
+      "evidence": [
+        "package.json",
+        "src/core/yaml.js"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0007"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-15T09:39:29.745Z",
+      "factId": "CTX-0007",
+      "promotedAt": "2026-10-15T09:44:34.182Z",
+      "target": "context/tech-stack.md"
+    },
+    {
+      "id": "K-008",
+      "kind": "tech-stack",
+      "source": "implementation-runtime",
+      "summary": "There is no frontend. YallaFlow is a terminal CLI plus Markdown/YAML files it maintains inside the target repository.",
+      "evidence": [
+        "package.json",
+        "src/cli.js"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0008"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-15T09:39:30.799Z",
+      "factId": "CTX-0008",
+      "promotedAt": "2026-10-15T09:44:34.519Z",
+      "target": "context/tech-stack.md"
+    },
+    {
+      "id": "K-009",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Command layer: src/cli.js parses arguments and dispatches each command to a handler in src/commands/<name>.js. Handlers find the project root and print outcome text, and domain logic lives in the domain modules. Help output never mutates YallaFlow state, in any command namespace.",
+      "evidence": [
+        "src/cli.js",
+        "src/commands/start.js",
+        "src/commands/baseline.js",
+        "test/recursive-help-safety.test.js",
+        "docs/architecture.md"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0009"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-15T09:39:31.868Z",
+      "factId": "CTX-0009",
+      "promotedAt": "2026-10-15T09:44:34.843Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-010",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "State ownership: STATE_OWNERSHIP maps every .yallaflow path to an owner (cli, projection, shared, human) and the commands allowed to write it. Agents must change CLI-owned state only through yallaflow commands. Enforcement is guidance plus doctor integrity checks, not file locking.",
+      "evidence": [
+        "src/core/ownership.js",
+        "src/core/integrity.js",
+        "src/agent/contract.js"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0011"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-15T09:39:33.161Z",
+      "factId": "CTX-0011",
+      "promotedAt": "2026-10-15T09:44:35.193Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-011",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "`yallaflow finish` is the read-only completion check the Agent runs before saying a task is ready. It checks lifecycle, project integrity and, in a Shared Project, whether shared memory changed under the work's delta. It prints developer-language outcome lines, keeps a --verbose audit, and never commits or pushes.",
+      "evidence": [
+        "src/commands/finish.js",
+        "src/agent/contract.js"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0026"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-15T09:39:34.450Z",
+      "factId": "CTX-0026",
+      "promotedAt": "2026-10-15T09:44:35.525Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-012",
+      "kind": "integration",
+      "source": "implementation-runtime",
+      "summary": "Agent integration is through instruction files only. Claude Code imports @.yallaflow/AGENT.md from CLAUDE.md, and Codex is pointed to it from AGENTS.md. YallaFlow never runs the agent itself.",
+      "evidence": [
+        "src/agent/bootstrap.js",
+        "resources/agents/claude/README.md",
+        "resources/agents/codex/README.md",
+        "docs/limitations.md"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0032"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-15T09:39:35.448Z",
+      "factId": "CTX-0032",
+      "promotedAt": "2026-10-15T09:44:35.856Z",
+      "target": "context/integrations.md"
+    },
+    {
+      "id": "K-013",
+      "kind": "environment",
+      "source": "implementation-runtime",
+      "summary": "The runtime requirement is Node.js >= 20.16.0 (package.json engines). Windows support is not verified.",
+      "evidence": [
+        "package.json",
+        "docs/limitations.md"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0033"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-15T09:39:36.513Z",
+      "factId": "CTX-0033",
+      "promotedAt": "2026-10-15T09:44:36.210Z",
+      "target": "context/environments.md"
+    },
+    {
+      "id": "K-014",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Tests: - Tests use the built-in node:test runner (npm test = node --test) and live as flat test/*.test.js files, with fixtures under test/fixtures/. - Shared helpers live in test-support/ because node --test loads every file under test/. - npm run check = a node --check syntax pass over src, test and test-support, then the full suite.",
+      "evidence": [
+        "package.json",
+        "test-support/shared.js",
+        "test-support/delivery.js"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0035"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-15T09:39:37.507Z",
+      "factId": "CTX-0035",
+      "promotedAt": "2026-10-15T09:44:36.554Z",
+      "target": "context/conventions.md"
+    },
+    {
+      "id": "K-015",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Documentation set: - README.md is the simple first-use journey; docs/using-yallaflow.md is the practical developer guide. - docs/cli.md is the command reference. - docs/architecture.md, docs/project-memory.md and docs/shared-projects.md cover the design. - docs/security.md and docs/limitations.md cover trust boundaries and gaps; docs/releasing.md covers the release policy. - docs/upgrading-to-*.md are per-version upgrade notes.",
+      "evidence": [
+        "README.md",
+        "docs/using-yallaflow.md",
+        "docs/cli.md",
+        "docs/architecture.md",
+        "docs/limitations.md"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0040"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-15T09:39:38.623Z",
+      "factId": "CTX-0040",
+      "promotedAt": "2026-10-15T09:44:36.900Z",
+      "target": "context/conventions.md"
+    },
+    {
+      "id": "K-016",
+      "kind": "business-rule",
+      "source": "implementation-runtime",
+      "summary": "Human review boundaries: baseline approval, reconciliation approval and configured review gates are human decisions. The Agent records them only after explicit approval in the conversation and never infers approval from silence or a general 'ok'.",
+      "evidence": [
+        "src/agent/contract.js",
+        "resources/skills/repository-baseline.md",
+        "src/baseline/store.js"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0041"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-15T09:39:39.717Z",
+      "factId": "CTX-0041",
+      "promotedAt": "2026-10-15T09:44:37.241Z",
+      "target": "context/business-rules.md"
+    },
+    {
+      "id": "K-017",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Durable secret redaction (v0.3.10-internal.4): - writeYaml/writeYamlAtomic, the context-ledger writer, renderAreaBlock, the work-record writers (appendRedactedText/writeRedactedText), the reconciliation archive, verification logs and extracted source text all pass through redactSecrets/redactDeep. - Values are replaced by <redacted> while names stay, e.g. DB_PASSWORD=<redacted>. - It handles secret-named assignments (=, :, =>, :=), Authorization/Bearer/Basic values, cookies, PEM keys, URL credentials, CLI flags, and well-known token formats. - It is linear-time and idempotent.",
+      "evidence": [
+        "src/security/redact.js",
+        "src/core/yaml.js",
+        "src/context/ledger.js",
+        "test/pilot-hardening.test.js"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0057"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-15T09:39:40.885Z",
+      "factId": "CTX-0057",
+      "promotedAt": "2026-10-15T09:44:37.582Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-018",
+      "kind": "project",
+      "source": "implementation-runtime",
+      "summary": "From 1.0.0 YallaFlow is a public npm package: package.json names `yallaflow` (no private flag, MIT, publishConfig.access public) and the primary documented install is `npm install -g yallaflow`; Git-tag and tarball installs remain documented alternatives. The 0.2.0-internal.1 … 0.3.10-internal.4 versions were internal prereleases, git-tagged only and never published to npm; every released tag is immutable. 1.0.0 is published manually by the package owner; later versions are published by the release workflow.",
+      "evidence": [
+        "package.json",
+        "README.md",
+        "docs/installation.md",
+        "docs/releasing.md"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0058"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-15T09:39:42.066Z",
+      "factId": "CTX-0058",
+      "promotedAt": "2026-10-15T09:44:37.910Z",
+      "target": "PROJECT.md"
+    },
+    {
+      "id": "K-019",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Release process (from 1.0.0): - The package follows SemVer; each release is one commit with an annotated tag vX.Y.Z matching package.json and src/version.js; tags are never moved. - Before release: npm ci + npm run check, doctor on the self-dogfood workspace, npm audit with every finding classified, npm pack --dry-run plus inspection and secret scan of the real tarball, a packed-candidate smoke test from an isolated prefix, provider/network scan, git diff --check. - CHANGELOG.md and docs/upgrading-to-*.md are updated per release; GitHub release notes live in .github/release-notes/. - Publishing: GitHub Release -> release.yml -> npm Trusted Publishing with provenance; the trusted publisher is created when the first automated release is ready because npm expires an unused configuration after 2 days. - package.json files ships src, resources, docs, README.md, CHANGELOG.md and LICENSE. - Nothing is committed, tagged, pushed or published without the maintainer's explicit approval.",
+      "evidence": [
+        "docs/releasing.md",
+        "package.json",
+        ".github/workflows/release.yml",
+        "CHANGELOG.md"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0060"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-15T09:39:43.143Z",
+      "factId": "CTX-0060",
+      "promotedAt": "2026-10-15T09:44:38.262Z",
+      "target": "context/conventions.md"
+    },
+    {
+      "id": "K-020",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Versioning and compatibility: - The package version (src/version.js), Agent Contract, bootstrap, Skill Registry, knowledge policy and each per-file schemaVersion are independent; one is never inferred from another, and 1.0.0 bumped only the package version. - From 1.0.0 the package follows SemVer: PATCH = backward-compatible fixes and docs; MINOR = backward-compatible functionality; MAJOR = incompatible public CLI behavior, incompatible durable workspace behavior, or any break not handled by backward-compatible reads/migrations. - Work items keep their pinned behavior, released skill instructions are immutable, supported workspaces stay readable without migration on read, and historical work is never silently rewritten. - Persisted schemas are bumped only when the stored shape truly requires it, written at the lowest version that can represent the content.",
+      "evidence": [
+        "docs/releasing.md",
+        "src/version.js",
+        "src/context/constants.js",
+        "src/knowledge/constants.js",
+        "docs/upgrading-to-v1.0.md"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0061"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-15T09:39:44.364Z",
+      "factId": "CTX-0061",
+      "promotedAt": "2026-10-15T09:44:38.580Z",
+      "target": "context/conventions.md"
+    }
+  ],
+  "updatedAt": "2026-10-15T09:44:38.580Z",
+  "reviewedAt": "2026-10-15T09:44:38.580Z"
+}

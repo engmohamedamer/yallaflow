@@ -422,6 +422,7 @@ Then go deeper only where you need to:
 | [Security](docs/security.md) | local-first trust model, secret redaction, sources |
 | [Limitations](docs/limitations.md) | current boundaries |
 | [Roadmap](docs/roadmap.md) | what comes next |
+| [Upgrading to 1.0.1](docs/upgrading-to-v1.0.1.md) | upgrading from 1.0.0; recovering a change made without a work item |
 | [Upgrading to 1.0](docs/upgrading-to-v1.0.md) | upgrading from a 0.3.x prerelease |
 | [Releasing & compatibility](docs/releasing.md) | versioning and the 1.0 compatibility promise |
 | [Changelog](CHANGELOG.md) | release history |
@@ -430,7 +431,7 @@ Then go deeper only where you need to:
 
 ## Current status
 
-Current version: **1.0.0** — the first public, stable release.
+Current version: **1.0.1**: a patch that makes agents route every engineering change through YallaFlow before its first edit. 1.0.0 was the first public, stable release.
 
 YallaFlow is:
 

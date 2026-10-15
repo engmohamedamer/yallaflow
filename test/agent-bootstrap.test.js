@@ -119,7 +119,9 @@ test('AC-107: provider blocks point to AGENT.md and never restate its rules', ()
     const body = bootstrapBody(provider);
     assert.match(body, /\.yallaflow\/AGENT\.md/);
     assert.match(body, /yallaflow brief/);
-    assert.ok(body.length < 1600, 'a thin pointer, not a second contract');
+    // v1.0.1 (bootstrap v3) raised the cap from 1600: the route-before-editing
+    // precondition is the one rule a cold session must see before it reads AGENT.md.
+    assert.ok(body.length < 1800, 'a thin pointer, not a second contract');
     for (const heading of contract.match(/^## .+$/gm)) assert.ok(!body.includes(heading), `does not copy ${heading}`);
   }
   // Claude Code expands `@path` imports in CLAUDE.md (resolved relative to the file);

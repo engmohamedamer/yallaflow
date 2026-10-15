@@ -192,5 +192,5 @@ async function primaryConcern(root, report, active, delivery, onboarding, shared
   const original = understandingEstablished(report) ? await pendingOriginalRequest(root) : null;
   if (original) return { text: `project understanding approved — continue the original request that started the Brownfield baseline (${original.baselineId}) without asking the developer to repeat it: ${oneLine(original.objective)}`, command: `yallaflow start ${shellQuote(original.objective)}` };
   if (report.memory.exists && report.memory.revalidate.length) return { text: `${report.memory.revalidate.length} project fact(s) may be stale or disputed`, command: 'yallaflow context status' };
-  return { text: 'none — ready for new work', command: 'yallaflow start "<request>"' };
+  return { text: 'none — ready for new work; route an engineering change before its first edit (small changes route as bounded work)', command: 'yallaflow start "<request>"' };
 }

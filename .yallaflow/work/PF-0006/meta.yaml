@@ -1,0 +1,48 @@
+{
+  "id": "PF-0006",
+  "type": "release",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Release YallaFlow v1.0.1 (automatic work-routing fix)",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-10-15T10:44:52.903Z",
+  "updatedAt": "2026-10-15T11:00:45.546Z",
+  "title": "Release YallaFlow v1.0.1 (automatic work-routing fix)",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow release --scope bounded`.",
+  "routedAt": "2026-10-15T10:44:52.912Z",
+  "workflow": "release",
+  "requiredCapabilities": [
+    "discover",
+    "plan",
+    "implement",
+    "verify",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 8,
+    "skills": [
+      "context-discovery",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "code-review"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-10-15T11:00:45.546Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004"
+      ]
+    }
+  ]
+}
