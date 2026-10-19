@@ -1,0 +1,72 @@
+{
+  "id": "PF-0017",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Generated QC/demo reports (report.md, report.html) are tracked by Git by default; only media is ignored",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-10-19T22:12:36.562Z",
+  "updatedAt": "2026-10-19T22:47:47.158Z",
+  "title": "Generated QC/demo reports (report.md, report.html) are tracked by Git by default; only media is ignored",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-10-19T22:12:36.573Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0010",
+      "type": "file",
+      "name": "git-hygiene-approval.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-10-19T22:12:36.736Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0011",
+      "type": "file",
+      "name": "recovery-approval.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-10-19T22:26:51.962Z",
+      "workStatusAtLink": "IMPLEMENTATION",
+      "relationship": "work-input"
+    }
+  ],
+  "lastInvalidationAt": "2026-10-19T22:38:36.853Z",
+  "completionHistory": [
+    {
+      "completedAt": "2026-10-19T22:47:47.158Z",
+      "verificationRunIds": [
+        "V-003",
+        "V-004",
+        "V-005",
+        "V-006",
+        "V-007",
+        "V-008",
+        "V-009"
+      ]
+    }
+  ]
+}

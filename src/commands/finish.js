@@ -67,10 +67,14 @@ async function qualityLines(root, meta, detail) {
   if (demo.exists) {
     const latest = demo.ledger.runs.at(-1);
     detail.push(`demo: ${demo.ledger.proposals.length} proposal(s), ${demo.ledger.runs.length} run(s)`);
-    if (latest) lines.push(`Smart Demo ${latest.id}: ${latest.scenarios.filter((result) => result.status === 'shown').length} scenario(s) shown${latest.video ? ', with a local video' : ''}. A demo is not test evidence.`);
+    // Say where the video is only as far as this machine can tell (existence; no hashing).
+    const videoHere = latest?.video ? await exists(path.join(workspacePath(root), 'work', meta.id, 'quality', latest.video.path)) : false;
+    if (latest) lines.push(`Smart Demo ${latest.id}: ${latest.scenarios.filter((result) => result.status === 'shown').length} scenario(s) shown${latest.video ? (videoHere ? ', with a video on this machine' : ', with a recorded video that is not on this machine') : ''}. A demo is not test evidence.`);
     else if (!currentApproval(demo.ledger)) lines.push('Smart Demo: the proposed scope is awaiting your approval; nothing has been recorded.');
   }
-  lines.push(`Quality report: .yallaflow/work/${meta.id}/quality/report.md (and report.html).`);
+  lines.push(await exists(path.join(workspacePath(root), 'work', meta.id, 'quality', 'report.md'))
+    ? `Quality report (generated locally; ignored by Git by default): .yallaflow/work/${meta.id}/quality/report.md (and report.html).`
+    : 'QC/demo records are in this work item\'s qc.json/demo.json; there is no local quality report on this machine (reports are generated locally and not committed).');
   return lines;
 }
 

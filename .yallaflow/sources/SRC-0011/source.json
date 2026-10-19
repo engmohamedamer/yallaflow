@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0011",
+  "sourceType": "file",
+  "sourceName": "recovery-approval.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-10-19T22:26:51.945Z",
+  "original": {
+    "path": "sources/SRC-0011/recovery-approval.md",
+    "sha256": "e25d78c81af07cf4d30c7723a4185bd33a657f99dcbec201c90c081fd368b46e",
+    "sizeBytes": 1213
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0017"
+  ],
+  "rawText": "Developer approval (2026-10-20) of the Git recovery after a review subagent wrote to the real repository:\n\"I approve the proposed recovery, with one additional safety requirement. Before modifying Git history: 1. Create a clearly named local backup branch pointing to the current HEAD (9b66836). 2. Verify that d3a70c5 is the intended clean release-candidate base and that both accidental commits are fully recoverable. 3. Confirm that no user work, untracked files, or legitimate changes will be lost. Then: perform the proposed soft reset to d3a70c5; restore only .yallaflow/config.yaml to its last valid committed version; preserve all legitimate PF-0017 implementation changes; verify git status, YallaFlow doctor, and the work-item state. Record the incident and recovery in YallaFlow. After recovery, fix the remaining Git-hygiene findings and complete verification. For the independent review, use an isolated repository copy with no ability to modify the original working tree or Git metadata. Do not allow review subagents to run Git write operations against the real repository. Do not push, tag, publish, or rewrite any remote history. Stop and report if the recovery differs from the expected state.\"\n"
+}

@@ -13,13 +13,14 @@
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-032)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-19T20:31:37.009Z (commit 9c38eec)
+- **Verified:** 2026-10-19T22:48:06.051Z (commit d3a70c5)
 - **Evidence:**
-  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
-  - src/agent/bootstrap.js (repository @ 9c38eec)
-  - resources/agents/claude/README.md (repository @ 9c38eec)
-  - resources/agents/codex/README.md (repository @ 9c38eec)
-  - docs/limitations.md (repository @ 9c38eec)
+  - node src/cli.js context status (passed) (runtime, PF-0018 V-001)
+  - node src/cli.js context status (passed) (runtime)
+  - src/agent/bootstrap.js (repository @ d3a70c5)
+  - resources/agents/claude/README.md (repository @ d3a70c5)
+  - resources/agents/codex/README.md (repository @ d3a70c5)
+  - docs/limitations.md (repository @ d3a70c5)
 
 <!-- yallaflow-fact:CTX-0075 -->
 ### CTX-0075 — Network access exists only in the explicit, opt-in 'yallaflow intake ticket <ref> --fetch' (v1.1.0): src/intake/providers/http.js issues read-only GET requests with a timeout and size cap. Credentials are read from environment variables and sent only over https to the hosted tracker (api.github.com, *.atlassian.net, dev.azure.com, *.visualstudio.com) or to an origin the project configured explicitly in requirements.providers (the only way to trust GitHub Enterprise, Jira Data Center, Azure DevOps Server, or http); a ticket URL alone never decides where a token goes, and the check runs before any request. Credentialed requests never follow cross-origin redirects; attachments download only from the tracker origin or GitHub's own attachment hosts; credentials are never persisted or printed. The provider layer is lazily imported only by the intake command. Every other command makes no network call, no model/provider call, and no telemetry. The only other external tool is local read-only Git; YallaFlow never commits, pushes or rewrites branches.

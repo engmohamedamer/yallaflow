@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node src/cli.js context status",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "src/cli.js",
+        "context",
+        "status"
+      ],
+      "displayCommand": "node src/cli.js context status",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-19T22:48:03.524Z",
+      "finishedAt": "2026-10-19T22:48:03.842Z",
+      "verifiedAt": "2026-10-19T22:48:03.842Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

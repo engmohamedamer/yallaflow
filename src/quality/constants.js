@@ -31,8 +31,26 @@ export const DEMO_SCENARIO_ID = /^D-\d{2,}$/;
 export const MAX_ARTIFACT_BYTES = 500 * 1024 * 1024;
 export const MAX_ARTIFACTS_PER_RECORD = 200;
 
-// Binary media stays on this machine unless the project opts in (quality.media.commit).
-export const MEDIA_GITIGNORE = '# Written by YallaFlow: QC/demo media stays local. Hashes and sizes are in qc.json / demo.json.\n# Set quality.media.commit: true in .yallaflow/config.yaml to track media in Git instead.\n*\n!.gitignore\n';
+// Generated QC/demo artifacts stay out of Git (v1.1.0): media (videos, screenshots,
+// traces) and the regenerated reports. Only qc.json / demo.json — the durable records
+// with approvals, results, and media hashes — are committed. quality.media.commit: true
+// opts media back in; reports are always local. Older builds wrote media/.gitignore,
+// which stays valid.
+export const QUALITY_GITIGNORE_HEADER = '# Written by YallaFlow: generated QC/demo artifacts stay on this machine.';
+// The pre-release media/.gitignore header (ignores all media).
+export const LEGACY_MEDIA_GITIGNORE_HEADER = '# Written by YallaFlow: QC/demo media stays local.';
+
+export function qualityGitignore({ commitMedia = false } = {}) {
+  return [
+    QUALITY_GITIGNORE_HEADER,
+    '# qc.json and demo.json (approvals, results, media hashes) are committed.',
+    commitMedia ? '# Media is committed because quality.media.commit is true.' : '# Set quality.media.commit: true in .yallaflow/config.yaml to commit media too.',
+    ...(commitMedia ? [] : ['media/']),
+    'report.md',
+    'report.html',
+    ''
+  ].join('\n');
+}
 
 export const ARTIFACT_KINDS = Object.freeze({
   '.webm': 'video', '.mp4': 'video', '.mov': 'video',

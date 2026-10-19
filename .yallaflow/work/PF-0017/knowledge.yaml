@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Optional AI QC (v1.1.0, src/quality/): YallaFlow never runs a browser or test itself; on explicit request the Agent drives Playwright (CLI or MCP) and records results with 'yallaflow qc plan|record|status'. Records live in work/<id>/quality/qc.json (append-only QP-### plans, QC-### runs), separate from the V-### verification ledger, for routed work at any stage including DONE, never changing lifecycle state. Honesty rules: passed requires executed steps plus an artifact or a passed YallaFlow verification run newer than the latest reopen; failed requires actual behavior and steps; blocked/not-run require a reason. A result counts only for the scenario definition it was recorded against (scenarioFingerprint), so a redefined scenario must run again. Policies: advisory (default; failures reported, never blocking) or strict (plan or config quality.qc.policy; a config strict is a floor a plan cannot weaken and the stricter of plan and current config governs, including earlier plans; quality approval is computed from required scenarios and is separate from DONE). Artifacts are copied with sha256 into a folder created exclusively for each record, quality/media/<record-id>-<random>/ (never reused, so evidence from another branch or an earlier run is never overwritten; a failed record removes only its own folder; identical files within a record stored once; no local source path recorded). Git: a YallaFlow-managed quality/.gitignore (kept in line with quality.media.commit while it carries YallaFlow's header; a header-less file is the project's own) ignores media/, report.md and report.html, so only qc.json/demo.json are committed by default; quality.media.commit: true commits media, reports stay local; files already tracked are never untracked or deleted — doctor names them with a git rm -r --cached hint built from tracked paths; qc/demo status and finish state how much recorded media is on this machine and mention reports only when present. doctor, qc status and demo status verify stored media against the ledger (streamed hashing; never via brief/upgrade/shared/finish) and warn on changed, unreadable, or out-of-folder (symlinked) files, which are never read. Shared Projects use branch-safe record IDs (QP/QC/DP/DM-<clone tag>-0001); IDs duplicated by a merge are doctor warnings and qc: citations of them are refused, and report.md + a static report.html are regenerated locally with relative links. Convergence may cite a scenario as qc:QC-001#S-01; only a passed scenario can support satisfied, and a later non-passing result or a redefinition makes the finding stale.",
+      "evidence": [
+        "src/quality/artifacts.js#ensureQualityGitignore",
+        "src/quality/constants.js",
+        "src/quality/integrity.js",
+        "test/quality-git-hygiene.test.js",
+        "verification:V-003",
+        "verification:V-006"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0081"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-19T22:47:46.760Z",
+      "factId": "CTX-0083",
+      "promotedAt": "2026-10-19T22:47:46.925Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-10-19T22:47:46.925Z",
+  "reviewedAt": "2026-10-19T22:47:46.925Z"
+}

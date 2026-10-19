@@ -55,7 +55,8 @@ export async function qcRecordCommand(workId, { file, allowRemote = false }) {
   const counts = Object.fromEntries(['passed', 'failed', 'blocked', 'not-run'].map((status) => [status, run.scenarios.filter((result) => result.status === status).length]));
   const artifacts = run.scenarios.reduce((sum, result) => sum + (result.artifacts?.length ?? 0), 0);
   console.log(`QC ${run.id} recorded for ${workId} (${run.origin} via ${run.tool}): ${counts.passed} passed · ${counts.failed} failed · ${counts.blocked} blocked · ${counts['not-run']} not run.`);
-  if (artifacts) console.log(`Artifacts: ${artifacts} file(s) stored locally with hashes under ${relative(root, path.join(path.dirname(report.markdown), 'media', run.id))}/`);
+  const folder = run.scenarios.flatMap((result) => result.artifacts ?? [])[0]?.path.split('/').slice(0, 2).join('/');
+  if (artifacts) console.log(`Artifacts: ${artifacts} file(s) stored with hashes under ${relative(root, path.join(path.dirname(report.markdown), folder))}/`);
   for (const result of run.scenarios.filter((entry) => entry.status !== 'passed')) {
     console.log(`  ${result.id} ${result.status.toUpperCase()}: ${result.actual ?? result.reason ?? ''}`.trimEnd());
   }
@@ -82,15 +83,32 @@ export async function qcStatusCommand(workId) {
   }
   if (view.plan.criteriaNotCovered.length) console.log(`Criteria with no scenario: ${view.plan.criteriaNotCovered.join(', ')}`);
   printPolicy(view);
-  await printMediaWarnings(root, workId);
-  console.log(`Report: .yallaflow/work/${workId}/quality/report.md · report.html`);
+  await printMediaWarnings(root, workId, 'qc');
+  console.log(await reportLine(root, workId));
 }
 
 // Stored media whose bytes no longer match the recorded hash (v1.1.0). Missing media is
 // expected in a fresh clone (media is local-only by default) and is not reported here.
-async function printMediaWarnings(root, workId) {
-  const { qualityMediaWarnings } = await import('../quality/integrity.js');
+async function printMediaWarnings(root, workId, kind) {
+  const { mediaAvailability, qualityMediaWarnings } = await import('../quality/integrity.js');
+  const { recorded, present } = await mediaAvailability(root, workId, kind);
+  if (recorded) {
+    const { loadQualitySettings } = await import('../quality/qc.js');
+    const why = (await loadQualitySettings(root)).commitMedia
+      ? 'they were not pulled to, or were removed from, this checkout'
+      : 'media is local-only by default (not committed)';
+    console.log(`Local media: ${present} of ${recorded} recorded file(s) are on this machine.${present < recorded ? ` The others are not here (${why}): their results and hashes are recorded in the ledger, but the files cannot be viewed or re-verified on this machine.` : ''}`);
+  }
   for (const warning of await qualityMediaWarnings(root, workId)) console.log(`Warning: ${warning}`);
+}
+
+// Reports are generated locally and not committed: mention one only when it exists.
+async function reportLine(root, workId) {
+  const { exists } = await import('../utils/fs.js');
+  const dir = path.join(root, '.yallaflow', 'work', workId, 'quality');
+  return await exists(path.join(dir, 'report.md'))
+    ? `Report: .yallaflow/work/${workId}/quality/report.md · report.html (generated locally; ignored by Git by default)`
+    : 'No local report on this machine (reports are generated locally and not committed); it is written again on the next QC or demo record.';
 }
 
 function printPolicy(view) {
@@ -171,6 +189,6 @@ export async function demoStatusCommand(workId) {
   const { approvedCoverage } = await import('../quality/demo.js');
   const coverage = approvedCoverage(ledger);
   if (coverage?.remaining.length && coverage.runs.length) console.log(`Approved, not yet shown in any recording: ${coverage.remaining.join(', ')}`);
-  await printMediaWarnings(root, workId);
-  console.log(`Report: .yallaflow/work/${workId}/quality/report.md · report.html`);
+  await printMediaWarnings(root, workId, 'demo');
+  console.log(await reportLine(root, workId));
 }

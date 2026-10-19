@@ -54,7 +54,9 @@ None are required. `init` writes none of them, and `doctor` validates them when 
 "quality": { "qc": { "policy": "strict" }, "media": { "commit": false } }
 ```
 
-Credentials never go in config. If your repository ignores `*.log` or similar patterns, nothing changes for QC: media exclusion is handled by YallaFlow's own `media/.gitignore`.
+Credentials never go in config. Git exclusion of QC/demo artifacts is handled by YallaFlow's own `quality/.gitignore` (media and reports), whatever your repository's ignore rules are.
+
+**Pilot projects (pre-release 1.1.0 builds).** If a pre-release build committed `report.md`, `report.html`, or media, those files stay tracked: YallaFlow never untracks or deletes them. `yallaflow doctor` lists them. Run the one-time `git rm -r --cached …` it prints (your local files are kept), then commit.
 
 ## Mixed versions
 

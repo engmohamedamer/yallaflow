@@ -1,0 +1,33 @@
+{
+  "id": "PF-0018",
+  "type": "investigation",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Revalidate project memory after the v1.1.0 Git hygiene fix",
+  "status": "DONE",
+  "readOnly": true,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-10-19T22:48:01.730Z",
+  "updatedAt": "2026-10-19T22:48:08.031Z",
+  "title": "Revalidate project memory after the v1.1.0 Git hygiene fix",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow investigate --scope bounded`.",
+  "routedAt": "2026-10-19T22:48:01.740Z",
+  "workflow": "investigation",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "verification"
+    ]
+  }
+}

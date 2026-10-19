@@ -1,0 +1,108 @@
+PASS config.yaml
+PASS PROJECT.md
+PASS AGENT.md
+PASS state/current.yaml
+PASS context/architecture.md
+PASS context/tech-stack.md
+PASS context/database.md
+PASS context/integrations.md
+PASS context/environments.md
+PASS context/conventions.md
+PASS context/business-rules.md
+PASS work
+PASS decisions
+PASS releases
+PASS work question ledgers (1 present)
+PASS schema parsing
+PASS sources (11 present)
+PASS built-in skill registry v9 (15 skills)
+PASS work progress ledgers (17 present)
+PASS work knowledge ledgers (15 present)
+PASS lifecycle integrity (17 work item(s) checked)
+PASS delivery integrity (17 work item(s) checked)
+PASS project context ledger (82 fact(s))
+WARN PF-0001: AC-005 convergence may be stale — evidence test/onboarding.test.js changed since CV-004 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0001: AC-006 convergence may be stale — evidence src/commands/init.js changed since CV-004; evidence test/onboarding.test.js changed since CV-004 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0001: AC-007 convergence may be stale — evidence src/cli.js changed since CV-004; evidence test/onboarding.test.js changed since CV-004 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0001: AC-008 convergence may be stale — evidence test/onboarding.test.js changed since CV-004 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0001: AC-009 convergence may be stale — evidence src/baseline/store.js changed since CV-004; evidence src/commands/brief.js changed since CV-004; evidence src/commands/baseline.js changed since CV-004; evidence test/onboarding.test.js changed since CV-004 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0001: AC-010 convergence may be stale — evidence src/agent/contract.js changed since CV-004; evidence test/agent-contract.test.js changed since CV-004 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0001: AC-011 convergence may be stale — evidence resources/skills/repository-baseline.md changed since CV-004; evidence src/agent/contract.js changed since CV-004; evidence test/onboarding.test.js changed since CV-004; evidence test/agent-contract.test.js changed since CV-004 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0001: AC-012 convergence may be stale — evidence src/commands/brief.js changed since CV-004; evidence test/onboarding.test.js changed since CV-004 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0001: AC-013 convergence may be stale — evidence src/commands/brief.js changed since CV-004; evidence test/onboarding.test.js changed since CV-004 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0001: AC-014 convergence may be stale — evidence src/commands/context.js changed since CV-004; evidence src/agent/contract.js changed since CV-004; evidence resources/skills/repository-baseline.md changed since CV-004; evidence test/onboarding.test.js changed since CV-004 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0001: AC-015 convergence may be stale — evidence docs/installation.md changed since CV-004 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0001: AC-016 convergence may be stale — evidence package.json changed since CV-004; evidence src/version.js changed since CV-004; evidence src/agent/contract.js changed since CV-004; evidence src/skills/constants.js changed since CV-004; evidence test/onboarding.test.js changed since CV-004; evidence test/agent-contract.test.js changed since CV-004; evidence test/cli.test.js changed since CV-004; evidence src/commands/doctor.js changed since CV-004 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0001: AC-017 convergence may be stale — evidence src/commands/doctor.js changed since CV-004 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0003: AC-001 convergence may be stale — evidence src/commands/intake.js changed since CV-001; evidence test/pilot-hardening.test.js changed since CV-001; evidence test/hardening.test.js changed since CV-001 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0003: AC-002 convergence may be stale — evidence test/pilot-hardening.test.js changed since CV-001 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0003: AC-003 convergence may be stale — evidence src/agent/contract.js changed since CV-001; evidence test/pilot-hardening.test.js changed since CV-001 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0003: AC-004 convergence may be stale — evidence src/commands/brief.js changed since CV-001; evidence test/pilot-hardening.test.js changed since CV-001 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0003: AC-005 convergence may be stale — evidence test/pilot-hardening.test.js changed since CV-001 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0003: AC-006 convergence may be stale — evidence src/commands/verify.js changed since CV-001; evidence test/pilot-hardening.test.js changed since CV-001 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0003: AC-007 convergence may be stale — evidence test/pilot-hardening.test.js changed since CV-001 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0003: AC-008 convergence may be stale — evidence test/pilot-hardening.test.js changed since CV-001 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0003: AC-009 convergence may be stale — evidence test/pilot-hardening.test.js changed since CV-001 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0003: AC-010 convergence may be stale — evidence src/skills/instructions.js changed since CV-001; evidence src/version.js changed since CV-001; evidence package.json changed since CV-001; evidence test/pilot-hardening.test.js changed since CV-001 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0003: AC-011 convergence may be stale — evidence test/pilot-hardening.test.js changed since CV-001; evidence README.md changed since CV-001; evidence docs/using-yallaflow.md changed since CV-001 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-001 convergence may be stale — PF-0008's current finding for PF-0007/AC-001 is stale (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-002 convergence may be stale — PF-0008's current finding for PF-0007/AC-002 is stale (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-003 convergence may be stale — PF-0008's current finding for PF-0007/AC-003 is stale (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-004 convergence may be stale — PF-0008's current finding for PF-0007/AC-004 is stale (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-005 convergence may be stale — PF-0008's current finding for PF-0007/AC-005 is stale (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-006 convergence may be stale — PF-0008's current finding for PF-0007/AC-006 is stale (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-007 convergence may be stale — PF-0008's current finding for PF-0007/AC-007 is stale (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-008 convergence may be stale — PF-0008's current finding for PF-0007/AC-008 is stale (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-009 convergence may be stale — PF-0008's current finding for PF-0007/AC-009 is stale (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-010 convergence may be stale — PF-0009's current finding for PF-0007/AC-010 is stale (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-011 convergence may be stale — PF-0009's current finding for PF-0007/AC-011 is stale (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-012 convergence may be stale — PF-0009's current finding for PF-0007/AC-012 is stale (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-013 convergence may be stale — PF-0009's current finding for PF-0007/AC-013 is stale (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-014 convergence may be stale — PF-0009's current finding for PF-0007/AC-014 is stale (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-015 convergence may be stale — PF-0009's current finding for PF-0007/AC-015 is stale (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-016 convergence may be stale — PF-0009's current finding for PF-0007/AC-016 is stale (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-017 convergence may be stale — PF-0010's current finding for PF-0007/AC-017 is stale (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-018 convergence may be stale — PF-0010's current finding for PF-0007/AC-018 is stale (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-019 convergence may be stale — PF-0010's current finding for PF-0007/AC-019 is stale (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-020 convergence may be stale — PF-0010's current finding for PF-0007/AC-020 is stale (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-021 convergence may be stale — PF-0010's current finding for PF-0007/AC-021 is stale (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-022 convergence may be stale — PF-0009's current finding for PF-0007/AC-022 is stale (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-023 convergence may be stale — PF-0009's current finding for PF-0007/AC-023 is stale (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-025 convergence may be stale — evidence src/agent/contract.js changed since CV-001 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0007: AC-027 convergence may be stale — evidence CHANGELOG.md changed since CV-001; evidence docs/upgrading-to-v1.1.0.md changed since CV-001 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0008: PF-0007/AC-001 convergence may be stale — evidence test/ticket-intake.test.js changed since CV-002 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0008: PF-0007/AC-002 convergence may be stale — evidence test/ticket-intake.test.js changed since CV-002 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0008: PF-0007/AC-003 convergence may be stale — evidence test/ticket-intake.test.js changed since CV-002 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0008: PF-0007/AC-004 convergence may be stale — evidence test/ticket-intake.test.js changed since CV-002 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0008: PF-0007/AC-005 convergence may be stale — evidence test/ticket-intake.test.js changed since CV-002 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0008: PF-0007/AC-006 convergence may be stale — evidence test/ticket-intake.test.js changed since CV-002 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0008: PF-0007/AC-007 convergence may be stale — evidence test/ticket-intake.test.js changed since CV-002 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0008: PF-0007/AC-008 convergence may be stale — evidence src/intake/providers/ticket.js changed since CV-002; evidence test/ticket-intake.test.js changed since CV-002 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0008: PF-0007/AC-009 convergence may be stale — evidence src/intake/providers/ticket.js changed since CV-002; evidence test/ticket-intake.test.js changed since CV-002 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0009: PF-0007/AC-010 convergence may be stale — evidence src/quality/qc.js changed since CV-003; evidence test/quality-qc.test.js changed since CV-003 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0009: PF-0007/AC-011 convergence may be stale — evidence src/quality/qc.js changed since CV-003; evidence test/quality-qc.test.js changed since CV-003 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0009: PF-0007/AC-012 convergence may be stale — evidence src/commands/quality.js changed since CV-003; evidence src/commands/finish.js changed since CV-003; evidence test/quality-qc.test.js changed since CV-003 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0009: PF-0007/AC-013 convergence may be stale — evidence src/commands/finish.js changed since CV-003; evidence test/quality-qc.test.js changed since CV-003 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0009: PF-0007/AC-014 convergence may be stale — evidence src/quality/qc.js changed since CV-003; evidence test/quality-qc.test.js changed since CV-003 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0009: PF-0007/AC-015 convergence may be stale — evidence src/delivery/convergence.js changed since CV-003; evidence src/quality/qc.js changed since CV-003; evidence test/quality-qc.test.js changed since CV-003 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0009: PF-0007/AC-016 convergence may be stale — evidence test/quality-qc.test.js changed since CV-003 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0009: PF-0007/AC-022 convergence may be stale — evidence src/quality/artifacts.js changed since CV-003; evidence test/quality-qc.test.js changed since CV-003 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0009: PF-0007/AC-023 convergence may be stale — evidence src/quality/report.js changed since CV-003; evidence test/quality-qc.test.js changed since CV-003 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0010: PF-0007/AC-017 convergence may be stale — evidence src/quality/demo.js changed since CV-003; evidence test/quality-demo.test.js changed since CV-003 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0010: PF-0007/AC-018 convergence may be stale — evidence src/quality/demo.js changed since CV-003; evidence test/quality-demo.test.js changed since CV-003 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0010: PF-0007/AC-019 convergence may be stale — evidence src/quality/artifacts.js changed since CV-003; evidence test/quality-demo.test.js changed since CV-003 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0010: PF-0007/AC-020 convergence may be stale — evidence src/quality/constants.js changed since CV-003; evidence src/delivery/convergence.js changed since CV-003; evidence test/quality-demo.test.js changed since CV-003 (DONE history is unchanged; reopen to revalidate if needed).
+WARN PF-0010: PF-0007/AC-021 convergence may be stale — evidence src/quality/demo.js changed since CV-003; evidence resources/skills/smart-demo.md changed since CV-003; evidence test/quality-demo.test.js changed since CV-003 (DONE history is unchanged; reopen to revalidate if needed).
+WARN CTX-0026 may be stale because src/commands/finish.js changed since it was verified.
+WARN CTX-0032 may be stale because docs/limitations.md changed since it was verified.
+WARN CTX-0033 may be stale because docs/limitations.md changed since it was verified.
+WARN CTX-0046 may be stale because docs/limitations.md changed since it was verified.
+WARN CTX-0060 may be stale because CHANGELOG.md changed since it was verified.
+WARN CTX-0069 may be stale because docs/connected-requirements-and-quality.md, docs/limitations.md, docs/upgrading-to-v1.1.0.md changed since it was verified.
+WARN CTX-0073 may be stale because test/quality-qc.test.js changed since it was verified.
+WARN CTX-0080 may be stale because src/quality/report.js changed since it was verified.
+WARN CTX-0081 may be stale because src/quality/artifacts.js, src/quality/integrity.js changed since it was verified.
+WARN CTX-0082 may be stale because src/quality/artifacts.js, docs/security.md changed since it was verified.
+
+Workspace healthy.
+82 warning(s) — informational only, does not affect workspace health.

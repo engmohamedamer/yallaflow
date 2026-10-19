@@ -3,7 +3,7 @@ import { writeFile } from 'node:fs/promises';
 import { ensureDir } from '../utils/fs.js';
 import { loadWorkMetaOrThrow } from '../core/workspace.js';
 import { redactSecrets } from '../security/redact.js';
-import { artifactState, qualityDirPath } from './artifacts.js';
+import { artifactState, ensureQualityGitignore, qualityDirPath } from './artifacts.js';
 import { evaluateQc, loadQcLedger, loadQualitySettings } from './qc.js';
 import { approvedCoverage, currentApproval, loadDemoLedger } from './demo.js';
 import { DEMO_DISCLAIMER } from './constants.js';
@@ -22,6 +22,7 @@ export async function writeQualityReport(root, workId, now = new Date().toISOStr
     if (built) sections.push(built);
   }
   const dir = qualityDirPath(root, workId);
+  await ensureQualityGitignore(root, workId, { commitMedia: (await loadQualitySettings(root)).commitMedia });
   await ensureDir(dir);
   const title = `Quality report — ${meta.id}: ${meta.title ?? 'untitled'}`;
   const intro = `Generated ${now} by YallaFlow from this work item's QC and demo records. Local files only; nothing was uploaded.`;

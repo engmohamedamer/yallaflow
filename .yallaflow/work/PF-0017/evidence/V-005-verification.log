@@ -1,0 +1,6 @@
+PASS version 1.1.0
+PASS greenfield init, bootstraps, contract v10
+PASS brownfield gate
+PASS offline ticket import
+PASS real video written: 289387 bytes
+PASS stored video playable and byte-identical (media/DM-001-8088df/demo.webm)

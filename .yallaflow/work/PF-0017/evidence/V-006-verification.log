@@ -1,0 +1,12 @@
+PASS version 1.1.0
+PASS greenfield init, bootstraps, contract v10
+PASS brownfield gate
+PASS offline ticket import
+PASS real video written: 291888 bytes
+PASS stored video playable and byte-identical (media/DM-001-77fcfb/demo.webm)
+PASS Git tracks only: .yallaflow/work/PF-0001/quality/.gitignore .yallaflow/work/PF-0001/quality/demo.json 
+PASS video, screenshot, report.md, report.html ignored
+PASS clone states missing media and report plainly
+PASS doctor in clone
+PASS doctor verifies media in the original
+RELEASE SMOKE OK (/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/smoke.RoGvAY)

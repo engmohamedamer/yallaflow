@@ -161,7 +161,7 @@ test('advisory policy: failures are reported by status and finish, and never blo
   run(root, ['qc', 'record', id, '--file', await writeJsonFile(dir, 'r.json', { tool: 'playwright-mcp', origin: 'agent-driven', scenarios: [{ id: 'S-01', status: 'failed', steps: ['Resize to 320px'], actual: 'Filter overlaps the table' }] })]);
   const finish = run(root, ['finish', id]);
   assert.match(finish.stdout, /AI QC \(advisory\) found 1 scenario\(s\) not passing: S-01 failed\. Reported only — completion is not blocked\./);
-  assert.match(finish.stdout, /Quality report: \.yallaflow\/work\/PF-0001\/quality\/report\.md/);
+  assert.match(finish.stdout, /Quality report \(generated locally; ignored by Git by default\): \.yallaflow\/work\/PF-0001\/quality\/report\.md/);
   assert.match(finish.stdout, /Ready to push\./);
 });
 
@@ -239,9 +239,10 @@ test('artifacts: copied with hashes, git-excluded by default, opt-in commit; rep
     tool: 'playwright-cli', origin: 'agent-driven', scenarios: [{ ...passed(dir), artifacts: [path.join(dir, 'export.png'), path.join(dir, 'trace.zip')] }]
   })]);
   const q = quality(root, id);
-  const ignore = await readFile(path.join(q, 'media', '.gitignore'), 'utf8');
-  assert.match(ignore, /^\*$/m);
-  assert.match(ignore, /^!\.gitignore$/m);
+  const ignore = await readFile(path.join(q, '.gitignore'), 'utf8');
+  assert.match(ignore, /^media\/$/m);
+  assert.match(ignore, /^report\.md$/m);
+  assert.match(ignore, /^report\.html$/m);
   const ledger = JSON.parse(await readFile(path.join(q, 'qc.json'), 'utf8'));
   const [shot, trace] = ledger.runs[0].scenarios[0].artifacts;
   assert.deepEqual([shot.kind, trace.kind], ['screenshot', 'trace']);
@@ -267,7 +268,9 @@ test('artifacts: copied with hashes, git-excluded by default, opt-in commit; rep
   const other = await featureWithCriteria(committed, dir);
   run(committed, ['qc', 'plan', other, '--file', path.join(dir, 'plan.json')]);
   run(committed, ['qc', 'record', other, '--file', path.join(dir, 'r.json')]);
-  assert.equal(existsSync(path.join(quality(committed, other), 'media', '.gitignore')), false);
+  const committedIgnore = await readFile(path.join(quality(committed, other), '.gitignore'), 'utf8');
+  assert.doesNotMatch(committedIgnore, /^media\/$/m, 'the opt-in commits media');
+  assert.match(committedIgnore, /^report\.md$/m, 'reports stay local even with the media opt-in');
 });
 
 test('doctor validates the QC ledger and its config; QC commands make no network call', async () => {

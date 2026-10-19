@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0010",
+  "sourceType": "file",
+  "sourceName": "git-hygiene-approval.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-10-19T22:12:36.721Z",
+  "original": {
+    "path": "sources/SRC-0010/git-hygiene-approval.md",
+    "sha256": "0123e7a27656d27818966379b00229912b1984e8fecd49c37035acbf6057e903",
+    "sizeBytes": 978
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0017"
+  ],
+  "rawText": "Developer decision (2026-10-20): approve the proposed Git hygiene fix.\n- Keep qc.json and demo.json version-controlled as lightweight, durable project records.\n- Exclude all generated QC/Demo runtime artifacts from Git by default, including media, screenshots, traces, report.md and report.html.\n- Use the proposed quality/.gitignore approach, preserving the existing explicit opt-in to commit media.\n- Existing tracked files must not be automatically deleted or untracked.\n- Missing local media in another clone must be reported clearly, without making false claims about evidence availability.\n- Preserve the integrity checks and backward compatibility; keep normal YallaFlow operations lightweight.\n- Performance benchmarks accepted; keep doctor's full media integrity verification as implemented.\n- Govern as a small bug fix, add regression tests, perform final release checks and independent review, create a local commit if everything passes. Do not tag, push or publish.\n"
+}

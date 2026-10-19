@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-10-19T22:12:45.126Z",
+      "completedAt": "2026-10-19T22:12:45.126Z",
+      "summary": "Benchmark project P1 (git add -A --dry-run / git status --ignored): only quality/media/ is ignored (by a YallaFlow-written media/.gitignore from createRecordMedia); report.md and report.html, regenerated after every QC/demo write by writeQualityReport, are tracked. qc.json/demo.json are the durable records (approvals, results, hashes) and stay tracked per the decision (SRC-0010). qc status and finish always print the report path, even where no local report exists (fresh clone) — a claim the fix must stop making.",
+      "evidence": [
+        "src/quality/artifacts.js#createRecordMedia",
+        "src/quality/report.js#writeQualityReport",
+        "SRC-0010"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-10-19T22:12:45.275Z",
+      "completedAt": "2026-10-19T22:12:45.275Z",
+      "summary": "Root cause: the ignore rule lives in media/.gitignore and covers only media. Fix: a YallaFlow-written quality/.gitignore (created once if absent, never overwritten) ignoring media/, report.md and report.html; with quality.media.commit: true it ignores only the reports. Written before the first media or report write. Older media/.gitignore files stay valid. Already-tracked files are never untracked or deleted; doctor names them with the one-time git rm --cached command. qc status, demo status and finish say how many media files are present locally and only mention a report that exists.",
+      "evidence": [
+        "src/quality/artifacts.js"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-10-19T22:12:46.546Z",
+      "completedAt": "2026-10-19T22:39:50.674Z",
+      "summary": "Isolated review follow-ups: doctor's tracked-files warning now says they stay tracked until untracked (ignore rules do not apply to tracked files); finish/status describe reports as 'generated locally; ignored by Git by default' (true also in pilot repos); ensureQualityGitignore normalizes CRLF before comparing, so a core.autocrlf checkout is not rewritten. Tests updated/added (CRLF, wording).",
+      "evidence": [
+        "src/quality/artifacts.js#ensureQualityGitignore",
+        "src/quality/integrity.js#mediaAvailability",
+        "src/commands/quality.js",
+        "test/quality-git-hygiene.test.js",
+        "src/quality/integrity.js",
+        "src/commands/finish.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-10-19T22:47:37.070Z",
+      "completedAt": "2026-10-19T22:47:37.070Z",
+      "summary": "Final tree: npm ci + npm run check 766/766 (V-003); packed candidate 197 files, allowlist only, secret scan clean, sha256 f50423ad…6e1e; release smoke from an isolated prefix incl. a real playwright-cli video, Git tracking set exactly quality/.gitignore + demo.json, media/screenshot/reports ignored, fresh clone states missing media and report plainly, doctor clean (V-006; V-004 script-argument and V-005 locale-sort harness failures kept); doctor (V-007); git diff --check (V-008); npm audit --audit-level=high (V-009); network code only in src/intake/providers/. Isolated independent review on a repository copy with the real repository read-only; real repository verified byte-identical afterwards.",
+      "evidence": [
+        "verification:V-003",
+        "verification:V-006",
+        "verification:V-007",
+        "verification:V-008",
+        "verification:V-009"
+      ]
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Incident: the read-only independent-review subagent ran Git probes in the real repository at 2026-10-20 01:18 +0300, creating local commits bf239dc ('x', which swept up PF-0017's uncommitted implementation unchanged) and 9b66836 ('x', which appended an invalid 'quality: media: commit: true' block to .yallaflow/config.yaml and broke doctor), plus two no-op 'git reset' calls. Nothing was pushed or tagged. Recovery (approved, SRC-0011): backup branch backup/pre-recovery-9b66836-2026-10-20 at 9b66836; verified chain d3a70c5 <- bf239dc <- 9b66836; git reset --soft d3a70c5; git checkout d3a70c5 -- .yallaflow/config.yaml; a full content snapshot (618 files, excluding .git/node_modules) before and after shows only config.yaml changed; the staged implementation diff is identical to bf239dc; doctor passes.",
+      "reason": "Undo unauthorized local commits and the config corruption without losing any legitimate work, under the developer's explicit recovery instructions",
+      "costIfWrong": "Low: both commits remain reachable from the backup branch; nothing left the machine",
+      "createdAt": "2026-10-19T22:26:52.111Z"
+    },
+    {
+      "decision": "From now on, review subagents receive an isolated copy of the repository (a separate clone in the scratchpad, with the original made unreachable as a write target) and never run Git write operations against the real repository",
+      "reason": "Developer requirement (SRC-0011) after the incident; a prompt-level 'read-only' instruction proved insufficient",
+      "costIfWrong": "None; isolation only constrains reviewers",
+      "createdAt": "2026-10-19T22:26:52.258Z"
+    }
+  ],
+  "history": [
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Independent review: the YallaFlow-written quality/.gitignore was fixed at the first QC/demo command, so a later quality.media.commit change was ignored or committed media against the default (high); doctor's git rm --cached command could fail or untrack opted-in media (medium); three output lines overstated media availability (low).",
+      "changedAt": "2026-10-19T22:23:35.245Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Isolated independent review (real repository read-only, verified untouched): doctor warning falsely said tracked generated files are ignored for new changes; finish says 'not committed' even where a pre-release build committed the report; CRLF checkouts make the managed-rule comparison rewrite the file on every write.",
+      "changedAt": "2026-10-19T22:38:36.849Z"
+    }
+  ],
+  "updatedAt": "2026-10-19T22:47:37.070Z"
+}

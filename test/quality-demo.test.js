@@ -113,7 +113,7 @@ test('video is optional; a recorded video and screenshots are stored locally wit
   assert.equal(run2.video.kind, 'video');
   assert.match(run2.video.sha256, /^[0-9a-f]{64}$/);
   assert.deepEqual(await readFile(path.join(quality(root, id), run2.video.path)), await readFile(path.join(dir, 'demo.webm')));
-  assert.match(await readFile(path.join(quality(root, id), 'media', '.gitignore'), 'utf8'), /^\*$/m);
+  assert.match(await readFile(path.join(quality(root, id), '.gitignore'), 'utf8'), /^media\/$/m);
 
   const notes = run(root, ['demo', 'record', id, '--file', await writeJsonFile(dir, 'r4.json', { tool: 'playwright-cli', scenarios: [{ id: 'D-01', status: 'failed' }] })], { ok: false });
   assert.match(notes.stderr, /failed requires notes/);

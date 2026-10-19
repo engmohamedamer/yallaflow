@@ -1,11 +1,11 @@
 import path from 'node:path';
 import { createHash, randomBytes } from 'node:crypto';
 import { constants as fsConstants, createReadStream } from 'node:fs';
-import { copyFile, mkdir, realpath, rm, stat, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readFile, realpath, rm, stat, writeFile } from 'node:fs/promises';
 import { ensureDir, exists } from '../utils/fs.js';
 import { workspacePath } from '../core/workspace.js';
 import { assertSafeSourceName, assertWithinDirectory } from '../intake/validation.js';
-import { ARTIFACT_KINDS, MAX_ARTIFACT_BYTES, MAX_ARTIFACTS_PER_RECORD, MEDIA_GITIGNORE } from './constants.js';
+import { ARTIFACT_KINDS, MAX_ARTIFACT_BYTES, MAX_ARTIFACTS_PER_RECORD, QUALITY_GITIGNORE_HEADER, qualityGitignore } from './constants.js';
 
 // Local quality artifacts (v1.1.0): screenshots, videos, traces, logs the Agent
 // produced with Playwright. Each is copied byte-for-byte into
@@ -54,9 +54,8 @@ export async function createRecordMedia(root, workId, recordId, { commitMedia = 
 
   async function ensureFolder() {
     if (dir) return;
+    await ensureQualityGitignore(root, workId, { commitMedia });
     await ensureDir(media);
-    const ignoreFile = path.join(media, '.gitignore');
-    if (!commitMedia && !await exists(ignoreFile)) await writeFile(ignoreFile, MEDIA_GITIGNORE, 'utf8');
     for (let attempt = 0; attempt < 5 && !dir; attempt += 1) {
       const candidate = `${recordId}-${randomBytes(3).toString('hex')}`;
       try {
@@ -102,6 +101,24 @@ export async function createRecordMedia(root, workId, recordId, { commitMedia = 
       if (dir) await rm(dir, { recursive: true, force: true });
     }
   };
+}
+
+// Checked before every media or report write. While the file starts with YallaFlow's
+// header it is YallaFlow-managed and follows quality.media.commit (an opt-in made later
+// takes effect, and opting back out re-ignores media); a file without the header is the
+// project's own and is never touched. Never untracks or deletes anything already in Git.
+export async function ensureQualityGitignore(root, workId, { commitMedia = false } = {}) {
+  const dir = qualityDirPath(root, workId);
+  const file = path.join(dir, '.gitignore');
+  const wanted = qualityGitignore({ commitMedia });
+  if (await exists(file)) {
+    // CRLF checkouts (core.autocrlf) are the same rule, not a reason to rewrite it.
+    const current = (await readFile(file, 'utf8')).replace(/\r\n/g, '\n');
+    if (!current.startsWith(QUALITY_GITIGNORE_HEADER) || current === wanted) return false;
+  }
+  await ensureDir(dir);
+  await writeFile(file, wanted, 'utf8');
+  return true;
 }
 
 // present | missing | changed | unreadable | unsafe — size first, hash only when the size
