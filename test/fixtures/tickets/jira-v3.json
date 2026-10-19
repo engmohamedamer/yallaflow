@@ -1,0 +1,33 @@
+{
+  "key": "SHOP-42",
+  "self": "https://acme.atlassian.net/rest/api/3/issue/10042",
+  "names": { "summary": "Summary", "customfield_10035": "Acceptance Criteria" },
+  "fields": {
+    "summary": "Invoice totals include tax",
+    "issuetype": { "name": "Story" },
+    "status": { "name": "In Progress" },
+    "labels": ["billing"],
+    "reporter": { "displayName": "Erin" },
+    "created": "2026-08-01T09:00:00.000+0000",
+    "updated": "2026-08-10T09:00:00.000+0000",
+    "description": { "type": "doc", "version": 1, "content": [
+      { "type": "paragraph", "content": [{ "type": "text", "text": "Totals must include VAT." }] },
+      { "type": "bulletList", "content": [
+        { "type": "listItem", "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "Applies to all invoices" }] }] }
+      ] }
+    ] },
+    "customfield_10035": { "type": "doc", "version": 1, "content": [
+      { "type": "bulletList", "content": [
+        { "type": "listItem", "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "Invoice total equals net plus VAT" }] }] },
+        { "type": "listItem", "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "VAT rate comes from settings" }] }] }
+      ] }
+    ] },
+    "comment": { "comments": [
+      { "id": "300", "author": { "displayName": "Frank", "accountType": "atlassian" }, "body": { "type": "doc", "version": 1, "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "Rounding is half-up." }] }] }, "created": "2026-08-02T09:00:00.000+0000" },
+      { "id": "301", "author": { "displayName": "Automation for Jira", "accountType": "app" }, "body": "Transitioned.", "created": "2026-08-03T09:00:00.000+0000" }
+    ] },
+    "attachment": [
+      { "id": "500", "filename": "invoice-sample.txt", "size": 18, "mimeType": "text/plain", "content": "https://acme.atlassian.net/rest/api/3/attachment/content/500" }
+    ]
+  }
+}

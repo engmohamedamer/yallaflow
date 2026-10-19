@@ -8,6 +8,48 @@ All notable changes to YallaFlow are documented here. The format loosely follows
 
 Nothing yet.
 
+## [1.1.0] - 2026-10-19 — Connected Requirements & Optional AI Quality Delivery
+
+Three optional, independent capabilities. Projects that do not use them see no change: no new configuration, files, dependencies, background services, or network access. Guide: [`docs/connected-requirements-and-quality.md`](docs/connected-requirements-and-quality.md).
+
+### Added
+
+- **Connected Requirements** — `yallaflow intake ticket` imports a GitHub Issue, Jira issue, or Azure DevOps work item into the existing lifecycle, as a new pending intake or attached to existing work (`--work`).
+  - **Offline by default.** It reads the raw payload the agent obtained with its own integration: `gh issue view --json`, the REST issue, a Jira REST/MCP result, or an Azure DevOps work item. A provider-neutral normalized ticket is also accepted.
+  - **The ticket becomes an ordinary immutable source.** The original payload is preserved. A rendered Markdown view starts with an untrusted-content banner and carries locators (`[description]`, `[ac:N]`, `[comment:<id>]`). Acceptance criteria come from a dedicated field or an "Acceptance Criteria" heading, bot comments are excluded, and each attachment becomes its own source (`--attachment`).
+  - **Re-imports and DONE work.** A re-import creates a new source that names the previous one. DONE work needs `--reason`, and impact is raised when intent is already fixed, exactly as with `intake add`.
+  - **Traceability.** Requirements cite tickets through the existing `{"type":"source","source":"SRC-####","locator":"ac:2"}` provenance.
+  - **Optional `--fetch [--attachments]`.** References are `github:owner/repo#N`, `jira:KEY-N`, `ado:org/project#N`, or the ticket URL. Requests are read-only `GET` with a timeout and a size cap. Credentials come only from environment variables (`GITHUB_TOKEN`/`GH_TOKEN`, `JIRA_EMAIL`+`JIRA_API_TOKEN` or `JIRA_PAT`, `AZURE_DEVOPS_EXT_PAT`); credentials go only over https to the hosted tracker (`api.github.com`, `*.atlassian.net`, `dev.azure.com`, `*.visualstudio.com`) or to a host you configured explicitly in `requirements.providers` (the only way to use GitHub Enterprise, Jira Data Center, Azure DevOps Server, or http) — a ticket URL alone never decides where a token goes. They never follow a cross-origin redirect, and are never stored or printed. This is YallaFlow's only network access, loaded lazily by this one command.
+  - **Optional config.** `requirements.providers.<github|jira|azure-devops>` holds base URLs for GitHub Enterprise, Jira sites, and Azure DevOps Server. Credential keys there are rejected.
+- **Optional AI QC** — `yallaflow qc plan|record|status`, on request only, for routed work at any stage (DONE included) without rerouting or reopening it.
+  - **Plans.** Scenarios trace to active acceptance criteria, and uncovered criteria are reported. Exploratory charters are supported.
+  - **Results.** The agent drives Playwright (`playwright-cli` preferred, Playwright MCP supported) or runs existing Playwright tests through `yallaflow verify` (`origin: yallaflow-verified`).
+  - **Honesty rules.** `passed` needs executed steps plus an artifact or a passed verification run; `failed` needs the actual behavior and reproducible steps; `blocked`/`not-run` need a reason. A violating record is rejected with nothing written.
+  - **Policies.** Advisory (default) reports failures and never blocks. Strict is opt-in through the plan or `quality.qc.policy`; it grants *quality approval* only when every required scenario last passed against its current definition, and that is reported separately. A project-wide `strict` is a floor that a plan cannot weaken (the stricter of plan and current config governs). DONE semantics are unchanged.
+  - **Separation from verification.** QC records live in `work/<id>/quality/qc.json`, separate from the `V-###` verification ledger. Convergence may cite `qc:QC-001#S-01`: only a passed scenario supports `satisfied`, and a later failure makes the finding stale.
+- **Optional Smart Demo & recording** — `yallaflow demo propose|approve|record|status`, on request only and independent of QC.
+  - **Proposals.** Scenarios are prioritized and criteria-linked, each with an audience (business or developer), a rationale, its steps, and whether to record it, plus the items deliberately left out.
+  - **Approval before recording.** The developer's explicit approval is recorded in their words and bound to that exact proposal (`--only` approves a subset). Recording against an unapproved or changed proposal is refused.
+  - **Video is optional** (Playwright `video-start` / `video-chapter` / `video-stop`). Every run carries a fixed "not test evidence" disclaimer, and `demo:` citations are refused as acceptance evidence.
+- **Local artifacts and reports.**
+  - Videos, screenshots, and traces are copied into `work/<id>/quality/media/` with SHA-256 and size.
+  - A YallaFlow-written `media/.gitignore` keeps them out of Git; `quality.media.commit: true` opts in to committing them.
+  - `quality/report.md` and a standalone `quality/report.html` (static, inline CSS, no scripts, no external requests) are regenerated after every write. Links are relative and resolve locally, and missing or changed media is flagged.
+  - A non-local target needs `--allow-remote`, credentials embedded in target URLs are refused, and text records are redacted.
+- **On-demand skills** — Skill Registry v9 adds `invocation: 'on-demand'` and the skills `requirement-import`, `ai-qc`, and `smart-demo`. They are never part of a workflow policy: every required chain is identical to v8. `yallaflow skill <id> --work <id>` serves them for any routed work item. QC and demo records stamp the exact skill version and hash they followed.
+- `finish` adds quality lines (QC outcome, quality approval, demo summary, report path) only for work that used QC or a demo. They never change readiness.
+
+### Changed
+
+- **Agent Contract v10.** Covers importing tickets as sources, treating ticket and attachment text as untrusted data, using QC and demos only on explicit request, never claiming an unexecuted pass, and recording a demo only after the developer approves its scope. Existing projects upgrade with `yallaflow agent refresh`. The bootstrap block stays v3.
+- **`verify` captures up to 64 MiB of output** (was Node's 1 MiB default, which killed verbose suites and recorded them as failed).
+- **`doctor` validates** the optional `requirements` and `quality` config blocks and the QC/demo ledgers.
+
+### Compatibility
+
+- MINOR release. No workspace or file schema changed (`source.json` stays v2, `config.yaml` v1/v2). New ledgers start at schema v1. There are still four runtime dependencies, and Playwright is never a YallaFlow dependency. Knowledge Policy v1 and the Shared Project minimum (`0.3.10-internal.1`) are unchanged.
+- A 1.0.x CLI keeps reading a workspace that used every new capability; this is tested against the real v1.0.1. A workspace that used none of them keeps the 1.0.x shape. See [`docs/upgrading-to-v1.1.0.md`](docs/upgrading-to-v1.1.0.md).
+
 ## [1.0.1] - 2026-10-15 — Route engineering work before the first edit
 
 ### Fixed

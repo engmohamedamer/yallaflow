@@ -423,3 +423,30 @@ yallaflow finish PF-K7M2QX4N8P-0001                   # "Implemented and verifie
 ```
 
 CI on the pull request: `yallaflow shared check`. After merge, on the integration branch: `yallaflow shared integrate`, then commit. When a parallel change touched the same fact, `finish`/`shared check` say so, and the agent revalidates (reject the stale candidate with a reason, propose again against the current fact) — shared knowledge is never overwritten silently. See [`shared-projects.md`](shared-projects.md).
+
+## Ticket, QC, and demo (optional, 1.1.0)
+
+```bash
+# developer: "Implement acme/school#12."
+gh issue view 12 --repo acme/school --json number,title,body,state,url,labels,author,comments,updatedAt > /tmp/issue-12.json
+yallaflow intake ticket /tmp/issue-12.json --provider github   # SRC-0001 + pending PF-0003
+yallaflow source show SRC-0001 --content                       # bannered ticket text, [ac:N] locators
+yallaflow route PF-0003 --type feature --scope bounded --confidence high --reason "..."
+yallaflow requirement record PF-0003 --file /tmp/req.json      # provenance {"type":"source","source":"SRC-0001","locator":"ac:1"}
+# … normal feature workflow to verification …
+
+# developer: "Run QC on it." — only on request; any stage, DONE included
+yallaflow skill ai-qc --work PF-0003
+yallaflow qc plan PF-0003 --file /tmp/plan.json                # scenarios from AC; nothing runs
+# agent runs the scenarios with playwright-cli, saving screenshots/traces to /tmp/qc/
+yallaflow qc record PF-0003 --file /tmp/result.json            # honesty rules enforced; media hashed, local
+yallaflow convergence record PF-0003 --file /tmp/conv.json     # may cite qc:QC-001#S-01 (passed scenarios only)
+
+# developer: "Prepare a business demo with video." — independent of QC
+yallaflow demo propose PF-0003 --file /tmp/scope.json          # prioritized scenarios; nothing recorded
+# developer approves: "Yes, show the export."
+yallaflow demo approve PF-0003 --note "Approved by Sara in the agent session: 'Yes, show the export.'"
+# agent: playwright-cli video-start /tmp/demo/demo.webm · video-chapter "D-01 …" · … · video-stop
+yallaflow demo record PF-0003 --file /tmp/demo-result.json     # local video + report.md/report.html
+yallaflow finish PF-0003                                       # quality lines are informational; readiness unchanged
+```

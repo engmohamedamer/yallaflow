@@ -122,6 +122,39 @@ export const SKILL_REGISTRY = Object.freeze([
     instructionPath: 'resources/skills/repository-baseline.md'
   }),
   skill({
+    id: 'requirement-import',
+    version: 1,
+    capability: 'import',
+    title: 'Requirement Import',
+    phase: 'discovery',
+    mode: 'read-only',
+    prerequisites: [],
+    instructionPath: 'resources/skills/requirement-import.md',
+    invocation: 'on-demand'
+  }),
+  skill({
+    id: 'ai-qc',
+    version: 1,
+    capability: 'qc',
+    title: 'AI QC',
+    phase: 'verification',
+    mode: 'verification-only',
+    prerequisites: [],
+    instructionPath: 'resources/skills/ai-qc.md',
+    invocation: 'on-demand'
+  }),
+  skill({
+    id: 'smart-demo',
+    version: 1,
+    capability: 'demo',
+    title: 'Smart Demo',
+    phase: 'review',
+    mode: 'review-only',
+    prerequisites: [],
+    instructionPath: 'resources/skills/smart-demo.md',
+    invocation: 'on-demand'
+  }),
+  skill({
     id: 'context-reconciliation',
     version: 1,
     capability: 'reconcile',
@@ -135,6 +168,10 @@ export const SKILL_REGISTRY = Object.freeze([
 
 export function findSkill(skillId, registry = SKILL_REGISTRY) {
   return registry.find((entry) => entry.id === skillId) ?? null;
+}
+
+export function isOnDemandSkill(entry) {
+  return entry?.invocation === 'on-demand';
 }
 
 export function instructionFilePath(entry, packageRoot = PACKAGE_ROOT) {

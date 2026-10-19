@@ -1,4 +1,4 @@
-# Current Limitations (1.0)
+# Current Limitations (1.1)
 
 Known gaps and deliberate boundaries. Planned work is tracked in [`roadmap.md`](roadmap.md).
 
@@ -33,7 +33,9 @@ Known gaps and deliberate boundaries. Planned work is tracked in [`roadmap.md`](
 
 ## Intake
 
-- **No tracker, email, or message adapters.** Intake is plain text or local files.
+- **Tracker import is read-only and per ticket.** GitHub Issues, Jira, and Azure DevOps tickets import one at a time ([guide](connected-requirements-and-quality.md#connected-requirements)); there is no sync, webhook, query/bulk import, or writeback (comments, status). Email and chat adapters do not exist. Acceptance criteria are taken mechanically from a dedicated field or an "Acceptance Criteria" heading; anything else is left in the description for the agent to read. Jira wiki markup (REST v2) is kept as written, not converted.
+- **Live tracker calls are verified against recorded payloads and a local test server**, not against the hosted services in the release suite. GitHub Enterprise and Azure DevOps Server need their base URL in config.
+- **`--fetch` attachments on GitHub** are downloaded without credentials (they are hosted outside the API origin), so attachments of private repositories may not download; they are listed as not downloaded.
 - **No OCR or vision.** Images and scanned PDFs are preserved as sources, but no text is extracted.
 - **PDF reading order** follows the content stream and may differ from visual order, notably for right-to-left scripts. `.odg`/`.epub` text extraction is not implemented.
 
@@ -86,11 +88,21 @@ Known gaps and deliberate boundaries. Planned work is tracked in [`roadmap.md`](
 - **Decomposed children do not receive their parent's impacts.** A parent revising a criterion a child answers for makes the child's finding stale (reported, and DONE is blocked for a child not yet DONE); the parent owns the impact assessment.
 - **No human review gate for convergence.** Convergence is a hard correctness gate; there is no optional `approve --stage convergence` in this release.
 
+## Optional quality (AI QC and Smart Demo)
+
+- **YallaFlow does not drive the browser.** The agent runs Playwright (CLI or MCP) and records what it did; YallaFlow validates the honesty rules and hashes the artifacts but cannot observe the run itself. Agent-driven results are labelled `agent-driven`; only a `yallaflow-verified` scenario rests on a command YallaFlow executed.
+- **No Playwright bundled.** QC and demos need Playwright available to the agent (`playwright-cli`, Playwright MCP, or the project's `@playwright/test`). Video recording needs Playwright's ffmpeg (`npx playwright install ffmpeg`); without it, a recorder can report a video it never wrote — `demo record` refuses a missing file.
+- **Media is local by default.** A fresh clone has the ledgers and reports but not the media; reports mark it as not on this machine. Commit media only by setting `quality.media.commit: true` (consider Git LFS for videos).
+- **Strict QC approval is a signal, not a lock.** It never blocks `finish` or DONE; enforce it in your own review or release process if you need a hard gate.
+- **QC and demo IDs are per work item and allocated locally.** In a Shared Project, record QC or demos for one work item on one branch: two branches recording `QC-001` for the same work item conflict in `qc.json` at merge.
+- **Exploratory coverage is what was explored.** QC records the scenarios that ran; it does not measure coverage.
+
 ## Agent bootstrap
 
 - **Two providers.** `agent setup` supports Codex (`AGENTS.md`) and Claude (`CLAUDE.md`). Other agents can follow `.yallaflow/AGENT.md` directly.
 - **Instruction files only.** No hooks, plugins, or settings files are written; whether a session actually reads the bootstrap file is up to the agent product.
-- **Mixed versions.** A v0.3.7 CLI does not know the delivery gate and can complete v0.3.8-routed feature work without convergence (v0.3.8's `doctor` then reports it). Upgrade everyone together.
+- **Mixed versions (1.1.0).** A 1.0.x CLI reads a workspace that used tickets, QC, and demos (status, guide, doctor, convergence; tested against the real v1.0.1), but has no `qc`/`demo`/`intake ticket` commands and does not know registry v9's on-demand skills or Agent Contract v10 (reported as newer, never downgraded).
+- **Mixed versions (older).** A v0.3.7 CLI does not know the delivery gate and can complete v0.3.8-routed feature work without convergence (v0.3.8's `doctor` then reports it). Upgrade everyone together.
 
 ## Upgrades
 

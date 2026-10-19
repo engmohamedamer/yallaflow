@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-19T16:15:26.400Z",
+      "finishedAt": "2026-10-19T16:20:57.876Z",
+      "verifiedAt": "2026-10-19T16:20:57.876Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-19T17:03:11.424Z",
+      "finishedAt": "2026-10-19T17:09:41.607Z",
+      "verifiedAt": "2026-10-19T17:09:41.607Z",
+      "log": "V-002-verification.log"
+    },
+    {
+      "id": "V-003",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-19T17:32:21.867Z",
+      "finishedAt": "2026-10-19T17:41:05.521Z",
+      "verifiedAt": "2026-10-19T17:41:05.521Z",
+      "log": "V-003-verification.log"
+    }
+  ]
+}

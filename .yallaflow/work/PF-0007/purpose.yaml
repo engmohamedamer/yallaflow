@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "workId": "PF-0007",
+  "mode": "intent",
+  "objective": "Add optional Connected Requirements (GitHub/Jira/Azure DevOps import), optional Playwright AI QC, and optional Smart Demo/recording to YallaFlow as v1.1.0",
+  "preservation": [
+    "existing lifecycle, routing, skill registry pinning, project memory, delivery convergence semantics",
+    "no network calls, telemetry, or uploads by default; normal path unchanged when features are unused",
+    "Claude Code and Codex compatibility; four runtime dependencies"
+  ],
+  "focus": [
+    "intake/sources",
+    "delivery requirements/convergence",
+    "verification evidence ledger",
+    "skill registry and agent contract versioning",
+    "config schema"
+  ],
+  "history": [
+    {
+      "action": "recorded",
+      "at": "2026-10-19T14:43:17.802Z"
+    }
+  ],
+  "recordedAt": "2026-10-19T14:43:17.802Z",
+  "updatedAt": "2026-10-19T14:43:17.802Z"
+}

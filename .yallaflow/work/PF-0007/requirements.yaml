@@ -1,0 +1,912 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "Developers can import a GitHub Issue, Jira issue, or Azure DevOps work item into the existing lifecycle as an immutable ticket source, from a payload the agent obtained.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Functional Requirements and Business Rules"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "YallaFlow offers an optional, explicit, read-only built-in fetch with environment-provided credentials that are never persisted.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Functional Requirements and Business Rules"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "Provider support is provider-independent: one normalized ticket shape, self-contained adapters, traceability through existing source provenance.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Functional Requirements and Business Rules"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "REQ-004",
+      "statement": "Imported tickets and attachments are treated as untrusted data, never as instructions.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Functional Requirements and Business Rules"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "REQ-005",
+      "statement": "Developers can request AI QC (functional and exploratory, Playwright-driven) on any routed work at any stage, with honest per-scenario results and evidence.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Functional Requirements and Business Rules"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "REQ-006",
+      "statement": "QC supports an advisory policy (default) and an opt-in strict policy whose quality approval is distinct from lifecycle completion.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Functional Requirements and Business Rules"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "REQ-007",
+      "statement": "QC records are separate from core verification evidence; only passed scenarios may support acceptance.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Functional Requirements and Business Rules"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "REQ-008",
+      "statement": "Developers can request a Smart Demo, independent of QC, with prioritized scenarios approved before recording and optional video.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Functional Requirements and Business Rules"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "REQ-009",
+      "statement": "Quality artifacts are stored locally, binaries excluded from Git by default, with Markdown and standalone HTML reports whose links resolve locally.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Functional Requirements and Business Rules"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "REQ-010",
+      "statement": "QC, Smart Demo, and requirement import are on-demand skills in the Skill Registry, never part of required lifecycle stages; the Agent Contract states their rules.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Functional Requirements and Business Rules"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "REQ-011",
+      "statement": "Existing behavior, workspaces, and dependencies are unchanged when the new capabilities are unused; the release follows SemVer and the release policy.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Functional Requirements and Business Rules"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "A raw payload for each provider imports offline into one ticket source with title, description, acceptance criteria where present, comments, attachment list, and origin.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "Import without --work creates a pending intake; with --work it attaches like intake add, including the DONE --reason rule and impact raising.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-001",
+      "statement": "Re-importing a ticket creates a new source referencing the previous source of the same ticket; the earlier source is unchanged.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-002",
+      "statement": "--fetch issues only GET requests to the provider host using environment credentials that never appear in state or output; missing credentials name the variable.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-005",
+      "requirement": "REQ-002",
+      "statement": "init, brief, start, route, verify, finish, file intake, and QC/demo commands never perform network access.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-006",
+      "requirement": "REQ-002",
+      "statement": "Attachments become their own linked sources, downloaded only with --attachments or supplied with --attachment.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-007",
+      "requirement": "REQ-003",
+      "statement": "Each provider is a self-contained adapter whose normalize is fixture-tested.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-008",
+      "requirement": "REQ-003",
+      "statement": "Requirements can cite a ticket source with a locator through existing source provenance.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-009",
+      "requirement": "REQ-004",
+      "statement": "Rendered ticket text carries an untrusted-content banner and is redacted; the untrusted-content rule is in the Agent Contract and skill.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-010",
+      "requirement": "REQ-005",
+      "statement": "QC plan and record work on routed work at any stage including DONE without lifecycle change, and are refused for unrouted work.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-011",
+      "requirement": "REQ-005",
+      "statement": "Honesty rules are enforced: passed requires steps plus an artifact or passed verification run; failed requires actual and steps; blocked and not-run require a reason.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-012",
+      "requirement": "REQ-005",
+      "statement": "No command starts a browser or server or runs QC implicitly.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-013",
+      "requirement": "REQ-006",
+      "statement": "Under the advisory policy, QC failures are reported and never block finish.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-014",
+      "requirement": "REQ-006",
+      "statement": "Under the strict policy, quality approval is granted only when every required scenario latest result passed; it is reported separately and DONE semantics are unchanged.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-015",
+      "requirement": "REQ-007",
+      "statement": "A qc: citation of a passed scenario resolves as evidence; failed, blocked, or not-run scenarios cannot support a satisfied finding.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-016",
+      "requirement": "REQ-007",
+      "statement": "QC never writes the verification ledger, progress, or checkpoints.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-017",
+      "requirement": "REQ-008",
+      "statement": "A demo proposal with prioritized, criteria-linked scenarios works with no QC records.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-018",
+      "requirement": "REQ-008",
+      "statement": "Demo recording is refused unless the current proposal revision was approved with the developer recorded words.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-019",
+      "requirement": "REQ-008",
+      "statement": "A demo run without video is valid; a recorded video is stored with its hash.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-020",
+      "requirement": "REQ-008",
+      "statement": "Every demo summary carries the not-test-evidence disclaimer and demo: citations are rejected as convergence evidence.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-021",
+      "requirement": "REQ-008",
+      "statement": "Non-local demo/QC targets require --allow-remote and persisted text is redacted.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-022",
+      "requirement": "REQ-009",
+      "statement": "Media is git-excluded by default with tracked manifests and hashes; quality.media.commit opts in to committing it.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-023",
+      "requirement": "REQ-009",
+      "statement": "report.md and a dependency-free report.html are generated with relative links that resolve locally and flag missing media.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-024",
+      "requirement": "REQ-010",
+      "statement": "Registry v9 on-demand skills are served for any routed work (including v8-pinned and DONE) and appear in no workflow policy; existing pins are unchanged.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-025",
+      "requirement": "REQ-010",
+      "statement": "Agent Contract v10 states the new rules; the bootstrap block is unchanged.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-026",
+      "requirement": "REQ-011",
+      "statement": "The existing suite passes, init output is unchanged except the contract version, runtime dependencies stay at four, and a 1.0.1 CLI can read a workspace that did not use the features.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    },
+    {
+      "id": "AC-027",
+      "requirement": "REQ-011",
+      "statement": "CHANGELOG, upgrade note, and docs are updated; nothing is published, tagged, or pushed without approval.",
+      "provenance": [
+        {
+          "type": "specification",
+          "section": "Acceptance Criteria"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-10-19T15:13:52.909Z",
+      "updatedAt": "2026-10-19T15:13:52.909Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-004",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-005",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-006",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-007",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-008",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-009",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-010",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-011",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-005",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-006",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-007",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-008",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-009",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-010",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-011",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-012",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-013",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-014",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-015",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-016",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-017",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-018",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-019",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-020",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-021",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-022",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-023",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-024",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-025",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-026",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-027",
+      "at": "2026-10-19T15:13:52.909Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-10-19T15:13:52.909Z"
+}

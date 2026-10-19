@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "integration",
+      "source": "implementation-runtime",
+      "summary": "Network access exists only in the explicit, opt-in 'yallaflow intake ticket <ref> --fetch' (v1.1.0): src/intake/providers/http.js issues read-only GET requests to the tracker API origin (GitHub, Jira, Azure DevOps), sends credentials read from environment variables only to that origin, refuses cross-origin redirects for credentialed requests, and never persists or prints credentials; the provider layer is lazily imported only by the intake command. Every other command makes no network call, no model/provider call, and no telemetry. The only other external tool is local read-only Git (HEAD, diffs, tracked paths, identity); YallaFlow never commits, pushes or rewrites branches.",
+      "evidence": [
+        "src/intake/providers/http.js",
+        "src/commands/intake.js",
+        "test/ticket-intake.test.js",
+        "test/shared-project.test.js",
+        "src/core/git.js",
+        "verification:V-001"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0031"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-19T15:43:57.160Z",
+      "factId": "CTX-0064",
+      "promotedAt": "2026-10-19T15:44:01.248Z",
+      "target": "context/integrations.md"
+    },
+    {
+      "id": "K-002",
+      "kind": "integration",
+      "source": "implementation-runtime",
+      "summary": "Network access exists only in the explicit, opt-in 'yallaflow intake ticket <ref> --fetch' (v1.1.0): src/intake/providers/http.js issues read-only GET requests with a timeout and size cap. Credentials are read from environment variables and sent only over https to the hosted tracker (api.github.com, *.atlassian.net, dev.azure.com, *.visualstudio.com) or to an origin the project configured explicitly in requirements.providers (the only way to trust GitHub Enterprise, Jira Data Center, Azure DevOps Server, or http); a ticket URL alone never decides where a token goes, and the check runs before any request. Credentialed requests never follow cross-origin redirects; attachments download only from the tracker origin or GitHub's own attachment hosts; credentials are never persisted or printed. The provider layer is lazily imported only by the intake command. Every other command makes no network call, no model/provider call, and no telemetry. The only other external tool is local read-only Git; YallaFlow never commits, pushes or rewrites branches.",
+      "evidence": [
+        "src/intake/providers/http.js#assertTrustedOrigin",
+        "src/intake/providers/github.js",
+        "src/commands/intake.js",
+        "test/ticket-intake.test.js",
+        "test/shared-project.test.js",
+        "verification:V-002"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0064"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-19T17:10:31.241Z",
+      "factId": "CTX-0075",
+      "promotedAt": "2026-10-19T17:10:31.395Z",
+      "target": "context/integrations.md"
+    }
+  ],
+  "updatedAt": "2026-10-19T17:10:31.395Z",
+  "reviewedAt": "2026-10-19T17:10:31.395Z"
+}

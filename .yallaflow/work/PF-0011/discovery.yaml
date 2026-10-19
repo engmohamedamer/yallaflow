@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "architecture",
+      "summary": "Pre-existing (since 0.3.10-internal.4): the CLI exits with an unhandled EPIPE when its stdout pipe is closed early (e.g. | grep -q, | head). Not changed in 1.1.0; it surfaced again in the packed smoke test (V-012), which now reads output fully (V-016).",
+      "reason": "Out of scope for this release; candidate for a patch release (handle EPIPE on stdout).",
+      "recordedAt": "2026-10-19T17:51:28.705Z"
+    }
+  ],
+  "updatedAt": "2026-10-19T17:51:28.705Z"
+}

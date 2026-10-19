@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "status": "executing",
+  "requirementsUniverse": [],
+  "acceptanceCriteriaUniverse": [],
+  "children": [
+    {
+      "key": "C1",
+      "title": "v1.1.0 C1 — Connected Requirements (ticket import, optional fetch, on-demand skill mechanism)",
+      "type": "feature",
+      "scope": "bounded",
+      "required": true,
+      "requirements": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004",
+        "REQ-010"
+      ],
+      "acceptanceCriteria": [
+        "AC-001",
+        "AC-002",
+        "AC-003",
+        "AC-004",
+        "AC-005",
+        "AC-006",
+        "AC-007",
+        "AC-008",
+        "AC-009",
+        "AC-024"
+      ],
+      "dependsOn": [],
+      "workId": "PF-0008"
+    },
+    {
+      "key": "C2",
+      "title": "v1.1.0 C2 — Optional AI QC (plans, honest results, advisory/strict policy, local artifacts and reports)",
+      "type": "feature",
+      "scope": "bounded",
+      "required": true,
+      "requirements": [
+        "REQ-005",
+        "REQ-006",
+        "REQ-007",
+        "REQ-009"
+      ],
+      "acceptanceCriteria": [
+        "AC-010",
+        "AC-011",
+        "AC-012",
+        "AC-013",
+        "AC-014",
+        "AC-015",
+        "AC-016",
+        "AC-022",
+        "AC-023"
+      ],
+      "dependsOn": [
+        "C1"
+      ],
+      "workId": "PF-0009"
+    },
+    {
+      "key": "C3",
+      "title": "v1.1.0 C3 — Smart Demo & Recording (approved scenarios, optional video, demo reports)",
+      "type": "feature",
+      "scope": "bounded",
+      "required": true,
+      "requirements": [
+        "REQ-008"
+      ],
+      "acceptanceCriteria": [
+        "AC-017",
+        "AC-018",
+        "AC-019",
+        "AC-020",
+        "AC-021"
+      ],
+      "dependsOn": [
+        "C2"
+      ],
+      "workId": "PF-0010"
+    },
+    {
+      "key": "C4",
+      "title": "v1.1.0 C4 — Integration, Agent Contract v10, documentation and release verification",
+      "type": "release",
+      "scope": "bounded",
+      "required": true,
+      "requirements": [
+        "REQ-011"
+      ],
+      "acceptanceCriteria": [
+        "AC-025",
+        "AC-026",
+        "AC-027"
+      ],
+      "dependsOn": [
+        "C1",
+        "C2",
+        "C3"
+      ],
+      "workId": "PF-0011"
+    }
+  ],
+  "history": [
+    {
+      "action": "proposed",
+      "at": "2026-10-19T15:15:03.670Z"
+    },
+    {
+      "action": "validated",
+      "at": "2026-10-19T15:15:07.950Z"
+    },
+    {
+      "action": "executed",
+      "at": "2026-10-19T15:15:08.265Z",
+      "childrenCreated": true
+    }
+  ],
+  "proposedAt": "2026-10-19T15:15:03.670Z",
+  "updatedAt": "2026-10-19T15:15:08.265Z",
+  "validatedAt": "2026-10-19T15:15:07.950Z",
+  "executedAt": "2026-10-19T15:15:08.265Z"
+}

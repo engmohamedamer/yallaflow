@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Optional Smart Demo (v1.1.0, src/quality/demo.js) is independent of QC: on explicit request the Agent proposes prioritized user-facing scenarios (demo propose: audience business|developer, priority, criteria, rationale, steps, record flag, excluded items), the developer's explicit approval is recorded with their words and bound to that exact proposal's SHA-256 (demo approve --note [--only]), and demo record is refused for an unapproved or changed proposal or scenarios outside the approved scope. Video is optional (Playwright video-start/chapter/stop; needs Playwright's ffmpeg) and stored hashed under work/<id>/quality/media/; every run carries a fixed 'not test evidence' disclaimer, and convergence refuses demo: citations. Demo and QC share the local artifact store and the report.md/report.html generator.",
+      "evidence": [
+        "src/quality/demo.js",
+        "src/quality/report.js",
+        "test/quality-demo.test.js",
+        "verification:V-001"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-10-19T16:21:17.826Z",
+      "factId": "CTX-0066",
+      "promotedAt": "2026-10-19T16:21:17.998Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-002",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Optional Smart Demo (v1.1.0, src/quality/demo.js) is independent of QC: on explicit request the Agent proposes prioritized user-facing scenarios (demo propose: audience business|developer, priority, criteria, rationale, steps, record flag, excluded items), the developer's explicit approval is recorded with their words and bound to that exact proposal's SHA-256 (demo approve --note [--only]), and demo record is refused for an unapproved or changed proposal or scenarios outside the approved scope. Video is optional (Playwright video-start/chapter/stop; needs Playwright's ffmpeg) and stored hashed under work/<id>/quality/media/; every run carries a fixed 'not test evidence' disclaimer, and convergence refuses demo: citations. Demo and QC share the local artifact store and the report.md/report.html generator.",
+      "evidence": [
+        "src/quality/demo.js#proposalHash",
+        "src/quality/report.js",
+        "test/quality-demo.test.js",
+        "verification:V-002"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0066"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-19T17:10:32.053Z",
+      "factId": "CTX-0066",
+      "promotedAt": "2026-10-19T17:10:32.216Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-003",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Optional Smart Demo (v1.1.0, src/quality/demo.js) is independent of QC: on explicit request the Agent proposes prioritized user-facing scenarios (demo propose: audience business|developer, priority, criteria, rationale, steps, record flag, excluded items), the developer's explicit approval is recorded with their words and bound to that exact proposal's SHA-256 (demo approve --note [--only]), and demo record is refused for an unapproved or changed proposal or scenarios outside the approved scope. Video is optional (Playwright video-start/chapter/stop; needs Playwright's ffmpeg) and stored hashed under work/<id>/quality/media/; every run carries a fixed 'not test evidence' disclaimer, and convergence refuses demo: citations. Demo and QC share the local artifact store and the report.md/report.html generator.",
+      "evidence": [
+        "src/quality/demo.js#proposalHash",
+        "test/quality-demo.test.js",
+        "verification:V-003"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0066"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-19T17:41:31.546Z",
+      "factId": "CTX-0066",
+      "promotedAt": "2026-10-19T17:41:31.700Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-10-19T17:41:31.700Z",
+  "reviewedAt": "2026-10-19T17:41:31.700Z"
+}

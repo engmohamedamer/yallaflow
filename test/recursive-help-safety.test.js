@@ -100,7 +100,14 @@ const HELP_INVOCATIONS = [
   ['requirement', 'record', 'PF-0001', '--file', 'requirements.json', '--help'],
   ['convergence', 'record', 'PF-0001', '--file', 'convergence.json', '-h'],
   ['impact', 'assess', 'PF-0001', '--file', 'impact.json', '--help'],
-  ['agent', 'setup', 'claude', '--help']
+  ['agent', 'setup', 'claude', '--help'],
+  // v1.1.0: help never fetches a ticket or imports anything
+  ['intake', 'ticket', '--help'],
+  ['intake', 'ticket', 'github:acme/shop#7', '--fetch', '--attachments', '--help'],
+  ['qc', '--help'],
+  ['qc', 'record', 'PF-0001', '--file', 'result.json', '--help'],
+  ['demo', '--help'],
+  ['demo', 'approve', 'PF-0001', '--note', 'Approved', '--help']
 ];
 
 for (const args of HELP_INVOCATIONS) {

@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 8
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-10-19T15:44:18.413Z",
+      "completedAt": "2026-10-19T15:44:18.413Z",
+      "summary": "Inherits PF-0007 discovery: V-### ledger (src/core/evidence.js) is argv/shell/script-only with no artifacts and failed runs reopen verification, so QC needs its own ledger; convergence evidence is normalized in src/delivery/convergence.js#normalizeFindingEvidence (convergence: form precedent) and stored entries are validated only by type/description (1.0.x reads extra fields); STATE_OWNERSHIP needs work/<id>/quality/; finish (src/commands/finish.js) is the place for quality lines; verify spawnSync has the 1 MiB default maxBuffer.",
+      "evidence": [
+        "src/core/evidence.js",
+        "src/delivery/convergence.js",
+        "src/core/ownership.js",
+        "src/commands/finish.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-10-19T15:44:18.710Z",
+      "completedAt": "2026-10-19T15:44:18.710Z",
+      "summary": "Criteria AC-010…016, AC-022, AC-023 inherited from PF-0007's approved specification; no open questions.",
+      "evidence": [
+        "SRC-0002"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-10-19T17:20:03.105Z",
+      "completedAt": "2026-10-19T17:22:29.229Z",
+      "summary": "Re-review fix (low): evaluateQc applies the stricter of the plan's policy and the current config (configPolicy passed by report, qc record/status and finish), so switching a project to strict also governs plans recorded earlier. Regression test added.",
+      "evidence": [
+        "src/quality/qc.js",
+        "src/commands/quality.js",
+        "src/commands/finish.js",
+        "test/quality-qc.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-10-19T17:41:29.425Z",
+      "completedAt": "2026-10-19T17:41:29.425Z",
+      "summary": "npm run check passed as V-003 (739 tests) after the re-review fixes.",
+      "evidence": [
+        "verification:V-003"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-10-19T17:41:30.106Z",
+      "completedAt": "2026-10-19T17:41:30.106Z",
+      "summary": "All assigned criteria re-assessed as satisfied, citing V-003.",
+      "evidence": [
+        "verification:V-003"
+      ]
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Agent Contract v10 is written in C2 instead of C4",
+      "reason": "test 54 requires the contract to name every CLI-owned path, and C2 adds work/<id>/quality/; one unreleased v10 covers tickets, QC and demo",
+      "costIfWrong": "Low: C3/C4 may still refine the unreleased v10 text; C4 assesses AC-025",
+      "createdAt": "2026-10-19T15:59:30.821Z"
+    }
+  ],
+  "history": [
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Release code review (PF-0011): strict quality approval could pass on results recorded against an earlier plan; a plan could weaken a project's strict policy to advisory; yallaflow-verified scenarios accepted verification runs from before the latest reopen; an unreadable QC ledger crashed finish; absolute artifact source paths were written to committed ledgers; per-work QC IDs collide across branches (document).",
+      "changedAt": "2026-10-19T16:43:11.564Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Release code review (PF-0011): strict quality approval could pass on results recorded against an earlier plan; a plan could weaken a project's strict policy to advisory; yallaflow-verified scenarios accepted verification runs from before the latest reopen; an unreadable QC ledger crashed finish; absolute artifact source paths were written to committed ledgers; per-work QC IDs collide across branches (document).",
+      "changedAt": "2026-10-19T16:43:11.564Z"
+    },
+    {
+      "skill": "delivery-convergence",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Release code review (PF-0011): strict quality approval could pass on results recorded against an earlier plan; a plan could weaken a project's strict policy to advisory; yallaflow-verified scenarios accepted verification runs from before the latest reopen; an unreadable QC ledger crashed finish; absolute artifact source paths were written to committed ledgers; per-work QC IDs collide across branches (document).",
+      "changedAt": "2026-10-19T16:43:11.564Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Release re-review (low): a project strict policy set after an advisory plan was recorded did not apply to that plan; the stricter of plan and current config must govern.",
+      "changedAt": "2026-10-19T17:20:03.105Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Release re-review (low): a project strict policy set after an advisory plan was recorded did not apply to that plan; the stricter of plan and current config must govern.",
+      "changedAt": "2026-10-19T17:20:03.105Z"
+    },
+    {
+      "skill": "delivery-convergence",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Release re-review (low): a project strict policy set after an advisory plan was recorded did not apply to that plan; the stricter of plan and current config must govern.",
+      "changedAt": "2026-10-19T17:20:03.105Z"
+    }
+  ],
+  "updatedAt": "2026-10-19T17:41:30.106Z"
+}

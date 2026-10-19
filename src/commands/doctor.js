@@ -15,6 +15,7 @@ import { checkContextIntegrity } from '../context/integrity.js';
 import { describeAgentContractState, inspectAgentContract } from '../agent/contract.js';
 import { describeBootstrapState, inspectAllBootstraps } from '../agent/bootstrap.js';
 import { checkDeliveryIntegrity } from '../delivery/integrity.js';
+import { checkQualityIntegrity } from '../quality/integrity.js';
 import { checkWorkRecordOwnership } from '../core/ownership.js';
 
 export async function doctorCommand() {
@@ -148,6 +149,15 @@ export async function collectDoctorReport(root) {
     if (!failed) checks.push([`delivery integrity (${work.length} work item(s) checked)`, true]);
   } catch (error) {
     checks.push([`delivery integrity: ${error instanceof Error ? error.message : String(error)}`, false]);
+  }
+
+  // Optional quality ledgers (v1.1.0): reported only for work that used QC or a demo.
+  try {
+    for (const item of await listWork(root)) {
+      for (const error of await checkQualityIntegrity(root, item)) checks.push([error, false]);
+    }
+  } catch (error) {
+    checks.push([`quality ledgers: ${error instanceof Error ? error.message : String(error)}`, false]);
   }
 
   // State ownership (v0.3.7): CLI-appended work.md lifecycle records must still match

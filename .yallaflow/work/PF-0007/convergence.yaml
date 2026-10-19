@@ -1,0 +1,554 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-10-19T18:01:41.600Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "Parent assessment: children's current convergence for their assigned criteria; AC-025…027 assessed directly.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0008's current assessment CV-002 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0008",
+              "assessmentId": "CV-002"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0008's current assessment CV-002 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0008",
+              "assessmentId": "CV-002"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0008's current assessment CV-002 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0008",
+              "assessmentId": "CV-002"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0008's current assessment CV-002 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0008",
+              "assessmentId": "CV-002"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0008's current assessment CV-002 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0008",
+              "assessmentId": "CV-002"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0008's current assessment CV-002 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0008",
+              "assessmentId": "CV-002"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0008's current assessment CV-002 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0008",
+              "assessmentId": "CV-002"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-008",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0008's current assessment CV-002 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0008",
+              "assessmentId": "CV-002"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-009",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0008's current assessment CV-002 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0008",
+              "assessmentId": "CV-002"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-024",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0008's current assessment CV-002 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0008",
+              "assessmentId": "CV-002"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-010",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0009's current assessment CV-003 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0009",
+              "assessmentId": "CV-003"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-011",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0009's current assessment CV-003 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0009",
+              "assessmentId": "CV-003"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-012",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0009's current assessment CV-003 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0009",
+              "assessmentId": "CV-003"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-013",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0009's current assessment CV-003 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0009",
+              "assessmentId": "CV-003"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-014",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0009's current assessment CV-003 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0009",
+              "assessmentId": "CV-003"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-015",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0009's current assessment CV-003 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0009",
+              "assessmentId": "CV-003"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-016",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0009's current assessment CV-003 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0009",
+              "assessmentId": "CV-003"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-022",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0009's current assessment CV-003 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0009",
+              "assessmentId": "CV-003"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-023",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0009's current assessment CV-003 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0009",
+              "assessmentId": "CV-003"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-017",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0010's current assessment CV-003 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0010",
+              "assessmentId": "CV-003"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-018",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0010's current assessment CV-003 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0010",
+              "assessmentId": "CV-003"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-019",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0010's current assessment CV-003 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0010",
+              "assessmentId": "CV-003"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-020",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0010's current assessment CV-003 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0010",
+              "assessmentId": "CV-003"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-021",
+          "status": "satisfied",
+          "reason": "Satisfied in PF-0010's current assessment CV-003 (re-assessed after the release-review fixes).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0010",
+              "assessmentId": "CV-003"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-025",
+          "status": "satisfied",
+          "reason": "Agent Contract v10 carries the untrusted-ticket, on-demand QC/demo, no-unexecuted-pass and demo-approval rules (test 54 checks it names quality/); this repository was refreshed to v10; the bootstrap block stays v3 (agent refresh: already current).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agent/contract.js",
+              "contentHash": "sha256:ab1394dd25aaa0d4d8c6ae841dce626cec00a2db734b03cfc6e5d63838bc337e",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/state-ownership.test.js",
+              "contentHash": "sha256:2fe5836701075044e5bdb4f6c9cd3e5d212e1a00bf97b60b20690c8446918f1a",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/agent/bootstrap.js",
+              "contentHash": "sha256:141d8e937c424b10d9ed86561381cac6e44dc3a3016e21f80f9b191ff4174466",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-026",
+          "status": "satisfied",
+          "reason": "The full existing suite passes (739 incl. all pre-existing tests); init writes no new settings (v110-compatibility test and packed smoke); runtime dependencies stay four (dependencies test); the real frozen v1.0.1 CLI reads a workspace that used every new capability.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/v110-compatibility.test.js",
+              "contentHash": "sha256:3417f6ea14515965bd23d00d5d794744b827856836dfa043c0e76b5fee1e764c",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/dependencies.test.js",
+              "contentHash": "sha256:d8ea18cdd306132839b6456ab888947f25c183b83a7944b19e40158e3bc8e1a1",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "package.json",
+              "contentHash": "sha256:ab69e21ec6b61c111c490c1f690b8d02f79f2a8aa9deaa8e90e2245a91d7d8fe",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0007",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-027",
+          "status": "satisfied",
+          "reason": "CHANGELOG 1.1.0, docs/upgrading-to-v1.1.0.md, release notes and docs updated; no commit, tag or publish was made: HEAD is still 032f32c (v1.0.1), no v1.1* tag exists, npm still serves 1.0.1, and the 1.1.0 changes are uncommitted in the working tree awaiting approval.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "CHANGELOG.md",
+              "contentHash": "sha256:a1bdadaee897c21138d20f2742367e2598103557f687991181b284a2aeb66efe",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "docs/upgrading-to-v1.1.0.md",
+              "contentHash": "sha256:00f5743cc5ba06812f40ceaf70b428a1f2feeeaacb70fb747a468ba53ac4ea70",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": ".github/release-notes/v1.1.0.md",
+              "contentHash": "sha256:e773dbf8f6fc1f874448d53dfe8d7ea8c311188af06ad6385b4a36ebeb050d66",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "git tag -l v1.1* is empty, HEAD 032f32c release: v1.0.1, npm view yallaflow version = 1.0.1 (2026-10-19)"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-10-19T18:01:41.600Z"
+}

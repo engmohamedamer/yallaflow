@@ -168,6 +168,10 @@ The durable engineering state stays with the project.
 
 SRS files, PDFs, spreadsheets, presentations, and other inputs can be preserved as sources instead of disappearing into chat history.
 
+### 🎫 Requirements from your tracker, optional QC and demos
+
+Point the agent at a GitHub issue, a Jira ticket, or an Azure DevOps work item and it enters the normal workflow, traceable to the ticket. Ask for AI QC with Playwright, or a smart demo with optional video, when you want them — never automatically. ([how](docs/connected-requirements-and-quality.md))
+
 ### 🌱 Brownfield is first-class
 
 Existing systems are not treated like blank projects.
@@ -414,6 +418,7 @@ Then go deeper only where you need to:
 | --- | --- |
 | [Installation](docs/installation.md) | installation options, legacy projects, upgrades |
 | [Shared Projects](docs/shared-projects.md) | one project understanding for the whole team, through Git |
+| [Tickets, AI QC & Smart Demo](docs/connected-requirements-and-quality.md) | import GitHub/Jira/Azure DevOps tickets; optional Playwright QC and recorded demos |
 | [Canonical workflows](docs/workflows.md) | Greenfield, Brownfield, bugs, investigations, features, teams |
 | [Feature guide](docs/guide.md) | detailed YallaFlow behavior |
 | [Project memory](docs/project-memory.md) | durable context, evidence and freshness |
@@ -422,6 +427,7 @@ Then go deeper only where you need to:
 | [Security](docs/security.md) | local-first trust model, secret redaction, sources |
 | [Limitations](docs/limitations.md) | current boundaries |
 | [Roadmap](docs/roadmap.md) | what comes next |
+| [Upgrading to 1.1.0](docs/upgrading-to-v1.1.0.md) | upgrading from 1.0.x; the new optional capabilities |
 | [Upgrading to 1.0.1](docs/upgrading-to-v1.0.1.md) | upgrading from 1.0.0; recovering a change made without a work item |
 | [Upgrading to 1.0](docs/upgrading-to-v1.0.md) | upgrading from a 0.3.x prerelease |
 | [Releasing & compatibility](docs/releasing.md) | versioning and the 1.0 compatibility promise |
@@ -431,7 +437,7 @@ Then go deeper only where you need to:
 
 ## Current status
 
-Current version: **1.0.1**: a patch that makes agents route every engineering change through YallaFlow before its first edit. 1.0.0 was the first public, stable release.
+Current version: **1.1.0**: connected requirements (GitHub Issues, Jira, Azure DevOps) and optional AI QC and Smart Demo with Playwright — all opt-in, nothing changes if you do not use them. 1.0.0 was the first public, stable release.
 
 YallaFlow is:
 
@@ -440,7 +446,7 @@ YallaFlow is:
 - AI-agent agnostic, with first-party setup for Claude Code and Codex,
 - stable: from 1.0.0 it follows Semantic Versioning, keeps existing workspaces readable, and never silently rewrites historical work ([compatibility promise](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise)).
 
-It does not call an LLM itself and sends no telemetry. The coding agent does the semantic reasoning; YallaFlow provides deterministic governance and durable engineering state around that reasoning.
+It does not call an LLM itself, sends no telemetry, and touches the network only when you explicitly ask it to fetch a tracker ticket (`--fetch`). The coding agent does the semantic reasoning; YallaFlow provides deterministic governance and durable engineering state around that reasoning.
 
 It is not a cloud service, a real-time collaboration server, a project-management tool, or a bot that commits or pushes for you.
 

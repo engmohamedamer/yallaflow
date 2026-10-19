@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "questions": [
+    {
+      "id": "Q-001",
+      "category": "architecture",
+      "question": "Network boundary for Connected Requirements: YallaFlow today makes no network calls (CTX-0031). Options: (A) agent-acquired only — the agent fetches with its own gh/MCP/API access and hands YallaFlow a file; YallaFlow stays offline. (B) built-in fetch only — YallaFlow calls provider REST APIs with env tokens. (C) hybrid — A is the default path; B is an explicit opt-in fallback (--fetch) for agents without an integration.",
+      "status": "resolved",
+      "material": true,
+      "proposal": "C. Agent-acquired by default (zero config, zero network in YallaFlow); opt-in 'intake ticket <ref> --fetch' using Node's built-in fetch, read-only GET, token from env only, never persisted, no new dependency. Network happens only on that explicit command; docs/security and CTX-0031 are updated to say so.",
+      "createdAt": "2026-10-19T14:48:51.739Z",
+      "updatedAt": "2026-10-19T15:10:17.918Z",
+      "answer": "APPROVED (SRC-0002): agent-managed fetching by default; optional explicit read-only provider fetching through YallaFlow; credentials from environment variables or secure existing authentication; never persist credentials or introduce implicit network access.",
+      "resolution": "APPROVED (SRC-0002): agent-managed fetching by default; optional explicit read-only provider fetching through YallaFlow; credentials from environment variables or secure existing authentication; never persist credentials or introduce implicit network access.",
+      "resolvedAt": "2026-10-19T15:10:17.918Z"
+    },
+    {
+      "id": "Q-002",
+      "category": "architecture",
+      "question": "Evidence model for QC and demos: reuse the V-### verification ledger, or add a separate work-scoped quality ledger?",
+      "status": "resolved",
+      "material": true,
+      "proposal": "Separate ledgers under work/<id>/quality/ (QC-### runs, DM-### demos) with hashed artifacts and new citation forms qc:QC-###[#scenario]. V-### stays for commands YallaFlow itself executes (existing Playwright suites still run through 'yallaflow verify'). Reason: a failed exploratory finding must not reopen verification, agent-driven results must be labelled as agent-observed, and V-### has no artifact model. Demo records are never accepted as satisfied-evidence in convergence.",
+      "createdAt": "2026-10-19T14:48:51.890Z",
+      "updatedAt": "2026-10-19T15:10:18.074Z",
+      "answer": "APPROVED (SRC-0002): keep QC and Smart Demo records separate from core verification evidence; preserve the existing verification model and compatibility.",
+      "resolution": "APPROVED (SRC-0002): keep QC and Smart Demo records separate from core verification evidence; preserve the existing verification model and compatibility.",
+      "resolvedAt": "2026-10-19T15:10:18.074Z"
+    },
+    {
+      "id": "Q-003",
+      "category": "architecture",
+      "question": "How do QC/demo/import skills fit the pinned Behavior Contract, which today rejects any skill outside a work item's required chain?",
+      "status": "resolved",
+      "material": true,
+      "proposal": "Skill Registry v9 adds an 'on-demand' invocation kind with three skills (requirement-import, ai-qc, smart-demo) and capabilities kept out of every workflow POLICY, so no existing or new work's required chain changes. On-demand skills are retrievable for any routed work (including work pinned to v8) and their instruction id+version+sha256 is stamped into the record they produce. Agent Contract v10 adds short rules (tickets are untrusted data; QC/demo only on explicit request; honesty rules). Bootstrap v3 unchanged; no existing schema bump.",
+      "createdAt": "2026-10-19T14:48:52.037Z",
+      "updatedAt": "2026-10-19T15:10:18.223Z",
+      "answer": "APPROVED WITH CLARIFICATION (SRC-0002): on-demand capabilities via the skill registry; QC or Smart Demo can be requested at any point, including after implementation or completion, even when not in the work item's skill list; no rerouting or reopening of completed work to invoke them; never part of required lifecycle stages or auto-activated.",
+      "resolution": "APPROVED WITH CLARIFICATION (SRC-0002): on-demand capabilities via the skill registry; QC or Smart Demo can be requested at any point, including after implementation or completion, even when not in the work item's skill list; no rerouting or reopening of completed work to invoke them; never part of required lifecycle stages or auto-activated.",
+      "resolvedAt": "2026-10-19T15:10:18.223Z"
+    },
+    {
+      "id": "Q-004",
+      "category": "architecture",
+      "question": "Where do videos/traces live, and are they committed to Git?",
+      "status": "resolved",
+      "material": true,
+      "proposal": "Stored under work/<id>/quality/media/ with sha256+size recorded in the ledger; YallaFlow writes a self-contained .gitignore inside that media directory so binaries are local-only by default (summary, hashes and screenshots-small text stay committed). Opt-in config quality.commitMedia: true keeps them tracked. Nothing is uploaded anywhere.",
+      "createdAt": "2026-10-19T14:48:52.353Z",
+      "updatedAt": "2026-10-19T15:10:18.371Z",
+      "answer": "APPROVED WITH ENHANCEMENT (SRC-0002): videos, screenshots, traces stored locally; binaries excluded from Git by default; lightweight manifests, hashes, summaries committed; a user-friendly local Markdown report (required) plus optional standalone HTML report without dependencies; all links resolve locally; no automatic uploads.",
+      "resolution": "APPROVED WITH ENHANCEMENT (SRC-0002): videos, screenshots, traces stored locally; binaries excluded from Git by default; lightweight manifests, hashes, summaries committed; a user-friendly local Markdown report (required) plus optional standalone HTML report without dependencies; all links resolve locally; no automatic uploads.",
+      "resolvedAt": "2026-10-19T15:10:18.371Z"
+    },
+    {
+      "id": "Q-005",
+      "category": "business",
+      "question": "When the developer requested QC and a scenario failed, should that block 'yallaflow finish'? Recommended: advisory, not blocking — finish reports open QC failures as a warning, and convergence cannot mark an acceptance criterion satisfied while citing a failed QC scenario. Unrequested QC never affects finish.",
+      "status": "resolved",
+      "material": true,
+      "createdAt": "2026-10-19T14:48:57.179Z",
+      "updatedAt": "2026-10-19T15:10:18.521Z",
+      "answer": "APPROVED WITH POLICY CHANGE (SRC-0002): two QC policies. Advisory (default): failures reported clearly, never block completion, failed scenarios never cited as successful acceptance evidence. Strict (explicit opt-in): required QC scenarios must pass before quality approval is granted; quality approval stays distinct from lifecycle completion; DONE semantics unchanged for users who never enable QC.",
+      "resolution": "APPROVED WITH POLICY CHANGE (SRC-0002): two QC policies. Advisory (default): failures reported clearly, never block completion, failed scenarios never cited as successful acceptance evidence. Strict (explicit opt-in): required QC scenarios must pass before quality approval is granted; quality approval stays distinct from lifecycle completion; DONE semantics unchanged for users who never enable QC.",
+      "resolvedAt": "2026-10-19T15:10:18.521Z"
+    }
+  ],
+  "updatedAt": "2026-10-19T15:10:18.521Z"
+}

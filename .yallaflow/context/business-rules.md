@@ -13,11 +13,11 @@
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-041)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-15T09:44:37.241Z (commit 6c01a54)
+- **Verified:** 2026-10-19T16:37:35.637Z (commit 032f32c)
 - **Evidence:**
-  - src/agent/contract.js (repository @ 6c01a54)
-  - resources/skills/repository-baseline.md (repository @ 6c01a54)
-  - src/baseline/store.js (repository @ 6c01a54)
+  - src/agent/contract.js (repository @ 032f32c)
+  - resources/skills/repository-baseline.md (repository @ 032f32c)
+  - src/baseline/store.js (repository @ 032f32c)
 
 <!-- yallaflow-fact:CTX-0042 -->
 ### CTX-0042 — No work item may become DONE without fresh, successful verification evidence (investigations excepted), and failed verification runs stay in the append-only ledger.
@@ -56,11 +56,11 @@
 - **Source work:** PF-0005
 - **Knowledge ID:** K-002
 - **Promoted at:** 2026-10-15T09:44:32.654Z
-- **Verified:** 2026-10-15T09:44:32.654Z (commit 6c01a54)
+- **Verified:** 2026-10-19T16:37:36.762Z (commit 032f32c)
 - **Evidence:**
-  - src/agent/contract.js (repository @ 6c01a54)
-  - src/agent/bootstrap.js (repository @ 6c01a54)
-  - test/work-routing.test.js (repository @ 6c01a54)
-  - docs/upgrading-to-v1.0.1.md (repository @ 6c01a54)
+  - src/agent/contract.js (repository @ 032f32c)
+  - src/agent/bootstrap.js (repository @ 032f32c)
+  - test/work-routing.test.js (repository @ 032f32c)
+  - docs/upgrading-to-v1.0.1.md (repository @ 032f32c)
 
 <!-- yallaflow-context:end -->

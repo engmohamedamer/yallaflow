@@ -91,7 +91,7 @@ function verifyAndFinish(root, id) {
 // Contract and bootstrap text (automated contract evidence, not agent behavior)
 
 test('contract v9 requires a routed, authorized work item before the first engineering edit', () => {
-  assert.equal(AGENT_CONTRACT_VERSION, 9);
+  assert.ok(AGENT_CONTRACT_VERSION >= 9, 'v9 rules stay in every later contract');
   const body = agentContractBody();
   assert.match(body, /^8\. Route before editing\. Every intentional engineering change, however small, is made inside a routed work item at a stage that authorizes it\./m);
   assert.match(body, /^## Work routing before editing$/m);
@@ -327,7 +327,7 @@ async function v100Workspace() {
 
 test('a v1.0.0 workspace (contract v8, bootstrap v2) reads as outdated, keeps working, and upgrades only on explicit refresh', async () => {
   const root = await v100Workspace();
-  assert.deepEqual(await inspectAgentContract(root), { state: 'outdated', installed: 9, version: 8 });
+  assert.deepEqual(await inspectAgentContract(root), { state: 'outdated', installed: AGENT_CONTRACT_VERSION, version: 8 });
   for (const provider of Object.values(BOOTSTRAP_PROVIDERS)) assert.equal((await inspectBootstrap(root, provider)).state, 'outdated');
 
   const before = await snapshot(path.join(root, '.yallaflow'));
@@ -335,7 +335,7 @@ test('a v1.0.0 workspace (contract v8, bootstrap v2) reads as outdated, keeps wo
   const brief = cli(root, ['brief']).stdout;
   assert.match(brief, /Primary next concern: agent contract is not current/);
   assert.match(brief, /Next: yallaflow agent refresh/);
-  assert.match(cli(root, ['agent', 'status']).stdout, /outdated \(v8 → v9\)/);
+  assert.match(cli(root, ['agent', 'status']).stdout, new RegExp(`outdated \\(v8 → v${AGENT_CONTRACT_VERSION}\\)`));
   assert.deepEqual(await snapshot(path.join(root, '.yallaflow')), before, 'never rewritten on read');
   assert.equal(await readFile(path.join(root, 'CLAUDE.md'), 'utf8'), claudeBefore);
 
@@ -348,7 +348,7 @@ test('a v1.0.0 workspace (contract v8, bootstrap v2) reads as outdated, keeps wo
   assert.equal(await readFile(path.join(root, 'CLAUDE.md'), 'utf8'), `# Team rules\n\nUse pnpm.\n\n${renderBootstrapBlock(BOOTSTRAP_PROVIDERS.claude)}`);
   assert.equal(await readFile(path.join(root, 'AGENTS.md'), 'utf8'), renderBootstrapBlock(BOOTSTRAP_PROVIDERS.codex));
   assert.deepEqual(await snapshot(path.join(root, '.yallaflow', 'work')), workBefore, 'historical work is never rewritten by a refresh');
-  assert.match(cli(root, ['agent', 'refresh']).stdout, /already at agent contract v9; nothing changed/);
+  assert.match(cli(root, ['agent', 'refresh']).stdout, new RegExp(`already at agent contract v${AGENT_CONTRACT_VERSION}; nothing changed`));
 });
 
 test('a v1.0.0 CLI on a refreshed workspace reports the newer contract and refuses to downgrade it', async (t) => {
@@ -361,7 +361,7 @@ test('a v1.0.0 CLI on a refreshed workspace reports the newer contract and refus
   const agentMd = await readFile(path.join(root, '.yallaflow', 'AGENT.md'), 'utf8');
   const status = v100(root, ['agent', 'status']);
   assert.equal(status.status, 0);
-  assert.match(status.stdout, /newer YallaFlow \(v9 > installed v8\)/);
+  assert.match(status.stdout, new RegExp(`newer YallaFlow \\(v${AGENT_CONTRACT_VERSION} > installed v8\\)`));
   assert.notEqual(v100(root, ['agent', 'refresh']).status, 0);
   assert.equal(await readFile(path.join(root, '.yallaflow', 'AGENT.md'), 'utf8'), agentMd);
   // Work still runs on the older CLI: no schema changed.

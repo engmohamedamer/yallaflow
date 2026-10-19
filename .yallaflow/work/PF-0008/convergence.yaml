@@ -1,0 +1,708 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-10-19T15:43:47.991Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "C1 assessed after V-001 passed.",
+      "findings": [
+        {
+          "criterion": "PF-0007/AC-001",
+          "status": "satisfied",
+          "reason": "Raw gh/REST GitHub, Jira v3, and Azure DevOps payloads normalize offline into one ticket source with title, description, criteria, comments, attachments, origin; offline import test runs under the no-network preload.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/intake/providers/github.js",
+              "symbol": "normalize",
+              "contentHash": "sha256:a37e57a36141488356d00e403653392206ef317ac2246dd3eb48a3ee645cae65",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/intake/providers/jira.js",
+              "symbol": "normalize",
+              "contentHash": "sha256:40d8658997c9aba5a9062b87ff8eeeab53f4d02c62d9961e4367d19d21175a23",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/intake/providers/azure-devops.js",
+              "symbol": "normalize",
+              "contentHash": "sha256:f8ef973e989014ea1b8403e16eb73aa295b1d2c282e8a302e794b0b48750424e",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/intake/ticket.js",
+              "symbol": "prepareTicketIntake",
+              "contentHash": "sha256:11d90166a412c499a7781057dba7bca12b6a15a73546588560d1e75bdb9db7e0",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/ticket-intake.test.js",
+              "contentHash": "sha256:25b5c02417bad0fa16a35737a470babd13191ad93aa8ca300e893c9057c07cc3",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0008",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-002",
+          "status": "satisfied",
+          "reason": "Without --work a pending intake is created; --work reuses addSourceToWork with the DONE --reason rule and impact raising (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/intake.js",
+              "symbol": "intakeTicketCommand",
+              "contentHash": "sha256:95a47773193822648e5266ad967c2b7f1fba34e3c512473992cb33d4a405d2cd",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/ticket-intake.test.js",
+              "contentHash": "sha256:25b5c02417bad0fa16a35737a470babd13191ad93aa8ca300e893c9057c07cc3",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0008",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-003",
+          "status": "satisfied",
+          "reason": "Re-import allocates a new SRC with metadata.ticket.previousSource; the earlier source.json is byte-identical (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/intake/ticket.js",
+              "symbol": "findPreviousTicketSource",
+              "contentHash": "sha256:11d90166a412c499a7781057dba7bca12b6a15a73546588560d1e75bdb9db7e0",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/ticket-intake.test.js",
+              "contentHash": "sha256:25b5c02417bad0fa16a35737a470babd13191ad93aa8ca300e893c9057c07cc3",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0008",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-004",
+          "status": "satisfied",
+          "reason": "httpGet is GET-only, credentials only to the API origin with no cross-origin redirect; local-server tests assert only GET requests, the token never in stdout/stderr/workspace, and missing credentials name the variable with zero requests and zero writes.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/intake/providers/http.js",
+              "symbol": "httpGet",
+              "contentHash": "sha256:02646e4fa30d7c7e21f07eda3790c91c95bebeb7030f1a8d252310c6ed045ab5",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/ticket-intake.test.js",
+              "contentHash": "sha256:25b5c02417bad0fa16a35737a470babd13191ad93aa8ca300e893c9057c07cc3",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0008",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-005",
+          "status": "satisfied",
+          "reason": "A no-network preload proves init, start, route, file and ticket intake, guide, brief, status, doctor, verify, handoff, finish make no network call; the source guard restricts network code to the provider layer, lazily imported only by intake ticket.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test-support/no-network.js",
+              "contentHash": "sha256:59d00d2663da5e2e5485968f9af8a6d85026ba0c9ef0347d61b427cd712254f9",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/ticket-intake.test.js",
+              "contentHash": "sha256:25b5c02417bad0fa16a35737a470babd13191ad93aa8ca300e893c9057c07cc3",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/shared-project.test.js",
+              "contentHash": "sha256:b8b52d9da08b9f507e8767180721e064747b594168d2137fc3559b948484c770",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0008",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-006",
+          "status": "satisfied",
+          "reason": "--attachments (requires --fetch) downloads each attachment into a temp dir and captures it through prepareFileIntake; --attachment preserves agent-saved files; both become linked sources (tested for Jira fetch and ADO offline).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/intake.js",
+              "symbol": "downloadAttachments",
+              "contentHash": "sha256:95a47773193822648e5266ad967c2b7f1fba34e3c512473992cb33d4a405d2cd",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/ticket-intake.test.js",
+              "contentHash": "sha256:25b5c02417bad0fa16a35737a470babd13191ad93aa8ca300e893c9057c07cc3",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0008",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-007",
+          "status": "satisfied",
+          "reason": "Each provider is a self-contained module behind the PROVIDERS registry; normalize is pure and fixture-tested per provider.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/intake/providers/index.js",
+              "contentHash": "sha256:f9cf3e5d585f41ce5924c0cd6570795d3e8cf8e63f496836380a0a67de55c798",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/fixtures/tickets/jira-v3.json",
+              "contentHash": "sha256:51da870c3a631acf2c5e5841b63e0ef2df8567a21db4abb4240428b542737374",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/ticket-intake.test.js",
+              "contentHash": "sha256:25b5c02417bad0fa16a35737a470babd13191ad93aa8ca300e893c9057c07cc3",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0008",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-008",
+          "status": "satisfied",
+          "reason": "Requirement record accepts {type:source, source, locator:'ac:1'} citing the ticket source; rendered locators are printed in the source text (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/intake/providers/ticket.js",
+              "symbol": "renderTicketMarkdown",
+              "contentHash": "sha256:f72e8197b2ce3f3f3d622e54eac4f78bc2e971c007b4102ada0e3a5d8afdc89b",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/ticket-intake.test.js",
+              "contentHash": "sha256:25b5c02417bad0fa16a35737a470babd13191ad93aa8ca300e893c9057c07cc3",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0008",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-009",
+          "status": "satisfied",
+          "reason": "Rendered text starts with the untrusted banner, ticket headings are demoted, text is redacted at persistence (token redaction observed); the requirement-import skill states the untrusted-content rule. Agent Contract wording lands with v10 in C4.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/intake/providers/ticket.js",
+              "symbol": "UNTRUSTED_BANNER",
+              "contentHash": "sha256:f72e8197b2ce3f3f3d622e54eac4f78bc2e971c007b4102ada0e3a5d8afdc89b",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "resources/skills/requirement-import.md",
+              "contentHash": "sha256:35ec8843ba84d89ea282f8d1c181b4d5b4a4727e242cee9b505e59d886cfd7ad",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/ticket-intake.test.js",
+              "contentHash": "sha256:25b5c02417bad0fa16a35737a470babd13191ad93aa8ca300e893c9057c07cc3",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0008",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-024",
+          "status": "satisfied",
+          "reason": "Registry v9 adds invocation on-demand; resolveSkills refuses on-demand capabilities so no policy can require them; skill --work serves them for DONE and v8-pinned work without writes; checkpoints for them are refused.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/skills/resolver.js",
+              "symbol": "resolveSkills",
+              "contentHash": "sha256:4c3070b434a334e561b2b47d4fdc0bfc69a8a13469edf01f663fc238ef02de8c",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/skill.js",
+              "symbol": "printOnDemandSkill",
+              "contentHash": "sha256:1ab156bd00db5fe2fb6fd1f9902b581fe9a2be08e62d112a6f64acf9b2bbece1",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/on-demand-skills.test.js",
+              "contentHash": "sha256:1f0411299f0acb26e38dc886393a76f9fcd469605e0d9679d9218969f1ec2b6b",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0008",
+              "verificationRunId": "V-001"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    },
+    {
+      "id": "CV-002",
+      "recordedAt": "2026-10-19T17:10:08.869Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+        "verificationRunIds": [
+          "V-002"
+        ]
+      },
+      "summary": "C1 assessed again after the release-review fixes; V-002 passed.",
+      "findings": [
+        {
+          "criterion": "PF-0007/AC-001",
+          "status": "satisfied",
+          "reason": "Raw gh/REST GitHub, Jira v3, and Azure DevOps payloads normalize offline into one ticket source with title, description, criteria, comments, attachments, origin; offline import test runs under the no-network preload.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/intake/providers/github.js",
+              "symbol": "normalize",
+              "contentHash": "sha256:482ad96f5a425f02ed763ba7d323083310288349753a8d8e504534158e2501cc",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/intake/providers/jira.js",
+              "symbol": "normalize",
+              "contentHash": "sha256:3b13471bc894cbee8ac9b35d79f3252a537850e5d366beb272e8c657f1133c24",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/intake/providers/azure-devops.js",
+              "symbol": "normalize",
+              "contentHash": "sha256:6e87930930237fc0076f6dd89ecad1a6add2146f37a63c7f06670249caccb5a1",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/intake/ticket.js",
+              "symbol": "prepareTicketIntake",
+              "contentHash": "sha256:11d90166a412c499a7781057dba7bca12b6a15a73546588560d1e75bdb9db7e0",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/ticket-intake.test.js",
+              "contentHash": "sha256:ff667067e28127ae21681b391da926b052fd6d79d66bb5e03a6f467bd6f96e91",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0008",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-002",
+          "status": "satisfied",
+          "reason": "Without --work a pending intake is created; --work reuses addSourceToWork with the DONE --reason rule and impact raising (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/intake.js",
+              "symbol": "intakeTicketCommand",
+              "contentHash": "sha256:14427c4585c5f91f3fe237f218f091082d79ad78e8fb16bf19de850d547bb146",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/ticket-intake.test.js",
+              "contentHash": "sha256:ff667067e28127ae21681b391da926b052fd6d79d66bb5e03a6f467bd6f96e91",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0008",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-003",
+          "status": "satisfied",
+          "reason": "Re-import allocates a new SRC with metadata.ticket.previousSource; the earlier source.json is byte-identical (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/intake/ticket.js",
+              "symbol": "findPreviousTicketSource",
+              "contentHash": "sha256:11d90166a412c499a7781057dba7bca12b6a15a73546588560d1e75bdb9db7e0",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/ticket-intake.test.js",
+              "contentHash": "sha256:ff667067e28127ae21681b391da926b052fd6d79d66bb5e03a6f467bd6f96e91",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0008",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-004",
+          "status": "satisfied",
+          "reason": "httpGet is GET-only; assertTrustedOrigin sends credentials only over https to the hosted tracker (api.github.com, *.atlassian.net, dev.azure.com, *.visualstudio.com) or an explicitly configured origin, checked before any request; no cross-origin redirect for credentialed requests. Tests: untrusted and plain-http hosts refused with zero requests, zero writes and no credential in errors; tokens never in stdout/stderr/workspace; missing credentials name the variable.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/intake/providers/http.js",
+              "symbol": "assertTrustedOrigin",
+              "contentHash": "sha256:de165cb7d38e23501d18d14e58c3601875ac3f10e43367242b015a9cce7e812b",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/intake/providers/http.js",
+              "symbol": "httpGet",
+              "contentHash": "sha256:de165cb7d38e23501d18d14e58c3601875ac3f10e43367242b015a9cce7e812b",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/ticket-intake.test.js",
+              "contentHash": "sha256:ff667067e28127ae21681b391da926b052fd6d79d66bb5e03a6f467bd6f96e91",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0008",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-005",
+          "status": "satisfied",
+          "reason": "A no-network preload proves init, start, route, file and ticket intake, guide, brief, status, doctor, verify, handoff, finish make no network call; the source guard restricts network code to the provider layer, lazily imported only by intake ticket.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test-support/no-network.js",
+              "contentHash": "sha256:59d00d2663da5e2e5485968f9af8a6d85026ba0c9ef0347d61b427cd712254f9",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/ticket-intake.test.js",
+              "contentHash": "sha256:ff667067e28127ae21681b391da926b052fd6d79d66bb5e03a6f467bd6f96e91",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/shared-project.test.js",
+              "contentHash": "sha256:b8b52d9da08b9f507e8767180721e064747b594168d2137fc3559b948484c770",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0008",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-006",
+          "status": "satisfied",
+          "reason": "--attachments (requires --fetch) downloads each attachment into a temp dir and captures it through prepareFileIntake; --attachment preserves agent-saved files; both become linked sources (tested for Jira fetch and ADO offline). Attachments download only from the tracker origin or GitHub's own attachment hosts (look-alikes rejected).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/intake.js",
+              "symbol": "downloadAttachments",
+              "contentHash": "sha256:14427c4585c5f91f3fe237f218f091082d79ad78e8fb16bf19de850d547bb146",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/ticket-intake.test.js",
+              "contentHash": "sha256:ff667067e28127ae21681b391da926b052fd6d79d66bb5e03a6f467bd6f96e91",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0008",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-007",
+          "status": "satisfied",
+          "reason": "Each provider is a self-contained module behind the PROVIDERS registry; normalize is pure and fixture-tested per provider.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/intake/providers/index.js",
+              "contentHash": "sha256:f9cf3e5d585f41ce5924c0cd6570795d3e8cf8e63f496836380a0a67de55c798",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/fixtures/tickets/jira-v3.json",
+              "contentHash": "sha256:51da870c3a631acf2c5e5841b63e0ef2df8567a21db4abb4240428b542737374",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/ticket-intake.test.js",
+              "contentHash": "sha256:ff667067e28127ae21681b391da926b052fd6d79d66bb5e03a6f467bd6f96e91",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0008",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-008",
+          "status": "satisfied",
+          "reason": "Requirement record accepts {type:source, source, locator:'ac:1'} citing the ticket source; rendered locators are printed in the source text (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/intake/providers/ticket.js",
+              "symbol": "renderTicketMarkdown",
+              "contentHash": "sha256:f72e8197b2ce3f3f3d622e54eac4f78bc2e971c007b4102ada0e3a5d8afdc89b",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/ticket-intake.test.js",
+              "contentHash": "sha256:ff667067e28127ae21681b391da926b052fd6d79d66bb5e03a6f467bd6f96e91",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0008",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-009",
+          "status": "satisfied",
+          "reason": "Rendered text starts with the untrusted banner, ticket headings are demoted, text is redacted at persistence (token redaction observed); the requirement-import skill states the untrusted-content rule. Agent Contract wording lands with v10 in C4.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/intake/providers/ticket.js",
+              "symbol": "UNTRUSTED_BANNER",
+              "contentHash": "sha256:f72e8197b2ce3f3f3d622e54eac4f78bc2e971c007b4102ada0e3a5d8afdc89b",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "resources/skills/requirement-import.md",
+              "contentHash": "sha256:35ec8843ba84d89ea282f8d1c181b4d5b4a4727e242cee9b505e59d886cfd7ad",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/ticket-intake.test.js",
+              "contentHash": "sha256:ff667067e28127ae21681b391da926b052fd6d79d66bb5e03a6f467bd6f96e91",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0008",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-024",
+          "status": "satisfied",
+          "reason": "Registry v9 adds invocation on-demand; resolveSkills refuses on-demand capabilities so no policy can require them; skill --work serves them for DONE and v8-pinned work without writes; checkpoints for them are refused.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/skills/resolver.js",
+              "symbol": "resolveSkills",
+              "contentHash": "sha256:4c3070b434a334e561b2b47d4fdc0bfc69a8a13469edf01f663fc238ef02de8c",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/skill.js",
+              "symbol": "printOnDemandSkill",
+              "contentHash": "sha256:1ab156bd00db5fe2fb6fd1f9902b581fe9a2be08e62d112a6f64acf9b2bbece1",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/on-demand-skills.test.js",
+              "contentHash": "sha256:1f0411299f0acb26e38dc886393a76f9fcd469605e0d9679d9218969f1ec2b6b",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0008",
+              "verificationRunId": "V-002"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-10-19T17:10:08.869Z"
+}

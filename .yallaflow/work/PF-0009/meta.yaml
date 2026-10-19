@@ -1,0 +1,92 @@
+{
+  "id": "PF-0009",
+  "type": "feature",
+  "title": "v1.1.0 C2 — Optional AI QC (plans, honest results, advisory/strict policy, local artifacts and reports)",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "routingConfidence": "high",
+  "routingReason": "Decomposed from PF-0007.",
+  "routedAt": "2026-10-19T15:15:08.265Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "implement",
+    "verify",
+    "converge"
+  ],
+  "behaviorContract": {
+    "registryVersion": 8,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation",
+      "verification",
+      "delivery-convergence"
+    ]
+  },
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "parent": "PF-0007",
+  "decompositionKey": "C2",
+  "requirements": [
+    "REQ-005",
+    "REQ-006",
+    "REQ-007",
+    "REQ-009"
+  ],
+  "acceptanceCriteria": [
+    "AC-010",
+    "AC-011",
+    "AC-012",
+    "AC-013",
+    "AC-014",
+    "AC-015",
+    "AC-016",
+    "AC-022",
+    "AC-023"
+  ],
+  "createdAt": "2026-10-19T15:15:08.265Z",
+  "updatedAt": "2026-10-19T17:41:31.944Z",
+  "completionHistory": [
+    {
+      "completedAt": "2026-10-19T16:05:00.300Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    },
+    {
+      "completedAt": "2026-10-19T17:10:32.977Z",
+      "verificationRunIds": [
+        "V-002"
+      ]
+    },
+    {
+      "completedAt": "2026-10-19T17:41:31.944Z",
+      "verificationRunIds": [
+        "V-003"
+      ]
+    }
+  ],
+  "lastInvalidationAt": "2026-10-19T17:20:03.105Z",
+  "lifecycleHistory": [
+    {
+      "action": "reopen",
+      "fromStage": "DONE",
+      "toStage": "IMPLEMENTATION",
+      "reason": "Release code review (PF-0011): strict quality approval could pass on results recorded against an earlier plan; a plan could weaken a project's strict policy to advisory; yallaflow-verified scenarios accepted verification runs from before the latest reopen; an unreadable QC ledger crashed finish; absolute artifact source paths were written to committed ledgers; per-work QC IDs collide across branches (document).",
+      "changedAt": "2026-10-19T16:43:11.564Z"
+    },
+    {
+      "action": "reopen",
+      "fromStage": "DONE",
+      "toStage": "IMPLEMENTATION",
+      "reason": "Release re-review (low): a project strict policy set after an advisory plan was recorded did not apply to that plan; the stricter of plan and current config must govern.",
+      "changedAt": "2026-10-19T17:20:03.105Z"
+    }
+  ]
+}

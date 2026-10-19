@@ -15,7 +15,7 @@ import { checkpointCommand, reviseCheckpointCommand } from './commands/checkpoin
 import { knowledgeCommand } from './commands/knowledge.js';
 import { questionCommand } from './commands/question.js';
 import { readyCommand } from './commands/ready.js';
-import { intakeAddCommand, intakeCommand } from './commands/intake.js';
+import { intakeAddCommand, intakeCommand, intakeTicketCommand } from './commands/intake.js';
 import { sourceCommand } from './commands/source.js';
 import { reopenCommand } from './commands/reopen.js';
 import { decomposeExecuteCommand, decomposeProposeCommand, decomposeStatusCommand, decomposeValidateCommand } from './commands/decompose.js';
@@ -69,6 +69,7 @@ import {
 } from './commands/baseline.js';
 import { sharedCheckCommand, sharedEnableCommand, sharedIntegrateCommand, sharedStatusCommand } from './commands/shared.js';
 import { finishCommand } from './commands/finish.js';
+import { demoApproveCommand, demoProposeCommand, demoRecordCommand, demoStatusCommand, qcPlanCommand, qcRecordCommand, qcStatusCommand } from './commands/quality.js';
 import { purposeCommand } from './commands/purpose.js';
 import { findProjectRoot } from './core/workspace.js';
 import { checkProjectCompatibility, incompatibleMessage } from './shared/config.js';
@@ -78,7 +79,7 @@ import { INTERACTION_MODES, GATE_NAMES } from './behavior/interaction.js';
 const VALID_PROJECT_TYPES = new Set(['greenfield', 'brownfield']);
 
 function help() {
-  console.log(`YallaFlow foundation CLI\n\nGive AI your project, not just your prompt.\n\nUsage:\n  yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]\n  yallaflow start [request]\n  yallaflow request --help\n  yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]\n  yallaflow source --help\n  yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]\n  yallaflow baseline --help\n  yallaflow guide [work-id]\n  yallaflow ready [work-id]\n  yallaflow skill <skill-id> [--work <work-id>]\n  yallaflow checkpoint --help\n  yallaflow question --help\n  yallaflow knowledge --help\n  yallaflow requirement --help\n  yallaflow convergence --help\n  yallaflow impact --help\n  yallaflow context --help\n  yallaflow upgrade status|plan\n  yallaflow brief\n  yallaflow inspect\n  yallaflow limitation --help\n  yallaflow agent --help\n  yallaflow decompose --help\n  yallaflow progress <parent-id>\n  yallaflow next <parent-id>\n  yallaflow approve <work-id> --stage GATE [--note TEXT]\n  yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]\n  yallaflow handoff [work-id]\n  yallaflow feature <title> --scope SCOPE\n  yallaflow bug <title> --scope SCOPE\n  yallaflow investigate <title> --scope SCOPE\n  yallaflow change <title> --scope SCOPE\n  yallaflow refactor <title> --scope SCOPE\n  yallaflow release <title> --scope SCOPE\n  yallaflow purpose --help\n  yallaflow finish [work-id] [--verbose]\n  yallaflow shared --help\n  yallaflow status\n  yallaflow resume [work-id]\n  yallaflow doctor\n  yallaflow advance [work-id]\n  yallaflow verify [work-id] -- <executable> [args...]\n  yallaflow verify [work-id] --shell "<command>"\n  yallaflow verify [work-id] --script <path>\n  yallaflow verify list [work-id]\n  yallaflow reopen <work-id> --to implementation|verification|review --reason REASON\n  yallaflow --version\n`);
+  console.log(`YallaFlow foundation CLI\n\nGive AI your project, not just your prompt.\n\nUsage:\n  yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]\n  yallaflow start [request]\n  yallaflow request --help\n  yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]\n  yallaflow intake ticket <payload-file|ticket-ref> [--provider github|jira|azure-devops] [--work <work-id>] [--reason TEXT] [--fetch [--attachments]] [--attachment <file>]... [--title TITLE] [--max-comments N]\n  yallaflow source --help\n  yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]\n  yallaflow baseline --help\n  yallaflow guide [work-id]\n  yallaflow ready [work-id]\n  yallaflow skill <skill-id> [--work <work-id>]\n  yallaflow checkpoint --help\n  yallaflow question --help\n  yallaflow knowledge --help\n  yallaflow requirement --help\n  yallaflow convergence --help\n  yallaflow impact --help\n  yallaflow context --help\n  yallaflow upgrade status|plan\n  yallaflow brief\n  yallaflow inspect\n  yallaflow limitation --help\n  yallaflow agent --help\n  yallaflow decompose --help\n  yallaflow progress <parent-id>\n  yallaflow next <parent-id>\n  yallaflow approve <work-id> --stage GATE [--note TEXT]\n  yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]\n  yallaflow handoff [work-id]\n  yallaflow feature <title> --scope SCOPE\n  yallaflow bug <title> --scope SCOPE\n  yallaflow investigate <title> --scope SCOPE\n  yallaflow change <title> --scope SCOPE\n  yallaflow refactor <title> --scope SCOPE\n  yallaflow release <title> --scope SCOPE\n  yallaflow purpose --help\n  yallaflow finish [work-id] [--verbose]\n  yallaflow qc --help\n  yallaflow demo --help\n  yallaflow shared --help\n  yallaflow status\n  yallaflow resume [work-id]\n  yallaflow doctor\n  yallaflow advance [work-id]\n  yallaflow verify [work-id] -- <executable> [args...]\n  yallaflow verify [work-id] --shell "<command>"\n  yallaflow verify [work-id] --script <path>\n  yallaflow verify list [work-id]\n  yallaflow reopen <work-id> --to implementation|verification|review --reason REASON\n  yallaflow --version\n`);
 }
 
 function decomposeHelp() {
@@ -98,6 +99,8 @@ const AGENT_USAGE = 'yallaflow agent status\n  yallaflow agent refresh [--preser
 const REQUIREMENT_USAGE = 'yallaflow requirement record <work-id> --file <requirements.json>\n  yallaflow requirement list <work-id>\n  yallaflow requirement show <work-id> <REQ-###|AC-###>';
 const CONVERGENCE_USAGE = 'yallaflow convergence record <work-id> --file <convergence.json>\n  yallaflow convergence status <work-id>\n  yallaflow convergence show <work-id> [CV-###|AC-###|UR-###]';
 const IMPACT_USAGE = 'yallaflow impact status <work-id>\n  yallaflow impact assess <work-id> --file <impact.json>';
+const QC_USAGE = 'yallaflow qc plan <work-id> --file <plan.json>\n  yallaflow qc record <work-id> --file <result.json> [--allow-remote]\n  yallaflow qc status <work-id>';
+const DEMO_USAGE = 'yallaflow demo propose <work-id> --file <scope.json>\n  yallaflow demo approve <work-id> --note TEXT [--only D-01,D-02]\n  yallaflow demo record <work-id> --file <result.json> [--allow-remote]\n  yallaflow demo status <work-id>';
 const LIMITATION_USAGE = 'yallaflow limitation add [work-id] --type TYPE --area AREA --summary TEXT --reason TEXT\n  yallaflow limitation list [work-id]';
 
 function contextHelp() {
@@ -132,6 +135,14 @@ function impactHelp() {
   console.log(`Usage:\n  ${IMPACT_USAGE}\n\nA source attached, or requirements changed, after the approved intent was fixed raises a pending impact.\nThe Agent assesses each completed stage as affected or unaffected (with reasons); YallaFlow revises the affected checkpoints through the audited revision path. No evidence is deleted.\n`);
 }
 
+function qcHelp() {
+  console.log(`Usage:\n  ${QC_USAGE}\n\nOptional AI QC (on request only): the Agent plans scenarios from acceptance criteria, runs them with Playwright (CLI or MCP), and records what actually happened.\nNothing here starts a browser, a server, or a test. Results live in work/<id>/quality/ — separate from verification evidence — with local, hashed artifacts and a Markdown + HTML report.\nPolicies: advisory (default; failures are reported, never block) or strict (opt-in; required scenarios must pass for quality approval, which is separate from task completion).\nInstructions: yallaflow skill ai-qc --work <work-id>\n`);
+}
+
+function demoHelp() {
+  console.log(`Usage:\n  ${DEMO_USAGE}\n\nOptional Smart Demo (on request only; independent of QC): the Agent proposes the few user-facing scenarios worth showing, prioritized, per audience (business or developer).\nThe developer approves the scope first — recording against an unapproved proposal is refused. Video is optional (Playwright: video-start / video-chapter / video-stop).\nMedia stays local with hashes; report.md and report.html link the recordings. A demo is not test evidence and cannot be cited as acceptance evidence.\nInstructions: yallaflow skill smart-demo --work <work-id>\n`);
+}
+
 function limitationHelp() {
   console.log(`Usage:\n  ${LIMITATION_USAGE}\n\nTypes: not-inspected, unavailable, out-of-scope, runtime-unavailable, insufficient-evidence, uncaptured-artifact\nLimitations are work-scoped and never promoted into project context.\n`);
 }
@@ -162,7 +173,7 @@ function parseOptions(args, allowed) {
 const USAGE = {
   init: 'yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]',
   start: 'yallaflow start [request]',
-  intake: 'yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]',
+  intake: 'yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]\n  yallaflow intake ticket <payload-file|ticket-ref> [--provider github|jira|azure-devops] [--work <work-id>] [--reason TEXT] [--fetch [--attachments]] [--attachment <file>]... [--title TITLE] [--max-comments N]',
   guide: 'yallaflow guide [work-id]',
   skill: 'yallaflow skill <skill-id> [--work <work-id>]',
   route: 'yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]',
@@ -184,6 +195,8 @@ const USAGE = {
   brief: 'yallaflow brief',
   inspect: 'yallaflow inspect',
   limitation: LIMITATION_USAGE,
+  qc: QC_USAGE,
+  demo: DEMO_USAGE,
   agent: AGENT_USAGE,
   shared: SHARED_USAGE,
   purpose: PURPOSE_USAGE,
@@ -264,6 +277,17 @@ const NAMESPACE_ACTIONS = {
     status: 'yallaflow impact status <work-id>',
     assess: 'yallaflow impact assess <work-id> --file <impact.json>'
   },
+  qc: {
+    plan: 'yallaflow qc plan <work-id> --file <plan.json>',
+    record: 'yallaflow qc record <work-id> --file <result.json> [--allow-remote]',
+    status: 'yallaflow qc status <work-id>'
+  },
+  demo: {
+    propose: 'yallaflow demo propose <work-id> --file <scope.json>',
+    approve: 'yallaflow demo approve <work-id> --note TEXT [--only D-01,D-02]',
+    record: 'yallaflow demo record <work-id> --file <result.json> [--allow-remote]',
+    status: 'yallaflow demo status <work-id>'
+  },
   limitation: {
     add: 'yallaflow limitation add [work-id] --type TYPE --area AREA --summary TEXT --reason TEXT',
     list: 'yallaflow limitation list [work-id]'
@@ -276,7 +300,8 @@ const NAMESPACE_ACTIONS = {
     show: 'yallaflow source show <source-id> [--content]'
   },
   intake: {
-    add: 'yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]'
+    add: 'yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]',
+    ticket: 'yallaflow intake ticket <payload-file|ticket-ref> [--provider github|jira|azure-devops] [--work <work-id>] [--reason TEXT] [--fetch [--attachments]] [--attachment <file>]... [--title TITLE] [--max-comments N]'
   },
   checkpoint: {
     revise: 'yallaflow checkpoint revise [work-id] --skill SKILL --status STATUS --reason TEXT [--summary TEXT]'
@@ -326,7 +351,7 @@ function printCommandHelp(command, rest) {
   const actionKey = rest.find((token) => !isHelpToken(token) && !token.startsWith('-'));
   const nested = NAMESPACE_ACTIONS[command]?.[actionKey];
   if (nested) return console.log(`Usage:\n  ${nested}\n`);
-  const dedicated = { requirement: requirementHelp, convergence: convergenceHelp, impact: impactHelp, agent: agentHelp, context: contextHelp, upgrade: upgradeHelp, limitation: limitationHelp, source: sourceHelp, checkpoint: checkpointHelp, knowledge: knowledgeHelp, question: questionHelp, decompose: decomposeHelp, baseline: baselineHelp, shared: sharedHelp, purpose: purposeHelp };
+  const dedicated = { requirement: requirementHelp, convergence: convergenceHelp, impact: impactHelp, agent: agentHelp, context: contextHelp, upgrade: upgradeHelp, limitation: limitationHelp, qc: qcHelp, demo: demoHelp, source: sourceHelp, checkpoint: checkpointHelp, knowledge: knowledgeHelp, question: questionHelp, decompose: decomposeHelp, baseline: baselineHelp, shared: sharedHelp, purpose: purposeHelp };
   if (dedicated[command]) return dedicated[command]();
   if (USAGE[command]) return console.log(`Usage:\n  ${USAGE[command]}\n`);
   return help();
@@ -360,7 +385,7 @@ const READ_ONLY_COMMANDS = new Set(['brief', 'doctor', 'status', 'inspect', 'upg
 const READ_ONLY_ACTIONS = {
   shared: ['status', 'check'], context: ['status', 'list', 'show', 'history', 'affected'], knowledge: ['list'], question: ['list'],
   verify: ['list'], baseline: ['status', 'show'], decompose: ['status'], requirement: ['list', 'show'], convergence: ['status', 'show'],
-  impact: ['status'], limitation: ['list'], purpose: ['show'], agent: ['status']
+  impact: ['status'], limitation: ['list'], qc: ['status'], demo: ['status'], purpose: ['show'], agent: ['status']
 };
 
 async function assertCompatibleForCommand(command, rest) {
@@ -409,9 +434,46 @@ async function main() {
       const [workId, ...files] = positionals;
       return intakeAddCommand(workId, files, { reason: values.reason });
     }
+    if (rest[0] === 'ticket') {
+      const { values, positionals } = parseOptions(rest.slice(1), {
+        provider: { type: 'string' }, work: { type: 'string' }, reason: { type: 'string' }, fetch: { type: 'boolean' },
+        attachments: { type: 'boolean' }, attachment: { type: 'string', multiple: true }, title: { type: 'string' }, 'max-comments': { type: 'string' }
+      });
+      if (positionals.length !== 1) throw new Error(`Usage: ${NAMESPACE_ACTIONS.intake.ticket}`);
+      return intakeTicketCommand(positionals[0], { ...values, maxComments: values['max-comments'] });
+    }
     const { values, positionals } = parseOptions(rest, { title: { type: 'string' } });
     if (positionals.length < 1) throw new Error('Usage: yallaflow intake <file> [<file> ...] [--title TITLE]');
     return intakeCommand(positionals, { title: values.title });
+  }
+  if (command === 'qc') {
+    const [action, ...actionArgs] = rest;
+    if (!action) return qcHelp();
+    const usage = NAMESPACE_ACTIONS.qc[action];
+    if (!usage) throw new Error(`Unknown qc action: ${action}. Use ${Object.keys(NAMESPACE_ACTIONS.qc).join(', ')}.`);
+    const { values, positionals } = parseOptions(actionArgs, action === 'status' ? {} : { file: { type: 'string' }, ...(action === 'record' ? { 'allow-remote': { type: 'boolean' } } : {}) });
+    if (positionals.length !== 1 || (action !== 'status' && !values.file)) throw new Error(`Usage: ${usage}`);
+    if (action === 'plan') return qcPlanCommand(positionals[0], { file: values.file });
+    if (action === 'record') return qcRecordCommand(positionals[0], { file: values.file, allowRemote: values['allow-remote'] === true });
+    return qcStatusCommand(positionals[0]);
+  }
+  if (command === 'demo') {
+    const [action, ...actionArgs] = rest;
+    if (!action) return demoHelp();
+    const usage = NAMESPACE_ACTIONS.demo[action];
+    if (!usage) throw new Error(`Unknown demo action: ${action}. Use ${Object.keys(NAMESPACE_ACTIONS.demo).join(', ')}.`);
+    const options = {
+      propose: { file: { type: 'string' } },
+      approve: { note: { type: 'string' }, only: { type: 'string' } },
+      record: { file: { type: 'string' }, 'allow-remote': { type: 'boolean' } },
+      status: {}
+    }[action];
+    const { values, positionals } = parseOptions(actionArgs, options);
+    if (positionals.length !== 1 || ((action === 'propose' || action === 'record') && !values.file)) throw new Error(`Usage: ${usage}`);
+    if (action === 'propose') return demoProposeCommand(positionals[0], { file: values.file });
+    if (action === 'approve') return demoApproveCommand(positionals[0], { note: values.note, only: values.only });
+    if (action === 'record') return demoRecordCommand(positionals[0], { file: values.file, allowRemote: values['allow-remote'] === true });
+    return demoStatusCommand(positionals[0]);
   }
   if (command === 'source') {
     const [action, ...actionArgs] = rest;

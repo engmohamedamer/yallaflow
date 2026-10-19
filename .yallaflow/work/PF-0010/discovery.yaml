@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "runtime-unavailable",
+      "area": "testing",
+      "summary": "A real Playwright video was not captured end to end: playwright-cli video-start needs Playwright's ffmpeg, which is not installed on this machine (playwright-cli still printed a video link although no file was written). Video storage and hashing are verified with test bytes; a real screenshot from playwright-cli was recorded through demo record and qc record.",
+      "reason": "Installing ffmpeg downloads software onto the developer's machine; not done without the developer's agreement.",
+      "recordedAt": "2026-10-19T16:21:17.157Z"
+    }
+  ],
+  "updatedAt": "2026-10-19T16:21:17.157Z"
+}

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "gates": {
+    "specification": {
+      "status": "approved",
+      "respondedAt": "2026-10-19T15:14:06.252Z",
+      "note": "Approved by the developer in the agent session (SRC-0002): 'The overall architecture is approved, with the following decisions and adjustments' … 'Update the architecture and decision records in PF-0007 to reflect these approvals. Then proceed with incremental implementation' … 'Proceed with implementation under YallaFlow governance.' The specification records exactly that approved architecture and its adjustments; agent-owned low-risk choices are recorded as rulings.",
+      "history": [
+        {
+          "status": "awaiting_review",
+          "at": "2026-10-19T15:13:58.607Z"
+        },
+        {
+          "status": "approved",
+          "at": "2026-10-19T15:14:06.252Z",
+          "note": "Approved by the developer in the agent session (SRC-0002): 'The overall architecture is approved, with the following decisions and adjustments' … 'Update the architecture and decision records in PF-0007 to reflect these approvals. Then proceed with incremental implementation' … 'Proceed with implementation under YallaFlow governance.' The specification records exactly that approved architecture and its adjustments; agent-owned low-risk choices are recorded as rulings."
+        }
+      ]
+    },
+    "plan": {
+      "status": "approved",
+      "respondedAt": "2026-10-19T15:14:54.314Z",
+      "note": "Approved by the developer in the agent session (SRC-0002): 'Then proceed with incremental implementation: 1. Connected Requirements 2. Optional AI QC 3. Optional Smart Demo and Recording 4. Integration, documentation and release verification' … 'Proceed with implementation under YallaFlow governance.' The plan implements exactly these four milestones.",
+      "history": [
+        {
+          "status": "awaiting_review",
+          "at": "2026-10-19T15:14:49.742Z"
+        },
+        {
+          "status": "approved",
+          "at": "2026-10-19T15:14:54.314Z",
+          "note": "Approved by the developer in the agent session (SRC-0002): 'Then proceed with incremental implementation: 1. Connected Requirements 2. Optional AI QC 3. Optional Smart Demo and Recording 4. Integration, documentation and release verification' … 'Proceed with implementation under YallaFlow governance.' The plan implements exactly these four milestones."
+        }
+      ]
+    },
+    "decomposition": {
+      "status": "approved",
+      "respondedAt": "2026-10-19T15:15:08.112Z",
+      "note": "Approved by the developer in the agent session (SRC-0002): 'Then proceed with incremental implementation: 1. Connected Requirements 2. Optional AI QC 3. Optional Smart Demo and Recording 4. Integration, documentation and release verification'. The decomposition is exactly these four milestones.",
+      "history": [
+        {
+          "status": "approved",
+          "at": "2026-10-19T15:15:08.112Z",
+          "note": "Approved by the developer in the agent session (SRC-0002): 'Then proceed with incremental implementation: 1. Connected Requirements 2. Optional AI QC 3. Optional Smart Demo and Recording 4. Integration, documentation and release verification'. The decomposition is exactly these four milestones."
+        }
+      ]
+    }
+  },
+  "updatedAt": "2026-10-19T15:15:08.112Z"
+}

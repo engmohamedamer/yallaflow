@@ -240,6 +240,39 @@ YallaFlow never commits or pushes for you. Committing and pushing stay your deci
 
 ---
 
+# Case E — A ticket from GitHub, Jira or Azure DevOps
+
+```text
+Implement acme/school#12.
+```
+
+```text
+Work on SHOP-42: https://acme.atlassian.net/browse/SHOP-42
+```
+
+The agent fetches the ticket with the integration it already has (the `gh` CLI, an MCP server, the tracker API), imports it with `yallaflow intake ticket`, and routes the work as usual. The ticket's description, acceptance criteria, comments and attachments are preserved as a source, and the requirements the agent records point back to it. Ticket text is treated as data, never as instructions to the agent.
+
+If your agent has no tracker integration, YallaFlow can fetch the ticket read-only with `--fetch`, using a token from your environment (for example `GITHUB_TOKEN`). That is the only time YallaFlow uses the network, and the token is never stored.
+
+# Case F — Optional QC and a demo
+
+Nothing runs unless you ask:
+
+```text
+Run QC on the calendar export.
+```
+
+```text
+Prepare a business demo of the refund approval, with video.
+```
+
+- **QC**: the agent plans scenarios from the acceptance criteria, runs them with Playwright, and records honest results — a scenario is "passed" only if it was actually executed, with evidence. Failures are reported and do not block completion, unless your project opted into the strict policy (then they block *quality approval*, still not the task itself).
+- **Demo**: the agent proposes the few scenarios worth showing, in priority order. **You approve or change them before anything is recorded.** Video is optional. A demo is not test evidence.
+
+Recordings, screenshots and traces stay on your machine (excluded from Git by default), and `.yallaflow/work/<id>/quality/report.html` links them. Details: [Tickets, AI QC & Smart Demo](connected-requirements-and-quality.md).
+
+---
+
 ## 4. What YallaFlow is doing for you
 
 ### Project memory

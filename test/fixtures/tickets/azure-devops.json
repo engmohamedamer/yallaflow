@@ -1,0 +1,27 @@
+{
+  "workItem": {
+    "id": 77,
+    "rev": 5,
+    "url": "https://dev.azure.com/acme/_apis/wit/workItems/77",
+    "fields": {
+      "System.TeamProject": "Portal",
+      "System.Title": "Password reset email",
+      "System.WorkItemType": "User Story",
+      "System.State": "Active",
+      "System.Tags": "auth; email",
+      "System.CreatedBy": { "displayName": "Grace" },
+      "System.CreatedDate": "2026-07-01T00:00:00Z",
+      "System.ChangedDate": "2026-07-04T00:00:00Z",
+      "System.Description": "<div>Users can reset a forgotten password.<br>Links expire.</div>",
+      "Microsoft.VSTS.Common.AcceptanceCriteria": "<ul><li>The email contains a single-use link</li><li>The link expires after 30 minutes</li></ul>"
+    },
+    "relations": [
+      { "rel": "AttachedFile", "url": "https://dev.azure.com/acme/_apis/wit/attachments/abc", "attributes": { "name": "flow.txt", "resourceSize": 12 } },
+      { "rel": "System.LinkTypes.Hierarchy-Reverse", "url": "https://dev.azure.com/acme/_apis/wit/workItems/70" }
+    ],
+    "_links": { "html": { "href": "https://dev.azure.com/acme/Portal/_workitems/edit/77" } }
+  },
+  "comments": { "comments": [
+    { "id": 1, "text": "<p>Use the existing mailer.</p>", "createdBy": { "displayName": "Heidi" }, "createdDate": "2026-07-02T00:00:00Z" }
+  ] }
+}

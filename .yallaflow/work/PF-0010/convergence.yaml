@@ -1,0 +1,540 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-10-19T16:21:17.333Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "C3 assessed after V-001 passed.",
+      "findings": [
+        {
+          "criterion": "PF-0007/AC-017",
+          "status": "satisfied",
+          "reason": "demo propose records priority-ordered, criteria-linked scenarios with audience, rationale and excluded items; no qc.json or media is created and no QC record is needed (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/demo.js",
+              "symbol": "proposeDemo",
+              "contentHash": "sha256:5d8af56c9dc69ee60cc8757a590bab5d93639b4ae28d8810527e31b5ae2659e0",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-demo.test.js",
+              "contentHash": "sha256:572a225308c619936f850484c90acc339c10a79ec5b46b0c2331015f7b1fdddb",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0010",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-018",
+          "status": "satisfied",
+          "reason": "recordDemo is refused unless the latest proposal has an approval bound to its sha256 with a non-empty developer note; re-proposing requires a new approval; --only limits the approved scope; tampered approvals fail doctor (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/demo.js",
+              "symbol": "approveDemo",
+              "contentHash": "sha256:5d8af56c9dc69ee60cc8757a590bab5d93639b4ae28d8810527e31b5ae2659e0",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/quality/demo.js",
+              "symbol": "recordDemo",
+              "contentHash": "sha256:5d8af56c9dc69ee60cc8757a590bab5d93639b4ae28d8810527e31b5ae2659e0",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-demo.test.js",
+              "contentHash": "sha256:572a225308c619936f850484c90acc339c10a79ec5b46b0c2331015f7b1fdddb",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0010",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-019",
+          "status": "satisfied",
+          "reason": "A run without video is valid ('recording is optional'); a supplied video is copied with sha256 and size and a missing video file is refused (catches recorders that claim a video they never wrote, seen in the real playwright-cli run).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/artifacts.js",
+              "symbol": "storeArtifacts",
+              "contentHash": "sha256:cfe73e64e449b47069273dc10843288f569f7ec78e1f8b414da231c564fe603b",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-demo.test.js",
+              "contentHash": "sha256:572a225308c619936f850484c90acc339c10a79ec5b46b0c2331015f7b1fdddb",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0010",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-020",
+          "status": "satisfied",
+          "reason": "Every run stores the fixed disclaimer (doctor requires it) and stdout, report.md and report.html show it; convergence rejects demo: citations (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/constants.js",
+              "symbol": "DEMO_DISCLAIMER",
+              "contentHash": "sha256:d22c401e2d44b3e2b9ac7f1099174ce144b429c8ac362bebd258f7f675a3f9b3",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/delivery/convergence.js",
+              "contentHash": "sha256:da42da261a2771e97531deac3f2d554b9f4977fbafcf4783c3c29c9760a78ea3",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-demo.test.js",
+              "contentHash": "sha256:572a225308c619936f850484c90acc339c10a79ec5b46b0c2331015f7b1fdddb",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0010",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-021",
+          "status": "satisfied",
+          "reason": "Non-local targets need --allow-remote, credentials embedded in a target URL are refused, and a token in notes is redacted in demo.json, report.md and report.html (tested); the skill requires test data and storage-state auth outside .yallaflow.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/demo.js",
+              "symbol": "recordDemo",
+              "contentHash": "sha256:5d8af56c9dc69ee60cc8757a590bab5d93639b4ae28d8810527e31b5ae2659e0",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "resources/skills/smart-demo.md",
+              "contentHash": "sha256:01c8a4aef75b6a6d762bcfee0397227efe5f558bc92434ab71327bb14df9498d",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-demo.test.js",
+              "contentHash": "sha256:572a225308c619936f850484c90acc339c10a79ec5b46b0c2331015f7b1fdddb",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0010",
+              "verificationRunId": "V-001"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    },
+    {
+      "id": "CV-002",
+      "recordedAt": "2026-10-19T17:10:11.004Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+        "verificationRunIds": [
+          "V-002"
+        ]
+      },
+      "summary": "C3 assessed again after the release-review fixes; V-002 passed.",
+      "findings": [
+        {
+          "criterion": "PF-0007/AC-017",
+          "status": "satisfied",
+          "reason": "demo propose records priority-ordered, criteria-linked scenarios with audience, rationale and excluded items; no qc.json or media is created and no QC record is needed (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/demo.js",
+              "symbol": "proposeDemo",
+              "contentHash": "sha256:77bd76f6427af5014e2c8e6762e795e32a6916adfb70817968315b7ce802b940",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-demo.test.js",
+              "contentHash": "sha256:0a6bda1464ce15eb3ac9e9d813d705b1bc5a2cf15c0d25db052e7829e48e972f",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0010",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-018",
+          "status": "satisfied",
+          "reason": "recordDemo is refused unless the latest proposal has an approval bound to its sha256 with a non-empty developer note; re-proposing requires a new approval; --only limits the approved scope; tampered approvals fail doctor (tested). The proposal hash is recomputed on every load, so a hand-edited proposal loses its approval (regression test).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/demo.js",
+              "symbol": "approveDemo",
+              "contentHash": "sha256:77bd76f6427af5014e2c8e6762e795e32a6916adfb70817968315b7ce802b940",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/quality/demo.js",
+              "symbol": "recordDemo",
+              "contentHash": "sha256:77bd76f6427af5014e2c8e6762e795e32a6916adfb70817968315b7ce802b940",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-demo.test.js",
+              "contentHash": "sha256:0a6bda1464ce15eb3ac9e9d813d705b1bc5a2cf15c0d25db052e7829e48e972f",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0010",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-019",
+          "status": "satisfied",
+          "reason": "A run without video is valid ('recording is optional'); a supplied video is copied with sha256 and size and a missing video file is refused (catches recorders that claim a video they never wrote, seen in the real playwright-cli run).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/artifacts.js",
+              "symbol": "storeArtifacts",
+              "contentHash": "sha256:92dcc72627549b61ef9edcb2f35e602a1cc4a10521a7f634909d5ceea642d592",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-demo.test.js",
+              "contentHash": "sha256:0a6bda1464ce15eb3ac9e9d813d705b1bc5a2cf15c0d25db052e7829e48e972f",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0010",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-020",
+          "status": "satisfied",
+          "reason": "Every run stores the fixed disclaimer (doctor requires it) and stdout, report.md and report.html show it; convergence rejects demo: citations (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/constants.js",
+              "symbol": "DEMO_DISCLAIMER",
+              "contentHash": "sha256:d22c401e2d44b3e2b9ac7f1099174ce144b429c8ac362bebd258f7f675a3f9b3",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/delivery/convergence.js",
+              "contentHash": "sha256:da42da261a2771e97531deac3f2d554b9f4977fbafcf4783c3c29c9760a78ea3",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-demo.test.js",
+              "contentHash": "sha256:0a6bda1464ce15eb3ac9e9d813d705b1bc5a2cf15c0d25db052e7829e48e972f",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0010",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-021",
+          "status": "satisfied",
+          "reason": "Non-local targets need --allow-remote, credentials embedded in a target URL are refused, and a token in notes is redacted in demo.json, report.md and report.html (tested); the skill requires test data and storage-state auth outside .yallaflow.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/demo.js",
+              "symbol": "recordDemo",
+              "contentHash": "sha256:77bd76f6427af5014e2c8e6762e795e32a6916adfb70817968315b7ce802b940",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "resources/skills/smart-demo.md",
+              "contentHash": "sha256:01c8a4aef75b6a6d762bcfee0397227efe5f558bc92434ab71327bb14df9498d",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-demo.test.js",
+              "contentHash": "sha256:0a6bda1464ce15eb3ac9e9d813d705b1bc5a2cf15c0d25db052e7829e48e972f",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0010",
+              "verificationRunId": "V-002"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    },
+    {
+      "id": "CV-003",
+      "recordedAt": "2026-10-19T17:41:30.578Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+        "verificationRunIds": [
+          "V-003"
+        ]
+      },
+      "summary": "Re-assessed after the release re-review fixes; V-003 passed.",
+      "findings": [
+        {
+          "criterion": "PF-0007/AC-017",
+          "status": "satisfied",
+          "reason": "demo propose records priority-ordered, criteria-linked scenarios with audience, rationale and excluded items; no qc.json or media is created and no QC record is needed (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/demo.js",
+              "symbol": "proposeDemo",
+              "contentHash": "sha256:ad8573c2cd76af79e162707d3fd1b7dd8dfddeaab2d003543ab78c506ca7e094",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-demo.test.js",
+              "contentHash": "sha256:e60719019edc4a025f50577def0446d651ffe79b7234a17d9bdfe5f1b738537e",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0010",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-018",
+          "status": "satisfied",
+          "reason": "recordDemo is refused unless the latest proposal has an approval bound to its sha256 with a non-empty developer note; re-proposing requires a new approval; --only limits the approved scope; tampered approvals fail doctor (tested). The proposal hash is recomputed on every load, so a hand-edited proposal loses its approval (regression test).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/demo.js",
+              "symbol": "approveDemo",
+              "contentHash": "sha256:ad8573c2cd76af79e162707d3fd1b7dd8dfddeaab2d003543ab78c506ca7e094",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/quality/demo.js",
+              "symbol": "recordDemo",
+              "contentHash": "sha256:ad8573c2cd76af79e162707d3fd1b7dd8dfddeaab2d003543ab78c506ca7e094",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-demo.test.js",
+              "contentHash": "sha256:e60719019edc4a025f50577def0446d651ffe79b7234a17d9bdfe5f1b738537e",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0010",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-019",
+          "status": "satisfied",
+          "reason": "A run without video is valid ('recording is optional'); a supplied video is copied with sha256 and size and a missing video file is refused (catches recorders that claim a video they never wrote, seen in the real playwright-cli run).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/artifacts.js",
+              "symbol": "storeArtifacts",
+              "contentHash": "sha256:92dcc72627549b61ef9edcb2f35e602a1cc4a10521a7f634909d5ceea642d592",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-demo.test.js",
+              "contentHash": "sha256:e60719019edc4a025f50577def0446d651ffe79b7234a17d9bdfe5f1b738537e",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0010",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-020",
+          "status": "satisfied",
+          "reason": "Every run stores the fixed disclaimer (doctor requires it) and stdout, report.md and report.html show it; convergence rejects demo: citations (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/constants.js",
+              "symbol": "DEMO_DISCLAIMER",
+              "contentHash": "sha256:d22c401e2d44b3e2b9ac7f1099174ce144b429c8ac362bebd258f7f675a3f9b3",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/delivery/convergence.js",
+              "contentHash": "sha256:da42da261a2771e97531deac3f2d554b9f4977fbafcf4783c3c29c9760a78ea3",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-demo.test.js",
+              "contentHash": "sha256:e60719019edc4a025f50577def0446d651ffe79b7234a17d9bdfe5f1b738537e",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0010",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-021",
+          "status": "satisfied",
+          "reason": "Non-local targets need --allow-remote, credentials embedded in a target URL are refused, and a token in notes is redacted in demo.json, report.md and report.html (tested); the skill requires test data and storage-state auth outside .yallaflow. Redacted demo text keeps the ledger valid (the proposal hash is taken over the persisted, redacted form).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/demo.js",
+              "symbol": "recordDemo",
+              "contentHash": "sha256:ad8573c2cd76af79e162707d3fd1b7dd8dfddeaab2d003543ab78c506ca7e094",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "resources/skills/smart-demo.md",
+              "contentHash": "sha256:01c8a4aef75b6a6d762bcfee0397227efe5f558bc92434ab71327bb14df9498d",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-demo.test.js",
+              "contentHash": "sha256:e60719019edc4a025f50577def0446d651ffe79b7234a17d9bdfe5f1b738537e",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0010",
+              "verificationRunId": "V-003"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-10-19T17:41:30.578Z"
+}

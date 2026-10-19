@@ -40,6 +40,8 @@ const FINDING_FIELDS = new Set(['criterion', 'status', 'reason', 'evidence']);
 const UNREQUESTED_FIELDS = new Set(['id', 'disposition', 'summary', 'reason', 'evidence']);
 const INPUT_FIELDS = new Set(['summary', 'findings', 'unrequested']);
 const CONVERGENCE_EVIDENCE = new RegExp(`^convergence:\\s*(${WORK_ID_SOURCE})/(CV-\\d{3,})$`, 'i');
+// v1.1.0 optional AI QC: `qc:QC-001#S-01` cites one scenario result of this work's QC.
+const QC_EVIDENCE = /^qc:\s*(QC-\d{3,})#(S-\d{2,})$/i;
 
 export function convergenceFilePath(root, workId) {
   return path.join(workspacePath(root), 'work', workId, 'convergence.yaml');
@@ -189,6 +191,9 @@ export async function recordConvergence(root, workId, input, now = new Date().to
         const run = runs.find((candidate) => candidate.id === entry.verificationRunId);
         if (!run?.success) errors.push(`${label}: satisfied cannot rest on failed verification run ${entry.verificationRunId}`);
       }
+      for (const entry of evidence.filter((item) => item.qcRunId && item.qcStatus !== 'passed')) {
+        errors.push(`${label}: satisfied cannot rest on QC ${entry.qcRunId} ${entry.qcScenario}, which was recorded ${entry.qcStatus}`);
+      }
     }
     findings.push({ criterion: criterion.ref, status: raw.status, reason: nonEmpty(raw.reason) ? raw.reason.trim() : raw.reason, evidence });
   }
@@ -259,6 +264,20 @@ async function normalizeFindingEvidence(root, workId, refs, runs, label, errors,
         : 'convergence evidence can only support a criterion finding';
       if (problem) { errors.push(`${label}: ${problem}`); continue; }
       out.push({ type: 'convergence', workId: child[1].toUpperCase(), assessmentId: child[2].toUpperCase() });
+      continue;
+    }
+    if (/^demo:/i.test(ref.trim())) {
+      errors.push(`${label}: ${ref}: a demo shows a scenario once and is not acceptance evidence; cite verification, QC, repository, or runtime evidence instead`);
+      continue;
+    }
+    const qc = QC_EVIDENCE.exec(ref.trim());
+    if (qc) {
+      try {
+        const { resolveQcEvidence } = await import('../quality/qc.js');
+        out.push(await resolveQcEvidence(root, workId, qc[1].toUpperCase(), qc[2].toUpperCase()));
+      } catch (error) {
+        errors.push(`${label}: ${ref}: ${error.message}`);
+      }
       continue;
     }
     try {
@@ -399,6 +418,11 @@ async function findingStaleness(root, meta, criterion, { finding, assessment }, 
     }
     if (entry.type === 'convergence') {
       const reason = await childEvidenceStaleness(root, meta, criterion, entry);
+      if (reason) reasons.push(reason);
+    }
+    if (entry.qcRunId) {
+      const { qcEvidenceStaleness } = await import('../quality/qc.js');
+      const reason = await qcEvidenceStaleness(root, meta, entry);
       if (reason) reasons.push(reason);
     }
     if (entry.verificationRunId && meta.lastInvalidationAt) {

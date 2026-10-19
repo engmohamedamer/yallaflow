@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 8
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-10-19T16:05:14.651Z",
+      "completedAt": "2026-10-19T16:05:14.651Z",
+      "summary": "Builds on C2's quality store (src/quality/artifacts.js storeArtifacts/artifactState, report.js sections, qc.js assertQualityTarget/skillStamp/loadQualitySettings) and the baseline approval precedent (approval recorded from the developer's words via --note, src/baseline/store.js). playwright-cli 0.1.22 offers video-start/video-chapter/video-stop and video-show-actions for recordings; convergence evidence parsing (src/delivery/convergence.js) is where demo: citations are rejected.",
+      "evidence": [
+        "src/quality/artifacts.js",
+        "src/quality/report.js",
+        "src/baseline/store.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-10-19T16:05:14.980Z",
+      "completedAt": "2026-10-19T16:05:14.980Z",
+      "summary": "Criteria AC-017…021 inherited from PF-0007's approved specification; developer requirements (SRC-0002): prioritize meaningful scenarios, approval before recording, recording optional, independent of QC.",
+      "evidence": [
+        "SRC-0002"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-10-19T17:20:02.809Z",
+      "completedAt": "2026-10-19T17:22:28.859Z",
+      "summary": "Re-review fix: the proposal hash is taken over the redacted proposal (redactDeep), which is what demo.json persists, so secret-like demo text no longer breaks the ledger's own integrity check. Regression test with a PASSWORD=… step.",
+      "evidence": [
+        "src/quality/demo.js",
+        "test/quality-demo.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-10-19T17:41:30.265Z",
+      "completedAt": "2026-10-19T17:41:30.265Z",
+      "summary": "npm run check passed as V-003 (739 tests) after the re-review fixes.",
+      "evidence": [
+        "verification:V-003"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-10-19T17:41:30.868Z",
+      "completedAt": "2026-10-19T17:41:30.868Z",
+      "summary": "All assigned criteria re-assessed as satisfied, citing V-003.",
+      "evidence": [
+        "verification:V-003"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Release code review (PF-0011): the demo approval check compared stored hashes only and did not recompute the proposal hash, so a hand-edited proposal kept its approval; an unreadable demo ledger crashed finish.",
+      "changedAt": "2026-10-19T16:43:11.731Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Release code review (PF-0011): the demo approval check compared stored hashes only and did not recompute the proposal hash, so a hand-edited proposal kept its approval; an unreadable demo ledger crashed finish.",
+      "changedAt": "2026-10-19T16:43:11.731Z"
+    },
+    {
+      "skill": "delivery-convergence",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Release code review (PF-0011): the demo approval check compared stored hashes only and did not recompute the proposal hash, so a hand-edited proposal kept its approval; an unreadable demo ledger crashed finish.",
+      "changedAt": "2026-10-19T16:43:11.731Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Release re-review: proposalHash was computed over the unredacted proposal while demo.json is persisted redacted, so a secret-like step (e.g. PASSWORD=<redacted>) made the ledger fail its own hash check on reload.",
+      "changedAt": "2026-10-19T17:20:02.809Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Release re-review: proposalHash was computed over the unredacted proposal while demo.json is persisted redacted, so a secret-like step (e.g. PASSWORD=<redacted>) made the ledger fail its own hash check on reload.",
+      "changedAt": "2026-10-19T17:20:02.809Z"
+    },
+    {
+      "skill": "delivery-convergence",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Release re-review: proposalHash was computed over the unredacted proposal while demo.json is persisted redacted, so a secret-like step (e.g. PASSWORD=<redacted>) made the ledger fail its own hash check on reload.",
+      "changedAt": "2026-10-19T17:20:02.809Z"
+    }
+  ],
+  "updatedAt": "2026-10-19T17:41:30.868Z"
+}

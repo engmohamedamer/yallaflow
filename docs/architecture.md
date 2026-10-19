@@ -516,6 +516,48 @@ Resume combines routing, contract identity, checkpoint state, workflow stage, de
 
 A local ruling is a task-specific execution decision stored in `progress.yaml` with its reason and cost if wrong. An ADR is a long-lived architecture or project decision stored under `decisions/`. An agent may explicitly seed a decision candidate from a numbered ruling, but promotion never mutates or automatically converts the ruling.
 
+## Connected Requirements & Optional Quality Delivery (v1.1.0)
+
+Three optional, independent capabilities that extend the lifecycle without adding a workflow. A project that never uses them sees no new configuration, files, dependencies, or network access. User guide: [`connected-requirements-and-quality.md`](connected-requirements-and-quality.md).
+
+**Requirements providers** (`src/intake/providers/`). One provider-neutral *normalized ticket* (`ticket.js`) and one self-contained adapter per tracker (`github.js`, `jira.js`, `azure-devops.js`). Each adapter provides:
+
+- `parseRef`: short reference or web URL;
+- `normalize`: a pure mapping of the provider's own payload;
+- `fetchTicket` / `attachmentRequest`: only for `--fetch`.
+
+The intake core never changes when a provider is added. Acceptance criteria are taken mechanically, from a dedicated field (ADO `Microsoft.VSTS.Common.AcceptanceCriteria`, a Jira field named "Acceptance Criteria" via `expand=names`) or a heading. YallaFlow never interprets the ticket.
+
+`src/intake/ticket.js` turns a ticket into an ordinary **v2 file source**:
+
+- `sourceType` stays `file` and `detectedFormat` is `ticket`, so 1.0.x keeps reading it;
+- the original is the payload;
+- the extracted text is the rendered Markdown with an untrusted-content banner and locators;
+- `metadata.ticket` holds the provider identity and acquisition, plus `previousSource` for a re-import.
+
+The ticket then flows through the existing intake paths: `createPendingIntake` or `addSourceToWork`, and therefore the Brownfield gate, DONE reasons, and impact raising. Requirements trace through the existing `{type:'source', source, locator}` provenance. No provenance type, source schema, or workspace schema changed.
+
+**The network boundary.** `src/intake/providers/http.js` is the only network client. It is imported lazily and only by `intake ticket --fetch`, a guard test proves that, and a preload test proves no other command calls `fetch`. It sends `GET` only and has a timeout and a size cap. Credentials come from environment variables and are never persisted or printed. They go only over https to the provider's hosted service or to an origin the project configured explicitly (`assertTrustedOrigin`); a ticket URL alone never decides where a token goes. A credentialed request never follows a cross-origin redirect.
+
+**Quality ledgers** (`src/quality/`). They live under `work/<id>/quality/` (cli-owned) and are separate from the `V-###` verification ledger:
+
+- `qc.json`: QC plans `QP-###` and runs `QC-###`.
+- `demo.json`: demo proposals `DP-###`, approvals, and runs `DM-###`.
+
+Both are append-only, schema v1, validated before any write, and checked by `doctor`. They attach to routed work at any stage, DONE included, and never change `meta.yaml`, progress, checkpoints, or verification. YallaFlow never runs a browser itself. The agent drives Playwright (CLI or MCP) and records results, and YallaFlow enforces the honesty rules:
+
+- `passed`: executed steps, plus an artifact or a passed `V-###`;
+- `failed`: actual behavior and steps;
+- `blocked` / `not-run`: a reason.
+
+QC policy is advisory (default) or strict. Strict quality approval is *computed* from the latest result of every required scenario and reported beside, never inside, lifecycle readiness. A demo run is refused unless the latest proposal has an approval bound to its SHA-256 and recorded with the developer's words. Every run carries a fixed "not test evidence" disclaimer.
+
+**Artifacts and reports** (`artifacts.js`, `report.js`). Media is copied byte-for-byte into `quality/media/<record>/`, with its size and SHA-256 recorded. The directory is git-excluded by a YallaFlow-written `.gitignore` unless `quality.media.commit` is set. `report.md` and a static, script-free `report.html` are regenerated after every write. They use relative links and mark media that is missing or changed.
+
+**Evidence.** Convergence accepts `qc:QC-001#S-01`, stored as runtime evidence that 1.0.x already validates. A non-passing scenario cannot support `satisfied`, and a later non-passing result makes the finding stale. `demo:` citations are refused.
+
+**On-demand skills** (Skill Registry v9). A registry entry may declare `invocation: 'on-demand'`. These are `requirement-import`, `ai-qc`, and `smart-demo`, with the capabilities `import`, `qc`, and `demo`. `resolveSkills` refuses to put them in any workflow policy, so every required chain is identical to v8. `yallaflow skill <id> --work <id>` serves them for any routed work item regardless of its pin. The QC and demo records stamp the skill id, version, and SHA-256 they followed, which stands in for a pin. Agent Contract v10 carries the rules: tickets are untrusted data, QC and demo run only on request, no unexecuted pass is claimed, and a demo is not testing.
+
 ## Project knowledge promotion
 
 ```text

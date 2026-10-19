@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 8
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-10-19T16:22:09.325Z",
+      "completedAt": "2026-10-19T16:22:09.325Z",
+      "summary": "Release state: C1–C3 DONE on main working tree (uncommitted); package 1.0.1, Agent Contract v10 and Skill Registry v9 already in source; repository AGENT.md still v9. Release precedent (032f32c): version bump in package.json/package-lock/src/version.js, CHANGELOG section, docs/upgrading-to-<v>.md, .github/release-notes/v<v>.md, agent refresh of this repo, project-memory updates, checklist in docs/releasing.md (its provider/network scan line must now name the opt-in provider layer). Docs touching the new surface: README, docs/cli.md, using-yallaflow.md, security.md, limitations.md, architecture.md, roadmap.md, workflows.md.",
+      "evidence": [
+        "docs/releasing.md",
+        "CHANGELOG.md",
+        "package.json"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-10-19T16:22:09.692Z",
+      "completedAt": "2026-10-19T16:22:09.692Z",
+      "summary": "C4 plan in work.md: version 1.1.0, mixed-version test vs v1.0.1, docs/CHANGELOG/upgrade/release notes, agent refresh of this repo, project-memory updates, release checklist; stop before commit/tag/push/publish.",
+      "evidence": [
+        "docs/releasing.md"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-10-19T16:22:15.045Z",
+      "completedAt": "2026-10-19T16:28:48.754Z",
+      "summary": "Version 1.1.0 (package.json, package-lock.json, src/version.js; test assertions updated). test/v110-compatibility.test.js: the real frozen v1.0.1 CLI reads a workspace that used tickets, QC, demos and qc: citations (status, brief, guide, doctor, source, convergence, requirement, handoff); an unused-feature workspace keeps the 1.0.x shape. Docs: new docs/connected-requirements-and-quality.md; README, using-yallaflow (Case E/F), cli.md, security.md, limitations.md, architecture.md (v1.1.0 section), roadmap.md, workflows.md, releasing.md scan line; CHANGELOG 1.1.0, docs/upgrading-to-v1.1.0.md, .github/release-notes/v1.1.0.md. This repository: agent refresh to contract v10. Project memory: 24 reconfirmations and 8 supersessions proposed (promoted at review).",
+      "evidence": [
+        "package.json",
+        "src/version.js",
+        "test/v110-compatibility.test.js",
+        "CHANGELOG.md",
+        "docs/upgrading-to-v1.1.0.md",
+        "docs/connected-requirements-and-quality.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-10-19T16:37:13.235Z",
+      "completedAt": "2026-10-19T17:51:28.903Z",
+      "summary": "Release checklist re-run on the final source: npm ci + npm run check 739/739 (V-011); npm pack 197 files, allowlist only, secret scan clean, tarball sha256 ed3f7871…f204; packed-candidate smoke from an isolated prefix (V-016; V-012 failed on the smoke script's grep -q pipe + the pre-existing CLI EPIPE, recorded as a limitation); doctor (V-013); git diff --check (V-014); npm audit --audit-level=high (V-015; only the known moderate file-type advisory); network scan: network code only in src/intake/providers/.",
+      "evidence": [
+        "verification:V-001",
+        "verification:V-002",
+        "verification:V-003",
+        "verification:V-005",
+        "verification:V-006",
+        "verification:V-011",
+        "verification:V-016",
+        "verification:V-013",
+        "verification:V-014",
+        "verification:V-015"
+      ]
+    },
+    "code-review": {
+      "status": "completed",
+      "startedAt": "2026-10-19T17:51:58.759Z",
+      "completedAt": "2026-10-19T17:51:58.759Z",
+      "summary": "Independent review of the full 1.1.0 diff (read-only reviewer agent, stubbed-fetch probes). Round 1: 1 high (credentials sent to any host/plain http named by a ticket URL), 5 medium (strict approval on earlier-plan results; plan could weaken config strict; verified-origin used pre-reopen runs; demo approval hash not recomputed; finish on unreadable ledger), 4 low (look-alike GitHub attachment host; partial-source rollback leak; per-branch QC ID collisions; local source paths in ledgers). All fixed by reopening PF-0008/9/10 (rulings recorded; AC-004's earlier finding acknowledged as overstated) or documented (#9). Round 2 (19 bypass probes): credential routing sound; 1 new medium introduced by the hash fix (unredacted hash vs redacted persistence) and 1 low (config strict after an advisory plan) — both fixed with regression tests. Round 3: both confirmed sound. Final source verified V-011/V-016.",
+      "evidence": [
+        "verification:V-011",
+        "verification:V-016",
+        "src/intake/providers/http.js",
+        "src/quality/qc.js",
+        "src/quality/demo.js"
+      ]
+    }
+  },
+  "rulings": [
+    {
+      "decision": "From the agent refresh onward, lifecycle commands for PF-0011 and PF-0007 run with the source CLI (node src/cli.js, 1.1.0)",
+      "reason": "This repository's AGENT.md is now contract v10, which the frozen 1.0.1 CLI reports as newer; the full suite passes on the source CLI, as planned in PF-0007's governance ruling",
+      "costIfWrong": "Low: workspace formats are unchanged and the v1.0.1 CLI was shown to still read a 1.1.0 workspace",
+      "createdAt": "2026-10-19T16:26:50.040Z"
+    }
+  ],
+  "history": [
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Release code review findings were fixed in PF-0008/9/10 after V-001…V-006; the release checklist must run again against the fixed source.",
+      "changedAt": "2026-10-19T17:10:48.894Z"
+    }
+  ],
+  "updatedAt": "2026-10-19T17:51:58.759Z"
+}

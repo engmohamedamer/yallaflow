@@ -27,6 +27,8 @@ export function resolveSkills(capabilities, registry = SKILL_REGISTRY) {
   for (const capability of capabilities) {
     const entry = skillsByCapability.get(capability);
     if (!entry) throw new Error(`Unknown capability: ${JSON.stringify(capability)}.`);
+    // v1.1.0: an on-demand skill is never part of a required chain.
+    if (entry.invocation === 'on-demand') throw new Error(`Capability ${capability} belongs to on-demand skill ${entry.id} and cannot be required by a workflow.`);
     includeSkill(entry.id);
   }
   return resolved;

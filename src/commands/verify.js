@@ -1,5 +1,9 @@
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+
+// v1.1.0: room for verbose suites (e.g. Playwright reporters). Node's 1 MiB default
+// killed a child that printed more and recorded a passing suite as a failed run.
+const VERIFY_MAX_BUFFER = 64 * 1024 * 1024;
 import { writeFile } from 'node:fs/promises';
 import { ensureDir } from '../utils/fs.js';
 import { redactSecrets } from '../security/redact.js';
@@ -14,7 +18,7 @@ import { workflowStagesFor } from '../core/workflows.js';
 // by default — YallaFlow never reconstructs a shell command from argv. Shell syntax
 // (pipes, redirection) requires the explicit --shell mode below.
 async function runArgv(root, executable, args) {
-  const result = spawnSync(executable, args, { cwd: root, shell: false, encoding: 'utf8', stdio: ['inherit', 'pipe', 'pipe'] });
+  const result = spawnSync(executable, args, { cwd: root, shell: false, encoding: 'utf8', stdio: ['inherit', 'pipe', 'pipe'], maxBuffer: VERIFY_MAX_BUFFER });
   return {
     executionMode: 'argv',
     executable,
@@ -27,12 +31,12 @@ async function runArgv(root, executable, args) {
 // GAP-VERIFY-001 (explicit escape hatch): shell interpretation only ever happens when
 // requested by name, never silently.
 async function runShell(root, shellCommand) {
-  const result = spawnSync(shellCommand, { cwd: root, shell: true, encoding: 'utf8', stdio: ['inherit', 'pipe', 'pipe'] });
+  const result = spawnSync(shellCommand, { cwd: root, shell: true, encoding: 'utf8', stdio: ['inherit', 'pipe', 'pipe'], maxBuffer: VERIFY_MAX_BUFFER });
   return { executionMode: 'shell', executable: shellCommand, args: [], displayCommand: shellCommand, result };
 }
 
 async function runScript(root, scriptPath) {
-  const result = spawnSync(scriptPath, [], { cwd: root, shell: false, encoding: 'utf8', stdio: ['inherit', 'pipe', 'pipe'] });
+  const result = spawnSync(scriptPath, [], { cwd: root, shell: false, encoding: 'utf8', stdio: ['inherit', 'pipe', 'pipe'], maxBuffer: VERIFY_MAX_BUFFER });
   return { executionMode: 'script', executable: scriptPath, args: [], displayCommand: `script ${scriptPath}`, result };
 }
 

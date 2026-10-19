@@ -31,6 +31,7 @@ export const STATE_OWNERSHIP = Object.freeze([
   { path: 'work/<id>/convergence.yaml', owner: 'cli', via: 'convergence record (append-only assessments)', pattern: new RegExp(`^work/${WORK_ID_SOURCE}/convergence\\.yaml$`) },
   { path: 'work/<id>/impact.yaml', owner: 'cli', via: 'intake add / requirement record (raise), impact assess', pattern: new RegExp(`^work/${WORK_ID_SOURCE}/impact\\.yaml$`) },
   { path: 'work/<id>/evidence/', owner: 'cli', via: 'verify (append-only verification ledger and logs)', pattern: new RegExp(`^work/${WORK_ID_SOURCE}/evidence/`) },
+  { path: 'work/<id>/quality/', owner: 'cli', via: 'qc plan|record, demo propose|approve|record (optional quality ledgers qc.json/demo.json, hashed local media, generated report.md/report.html)', pattern: new RegExp(`^work/${WORK_ID_SOURCE}/quality/`) },
   { path: 'context/index.yaml', owner: 'cli', via: 'baseline approve, knowledge promote, context reconcile apply, context adopt', pattern: /^context\/index\.yaml$/ },
   { path: 'sources/SRC-####/', owner: 'cli', via: 'intake, intake add (immutable originals + source.json metadata)', pattern: new RegExp(`^sources/${SOURCE_ID_SOURCE}/`) },
   { path: 'state/current.yaml', owner: 'cli', via: 'start, route, advance, reopen, baseline, context reconcile', pattern: /^state\/current\.yaml$/ },

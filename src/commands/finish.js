@@ -1,4 +1,6 @@
-import { findProjectRoot, getCurrentState, listWork, loadWorkMetaOrThrow } from '../core/workspace.js';
+import path from 'node:path';
+import { exists } from '../utils/fs.js';
+import { findProjectRoot, getCurrentState, listWork, loadWorkMetaOrThrow, workspacePath } from '../core/workspace.js';
 import { latestVerification } from '../core/evidence.js';
 import { loadWorkKnowledge } from '../knowledge/store.js';
 import { loadContextLedger } from '../context/ledger.js';
@@ -37,6 +39,39 @@ export async function finishCommand(requestedWorkId, { verbose = false } = {}) {
     for (const line of report.detail) console.log(`  ${line}`);
   }
   if (!report.ready) process.exitCode = 1;
+}
+
+// Optional quality delivery (v1.1.0). Reported only when QC or a demo was requested
+// for this work item; it never changes readiness — quality approval (strict QC) is a
+// separate signal from task completion, and work that never used QC is untouched.
+async function qualityLines(root, meta, detail) {
+  const lines = [];
+  if (!await exists(path.join(workspacePath(root), 'work', meta.id, 'quality'))) return lines;
+  const { evaluateQc, loadQcLedger, loadQualitySettings } = await import('../quality/qc.js');
+  const qc = await loadQcLedger(root, meta.id);
+  if (qc.exists) {
+    const view = evaluateQc(qc.ledger, meta, { configPolicy: (await loadQualitySettings(root)).qcPolicy });
+    detail.push(`qc: plan ${view.plan?.id ?? '-'}, ${view.runs} run(s), policy ${view.policy ?? '-'}`);
+    if (view.policy === 'strict') {
+      lines.push(view.approval.granted
+        ? 'Quality approval (strict QC): granted — every required scenario passed.'
+        : `Quality approval (strict QC): not granted — ${view.approval.reasons.join('; ')}. This is separate from the task being done.`);
+    } else if (view.failures.length) {
+      lines.push(`AI QC (advisory) found ${view.failures.length} scenario(s) not passing: ${view.failures.map((scenario) => `${scenario.id} ${scenario.latest.status}`).join(', ')}. Reported only — completion is not blocked.`);
+    } else if (view.runs) {
+      lines.push('AI QC (advisory): every recorded scenario passed.');
+    }
+  }
+  const { currentApproval, loadDemoLedger } = await import('../quality/demo.js');
+  const demo = await loadDemoLedger(root, meta.id);
+  if (demo.exists) {
+    const latest = demo.ledger.runs.at(-1);
+    detail.push(`demo: ${demo.ledger.proposals.length} proposal(s), ${demo.ledger.runs.length} run(s)`);
+    if (latest) lines.push(`Smart Demo ${latest.id}: ${latest.scenarios.filter((result) => result.status === 'shown').length} scenario(s) shown${latest.video ? ', with a local video' : ''}. A demo is not test evidence.`);
+    else if (!currentApproval(demo.ledger)) lines.push('Smart Demo: the proposed scope is awaiting your approval; nothing has been recorded.');
+  }
+  lines.push(`Quality report: .yallaflow/work/${meta.id}/quality/report.md (and report.html).`);
+  return lines;
 }
 
 export async function assessFinish(root, meta) {
@@ -98,6 +133,8 @@ export async function assessFinish(root, meta) {
 
   if (ready) {
     developer.push(`${meta.readOnly ? 'Completed and verified' : 'Implemented and verified'}. ${knowledgeLine}`);
+    // An unreadable quality ledger (hand edit, merge conflict) never breaks finish.
+    developer.push(...await qualityLines(root, meta, detail).catch(() => ['Optional QC/demo records for this work could not be read (run yallaflow doctor). Completion is not affected.']));
     const dirty = uncommittedPaths(root);
     if (dirty?.length) developer.push(`${dirty.length} changed file(s) are not committed yet — commit them, then push.`);
     developer.push('Ready to push.');

@@ -17,11 +17,11 @@ brownfield
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-001)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-15T09:44:32.913Z (commit 6c01a54)
+- **Verified:** 2026-10-19T17:51:44.084Z (commit 032f32c)
 - **Evidence:**
-  - package.json (repository @ 6c01a54)
-  - README.md (repository @ 6c01a54)
-  - docs/architecture.md (repository @ 6c01a54)
+  - package.json (repository @ 032f32c)
+  - README.md (repository @ 032f32c)
+  - docs/architecture.md (repository @ 032f32c)
 
 <!-- yallaflow-fact:CTX-0002 -->
 ### CTX-0002 — It serves developers who use AI coding agents on Greenfield and Brownfield repositories, alone or as a team sharing one project through ordinary Git (Shared Projects). The normal journey is install, then `yallaflow init`, then open the agent and describe the work; the agent orients itself through YallaFlow automatically.
@@ -31,11 +31,11 @@ brownfield
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-002)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-15T09:44:33.205Z (commit 6c01a54)
+- **Verified:** 2026-10-19T16:37:31.948Z (commit 032f32c)
 - **Evidence:**
-  - README.md (repository @ 6c01a54)
-  - docs/using-yallaflow.md (repository @ 6c01a54)
-  - docs/shared-projects.md (repository @ 6c01a54)
+  - README.md (repository @ 032f32c)
+  - docs/using-yallaflow.md (repository @ 032f32c)
+  - docs/shared-projects.md (repository @ 032f32c)
 
 <!-- yallaflow-fact:CTX-0003 -->
 ### CTX-0003 — Core product principles: discover before asking; understand before changing; prove before claiming; remember after finishing; revalidate before trusting stale knowledge. Work history is immutable while project memory evolves. Durable state beats conversational memory. Investigation is read-only.
@@ -45,30 +45,10 @@ brownfield
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-003)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-15T09:44:33.528Z (commit 6c01a54)
+- **Verified:** 2026-10-19T17:51:44.361Z (commit 032f32c)
 - **Evidence:**
-  - docs/architecture.md (repository @ 6c01a54)
-  - src/agent/contract.js (repository @ 6c01a54)
-
-<!-- yallaflow-fact:CTX-0047 -->
-### CTX-0047 — Core modules: CLI entry and argument parsing (src/cli.js); command handlers (src/commands/); workspace, IDs, lifecycle, progress and verification evidence (src/core/); routing and guidance (src/behavior/); Skill Registry (src/skills/); Agent Contract and bootstraps (src/agent/); project-memory ledger (src/context/); knowledge promotion (src/knowledge/); Brownfield baseline and the project-understanding gate (src/baseline/); delivery convergence (src/delivery/); Shared Projects (src/shared/); source intake (src/intake/); repository inventory (src/inventory/); discovery purpose (src/purpose/); durable secret redaction (src/security/); decomposition, questions, reviews, reconciliation, and limitations.
-
-- **State:** current
-- **Confidence:** confirmed
-- **Provenance:** repository
-- **Source work:** PF-0003
-- **Knowledge ID:** K-005
-- **Promoted at:** 2026-10-12T22:03:25.548Z
-- **Supersedes:** CTX-0005
-- **Verified:** 2026-10-12T22:03:25.548Z (commit b181dc0)
-- **Evidence:**
-  - src/cli.js (repository @ b181dc0)
-  - src/core/workspace.js (repository @ b181dc0)
-  - src/behavior/routing.js (repository @ b181dc0)
-  - src/context/ledger.js (repository @ b181dc0)
-  - src/security/redact.js (repository @ b181dc0)
-  - src/baseline/understanding.js (repository @ b181dc0)
-  - src/inventory/inventory.js (repository @ b181dc0)
+  - docs/architecture.md (repository @ 032f32c)
+  - src/agent/contract.js (repository @ 032f32c)
 
 <!-- yallaflow-fact:CTX-0058 -->
 ### CTX-0058 — From 1.0.0 YallaFlow is a public npm package: package.json names `yallaflow` (no private flag, MIT, publishConfig.access public) and the primary documented install is `npm install -g yallaflow`; Git-tag and tarball installs remain documented alternatives. The 0.2.0-internal.1 … 0.3.10-internal.4 versions were internal prereleases, git-tagged only and never published to npm; every released tag is immutable. 1.0.0 is published manually by the package owner; later versions are published by the release workflow.
@@ -80,11 +60,31 @@ brownfield
 - **Knowledge ID:** K-001
 - **Promoted at:** 2026-10-13T12:25:21.927Z
 - **Supersedes:** CTX-0004
-- **Verified:** 2026-10-15T09:44:37.910Z (commit 6c01a54)
+- **Verified:** 2026-10-19T16:37:35.852Z (commit 032f32c)
 - **Evidence:**
-  - package.json (repository @ 6c01a54)
-  - README.md (repository @ 6c01a54)
-  - docs/installation.md (repository @ 6c01a54)
-  - docs/releasing.md (repository @ 6c01a54)
+  - package.json (repository @ 032f32c)
+  - README.md (repository @ 032f32c)
+  - docs/installation.md (repository @ 032f32c)
+  - docs/releasing.md (repository @ 032f32c)
+
+<!-- yallaflow-fact:CTX-0067 -->
+### CTX-0067 — Core modules: CLI entry and argument parsing (src/cli.js); command handlers (src/commands/); workspace, IDs, lifecycle, progress and verification evidence (src/core/); routing and guidance (src/behavior/); Skill Registry (src/skills/); Agent Contract and bootstraps (src/agent/); project-memory ledger (src/context/); knowledge promotion (src/knowledge/); Brownfield baseline and the project-understanding gate (src/baseline/); delivery convergence (src/delivery/); Shared Projects (src/shared/); source intake (src/intake/), including the tracker providers (src/intake/providers/: GitHub, Jira, Azure DevOps adapters, the normalized ticket, and the only network client, used solely by intake ticket --fetch); optional quality delivery (src/quality/: QC and Smart Demo ledgers, local artifacts, reports); repository inventory (src/inventory/); discovery purpose (src/purpose/); durable secret redaction (src/security/); decomposition, questions, reviews, reconciliation, and limitations.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0011
+- **Knowledge ID:** K-025
+- **Promoted at:** 2026-10-19T16:37:37.201Z
+- **Supersedes:** CTX-0047
+- **Verified:** 2026-10-19T17:51:46.528Z (commit 032f32c)
+- **Evidence:**
+  - src/cli.js (repository @ 032f32c)
+  - src/core/workspace.js (repository @ 032f32c)
+  - src/intake/providers/index.js (repository @ 032f32c)
+  - src/quality/qc.js (repository @ 032f32c)
+  - src/quality/demo.js (repository @ 032f32c)
+  - src/context/ledger.js (repository @ 032f32c)
+  - src/security/redact.js (repository @ 032f32c)
 
 <!-- yallaflow-context:end -->

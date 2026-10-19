@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { access } from 'node:fs/promises';
 import { CAPABILITIES } from '../behavior/constants.js';
-import { REGISTRY_VERSION, SKILL_MODES, SKILL_PHASES } from './constants.js';
+import { REGISTRY_VERSION, SKILL_INVOCATIONS, SKILL_MODES, SKILL_PHASES } from './constants.js';
 import { instructionFilePath, PACKAGE_ROOT, SKILL_REGISTRY } from './registry.js';
 import { latestInstructionVersion, loadSkillInstructions, SKILL_INSTRUCTION_VERSIONS } from './instructions.js';
 
@@ -15,6 +15,8 @@ const REQUIRED_FIELDS = Object.freeze([
   'prerequisites',
   'instructionPath'
 ]);
+// v1.1.0 (registry v9): optional; absent means 'required'.
+const OPTIONAL_FIELDS = Object.freeze(['invocation']);
 
 export function validateRegistryStructure(registry = SKILL_REGISTRY) {
   if (!Array.isArray(registry) || registry.length === 0) throw new Error('Skill registry must be a non-empty array.');
@@ -25,7 +27,7 @@ export function validateRegistryStructure(registry = SKILL_REGISTRY) {
     if (!entry || typeof entry !== 'object' || Array.isArray(entry)) throw new Error('Each skill registry entry must be an object.');
     const missing = REQUIRED_FIELDS.filter((field) => !Object.hasOwn(entry, field));
     if (missing.length) throw new Error(`Skill registry entry is missing required field(s): ${missing.join(', ')}.`);
-    const unknown = Object.keys(entry).filter((field) => !REQUIRED_FIELDS.includes(field));
+    const unknown = Object.keys(entry).filter((field) => !REQUIRED_FIELDS.includes(field) && !OPTIONAL_FIELDS.includes(field));
     if (unknown.length) throw new Error(`Skill ${entry.id ?? '<unknown>'} has unknown field(s): ${unknown.join(', ')}.`);
     if (typeof entry.id !== 'string' || !entry.id.trim()) throw new Error('Skill id must be a non-empty string.');
     if (!Number.isInteger(entry.version) || entry.version < 1) throw new Error(`Skill ${entry.id} version must be a positive integer.`);
@@ -37,6 +39,9 @@ export function validateRegistryStructure(registry = SKILL_REGISTRY) {
     if (!SKILL_MODES.includes(entry.mode)) throw new Error(`Skill ${entry.id} mode must be one of: ${SKILL_MODES.join(', ')}.`);
     if (!Array.isArray(entry.prerequisites) || entry.prerequisites.some((value) => typeof value !== 'string' || !value.trim())) {
       throw new Error(`Skill ${entry.id} prerequisites must be an array of skill IDs.`);
+    }
+    if (entry.invocation !== undefined && !SKILL_INVOCATIONS.includes(entry.invocation)) {
+      throw new Error(`Skill ${entry.id} invocation must be one of: ${SKILL_INVOCATIONS.join(', ')}.`);
     }
     if (typeof entry.instructionPath !== 'string' || !entry.instructionPath.trim()) {
       throw new Error(`Skill ${entry.id} instructionPath must be non-empty.`);

@@ -1,0 +1,64 @@
+{
+  "id": "PF-0011",
+  "type": "release",
+  "title": "v1.1.0 C4 — Integration, Agent Contract v10, documentation and release verification",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "routingConfidence": "high",
+  "routingReason": "Decomposed from PF-0007.",
+  "routedAt": "2026-10-19T15:15:08.265Z",
+  "workflow": "release",
+  "requiredCapabilities": [
+    "discover",
+    "plan",
+    "implement",
+    "verify",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 8,
+    "skills": [
+      "context-discovery",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "code-review"
+    ]
+  },
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "parent": "PF-0007",
+  "decompositionKey": "C4",
+  "requirements": [
+    "REQ-011"
+  ],
+  "acceptanceCriteria": [
+    "AC-025",
+    "AC-026",
+    "AC-027"
+  ],
+  "createdAt": "2026-10-19T15:15:08.265Z",
+  "updatedAt": "2026-10-19T17:51:58.965Z",
+  "lastInvalidationAt": "2026-10-19T17:10:48.899Z",
+  "completionHistory": [
+    {
+      "completedAt": "2026-10-19T17:51:58.965Z",
+      "verificationRunIds": [
+        "V-007",
+        "V-008",
+        "V-009",
+        "V-010",
+        "V-011",
+        "V-012",
+        "V-013",
+        "V-014",
+        "V-015",
+        "V-016"
+      ]
+    }
+  ]
+}

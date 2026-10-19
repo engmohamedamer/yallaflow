@@ -1,0 +1,17 @@
+{
+  "issue": {
+    "number": 7,
+    "title": "Refund approval",
+    "body": "Refunds above 100 need a manager.\n\n**Acceptance criteria**\n1. A refund above 100 waits for approval\n2. A manager can approve it\n",
+    "state": "open",
+    "html_url": "https://github.com/acme/shop/issues/7",
+    "user": { "login": "carol", "type": "User" },
+    "labels": [{ "name": "payments" }],
+    "created_at": "2026-09-01T08:00:00Z",
+    "updated_at": "2026-09-05T08:00:00Z"
+  },
+  "comments": [
+    { "id": 9001, "user": { "login": "dave", "type": "User" }, "body": "Managers are users with the finance role.", "created_at": "2026-09-02T08:00:00Z" },
+    { "id": 9002, "user": { "login": "ci-helper", "type": "Bot" }, "body": "Build passed.", "created_at": "2026-09-03T08:00:00Z" }
+  ]
+}

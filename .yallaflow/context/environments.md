@@ -13,10 +13,10 @@
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-033)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-15T09:44:36.210Z (commit 6c01a54)
+- **Verified:** 2026-10-19T17:51:45.451Z (commit 032f32c)
 - **Evidence:**
-  - package.json (repository @ 6c01a54)
-  - docs/limitations.md (repository @ 6c01a54)
+  - package.json (repository @ 032f32c)
+  - docs/limitations.md (repository @ 032f32c)
 
 <!-- yallaflow-fact:CTX-0059 -->
 ### CTX-0059 — The only CI is .github/workflows/release.yml, triggered when a GitHub Release is published: a guard job (tag = v+package version, prerelease flag matches, tag on main, version not already on npm — an already-published version ends the run with a notice), a test job running npm ci and npm run check on Node 20, 22 and 24 with full Git history, and a publish job on Node 24 that smoke-tests the packed tarball and runs npm publish with provenance through npm Trusted Publishing (OIDC id-token, no stored npm token). There is no pull-request CI and no container configuration; day-to-day validation is local per docs/releasing.md.
@@ -28,10 +28,10 @@
 - **Knowledge ID:** K-002
 - **Promoted at:** 2026-10-13T12:25:22.356Z
 - **Supersedes:** CTX-0034
-- **Verified:** 2026-10-13T12:25:22.356Z (commit c433e61)
+- **Verified:** 2026-10-19T16:37:36.068Z (commit 032f32c)
 - **Evidence:**
-  - .github/workflows/release.yml (repository @ c433e61)
-  - docs/releasing.md (repository @ c433e61)
-  - PATH=/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/d1aeff28-7394-41fa-aeea-ba8a14616a0b/scratchpad/node/node-v24.21.0-linux-x64/bin:$PATH; node --version && npm test (passed) (runtime, PF-0004 V-015)
+  - .github/workflows/release.yml (repository @ 032f32c)
+  - docs/releasing.md (repository @ 032f32c)
+  - PATH=/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/d1aeff28-7394-41fa-aeea-ba8a14616a0b/scratchpad/node/node-v24.21.0-linux-x64/bin:$PATH; node --version && npm test (passed) (runtime)
 
 <!-- yallaflow-context:end -->

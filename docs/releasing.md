@@ -58,7 +58,8 @@ Run in order from a clean checkout. Nothing is committed, tagged, pushed, or pub
                                        # --version, init (Greenfield and Brownfield), Claude and
                                        # Codex bootstraps, the Brownfield first-request gate,
                                        # a Shared Project clone, doctor
-[ ] provider/inference scan           # no network, model-provider, or telemetry code in src/
+[ ] provider/inference scan           # no model-provider or telemetry code in src/; network code only in
+                                       # src/intake/providers/ (opt-in `intake ticket --fetch`), loaded lazily
 [ ] git diff --check                  # no whitespace errors
 [ ] CHANGELOG.md updated              # new section under the version being released
 [ ] version bumped                    # package.json + src/version.js, deliberately; domain

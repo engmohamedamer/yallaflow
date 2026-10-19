@@ -710,12 +710,20 @@ test('51/no-network: YallaFlow source never invokes mutating or network Git subc
         const text = await readFile(full, 'utf8');
         for (const match of text.matchAll(/spawnSync\('git', \[\s*'([a-z-]+)'/g)) if (!allowed.has(match[1])) offenders.push(`${entry.name}: git ${match[1]}`);
         for (const match of text.matchAll(/git\(root, \['([a-z-]+)'/g)) if (!allowed.has(match[1])) offenders.push(`${entry.name}: git ${match[1]}`);
-        if (/\bfetch\(|https?:\/\/(?!claude\.com)|node:https?['"]|node:net['"]|anthropic|openai/i.test(text)) offenders.push(`${entry.name}: network/provider reference`);
+        // v1.1.0: the only network client is the explicit, opt-in `intake ticket --fetch`
+        // provider layer (src/intake/providers/); it is guarded separately below.
+        const providerLayer = path.relative(srcDir, full).startsWith(`intake${path.sep}providers${path.sep}`);
+        if (!providerLayer && /\bfetch\(|https?:\/\/(?!claude\.com)|node:https?['"]|node:net['"]|anthropic|openai/i.test(text)) offenders.push(`${entry.name}: network/provider reference`);
+        if (!providerLayer && /intake\/providers\//.test(text) && path.relative(srcDir, full) !== path.join('commands', 'intake.js')) offenders.push(`${entry.name}: imports the network provider layer`);
+        if (providerLayer && /anthropic|openai|node:net['"]/i.test(text)) offenders.push(`${entry.name}: provider layer reference outside tracker APIs`);
       }
     }
   }
   await walk(srcDir);
   assert.deepEqual(offenders, []);
+  // The provider layer is loaded lazily, only by the ticket import command.
+  const intakeCommand = await readFile(path.join(srcDir, 'commands', 'intake.js'), 'utf8');
+  assert.doesNotMatch(intakeCommand, /^import [^\n]*intake\/providers\//m, 'providers are never imported at module load');
 });
 
 // ---------------------------------------------------------------------------

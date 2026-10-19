@@ -1,0 +1,85 @@
+{
+  "id": "PF-0010",
+  "type": "feature",
+  "title": "v1.1.0 C3 — Smart Demo & Recording (approved scenarios, optional video, demo reports)",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "routingConfidence": "high",
+  "routingReason": "Decomposed from PF-0007.",
+  "routedAt": "2026-10-19T15:15:08.265Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "implement",
+    "verify",
+    "converge"
+  ],
+  "behaviorContract": {
+    "registryVersion": 8,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation",
+      "verification",
+      "delivery-convergence"
+    ]
+  },
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "parent": "PF-0007",
+  "decompositionKey": "C3",
+  "requirements": [
+    "REQ-008"
+  ],
+  "acceptanceCriteria": [
+    "AC-017",
+    "AC-018",
+    "AC-019",
+    "AC-020",
+    "AC-021"
+  ],
+  "createdAt": "2026-10-19T15:15:08.265Z",
+  "updatedAt": "2026-10-19T17:41:32.443Z",
+  "completionHistory": [
+    {
+      "completedAt": "2026-10-19T16:21:18.285Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    },
+    {
+      "completedAt": "2026-10-19T17:10:33.477Z",
+      "verificationRunIds": [
+        "V-002"
+      ]
+    },
+    {
+      "completedAt": "2026-10-19T17:41:32.443Z",
+      "verificationRunIds": [
+        "V-003"
+      ]
+    }
+  ],
+  "lastInvalidationAt": "2026-10-19T17:20:02.809Z",
+  "lifecycleHistory": [
+    {
+      "action": "reopen",
+      "fromStage": "DONE",
+      "toStage": "IMPLEMENTATION",
+      "reason": "Release code review (PF-0011): the demo approval check compared stored hashes only and did not recompute the proposal hash, so a hand-edited proposal kept its approval; an unreadable demo ledger crashed finish.",
+      "changedAt": "2026-10-19T16:43:11.731Z"
+    },
+    {
+      "action": "reopen",
+      "fromStage": "DONE",
+      "toStage": "IMPLEMENTATION",
+      "reason": "Release re-review: proposalHash was computed over the unredacted proposal while demo.json is persisted redacted, so a secret-like step (e.g. PASSWORD=<redacted>) made the ledger fail its own hash check on reload.",
+      "changedAt": "2026-10-19T17:20:02.809Z"
+    }
+  ]
+}

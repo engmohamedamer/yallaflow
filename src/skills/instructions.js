@@ -21,6 +21,7 @@ import { PACKAGE_ROOT } from './registry.js';
 // earlier repository-baseline text that v0.3.9 had already replaced in place; that
 // pre-v6 drift cannot be recovered from the pin and is documented, not hidden.
 export const SKILL_INSTRUCTION_VERSIONS = Object.freeze({
+  'ai-qc': { 1: { path: 'resources/skills/ai-qc.md', sha256: '6d90d59ed0975428c61072cfced1296a187b1b626b99a46604350662448e177d' } },
   'code-review': { 1: { path: 'resources/skills/code-review.md', sha256: '35e1491831c7c8d4a6540a0c0ec0f3e21cc30a1656bb1c8132f8ce12a98a22b1' } },
   'context-discovery': {
     1: { path: 'resources/skills/archive/context-discovery.v1.md', sha256: '92bd36765f1d11f33471f86859fabd3aca6ba817ed1163365aa31e01c990aa5c' },
@@ -37,7 +38,9 @@ export const SKILL_INSTRUCTION_VERSIONS = Object.freeze({
     3: { path: 'resources/skills/archive/repository-baseline.v3.md', sha256: '67f5c0cfa5b9aeee15bf20c1173477c6471ed9d5ce8d42bd59fa50db9a9a9972' },
     4: { path: 'resources/skills/repository-baseline.md', sha256: '99b749b793155306078cf5ee1c574e8a6d3ee72489bf4850c56d5556319728ae' }
   },
+  'requirement-import': { 1: { path: 'resources/skills/requirement-import.md', sha256: '35ec8843ba84d89ea282f8d1c181b4d5b4a4727e242cee9b505e59d886cfd7ad' } },
   'requirement-clarification': { 1: { path: 'resources/skills/requirement-clarification.md', sha256: '6e980db5f14632b56b158f12c4720c022710b8fe0b499bb3fb26692c451c72af' } },
+  'smart-demo': { 1: { path: 'resources/skills/smart-demo.md', sha256: '01c8a4aef75b6a6d762bcfee0397227efe5f558bc92434ab71327bb14df9498d' } },
   specification: { 1: { path: 'resources/skills/specification.md', sha256: '2e5427c9767a8ebbf73d6c5cdc1024f8fbd0aafe6191bf2bac1c09b13f478702' } },
   'systematic-debugging': { 1: { path: 'resources/skills/systematic-debugging.md', sha256: '98f9d81cc91dead9eef8b77c7e6e4ed96449cd0bcde8ab28de57dbd76d21c816' } },
   verification: { 1: { path: 'resources/skills/verification.md', sha256: 'a2777bd2ed24f4ba6579654097dea4d2881cdafc56427abf2f3f7cdc68b853e4' } }

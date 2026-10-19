@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 8
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-10-19T15:15:19.745Z",
+      "completedAt": "2026-10-19T15:15:19.745Z",
+      "summary": "Inherits PF-0007 intent discovery (extension points: Normalized Intake Contract + persistSource, source.json v2 free-form metadata, validateSourceRef passthrough keys, intake command captureSources/createPendingIntake/addSourceToWork, cli.js USAGE/NAMESPACE_ACTIONS help strategy, Skill Registry strict entry fields and capability ownership, skill --work pin resolution). No live provider access (PF-0007 limitation).",
+      "evidence": [
+        "src/intake/normalize.js",
+        "src/commands/intake.js",
+        "src/skills/validation.js",
+        "src/commands/skill.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-10-19T15:15:20.082Z",
+      "completedAt": "2026-10-19T15:15:20.082Z",
+      "summary": "Criteria AC-001…009, AC-024 inherited from PF-0007's approved specification (REQ-001…004, REQ-010); no open business questions.",
+      "evidence": [
+        "SRC-0002"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-10-19T16:41:06.522Z",
+      "completedAt": "2026-10-19T16:43:02.185Z",
+      "summary": "Review fixes: assertTrustedOrigin (src/intake/providers/http.js) — credentials only over https to the hosted tracker (api.github.com, *.atlassian.net, dev.azure.com, *.visualstudio.com) or an explicitly configured origin; GitHub non-github.com hosts require requirements.providers.github.apiUrl; checked before any request. GitHub attachment hosts anchored (no look-alikes) and attachments download only from the tracker origin or those hosts. persistIntakes records each source as written so a mid-batch failure rolls back every one. Tests: untrusted/plain-http hosts refused with zero requests, zero writes, no credential in errors; look-alike attachment host rejected; local-server tests configure their host explicitly. Docs updated.",
+      "evidence": [
+        "src/intake/providers/http.js",
+        "src/intake/providers/github.js",
+        "src/commands/intake.js",
+        "test/ticket-intake.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-10-19T17:10:08.535Z",
+      "completedAt": "2026-10-19T17:10:08.535Z",
+      "summary": "npm run check passed as V-002 (737 tests) after the release-review fixes.",
+      "evidence": [
+        "verification:V-002"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-10-19T17:10:09.304Z",
+      "completedAt": "2026-10-19T17:10:09.304Z",
+      "summary": "All assigned criteria re-assessed as satisfied after the review fixes, citing V-002.",
+      "evidence": [
+        "verification:V-002"
+      ]
+    }
+  },
+  "rulings": [
+    {
+      "decision": "CV-001's AC-004 finding overstated the credential guard: allowedOrigin was derived from the user-supplied URL, so the same-origin check did not restrict which host received credentials",
+      "reason": "Independent release review reproduced token delivery to arbitrary and plain-http hosts with a stubbed fetch",
+      "costIfWrong": "A leaked tracker token; fixed by restricting credentialed requests to https trusted tracker hosts or explicitly configured origins",
+      "createdAt": "2026-10-19T16:41:06.881Z"
+    }
+  ],
+  "history": [
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Release code review (PF-0011) found that intake ticket --fetch sent credentials to whatever host the ticket URL named, including plain http (AC-004 was recorded satisfied on an incomplete guard), plus a look-alike GitHub attachment host match and a partial-source rollback leak.",
+      "changedAt": "2026-10-19T16:41:06.522Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Release code review (PF-0011) found that intake ticket --fetch sent credentials to whatever host the ticket URL named, including plain http (AC-004 was recorded satisfied on an incomplete guard), plus a look-alike GitHub attachment host match and a partial-source rollback leak.",
+      "changedAt": "2026-10-19T16:41:06.522Z"
+    },
+    {
+      "skill": "delivery-convergence",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Release code review (PF-0011) found that intake ticket --fetch sent credentials to whatever host the ticket URL named, including plain http (AC-004 was recorded satisfied on an incomplete guard), plus a look-alike GitHub attachment host match and a partial-source rollback leak.",
+      "changedAt": "2026-10-19T16:41:06.522Z"
+    }
+  ],
+  "updatedAt": "2026-10-19T17:10:09.304Z"
+}

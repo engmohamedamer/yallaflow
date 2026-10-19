@@ -40,9 +40,9 @@ async function workspaceWithPinnedWork(registryVersion) {
 // ---------------------------------------------------------------------------
 // Skill Registry immutability
 
-test('every released skill instruction version is immutable bytes with a recorded hash; the registry is v8', async () => {
-  assert.equal(REGISTRY_VERSION, 8);
-  assert.deepEqual(await validateSkillRegistry(), { registryVersion: 8, skillCount: 12 });
+test('every released skill instruction version is immutable bytes with a recorded hash; the registry is v9', async () => {
+  assert.equal(REGISTRY_VERSION, 9);
+  assert.deepEqual(await validateSkillRegistry(), { registryVersion: 9, skillCount: 15 });
   for (const [skillId, versions] of Object.entries(SKILL_INSTRUCTION_VERSIONS)) {
     for (const [version, entry] of Object.entries(versions)) {
       assert.equal(sha(await readFile(path.join(repo, entry.path), 'utf8')), entry.sha256, `${skillId} v${version}`);

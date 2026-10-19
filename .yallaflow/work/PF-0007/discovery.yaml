@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "unavailable",
+      "area": "integration",
+      "summary": "No live GitHub, Jira, or Azure DevOps access was exercised: gh CLI is not installed here, the Atlassian MCP server is present but unauthenticated, no Azure DevOps tooling exists.",
+      "reason": "Provider API payload shapes are taken from public API documentation knowledge, not from live calls; adapters must be validated against recorded fixtures and one real call per provider before release.",
+      "recordedAt": "2026-10-19T14:46:48.092Z"
+    },
+    {
+      "id": "DL-002",
+      "type": "not-inspected",
+      "area": "testing",
+      "summary": "Playwright MCP server behavior and Playwright test-runner video options were not exercised; only the installed @playwright/cli 0.1.22 command list (video-start/stop/chapter, tracing, screenshot) was inspected.",
+      "reason": "Discovery is read-only; runtime spikes belong to the QC and Demo children.",
+      "recordedAt": "2026-10-19T14:46:49.411Z"
+    }
+  ],
+  "updatedAt": "2026-10-19T14:46:49.411Z"
+}

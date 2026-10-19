@@ -23,7 +23,12 @@ export const CAPABILITIES = Object.freeze([
   'converge',
   'review',
   'baseline',
-  'reconcile'
+  'reconcile',
+  // v1.1.0 on-demand capabilities: owned by on-demand skills and never part of any
+  // workflow policy (behavior/policy.js), so no lifecycle ever requires them.
+  'import',
+  'qc',
+  'demo'
 ]);
 
 export const WRITE_STAGES = Object.freeze({

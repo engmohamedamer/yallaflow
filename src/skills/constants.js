@@ -13,7 +13,16 @@
 //     request as the baseline objective and its automatic continuation after approval,
 //     declared discovery coverage, never copying secret values). Same skills and
 //     capability pins; work pinned to v7 keeps instruction v3.
-export const REGISTRY_VERSION = 8;
+// 9 — v1.1.0: on-demand skills (`invocation: 'on-demand'`) — requirement-import
+//     (capability 'import'), ai-qc ('qc') and smart-demo ('demo'). They belong to no
+//     workflow policy, so every required chain is unchanged from v8; `yallaflow skill
+//     <id> --work <id>` serves them for any routed work item, whatever registry it
+//     pinned. Same instruction versions as v8 for every required skill.
+export const REGISTRY_VERSION = 9;
+
+// How a skill is reached: 'required' skills come from a work item's pinned Behavior
+// Contract; 'on-demand' skills are used only when the developer asks for them.
+export const SKILL_INVOCATIONS = Object.freeze(['required', 'on-demand']);
 
 export const SKILL_PHASES = Object.freeze([
   'discovery',

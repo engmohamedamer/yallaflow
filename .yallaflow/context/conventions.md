@@ -16,11 +16,11 @@
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-035)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-15T09:44:36.554Z (commit 6c01a54)
+- **Verified:** 2026-10-19T16:37:35.176Z (commit 032f32c)
 - **Evidence:**
-  - package.json (repository @ 6c01a54)
-  - test-support/shared.js (repository @ 6c01a54)
-  - test-support/delivery.js (repository @ 6c01a54)
+  - package.json (repository @ 032f32c)
+  - test-support/shared.js (repository @ 032f32c)
+  - test-support/delivery.js (repository @ 032f32c)
 
 <!-- yallaflow-fact:CTX-0036 -->
 ### CTX-0036 — Compatibility is tested against real frozen releases: test-support frozenCli(tag) extracts a released tag's CLI with git archive into a temp directory (symlinking node_modules) and returns null when Git history is unavailable. Mixed-version tests use it.
@@ -30,10 +30,10 @@
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-036)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-12T22:03:32.028Z (commit b181dc0)
+- **Verified:** 2026-10-19T16:37:35.415Z (commit 032f32c)
 - **Evidence:**
-  - test-support/shared.js#frozenCli (repository @ b181dc0)
-  - test/hardening.test.js (repository @ b181dc0)
+  - test-support/shared.js#frozenCli (repository @ 032f32c)
+  - test/hardening.test.js (repository @ 032f32c)
 
 <!-- yallaflow-fact:CTX-0038 -->
 ### CTX-0038 — Code style: ES modules with named exports, async/await over node:fs/promises, Object.freeze constant vocabularies in per-domain constants.js files, and validation that runs before any write so an invalid input mutates nothing. Comments explain intent and the version that introduced a behavior.
@@ -50,27 +50,6 @@
   - src/context/constants.js (repository @ b181dc0)
   - src/baseline/store.js (repository @ b181dc0)
 
-<!-- yallaflow-fact:CTX-0040 -->
-### CTX-0040 — Documentation set:
-- README.md is the simple first-use journey; docs/using-yallaflow.md is the practical developer guide.
-- docs/cli.md is the command reference.
-- docs/architecture.md, docs/project-memory.md and docs/shared-projects.md cover the design.
-- docs/security.md and docs/limitations.md cover trust boundaries and gaps; docs/releasing.md covers the release policy.
-- docs/upgrading-to-*.md are per-version upgrade notes.
-
-- **State:** current
-- **Confidence:** confirmed
-- **Provenance:** repository
-- **From baseline:** PF-0002 (BF-040)
-- **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-15T09:44:36.900Z (commit 6c01a54)
-- **Evidence:**
-  - README.md (repository @ 6c01a54)
-  - docs/using-yallaflow.md (repository @ 6c01a54)
-  - docs/cli.md (repository @ 6c01a54)
-  - docs/architecture.md (repository @ 6c01a54)
-  - docs/limitations.md (repository @ 6c01a54)
-
 <!-- yallaflow-fact:CTX-0060 -->
 ### CTX-0060 — Release process (from 1.0.0): - The package follows SemVer; each release is one commit with an annotated tag vX.Y.Z matching package.json and src/version.js; tags are never moved. - Before release: npm ci + npm run check, doctor on the self-dogfood workspace, npm audit with every finding classified, npm pack --dry-run plus inspection and secret scan of the real tarball, a packed-candidate smoke test from an isolated prefix, provider/network scan, git diff --check. - CHANGELOG.md and docs/upgrading-to-*.md are updated per release; GitHub release notes live in .github/release-notes/. - Publishing: GitHub Release -> release.yml -> npm Trusted Publishing with provenance; the trusted publisher is created when the first automated release is ready because npm expires an unused configuration after 2 days. - package.json files ships src, resources, docs, README.md, CHANGELOG.md and LICENSE. - Nothing is committed, tagged, pushed or published without the maintainer's explicit approval.
 
@@ -81,12 +60,12 @@
 - **Knowledge ID:** K-003
 - **Promoted at:** 2026-10-13T12:25:22.722Z
 - **Supersedes:** CTX-0039
-- **Verified:** 2026-10-15T09:44:38.262Z (commit 6c01a54)
+- **Verified:** 2026-10-19T17:51:46.240Z (commit 032f32c)
 - **Evidence:**
-  - docs/releasing.md (repository @ 6c01a54)
-  - package.json (repository @ 6c01a54)
-  - .github/workflows/release.yml (repository @ 6c01a54)
-  - CHANGELOG.md (repository @ 6c01a54)
+  - docs/releasing.md (repository @ 032f32c)
+  - package.json (repository @ 032f32c)
+  - .github/workflows/release.yml (repository @ 032f32c)
+  - CHANGELOG.md (repository @ 032f32c)
 
 <!-- yallaflow-fact:CTX-0061 -->
 ### CTX-0061 — Versioning and compatibility: - The package version (src/version.js), Agent Contract, bootstrap, Skill Registry, knowledge policy and each per-file schemaVersion are independent; one is never inferred from another, and 1.0.0 bumped only the package version. - From 1.0.0 the package follows SemVer: PATCH = backward-compatible fixes and docs; MINOR = backward-compatible functionality; MAJOR = incompatible public CLI behavior, incompatible durable workspace behavior, or any break not handled by backward-compatible reads/migrations. - Work items keep their pinned behavior, released skill instructions are immutable, supported workspaces stay readable without migration on read, and historical work is never silently rewritten. - Persisted schemas are bumped only when the stored shape truly requires it, written at the lowest version that can represent the content.
@@ -98,12 +77,32 @@
 - **Knowledge ID:** K-004
 - **Promoted at:** 2026-10-13T12:25:23.073Z
 - **Supersedes:** CTX-0037
-- **Verified:** 2026-10-15T09:44:38.580Z (commit 6c01a54)
+- **Verified:** 2026-10-19T16:37:36.535Z (commit 032f32c)
 - **Evidence:**
-  - docs/releasing.md (repository @ 6c01a54)
-  - src/version.js (repository @ 6c01a54)
-  - src/context/constants.js (repository @ 6c01a54)
-  - src/knowledge/constants.js (repository @ 6c01a54)
-  - docs/upgrading-to-v1.0.md (repository @ 6c01a54)
+  - docs/releasing.md (repository @ 032f32c)
+  - src/version.js (repository @ 032f32c)
+  - src/context/constants.js (repository @ 032f32c)
+  - src/knowledge/constants.js (repository @ 032f32c)
+  - docs/upgrading-to-v1.0.md (repository @ 032f32c)
+
+<!-- yallaflow-fact:CTX-0069 -->
+### CTX-0069 — Documentation set: - README.md is the simple first-use journey; docs/using-yallaflow.md is the practical developer guide. - docs/cli.md is the command reference. - docs/architecture.md, docs/project-memory.md and docs/shared-projects.md cover the design; docs/connected-requirements-and-quality.md is the guide to ticket import, AI QC and Smart Demo. - docs/security.md and docs/limitations.md cover trust boundaries and gaps; docs/releasing.md covers the release policy. - docs/upgrading-to-*.md are per-version upgrade notes; .github/release-notes/ holds GitHub release notes.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0011
+- **Knowledge ID:** K-027
+- **Promoted at:** 2026-10-19T16:37:37.712Z
+- **Supersedes:** CTX-0040
+- **Verified:** 2026-10-19T17:51:46.842Z (commit 032f32c)
+- **Evidence:**
+  - README.md (repository @ 032f32c)
+  - docs/using-yallaflow.md (repository @ 032f32c)
+  - docs/cli.md (repository @ 032f32c)
+  - docs/architecture.md (repository @ 032f32c)
+  - docs/connected-requirements-and-quality.md (repository @ 032f32c)
+  - docs/limitations.md (repository @ 032f32c)
+  - docs/upgrading-to-v1.1.0.md (repository @ 032f32c)
 
 <!-- yallaflow-context:end -->

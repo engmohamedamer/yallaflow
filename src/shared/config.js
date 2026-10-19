@@ -76,6 +76,8 @@ export function validateProjectConfig(config) {
       if (block.minimumVersion !== undefined && !parseVersion(block.minimumVersion)) errors.push(`config.yaml yallaflow.minimumVersion ${JSON.stringify(block.minimumVersion)} is not a valid version.`);
     }
   }
+  errors.push(...validateRequirementsConfig(config.requirements));
+  errors.push(...validateQualityConfig(config.quality));
   if (config.shared === undefined) {
     if (config.schemaVersion === CONFIG_SCHEMA_SHARED) errors.push('config.yaml schema v2 requires a shared block (written by `yallaflow shared enable`).');
     return errors;
@@ -99,6 +101,68 @@ export function validateProjectConfig(config) {
       if (extra.length) errors.push(`config.yaml shared.sources has unknown field(s): ${extra.join(', ')}.`);
       if (sources.storage !== undefined && !SOURCE_STORAGE_POLICIES.includes(sources.storage)) errors.push(`config.yaml shared.sources.storage must be one of: ${SOURCE_STORAGE_POLICIES.join(', ')}.`);
       if (sources.largeFileBytes !== undefined && (!Number.isInteger(sources.largeFileBytes) || sources.largeFileBytes < 1)) errors.push('config.yaml shared.sources.largeFileBytes must be a positive integer.');
+    }
+  }
+  return errors;
+}
+
+// Optional Connected Requirements settings (v1.1.0). Absent means defaults; nothing
+// here enables network access — only `intake ticket --fetch` ever fetches.
+//   requirements:
+//     providers:
+//       github:       { apiUrl: <GitHub Enterprise API URL, e.g. ghe.example.com/api/v3> }
+//       jira:         { baseUrl: <site URL, e.g. example.atlassian.net> }
+//       azure-devops: { baseUrl: <Azure DevOps Server collection URL> }
+const PROVIDER_URL_FIELDS = Object.freeze({ github: 'apiUrl', jira: 'baseUrl', 'azure-devops': 'baseUrl' });
+
+export function validateRequirementsConfig(block) {
+  if (block === undefined) return [];
+  if (!block || typeof block !== 'object' || Array.isArray(block)) return ['config.yaml requirements must be an object.'];
+  const errors = [];
+  const extra = Object.keys(block).filter((key) => key !== 'providers');
+  if (extra.length) errors.push(`config.yaml requirements has unknown field(s): ${extra.join(', ')}.`);
+  if (block.providers === undefined) return errors;
+  if (!block.providers || typeof block.providers !== 'object' || Array.isArray(block.providers)) return [...errors, 'config.yaml requirements.providers must be an object.'];
+  for (const [provider, settings] of Object.entries(block.providers)) {
+    const field = PROVIDER_URL_FIELDS[provider];
+    if (!field) {
+      errors.push(`config.yaml requirements.providers has unknown provider ${JSON.stringify(provider)} (known: ${Object.keys(PROVIDER_URL_FIELDS).join(', ')}).`);
+      continue;
+    }
+    if (!settings || typeof settings !== 'object' || Array.isArray(settings)) {
+      errors.push(`config.yaml requirements.providers.${provider} must be an object.`);
+      continue;
+    }
+    const unknown = Object.keys(settings).filter((key) => key !== field);
+    if (unknown.length) errors.push(`config.yaml requirements.providers.${provider} has unknown field(s): ${unknown.join(', ')} (credentials never belong in config; use environment variables).`);
+    if (settings[field] !== undefined && !/^https?:\/\/[^\s]+$/.test(String(settings[field]))) errors.push(`config.yaml requirements.providers.${provider}.${field} must be an http(s) URL.`);
+  }
+  return errors;
+}
+
+// Optional quality settings (v1.1.0) inside the existing quality block:
+//   quality:
+//     qc:    { policy: advisory | strict }   default advisory; strict is an explicit opt-in
+//     media: { commit: true | false }        default false: QC/demo media stays local
+// Only these two sub-blocks are validated; other quality keys (testingStrategy) are untouched.
+export function validateQualityConfig(block) {
+  if (block === undefined) return [];
+  if (!block || typeof block !== 'object' || Array.isArray(block)) return ['config.yaml quality must be an object.'];
+  const errors = [];
+  if (block.qc !== undefined) {
+    if (!block.qc || typeof block.qc !== 'object' || Array.isArray(block.qc)) errors.push('config.yaml quality.qc must be an object.');
+    else {
+      const extra = Object.keys(block.qc).filter((key) => key !== 'policy');
+      if (extra.length) errors.push(`config.yaml quality.qc has unknown field(s): ${extra.join(', ')}.`);
+      if (block.qc.policy !== undefined && !['advisory', 'strict'].includes(block.qc.policy)) errors.push('config.yaml quality.qc.policy must be advisory or strict.');
+    }
+  }
+  if (block.media !== undefined) {
+    if (!block.media || typeof block.media !== 'object' || Array.isArray(block.media)) errors.push('config.yaml quality.media must be an object.');
+    else {
+      const extra = Object.keys(block.media).filter((key) => key !== 'commit');
+      if (extra.length) errors.push(`config.yaml quality.media has unknown field(s): ${extra.join(', ')}.`);
+      if (block.media.commit !== undefined && typeof block.media.commit !== 'boolean') errors.push('config.yaml quality.media.commit must be true or false.');
     }
   }
   return errors;

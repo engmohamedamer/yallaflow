@@ -108,6 +108,9 @@ test('no parallel attachment system: capture goes through sources/, never work/<
     for (const entry of await readdir(dir, { withFileTypes: true })) {
       const full = path.join(dir, entry.name);
       if (entry.isDirectory()) await walk(full);
+      // v1.1.0: tracker payloads name an "attachments" field; those files are captured
+      // as ordinary sources (intake ticket), so the provider layer is not a parallel system.
+      else if (path.relative(srcDir, full).startsWith(`intake${path.sep}providers${path.sep}`)) continue;
       else if (/['"`]attachments['"`/]/.test(await readFile(full, 'utf8'))) offenders.push(path.relative(srcDir, full));
     }
   };

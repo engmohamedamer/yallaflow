@@ -1,0 +1,849 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-10-19T16:04:48.595Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "C2 assessed after V-001 passed.",
+      "findings": [
+        {
+          "criterion": "PF-0007/AC-010",
+          "status": "satisfied",
+          "reason": "qc plan/record accept routed work at any stage (tested on DONE work: meta, progress and verification ledger byte-identical) and refuse unrouted work.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/qc.js",
+              "symbol": "assertQualityTarget",
+              "contentHash": "sha256:71be3f4d46dcc1f44cffc0ea48e2575c11711ebdaed2ec9a5933e1c029c1deac",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:70bd4a204e94b36c8d54323555cd4c90d31e74bf64efb20f03e5c98a9a2cc4c7",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-011",
+          "status": "satisfied",
+          "reason": "recordQcRun enforces: passed needs executed steps plus an artifact or a passed V-### (yallaflow-verified); failed needs actual and steps; blocked/not-run need a reason; unknown scenarios and missing artifacts rejected with zero writes (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/qc.js",
+              "symbol": "recordQcRun",
+              "contentHash": "sha256:71be3f4d46dcc1f44cffc0ea48e2575c11711ebdaed2ec9a5933e1c029c1deac",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:70bd4a204e94b36c8d54323555cd4c90d31e74bf64efb20f03e5c98a9a2cc4c7",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-012",
+          "status": "satisfied",
+          "reason": "No lifecycle command invokes QC; qc commands only validate and record (plan prints 'Nothing was run'); QC modules are lazy-loaded and the commands make no network call (no-network preload test).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/quality.js",
+              "contentHash": "sha256:16beafa8065bd3a8aee712e7a1138d4f6d5491ff36e7b1fe56d55cd14b70e3f6",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/finish.js",
+              "symbol": "qualityLines",
+              "contentHash": "sha256:cb45939e1bd91427ae9a3bc0ac6eb150638a8f9c41c473fa5a7f473392c9d397",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:70bd4a204e94b36c8d54323555cd4c90d31e74bf64efb20f03e5c98a9a2cc4c7",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-013",
+          "status": "satisfied",
+          "reason": "Advisory failures are printed by qc record/status and finish ('Reported only — completion is not blocked') while finish still reports Ready to push (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/finish.js",
+              "symbol": "qualityLines",
+              "contentHash": "sha256:cb45939e1bd91427ae9a3bc0ac6eb150638a8f9c41c473fa5a7f473392c9d397",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:70bd4a204e94b36c8d54323555cd4c90d31e74bf64efb20f03e5c98a9a2cc4c7",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-014",
+          "status": "satisfied",
+          "reason": "evaluateQc grants strict quality approval only when every required scenario's latest result passed; finish exits 0 and reports approval as separate; work that never used QC prints no quality lines even with a strict project default (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/qc.js",
+              "symbol": "evaluateQc",
+              "contentHash": "sha256:71be3f4d46dcc1f44cffc0ea48e2575c11711ebdaed2ec9a5933e1c029c1deac",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:70bd4a204e94b36c8d54323555cd4c90d31e74bf64efb20f03e5c98a9a2cc4c7",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-015",
+          "status": "satisfied",
+          "reason": "qc:QC-###/#S-## resolves to runtime evidence; satisfied citing a failed scenario is rejected; a later failing run marks the finding stale (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/delivery/convergence.js",
+              "contentHash": "sha256:c45b0485f846436d8b59f17b4aa188ce403e77a9474b9f910f129a6078e351b9",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/quality/qc.js",
+              "symbol": "qcEvidenceStaleness",
+              "contentHash": "sha256:71be3f4d46dcc1f44cffc0ea48e2575c11711ebdaed2ec9a5933e1c029c1deac",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:70bd4a204e94b36c8d54323555cd4c90d31e74bf64efb20f03e5c98a9a2cc4c7",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-016",
+          "status": "satisfied",
+          "reason": "QC writes only work/<id>/quality/; the DONE-work test proves progress.yaml and evidence/verification.json unchanged and verification checkpoint untouched.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/core/ownership.js",
+              "contentHash": "sha256:90aa8e852f4ad578ef410b09f198d04865bd512432ab485e6308c68fe03fddb3",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:70bd4a204e94b36c8d54323555cd4c90d31e74bf64efb20f03e5c98a9a2cc4c7",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-022",
+          "status": "satisfied",
+          "reason": "Artifacts are copied with sha256/size into media/<record>/ with a YallaFlow-written .gitignore ('*', '!.gitignore'); quality.media.commit: true skips it; manifests live in qc.json (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/artifacts.js",
+              "symbol": "storeArtifacts",
+              "contentHash": "sha256:cfe73e64e449b47069273dc10843288f569f7ec78e1f8b414da231c564fe603b",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:70bd4a204e94b36c8d54323555cd4c90d31e74bf64efb20f03e5c98a9a2cc4c7",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-023",
+          "status": "satisfied",
+          "reason": "report.md and a static report.html (inline CSS, no scripts, no external URLs) are regenerated after each write; every Markdown link resolves under quality/; deleted media is flagged in both (tested). Demo sections are added in C3.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/report.js",
+              "symbol": "writeQualityReport",
+              "contentHash": "sha256:f25d0f33070472fcbfbf6478ae73db3723616c6e7d53cdaa110b2dbb122cf22b",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:70bd4a204e94b36c8d54323555cd4c90d31e74bf64efb20f03e5c98a9a2cc4c7",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-001"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    },
+    {
+      "id": "CV-002",
+      "recordedAt": "2026-10-19T17:10:09.965Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+        "verificationRunIds": [
+          "V-002"
+        ]
+      },
+      "summary": "C2 assessed again after the release-review fixes; V-002 passed.",
+      "findings": [
+        {
+          "criterion": "PF-0007/AC-010",
+          "status": "satisfied",
+          "reason": "qc plan/record accept routed work at any stage (tested on DONE work: meta, progress and verification ledger byte-identical) and refuse unrouted work.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/qc.js",
+              "symbol": "assertQualityTarget",
+              "contentHash": "sha256:6073487e99b89d022162bf30254c809ee90722ebda369ee8c35eef20bb5b1089",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:ec190ccad3f071fe91994f01998a45cb893186c13f1cf25a327c09e59f1367b2",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-011",
+          "status": "satisfied",
+          "reason": "recordQcRun enforces: passed needs executed steps plus an artifact or a passed V-### (yallaflow-verified); failed needs actual and steps; blocked/not-run need a reason; unknown scenarios and missing artifacts rejected with zero writes (tested). A yallaflow-verified pass must cite a verification run newer than the latest reopen.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/qc.js",
+              "symbol": "recordQcRun",
+              "contentHash": "sha256:6073487e99b89d022162bf30254c809ee90722ebda369ee8c35eef20bb5b1089",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:ec190ccad3f071fe91994f01998a45cb893186c13f1cf25a327c09e59f1367b2",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-012",
+          "status": "satisfied",
+          "reason": "No lifecycle command invokes QC; qc commands only validate and record (plan prints 'Nothing was run'); QC modules are lazy-loaded and the commands make no network call (no-network preload test).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/quality.js",
+              "contentHash": "sha256:b90c8be59246651abb0030d090966daed15d450305712f2602ffa99e4ced3954",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/finish.js",
+              "symbol": "qualityLines",
+              "contentHash": "sha256:365a5e55664113402d1d9f0f464446dc28676ee5cfb2c056e891156915bcd8bc",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:ec190ccad3f071fe91994f01998a45cb893186c13f1cf25a327c09e59f1367b2",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-013",
+          "status": "satisfied",
+          "reason": "Advisory failures are printed by qc record/status and finish ('Reported only — completion is not blocked') while finish still reports Ready to push (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/finish.js",
+              "symbol": "qualityLines",
+              "contentHash": "sha256:365a5e55664113402d1d9f0f464446dc28676ee5cfb2c056e891156915bcd8bc",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:ec190ccad3f071fe91994f01998a45cb893186c13f1cf25a327c09e59f1367b2",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-014",
+          "status": "satisfied",
+          "reason": "evaluateQc grants strict quality approval only when every required scenario's latest result passed; finish exits 0 and reports approval as separate; work that never used QC prints no quality lines even with a strict project default (tested). Results count only for the scenario definition they were recorded against, and a config strict policy is a floor a plan cannot weaken (regression tests).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/qc.js",
+              "symbol": "evaluateQc",
+              "contentHash": "sha256:6073487e99b89d022162bf30254c809ee90722ebda369ee8c35eef20bb5b1089",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:ec190ccad3f071fe91994f01998a45cb893186c13f1cf25a327c09e59f1367b2",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-015",
+          "status": "satisfied",
+          "reason": "qc:QC-###/#S-## resolves to runtime evidence; satisfied citing a failed scenario is rejected; a later failing run marks the finding stale (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/delivery/convergence.js",
+              "contentHash": "sha256:da42da261a2771e97531deac3f2d554b9f4977fbafcf4783c3c29c9760a78ea3",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/quality/qc.js",
+              "symbol": "qcEvidenceStaleness",
+              "contentHash": "sha256:6073487e99b89d022162bf30254c809ee90722ebda369ee8c35eef20bb5b1089",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:ec190ccad3f071fe91994f01998a45cb893186c13f1cf25a327c09e59f1367b2",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-016",
+          "status": "satisfied",
+          "reason": "QC writes only work/<id>/quality/; the DONE-work test proves progress.yaml and evidence/verification.json unchanged and verification checkpoint untouched.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/core/ownership.js",
+              "contentHash": "sha256:90aa8e852f4ad578ef410b09f198d04865bd512432ab485e6308c68fe03fddb3",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:ec190ccad3f071fe91994f01998a45cb893186c13f1cf25a327c09e59f1367b2",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-022",
+          "status": "satisfied",
+          "reason": "Artifacts are copied with sha256/size into media/<record>/ with a YallaFlow-written .gitignore ('*', '!.gitignore'); quality.media.commit: true skips it; manifests live in qc.json (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/artifacts.js",
+              "symbol": "storeArtifacts",
+              "contentHash": "sha256:92dcc72627549b61ef9edcb2f35e602a1cc4a10521a7f634909d5ceea642d592",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:ec190ccad3f071fe91994f01998a45cb893186c13f1cf25a327c09e59f1367b2",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-023",
+          "status": "satisfied",
+          "reason": "report.md and a static report.html (inline CSS, no scripts, no external URLs) are regenerated after each write; every Markdown link resolves under quality/; deleted media is flagged in both (tested). Demo sections are added in C3.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/report.js",
+              "symbol": "writeQualityReport",
+              "contentHash": "sha256:1d8ce1a9939a92117a783e752e0315378f45d57cd15aa2e34f4156d8dca3a6b0",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:ec190ccad3f071fe91994f01998a45cb893186c13f1cf25a327c09e59f1367b2",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-002"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    },
+    {
+      "id": "CV-003",
+      "recordedAt": "2026-10-19T17:41:29.758Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+        "verificationRunIds": [
+          "V-003"
+        ]
+      },
+      "summary": "Re-assessed after the release re-review fixes; V-003 passed.",
+      "findings": [
+        {
+          "criterion": "PF-0007/AC-010",
+          "status": "satisfied",
+          "reason": "qc plan/record accept routed work at any stage (tested on DONE work: meta, progress and verification ledger byte-identical) and refuse unrouted work.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/qc.js",
+              "symbol": "assertQualityTarget",
+              "contentHash": "sha256:e8c8f76dc47c251559c8fca009626614975ec9b6699146daa49c1623b8856fa2",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:7b50c11b9d4822306f69ab04aa842bcb0ef3fc6fd31840ced99663a4865bf135",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-011",
+          "status": "satisfied",
+          "reason": "recordQcRun enforces: passed needs executed steps plus an artifact or a passed V-### (yallaflow-verified); failed needs actual and steps; blocked/not-run need a reason; unknown scenarios and missing artifacts rejected with zero writes (tested). A yallaflow-verified pass must cite a verification run newer than the latest reopen.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/qc.js",
+              "symbol": "recordQcRun",
+              "contentHash": "sha256:e8c8f76dc47c251559c8fca009626614975ec9b6699146daa49c1623b8856fa2",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:7b50c11b9d4822306f69ab04aa842bcb0ef3fc6fd31840ced99663a4865bf135",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-012",
+          "status": "satisfied",
+          "reason": "No lifecycle command invokes QC; qc commands only validate and record (plan prints 'Nothing was run'); QC modules are lazy-loaded and the commands make no network call (no-network preload test).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/quality.js",
+              "contentHash": "sha256:a7460ee35d6ab6268aa60cc019339c329cb69e5036491291628b7e0d4b4014c2",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/finish.js",
+              "symbol": "qualityLines",
+              "contentHash": "sha256:1d19244153755a50c850eba1890021677d1d23af03bf590b1c4bef4df255d410",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:7b50c11b9d4822306f69ab04aa842bcb0ef3fc6fd31840ced99663a4865bf135",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-013",
+          "status": "satisfied",
+          "reason": "Advisory failures are printed by qc record/status and finish ('Reported only — completion is not blocked') while finish still reports Ready to push (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/finish.js",
+              "symbol": "qualityLines",
+              "contentHash": "sha256:1d19244153755a50c850eba1890021677d1d23af03bf590b1c4bef4df255d410",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:7b50c11b9d4822306f69ab04aa842bcb0ef3fc6fd31840ced99663a4865bf135",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-014",
+          "status": "satisfied",
+          "reason": "evaluateQc grants strict quality approval only when every required scenario's latest result passed; finish exits 0 and reports approval as separate; work that never used QC prints no quality lines even with a strict project default (tested). Results count only for the scenario definition they were recorded against, and a config strict policy is a floor a plan cannot weaken (regression tests). The stricter of the plan and the current config governs, including earlier plans.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/qc.js",
+              "symbol": "evaluateQc",
+              "contentHash": "sha256:e8c8f76dc47c251559c8fca009626614975ec9b6699146daa49c1623b8856fa2",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:7b50c11b9d4822306f69ab04aa842bcb0ef3fc6fd31840ced99663a4865bf135",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-015",
+          "status": "satisfied",
+          "reason": "qc:QC-###/#S-## resolves to runtime evidence; satisfied citing a failed scenario is rejected; a later failing run marks the finding stale (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/delivery/convergence.js",
+              "contentHash": "sha256:da42da261a2771e97531deac3f2d554b9f4977fbafcf4783c3c29c9760a78ea3",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/quality/qc.js",
+              "symbol": "qcEvidenceStaleness",
+              "contentHash": "sha256:e8c8f76dc47c251559c8fca009626614975ec9b6699146daa49c1623b8856fa2",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:7b50c11b9d4822306f69ab04aa842bcb0ef3fc6fd31840ced99663a4865bf135",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-016",
+          "status": "satisfied",
+          "reason": "QC writes only work/<id>/quality/; the DONE-work test proves progress.yaml and evidence/verification.json unchanged and verification checkpoint untouched.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/core/ownership.js",
+              "contentHash": "sha256:90aa8e852f4ad578ef410b09f198d04865bd512432ab485e6308c68fe03fddb3",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:7b50c11b9d4822306f69ab04aa842bcb0ef3fc6fd31840ced99663a4865bf135",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-022",
+          "status": "satisfied",
+          "reason": "Artifacts are copied with sha256/size into media/<record>/ with a YallaFlow-written .gitignore ('*', '!.gitignore'); quality.media.commit: true skips it; manifests live in qc.json (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/artifacts.js",
+              "symbol": "storeArtifacts",
+              "contentHash": "sha256:92dcc72627549b61ef9edcb2f35e602a1cc4a10521a7f634909d5ceea642d592",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:7b50c11b9d4822306f69ab04aa842bcb0ef3fc6fd31840ced99663a4865bf135",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0007/AC-023",
+          "status": "satisfied",
+          "reason": "report.md and a static report.html (inline CSS, no scripts, no external URLs) are regenerated after each write; every Markdown link resolves under quality/; deleted media is flagged in both (tested). Demo sections are added in C3.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/quality/report.js",
+              "symbol": "writeQualityReport",
+              "contentHash": "sha256:e531c2edd65b553dce47f4fecc28cfc55172ad0a2d3bf0981b593d4a623bc24a",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/quality-qc.test.js",
+              "contentHash": "sha256:7b50c11b9d4822306f69ab04aa842bcb0ef3fc6fd31840ced99663a4865bf135",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0009",
+              "verificationRunId": "V-003"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-10-19T17:41:29.758Z"
+}

@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 8
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-10-19T14:46:50.687Z",
+      "completedAt": "2026-10-19T14:46:50.687Z",
+      "summary": "Intent discovery. None of the three capabilities exist (only docs/roadmap.md:71 tracker-intake line). Extension points: source intake Normalized Intake Contract + persistSource (src/intake/normalize.js, src/core/sources.js; source.json v2 free-form metadata holds origin without schema bump); requirement provenance {type:source, locator} (src/delivery/requirements.js); verification V-### ledger (src/core/evidence.js) is argv-only with no artifacts and failed runs reopen verification — QC/demo need a separate ledger; evidence normalizer src/context/evidence.js is the single plug point for a new citation form; config.yaml v1 tolerates absent optional blocks; Skill Registry v8 has no optional-skill concept (checkpoint rejects skills outside the pinned contract); Agent Contract v9; CTX-0031 invariant: no network calls. @playwright/cli 0.1.22 installed with video/tracing/screenshot commands.",
+      "evidence": [
+        "src/intake/normalize.js",
+        "src/core/sources.js",
+        "src/delivery/requirements.js",
+        "src/core/evidence.js",
+        "src/context/evidence.js",
+        "src/skills/constants.js",
+        "docs/roadmap.md"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-10-19T14:48:36.150Z",
+      "completedAt": "2026-10-19T14:48:36.150Z",
+      "summary": "Intent is fully specified by SRC-0001 (product brief). Confirmed: three independent optional capabilities, MINOR release 1.1.0, no publish/tag without approval. Working assumptions (agent-owned, low risk): tracker import is read-only (no writeback); Jira Cloud and Azure DevOps Services first with configurable base URL; imported content is untrusted data. Material open decisions (network boundary, quality evidence model, on-demand skills, QC blocking DONE, media in Git) are architecture/business choices recorded as questions in design exploration. REQ/AC are recorded at the specification checkpoint.",
+      "evidence": [
+        "SRC-0001"
+      ]
+    },
+    "design-exploration": {
+      "status": "completed",
+      "startedAt": "2026-10-19T14:48:36.703Z",
+      "completedAt": "2026-10-19T15:13:29.746Z",
+      "summary": "Design approved by the developer (SRC-0002) with adjustments: hybrid agent-first acquisition + explicit read-only --fetch; separate quality ledgers; Registry v9 on-demand skills invocable at any stage incl. DONE; local media git-excluded by default with Markdown + standalone HTML reports; advisory/strict QC policies with quality approval distinct from DONE. Agent-owned rulings recorded (no enable flag, computed strict approval, ticket sourceType file).",
+      "evidence": [
+        "SRC-0002",
+        "SRC-0001"
+      ]
+    },
+    "specification": {
+      "status": "completed",
+      "startedAt": "2026-10-19T15:13:30.054Z",
+      "completedAt": "2026-10-19T15:13:58.450Z",
+      "summary": "Specification for v1.1.0 written in work.md (11 REQ / 27 AC recorded), derived from the approved design (SRC-0002) and brief (SRC-0001): ticket import + optional read-only fetch, untrusted ticket content, on-demand QC with honesty rules and advisory/strict policies, Smart Demo with approval-before-recording, local media + Markdown/HTML reports, Registry v9 on-demand skills, Agent Contract v10, compatibility constraints.",
+      "evidence": [
+        "SRC-0002"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-10-19T15:14:49.545Z",
+      "completedAt": "2026-10-19T15:14:49.545Z",
+      "summary": "Plan in work.md: decompose into C1 Connected Requirements, C2 Optional AI QC, C3 Smart Demo & Recording (feature/bounded each, inheriting approved criteria), C4 Integration/docs/release verification (release/bounded); files, symbols, tests and verification commands named per child.",
+      "evidence": [
+        "src/intake/normalize.js",
+        "src/skills/registry.js",
+        "src/context/evidence.js"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-10-19T17:52:09.471Z",
+      "completedAt": "2026-10-19T17:52:09.471Z",
+      "summary": "Implemented through four DONE children: PF-0008 Connected Requirements, PF-0009 Optional AI QC, PF-0010 Smart Demo & Recording (all reopened once for release-review fixes and re-verified), PF-0011 Integration/docs/release verification (Agent Contract v10, version 1.1.0, mixed-version test vs v1.0.1, docs, release checklist, independent code review).",
+      "evidence": [
+        "src/intake/providers/index.js",
+        "src/quality/qc.js",
+        "src/quality/demo.js",
+        "CHANGELOG.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-10-19T18:01:41.242Z",
+      "completedAt": "2026-10-19T18:01:41.242Z",
+      "summary": "npm run check passed as V-001 (739 tests) on the final 1.1.0 source; children carry their own fresh verification and the release checklist (PF-0011 V-011…V-016).",
+      "evidence": [
+        "verification:V-001"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-10-19T18:01:50.176Z",
+      "completedAt": "2026-10-19T18:01:50.176Z",
+      "summary": "All 27 acceptance criteria currently satisfied (CV-001): 24 through the children's current assessments, AC-025…027 directly.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    },
+    "code-review": {
+      "status": "completed",
+      "startedAt": "2026-10-19T18:01:50.695Z",
+      "completedAt": "2026-10-19T18:01:50.695Z",
+      "summary": "Release-wide independent code review recorded in PF-0011 (three rounds; 1 high, 6 medium, 5 low findings, all fixed with regression tests or documented; final round confirmed sound).",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [
+    {
+      "decision": "QC and Smart Demo require no config enable flag; the developer's explicit request is the opt-in, and nothing runs implicitly",
+      "reason": "SRC-0001 says developers explicitly choose to run QC and must not be required to configure providers; a flag would add configuration without adding safety because no command runs QC/demo implicitly",
+      "costIfWrong": "If a team wants to forbid QC/demo entirely, a quality.qc.enabled/demo.enabled refusal flag can be added later as a backward-compatible MINOR change",
+      "createdAt": "2026-10-19T15:13:29.286Z"
+    },
+    {
+      "decision": "Strict-policy quality approval is computed from recorded QC results (granted when every required scenario's latest result passed), not a separate human sign-off command",
+      "reason": "SRC-0002 defines strict as 'required QC scenarios must pass before quality approval is granted'; computing it keeps one source of truth and avoids an extra approval ceremony",
+      "costIfWrong": "If a human QA sign-off is wanted, add 'qc approve --note' on top of the computed precondition",
+      "createdAt": "2026-10-19T15:13:29.446Z"
+    },
+    {
+      "decision": "Ticket sources keep sourceType 'file' (detectedFormat 'ticket', origin in metadata.ticket) instead of a new sourceType",
+      "reason": "source.json v2 validation in YallaFlow 1.0.x rejects unknown sourceType values, so a new type would make older CLIs fail to list sources; free-form v2 metadata carries the origin without a schema bump",
+      "costIfWrong": "Low: a first-class type can be introduced in a future source schema v3 with migration-free reads",
+      "createdAt": "2026-10-19T15:13:29.597Z"
+    },
+    {
+      "decision": "Lifecycle governance commands for PF-0007 and its children run with the installed frozen yallaflow 1.0.1, not the in-development node src/cli.js",
+      "reason": "Keeps the governed lifecycle state independent of the code under change; both are 1.0.1 at start and the workspace format is unchanged by this release",
+      "costIfWrong": "Low: if new state written by 1.1.0 were needed in this repository's own workspace, switch to the source CLI at C4 after the suite passes",
+      "createdAt": "2026-10-19T15:14:49.392Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-10-19T18:01:50.695Z"
+}

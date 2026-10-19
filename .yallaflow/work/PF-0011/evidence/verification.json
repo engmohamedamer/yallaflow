@@ -1,0 +1,269 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "npm ci && npm run check",
+      "executionMode": "shell",
+      "executable": "npm ci && npm run check",
+      "args": [],
+      "displayCommand": "npm ci && npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-19T16:28:57.571Z",
+      "finishedAt": "2026-10-19T16:34:42.920Z",
+      "verifiedAt": "2026-10-19T16:34:42.920Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "node src/cli.js doctor",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "src/cli.js",
+        "doctor"
+      ],
+      "displayCommand": "node src/cli.js doctor",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-19T16:34:48.627Z",
+      "finishedAt": "2026-10-19T16:34:48.966Z",
+      "verifiedAt": "2026-10-19T16:34:48.966Z",
+      "log": "V-002-verification.log"
+    },
+    {
+      "id": "V-003",
+      "command": "npm audit --audit-level=high",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "audit",
+        "--audit-level=high"
+      ],
+      "displayCommand": "npm audit --audit-level=high",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-19T16:34:50.498Z",
+      "finishedAt": "2026-10-19T16:34:51.515Z",
+      "verifiedAt": "2026-10-19T16:34:51.515Z",
+      "log": "V-003-verification.log"
+    },
+    {
+      "id": "V-004",
+      "command": "script /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/smoke.sh",
+      "executionMode": "script",
+      "executable": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/smoke.sh",
+      "args": [],
+      "displayCommand": "script /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/smoke.sh",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-10-19T16:35:34.017Z",
+      "finishedAt": "2026-10-19T16:36:52.361Z",
+      "verifiedAt": "2026-10-19T16:36:52.361Z",
+      "log": "V-004-verification.log"
+    },
+    {
+      "id": "V-005",
+      "command": "script /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/smoke.sh",
+      "executionMode": "script",
+      "executable": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/smoke.sh",
+      "args": [],
+      "displayCommand": "script /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/smoke.sh",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-19T16:36:59.507Z",
+      "finishedAt": "2026-10-19T16:37:04.209Z",
+      "verifiedAt": "2026-10-19T16:37:04.209Z",
+      "log": "V-005-verification.log"
+    },
+    {
+      "id": "V-006",
+      "command": "git diff --check",
+      "executionMode": "argv",
+      "executable": "git",
+      "args": [
+        "diff",
+        "--check"
+      ],
+      "displayCommand": "git diff --check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-19T16:37:13.036Z",
+      "finishedAt": "2026-10-19T16:37:13.070Z",
+      "verifiedAt": "2026-10-19T16:37:13.070Z",
+      "log": "V-006-verification.log"
+    },
+    {
+      "id": "V-007",
+      "command": "npm ci && npm run check",
+      "executionMode": "shell",
+      "executable": "npm ci && npm run check",
+      "args": [],
+      "displayCommand": "npm ci && npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-19T17:11:04.434Z",
+      "finishedAt": "2026-10-19T17:18:50.524Z",
+      "verifiedAt": "2026-10-19T17:18:50.524Z",
+      "log": "V-007-verification.log"
+    },
+    {
+      "id": "V-008",
+      "command": "script /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/smoke.sh",
+      "executionMode": "script",
+      "executable": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/smoke.sh",
+      "args": [],
+      "displayCommand": "script /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/smoke.sh",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-19T17:18:51.646Z",
+      "finishedAt": "2026-10-19T17:19:50.096Z",
+      "verifiedAt": "2026-10-19T17:19:50.096Z",
+      "log": "V-008-verification.log"
+    },
+    {
+      "id": "V-009",
+      "command": "node src/cli.js doctor",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "src/cli.js",
+        "doctor"
+      ],
+      "displayCommand": "node src/cli.js doctor",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-19T17:19:50.377Z",
+      "finishedAt": "2026-10-19T17:19:50.923Z",
+      "verifiedAt": "2026-10-19T17:19:50.923Z",
+      "log": "V-009-verification.log"
+    },
+    {
+      "id": "V-010",
+      "command": "git diff --check",
+      "executionMode": "argv",
+      "executable": "git",
+      "args": [
+        "diff",
+        "--check"
+      ],
+      "displayCommand": "git diff --check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-19T17:19:51.202Z",
+      "finishedAt": "2026-10-19T17:19:51.257Z",
+      "verifiedAt": "2026-10-19T17:19:51.257Z",
+      "log": "V-010-verification.log"
+    },
+    {
+      "id": "V-011",
+      "command": "npm ci && npm run check",
+      "executionMode": "shell",
+      "executable": "npm ci && npm run check",
+      "args": [],
+      "displayCommand": "npm ci && npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-19T17:41:48.426Z",
+      "finishedAt": "2026-10-19T17:50:10.267Z",
+      "verifiedAt": "2026-10-19T17:50:10.267Z",
+      "log": "V-011-verification.log"
+    },
+    {
+      "id": "V-012",
+      "command": "script /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/smoke.sh",
+      "executionMode": "script",
+      "executable": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/smoke.sh",
+      "args": [],
+      "displayCommand": "script /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/smoke.sh",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-10-19T17:50:11.310Z",
+      "finishedAt": "2026-10-19T17:50:45.037Z",
+      "verifiedAt": "2026-10-19T17:50:45.037Z",
+      "log": "V-012-verification.log"
+    },
+    {
+      "id": "V-013",
+      "command": "node src/cli.js doctor",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "src/cli.js",
+        "doctor"
+      ],
+      "displayCommand": "node src/cli.js doctor",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-19T17:50:45.217Z",
+      "finishedAt": "2026-10-19T17:50:45.581Z",
+      "verifiedAt": "2026-10-19T17:50:45.581Z",
+      "log": "V-013-verification.log"
+    },
+    {
+      "id": "V-014",
+      "command": "git diff --check",
+      "executionMode": "argv",
+      "executable": "git",
+      "args": [
+        "diff",
+        "--check"
+      ],
+      "displayCommand": "git diff --check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-19T17:50:45.764Z",
+      "finishedAt": "2026-10-19T17:50:45.802Z",
+      "verifiedAt": "2026-10-19T17:50:45.802Z",
+      "log": "V-014-verification.log"
+    },
+    {
+      "id": "V-015",
+      "command": "npm audit --audit-level=high",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "audit",
+        "--audit-level=high"
+      ],
+      "displayCommand": "npm audit --audit-level=high",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-19T17:50:45.968Z",
+      "finishedAt": "2026-10-19T17:50:47.952Z",
+      "verifiedAt": "2026-10-19T17:50:47.952Z",
+      "log": "V-015-verification.log"
+    },
+    {
+      "id": "V-016",
+      "command": "script /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/smoke.sh",
+      "executionMode": "script",
+      "executable": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/smoke.sh",
+      "args": [],
+      "displayCommand": "script /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/smoke.sh",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-19T17:51:13.293Z",
+      "finishedAt": "2026-10-19T17:51:18.346Z",
+      "verifiedAt": "2026-10-19T17:51:18.346Z",
+      "log": "V-016-verification.log"
+    }
+  ]
+}

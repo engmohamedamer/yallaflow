@@ -68,7 +68,7 @@ YallaFlow is an AI-agnostic engineering governance layer for coding agents — d
 
 ### Still planned (not yet implemented)
 
-- **Tracker intake** — Azure DevOps, Jira, and GitHub Issues as requirement sources, with attachments and source traceability back to the originating ticket
+- ~~**Tracker intake**~~ — delivered in 1.1.0: GitHub Issues, Jira, and Azure DevOps tickets as requirement sources, with attachments and traceability back to the originating ticket (`yallaflow intake ticket`)
 - ~~**Codex adapter** and **Claude adapter**~~ and ~~**agent bootstrap/session guidance**~~ — delivered in v0.3.8 as thin, versioned bootstrap blocks (`yallaflow agent setup codex|claude`) pointing to `.yallaflow/AGENT.md`; deeper provider integration (hooks, plugins) remains future work
 - Git worktree safety and baseline verification for multi-source/multi-agent execution
 - Future semantic deduplication and optional assisted knowledge extraction (still explicitly agent-proposed, not inferred by YallaFlow)
@@ -209,6 +209,17 @@ Deliberately not in scope: hosted or cloud YallaFlow, accounts, RBAC, invitation
 ## 1.0.0 — First public release
 
 The v0.3.10 product declared stable and published to npm (`npm install -g yallaflow`). No new runtime behavior; the SemVer compatibility promise for the CLI, durable workspaces, pinned behavior, and immutable instructions is defined in [`releasing.md`](releasing.md#semantic-versioning-and-the-10-compatibility-promise).
+
+## 1.1.0 — Connected Requirements & Optional AI Quality Delivery
+
+Three optional, independent capabilities; nothing changes for projects that do not use them ([guide](connected-requirements-and-quality.md)):
+
+- **Connected Requirements** — `yallaflow intake ticket` imports GitHub Issues, Jira, and Azure DevOps tickets as immutable sources (agent-acquired payloads by default; an explicit, read-only `--fetch` with environment credentials), and requirements cite them through ordinary source provenance.
+- **Optional AI QC** — Playwright-driven functional and exploratory testing on request: plans traced to acceptance criteria, honesty rules for every result, advisory (default) or strict quality policy, separate from verification evidence.
+- **Optional Smart Demo & recording** — prioritized demo scenarios approved by the developer before recording, optional video, local hashed media, Markdown and HTML reports; never presented as test evidence.
+- Skill Registry v9 (on-demand skills), Agent Contract v10.
+
+Not in scope: tracker writeback or sync, bundled browsers, a test framework, background services, telemetry, uploads.
 
 ## Future directions (not committed, not scheduled)
 

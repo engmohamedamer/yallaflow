@@ -1,0 +1,81 @@
+{
+  "id": "PF-0008",
+  "type": "feature",
+  "title": "v1.1.0 C1 — Connected Requirements (ticket import, optional fetch, on-demand skill mechanism)",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "routingConfidence": "high",
+  "routingReason": "Decomposed from PF-0007.",
+  "routedAt": "2026-10-19T15:15:08.265Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "implement",
+    "verify",
+    "converge"
+  ],
+  "behaviorContract": {
+    "registryVersion": 8,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation",
+      "verification",
+      "delivery-convergence"
+    ]
+  },
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "parent": "PF-0007",
+  "decompositionKey": "C1",
+  "requirements": [
+    "REQ-001",
+    "REQ-002",
+    "REQ-003",
+    "REQ-004",
+    "REQ-010"
+  ],
+  "acceptanceCriteria": [
+    "AC-001",
+    "AC-002",
+    "AC-003",
+    "AC-004",
+    "AC-005",
+    "AC-006",
+    "AC-007",
+    "AC-008",
+    "AC-009",
+    "AC-024"
+  ],
+  "createdAt": "2026-10-19T15:15:08.265Z",
+  "updatedAt": "2026-10-19T17:10:32.477Z",
+  "completionHistory": [
+    {
+      "completedAt": "2026-10-19T15:44:06.027Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    },
+    {
+      "completedAt": "2026-10-19T17:10:32.477Z",
+      "verificationRunIds": [
+        "V-002"
+      ]
+    }
+  ],
+  "lastInvalidationAt": "2026-10-19T16:41:06.522Z",
+  "lifecycleHistory": [
+    {
+      "action": "reopen",
+      "fromStage": "DONE",
+      "toStage": "IMPLEMENTATION",
+      "reason": "Release code review (PF-0011) found that intake ticket --fetch sent credentials to whatever host the ticket URL named, including plain http (AC-004 was recorded satisfied on an incomplete guard), plus a look-alike GitHub attachment host match and a partial-source rollback leak.",
+      "changedAt": "2026-10-19T16:41:06.522Z"
+    }
+  ]
+}
