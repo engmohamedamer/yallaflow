@@ -1,0 +1,16 @@
+# npm audit report
+
+file-type  13.0.0 - 21.3.0
+Severity: moderate
+file-type affected by infinite loop in ASF parser on malformed input with zero-size sub-header - https://github.com/advisories/GHSA-5v7r-6r5c-r473
+fix available via `npm audit fix --force`
+Will install officeparser@7.8.0, which is a breaking change
+node_modules/file-type
+  officeparser  3.3.0 - 6.0.6
+  Depends on vulnerable versions of file-type
+  node_modules/officeparser
+
+2 moderate severity vulnerabilities
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force

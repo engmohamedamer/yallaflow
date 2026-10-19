@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "project",
+      "source": "implementation-runtime",
+      "summary": "Core modules: CLI entry and argument parsing (src/cli.js); command handlers (src/commands/); workspace, IDs, lifecycle, progress and verification evidence (src/core/); routing and guidance (src/behavior/); Skill Registry (src/skills/); Agent Contract and bootstraps (src/agent/); project-memory ledger (src/context/); knowledge promotion (src/knowledge/); Brownfield baseline and the project-understanding gate (src/baseline/); delivery convergence (src/delivery/); Shared Projects (src/shared/); source intake (src/intake/), including the tracker providers (src/intake/providers/: GitHub, Jira, Azure DevOps adapters, the normalized ticket, and the only network client, used solely by intake ticket --fetch); optional quality delivery (src/quality/: QC and Smart Demo ledgers, local artifacts, reports); repository inventory (src/inventory/); discovery purpose (src/purpose/); durable secret redaction (src/security/); decomposition, questions, reviews, reconciliation, and limitations.",
+      "evidence": [
+        "verification:V-001",
+        "runtime:node src/cli.js context status (passed)",
+        "src/cli.js",
+        "src/core/workspace.js",
+        "src/intake/providers/index.js",
+        "src/quality/qc.js",
+        "src/quality/demo.js",
+        "src/context/ledger.js",
+        "src/security/redact.js"
+      ],
+      "confidence": "confirmed",
+      "provenance": "repository",
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0067"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-19T23:24:08.109Z",
+      "factId": "CTX-0067",
+      "promotedAt": "2026-10-19T23:24:08.722Z",
+      "target": "PROJECT.md"
+    },
+    {
+      "id": "K-002",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Optional Smart Demo (v1.1.0, src/quality/demo.js) is independent of QC: on explicit request the Agent proposes prioritized user-facing scenarios (demo propose: audience business|developer, priority, criteria, rationale, steps, record flag, excluded items), the developer's explicit approval is recorded with their words and bound to that exact proposal's SHA-256 (demo approve --note [--only]), and demo record is refused for an unapproved or changed proposal or scenarios outside the approved scope. Approved scenarios may be split across several recordings (one video per feature or audience); coverage of the approved scope is computed across all runs of the approved proposal (approvedCoverage), never per video. Video is optional (Playwright video-start/chapter/stop; needs Playwright's ffmpeg) and stored hashed under work/<id>/quality/media/; every run carries a fixed 'not test evidence' disclaimer, and convergence refuses demo: citations. Demo and QC share the local artifact store and the report.md/report.html generator.",
+      "evidence": [
+        "verification:V-001",
+        "runtime:node src/cli.js context status (passed)",
+        "src/quality/demo.js#approvedCoverage",
+        "src/quality/report.js",
+        "test/pilot-feedback.test.js",
+        "runtime:npm run check (passed)"
+      ],
+      "confidence": "confirmed",
+      "provenance": "repository",
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0080"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-19T23:24:08.269Z",
+      "factId": "CTX-0080",
+      "promotedAt": "2026-10-19T23:24:08.957Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-10-19T23:24:08.957Z",
+  "reviewedAt": "2026-10-19T23:24:08.957Z"
+}

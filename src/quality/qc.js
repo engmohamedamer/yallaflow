@@ -371,4 +371,3 @@ export async function qcEvidenceStaleness(root, meta, entry) {
 function rejection(errors, action = 'QC record') {
   return new Error(`${action} rejected:\n- ${errors.join('\n- ')}\n\nNo files were changed.`);
 }
-

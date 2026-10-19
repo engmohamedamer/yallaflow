@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0013",
+  "sourceType": "file",
+  "sourceName": "whitespace-decision.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-10-19T23:15:20.192Z",
+  "original": {
+    "path": "sources/SRC-0013/whitespace-decision.md",
+    "sha256": "600b654dbb0adbe7fd9f456e2259c66dfbd4894a748396611467006d03a6026e",
+    "sizeBytes": 454
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0020"
+  ],
+  "rawText": "Developer decision (2026-10-20): \"Proceed with option 1. Fix only the two whitespace issues, complete the required checks, and tag the new verified commit as v1.1.0. You may push main and the tag to GitHub after verification. Do not publish the GitHub Release or trigger npm publication yet.\" Context: release check git diff --check (v1.0.1..HEAD) flagged a trailing blank line at EOF in src/quality/demo.js and src/quality/qc.js, introduced in d3a70c5.\n"
+}

@@ -82,15 +82,16 @@ brownfield
 - **Knowledge ID:** K-025
 - **Promoted at:** 2026-10-19T16:37:37.201Z
 - **Supersedes:** CTX-0047
-- **Verified:** 2026-10-19T20:31:38.671Z (commit 9c38eec)
+- **Verified:** 2026-10-19T23:24:08.722Z (commit 55fd81c)
 - **Evidence:**
-  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
-  - src/cli.js (repository @ 9c38eec)
-  - src/core/workspace.js (repository @ 9c38eec)
-  - src/intake/providers/index.js (repository @ 9c38eec)
-  - src/quality/qc.js (repository @ 9c38eec)
-  - src/quality/demo.js (repository @ 9c38eec)
-  - src/context/ledger.js (repository @ 9c38eec)
-  - src/security/redact.js (repository @ 9c38eec)
+  - git diff --check 032f32c HEAD (passed) (runtime, PF-0021 V-001)
+  - node src/cli.js context status (passed) (runtime)
+  - src/cli.js (repository @ 55fd81c)
+  - src/core/workspace.js (repository @ 55fd81c)
+  - src/intake/providers/index.js (repository @ 55fd81c)
+  - src/quality/qc.js (repository @ 55fd81c)
+  - src/quality/demo.js (repository @ 55fd81c)
+  - src/context/ledger.js (repository @ 55fd81c)
+  - src/security/redact.js (repository @ 55fd81c)
 
 <!-- yallaflow-context:end -->

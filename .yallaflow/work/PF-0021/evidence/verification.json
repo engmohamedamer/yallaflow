@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "git diff --check 032f32c HEAD",
+      "executionMode": "argv",
+      "executable": "git",
+      "args": [
+        "diff",
+        "--check",
+        "032f32c",
+        "HEAD"
+      ],
+      "displayCommand": "git diff --check 032f32c HEAD",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-19T23:23:55.500Z",
+      "finishedAt": "2026-10-19T23:23:55.565Z",
+      "verifiedAt": "2026-10-19T23:23:55.565Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

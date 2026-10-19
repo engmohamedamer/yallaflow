@@ -411,13 +411,13 @@ Reopen (DONE to implementation, verification or review, with a reason) cascades 
 - **Knowledge ID:** K-002
 - **Promoted at:** 2026-10-19T20:21:09.344Z
 - **Supersedes:** CTX-0066
-- **Verified:** 2026-10-19T22:48:07.535Z (commit d3a70c5)
+- **Verified:** 2026-10-19T23:24:08.957Z (commit 55fd81c)
 - **Evidence:**
-  - node src/cli.js context status (passed) (runtime, PF-0018 V-001)
+  - git diff --check 032f32c HEAD (passed) (runtime, PF-0021 V-001)
   - node src/cli.js context status (passed) (runtime)
-  - src/quality/demo.js#approvedCoverage (repository @ d3a70c5)
-  - src/quality/report.js (repository @ d3a70c5)
-  - test/pilot-feedback.test.js (repository @ d3a70c5)
+  - src/quality/demo.js#approvedCoverage (repository @ 55fd81c)
+  - src/quality/report.js (repository @ 55fd81c)
+  - test/pilot-feedback.test.js (repository @ 55fd81c)
   - npm run check (passed) (runtime)
 
 <!-- yallaflow-fact:CTX-0082 -->

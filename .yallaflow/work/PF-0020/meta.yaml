@@ -1,0 +1,58 @@
+{
+  "id": "PF-0020",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Trailing blank line at end of src/quality/demo.js and src/quality/qc.js fails the release git diff --check",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-10-19T23:15:20.023Z",
+  "updatedAt": "2026-10-19T23:23:39.409Z",
+  "title": "Trailing blank line at end of src/quality/demo.js and src/quality/qc.js fails the release git diff --check",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-10-19T23:15:20.035Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0013",
+      "type": "file",
+      "name": "whitespace-decision.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-10-19T23:15:20.205Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ],
+  "completionHistory": [
+    {
+      "completedAt": "2026-10-19T23:23:39.409Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004"
+      ]
+    }
+  ]
+}

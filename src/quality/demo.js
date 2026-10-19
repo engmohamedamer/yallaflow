@@ -312,4 +312,3 @@ function sameList(a = [], b = []) {
 function rejection(errors, action = 'Demo record') {
   return new Error(`${action} rejected:\n- ${errors.join('\n- ')}\n\nNo files were changed.`);
 }
-

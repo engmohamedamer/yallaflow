@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "git diff --check 032f32c && npm ci && npm run check",
+      "executionMode": "shell",
+      "executable": "git diff --check 032f32c && npm ci && npm run check",
+      "args": [],
+      "displayCommand": "git diff --check 032f32c && npm ci && npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-19T23:15:37.067Z",
+      "finishedAt": "2026-10-19T23:20:46.682Z",
+      "verifiedAt": "2026-10-19T23:20:46.682Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "node src/cli.js doctor",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "src/cli.js",
+        "doctor"
+      ],
+      "displayCommand": "node src/cli.js doctor",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-19T23:20:58.244Z",
+      "finishedAt": "2026-10-19T23:20:58.723Z",
+      "verifiedAt": "2026-10-19T23:20:58.723Z",
+      "log": "V-002-verification.log"
+    },
+    {
+      "id": "V-003",
+      "command": "npm audit --audit-level=high",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "audit",
+        "--audit-level=high"
+      ],
+      "displayCommand": "npm audit --audit-level=high",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-19T23:20:58.873Z",
+      "finishedAt": "2026-10-19T23:21:00.453Z",
+      "verifiedAt": "2026-10-19T23:21:00.453Z",
+      "log": "V-003-verification.log"
+    },
+    {
+      "id": "V-004",
+      "command": "cd /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/pack-final.UZ57lR && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/release-smoke.sh /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/pack-final.UZ57lR/yallaflow-1.1.0.tgz",
+      "executionMode": "shell",
+      "executable": "cd /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/pack-final.UZ57lR && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/release-smoke.sh /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/pack-final.UZ57lR/yallaflow-1.1.0.tgz",
+      "args": [],
+      "displayCommand": "cd /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/pack-final.UZ57lR && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/release-smoke.sh /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/pack-final.UZ57lR/yallaflow-1.1.0.tgz",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-19T23:21:01.274Z",
+      "finishedAt": "2026-10-19T23:23:24.899Z",
+      "verifiedAt": "2026-10-19T23:23:24.899Z",
+      "log": "V-004-verification.log"
+    }
+  ]
+}
