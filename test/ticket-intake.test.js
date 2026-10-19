@@ -116,6 +116,23 @@ test('markup helpers are mechanical: headings, lists, entities, scripts dropped'
   assert.equal(adfToMarkdown({ type: 'doc', content: [{ type: 'heading', attrs: { level: 2 }, content: [{ type: 'text', text: 'Title' }] }] }), '## Title');
 });
 
+test('acceptance criteria are found in the formats real trackers use (found in live acceptance)', () => {
+  const texts = (body) => extractAcceptanceSection(body).map((entry) => entry.text);
+  // Plain label line with a colon, "*" bullets, tracker sync footer (as in mozilla/fxa issues).
+  assert.deepEqual(texts('Display the amount.\n\nAcceptance Criteria:\n\n* Component shows the amount\n* FE tests check it\n\n┆Issue is synchronized with this [Jira Task](https://example.atlassian.net/browse/X-1)\n'), ['Component shows the amount', 'FE tests check it']);
+  // "1-" numbering with Jira wiki image lines between items.
+  assert.deepEqual(texts('Acceptance Criteria:\n\n1- The registration page has updated copy.\n\n!image-1.png|width=90%!\n\n2- The sign-in page has updated copy.'), ['The registration page has updated copy.', 'The sign-in page has updated copy.']);
+  // Bold label followed by prose instead of a list; ends at the next label.
+  const prose = extractAcceptanceSection('Intro\n\n**Acceptance Criteria**\n\nThere are two entry points.\n\n**(entrypoint=menu)** Users from the menu see version A.\n\n**Notes**\n- not this');
+  assert.deepEqual(prose.map((entry) => entry.text), ['There are two entry points.', '**(entrypoint=menu)** Users from the menu see version A.']);
+  assert.equal(prose[0].origin, 'description-heading (prose)');
+  // Jira wiki heading; a section ends at a plain "Label:" line.
+  assert.deepEqual(texts('h3. Acceptance criteria\n# ignored heading text\n* A\n* B\n\nOut of scope:\n* C'), []);
+  assert.deepEqual(texts('h3. Acceptance criteria\n* A\n* B\n\nOut of scope:\n* C'), ['A', 'B']);
+  // A sentence that merely mentions acceptance criteria is not a section label.
+  assert.deepEqual(texts('We discussed acceptance criteria in the meeting.\n- not a criterion'), []);
+});
+
 test('a credentialed request never follows a redirect to another origin', async () => {
   const fetchImpl = async () => new Response(null, { status: 302, headers: { location: 'https://evil.example/steal' } });
   await assert.rejects(

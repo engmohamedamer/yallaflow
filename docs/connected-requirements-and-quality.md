@@ -14,7 +14,7 @@ You do not run these commands yourself. The agent does, following on-demand skil
 
 ## Connected Requirements
 
-Import an existing requirement from **GitHub Issues**, **Jira**, or **Azure DevOps Boards**. The import includes the description, the acceptance criteria (from a dedicated field, or under an "Acceptance Criteria" heading), relevant comments (bots excluded; the 20 most recent by default), attachments, and a link back to the ticket.
+Import an existing requirement from **GitHub Issues**, **Jira**, or **Azure DevOps Boards**. The import includes the description, the acceptance criteria (from a dedicated field, or from an "Acceptance Criteria" section: a heading, a bold label, or a plain `Acceptance Criteria:` line, with bullets, numbered items, or prose), relevant comments (bots excluded; the 20 most recent by default), attachments, and a link back to the ticket.
 
 ### How the ticket gets in
 

@@ -1,0 +1,9 @@
+PASS video file physically exists: 301290 bytes
+PASS container "matroska,webm", stream vp8,1280,720, duration 11.640000s
+PASS full decode without errors (playable)
+PASS 291 decoded frames
+PASS ledger sha256+size match the stored file
+PASS report.html <video> and report.md link point at the stored file
+PASS media is git-ignored by default
+PASS no storage-state path, session value, or credential in YallaFlow text state
+VIDEO ACCEPTANCE OK

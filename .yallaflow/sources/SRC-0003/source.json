@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0003",
+  "sourceType": "file",
+  "sourceName": "acceptance-request.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-10-19T18:31:40.421Z",
+  "original": {
+    "path": "sources/SRC-0003/acceptance-request.md",
+    "sha256": "8a5660c834ea655dd896d427c20e6b794082a21acbdc592eacda0ce9ec7e1cfa",
+    "sizeBytes": 1378
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0012"
+  ],
+  "rawText": "YallaFlow v1.1.0 final real-world acceptance (developer request, 2026-10-19):\n1. Commit the implementation after reviewing the diff (no tag/push/release/publish).\n2. Validate real video recording: check Playwright recording prerequisites, install missing development-only prerequisites if needed and safe (no mandatory YallaFlow dependency), run an actual Smart Demo with video against a safe local test application; verify the video physically exists, is playable, corresponds to the selected demo scenario, the local report links it correctly, and no credentials or sensitive data are exposed. A printed video path is not success.\n3. Validate connected requirements with a real, publicly accessible GitHub Issue; test Azure DevOps or Jira only if authenticated access already exists; otherwise clearly distinguish simulated tests from live validation; do not request or expose credentials.\n4. Review the documented QC/demo ID collision limitation: data loss or evidence overwrite? normal single-branch usage affected? safe backward-compatible fix feasible before release? Propose a fix if there is meaningful risk of losing evidence.\n5. Final acceptance report: tests executed, evidence paths and results, remaining limitations, bugs discovered, READY / NOT READY recommendation.\nUse YallaFlow governance for new fixes. Do not publish, push, or tag without explicit approval.\n"
+}

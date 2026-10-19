@@ -129,20 +129,35 @@ function demoteHeadings(text) {
   return text.replace(/^(\s{0,3})(#{1,6})(?=\s)/gm, (_, indent, hashes) => `${indent}${'#'.repeat(Math.min(6, hashes.length + 3))}`);
 }
 
-// "## Acceptance Criteria" (any heading level, or a bold line) followed by list items,
-// up to the next heading. Mechanical: only that heading's own list is taken.
+// The "Acceptance Criteria" section of a description, taken mechanically (v1.1.0; widened
+// after live acceptance against real public issues):
+//   - the label is a whole line in any form: "## Acceptance Criteria", "**Acceptance
+//     criteria**", "Acceptance Criteria:", "h3. Acceptance criteria" (Jira wiki);
+//   - list items ("-", "*", "+", "1.", "1)", "1-", task boxes) become criteria;
+//   - a section without list items yields its prose lines instead (image/markup-only lines
+//     and tracker sync footers skipped);
+//   - the section ends at the next heading or label line ("**Notes**", "Out of scope:").
+const AC_LABEL = /^\s*(?:#{1,6}\s*|h[1-6]\.\s*)?(?:\*\*|__)?\s*acceptance criteria\b[^*_:\n]{0,40}(?:\*\*|__)?\s*:?\s*(?:\*\*|__)?\s*$/i;
+const AC_ITEM = /^\s*(?:[-*+•]|\d+\s*[.)\-])\s+(?:\[[ xX]\]\s+)?(.+)$/;
+const SECTION_END = /^\s*(?:#{1,6}\s|h[1-6]\.\s)|^\s*(?:\*\*|__)[^*_]+(?:\*\*|__)\s*:?\s*$|^\s*[A-Z][\w /&()-]{0,40}:\s*$/;
+const MARKUP_ONLY = /^\s*(?:!\[[^\]]*\]\([^)]*\)|![^!\s][^!]*!|<img\b[^>]*>|┆.*|-{3,}|\*{3,})\s*$/;
+const MAX_CRITERIA = 50;
+
 export function extractAcceptanceSection(markdown, origin = 'description-heading') {
   if (typeof markdown !== 'string' || !markdown.trim()) return [];
   const lines = markdown.split(/\r?\n/);
-  const start = lines.findIndex((line) => /^\s*(?:#{1,6}\s*|\*\*\s*)acceptance criteria\b/i.test(line));
+  const start = lines.findIndex((line) => AC_LABEL.test(line));
   if (start === -1) return [];
   const items = [];
+  const prose = [];
   for (const line of lines.slice(start + 1)) {
-    if (/^\s*#{1,6}\s/.test(line) || /^\s*\*\*[^*]+\*\*\s*:?\s*$/.test(line)) break;
-    const item = /^\s*(?:[-*+]|\d+[.)])\s+(?:\[[ xX]\]\s+)?(.+)$/.exec(line);
+    if (SECTION_END.test(line)) break;
+    const item = AC_ITEM.exec(line);
     if (item) items.push(item[1].trim());
+    else if (line.trim() && !MARKUP_ONLY.test(line)) prose.push(line.trim());
   }
-  return items.map((text, index) => ({ id: `ac:${index + 1}`, text, origin }));
+  const criteria = items.length ? items : prose;
+  return criteria.slice(0, MAX_CRITERIA).map((text, index) => ({ id: `ac:${index + 1}`, text, origin: items.length ? origin : `${origin} (prose)` }));
 }
 
 // Atlassian Document Format (Jira Cloud REST v3) → Markdown-ish text.

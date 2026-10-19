@@ -1,0 +1,7 @@
+PASS path A (agent-acquired, imported with no network): 4 acceptance criteria, 3 comments
+PASS path B (live --fetch, no credentials): same ticket, re-import linked to SRC-0001
+PASS both paths agree on key, URL, title, state, revision, criteria; provenance distinguishes agent vs fetch
+PASS rendered text bannered as untrusted, criteria locators [ac:1..4] present
+PASS requirement traced to the live ticket via {source: SRC-0002, locator: ac:1}
+PASS doctor
+LIVE GITHUB ACCEPTANCE OK

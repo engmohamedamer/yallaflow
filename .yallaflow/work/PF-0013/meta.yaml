@@ -1,0 +1,56 @@
+{
+  "id": "PF-0013",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Acceptance criteria not detected in common real-world GitHub issue formats (plain 'Acceptance Criteria:' label, '1-' numbering, paragraph criteria)",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-10-19T18:36:11.628Z",
+  "updatedAt": "2026-10-19T18:45:00.901Z",
+  "title": "Acceptance criteria not detected in common real-world GitHub issue formats (plain 'Acceptance Criteria:' label, '1-' numbering, paragraph criteria)",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-10-19T18:36:11.639Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0004",
+      "type": "file",
+      "name": "issue.json",
+      "detectedFormat": "json",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-10-19T18:36:11.842Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ],
+  "completionHistory": [
+    {
+      "completedAt": "2026-10-19T18:45:00.901Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "PF-0012",
+  "type": "investigation",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "v1.1.0 real-world acceptance: real Smart Demo video recording, live GitHub ticket import, QC/demo ID-collision risk review",
+  "status": "DONE",
+  "readOnly": true,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-10-19T18:31:40.262Z",
+  "updatedAt": "2026-10-19T18:45:51.331Z",
+  "title": "v1.1.0 real-world acceptance: real Smart Demo video recording, live GitHub ticket import, QC/demo ID-collision risk review",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow investigate --scope bounded`.",
+  "routedAt": "2026-10-19T18:31:40.271Z",
+  "workflow": "investigation",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "verification"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0003",
+      "type": "file",
+      "name": "acceptance-request.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-10-19T18:31:40.433Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ]
+}

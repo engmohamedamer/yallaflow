@@ -1,0 +1,5 @@
+branch B allocated QC-001 (same ID as branch A)
+REPRODUCED: branch A's QC-001 media now holds branch B's bytes
+REPRODUCED: branch A's ledger hash no longer matches its evidence file
+REPRODUCED: doctor still passes (silent)
+REPRODUCED: merging both branches conflicts in the QC ledger

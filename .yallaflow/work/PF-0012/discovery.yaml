@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "unavailable",
+      "area": "integration",
+      "summary": "Jira and Azure DevOps were not validated live: no Jira or Azure DevOps credentials exist in this environment, and the Atlassian MCP connector present in the agent session is unauthenticated (not authenticated, to avoid requesting credentials). Their adapters are covered only by simulated tests: recorded REST payload fixtures and a local HTTP test server.",
+      "reason": "The developer asked not to request or expose credentials; only GitHub could be validated live (public, unauthenticated).",
+      "recordedAt": "2026-10-19T18:45:06.336Z"
+    }
+  ],
+  "updatedAt": "2026-10-19T18:45:06.336Z"
+}

@@ -33,7 +33,7 @@ Known gaps and deliberate boundaries. Planned work is tracked in [`roadmap.md`](
 
 ## Intake
 
-- **Tracker import is read-only and per ticket.** GitHub Issues, Jira, and Azure DevOps tickets import one at a time ([guide](connected-requirements-and-quality.md#connected-requirements)); there is no sync, webhook, query/bulk import, or writeback (comments, status). Email and chat adapters do not exist. Acceptance criteria are taken mechanically from a dedicated field or an "Acceptance Criteria" heading; anything else is left in the description for the agent to read. Jira wiki markup (REST v2) is kept as written, not converted.
+- **Tracker import is read-only and per ticket.** GitHub Issues, Jira, and Azure DevOps tickets import one at a time ([guide](connected-requirements-and-quality.md#connected-requirements)); there is no sync, webhook, query/bulk import, or writeback (comments, status). Email and chat adapters do not exist. Acceptance criteria are taken mechanically from a dedicated field or an "Acceptance Criteria" section (heading, bold, or plain label line); anything else is left in the description for the agent to read. Jira wiki markup (REST v2) is kept as written, not converted.
 - **Live tracker calls are verified against recorded payloads and a local test server**, not against the hosted services in the release suite. GitHub Enterprise and Azure DevOps Server need their base URL in config.
 - **`--fetch` attachments on GitHub** are downloaded without credentials (they are hosted outside the API origin), so attachments of private repositories may not download; they are listed as not downloaded.
 - **No OCR or vision.** Images and scanned PDFs are preserved as sources, but no text is extracted.

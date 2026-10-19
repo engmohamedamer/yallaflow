@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0004",
+  "sourceType": "file",
+  "sourceName": "issue.json",
+  "detectedFormat": "json",
+  "contentType": "application/json",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-10-19T18:36:11.826Z",
+  "original": {
+    "path": "sources/SRC-0004/issue.json",
+    "sha256": "4e69fc184e99263ceeb5e72d7a3534a140849d6baeb7ee980f0836a67efc449d",
+    "sizeBytes": 3386
+  },
+  "metadata": {
+    "extension": ".json",
+    "detectedFormat": "json"
+  },
+  "linkedWork": [
+    "PF-0013"
+  ],
+  "rawText": "{\n  \"url\": \"https://api.github.com/repos/mozilla/fxa/issues/13609\",\n  \"repository_url\": \"https://api.github.com/repos/mozilla/fxa\",\n  \"labels_url\": \"https://api.github.com/repos/mozilla/fxa/issues/13609/labels{/name}\",\n  \"comments_url\": \"https://api.github.com/repos/mozilla/fxa/issues/13609/comments\",\n  \"events_url\": \"https://api.github.com/repos/mozilla/fxa/issues/13609/events\",\n  \"html_url\": \"https://github.com/mozilla/fxa/issues/13609\",\n  \"id\": 1302497322,\n  \"node_id\": \"I_kwDOAjH_ac5Noogq\",\n  \"number\": 13609,\n  \"title\": \"Display Prorated Amount on PlanDetails Component on Subscription Upgrade\",\n  \"user\": {\n    \"login\": \"data-sync-user\",\n    \"id\": 54726158,\n    \"node_id\": \"MDQ6VXNlcjU0NzI2MTU4\",\n    \"avatar_url\": \"https://avatars.githubusercontent.com/u/54726158?v=4\",\n    \"gravatar_id\": \"\",\n    \"url\": \"https://api.github.com/users/data-sync-user\",\n    \"html_url\": \"https://github.com/data-sync-user\",\n    \"followers_url\": \"https://api.github.com/users/data-sync-user/followers\",\n    \"following_url\": \"https://api.github.com/users/data-sync-user/following{/other_user}\",\n    \"gists_url\": \"https://api.github.com/users/data-sync-user/gists{/gist_id}\",\n    \"starred_url\": \"https://api.github.com/users/data-sync-user/starred{/owner}{/repo}\",\n    \"subscriptions_url\": \"https://api.github.com/users/data-sync-user/subscriptions\",\n    \"organizations_url\": \"https://api.github.com/users/data-sync-user/orgs\",\n    \"repos_url\": \"https://api.github.com/users/data-sync-user/repos\",\n    \"events_url\": \"https://api.github.com/users/data-sync-user/events{/privacy}\",\n    \"received_events_url\": \"https://api.github.com/users/data-sync-user/received_events\",\n    \"type\": \"User\",\n    \"user_view_type\": \"public\",\n    \"site_admin\": false\n  },\n  \"labels\": [\n\n  ],\n  \"state\": \"closed\",\n  \"locked\": false,\n  \"assignees\": [\n\n  ],\n  \"milestone\": null,\n  \"comments\": 3,\n  \"created_at\": \"2022-07-12T18:59:14Z\",\n  \"updated_at\": \"2022-08-11T17:42:28Z\",\n  \"closed_at\": \"2022-08-11T17:42:28Z\",\n  \"assignee\": null,\n  \"author_association\": \"COLLABORATOR\",\n  \"issue_field_values\": [\n\n  ],\n  \"type\": null,\n  \"active_lock_reason\": null,\n  \"sub_issues_summary\": {\n    \"total\": 0,\n    \"completed\": 0,\n    \"percent_completed\": 0\n  },\n  \"issue_dependencies_summary\": {\n    \"blocked_by\": 0,\n    \"total_blocked_by\": 0,\n    \"blocking\": 0,\n    \"total_blocking\": 0\n  },\n  \"body\": \"Display the prorated amount when a user is upgrading their subscription with a coupon. The preview invoice API endpoint should already be retreiving the necessary information but the PlanDetails component will need to be changed to display this information. \\n\\nAcceptance Criteria:\\n\\n* Component is updated to display prorated amount\\n* FE tests to check that amount is displayed\\n* BE tests to verify information is present in response\\n* Stories updated for changed component(s)\\n\\n┆Issue is synchronized with this [Jira Task](https://mozilla-hub.atlassian.net/browse/FXA-5538)\\n\",\n  \"closed_by\": null,\n  \"reactions\": {\n    \"url\": \"https://api.github.com/repos/mozilla/fxa/issues/13609/reactions\",\n    \"total_count\": 0,\n    \"+1\": 0,\n    \"-1\": 0,\n    \"laugh\": 0,\n    \"hooray\": 0,\n    \"confused\": 0,\n    \"heart\": 0,\n    \"rocket\": 0,\n    \"eyes\": 0\n  },\n  \"timeline_url\": \"https://api.github.com/repos/mozilla/fxa/issues/13609/timeline\",\n  \"performed_via_github_app\": null,\n  \"state_reason\": \"completed\",\n  \"pinned_comment\": null\n}\n"
+}

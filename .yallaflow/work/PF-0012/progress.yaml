@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-10-19T18:45:49.633Z",
+      "completedAt": "2026-10-19T18:45:49.633Z",
+      "summary": "Playwright recording prerequisite: playwright-cli 0.1.22 needs Playwright's own ffmpeg build (ffmpeg-1011); /usr/bin/ffmpeg is not used. Installed dev-only into ~/.cache/ms-playwright from Playwright's CDN (2.3 MiB); no YallaFlow or project dependency added. No GitHub/Jira/ADO credentials in the environment; the Atlassian MCP connector is unauthenticated.",
+      "evidence": [
+        "SRC-0003"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-10-19T18:45:49.972Z",
+      "completedAt": "2026-10-19T18:45:49.972Z",
+      "summary": "Findings: (1) real Smart Demo video recorded and verified (VP8/WebM 1280x720, 11.6 s, 291 frames, full decode clean; chapter title card 'D-01 Manager approves a large refund' rendered in-video; frames show waiting then approved state; ledger hash = file; report.md/report.html link it; media git-ignored; no credential, session value or storage-state path in stored records) — V-002. (2) Live GitHub import of public mozilla/fxa#13609 via agent-acquired and --fetch paths; found and fixed a real bug: acceptance criteria not detected in real-world formats (PF-0013, now 4/4) — V-003. Jira/ADO live untested (no credentials). (3) QC/demo record IDs restart per branch and ignored media survives checkout, so a second branch's QC-001 silently overwrites the first branch's evidence file; doctor stays green; merges conflict in the ledger — V-004. Same root cause also hits single-branch 'undo' (restoring qc.json while media remains) and a failed record's rollback can delete another branch's media dir. Fix proposed, not implemented, pending approval.",
+      "evidence": [
+        "verification:V-002",
+        "verification:V-003",
+        "verification:V-004",
+        "src/quality/artifacts.js#storeArtifacts",
+        "src/quality/input.js#nextId"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-10-19T18:45:51.028Z",
+      "completedAt": "2026-10-19T18:45:51.028Z",
+      "summary": "Evidence V-002 (real video), V-003 (live GitHub), V-004 (collision reproduction); V-001 failed on an over-broad grep in the check script (kept).",
+      "evidence": [
+        "verification:V-002",
+        "verification:V-003",
+        "verification:V-004"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-10-19T18:45:51.028Z"
+}

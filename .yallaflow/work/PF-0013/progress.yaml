@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-10-19T18:36:12.198Z",
+      "completedAt": "2026-10-19T18:36:12.198Z",
+      "summary": "Live acceptance (PF-0012) imported real public issue mozilla/fxa#13609 via both paths; extractAcceptanceSection (src/intake/providers/ticket.js) found 0 criteria. Sampled real bodies (mozilla/fxa #13609, #13615, #13285, #13488, #13443) use: a plain 'Acceptance Criteria:' line (not heading/bold), '1-' numbering, and paragraph criteria under a bold label; the current regex requires a #-heading or **bold** start and [-*+]/N. or N) bullets.",
+      "evidence": [
+        "src/intake/providers/ticket.js#extractAcceptanceSection",
+        "SRC-0004"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-10-19T18:36:22.809Z",
+      "completedAt": "2026-10-19T18:36:22.809Z",
+      "summary": "Reproduced offline against the preserved real payload: extractAcceptanceSection returns 0. Root cause: the section-start regex only accepts '#' headings or a '**' bold start, so a plain 'Acceptance Criteria:' label line never matches; list items only accept '-*+', 'N.' and 'N)', not 'N-'; and a section of paragraphs yields nothing. Fix: accept a whole-line label in plain, bold, or heading form (with optional colon); accept 'N-' numbering; stop at the next heading or label line; when the section has no list items, take its non-empty prose lines (excluding image/markup-only lines) as criteria.",
+      "evidence": [
+        "src/intake/providers/ticket.js#extractAcceptanceSection"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-10-19T18:36:40.604Z",
+      "completedAt": "2026-10-19T18:37:48.463Z",
+      "summary": "extractAcceptanceSection accepts a whole-line Acceptance Criteria label (heading, bold, Jira h3., or plain 'Acceptance Criteria:'), '1-' numbering and '•' bullets, ends at the next heading or label line, and falls back to prose lines (origin '… (prose)') when the section has no list; image/markup-only lines and tracker sync footers are skipped. Regression test mirrors the real formats; docs/CHANGELOG/limitations wording updated.",
+      "evidence": [
+        "src/intake/providers/ticket.js#extractAcceptanceSection",
+        "test/ticket-intake.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-10-19T18:45:00.597Z",
+      "completedAt": "2026-10-19T18:45:00.597Z",
+      "summary": "Full suite 740/740 (V-001); live re-validation with a freshly packed candidate against public issue mozilla/fxa#13609 finds all 4 acceptance criteria through both the agent-acquired and the --fetch path (V-002).",
+      "evidence": [
+        "verification:V-001",
+        "verification:V-002"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-10-19T18:45:00.597Z"
+}
