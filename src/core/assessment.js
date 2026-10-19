@@ -37,7 +37,7 @@ export async function assessWorkspace(root) {
 
   const legacyStructures = [];
   if (['legacy-generated', 'legacy-customized'].includes(agent.state)) legacyStructures.push('unversioned AGENT.md (pre-v0.3.6 agent guidance)');
-  if (agent.state === 'outdated') legacyStructures.push(`agent contract v${agent.version} (installed v${agent.installed})`);
+  if (agent.state === 'outdated') legacyStructures.push(agent.sameVersion ? `agent contract v${agent.version} from an earlier build of v${agent.installed} (refresh to the final text)` : `agent contract v${agent.version} (installed v${agent.installed})`);
   if (pendingLegacy.length) legacyStructures.push(`v0.3.5 append-only project context (${pendingLegacy.length} item(s) not yet reconciled)`);
   const uncontracted = work.filter((item) => item.routingStatus !== 'pending' && !item.behaviorContract && !item.requiredCapabilities);
   if (uncontracted.length) legacyStructures.push(`${uncontracted.length} pre-v0.2 work item(s) without a pinned Behavior Contract (readable as-is; no action needed)`);

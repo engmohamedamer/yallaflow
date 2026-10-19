@@ -1,0 +1,12 @@
+PASS version 1.1.0
+PASS greenfield init, Claude+Codex bootstraps, contract v10
+PASS init writes no QC/demo/provider settings
+PASS brownfield gate refuses work before baseline
+PASS offline ticket import (no network)
+PASS qc plan/record with a real playwright-cli screenshot (no network)
+PASS demo approval gate and record (no network)
+PASS reports and git-excluded media
+PASS on-demand skill served
+PASS shared clone doctor
+PASS doctor
+SMOKE OK

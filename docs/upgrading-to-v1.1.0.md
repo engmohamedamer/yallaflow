@@ -41,7 +41,7 @@ yallaflow agent refresh           # updates only the YallaFlow-managed block
 yallaflow doctor
 ```
 
-Commit `.yallaflow/AGENT.md`. Your own text outside the managed block, your work items, and your project memory are not touched. Until you refresh, 1.1.0 keeps working with the v9 contract. The new commands work either way, but the agent learns the new rules (untrusted tickets, QC/demo only on request) from v10.
+Commit `.yallaflow/AGENT.md`. Your own text outside the managed block, your work items, and your project memory are not touched. If a pre-release 1.1.0 build set up the project (for example a pilot), `agent refresh` also updates its unedited v10 block to the final text. Until you refresh, 1.1.0 keeps working with the earlier contract. The new commands work either way, but the agent learns the new rules (untrusted tickets, QC/demo only on request) from v10.
 
 Existing work items keep their pinned behavior. On-demand skills apply to them too, including finished work, without rerouting or reopening.
 

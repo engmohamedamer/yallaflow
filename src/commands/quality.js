@@ -82,7 +82,15 @@ export async function qcStatusCommand(workId) {
   }
   if (view.plan.criteriaNotCovered.length) console.log(`Criteria with no scenario: ${view.plan.criteriaNotCovered.join(', ')}`);
   printPolicy(view);
+  await printMediaWarnings(root, workId);
   console.log(`Report: .yallaflow/work/${workId}/quality/report.md · report.html`);
+}
+
+// Stored media whose bytes no longer match the recorded hash (v1.1.0). Missing media is
+// expected in a fresh clone (media is local-only by default) and is not reported here.
+async function printMediaWarnings(root, workId) {
+  const { qualityMediaWarnings } = await import('../quality/integrity.js');
+  for (const warning of await qualityMediaWarnings(root, workId)) console.log(`Warning: ${warning}`);
 }
 
 function printPolicy(view) {
@@ -138,7 +146,10 @@ export async function demoRecordCommand(workId, { file, allowRemote = false }) {
   console.log(`Demo ${run.id} recorded for ${workId}${run.audience ? ` (${run.audience} audience)` : ''}: ${run.scenarios.map((result) => `${result.id} ${result.status}`).join(', ')}.`);
   if (run.video) console.log(`Video: ${relative(root, path.join(path.dirname(report.markdown), run.video.path))} (local; sha256 ${run.video.sha256.slice(0, 12)}…)`);
   else console.log('No video recorded (recording is optional).');
-  if (run.notShown.length) console.log(`Approved but not shown: ${run.notShown.join(', ')}`);
+  const { approvedCoverage, loadDemoLedger } = await import('../quality/demo.js');
+  const coverage = approvedCoverage((await loadDemoLedger(root, workId)).ledger);
+  if (coverage?.remaining.length) console.log(`Approved scope not yet shown in any recording: ${coverage.remaining.join(', ')}`);
+  else if (coverage) console.log('Every approved scenario has now been shown across the recordings.');
   console.log(DEMO_DISCLAIMER);
   console.log(`${meta.id} stays ${meta.status}; demos never change the lifecycle and are not acceptance evidence.`);
   console.log(`Demo summary: ${relative(root, report.markdown)} · ${relative(root, report.html)}`);
@@ -157,5 +168,9 @@ export async function demoStatusCommand(workId) {
   console.log(`${workId} demo — proposal ${proposal.id}: ${approved ? `approved (${approved.approval.scenarios.join(', ')}) at ${approved.approval.approvedAt}` : 'awaiting the developer\'s approval'}`);
   for (const scenario of proposal.scenarios) console.log(`  ${scenario.priority}. ${scenario.id} [${scenario.audience}] ${scenario.title}`);
   for (const run of ledger.runs) console.log(`  ${run.id} (${run.recordedAt}): ${run.scenarios.map((result) => `${result.id} ${result.status}`).join(', ')}${run.video ? ' · video' : ''}`);
+  const { approvedCoverage } = await import('../quality/demo.js');
+  const coverage = approvedCoverage(ledger);
+  if (coverage?.remaining.length && coverage.runs.length) console.log(`Approved, not yet shown in any recording: ${coverage.remaining.join(', ')}`);
+  await printMediaWarnings(root, workId);
   console.log(`Report: .yallaflow/work/${workId}/quality/report.md · report.html`);
 }

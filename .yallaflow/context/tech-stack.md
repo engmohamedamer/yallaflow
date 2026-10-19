@@ -23,10 +23,11 @@
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-006)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-19T16:37:32.391Z (commit 032f32c)
+- **Verified:** 2026-10-19T20:31:35.368Z (commit 9c38eec)
 - **Evidence:**
-  - package.json (repository @ 032f32c)
-  - src/cli.js (repository @ 032f32c)
+  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
+  - package.json (repository @ 9c38eec)
+  - src/cli.js (repository @ 9c38eec)
 
 <!-- yallaflow-fact:CTX-0007 -->
 ### CTX-0007 — There are only four runtime dependencies, all for source intake: officeparser 5.2.2 (office documents), pdfjs-dist 5.4.624 (PDF, pinned through overrides), yauzl (zip reading), and @xmldom/xmldom. Everything else uses Node built-ins. YAML files are written as JSON (JSON is valid YAML 1.2), so no YAML library is needed.
@@ -49,9 +50,10 @@
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-008)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-19T16:37:32.843Z (commit 032f32c)
+- **Verified:** 2026-10-19T20:31:35.598Z (commit 9c38eec)
 - **Evidence:**
-  - package.json (repository @ 032f32c)
-  - src/cli.js (repository @ 032f32c)
+  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
+  - package.json (repository @ 9c38eec)
+  - src/cli.js (repository @ 9c38eec)
 
 <!-- yallaflow-context:end -->

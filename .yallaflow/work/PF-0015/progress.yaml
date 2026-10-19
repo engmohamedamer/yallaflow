@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-10-19T19:50:26.575Z",
+      "completedAt": "2026-10-19T19:50:26.575Z",
+      "summary": "Pilot report (SRC-0006): 8/8 QC passed, three real demo videos, natural-language requests worked. Inspected: (1) qc.js/demo.js rejection() printed 'QC record rejected'/'Demo record rejected' for plan/proposal failures, and citing a criterion on work without criteria reported it as 'not an active acceptance criterion'; (2) recordDemo stored per-run notShown = approved minus this run, so one-video-per-feature showed other videos' scenarios as 'Approved but not shown'; (3) real playwright-cli behavior probed: a click that opens confirm() returns with a '### Modal state' block, every other command fails with 'does not handle the modal state' until dialog-accept/dialog-dismiss (dismiss keeps the booking, accept cancels) — skills say nothing about it; (4) storeArtifacts copied the same file once per scenario; (5) natural-language routing relies on Agent Contract v10 + skill text, which name the commands but not the developer phrasings; (6) no command triggers QC/demo (existing tests).",
+      "evidence": [
+        "SRC-0006",
+        "src/quality/qc.js",
+        "src/quality/demo.js",
+        "resources/skills/ai-qc.md"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-10-19T19:50:26.738Z",
+      "completedAt": "2026-10-19T19:50:26.738Z",
+      "summary": "Root causes as listed in discovery; fix plan: action-specific rejection headers and a clearer no-criteria message; demo coverage computed across all runs of the approved proposal; within-record file dedupe by hash; ai-qc and smart-demo skills gain a dialog section from the probed behavior; Agent Contract v10 and skills map everyday phrasings to the on-demand skills and restate that they never start without the developer's intent; verify natural-language routing with fresh agents in a scratch project, including a negative case.",
+      "evidence": [
+        "resources/skills/smart-demo.md"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-10-19T19:50:28.069Z",
+      "completedAt": "2026-10-19T20:08:38.286Z",
+      "summary": "Approved review fix (SRC-0008): L4 — the upgrade assessment describes a same-version outdated agent contract as 'from an earlier build of vN (refresh to the final text)'. Test added to test/quality-integrity.test.js.",
+      "evidence": [
+        "src/quality/demo.js#approvedCoverage",
+        "resources/skills/ai-qc.md",
+        "resources/skills/smart-demo.md",
+        "src/agent/contract.js",
+        "test/pilot-feedback.test.js",
+        "runtime:three fresh agents given plain-language requests in a scratch YallaFlow project chose ai-qc, smart-demo, and no QC/demo for a typo fix respectively (planning-only, 2026-10-19)",
+        "src/core/assessment.js",
+        "test/quality-integrity.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-10-19T20:21:08.505Z",
+      "completedAt": "2026-10-19T20:21:08.505Z",
+      "summary": "npm run check 755/755 on the final PF-0015 tree (V-002; V-001 751/751 before the approved review fix); natural-language routing checked with three fresh agents (QC, Smart Demo, typo-fix control).",
+      "evidence": [
+        "verification:V-002"
+      ]
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Pilot items 1 (QC plan/demo proposal rejection headers and the criteria message for work without criteria, src/quality/qc.js + demo.js), 2 (scope-level 'approved, not yet shown' coverage replacing per-run notShown, src/quality/demo.js#approvedCoverage, report.js, commands/quality.js) and 4 (identical files stored once within a record, src/quality/artifacts.js#createRecordMedia) were edited while PF-0014 held implementation authorization, because they live in the same functions; adopted for review and verification under PF-0015",
+      "reason": "Disclosed rather than hidden: the edits belong to PF-0015's objective, not PF-0014's",
+      "costIfWrong": "Audit clarity only; the changes are verified fresh under both work items",
+      "createdAt": "2026-10-19T19:50:26.419Z"
+    }
+  ],
+  "history": [
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Approved independent review (SRC-0008): upgrade assessment wording for a same-version outdated agent contract (L4).",
+      "changedAt": "2026-10-19T20:07:18.336Z"
+    }
+  ],
+  "updatedAt": "2026-10-19T20:21:08.505Z"
+}

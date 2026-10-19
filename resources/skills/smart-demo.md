@@ -2,7 +2,9 @@
 
 ## Purpose
 
-Show what was delivered, through the few scenarios that matter, to the audience that needs to see them. Recording is optional. This is an on-demand skill: use it only when the developer asks for a demo, on any routed work item at any stage (DONE included). It is independent of QC: a demo needs no QC records, and QC needs no demo. A demo is not testing. It shows selected scenarios working once, as recorded, and proves neither correctness nor coverage.
+Show what was delivered, through the few scenarios that matter, to the audience that needs to see them. Recording is optional. This is an on-demand skill: use it only when the developer asks for a demo, on any routed work item at any stage (DONE included). It is independent of QC: a demo needs no QC records, and QC needs no demo.
+
+The developer does not need to know any command. Requests such as "prepare a demo", "record a video of the new booking flow", "show the client how cancelling works", or "make a walkthrough for the team" mean Smart Demo. Never start one because work was finished or a QC run passed. A demo is not testing. It shows selected scenarios working once, as recorded, and proves neither correctness nor coverage.
 
 ## Behavior
 
@@ -53,6 +55,20 @@ Show what was delivered, through the few scenarios that matter, to the audience 
 
    Use `skipped` or `failed`, with notes, for anything that did not go as proposed. A non-local `baseUrl` needs `--allow-remote`. YallaFlow stores the media locally with hashes (it stays out of Git by default) and regenerates `quality/report.md` and `quality/report.html` with links to the recordings.
 7. **Give the developer the demo summary:** each scenario shown, links to the recording and screenshots, what was skipped or failed and why, and the reminder that a demo is not test evidence.
+
+## Browser dialogs (confirm, alert, prompt)
+
+A step can open a native dialog, such as "Cancel booking #7?". With `playwright-cli`, the click returns while the dialog is still open, and its output contains a `### Modal state` block naming the dialog. Until you answer it, every other command fails with `does not handle the modal state`. That includes snapshot, screenshot and eval.
+
+- After every action that can open a dialog, read the output for `### Modal state`.
+- Answer the dialog deliberately:
+  - `playwright-cli dialog-accept` confirms (for a prompt, `dialog-accept "<text>"`).
+  - `playwright-cli dialog-dismiss` takes the cancel path.
+- Record the answer as a step, for example "Confirm dialog 'Cancel booking #7?' → dismissed".
+- Then check the outcome on the page. Dismissing must leave the booking unchanged, and accepting must cancel it.
+- In a demo, show the path the approved scenario describes. Add a `video-chapter` before the dialog step, so the recording explains what was chosen.
+- Never leave a dialog pending. Never treat a command that failed on the modal state as a test result.
+- With Playwright MCP, use its dialog tool the same way.
 
 ## Guard
 

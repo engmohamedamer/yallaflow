@@ -251,9 +251,9 @@ test('artifacts: copied with hashes, git-excluded by default, opt-in commit; rep
 
   const md = await readFile(path.join(q, 'report.md'), 'utf8');
   for (const [, link] of md.matchAll(/\]\(([^)]+)\)/g)) assert.ok(existsSync(path.join(q, decodeURI(link))), `${link} resolves locally`);
-  assert.match(md, /npx playwright show-trace media\/QC-001\/trace\.zip/);
+  assert.match(md, /npx playwright show-trace media\/QC-001-[0-9a-f]{6}\/trace\.zip/);
   const html = await readFile(path.join(q, 'report.html'), 'utf8');
-  assert.match(html, /<img alt="export\.png" src="media\/QC-001\/export\.png">/);
+  assert.match(html, /<img alt="export\.png" src="media\/QC-001-[0-9a-f]{6}\/export\.png">/);
   assert.doesNotMatch(html, /<script|https?:\/\//i, 'standalone: no scripts and no external requests');
 
   await rm(path.join(q, shot.path));

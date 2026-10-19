@@ -15,13 +15,14 @@
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-009)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-19T17:51:44.624Z (commit 032f32c)
+- **Verified:** 2026-10-19T20:31:35.833Z (commit 9c38eec)
 - **Evidence:**
-  - src/cli.js (repository @ 032f32c)
-  - src/commands/start.js (repository @ 032f32c)
-  - src/commands/baseline.js (repository @ 032f32c)
-  - test/recursive-help-safety.test.js (repository @ 032f32c)
-  - docs/architecture.md (repository @ 032f32c)
+  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
+  - src/cli.js (repository @ 9c38eec)
+  - src/commands/start.js (repository @ 9c38eec)
+  - src/commands/baseline.js (repository @ 9c38eec)
+  - test/recursive-help-safety.test.js (repository @ 9c38eec)
+  - docs/architecture.md (repository @ 9c38eec)
 
 <!-- yallaflow-fact:CTX-0010 -->
 ### CTX-0010 — Workspace and state model:
@@ -48,11 +49,12 @@
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-011)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-19T16:37:33.540Z (commit 032f32c)
+- **Verified:** 2026-10-19T20:31:36.067Z (commit 9c38eec)
 - **Evidence:**
-  - src/core/ownership.js (repository @ 032f32c)
-  - src/core/integrity.js (repository @ 032f32c)
-  - src/agent/contract.js (repository @ 032f32c)
+  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
+  - src/core/ownership.js (repository @ 9c38eec)
+  - src/core/integrity.js (repository @ 9c38eec)
+  - src/agent/contract.js (repository @ 9c38eec)
 
 <!-- yallaflow-fact:CTX-0012 -->
 ### CTX-0012 — Work lifecycle:
@@ -164,12 +166,13 @@ Reopen (DONE to implementation, verification or review, with a reason) cascades 
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-024)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-19T16:37:34.026Z (commit 032f32c)
+- **Verified:** 2026-10-19T20:31:36.306Z (commit 9c38eec)
 - **Evidence:**
-  - src/delivery/policy.js (repository @ 032f32c)
-  - src/delivery/convergence.js (repository @ 032f32c)
-  - src/delivery/requirements.js (repository @ 032f32c)
-  - src/delivery/impact.js (repository @ 032f32c)
+  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
+  - src/delivery/policy.js (repository @ 9c38eec)
+  - src/delivery/convergence.js (repository @ 9c38eec)
+  - src/delivery/requirements.js (repository @ 9c38eec)
+  - src/delivery/impact.js (repository @ 9c38eec)
 
 <!-- yallaflow-fact:CTX-0025 -->
 ### CTX-0025 — Shared Project architecture:
@@ -184,13 +187,14 @@ Reopen (DONE to implementation, verification or review, with a reason) cascades 
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-025)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-19T16:37:34.247Z (commit 032f32c)
+- **Verified:** 2026-10-19T20:31:36.548Z (commit 9c38eec)
 - **Evidence:**
-  - src/core/ids.js (repository @ 032f32c)
-  - src/shared/identity.js (repository @ 032f32c)
-  - src/shared/memory.js (repository @ 032f32c)
-  - src/shared/config.js (repository @ 032f32c)
-  - src/commands/shared.js (repository @ 032f32c)
+  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
+  - src/core/ids.js (repository @ 9c38eec)
+  - src/shared/identity.js (repository @ 9c38eec)
+  - src/shared/memory.js (repository @ 9c38eec)
+  - src/shared/config.js (repository @ 9c38eec)
+  - src/commands/shared.js (repository @ 9c38eec)
 
 <!-- yallaflow-fact:CTX-0026 -->
 ### CTX-0026 — `yallaflow finish` is the read-only completion check the Agent runs before saying a task is ready. It checks lifecycle, project integrity and, in a Shared Project, whether shared memory changed under the work's delta. It prints developer-language outcome lines, keeps a --verbose audit, and never commits or pushes.
@@ -200,10 +204,11 @@ Reopen (DONE to implementation, verification or review, with a reason) cascades 
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-026)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-19T17:51:44.914Z (commit 032f32c)
+- **Verified:** 2026-10-19T20:31:36.775Z (commit 9c38eec)
 - **Evidence:**
-  - src/commands/finish.js (repository @ 032f32c)
-  - src/agent/contract.js (repository @ 032f32c)
+  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
+  - src/commands/finish.js (repository @ 9c38eec)
+  - src/agent/contract.js (repository @ 9c38eec)
 
 <!-- yallaflow-fact:CTX-0029 -->
 ### CTX-0029 — Legacy (v0.3.5 append-only) project knowledge becomes canonical only through reviewed context reconciliation: start, plan, preview, human approve, then apply. Migration is never reconciliation, and historical work records are never rewritten.
@@ -227,10 +232,11 @@ Reopen (DONE to implementation, verification or review, with a reason) cascades 
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-046)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-19T17:51:45.712Z (commit 032f32c)
+- **Verified:** 2026-10-19T20:31:37.713Z (commit 9c38eec)
 - **Evidence:**
-  - docs/architecture.md (repository @ 032f32c)
-  - docs/limitations.md (repository @ 032f32c)
+  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
+  - docs/architecture.md (repository @ 9c38eec)
+  - docs/limitations.md (repository @ 9c38eec)
 
 <!-- yallaflow-fact:CTX-0050 -->
 ### CTX-0050 — Project understanding: - A Brownfield repository establishes it once through the Brownfield baseline: a read-only investigation work item with a repository-baseline checkpoint, a structured draft (baseline.yaml) with per-fact status, evidence and source, discovery limitations, and optionally declared coverage (inspected, sampled). - Review shows coverage: inspected, sampled, not inspected, unavailable, unresolved, and cited paths versus the inventory. - Human approval promotes every fact into the context ledger. The baseline objective (often the developer's first request) is then named as the next work until a later work item exists. - Greenfield understanding comes from intent and approved work, never a repository scan. There is no baseline refresh.
@@ -259,14 +265,15 @@ Reopen (DONE to implementation, verification or review, with a reason) cascades 
 - **Knowledge ID:** K-018
 - **Promoted at:** 2026-10-12T22:03:28.235Z
 - **Supersedes:** CTX-0018
-- **Verified:** 2026-10-19T17:51:45.982Z (commit 032f32c)
+- **Verified:** 2026-10-19T20:31:37.940Z (commit 9c38eec)
 - **Evidence:**
-  - src/baseline/understanding.js#assertEngineeringWorkAllowed (repository @ 032f32c)
-  - src/behavior/routing.js (repository @ 032f32c)
-  - src/commands/intake.js (repository @ 032f32c)
-  - src/decomposition/store.js (repository @ 032f32c)
-  - src/core/transitions.js (repository @ 032f32c)
-  - test/ticket-intake.test.js (repository @ 032f32c)
+  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
+  - src/baseline/understanding.js#assertEngineeringWorkAllowed (repository @ 9c38eec)
+  - src/behavior/routing.js (repository @ 9c38eec)
+  - src/commands/intake.js (repository @ 9c38eec)
+  - src/decomposition/store.js (repository @ 9c38eec)
+  - src/core/transitions.js (repository @ 9c38eec)
+  - test/ticket-intake.test.js (repository @ 9c38eec)
 
 <!-- yallaflow-fact:CTX-0052 -->
 ### CTX-0052 — Projection: PROJECT.md and context/*.md are projections. Each document owns exactly one managed block rendered from the ledger for its area, and content outside the block is preserved byte for byte. The one exception: once the ledger holds a current fact, the untouched init starter prompts in PROJECT.md are retired (stripStarterPlaceholders), and doctor warns while they remain. Nothing is invented in their place. The rendered block never repeats a recognizable secret value.
@@ -317,21 +324,6 @@ Reopen (DONE to implementation, verification or review, with a reason) cascades 
   - src/context/ledger.js (repository @ 032f32c)
   - test/pilot-hardening.test.js (repository @ 032f32c)
 
-<!-- yallaflow-fact:CTX-0066 -->
-### CTX-0066 — Optional Smart Demo (v1.1.0, src/quality/demo.js) is independent of QC: on explicit request the Agent proposes prioritized user-facing scenarios (demo propose: audience business|developer, priority, criteria, rationale, steps, record flag, excluded items), the developer's explicit approval is recorded with their words and bound to that exact proposal's SHA-256 (demo approve --note [--only]), and demo record is refused for an unapproved or changed proposal or scenarios outside the approved scope. Video is optional (Playwright video-start/chapter/stop; needs Playwright's ffmpeg) and stored hashed under work/<id>/quality/media/; every run carries a fixed 'not test evidence' disclaimer, and convergence refuses demo: citations. Demo and QC share the local artifact store and the report.md/report.html generator.
-
-- **State:** current
-- **Confidence:** confirmed
-- **Provenance:** repository
-- **Source work:** PF-0010
-- **Knowledge ID:** K-001
-- **Promoted at:** 2026-10-19T16:21:17.998Z
-- **Verified:** 2026-10-19T17:41:31.700Z (commit 032f32c)
-- **Evidence:**
-  - src/quality/demo.js#proposalHash (repository @ 032f32c)
-  - test/quality-demo.test.js (repository @ 032f32c)
-  - npm run check (passed) (runtime, PF-0010 V-003)
-
 <!-- yallaflow-fact:CTX-0068 -->
 ### CTX-0068 — Skill Registry and immutable instructions: - Engineering behavior is defined by package-owned skills (Skill Registry version 9, 15 skills: 12 required-chain skills plus 3 on-demand skills). - Every work item pins behaviorContract {registryVersion, skills} at creation. - Every instruction version has a fixed SHA-256 and path. Older bytes are archived byte-for-byte in resources/skills/archive/ (repository-baseline v1–v3), and a work item always receives the instruction version its registry pinned: v6 gets repository-baseline v2, v7 gets v3, v8 and v9 get v4. - A changed instruction semantic requires a new instruction version and a registry bump, never an in-place edit. - On-demand skills (registry v9: requirement-import, ai-qc, smart-demo; invocation 'on-demand', capabilities import/qc/demo) are never part of a workflow policy (resolveSkills refuses them), are served by 'yallaflow skill <id> --work <id>' for any routed work item whatever its pin, and the records they produce stamp the skill id, version and SHA-256.
 
@@ -342,15 +334,16 @@ Reopen (DONE to implementation, verification or review, with a reason) cascades 
 - **Knowledge ID:** K-026
 - **Promoted at:** 2026-10-19T16:37:37.461Z
 - **Supersedes:** CTX-0049
-- **Verified:** 2026-10-19T16:37:37.461Z (commit 032f32c)
+- **Verified:** 2026-10-19T20:31:38.943Z (commit 9c38eec)
 - **Evidence:**
-  - src/skills/constants.js (repository @ 032f32c)
-  - src/skills/instructions.js (repository @ 032f32c)
-  - src/skills/validation.js (repository @ 032f32c)
-  - src/skills/registry.js (repository @ 032f32c)
-  - src/skills/resolver.js (repository @ 032f32c)
-  - src/commands/skill.js (repository @ 032f32c)
-  - test/on-demand-skills.test.js (repository @ 032f32c)
+  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
+  - src/skills/constants.js (repository @ 9c38eec)
+  - src/skills/instructions.js (repository @ 9c38eec)
+  - src/skills/validation.js (repository @ 9c38eec)
+  - src/skills/registry.js (repository @ 9c38eec)
+  - src/skills/resolver.js (repository @ 9c38eec)
+  - src/commands/skill.js (repository @ 9c38eec)
+  - test/on-demand-skills.test.js (repository @ 9c38eec)
 
 <!-- yallaflow-fact:CTX-0070 -->
 ### CTX-0070 — Source intake: - Material user artifacts are registered as immutable sources under .yallaflow/sources/SRC-*/: the original bytes are copied unchanged, and source.json records format, metadata and links. - YallaFlow's own text representations (native-text rawText in source.json, extracted.txt) are written with recognizable secret values redacted, and intake warns when a captured original appears to contain secrets. - Formats: office and PDF are extracted, images get no OCR, and archives are never unpacked. - Format is detected from content, and writes are confined to the source directory. - Tracker tickets (intake ticket, v1.1.0) are ordinary v2 file sources (detectedFormat 'ticket', origin in metadata.ticket, previousSource on re-import): the provider payload is the original, the rendered untrusted-content-bannered Markdown with [description]/[ac:N]/[comment:id] locators is the extracted text, and each attachment is its own source.
@@ -362,31 +355,14 @@ Reopen (DONE to implementation, verification or review, with a reason) cascades 
 - **Knowledge ID:** K-028
 - **Promoted at:** 2026-10-19T16:37:37.968Z
 - **Supersedes:** CTX-0054
-- **Verified:** 2026-10-19T17:51:47.136Z (commit 032f32c)
+- **Verified:** 2026-10-19T20:31:39.427Z (commit 9c38eec)
 - **Evidence:**
-  - src/core/sources.js#persistSource (repository @ 032f32c)
-  - src/intake/ticket.js (repository @ 032f32c)
-  - src/commands/intake.js (repository @ 032f32c)
-  - src/intake/validation.js (repository @ 032f32c)
-  - test/ticket-intake.test.js (repository @ 032f32c)
-
-<!-- yallaflow-fact:CTX-0072 -->
-### CTX-0072 — Agent Contract architecture: - .yallaflow/AGENT.md is the single canonical agent contract, held in a managed block versioned by AGENT_CONTRACT_VERSION (currently 10, v1.1.0) and sealed with a SHA-256 of its body. - v8 added the pre-baseline refusal, the original request as the baseline objective, operational assistance versus engineering work, baseline coverage, and no secret values; v9 added work routing before editing; v10 adds tracker tickets as untrusted sources (agent-acquired by default, explicit --fetch only when needed) and optional, on-demand AI QC and Smart Demo (never automatic, separate from verification, no unexecuted pass, demo scope approved by the developer, a demo is not test evidence). - Repository-root CLAUDE.md and AGENTS.md carry only a thin pointer block (BOOTSTRAP_VERSION 3, which repeats the route-before-edit precondition as a numbered step; its length is capped by test at 1800 characters and it copies no contract heading). - yallaflow agent refresh/setup update those blocks idempotently, refuse hand-edited or newer blocks, and preserve content outside the blocks.
-
-- **State:** current
-- **Confidence:** confirmed
-- **Provenance:** repository
-- **Source work:** PF-0011
-- **Knowledge ID:** K-030
-- **Promoted at:** 2026-10-19T16:37:38.463Z
-- **Supersedes:** CTX-0062
-- **Verified:** 2026-10-19T16:37:38.463Z (commit 032f32c)
-- **Evidence:**
-  - src/agent/contract.js (repository @ 032f32c)
-  - src/agent/bootstrap.js (repository @ 032f32c)
-  - test/agent-contract.test.js (repository @ 032f32c)
-  - test/work-routing.test.js (repository @ 032f32c)
-  - .yallaflow/AGENT.md (repository @ 032f32c)
+  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
+  - src/core/sources.js#persistSource (repository @ 9c38eec)
+  - src/intake/ticket.js (repository @ 9c38eec)
+  - src/commands/intake.js (repository @ 9c38eec)
+  - src/intake/validation.js (repository @ 9c38eec)
+  - test/ticket-intake.test.js (repository @ 9c38eec)
 
 <!-- yallaflow-fact:CTX-0073 -->
 ### CTX-0073 — Verification evidence: 'yallaflow verify' runs argv commands by default (spawnSync with shell:false); --shell and --script are explicit alternatives. Each run is appended to work/<id>/evidence/verification.json with its full stdout/stderr log file, capturing up to 64 MiB of output (v1.1.0; Node's 1 MiB default had recorded verbose suites as failed). Recognizable secret values are redacted in the log and in the recorded command; the executed command is unchanged. Failed runs are kept. Optional QC and demo records never write this ledger.
@@ -398,45 +374,85 @@ Reopen (DONE to implementation, verification or review, with a reason) cascades 
 - **Knowledge ID:** K-031
 - **Promoted at:** 2026-10-19T16:37:38.721Z
 - **Supersedes:** CTX-0055
-- **Verified:** 2026-10-19T17:51:47.396Z (commit 032f32c)
+- **Verified:** 2026-10-19T20:31:39.674Z (commit 9c38eec)
 - **Evidence:**
-  - src/commands/verify.js (repository @ 032f32c)
-  - src/core/evidence.js (repository @ 032f32c)
-  - test/quality-qc.test.js (repository @ 032f32c)
+  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
+  - src/commands/verify.js (repository @ 9c38eec)
+  - src/core/evidence.js (repository @ 9c38eec)
+  - test/quality-qc.test.js (repository @ 9c38eec)
 
-<!-- yallaflow-fact:CTX-0077 -->
-### CTX-0077 — Optional AI QC (v1.1.0, src/quality/): YallaFlow never runs a browser or test itself; on explicit request the Agent drives Playwright (CLI or MCP) and records results with 'yallaflow qc plan|record|status'. Records live in work/<id>/quality/qc.json (append-only QP-### plans, QC-### runs), separate from the V-### verification ledger, for routed work at any stage including DONE, never changing lifecycle state. Honesty rules: passed requires executed steps plus an artifact or a passed YallaFlow verification run newer than the latest reopen; failed requires actual behavior and steps; blocked/not-run require a reason. A result counts only for the scenario definition it was recorded against (scenarioFingerprint), so a redefined scenario must run again. Policies: advisory (default; failures reported, never blocking) or strict (plan or config quality.qc.policy; a config strict is a floor a plan cannot weaken and the stricter of plan and current config governs, including earlier plans; quality approval is computed from required scenarios and is separate from DONE). Artifacts are copied with sha256 into quality/media/ (git-excluded by a YallaFlow-written .gitignore unless quality.media.commit; no local source path recorded), and report.md + a static report.html are regenerated with relative links. Convergence may cite a scenario as qc:QC-001#S-01; only a passed scenario can support satisfied, and a later non-passing result or a redefinition makes the finding stale.
+<!-- yallaflow-fact:CTX-0079 -->
+### CTX-0079 — Agent Contract architecture: - .yallaflow/AGENT.md is the single canonical agent contract, held in a managed block versioned by AGENT_CONTRACT_VERSION (currently 10, v1.1.0) and sealed with a SHA-256 of its body. - v8 added the pre-baseline refusal, the original request as the baseline objective, operational assistance versus engineering work, baseline coverage, and no secret values; v9 added work routing before editing; v10 adds tracker tickets as untrusted sources (agent-acquired by default, explicit --fetch only when needed) and optional, on-demand AI QC and Smart Demo: the developer asks in plain words ("test this", "record a video for the client") and the agent picks the skill; never automatic — not when work is finished or QC passed, and a fix/build request is not one; separate from verification, no unexecuted pass, demo scope approved by the developer, a demo is not test evidence. agent refresh also replaces an unedited block at the installed version whose recorded hash differs from the installed text (written by a pre-release build); hand-edited blocks are still refused. - Repository-root CLAUDE.md and AGENTS.md carry only a thin pointer block (BOOTSTRAP_VERSION 3, which repeats the route-before-edit precondition as a numbered step; its length is capped by test at 1800 characters and it copies no contract heading). - yallaflow agent refresh/setup update those blocks idempotently, refuse hand-edited or newer blocks, and preserve content outside the blocks.
 
 - **State:** current
 - **Confidence:** confirmed
 - **Provenance:** repository
-- **Source work:** PF-0009
-- **Knowledge ID:** K-003
-- **Promoted at:** 2026-10-19T17:41:31.240Z
-- **Supersedes:** CTX-0076
-- **Verified:** 2026-10-19T17:41:31.240Z (commit 032f32c)
+- **Source work:** PF-0015
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-10-19T20:21:09.055Z
+- **Supersedes:** CTX-0072
+- **Verified:** 2026-10-19T20:21:09.055Z (commit 9c38eec)
 - **Evidence:**
-  - src/quality/qc.js (repository @ 032f32c)
-  - src/commands/quality.js (repository @ 032f32c)
-  - test/quality-qc.test.js (repository @ 032f32c)
-  - npm run check (passed) (runtime, PF-0009 V-003)
+  - src/agent/contract.js (repository @ 9c38eec)
+  - test/pilot-feedback.test.js (repository @ 9c38eec)
+  - src/core/assessment.js (repository @ 9c38eec)
+  - npm run check (passed) (runtime, PF-0015 V-002)
 
-<!-- yallaflow-fact:CTX-0078 -->
-### CTX-0078 — Security boundaries: - Repository evidence must be a relative path inside the root. - Source writes are confined to their directory, and quality artifacts to work/<id>/quality/media/<record>/. - verify is not a sandbox. - Write authorization, approvals, demo approvals, strict QC quality approval and Shared Project roles are workflow guidance, not access control. - There is no secrets store: tracker credentials for intake ticket --fetch are read from environment variables per request, sent only over https to the hosted tracker (api.github.com, *.atlassian.net, dev.azure.com, *.visualstudio.com) or to an origin the project configured explicitly — never to a host taken only from a ticket URL, and never persisted; doctor rejects credential-like keys in requirements.providers config. - One pattern-based sanitizer (src/security/redact.js) redacts recognizable secret values at YallaFlow's persistence boundary: structured state, the ledger and its projection, work records, ADRs, logs, source text representations, and quality ledgers and reports. It never modifies developer files, preserved source originals, or copied quality media.
+<!-- yallaflow-fact:CTX-0080 -->
+### CTX-0080 — Optional Smart Demo (v1.1.0, src/quality/demo.js) is independent of QC: on explicit request the Agent proposes prioritized user-facing scenarios (demo propose: audience business|developer, priority, criteria, rationale, steps, record flag, excluded items), the developer's explicit approval is recorded with their words and bound to that exact proposal's SHA-256 (demo approve --note [--only]), and demo record is refused for an unapproved or changed proposal or scenarios outside the approved scope. Approved scenarios may be split across several recordings (one video per feature or audience); coverage of the approved scope is computed across all runs of the approved proposal (approvedCoverage), never per video. Video is optional (Playwright video-start/chapter/stop; needs Playwright's ffmpeg) and stored hashed under work/<id>/quality/media/; every run carries a fixed 'not test evidence' disclaimer, and convergence refuses demo: citations. Demo and QC share the local artifact store and the report.md/report.html generator.
 
 - **State:** current
 - **Confidence:** confirmed
 - **Provenance:** repository
-- **Source work:** PF-0011
-- **Knowledge ID:** K-048
-- **Promoted at:** 2026-10-19T17:51:47.680Z
-- **Supersedes:** CTX-0074
-- **Verified:** 2026-10-19T17:51:47.680Z (commit 032f32c)
+- **Source work:** PF-0015
+- **Knowledge ID:** K-002
+- **Promoted at:** 2026-10-19T20:21:09.344Z
+- **Supersedes:** CTX-0066
+- **Verified:** 2026-10-19T20:31:40.434Z (commit 9c38eec)
 - **Evidence:**
-  - src/security/redact.js (repository @ 032f32c)
-  - src/intake/providers/http.js (repository @ 032f32c)
-  - src/shared/config.js (repository @ 032f32c)
-  - src/quality/artifacts.js (repository @ 032f32c)
-  - docs/security.md (repository @ 032f32c)
+  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
+  - src/quality/demo.js#approvedCoverage (repository @ 9c38eec)
+  - src/quality/report.js (repository @ 9c38eec)
+  - test/pilot-feedback.test.js (repository @ 9c38eec)
+  - npm run check (passed) (runtime)
+
+<!-- yallaflow-fact:CTX-0081 -->
+### CTX-0081 — Optional AI QC (v1.1.0, src/quality/): YallaFlow never runs a browser or test itself; on explicit request the Agent drives Playwright (CLI or MCP) and records results with 'yallaflow qc plan|record|status'. Records live in work/<id>/quality/qc.json (append-only QP-### plans, QC-### runs), separate from the V-### verification ledger, for routed work at any stage including DONE, never changing lifecycle state. Honesty rules: passed requires executed steps plus an artifact or a passed YallaFlow verification run newer than the latest reopen; failed requires actual behavior and steps; blocked/not-run require a reason. A result counts only for the scenario definition it was recorded against (scenarioFingerprint), so a redefined scenario must run again. Policies: advisory (default; failures reported, never blocking) or strict (plan or config quality.qc.policy; a config strict is a floor a plan cannot weaken and the stricter of plan and current config governs, including earlier plans; quality approval is computed from required scenarios and is separate from DONE). Artifacts are copied with sha256 into a folder created exclusively for each record, quality/media/<record-id>-<random>/ (never reused, so evidence from another branch or an earlier run is never overwritten; a failed record removes only its own folder; identical files within a record stored once; git-excluded by a YallaFlow-written .gitignore unless quality.media.commit; no local source path recorded). doctor, qc status and demo status verify stored media against the ledger (streamed hashing; never via brief/upgrade/shared/finish) and warn on changed, unreadable, or out-of-folder (symlinked) files, which are never read. Shared Projects use branch-safe record IDs (QP/QC/DP/DM-<clone tag>-0001); IDs duplicated by a merge are doctor warnings and qc: citations of them are refused, and report.md + a static report.html are regenerated with relative links. Convergence may cite a scenario as qc:QC-001#S-01; only a passed scenario can support satisfied, and a later non-passing result or a redefinition makes the finding stale.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0014
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-10-19T20:31:02.112Z
+- **Supersedes:** CTX-0077
+- **Verified:** 2026-10-19T20:31:02.112Z (commit 9c38eec)
+- **Evidence:**
+  - src/quality/artifacts.js#createRecordMedia (repository @ 9c38eec)
+  - src/quality/artifacts.js#artifactState (repository @ 9c38eec)
+  - src/quality/integrity.js (repository @ 9c38eec)
+  - src/quality/input.js#allocateRecordId (repository @ 9c38eec)
+  - test/quality-integrity.test.js (repository @ 9c38eec)
+  - npm ci && npm run check (passed) (runtime, PF-0014 V-003)
+  - script /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/final-video.sh (passed) (runtime, PF-0014 V-005)
+
+<!-- yallaflow-fact:CTX-0082 -->
+### CTX-0082 — Security boundaries: - Repository evidence must be a relative path inside the root. - Source writes are confined to their directory, and quality artifacts to a folder created exclusively per record, work/<id>/quality/media/<record-id>-<random>/; integrity checks read media only when its real path is inside that work item's media folder (symlinks pointing elsewhere are reported, never followed). - verify is not a sandbox. - Write authorization, approvals, demo approvals, strict QC quality approval and Shared Project roles are workflow guidance, not access control. - There is no secrets store: tracker credentials for intake ticket --fetch are read from environment variables per request, sent only over https to the hosted tracker (api.github.com, *.atlassian.net, dev.azure.com, *.visualstudio.com) or to an origin the project configured explicitly — never to a host taken only from a ticket URL, and never persisted; doctor rejects credential-like keys in requirements.providers config. - One pattern-based sanitizer (src/security/redact.js) redacts recognizable secret values at YallaFlow's persistence boundary: structured state, the ledger and its projection, work records, ADRs, logs, source text representations, and quality ledgers and reports. It never modifies developer files, preserved source originals, or copied quality media.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0016
+- **Knowledge ID:** K-023
+- **Promoted at:** 2026-10-19T20:31:40.191Z
+- **Supersedes:** CTX-0078
+- **Verified:** 2026-10-19T20:31:40.191Z (commit 9c38eec)
+- **Evidence:**
+  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
+  - src/security/redact.js (repository @ 9c38eec)
+  - src/intake/providers/http.js (repository @ 9c38eec)
+  - src/shared/config.js (repository @ 9c38eec)
+  - src/quality/artifacts.js (repository @ 9c38eec)
+  - docs/security.md (repository @ 9c38eec)
 
 <!-- yallaflow-context:end -->

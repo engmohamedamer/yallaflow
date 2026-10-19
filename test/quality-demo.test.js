@@ -107,7 +107,7 @@ test('video is optional; a recorded video and screenshots are stored locally wit
     tool: 'playwright-cli', audience: 'business', video: path.join(dir, 'demo.webm'),
     scenarios: [{ id: 'D-01', status: 'shown', artifacts: [path.join(dir, 'approved.png')] }, { id: 'D-02', status: 'skipped', notes: 'Shown in DM-001.' }]
   })]);
-  assert.match(withVideo.stdout, /Video: \.yallaflow\/work\/PF-0001\/quality\/media\/DM-002\/demo\.webm \(local; sha256/);
+  assert.match(withVideo.stdout, /Video: \.yallaflow\/work\/PF-0001\/quality\/media\/DM-002-[0-9a-f]{6}\/demo\.webm \(local; sha256/);
   const ledger = JSON.parse(await readFile(path.join(quality(root, id), 'demo.json'), 'utf8'));
   const run2 = ledger.runs[1];
   assert.equal(run2.video.kind, 'video');
@@ -137,7 +137,7 @@ test('every demo summary says it is not test evidence, and convergence refuses d
   for (const [, link] of md.matchAll(/\]\(([^)]+)\)/g)) assert.ok(existsSync(path.join(quality(root, id), decodeURI(link))), `${link} resolves locally`);
   const html = await readFile(path.join(quality(root, id), 'report.html'), 'utf8');
   assert.ok(html.includes(DEMO_DISCLAIMER));
-  assert.match(html, /<video controls preload="metadata" src="media\/DM-001\/demo\.webm"><\/video>/);
+  assert.match(html, /<video controls preload="metadata" src="media\/DM-001-[0-9a-f]{6}\/demo\.webm"><\/video>/);
   assert.doesNotMatch(html, /<script/i);
 
   run(root, ['checkpoint', id, '--skill', 'implementation', '--complete', '--summary', 'done']);

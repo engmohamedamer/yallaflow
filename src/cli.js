@@ -982,6 +982,14 @@ function reconcileCommand(args) {
   throw new Error(`Unknown context reconcile action: ${action}. Use start, status, show, plan, preview, approve, feedback, or apply.`);
 }
 
+// A reader that closes early (`yallaflow … | head`, `| grep -q`) is not an error: further
+// output is discarded, and the command still runs to completion and exits with its own
+// exit code (never cut short between state writes). Anything else still throws.
+process.stdout.on('error', (error) => {
+  if (error.code !== 'EPIPE') throw error;
+  process.stdout.write = () => true;
+});
+
 main().catch((error) => {
   console.error(error instanceof Error ? error.message : String(error));
   process.exitCode = 1;

@@ -2,7 +2,9 @@
 
 ## Purpose
 
-Run AI-assisted functional and exploratory testing of the delivered behavior with Playwright, and record honest, reproducible results. This is an on-demand skill. Use it only when the developer asks for QC. Never start it because work was initialized, implemented, or completed, and never start a browser, a test server, or an install without that request. You can use it on any routed work item at any stage, DONE included. Using it never reroutes, reopens, or advances the work.
+Run AI-assisted functional and exploratory testing of the delivered behavior with Playwright, and record honest, reproducible results. This is an on-demand skill. Use it only when the developer asks for QC.
+
+The developer does not need to know any command. Requests such as "test this", "run QC", "check the booking flow in the browser", "make sure cancelling works", or "try to break the checkout" mean QC. A request to fix, build, or change something does not, and neither does finishing a task. Never start it because work was initialized, implemented, or completed, and never start a browser, a test server, or an install without that request. You can use it on any routed work item at any stage, DONE included. Using it never reroutes, reopens, or advances the work.
 
 ## Behavior
 
@@ -55,6 +57,20 @@ Run AI-assisted functional and exploratory testing of the delivered behavior wit
    - which criteria no scenario covered, and what you could not test (limitations).
 
    Under the advisory policy, failures are reported and never block completion. Under the strict policy, `yallaflow qc status <work-id>` shows whether quality approval is granted. Quality approval is separate from the task being done.
+
+## Browser dialogs (confirm, alert, prompt)
+
+A step can open a native dialog, such as "Cancel booking #7?". With `playwright-cli`, the click returns while the dialog is still open, and its output contains a `### Modal state` block naming the dialog. Until you answer it, every other command fails with `does not handle the modal state`. That includes snapshot, screenshot and eval.
+
+- After every action that can open a dialog, read the output for `### Modal state`.
+- Answer the dialog deliberately:
+  - `playwright-cli dialog-accept` confirms (for a prompt, `dialog-accept "<text>"`).
+  - `playwright-cli dialog-dismiss` takes the cancel path.
+- Record the answer as a step, for example "Confirm dialog 'Cancel booking #7?' → dismissed".
+- Then check the outcome on the page. Dismissing must leave the booking unchanged, and accepting must cancel it.
+- To test both branches of a confirmation, run them as separate steps or scenarios.
+- Never leave a dialog pending. Never treat a command that failed on the modal state as a test result.
+- With Playwright MCP, use its dialog tool the same way.
 
 ## Honesty rules
 

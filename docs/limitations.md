@@ -94,7 +94,7 @@ Known gaps and deliberate boundaries. Planned work is tracked in [`roadmap.md`](
 - **No Playwright bundled.** QC and demos need Playwright available to the agent (`playwright-cli`, Playwright MCP, or the project's `@playwright/test`). Video recording needs Playwright's ffmpeg (`npx playwright install ffmpeg`); without it, a recorder can report a video it never wrote — `demo record` refuses a missing file.
 - **Media is local by default.** A fresh clone has the ledgers and reports but not the media; reports mark it as not on this machine. Commit media only by setting `quality.media.commit: true` (consider Git LFS for videos).
 - **Strict QC approval is a signal, not a lock.** It never blocks `finish` or DONE; enforce it in your own review or release process if you need a hard gate.
-- **QC and demo IDs are per work item and allocated locally.** In a Shared Project, record QC or demos for one work item on one branch: two branches recording `QC-001` for the same work item conflict in `qc.json` at merge.
+- **Recording on two branches of one work item.** Evidence is never overwritten: every record writes its own new media folder. In a Shared Project, record IDs are branch-safe (`QC-<tag>-0001`). In a single-user project, two branches can both create `QC-001`. Merging them conflicts in `qc.json`/`demo.json`; resolve it by keeping both entries. `doctor` then warns about the duplicate ID, and citing it is refused until the scenario is recorded again.
 - **Exploratory coverage is what was explored.** QC records the scenarios that ran; it does not measure coverage.
 
 ## Agent bootstrap

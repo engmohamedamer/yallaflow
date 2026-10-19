@@ -17,11 +17,12 @@ brownfield
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-001)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-19T17:51:44.084Z (commit 032f32c)
+- **Verified:** 2026-10-19T20:31:34.904Z (commit 9c38eec)
 - **Evidence:**
-  - package.json (repository @ 032f32c)
-  - README.md (repository @ 032f32c)
-  - docs/architecture.md (repository @ 032f32c)
+  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
+  - package.json (repository @ 9c38eec)
+  - README.md (repository @ 9c38eec)
+  - docs/architecture.md (repository @ 9c38eec)
 
 <!-- yallaflow-fact:CTX-0002 -->
 ### CTX-0002 — It serves developers who use AI coding agents on Greenfield and Brownfield repositories, alone or as a team sharing one project through ordinary Git (Shared Projects). The normal journey is install, then `yallaflow init`, then open the agent and describe the work; the agent orients itself through YallaFlow automatically.
@@ -45,10 +46,11 @@ brownfield
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-003)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-19T17:51:44.361Z (commit 032f32c)
+- **Verified:** 2026-10-19T20:31:35.129Z (commit 9c38eec)
 - **Evidence:**
-  - docs/architecture.md (repository @ 032f32c)
-  - src/agent/contract.js (repository @ 032f32c)
+  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
+  - docs/architecture.md (repository @ 9c38eec)
+  - src/agent/contract.js (repository @ 9c38eec)
 
 <!-- yallaflow-fact:CTX-0058 -->
 ### CTX-0058 — From 1.0.0 YallaFlow is a public npm package: package.json names `yallaflow` (no private flag, MIT, publishConfig.access public) and the primary documented install is `npm install -g yallaflow`; Git-tag and tarball installs remain documented alternatives. The 0.2.0-internal.1 … 0.3.10-internal.4 versions were internal prereleases, git-tagged only and never published to npm; every released tag is immutable. 1.0.0 is published manually by the package owner; later versions are published by the release workflow.
@@ -77,14 +79,15 @@ brownfield
 - **Knowledge ID:** K-025
 - **Promoted at:** 2026-10-19T16:37:37.201Z
 - **Supersedes:** CTX-0047
-- **Verified:** 2026-10-19T17:51:46.528Z (commit 032f32c)
+- **Verified:** 2026-10-19T20:31:38.671Z (commit 9c38eec)
 - **Evidence:**
-  - src/cli.js (repository @ 032f32c)
-  - src/core/workspace.js (repository @ 032f32c)
-  - src/intake/providers/index.js (repository @ 032f32c)
-  - src/quality/qc.js (repository @ 032f32c)
-  - src/quality/demo.js (repository @ 032f32c)
-  - src/context/ledger.js (repository @ 032f32c)
-  - src/security/redact.js (repository @ 032f32c)
+  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
+  - src/cli.js (repository @ 9c38eec)
+  - src/core/workspace.js (repository @ 9c38eec)
+  - src/intake/providers/index.js (repository @ 9c38eec)
+  - src/quality/qc.js (repository @ 9c38eec)
+  - src/quality/demo.js (repository @ 9c38eec)
+  - src/context/ledger.js (repository @ 9c38eec)
+  - src/security/redact.js (repository @ 9c38eec)
 
 <!-- yallaflow-context:end -->

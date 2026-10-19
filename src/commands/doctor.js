@@ -21,7 +21,7 @@ import { checkWorkRecordOwnership } from '../core/ownership.js';
 export async function doctorCommand() {
   const root = await findProjectRoot();
   if (!root) throw new Error('FAIL No .yallaflow workspace found.');
-  const { checks, warnings } = await collectDoctorReport(root);
+  const { checks, warnings } = await collectDoctorReport(root, { verifyMedia: true });
   const failed = checks.filter(([, ok]) => !ok);
   for (const [name, ok] of checks) console.log(`${ok ? 'PASS' : 'FAIL'} ${name}`);
   for (const warning of warnings) console.log(`WARN ${warning}`);
@@ -37,7 +37,10 @@ export async function doctorCommand() {
 // The complete read-only integrity report — shared by `doctor` (which prints it) and
 // the `upgrade status|plan` / `brief` assessments (which aggregate it), so there is
 // exactly one interpretation of workspace health.
-export async function collectDoctorReport(root) {
+// verifyMedia (v1.1.0): hash stored QC/demo media against the ledgers. Only `doctor`
+// itself asks for it; brief, upgrade, shared and finish run this report on every
+// session or completion and stay lightweight (no reading of videos).
+export async function collectDoctorReport(root, { verifyMedia = false } = {}) {
   const base = workspacePath(root);
   const checks = [];
   // A Shared Project keeps active-work focus in the gitignored local/ directory; a
@@ -152,9 +155,13 @@ export async function collectDoctorReport(root) {
   }
 
   // Optional quality ledgers (v1.1.0): reported only for work that used QC or a demo.
+  // An invalid ledger fails; overwritten media and merge-duplicated IDs are warnings.
+  const qualityWarnings = [];
   try {
     for (const item of await listWork(root)) {
-      for (const error of await checkQualityIntegrity(root, item)) checks.push([error, false]);
+      const quality = await checkQualityIntegrity(root, item, { verifyMedia });
+      for (const error of quality.errors) checks.push([error, false]);
+      qualityWarnings.push(...quality.warnings);
     }
   } catch (error) {
     checks.push([`quality ledgers: ${error instanceof Error ? error.message : String(error)}`, false]);
@@ -164,6 +171,7 @@ export async function collectDoctorReport(root) {
   // the structured state they were written from. Informational — work.md is shared.
   const warnings = [];
   warnings.push(...deliveryWarnings);
+  warnings.push(...qualityWarnings);
   try {
     for (const item of await listWork(root)) warnings.push(...(await checkWorkRecordOwnership(root, item)));
   } catch (error) {

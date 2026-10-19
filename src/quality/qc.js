@@ -13,8 +13,8 @@ import {
   DEFAULT_QC_POLICY, PLAN_ID, QC_ORIGINS, QC_POLICIES, QC_SCENARIO_KINDS, QC_SCHEMA_VERSION, QC_STATUSES, QC_TOOLS,
   RUN_ID, SCENARIO_ID, isLocalTarget
 } from './constants.js';
-import { nextId, nonEmpty, normalizeTarget, stringList, unknown } from './input.js';
-import { inspectArtifacts, qualityDirPath, removeRecordMedia, storeArtifacts, validateArtifactEntry } from './artifacts.js';
+import { allocateRecordId, duplicateIds, nonEmpty, normalizeTarget, stringList, unknown } from './input.js';
+import { createRecordMedia, inspectArtifacts, qualityDirPath, validateArtifactEntry } from './artifacts.js';
 
 // AI QC ledger (v1.1.0): work/<id>/quality/qc.json — append-only plans (QP-###) and
 // runs (QC-###), separate from the V-### verification ledger. A QC failure never
@@ -73,6 +73,11 @@ export function validateQcLedger(ledger) {
 
 // Quality records attach to routed work at any stage — DONE included — without
 // rerouting, reopening, or changing it.
+// Duplicate IDs are a merge artifact, not corruption: reported as a doctor warning.
+export function qcDuplicateIds(ledger) {
+  return [...duplicateIds(ledger.plans), ...duplicateIds(ledger.runs)];
+}
+
 export async function assertQualityTarget(root, workId) {
   const meta = await loadWorkMetaOrThrow(root, workId);
   if (meta.routingStatus === 'pending') throw new Error(`${workId} is awaiting routing. Route the work before recording QC or demo results for it.`);
@@ -97,7 +102,7 @@ export function skillStamp(skillId) {
 export async function recordQcPlan(root, workId, input, now = new Date().toISOString()) {
   const meta = await assertQualityTarget(root, workId);
   const errors = [];
-  if (!input || typeof input !== 'object' || Array.isArray(input)) throw rejection(['the plan file must be a JSON object']);
+  if (!input || typeof input !== 'object' || Array.isArray(input)) throw rejection(['the plan file must be a JSON object'], 'QC plan');
   unknown(input, PLAN_INPUT_FIELDS, 'plan', errors);
   if (input.policy !== undefined && !QC_POLICIES.includes(input.policy)) errors.push(`policy must be one of: ${QC_POLICIES.join(', ')}`);
   const target = normalizeTarget(input.target, 'plan target', errors);
@@ -116,7 +121,11 @@ export async function recordQcPlan(root, workId, input, now = new Date().toISOSt
     const criteria = [];
     for (const ref of raw.criteria ?? []) {
       const match = typeof ref === 'string' ? active.find((entry) => entry.id === bareRef(ref.trim(), resolved.owner)) : null;
-      if (!match) errors.push(`${label}: ${JSON.stringify(ref)} is not an active acceptance criterion of ${workId}`);
+      if (!match) {
+        errors.push(active.length
+          ? `${label}: ${JSON.stringify(ref)} is not an active acceptance criterion of ${workId} (active: ${active.map((entry) => entry.id).join(', ')})`
+          : `${label}: ${JSON.stringify(ref)} cannot be cited — ${workId} has no recorded acceptance criteria; omit criteria and give the scenario a rationale instead`);
+      }
       else criteria.push(match.ref);
     }
     if (raw.criteria !== undefined && !Array.isArray(raw.criteria)) errors.push(`${label}: criteria must be an array`);
@@ -138,17 +147,17 @@ export async function recordQcPlan(root, workId, input, now = new Date().toISOSt
       ...(steps.length ? { steps } : {})
     });
   }
-  if (errors.length) throw rejection(errors);
+  if (errors.length) throw rejection(errors, 'QC plan');
 
   const settings = await loadQualitySettings(root);
   // A project-wide strict policy is a floor: a plan may not weaken it.
   if (settings.qcPolicy === 'strict' && input.policy === 'advisory') {
-    throw rejection(['the project requires the strict QC policy (config.yaml quality.qc.policy: strict); a plan cannot weaken it to advisory']);
+    throw rejection(['the project requires the strict QC policy (config.yaml quality.qc.policy: strict); a plan cannot weaken it to advisory'], 'QC plan');
   }
   const loaded = await loadQcLedger(root, workId);
   const ledger = loaded.ledger;
   const plan = {
-    id: nextId('QP', ledger.plans),
+    id: await allocateRecordId(root, 'QP', ledger.plans),
     recordedAt: now,
     workStatus: meta.status,
     policy: input.policy ?? settings.qcPolicy ?? DEFAULT_QC_POLICY,
@@ -238,12 +247,12 @@ export async function recordQcRun(root, workId, input, { now = new Date().toISOS
   if (!results.length) errors.push('scenarios must report at least one planned scenario');
   if (errors.length) throw rejection(errors);
 
-  const id = nextId('QC', ledger.runs);
+  const id = await allocateRecordId(root, 'QC', ledger.runs);
   const settings = await loadQualitySettings(root);
+  const media = await createRecordMedia(root, workId, id, { commitMedia: settings.commitMedia });
   try {
-    const used = new Set();
     for (const result of results) {
-      const artifacts = await storeArtifacts(root, workId, id, inspectedByResult.get(result.id), { commitMedia: settings.commitMedia, used });
+      const artifacts = await media.add(inspectedByResult.get(result.id));
       if (artifacts.length) result.artifacts = artifacts;
     }
     const head = gitHead(root);
@@ -270,7 +279,7 @@ export async function recordQcRun(root, workId, input, { now = new Date().toISOS
     await writeYamlAtomic(qcFilePath(root, workId), ledger);
     return { meta, plan, run, ledger };
   } catch (error) {
-    await removeRecordMedia(root, workId, id);
+    await media.remove();
     throw error;
   }
 }
@@ -325,8 +334,10 @@ export function evaluateQc(ledger, meta = null, { configPolicy = null } = {}) {
 export async function resolveQcEvidence(root, workId, runId, scenarioId) {
   const { exists: present, ledger } = await loadQcLedger(root, workId);
   if (!present) throw new Error(`${workId} has no QC records`);
-  const run = ledger.runs.find((entry) => entry.id === runId);
-  if (!run) throw new Error(`QC run ${runId} was not found for ${workId}`);
+  const matches = ledger.runs.filter((entry) => entry.id === runId);
+  if (!matches.length) throw new Error(`QC run ${runId} was not found for ${workId}`);
+  if (matches.length > 1) throw new Error(`${runId} is ambiguous: ${matches.length} runs share this ID (ledgers merged from different branches); record the scenario again and cite the new run`);
+  const [run] = matches;
   const result = run.scenarios.find((entry) => entry.id === scenarioId);
   if (!result) throw new Error(`${runId} has no result for ${scenarioId}`);
   return {
@@ -357,7 +368,7 @@ export async function qcEvidenceStaleness(root, meta, entry) {
   return null;
 }
 
-function rejection(errors) {
-  return new Error(`QC record rejected:\n- ${errors.join('\n- ')}\n\nNo files were changed.`);
+function rejection(errors, action = 'QC record') {
+  return new Error(`${action} rejected:\n- ${errors.join('\n- ')}\n\nNo files were changed.`);
 }
 

@@ -1,0 +1,11 @@
+PASS real video written by playwright-cli: 292601 bytes
+PASS stored in its own record folder: media/DM-001-4f9440/demo.webm
+PASS playable: vp8,1280,720, 10.680000s, full decode clean
+PASS stored video is byte-identical to the recording
+PASS the screenshot attached twice is stored once
+PASS report.html links the stored video
+frames: /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/video/chapter.png /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/video/end.png
+PASS doctor verifies media without warnings
+PASS media git-ignored
+PASS no credential or session data in stored records
+FINAL VIDEO ACCEPTANCE OK

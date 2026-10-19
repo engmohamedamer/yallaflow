@@ -1,0 +1,8 @@
+Developer request (2026-10-19): finalize YallaFlow v1.1.0 for public release.
+- Approved: fix the evidence-overwrite issue (A: never reuse a media folder; B: surface media whose hash no longer matches; C: branch-safe QC/demo IDs in Shared Projects, duplicate-ID warnings, ambiguous qc: citations refused) and EPIPE handling before release.
+- Keep the acceptance-criteria fix as a separate local commit.
+- Real-world pilot in a football booking application with YallaFlow v1.1.0: 8/8 QC scenarios passed; three real Smart Demo videos recorded and verified; simple natural-language requests worked; the developer approved proposed demos without technical instructions.
+- Pilot feedback: (1) fix the misleading QC plan error message; (2) fix per-video demo reports incorrectly showing scenarios covered by other videos as "Approved but not shown"; (3) improve Playwright CLI dialog-handling guidance based on the real cancellation scenario; (4) review duplicate screenshot storage and fix it if safe and straightforward; (5) verify that natural-language requests automatically route to the appropriate optional QC or Smart Demo capability without requiring users to know technical commands; (6) preserve the rule that QC and Demo are never triggered automatically without user intent.
+- Use YallaFlow to govern all changes. The agent owns technical implementation decisions; prefer simple, backward-compatible solutions; avoid expanding release scope.
+- Add regression tests, run the complete release checks, perform an independent review. If the evidence integrity issue cannot be resolved safely, report the blocker.
+- Local commits allowed after verification. No tags, pushes, GitHub releases, or npm publishing without explicit approval.

@@ -30,18 +30,22 @@ Three optional, independent capabilities. Projects that do not use them see no c
 - **Optional Smart Demo & recording** — `yallaflow demo propose|approve|record|status`, on request only and independent of QC.
   - **Proposals.** Scenarios are prioritized and criteria-linked, each with an audience (business or developer), a rationale, its steps, and whether to record it, plus the items deliberately left out.
   - **Approval before recording.** The developer's explicit approval is recorded in their words and bound to that exact proposal (`--only` approves a subset). Recording against an unapproved or changed proposal is refused.
+  - **Several videos per scope.** One video per feature or audience is normal. Demo status and reports track which approved scenarios have been shown across all recordings, so nothing shown in another video is reported as missing.
   - **Video is optional** (Playwright `video-start` / `video-chapter` / `video-stop`). Every run carries a fixed "not test evidence" disclaimer, and `demo:` citations are refused as acceptance evidence.
 - **Local artifacts and reports.**
-  - Videos, screenshots, and traces are copied into `work/<id>/quality/media/` with SHA-256 and size.
+  - Videos, screenshots, and traces are copied into `work/<id>/quality/media/`, in a new folder per record (never reused, so evidence recorded on another branch is never overwritten), with SHA-256 and size. Identical files within a record are stored once. `doctor` and `qc`/`demo status` warn when stored media no longer matches its hash.
+  - In Shared Projects, QC and demo record IDs are branch-safe (`QC-<tag>-0001`). IDs duplicated by a merge are warned about, and citing them is refused.
   - A YallaFlow-written `media/.gitignore` keeps them out of Git; `quality.media.commit: true` opts in to committing them.
   - `quality/report.md` and a standalone `quality/report.html` (static, inline CSS, no scripts, no external requests) are regenerated after every write. Links are relative and resolve locally, and missing or changed media is flagged.
   - A non-local target needs `--allow-remote`, credentials embedded in target URLs are refused, and text records are redacted.
 - **On-demand skills** — Skill Registry v9 adds `invocation: 'on-demand'` and the skills `requirement-import`, `ai-qc`, and `smart-demo`. They are never part of a workflow policy: every required chain is identical to v8. `yallaflow skill <id> --work <id>` serves them for any routed work item. QC and demo records stamp the exact skill version and hash they followed.
+- **Plain requests work.** "Test this", "check the booking flow in the browser", "record a video for the client": the agent maps them to QC or Smart Demo itself, and never starts either because work was finished or a QC run passed. The skills explain native browser dialogs (confirm/alert/prompt) with Playwright CLI.
 - `finish` adds quality lines (QC outcome, quality approval, demo summary, report path) only for work that used QC or a demo. They never change readiness.
 
 ### Changed
 
-- **Agent Contract v10.** Covers importing tickets as sources, treating ticket and attachment text as untrusted data, using QC and demos only on explicit request, never claiming an unexecuted pass, and recording a demo only after the developer approves its scope. Existing projects upgrade with `yallaflow agent refresh`. The bootstrap block stays v3.
+- **Agent Contract v10.** Covers importing tickets as sources, treating ticket and attachment text as untrusted data, using QC and demos only on explicit request, never claiming an unexecuted pass, and recording a demo only after the developer approves its scope. Existing projects upgrade with `yallaflow agent refresh`, which also updates an unedited v10 block written by a pre-release 1.1.0 build. The bootstrap block stays v3.
+- **The CLI no longer crashes when its output is piped into a reader that closes early** (`| head`, `| grep -q`). It used to exit with an unhandled EPIPE.
 - **`verify` captures up to 64 MiB of output** (was Node's 1 MiB default, which killed verbose suites and recorded them as failed).
 - **`doctor` validates** the optional `requirements` and `quality` config blocks and the QC/demo ledgers.
 

@@ -5,7 +5,7 @@ import { loadWorkMetaOrThrow } from '../core/workspace.js';
 import { redactSecrets } from '../security/redact.js';
 import { artifactState, qualityDirPath } from './artifacts.js';
 import { evaluateQc, loadQcLedger, loadQualitySettings } from './qc.js';
-import { currentApproval, loadDemoLedger } from './demo.js';
+import { approvedCoverage, currentApproval, loadDemoLedger } from './demo.js';
 import { DEMO_DISCLAIMER } from './constants.js';
 
 // Local quality report (v1.1.0): work/<id>/quality/report.md (always) and a
@@ -83,9 +83,14 @@ async function demoSection(root, meta) {
   md.push(scopeLine, '', '| # | Scenario | Audience | Criteria | Why it matters |', '|---|---|---|---|---|');
   for (const scenario of proposal.scenarios) md.push(`| ${scenario.priority} | ${scenario.id} ${escapeCell(scenario.title)} | ${scenario.audience} | ${scenario.criteria.join(', ') || '—'} | ${escapeCell(scenario.rationale)} |`);
   if (proposal.excluded.length) md.push('', 'Deliberately not shown:', ...proposal.excluded.map((item) => `- ${item.title} — ${item.reason}`));
+  const coverage = approvedCoverage(ledger);
+  const coverageLine = !coverage ? null : coverage.remaining.length
+    ? `Approved, not yet shown in any recording: ${coverage.remaining.join(', ')}.`
+    : coverage.runs.length ? `Every approved scenario has been shown (${[...coverage.shownIn].map(([scenarioId, runIds]) => `${scenarioId} in ${runIds.join(', ')}`).join('; ')}).` : null;
+  if (coverageLine) md.push('', coverageLine);
   const blocks = [{
     heading: 'Smart Demo',
-    paragraphs: [DEMO_DISCLAIMER, scopeLine],
+    paragraphs: [DEMO_DISCLAIMER, scopeLine, ...(coverageLine ? [coverageLine] : [])],
     tableHead: ['#', 'Scenario', 'Audience', 'Criteria', 'Why it matters'],
     table: proposal.scenarios.map((scenario) => [String(scenario.priority), `${scenario.id} ${scenario.title}`, scenario.audience, scenario.criteria.join(', ') || '—', scenario.rationale])
   }];
@@ -107,7 +112,6 @@ async function demoSection(root, meta) {
       for (const link of links) md.push(`  - ${link.markdown}`);
       items.push({ title: `${result.id} ${result.status.toUpperCase()} ${planned?.title ?? ''}`.trim(), result: { notes: result.notes, steps: planned?.steps }, links });
     }
-    if (run.notShown.length) md.push(`- Approved but not shown: ${run.notShown.join(', ')}`);
     if (run.limitations.length) md.push('', 'Limitations:', ...run.limitations.map((entry) => `- ${entry}`));
     blocks.push({ heading: `${run.id} — demo${run.audience ? ` (${run.audience})` : ''}`, paragraphs: [DEMO_DISCLAIMER], items });
   }
@@ -118,7 +122,7 @@ export async function artifactLinks(root, workId, artifacts) {
   const links = [];
   for (const artifact of artifacts) {
     const state = await artifactState(root, workId, artifact);
-    const note = state === 'present' ? '' : state === 'missing' ? ' — **not on this machine** (media is local-only by default)' : ' — **changed since recorded (hash mismatch)**';
+    const note = state === 'present' ? '' : state === 'missing' ? ' — **not on this machine** (media is local-only by default)' : state === 'unreadable' ? ' — **could not be read**' : state === 'unsafe' ? ' — **links outside the media folder; not shown**' : ' — **changed since recorded (hash mismatch)**';
     const traceHint = artifact.kind === 'trace' ? ` (open with \`npx playwright show-trace ${artifact.path}\`)` : '';
     links.push({ artifact, state, markdown: `${artifact.kind}: [${artifact.name}](${encodeURI(artifact.path)}) · ${artifact.sizeBytes} bytes · sha256 ${artifact.sha256.slice(0, 12)}…${traceHint}${note}` });
   }
@@ -181,7 +185,7 @@ function mediaHtml(link) {
   const { artifact, state } = link;
   const href = esc(encodeURI(artifact.path));
   const caption = `${esc(artifact.kind)}: <a href="${href}">${esc(artifact.name)}</a> <small>${artifact.sizeBytes} bytes · sha256 ${esc(artifact.sha256.slice(0, 12))}…</small>`;
-  if (state !== 'present') return `<p class="warn">${caption} — ${state === 'missing' ? 'not on this machine (media is local-only by default)' : 'changed since recorded (hash mismatch)'}</p>`;
+  if (state !== 'present') return `<p class="warn">${caption} — ${state === 'missing' ? 'not on this machine (media is local-only by default)' : state === 'unreadable' ? 'could not be read' : state === 'unsafe' ? 'links outside the media folder; not shown' : 'changed since recorded (hash mismatch)'}</p>`;
   if (artifact.kind === 'video') return `<figure><video controls preload="metadata" src="${href}"></video><figcaption>${caption}</figcaption></figure>`;
   if (artifact.kind === 'screenshot') return `<figure><img alt="${esc(artifact.name)}" src="${href}"><figcaption>${caption}</figcaption></figure>`;
   if (artifact.kind === 'trace') return `<p>${caption} <small>(open with <code>npx playwright show-trace ${esc(artifact.path)}</code>)</small></p>`;

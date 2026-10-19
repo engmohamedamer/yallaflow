@@ -28,6 +28,11 @@ export const SOURCE_ID_PATTERN = new RegExp(`^${SOURCE_ID_SOURCE}$`);
 export const STORED_SOURCE_ID_PATTERN = new RegExp(`^SRC-(?:\\d{4,}|${TAG}-\\d{4,})$`);
 export const STORED_WORK_ID_PATTERN = new RegExp(`^PF-(?:\\d{4,}|${TAG}-\\d{4,})$`);
 export const CLONE_TAG_PATTERN = new RegExp(`^${TAG}$`);
+// Work-scoped record IDs that can be written on two branches of one work item (v1.1.0
+// QC/demo ledgers): QC-001 single-user, QC-<tag>-0001 in a Shared Project.
+export function recordIdSource(prefix) {
+  return `${prefix}-(?:\\d{3,}|${TAG}-\\d{4,})`;
+}
 
 export function isWorkId(value) {
   return typeof value === 'string' && WORK_ID_PATTERN.test(value);

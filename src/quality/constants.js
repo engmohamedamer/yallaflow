@@ -1,3 +1,5 @@
+import { recordIdSource } from '../core/ids.js';
+
 // Optional quality delivery (v1.1.0): AI QC and Smart Demo. Both are on-demand: no
 // command runs a browser, a server, or a test because YallaFlow was initialized or a
 // task advanced. YallaFlow never executes them itself; the Agent drives Playwright
@@ -19,11 +21,11 @@ export const DEMO_AUDIENCES = Object.freeze(['business', 'developer']);
 export const DEMO_RESULT_STATUSES = Object.freeze(['shown', 'skipped', 'failed']);
 export const DEMO_DISCLAIMER = 'A demonstration, not test evidence: it shows selected scenarios working once, as recorded. It does not prove correctness or coverage.';
 
-export const PLAN_ID = /^QP-\d{3,}$/;
-export const RUN_ID = /^QC-\d{3,}$/;
+export const PLAN_ID = new RegExp(`^${recordIdSource('QP')}$`);
+export const RUN_ID = new RegExp(`^${recordIdSource('QC')}$`);
 export const SCENARIO_ID = /^S-\d{2,}$/;
-export const DEMO_PROPOSAL_ID = /^DP-\d{3,}$/;
-export const DEMO_RUN_ID = /^DM-\d{3,}$/;
+export const DEMO_PROPOSAL_ID = new RegExp(`^${recordIdSource('DP')}$`);
+export const DEMO_RUN_ID = new RegExp(`^${recordIdSource('DM')}$`);
 export const DEMO_SCENARIO_ID = /^D-\d{2,}$/;
 
 export const MAX_ARTIFACT_BYTES = 500 * 1024 * 1024;

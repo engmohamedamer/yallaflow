@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Agent Contract architecture: - .yallaflow/AGENT.md is the single canonical agent contract, held in a managed block versioned by AGENT_CONTRACT_VERSION (currently 10, v1.1.0) and sealed with a SHA-256 of its body. - v8 added the pre-baseline refusal, the original request as the baseline objective, operational assistance versus engineering work, baseline coverage, and no secret values; v9 added work routing before editing; v10 adds tracker tickets as untrusted sources (agent-acquired by default, explicit --fetch only when needed) and optional, on-demand AI QC and Smart Demo: the developer asks in plain words (\"test this\", \"record a video for the client\") and the agent picks the skill; never automatic — not when work is finished or QC passed, and a fix/build request is not one; separate from verification, no unexecuted pass, demo scope approved by the developer, a demo is not test evidence. agent refresh also replaces an unedited block at the installed version whose recorded hash differs from the installed text (written by a pre-release build); hand-edited blocks are still refused. - Repository-root CLAUDE.md and AGENTS.md carry only a thin pointer block (BOOTSTRAP_VERSION 3, which repeats the route-before-edit precondition as a numbered step; its length is capped by test at 1800 characters and it copies no contract heading). - yallaflow agent refresh/setup update those blocks idempotently, refuse hand-edited or newer blocks, and preserve content outside the blocks.",
+      "evidence": [
+        "src/agent/contract.js",
+        "test/pilot-feedback.test.js",
+        "src/core/assessment.js",
+        "verification:V-002"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0072"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-19T20:21:08.690Z",
+      "factId": "CTX-0079",
+      "promotedAt": "2026-10-19T20:21:09.055Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-002",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Optional Smart Demo (v1.1.0, src/quality/demo.js) is independent of QC: on explicit request the Agent proposes prioritized user-facing scenarios (demo propose: audience business|developer, priority, criteria, rationale, steps, record flag, excluded items), the developer's explicit approval is recorded with their words and bound to that exact proposal's SHA-256 (demo approve --note [--only]), and demo record is refused for an unapproved or changed proposal or scenarios outside the approved scope. Approved scenarios may be split across several recordings (one video per feature or audience); coverage of the approved scope is computed across all runs of the approved proposal (approvedCoverage), never per video. Video is optional (Playwright video-start/chapter/stop; needs Playwright's ffmpeg) and stored hashed under work/<id>/quality/media/; every run carries a fixed 'not test evidence' disclaimer, and convergence refuses demo: citations. Demo and QC share the local artifact store and the report.md/report.html generator.",
+      "evidence": [
+        "src/quality/demo.js#approvedCoverage",
+        "src/quality/report.js",
+        "test/pilot-feedback.test.js",
+        "verification:V-002"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0066"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-19T20:21:08.862Z",
+      "factId": "CTX-0080",
+      "promotedAt": "2026-10-19T20:21:09.344Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-10-19T20:21:09.344Z",
+  "reviewedAt": "2026-10-19T20:21:09.344Z"
+}

@@ -1,3 +1,7 @@
+import { nextScopedId } from '../core/ids.js';
+import { isSharedWorkspace } from '../core/workspace.js';
+import { allocateCheckoutId } from '../shared/identity.js';
+
 // Shared input validation for the quality ledgers (v1.1.0). Every helper pushes
 // problems onto `errors` instead of throwing, so one rejection lists them all.
 export function normalizeTarget(target, label, errors) {
@@ -29,6 +33,22 @@ export function stringList(value, label, errors) {
     return [];
   }
   return value.map((item) => item.trim());
+}
+
+// Record IDs for the quality ledgers. In a Shared Project they are branch-safe
+// (QC-<clone tag>-0001, the same allocation as work and source IDs), so records made on
+// two branches never share an ID; single-user projects keep the short QC-001 form.
+export async function allocateRecordId(root, prefix, entries) {
+  if (!await isSharedWorkspace(root)) return nextId(prefix, entries);
+  return allocateCheckoutId(root, prefix, entries.map((entry) => entry.id), nextScopedId);
+}
+
+// IDs that occur more than once — possible only after a merge of two branches' ledgers.
+export function duplicateIds(entries) {
+  const seen = new Set();
+  const duplicates = new Set();
+  for (const entry of entries) (seen.has(entry.id) ? duplicates : seen).add(entry.id);
+  return [...duplicates];
 }
 
 export function nextId(prefix, entries) {

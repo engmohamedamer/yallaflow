@@ -1,6 +1,7 @@
 import path from 'node:path';
-import { createHash } from 'node:crypto';
-import { copyFile, readFile, rm, stat, writeFile } from 'node:fs/promises';
+import { createHash, randomBytes } from 'node:crypto';
+import { constants as fsConstants, createReadStream } from 'node:fs';
+import { copyFile, mkdir, realpath, rm, stat, writeFile } from 'node:fs/promises';
 import { ensureDir, exists } from '../utils/fs.js';
 import { workspacePath } from '../core/workspace.js';
 import { assertSafeSourceName, assertWithinDirectory } from '../intake/validation.js';
@@ -8,7 +9,7 @@ import { ARTIFACT_KINDS, MAX_ARTIFACT_BYTES, MAX_ARTIFACTS_PER_RECORD, MEDIA_GIT
 
 // Local quality artifacts (v1.1.0): screenshots, videos, traces, logs the Agent
 // produced with Playwright. Each is copied byte-for-byte into
-// work/<id>/quality/media/<record-id>/ and recorded with its size and SHA-256, so a
+// work/<id>/quality/media/<record-id>-<random>/ and recorded with its size and SHA-256, so a
 // report can tell a present file from a missing or altered one. Media is excluded from
 // Git by a YallaFlow-written media/.gitignore unless quality.media.commit is true;
 // the ledgers, hashes, and reports stay tracked. Nothing is ever uploaded.
@@ -37,50 +38,100 @@ export async function inspectArtifacts(paths, { cwd = process.cwd(), label = 'ar
   return inspected;
 }
 
-// Copies inspected artifacts into media/<recordId>/ and returns their manifest entries.
-// The caller removes media/<recordId>/ if the ledger write that follows fails.
-// `used` is shared across one record's calls so file names never collide within media/<recordId>/.
-export async function storeArtifacts(root, workId, recordId, inspected, { commitMedia = false, used = new Set() } = {}) {
-  if (!inspected.length) return [];
+// One record's media folder (v1.1.0, after acceptance found evidence overwritten across
+// branches). Media is git-ignored, so a folder written on one branch survives a checkout,
+// and record IDs can repeat on another branch or after a ledger is restored. A record
+// therefore never writes into an existing folder: each gets media/<record-id>-<random>/,
+// created exclusively, and a failed record removes only the folder it created. Within a
+// record, the same file attached twice (e.g. one screenshot for two scenarios) is stored
+// once and referenced from both.
+export async function createRecordMedia(root, workId, recordId, { commitMedia = false } = {}) {
   const media = mediaDirPath(root, workId);
-  await ensureDir(media);
-  const ignoreFile = path.join(media, '.gitignore');
-  if (!commitMedia && !await exists(ignoreFile)) await writeFile(ignoreFile, MEDIA_GITIGNORE, 'utf8');
-  const dir = path.join(media, recordId);
-  await ensureDir(dir);
-  const manifest = [];
-  for (const item of inspected) {
-    const name = uniqueName(assertSafeSourceName(path.basename(item.absolute).replace(/[\\/]/g, '_')), used);
-    const target = path.join(dir, name);
-    assertWithinDirectory(target, dir);
-    await copyFile(item.absolute, target);
-    const extension = path.extname(name).toLowerCase();
-    manifest.push({
-      name,
-      path: path.posix.join('media', recordId, name),
-      kind: ARTIFACT_KINDS[extension] ?? 'other',
-      sizeBytes: item.sizeBytes,
-      sha256: await hashFile(target)
-    });
+  let dir = null;
+  let name = null;
+  const byHash = new Map();
+  const used = new Set();
+
+  async function ensureFolder() {
+    if (dir) return;
+    await ensureDir(media);
+    const ignoreFile = path.join(media, '.gitignore');
+    if (!commitMedia && !await exists(ignoreFile)) await writeFile(ignoreFile, MEDIA_GITIGNORE, 'utf8');
+    for (let attempt = 0; attempt < 5 && !dir; attempt += 1) {
+      const candidate = `${recordId}-${randomBytes(3).toString('hex')}`;
+      try {
+        await mkdir(path.join(media, candidate));
+        dir = path.join(media, candidate);
+        name = candidate;
+      } catch (error) {
+        if (error.code !== 'EEXIST') throw error;
+      }
+    }
+    if (!dir) throw new Error(`Could not allocate a new media folder for ${recordId}.`);
   }
-  return manifest;
+
+  return {
+    // Copies inspected artifacts and returns their manifest entries.
+    async add(inspected = []) {
+      const manifest = [];
+      for (const item of inspected) {
+        const sha256 = await hashFile(item.absolute);
+        if (byHash.has(sha256)) {
+          manifest.push({ ...byHash.get(sha256) });
+          continue;
+        }
+        await ensureFolder();
+        const fileName = uniqueName(assertSafeSourceName(path.basename(item.absolute).replace(/[\\/]/g, '_')), used);
+        const target = path.join(dir, fileName);
+        assertWithinDirectory(target, dir);
+        await copyFile(item.absolute, target, fsConstants.COPYFILE_EXCL);
+        if (await hashFile(target) !== sha256) throw new Error(`${fileName} changed while it was being copied.`);
+        const entry = {
+          name: fileName,
+          path: path.posix.join('media', name, fileName),
+          kind: ARTIFACT_KINDS[path.extname(fileName).toLowerCase()] ?? 'other',
+          sizeBytes: item.sizeBytes,
+          sha256
+        };
+        byHash.set(sha256, entry);
+        manifest.push({ ...entry });
+      }
+      return manifest;
+    },
+    async remove() {
+      if (dir) await rm(dir, { recursive: true, force: true });
+    }
+  };
 }
 
-export async function removeRecordMedia(root, workId, recordId) {
-  await rm(path.join(mediaDirPath(root, workId), recordId), { recursive: true, force: true });
-}
-
-// present | missing | changed — size first, hash only when the size matches.
+// present | missing | changed | unreadable | unsafe — size first, hash only when the size
+// matches; unsafe = a link whose real location is outside the media folder (never read).
 export async function artifactState(root, workId, artifact) {
-  const file = path.join(qualityDirPath(root, workId), artifact.path);
-  const info = await stat(file).catch(() => null);
+  // A ledger can arrive by merge: never read outside this work item's media folder.
+  const media = mediaDirPath(root, workId);
+  const file = path.resolve(qualityDirPath(root, workId), artifact.path);
+  if (!file.startsWith(media + path.sep)) return 'missing';
+  // …including through symbolic links: the real location must be inside the real media
+  // folder, or the file is reported as unsafe and never stat'ed or read.
+  const realMedia = await realpath(media).catch(() => null);
+  const realFile = await realpath(file).catch(() => null);
+  if (!realMedia || !realFile) return 'missing';
+  if (!realFile.startsWith(realMedia + path.sep)) return 'unsafe';
+  const info = await stat(realFile).catch(() => null);
   if (!info?.isFile()) return 'missing';
   if (info.size !== artifact.sizeBytes) return 'changed';
-  return (await hashFile(file)) === artifact.sha256 ? 'present' : 'changed';
+  try {
+    return (await hashFile(realFile)) === artifact.sha256 ? 'present' : 'changed';
+  } catch {
+    return 'unreadable';
+  }
 }
 
+// Streamed, so a large video is never held in memory to be hashed.
 async function hashFile(file) {
-  return createHash('sha256').update(await readFile(file)).digest('hex');
+  const hash = createHash('sha256');
+  for await (const chunk of createReadStream(file)) hash.update(chunk);
+  return hash.digest('hex');
 }
 
 function uniqueName(name, used) {
@@ -94,7 +145,7 @@ function uniqueName(name, used) {
 export function validateArtifactEntry(entry, label) {
   const problems = [];
   if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return [`${label} must be an object`];
-  if (typeof entry.path !== 'string' || !/^media\/[A-Z]+-\d{3,}\/[^/]+$/.test(entry.path)) problems.push(`${label} has an invalid path`);
+  if (typeof entry.path !== 'string' || !/^media\/[A-Z]+-[A-Za-z0-9-]+\/[^/\\]+$/.test(entry.path) || entry.path.split('/').includes('..')) problems.push(`${label} has an invalid path`);
   if (!Number.isInteger(entry.sizeBytes) || entry.sizeBytes < 0) problems.push(`${label} has an invalid sizeBytes`);
   if (typeof entry.sha256 !== 'string' || !/^[0-9a-f]{64}$/.test(entry.sha256)) problems.push(`${label} has an invalid sha256`);
   return problems;

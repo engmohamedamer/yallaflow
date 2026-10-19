@@ -60,12 +60,13 @@
 - **Knowledge ID:** K-003
 - **Promoted at:** 2026-10-13T12:25:22.722Z
 - **Supersedes:** CTX-0039
-- **Verified:** 2026-10-19T17:51:46.240Z (commit 032f32c)
+- **Verified:** 2026-10-19T20:31:38.186Z (commit 9c38eec)
 - **Evidence:**
-  - docs/releasing.md (repository @ 032f32c)
-  - package.json (repository @ 032f32c)
-  - .github/workflows/release.yml (repository @ 032f32c)
-  - CHANGELOG.md (repository @ 032f32c)
+  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
+  - docs/releasing.md (repository @ 9c38eec)
+  - package.json (repository @ 9c38eec)
+  - .github/workflows/release.yml (repository @ 9c38eec)
+  - CHANGELOG.md (repository @ 9c38eec)
 
 <!-- yallaflow-fact:CTX-0061 -->
 ### CTX-0061 — Versioning and compatibility: - The package version (src/version.js), Agent Contract, bootstrap, Skill Registry, knowledge policy and each per-file schemaVersion are independent; one is never inferred from another, and 1.0.0 bumped only the package version. - From 1.0.0 the package follows SemVer: PATCH = backward-compatible fixes and docs; MINOR = backward-compatible functionality; MAJOR = incompatible public CLI behavior, incompatible durable workspace behavior, or any break not handled by backward-compatible reads/migrations. - Work items keep their pinned behavior, released skill instructions are immutable, supported workspaces stay readable without migration on read, and historical work is never silently rewritten. - Persisted schemas are bumped only when the stored shape truly requires it, written at the lowest version that can represent the content.
@@ -95,14 +96,15 @@
 - **Knowledge ID:** K-027
 - **Promoted at:** 2026-10-19T16:37:37.712Z
 - **Supersedes:** CTX-0040
-- **Verified:** 2026-10-19T17:51:46.842Z (commit 032f32c)
+- **Verified:** 2026-10-19T20:31:39.180Z (commit 9c38eec)
 - **Evidence:**
-  - README.md (repository @ 032f32c)
-  - docs/using-yallaflow.md (repository @ 032f32c)
-  - docs/cli.md (repository @ 032f32c)
-  - docs/architecture.md (repository @ 032f32c)
-  - docs/connected-requirements-and-quality.md (repository @ 032f32c)
-  - docs/limitations.md (repository @ 032f32c)
-  - docs/upgrading-to-v1.1.0.md (repository @ 032f32c)
+  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
+  - README.md (repository @ 9c38eec)
+  - docs/using-yallaflow.md (repository @ 9c38eec)
+  - docs/cli.md (repository @ 9c38eec)
+  - docs/architecture.md (repository @ 9c38eec)
+  - docs/connected-requirements-and-quality.md (repository @ 9c38eec)
+  - docs/limitations.md (repository @ 9c38eec)
+  - docs/upgrading-to-v1.1.0.md (repository @ 9c38eec)
 
 <!-- yallaflow-context:end -->

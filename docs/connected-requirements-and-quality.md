@@ -8,7 +8,7 @@ YallaFlow 1.1.0 adds three optional capabilities. Each one is off unless you ask
 | "Run QC on this" | The agent plans scenarios from the acceptance criteria, runs them with Playwright, and records honest results. | `.yallaflow/work/<id>/quality/qc.json` |
 | "Prepare a demo" | The agent proposes the scenarios worth showing. You approve them, then it runs and optionally records them. | `.yallaflow/work/<id>/quality/demo.json` |
 
-You do not run these commands yourself. The agent does, following on-demand skills: `yallaflow skill requirement-import`, `ai-qc`, and `smart-demo`. They are listed here so you can see what happens.
+You do not run these commands yourself, and you do not need to know them. Ask in your own words, for example "check that cancelling works in the browser" or "make a short video for the club owner". The agent picks the matching on-demand skill (`yallaflow skill requirement-import`, `ai-qc`, or `smart-demo`) and runs the commands. QC and demos never start without such a request: not when work is finished, and not after a QC run passes. The commands are listed here so you can see what happens.
 
 ---
 
@@ -154,13 +154,13 @@ yallaflow demo approve PF-0012 --note "Approved by Sara in the agent session: 'y
 yallaflow demo record PF-0012 --file result.json
 ```
 
-Separate features can be shown in separate runs, for example one for the business audience and one for developers. Every demo record and summary says that **a demonstration is not test evidence**, and convergence refuses `demo:` citations.
+Separate features can be shown in separate runs, for example one for the business audience and one for developers. Status and reports track which approved scenarios have been shown across all recordings. Every demo record and summary says that **a demonstration is not test evidence**, and convergence refuses `demo:` citations.
 
 ---
 
 ## Artifacts, reports, and privacy
 
-- **Local by default.** Videos, screenshots, and traces are copied into `work/<id>/quality/media/<record-id>/`, with their size and SHA-256 recorded. YallaFlow writes `media/.gitignore`, so binaries stay out of Git. The ledgers (`qc.json`, `demo.json`), hashes, and reports are committed. Set `quality.media.commit: true` to track media too.
+- **Local by default.** Videos, screenshots, and traces are copied into a new folder per record, `work/<id>/quality/media/<record-id>-<random>/`, with their size and SHA-256 recorded. A record never writes into an existing folder, so evidence from another branch or an earlier run is never overwritten. The same file attached to several scenarios is stored once. `doctor`, `qc status`, and `demo status` warn when a stored file no longer matches its recorded hash. YallaFlow writes `media/.gitignore`, so binaries stay out of Git. The ledgers (`qc.json`, `demo.json`), hashes, and reports are committed. Set `quality.media.commit: true` to track media too.
 - **Reports.** `quality/report.md` and a standalone `quality/report.html` are regenerated after every QC or demo write. The HTML file is static, with inline styling, no scripts, and no external requests. Links are relative and resolve on your machine. In a fresh clone, where media is absent, or after a file changed, the report flags it instead of linking blindly.
 - **No uploads.** YallaFlow uploads nothing anywhere.
 - **Test data only.** A target that is not local (anything other than `localhost`, `127.0.0.1`, `*.local`, `*.test`, …) needs an explicit `--allow-remote`, and a target URL with embedded credentials is refused. The skills require test or seeded data, and a Playwright storage-state file kept outside `.yallaflow`, so no credential is typed on camera. Text records are redacted. Traces and screenshots are copied as-is and can contain personal data or tokens, so keep them local.

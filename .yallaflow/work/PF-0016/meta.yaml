@@ -1,0 +1,33 @@
+{
+  "id": "PF-0016",
+  "type": "investigation",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Revalidate project memory after the final v1.1.0 fixes",
+  "status": "DONE",
+  "readOnly": true,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-10-19T20:31:15.198Z",
+  "updatedAt": "2026-10-19T20:31:40.681Z",
+  "title": "Revalidate project memory after the final v1.1.0 fixes",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow investigate --scope bounded`.",
+  "routedAt": "2026-10-19T20:31:15.209Z",
+  "workflow": "investigation",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "verification"
+    ]
+  }
+}

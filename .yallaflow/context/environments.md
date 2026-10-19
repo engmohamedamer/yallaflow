@@ -13,10 +13,11 @@
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-033)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-19T17:51:45.451Z (commit 032f32c)
+- **Verified:** 2026-10-19T20:31:37.250Z (commit 9c38eec)
 - **Evidence:**
-  - package.json (repository @ 032f32c)
-  - docs/limitations.md (repository @ 032f32c)
+  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
+  - package.json (repository @ 9c38eec)
+  - docs/limitations.md (repository @ 9c38eec)
 
 <!-- yallaflow-fact:CTX-0059 -->
 ### CTX-0059 — The only CI is .github/workflows/release.yml, triggered when a GitHub Release is published: a guard job (tag = v+package version, prerelease flag matches, tag on main, version not already on npm — an already-published version ends the run with a notice), a test job running npm ci and npm run check on Node 20, 22 and 24 with full Git history, and a publish job on Node 24 that smoke-tests the packed tarball and runs npm publish with provenance through npm Trusted Publishing (OIDC id-token, no stored npm token). There is no pull-request CI and no container configuration; day-to-day validation is local per docs/releasing.md.

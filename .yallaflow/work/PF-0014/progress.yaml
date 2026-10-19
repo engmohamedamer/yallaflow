@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-10-19T19:42:25.289Z",
+      "completedAt": "2026-10-19T19:42:25.289Z",
+      "summary": "Reproduced in PF-0012 V-004: per-ledger record IDs (QC-###/DM-### via nextId, src/quality/input.js) restart on another branch, and git-ignored media/<record-id>/ survives checkouts, so storeArtifacts (src/quality/artifacts.js) copies into the other branch's directory and overwrites its files; removeRecordMedia on a failed record can delete another branch's directory; doctor never compares media to recorded hashes; merged ledgers can hold duplicate IDs. Shared Projects already have branch-safe allocation (allocateCheckoutId, src/shared/identity.js). EPIPE: cli.js has no stdout error handler (pre-existing since 0.3.10-internal.4).",
+      "evidence": [
+        "verification:V-004",
+        "src/quality/artifacts.js#storeArtifacts",
+        "src/shared/identity.js#allocateCheckoutId",
+        "src/cli.js"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-10-19T19:42:25.443Z",
+      "completedAt": "2026-10-19T19:42:25.443Z",
+      "summary": "Root causes: (1) media directory named only by a non-unique record ID and written with copyFile over existing files; (2) rollback deletes by record ID; (3) no hash check of stored media outside report regeneration; (4) record IDs are not branch-safe in Shared Projects and duplicates after a merge make qc: citations ambiguous; (5) unhandled EPIPE on process.stdout. Fix plan: unique per-record media directory created exclusively (mkdir without recursive; never reused) with rollback of only that directory; doctor and qc/demo status warn on hash-mismatched media; branch-safe QC/QP/DM/DP IDs in Shared Projects via allocateCheckoutId, duplicate-ID doctor warnings, ambiguous citations refused; stdout EPIPE ends the process quietly.",
+      "evidence": [
+        "src/quality/artifacts.js"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-10-19T19:42:30.304Z",
+      "completedAt": "2026-10-19T20:23:02.435Z",
+      "summary": "Approved hardening (SRC-0009): artifactState resolves the real path of the media folder and the file and returns 'unsafe' (never stat'ed or read) when a symlinked file or record folder points outside the real media folder; doctor/qc status/demo status warn, reports say 'links outside the media folder; not shown'; in-folder links still work. Regression test in test/quality-integrity.test.js; docs/security.md sentence.",
+      "evidence": [
+        "src/quality/artifacts.js#createRecordMedia",
+        "src/quality/integrity.js",
+        "src/quality/input.js#allocateRecordId",
+        "src/cli.js",
+        "test/quality-integrity.test.js",
+        "src/commands/doctor.js",
+        "src/quality/artifacts.js#artifactState"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-10-19T20:30:52.536Z",
+      "completedAt": "2026-10-19T20:30:52.536Z",
+      "summary": "Final release checks on the finished tree: npm ci + npm run check 756/756 (V-003); packed candidate (197 files, allowlist only, secret scan clean) passes the install smoke test (V-004); real playwright-cli video recorded and recorded through the packaged build — own record folder, playable VP8 1280x720 10.7 s, byte-identical, duplicate screenshot stored once, report links it, doctor verifies without warnings, git-ignored, no credential data (V-005); doctor (V-006); git diff --check (V-007); npm audit --audit-level=high (V-008); network code only in src/intake/providers/. Earlier V-001 (751) and V-002 (755) passed before the approved review fixes.",
+      "evidence": [
+        "verification:V-003",
+        "verification:V-004",
+        "verification:V-005",
+        "verification:V-006",
+        "verification:V-007",
+        "verification:V-008"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Approved independent review (SRC-0007): brief/upgrade/shared hashed every stored media file in full memory (M1); the EPIPE handler exited 0 mid-command (M2); artifact paths accepted backslashes (L3).",
+      "changedAt": "2026-10-19T20:07:18.176Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Approved review hardening (SRC-0009): stat/createReadStream follow symlinks, so a symlink inside media/ could make doctor hash a file outside the work item's media folder.",
+      "changedAt": "2026-10-19T20:21:16.933Z"
+    }
+  ],
+  "updatedAt": "2026-10-19T20:30:52.536Z"
+}

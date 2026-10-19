@@ -9,8 +9,8 @@ import {
   DEMO_AUDIENCES, DEMO_DISCLAIMER, DEMO_PROPOSAL_ID, DEMO_RESULT_STATUSES, DEMO_RUN_ID, DEMO_SCENARIO_ID, DEMO_SCHEMA_VERSION,
   QC_TOOLS, isLocalTarget
 } from './constants.js';
-import { nextId, nonEmpty, normalizeTarget, stringList, unknown } from './input.js';
-import { inspectArtifacts, qualityDirPath, removeRecordMedia, storeArtifacts, validateArtifactEntry } from './artifacts.js';
+import { allocateRecordId, duplicateIds, nonEmpty, normalizeTarget, stringList, unknown } from './input.js';
+import { createRecordMedia, inspectArtifacts, qualityDirPath, validateArtifactEntry } from './artifacts.js';
 import { assertQualityTarget, loadQualitySettings, skillStamp } from './qc.js';
 
 // Smart Demo ledger (v1.1.0): work/<id>/quality/demo.json — independent of QC.
@@ -78,7 +78,7 @@ export function validateDemoLedger(ledger) {
 export async function proposeDemo(root, workId, input, now = new Date().toISOString()) {
   const meta = await assertQualityTarget(root, workId);
   const errors = [];
-  if (!input || typeof input !== 'object' || Array.isArray(input)) throw rejection(['the scope file must be a JSON object']);
+  if (!input || typeof input !== 'object' || Array.isArray(input)) throw rejection(['the scope file must be a JSON object'], 'Demo proposal');
   unknown(input, PROPOSAL_INPUT_FIELDS, 'scope', errors);
   const target = normalizeTarget(input.target, 'scope target', errors);
   const resolved = await resolveDeliveryCriteria(root, meta);
@@ -102,7 +102,11 @@ export async function proposeDemo(root, workId, input, now = new Date().toISOStr
     if (raw.criteria !== undefined && !Array.isArray(raw.criteria)) errors.push(`${label}: criteria must be an array`);
     for (const ref of Array.isArray(raw.criteria) ? raw.criteria : []) {
       const match = typeof ref === 'string' ? active.find((entry) => entry.id === bareRef(ref.trim(), resolved.owner)) : null;
-      if (!match) errors.push(`${label}: ${JSON.stringify(ref)} is not an active acceptance criterion of ${workId}`);
+      if (!match) {
+        errors.push(active.length
+          ? `${label}: ${JSON.stringify(ref)} is not an active acceptance criterion of ${workId} (active: ${active.map((entry) => entry.id).join(', ')})`
+          : `${label}: ${JSON.stringify(ref)} cannot be cited — ${workId} has no recorded acceptance criteria; the rationale explains why the scenario matters`);
+      }
       else criteria.push(match.ref);
     }
     scenarios.push({
@@ -123,13 +127,13 @@ export async function proposeDemo(root, workId, input, now = new Date().toISOStr
     if (!raw || !nonEmpty(raw.title) || !nonEmpty(raw.reason)) { errors.push(`excluded #${index + 1} requires a title and a reason`); continue; }
     excluded.push({ title: raw.title.trim(), reason: raw.reason.trim() });
   }
-  if (errors.length) throw rejection(errors);
+  if (errors.length) throw rejection(errors, 'Demo proposal');
 
   scenarios.sort((a, b) => a.priority - b.priority || a.id.localeCompare(b.id));
   const loaded = await loadDemoLedger(root, workId);
   const ledger = loaded.ledger;
   const proposal = {
-    id: nextId('DP', ledger.proposals),
+    id: await allocateRecordId(root, 'DP', ledger.proposals),
     recordedAt: now,
     workStatus: meta.status,
     ...(target ? { target } : {}),
@@ -179,6 +183,31 @@ export async function approveDemo(root, workId, { note, only = null }, now = new
 // The approved content of a proposal: what will be shown, against what, and what is left out.
 export function proposalHash(proposal) {
   return createHash('sha256').update(JSON.stringify({ target: proposal.target ?? null, scenarios: proposal.scenarios, excluded: proposal.excluded })).digest('hex');
+}
+
+// Which approved scenarios have been shown so far, across every recording of the
+// approved proposal (one video per feature or audience is normal). A scenario shown in
+// any run counts; what remains is approved but not yet shown in any run.
+export function approvedCoverage(ledger) {
+  const approved = currentApproval(ledger);
+  if (!approved) return null;
+  const runs = ledger.runs.filter((run) => run.proposalId === approved.proposal.id && run.proposalSha256 === approved.proposal.sha256);
+  const shownIn = new Map();
+  for (const run of runs) {
+    for (const result of run.scenarios) {
+      if (result.status === 'shown' && approved.approval.scenarios.includes(result.id)) shownIn.set(result.id, [...(shownIn.get(result.id) ?? []), run.id]);
+    }
+  }
+  return {
+    approved: approved.approval.scenarios,
+    shownIn,
+    remaining: approved.approval.scenarios.filter((scenarioId) => !shownIn.has(scenarioId)),
+    runs: runs.map((run) => run.id)
+  };
+}
+
+export function demoDuplicateIds(ledger) {
+  return [...duplicateIds(ledger.proposals), ...duplicateIds(ledger.runs)];
 }
 
 export function currentApproval(ledger) {
@@ -239,13 +268,13 @@ export async function recordDemo(root, workId, input, { now = new Date().toISOSt
   if (!results.length) errors.push('scenarios must report at least one approved scenario');
   if (errors.length) throw rejection(errors);
 
-  const id = nextId('DM', ledger.runs);
+  const id = await allocateRecordId(root, 'DM', ledger.runs);
   const settings = await loadQualitySettings(root);
+  const media = await createRecordMedia(root, workId, id, { commitMedia: settings.commitMedia });
   try {
-    const used = new Set();
-    const [storedVideo] = await storeArtifacts(root, workId, id, video, { commitMedia: settings.commitMedia, used });
+    const [storedVideo] = await media.add(video);
     for (const result of results) {
-      const artifacts = await storeArtifacts(root, workId, id, inspectedByResult.get(result.id), { commitMedia: settings.commitMedia, used });
+      const artifacts = await media.add(inspectedByResult.get(result.id));
       if (artifacts.length) result.artifacts = artifacts;
     }
     const head = gitHead(root);
@@ -262,7 +291,6 @@ export async function recordDemo(root, workId, input, { now = new Date().toISOSt
       ...(storedVideo ? { video: storedVideo } : {}),
       ...(nonEmpty(input.summary) ? { summary: input.summary.trim() } : {}),
       scenarios: results,
-      notShown: approval.scenarios.filter((scenarioId) => !results.some((result) => result.id === scenarioId)),
       limitations,
       disclaimer: DEMO_DISCLAIMER,
       skill: skillStamp('smart-demo')
@@ -272,7 +300,7 @@ export async function recordDemo(root, workId, input, { now = new Date().toISOSt
     await writeYamlAtomic(demoFilePath(root, workId), ledger);
     return { meta, proposal, approval, run, ledger };
   } catch (error) {
-    await removeRecordMedia(root, workId, id);
+    await media.remove();
     throw error;
   }
 }
@@ -281,7 +309,7 @@ function sameList(a = [], b = []) {
   return a.length === b.length && a.every((value, index) => value === b[index]);
 }
 
-function rejection(errors) {
-  return new Error(`Demo record rejected:\n- ${errors.join('\n- ')}\n\nNo files were changed.`);
+function rejection(errors, action = 'Demo record') {
+  return new Error(`${action} rejected:\n- ${errors.join('\n- ')}\n\nNo files were changed.`);
 }
 

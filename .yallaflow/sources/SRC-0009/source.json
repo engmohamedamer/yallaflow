@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0009",
+  "sourceType": "file",
+  "sourceName": "symlink-approval.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-10-19T20:21:16.739Z",
+  "original": {
+    "path": "sources/SRC-0009/symlink-approval.md",
+    "sha256": "d77e8c00b6547b914252670786b689b6c3f0a4b548f303da4fa16a6ee359a950",
+    "sizeBytes": 479
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0014"
+  ],
+  "rawText": "Developer approval (2026-10-19): \"Approved. Please fix the symlink containment issue as recommended by the independent reviewer. Add regression coverage, complete the final verification, and make the necessary local commits. Keep the implementation focused. Do not introduce additional features or expand the release scope. Once all checks pass, provide a concise final release readiness report. Do not tag, push, create a GitHub Release, or publish to npm without my approval.\"\n"
+}

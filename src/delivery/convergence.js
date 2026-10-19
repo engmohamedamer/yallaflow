@@ -17,7 +17,7 @@ import {
 import { activeCriteria, bareRef, resolveDeliveryCriteria } from './requirements.js';
 import { convergenceImpactBoundary, loadWorkImpacts, pendingImpact, pendingImpactMessage } from './impact.js';
 import { convergenceRequired } from './policy.js';
-import { WORK_ID_SOURCE, isWorkId } from '../core/ids.js';
+import { WORK_ID_SOURCE, isWorkId, recordIdSource } from '../core/ids.js';
 
 // Delivery convergence (v0.3.8): does the delivered implementation match the approved
 // intent? Distinct from verification (do the recorded technical checks pass?) and
@@ -41,7 +41,7 @@ const UNREQUESTED_FIELDS = new Set(['id', 'disposition', 'summary', 'reason', 'e
 const INPUT_FIELDS = new Set(['summary', 'findings', 'unrequested']);
 const CONVERGENCE_EVIDENCE = new RegExp(`^convergence:\\s*(${WORK_ID_SOURCE})/(CV-\\d{3,})$`, 'i');
 // v1.1.0 optional AI QC: `qc:QC-001#S-01` cites one scenario result of this work's QC.
-const QC_EVIDENCE = /^qc:\s*(QC-\d{3,})#(S-\d{2,})$/i;
+const QC_EVIDENCE = new RegExp(`^qc:\\s*(${recordIdSource('QC')})#(S-\\d{2,})$`, 'i');
 
 export function convergenceFilePath(root, workId) {
   return path.join(workspacePath(root), 'work', workId, 'convergence.yaml');
