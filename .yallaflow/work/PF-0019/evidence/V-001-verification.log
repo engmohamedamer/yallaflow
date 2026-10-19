@@ -1,0 +1,185 @@
+TAP version 13
+# Subtest: exposes the YallaFlow product and CLI identity
+ok 1 - exposes the YallaFlow product and CLI identity
+  ---
+  duration_ms: 192.190087
+  ...
+# Subtest: namespace help is concise and discoverable
+ok 2 - namespace help is concise and discoverable
+  ---
+  duration_ms: 699.827394
+  ...
+# Subtest: AC-005: a bare .git (including a real empty `git init`) is Greenfield
+ok 3 - AC-005: a bare .git (including a real empty `git init`) is Greenfield
+  ---
+  duration_ms: 20.066777
+  ...
+# Subtest: AC-005: an `npm init`-only package.json, or any manifest without source, is Greenfield
+ok 4 - AC-005: an `npm init`-only package.json, or any manifest without source, is Greenfield
+  ---
+  duration_ms: 9.635864
+  ...
+# Subtest: AC-005: a manifest with one recognized source file is Brownfield
+ok 5 - AC-005: a manifest with one recognized source file is Brownfield
+  ---
+  duration_ms: 2.752333
+  ...
+# Subtest: AC-005: the source-file threshold is the named constant — 9 files Greenfield, 10 Brownfield
+ok 6 - AC-005: the source-file threshold is the named constant — 9 files Greenfield, 10 Brownfield
+  ---
+  duration_ms: 14.383546
+  ...
+# Subtest: AC-005: meaningful container/CI configuration is Brownfield; empty or comment-only is not
+ok 7 - AC-005: meaningful container/CI configuration is Brownfield; empty or comment-only is not
+  ---
+  duration_ms: 10.149533
+  ...
+# Subtest: AC-006: an APD-shaped tree with only nested applications and no Git is Brownfield
+ok 8 - AC-006: an APD-shaped tree with only nested applications and no Git is Brownfield
+  ---
+  duration_ms: 18.8284
+  ...
+# Subtest: AC-001: traversal is deterministic, skips ignored directories, and never follows symlinks
+ok 9 - AC-001: traversal is deterministic, skips ignored directories, and never follows symlinks
+  ---
+  duration_ms: 23.037937
+  ...
+# Subtest: AC-001: depth and entry bounds are enforced and reported, never silent
+ok 10 - AC-001: depth and entry bounds are enforced and reported, never silent
+  ---
+  duration_ms: 7.775445
+  ...
+# Subtest: AC-002: nested manifests, per-extension counts, documents, and hints — and nothing is persisted
+ok 11 - AC-002: nested manifests, per-extension counts, documents, and hints — and nothing is persisted
+  ---
+  duration_ms: 35.70157
+  ...
+# Subtest: AC-003: Angular majors per nested application; Spring Boot from parent, BOM property, or a bare reference
+ok 12 - AC-003: Angular majors per nested application; Spring Boot from parent, BOM property, or a bare reference
+  ---
+  duration_ms: 10.096483
+  ...
+# Subtest: AC-003: exactly the approved framework list, deterministic majors, and no semantic labels
+ok 13 - AC-003: exactly the approved framework list, deterministic majors, and no semantic labels
+  ---
+  duration_ms: 0.855347
+  ...
+# Subtest: AC-003: malformed or unreadable manifests are reported, never thrown
+ok 14 - AC-003: malformed or unreadable manifests are reported, never thrown
+  ---
+  duration_ms: 2.080244
+  ...
+# Subtest: AC-004: documentation candidates come from intake-owned formats and are labelled with intake handling
+ok 15 - AC-004: documentation candidates come from intake-owned formats and are labelled with intake handling
+  ---
+  duration_ms: 12.678254
+  ...
+# Subtest: review: unreadable container/CI files and directories are reported as unreadable, not as empty
+ok 16 - review: unreadable container/CI files and directories are reported as unreadable, not as empty
+  ---
+  duration_ms: 1.937851
+  ...
+# Subtest: review: Maven ${property} versions — kept when unresolvable, resolved from project-level (not profile) properties
+ok 17 - review: Maven ${property} versions — kept when unresolvable, resolved from project-level (not profile) properties
+  ---
+  duration_ms: 0.508189
+  ...
+# Subtest: review: Gradle comments are ignored; a BOM-prefixed package.json still yields hints
+ok 18 - review: Gradle comments are ignored; a BOM-prefixed package.json still yields hints
+  ---
+  duration_ms: 0.276746
+  ...
+# Subtest: review: Dockerfile.* and *.Dockerfile are recognized; oversized manifests are reported, not read
+ok 19 - review: Dockerfile.* and *.Dockerfile are recognized; oversized manifests are reported, not read
+  ---
+  duration_ms: 3.757177
+  ...
+# Subtest: contract v9 requires a routed, authorized work item before the first engineering edit
+ok 20 - contract v9 requires a routed, authorized work item before the first engineering edit
+  ---
+  duration_ms: 2.713841
+  ...
+# Subtest: contract v9 keeps small changes lightweight and operational help outside work items
+ok 21 - contract v9 keeps small changes lightweight and operational help outside work items
+  ---
+  duration_ms: 0.206718
+  ...
+# Subtest: contract v9 reuses covering active work and never duplicates it
+ok 22 - contract v9 reuses covering active work and never duplicates it
+  ---
+  duration_ms: 0.192109
+  ...
+# Subtest: contract v9 documents recovery of an untracked edit without reverting, rewriting history, or backdating
+ok 23 - contract v9 documents recovery of an untracked edit without reverting, rewriting history, or backdating
+  ---
+  duration_ms: 0.190673
+  ...
+# Subtest: bootstrap v3 carries the route-before-edit precondition for every provider and still defers to AGENT.md
+ok 24 - bootstrap v3 carries the route-before-edit precondition for every provider and still defers to AGENT.md
+  ---
+  duration_ms: 0.342189
+  ...
+# Subtest: documentation lint: no agent-facing text, doc, or normal CLI output presents YallaFlow tracking as optional
+ok 25 - documentation lint: no agent-facing text, doc, or normal CLI output presents YallaFlow tracking as optional
+  ---
+  duration_ms: 791.311698
+  ...
+# Subtest: brief with no active work ties a new request to routing before the first edit
+ok 26 - brief with no active work ties a new request to routing before the first edit
+  ---
+  duration_ms: 632.558971
+  ...
+# Subtest: CLI path for the Sekaya scenario: the bounded UI change is not authorized until routed and advanced, then needs no human approval in adaptive mode
+ok 27 - CLI path for the Sekaya scenario: the bounded UI change is not authorized until routed and advanced, then needs no human approval in adaptive mode
+  ---
+  duration_ms: 3948.739602
+  ...
+# Subtest: CLI path in gated mode: a bounded change stops at a human implementation review the agent must not self-approve
+ok 28 - CLI path in gated mode: a bounded change stops at a human implementation review the agent must not self-approve
+  ---
+  duration_ms: 1981.623766
+  ...
+# Subtest: verification and finish requirements still hold for lightweight work
+ok 29 - verification and finish requirements still hold for lightweight work
+  ---
+  duration_ms: 2471.151763
+  ...
+# Subtest: CLI path for active-work reuse: brief and status point to the covering item; an unrelated request becomes a separate item
+ok 30 - CLI path for active-work reuse: brief and status point to the covering item; an unrelated request becomes a separate item
+  ---
+  duration_ms: 1305.90018
+  ...
+# Subtest: operational requests create no work item and change no YallaFlow state
+ok 31 - operational requests create no work item and change no YallaFlow state
+  ---
+  duration_ms: 3209.496964
+  ...
+# Subtest: Brownfield gate and Greenfield freedom are unchanged for the Sekaya request
+ok 32 - Brownfield gate and Greenfield freedom are unchanged for the Sekaya request
+  ---
+  duration_ms: 841.967759
+  ...
+# Subtest: CLI path for recovery: an edit made before routing is kept, disclosed in a ruling, verified fresh, and dated when recorded
+ok 33 - CLI path for recovery: an edit made before routing is kept, disclosed in a ruling, verified fresh, and dated when recorded
+  ---
+  duration_ms: 3211.286701
+  ...
+# Subtest: a v1.0.0 workspace (contract v8, bootstrap v2) reads as outdated, keeps working, and upgrades only on explicit refresh
+ok 34 - a v1.0.0 workspace (contract v8, bootstrap v2) reads as outdated, keeps working, and upgrades only on explicit refresh
+  ---
+  duration_ms: 998.136234
+  ...
+# Subtest: a v1.0.0 CLI on a refreshed workspace reports the newer contract and refuses to downgrade it
+ok 35 - a v1.0.0 CLI on a refreshed workspace reports the newer contract and refuses to downgrade it
+  ---
+  duration_ms: 800.80479
+  ...
+1..35
+# tests 35
+# suites 0
+# pass 35
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 20293.278524

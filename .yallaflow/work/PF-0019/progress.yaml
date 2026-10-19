@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-10-19T22:55:15.175Z",
+      "completedAt": "2026-10-19T22:55:15.175Z",
+      "summary": "Current README.md: 463 lines; 2 Mermaid diagrams in ~~~ fences (agent/YallaFlow loop; brownfield/greenfield start); v1.1.0 appears only as one bullet; long sections (first-run baseline walkthrough, SRS distinction, team flow, who runs what, before/after) duplicate docs/using-yallaflow.md and docs/workflows.md. Facts to keep accurate: Node >= 20.16.0; npm install -g yallaflow; yallaflow init sets up Claude Code (CLAUDE.md) and Codex (AGENTS.md); Brownfield first request triggers an approved baseline; upgrade = install + yallaflow agent refresh; QC/demo on request only, ledgers committed, media and reports git-ignored, video needs Playwright ffmpeg; network only with intake ticket --fetch; release CI tests Node 20/22/24; Windows not verified (limitations). No application code is in scope.",
+      "evidence": [
+        "README.md",
+        "docs/connected-requirements-and-quality.md",
+        "docs/upgrading-to-v1.1.0.md",
+        "package.json"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-10-19T22:55:15.471Z",
+      "completedAt": "2026-10-19T22:55:15.471Z",
+      "summary": "Request SRC-0012 is fully specified; no open business questions. Documentation-only: README.md (no application code). Diagrams must avoid custom colors so GitHub light/dark themes apply.",
+      "evidence": [
+        "SRC-0012"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-10-19T22:55:15.781Z",
+      "completedAt": "2026-10-19T22:55:15.781Z",
+      "summary": "Plan in work.md: landing-page README with three theme-neutral Mermaid diagrams (who does what; lifecycle; v1.1.0 optional input and independent on-demand capabilities), concise What's new, condensed sections linking to existing guides, and link/Markdown/Mermaid/render checks; one local docs commit.",
+      "evidence": [
+        "README.md"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-10-19T22:55:28.551Z",
+      "completedAt": "2026-10-19T22:59:59.419Z",
+      "summary": "README.md rewritten as a landing page (463 → ~190 lines): tagline + 4 badges (npm, license, node, agents) + 3-point value proposition; quick start (install, init, two prompts, first-run approval in one paragraph); three theme-neutral Mermaid diagrams — who does what (developer → agent ↔ YallaFlow with memory/workflow/evidence), the lifecycle in two rows (Decide: request, route, understand, specify & plan when needed; Deliver: implement, verify, check against intent, remember), and v1.1.0 (ticket as optional input; AI QC and Smart Demo as separate on-request nodes, undirected dotted links); What's new in 1.1.0 with natural-language examples and a Good-to-know list (off by default, demo is not test proof, Git-ignored artifacts, committed ledgers, ffmpeg for video); condensed Teams, Upgrading, Commands, Documentation and Status sections linking to the guides. No application code changed.",
+      "evidence": [
+        "README.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-10-19T22:59:59.734Z",
+      "completedAt": "2026-10-19T22:59:59.734Z",
+      "summary": "README-related tests + git diff --check (V-001); doc checks (V-002): one H1, ordered headings, balanced fences, 23 relative links/anchors resolve, badge images 200, npm package exists, README in package; all 3 Mermaid diagrams parse and render with mermaid 10.9.1 and 11.4.1 in default and dark themes; full README rendered with github-markdown-css light/dark and inspected (lifecycle diagram redesigned to two rows after the first render showed unreadably small text).",
+      "evidence": [
+        "verification:V-001",
+        "verification:V-002"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-10-19T22:59:59.734Z"
+}

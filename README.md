@@ -2,462 +2,190 @@
 
 > **Give AI your project, not just your prompt.**
 
-Your coding agent is already smart.
+[![npm version](https://img.shields.io/npm/v/yallaflow?label=npm)](https://www.npmjs.com/package/yallaflow)
+[![license: MIT](https://img.shields.io/npm/l/yallaflow)](LICENSE)
+[![node](https://img.shields.io/node/v/yallaflow)](docs/installation.md)
+[![agents: Claude Code · Codex](https://img.shields.io/badge/agents-Claude%20Code%20%C2%B7%20Codex-informational)](#how-it-works)
 
-**YallaFlow gives it durable project memory, the right engineering workflow, and evidence that the work is actually done — without making you carry all of that in every prompt.**
+YallaFlow is an engineering governance layer for AI coding agents. **You describe the intent. YallaFlow supplies the rest:**
 
-> **You describe the intent. YallaFlow supplies the project.**
->
-> **Understand once. Share automatically. Revalidate precisely.**
+- **Project understanding.** A reviewed, durable memory of your codebase, so a new session never starts from zero.
+- **The right workflow.** A bug, a feature, and an investigation each get a lifecycle sized to the work.
+- **Evidence.** "Done" means verified and checked against what was asked, not just "the agent said so".
 
----
+It works with **Claude Code** and **Codex**, runs locally, and keeps everything in your repository.
 
-## Start in under a minute
+## Quick start
 
-### 1. Install
+Requires **Node.js ≥ 20.16.0**.
 
-YallaFlow requires **Node.js >= 20.16.0**.
-
-~~~bash
+```bash
 npm install -g yallaflow
-~~~
-
-Check it:
-
-~~~bash
-yallaflow --version
-~~~
-
-Other options — a tools prefix, a Git tag, or a checkout — are in [Installation](docs/installation.md).
-
-### 2. Initialize your project — once
-
-In the project root:
-
-~~~bash
+cd your-project
 yallaflow init
-~~~
+```
 
-That one command sets up YallaFlow and connects both Claude Code and Codex. It adds a small pointer to `CLAUDE.md` and `AGENTS.md`, and keeps anything already in those files.
+`init` connects Claude Code (`CLAUDE.md`) and Codex (`AGENTS.md`) with a small pointer and keeps anything already in those files. Then open **Claude Code or Codex in the project** and describe the work. These are prompts for your agent, not terminal commands:
 
-### 3. Open your AI coding session and describe the work
-
-Open **Claude Code or Codex in the project directory**.
-
-> The next lines are prompts for your AI coding agent — **not terminal commands**.
-
-**Existing project**
-
-~~~text
+```text
 Fix invoice totals.
-~~~
+```
 
-**New project**
-
-~~~text
+```text
 Build an anonymous employee survey platform.
-~~~
+```
 
-**That's it. YallaFlow and your coding agent handle the engineering workflow from here.**
+You don't need to say "use YallaFlow", explain the architecture, or ask for specs and tests. Every session orients itself automatically.
 
-You do not need to explain the architecture, repeat old decisions, choose a workflow, or tell the agent to create specifications and verification evidence by hand. You also do not need to say "Use YallaFlow": every session starts with it automatically.
+**On an existing project, the first request comes with one review step.** The agent first builds an evidence-backed understanding of the codebase, without changing code. It shows you what it found and what it did not inspect, and waits for you to reply `Approve`. After that, your original request continues, and every later session and teammate starts from that approved understanding. [More on first use →](docs/using-yallaflow.md#3-first-use)
 
----
+## How it works
 
-## What happens behind that simple prompt?
-
-~~~mermaid
+```mermaid
 flowchart LR
-    U["You<br/><b>Describe the intent</b>"]
-    A["Coding Agent<br/>Claude / Codex"]
-    Y["YallaFlow"]
+    dev(["You<br/>describe the intent"])
+    agent["Coding agent<br/>Claude Code · Codex"]
+    yf["YallaFlow"]
+    mem[("Project memory<br/>facts · rules · decisions")]
+    flow["Workflow<br/>sized to the request"]
+    ev["Evidence<br/>verification · intent checks"]
+    out(["Verified change"])
 
-    M["Project Memory<br/>architecture · rules · decisions"]
-    W["Adaptive Workflow<br/>bug · feature · investigation"]
-    E["Evidence<br/>verification · review · convergence"]
+    dev --> agent
+    agent <-->|"orients · records"| yf
+    yf --- mem
+    yf --- flow
+    yf --- ev
+    agent --> out
+```
 
-    D["Delivered Change"]
-    N["Next Session<br/>starts with project context"]
+The agent does the reasoning and the coding. YallaFlow keeps the durable state around it: what the project is, which workflow applies, and what has been proven. YallaFlow calls no AI model itself and sends no telemetry.
 
-    U --> A
-    A --> Y
-    Y --> M
-    Y --> W
-    Y --> E
+> **The complexity stays inside YallaFlow, not inside your prompt.**
 
-    M --> A
-    W --> A
-    E --> D
-    D --> N
-    N --> A
-~~~
+## The engineering lifecycle
 
-> **The complexity stays inside YallaFlow — not inside your prompt.**
+```mermaid
+flowchart TB
+    subgraph decide["Decide"]
+        direction LR
+        req(["Request"]) --> route["Route<br/>bug · feature · change · …"] --> und["Understand<br/>memory + code"] --> spec["Specify & plan<br/>when needed"]
+    end
+    subgraph deliver["Deliver"]
+        direction LR
+        impl["Implement"] --> ver["Verify<br/>with evidence"] --> conv["Check against<br/>intent"] --> rem[("Remember")]
+    end
+    decide --> deliver
+```
 
----
+The depth adapts to the work. A bounded bug fix goes from root-cause analysis straight to the fix, while architectural work gets a reviewed design, specification, or plan. Nothing is called done without fresh verification evidence, and work that carries acceptance criteria is checked against them before it closes. What was learned becomes reviewed project knowledge. [Workflows in detail →](docs/workflows.md)
 
-## New project or existing project? Same start.
+## What's new in 1.1.0
 
-~~~mermaid
-flowchart TD
-    I["yallaflow init"]
-    Q{"What is already here?"}
+Three **optional** capabilities. If you don't use them, nothing changes.
 
-    B["Existing repository<br/><b>Brownfield</b>"]
-    G["New repository<br/><b>Greenfield</b>"]
+```mermaid
+flowchart LR
+    ticket["Tracker ticket<br/>GitHub · Jira · Azure DevOps"]
+    subgraph life["Engineering lifecycle"]
+        direction LR
+        u["Understand"] --> c["Change"] --> v["Verify"] --> r["Remember"]
+    end
+    qc["AI QC<br/>Playwright"]
+    demo["Smart Demo<br/>optional video"]
 
-    BM["Understand existing code,<br/>docs and architecture"]
-    GI["Build from product intent"]
+    ticket -. "optional input" .-> life
+    qc -. "only when you ask" .- life
+    demo -. "only when you ask" .- life
+```
 
-    P["Durable project state"]
-    R["Describe the next change"]
+**Connected requirements.** Point the agent at an existing ticket. Its description, acceptance criteria, comments and attachments become a preserved source, and the requirements trace back to it. The agent fetches the ticket with the integration it already has. YallaFlow can also fetch it read-only, using a token from your environment that is never stored.
 
-    I --> Q
-    Q --> B
-    Q --> G
-    B --> BM
-    G --> GI
-    BM --> P
-    GI --> P
-    P --> R
-~~~
+```text
+Implement acme/shop#42.
+Work on SHOP-118 — https://acme.atlassian.net/browse/SHOP-118
+```
 
-YallaFlow performs bounded repository inspection and classifies the project automatically. You can override the classification when needed.
+**AI QC.** The agent plans functional and exploratory checks from the acceptance criteria, runs them with Playwright (CLI or MCP), and records what actually happened. A check counts as passed only if it was actually run and has evidence.
 
----
+```text
+Check that cancelling a booking works in the browser.
+```
 
-## Why use YallaFlow?
+**Smart Demo.** The agent proposes the few scenarios worth showing, in priority order. You approve them before anything is recorded, and video is optional.
 
-### 🧠 Project memory
+```text
+Record a short demo of booking a pitch for the club owner.
+```
 
-A new AI session does not have to start from zero.
+**Good to know**
 
-YallaFlow keeps reviewed project knowledge with evidence, provenance, and freshness information so future work can reuse what the project already knows.
+- QC and Smart Demo are **off by default**, independent of each other, and run **only when you ask**. They never start because a task finished.
+- A demo shows scenarios working once. **It is not proof that tests passed.**
+- Videos, screenshots, traces and generated reports stay on your machine and are **Git-ignored by default**. Only the lightweight `qc.json`/`demo.json` records are committed.
+- Playwright must be available to your agent. Video recording also needs Playwright's ffmpeg (`npx playwright install ffmpeg`).
 
-### 🧭 The right workflow for the work
+[Tickets, AI QC & Smart Demo guide →](docs/connected-requirements-and-quality.md)
 
-A bug is not a feature. An investigation is not an implementation task.
+## Teams
 
-YallaFlow lets the coding agent reason about the request, then governs the appropriate lifecycle around it.
-
-### ✅ "Done" needs evidence
-
-YallaFlow separates:
-
-~~~text
-Implementation
-      ↓
-Verification
-      ↓
-Delivery Convergence
-      ↓
-Code Review
-      ↓
-Durable Project Knowledge
-~~~
-
-Passing tests matters. Matching the approved intent matters too.
-
-### 🔄 Session and agent continuity
-
-Close the chat. Open a fresh session. Switch between supported coding agents.
-
-The durable engineering state stays with the project.
-
-### 📎 Original requirements stay traceable
-
-SRS files, PDFs, spreadsheets, presentations, and other inputs can be preserved as sources instead of disappearing into chat history.
-
-### 🎫 Requirements from your tracker, optional QC and demos
-
-Point the agent at a GitHub issue, a Jira ticket, or an Azure DevOps work item and it enters the normal workflow, traceable to the ticket. Ask for AI QC with Playwright, or a smart demo with optional video, when you want them — never automatically. ([how](docs/connected-requirements-and-quality.md))
-
-### 🌱 Brownfield is first-class
-
-Existing systems are not treated like blank projects.
-
-YallaFlow establishes a reviewed baseline before the agent is allowed to change a codebase it does not yet understand.
-
-### 👥 Shared with your team through Git
-
-Your whole team reuses one reviewed understanding of the project. Nobody re-explains the architecture, and nobody needs to learn YallaFlow.
+A maintainer runs `yallaflow init`, approves the project understanding, runs `yallaflow shared enable`, and commits `.yallaflow/`. Teammates just `git pull` and open their agent. They need no YallaFlow commands and no join step, only a compatible `yallaflow` CLI. Knowledge learned on a branch travels with that branch, and YallaFlow never commits, pushes, or merges for you. [Shared Projects →](docs/shared-projects.md)
 
 > **Developers work with Git. Agents work with YallaFlow.**
 
----
+## Upgrading from 1.0.x
 
-## Existing project: what happens the first time
+```bash
+npm install -g yallaflow@1.1.0
+yallaflow agent refresh   # updates only YallaFlow-managed blocks (AGENT.md, CLAUDE.md, AGENTS.md)
+yallaflow doctor
+```
 
-Just ask for the work you need:
+Existing work items, project memory and sources are unchanged. [Upgrading to 1.1.0 →](docs/upgrading-to-v1.1.0.md)
 
-~~~text
-Fix invoice totals.
-~~~
+## Commands you might run yourself
 
-Or ask a question about it:
+Day to day, you talk to your agent. These are for setup and for looking under the hood:
 
-~~~text
-How does subscription renewal work?
-~~~
-
-The first time, the agent notices that YallaFlow does not understand this project yet. Before any engineering work starts — a fix, a feature, or even a read-only investigation — it builds an evidence-backed understanding of the repository, using your request as its focus:
-
-- repository structure,
-- frameworks and versions,
-- architecture,
-- database and integrations,
-- authentication and permissions,
-- routes, APIs and important workflows,
-- project conventions,
-- important documents,
-- business rules,
-- unresolved facts and discovery limitations.
-
-It does not change application code while doing this, and it never copies secret values (from `.env` files, for example) into YallaFlow's records. Then it shows you what it found — and what it did *not* inspect — and asks you to review it.
-
-If it looks right, reply:
-
-~~~text
-Approve
-~~~
-
-If something is wrong, say what, and the agent corrects it. Once you approve, the agent records your approval and continues with your original request — you do not have to repeat it. **Until you approve, YallaFlow does not start engineering work on the project.**
-
-Quick operational help is the exception: starting Docker or a dev server, opening the app, showing logs, or checking `git status` just happens — no project understanding needed.
-
-This happens once per project. After that, every session and every teammate starts from the same approved understanding:
-
-~~~text
-What should I know before changing beneficiary registration?
-~~~
-
-### Want deeper understanding for a bigger goal?
-
-If you are planning something larger, you can ask for understanding with a purpose. The agent then goes deeper where that goal needs it:
-
-~~~text
-Understand this project. We are going to redesign the whole UI
-without changing business behavior.
-~~~
-
----
-
-## New project: just describe the product
-
-After setup:
-
-~~~text
-I want to build a contract management system.
-
-Admins create contracts, clients review and sign them, and payments are tracked.
-~~~
-
-You do **not** need to tell the agent:
-
-- "use SDD",
-- "create acceptance criteria",
-- "make an implementation plan",
-- "decide whether this is architectural",
-- "create verification evidence".
-
-YallaFlow keeps that engineering process proportional to the work.
-
----
-
-## Already have an SRS or project files?
-
-Hand them to the agent:
-
-~~~text
-Build this from docs/Product_SRS.docx and docs/payment-rules.xlsx.
-~~~
-
-The agent preserves the originals as sources linked to the work, so they do not disappear into chat history. You can also capture files yourself with `yallaflow intake <file> [<file> ...]`.
-
-YallaFlow deliberately keeps these distinct:
-
-~~~text
-Original Source
-      !=
-Extracted Representation
-      !=
-Specification
-      !=
-Implementation
-~~~
-
-So later you can still answer: **What were we originally given, and did we actually deliver it?**
-
----
-
-## Coming back tomorrow
-
-You do not need yesterday's chat. Open your coding agent and say:
-
-~~~text
-Continue the current work.
-~~~
-
-The agent orients itself with `yallaflow brief`. You can run it yourself too.
-
-That is one of the main ideas behind YallaFlow:
-
-> **The project — not the chat session — is the durable unit of AI-assisted software development.**
-
----
-
-## Working as a team
-
-~~~text
-Maintainer — once
-  install YallaFlow
-  → yallaflow init
-  → approve the initial project understanding (the agent asks)
-  → yallaflow shared enable
-  → commit and push the project state
-
-Developer — every day
-  git pull
-  → open your coding agent
-  → describe the task
-  → review
-  → git push
-~~~
-
-The maintainer commits the project state:
-
-~~~bash
-git add .yallaflow CLAUDE.md AGENTS.md
-git commit -m "Share YallaFlow project memory"
-git push
-~~~
-
-Developers need nothing else: no `yallaflow init`, no agent setup, no join command — just a compatible `yallaflow` CLI.
-
-When the work is done, the agent tells you in plain language:
-
-~~~text
-Implemented and verified. New project knowledge from this task will join the shared project memory after it is merged.
-Ready to push.
-~~~
-
-Underneath:
-
-- Work and source IDs are safe across parallel branches.
-- Knowledge learned on a branch travels with that branch's work.
-- Project memory is updated in one place, on the integration branch.
-- A parallel change is never silently overwritten.
-- `yallaflow shared check` is a read-only CI gate for any CI provider.
-- YallaFlow never commits, pushes, pulls, or merges for you.
-
-👉 [Shared Projects](docs/shared-projects.md)
-
----
-
-## Who runs what
-
-**Developers**: describe the work to your coding agent, review the result, and use Git as usual (`git pull`, `git push`). No YallaFlow commands.
-
-**Project maintainer**:
-
-~~~bash
-yallaflow init            # once per project
-yallaflow shared enable   # once, when the team should share project memory
-~~~
-
-**Manual / advanced** (for looking under the hood or recovering; the agent normally runs these):
-
-~~~bash
-yallaflow brief                  # project + current-work orientation
-yallaflow status                 # workflow state
-yallaflow doctor                 # integrity check
-yallaflow inspect                # read-only repository inventory
-yallaflow agent setup claude     # re-create the Claude pointer (CLAUDE.md)
-yallaflow agent setup codex      # re-create the Codex pointer (AGENTS.md)
-yallaflow baseline show          # inspect the project-understanding draft
-~~~
+```bash
+yallaflow init       # once per project
+yallaflow brief      # what YallaFlow knows and what's in progress
+yallaflow status     # workflow state
+yallaflow doctor     # integrity check
+```
 
 Everything else is in the [CLI reference](docs/cli.md).
 
----
+## Documentation
 
-## Before YallaFlow / with YallaFlow
-
-Without durable project state:
-
-~~~text
-"This project uses Spring Boot 2.7..."
-"The frontend is Angular 16..."
-"The payment rules are in this document..."
-"Read these six files first..."
-"Last time we decided..."
-"Please follow SDD..."
-~~~
-
-With YallaFlow:
-
-~~~text
-Add partial payments.
-~~~
-
-That difference is the product.
-
----
-
-## Want the details?
-
-The README is intentionally the shortest path into YallaFlow.
-
-If you want the practical end-to-end guide, start here:
-
-### 👉 [Using YallaFlow](docs/using-yallaflow.md)
-
-Then go deeper only where you need to:
-
-| Documentation | Purpose |
+| Guide | What it covers |
 | --- | --- |
-| [Installation](docs/installation.md) | installation options, legacy projects, upgrades |
+| [Using YallaFlow](docs/using-yallaflow.md) | the practical end-to-end guide: start here |
+| [Installation](docs/installation.md) | install options, updating, legacy projects |
+| [Tickets, AI QC & Smart Demo](docs/connected-requirements-and-quality.md) | connected requirements, optional QC and demos |
 | [Shared Projects](docs/shared-projects.md) | one project understanding for the whole team, through Git |
-| [Tickets, AI QC & Smart Demo](docs/connected-requirements-and-quality.md) | import GitHub/Jira/Azure DevOps tickets; optional Playwright QC and recorded demos |
-| [Canonical workflows](docs/workflows.md) | Greenfield, Brownfield, bugs, investigations, features, teams |
-| [Feature guide](docs/guide.md) | detailed YallaFlow behavior |
+| [Canonical workflows](docs/workflows.md) | Greenfield, Brownfield, bugs, features, investigations, teams |
 | [Project memory](docs/project-memory.md) | durable context, evidence and freshness |
 | [CLI reference](docs/cli.md) | every command and flag |
 | [Architecture](docs/architecture.md) | internal concepts and design |
-| [Security](docs/security.md) | local-first trust model, secret redaction, sources |
+| [Security](docs/security.md) | trust model, secret redaction, network boundary |
 | [Limitations](docs/limitations.md) | current boundaries |
-| [Roadmap](docs/roadmap.md) | what comes next |
-| [Upgrading to 1.1.0](docs/upgrading-to-v1.1.0.md) | upgrading from 1.0.x; the new optional capabilities |
-| [Upgrading to 1.0.1](docs/upgrading-to-v1.0.1.md) | upgrading from 1.0.0; recovering a change made without a work item |
-| [Upgrading to 1.0](docs/upgrading-to-v1.0.md) | upgrading from a 0.3.x prerelease |
-| [Releasing & compatibility](docs/releasing.md) | versioning and the 1.0 compatibility promise |
+| [Releasing & compatibility](docs/releasing.md) | Semantic Versioning and the compatibility promise |
 | [Changelog](CHANGELOG.md) | release history |
 
----
+## Status
 
-## Current status
+**1.1.0** adds connected requirements and optional AI QC and Smart Demo. 1.0.0 was the first public, stable release. YallaFlow follows Semantic Versioning and keeps existing workspaces readable ([compatibility promise](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise)).
 
-Current version: **1.1.0**: connected requirements (GitHub Issues, Jira, Azure DevOps) and optional AI QC and Smart Demo with Playwright — all opt-in, nothing changes if you do not use them. 1.0.0 was the first public, stable release.
+- **Local-first.** There is no YallaFlow server, account, or cloud service.
+- **Agent-agnostic**, with first-party setup for Claude Code and Codex.
+- **No AI calls and no telemetry.** YallaFlow touches the network only when you explicitly fetch a tracker ticket.
+- **Not a project-management tool**, and not a bot that commits or pushes for you.
 
-YallaFlow is:
-
-- local-first: no YallaFlow server, account, or cloud service — your project memory stays in your repository,
-- single-user by default, and shareable with a team through ordinary Git once a maintainer enables a Shared Project,
-- AI-agent agnostic, with first-party setup for Claude Code and Codex,
-- stable: from 1.0.0 it follows Semantic Versioning, keeps existing workspaces readable, and never silently rewrites historical work ([compatibility promise](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise)).
-
-It does not call an LLM itself, sends no telemetry, and touches the network only when you explicitly ask it to fetch a tracker ticket (`--fetch`). The coding agent does the semantic reasoning; YallaFlow provides deterministic governance and durable engineering state around that reasoning.
-
-It is not a cloud service, a real-time collaboration server, a project-management tool, or a bot that commits or pushes for you.
+See [Limitations](docs/limitations.md) for current boundaries, for example that Windows is not yet verified.
 
 ---
-
-## The idea
 
 **Agent reasons. YallaFlow governs. Project memory persists.**
-
-~~~text
-Understand → Decide → Change → Verify → Remember → Revalidate
-~~~
 
 > **Give AI your project, not just your prompt.**

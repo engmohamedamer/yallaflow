@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "project",
+      "source": "implementation-runtime",
+      "summary": "YallaFlow is an AI-agnostic engineering governance layer for coding agents (Claude Code, Codex): it gives the agent durable project memory, an adaptive workflow per request, and evidence that work is actually done, so the developer describes intent instead of repeating project context in every prompt.",
+      "evidence": [
+        "verification:V-002",
+        "runtime:node src/cli.js context status (passed)",
+        "package.json",
+        "README.md",
+        "docs/architecture.md"
+      ],
+      "confidence": "confirmed",
+      "provenance": "repository",
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0001"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-19T23:00:10.020Z",
+      "factId": "CTX-0001",
+      "promotedAt": "2026-10-19T23:00:10.797Z",
+      "target": "PROJECT.md"
+    },
+    {
+      "id": "K-002",
+      "kind": "project",
+      "source": "implementation-runtime",
+      "summary": "It serves developers who use AI coding agents on Greenfield and Brownfield repositories, alone or as a team sharing one project through ordinary Git (Shared Projects). The normal journey is install, then `yallaflow init`, then open the agent and describe the work; the agent orients itself through YallaFlow automatically.",
+      "evidence": [
+        "verification:V-002",
+        "README.md",
+        "docs/using-yallaflow.md",
+        "docs/shared-projects.md"
+      ],
+      "confidence": "confirmed",
+      "provenance": "repository",
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0002"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-19T23:00:10.180Z",
+      "factId": "CTX-0002",
+      "promotedAt": "2026-10-19T23:00:11.038Z",
+      "target": "PROJECT.md"
+    },
+    {
+      "id": "K-003",
+      "kind": "project",
+      "source": "implementation-runtime",
+      "summary": "From 1.0.0 YallaFlow is a public npm package: package.json names `yallaflow` (no private flag, MIT, publishConfig.access public) and the primary documented install is `npm install -g yallaflow`; Git-tag and tarball installs remain documented alternatives. The 0.2.0-internal.1 … 0.3.10-internal.4 versions were internal prereleases, git-tagged only and never published to npm; every released tag is immutable. 1.0.0 is published manually by the package owner; later versions are published by the release workflow.",
+      "evidence": [
+        "verification:V-002",
+        "package.json",
+        "README.md",
+        "docs/installation.md",
+        "docs/releasing.md"
+      ],
+      "confidence": "confirmed",
+      "provenance": "repository",
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0058"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-19T23:00:10.333Z",
+      "factId": "CTX-0058",
+      "promotedAt": "2026-10-19T23:00:11.267Z",
+      "target": "PROJECT.md"
+    },
+    {
+      "id": "K-004",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Documentation set: - README.md is the concise landing page (value proposition, badges, quick start, three Mermaid diagrams, what's new, links to the guides); docs/using-yallaflow.md is the practical developer guide. - docs/cli.md is the command reference. - docs/architecture.md, docs/project-memory.md and docs/shared-projects.md cover the design; docs/connected-requirements-and-quality.md is the guide to ticket import, AI QC and Smart Demo. - docs/security.md and docs/limitations.md cover trust boundaries and gaps; docs/releasing.md covers the release policy. - docs/upgrading-to-*.md are per-version upgrade notes; .github/release-notes/ holds GitHub release notes.",
+      "evidence": [
+        "verification:V-002",
+        "runtime:node src/cli.js context status (passed)",
+        "README.md",
+        "docs/using-yallaflow.md",
+        "docs/cli.md",
+        "docs/architecture.md",
+        "docs/connected-requirements-and-quality.md",
+        "docs/limitations.md",
+        "docs/upgrading-to-v1.1.0.md"
+      ],
+      "confidence": "confirmed",
+      "provenance": "repository",
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0069"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-19T23:00:10.493Z",
+      "factId": "CTX-0084",
+      "promotedAt": "2026-10-19T23:00:11.502Z",
+      "target": "context/conventions.md"
+    }
+  ],
+  "updatedAt": "2026-10-19T23:00:11.502Z",
+  "reviewedAt": "2026-10-19T23:00:11.502Z"
+}

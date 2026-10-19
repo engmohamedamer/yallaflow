@@ -15,34 +15,38 @@
       "evidence": [
         {
           "type": "runtime",
-          "description": "node src/cli.js context status (passed)",
-          "workId": "PF-0016",
-          "verificationRunId": "V-001"
+          "description": "script /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/readme.afL1rt/doc-checks.sh (passed)",
+          "workId": "PF-0019",
+          "verificationRunId": "V-002"
+        },
+        {
+          "type": "runtime",
+          "description": "node src/cli.js context status (passed)"
         },
         {
           "type": "repository",
           "path": "package.json",
           "contentHash": "sha256:ab69e21ec6b61c111c490c1f690b8d02f79f2a8aa9deaa8e90e2245a91d7d8fe",
-          "gitCommit": "9c38eec4a95b29f9b500cf3722707e67667f743e",
+          "gitCommit": "59bf70eeb865de1ba091592a5d92e0d0b72b93f8",
           "workingTree": "head"
         },
         {
           "type": "repository",
           "path": "README.md",
-          "contentHash": "sha256:06a4f04488ac3eeeab9ef8ea38148e50af86e05f1c6194eaeebef5e1094fa987",
-          "gitCommit": "9c38eec4a95b29f9b500cf3722707e67667f743e",
-          "workingTree": "head"
+          "contentHash": "sha256:74eafa93f1b578a26753b598903ec052858c26fbde65e1768c0fcc77f7f253a6",
+          "gitCommit": "59bf70eeb865de1ba091592a5d92e0d0b72b93f8",
+          "workingTree": "modified"
         },
         {
           "type": "repository",
           "path": "docs/architecture.md",
           "contentHash": "sha256:7b599fa216c1435db0f5e6eda9614a84eb2e05a229b13e3f19002336b50b3a25",
-          "gitCommit": "9c38eec4a95b29f9b500cf3722707e67667f743e",
-          "workingTree": "modified"
+          "gitCommit": "59bf70eeb865de1ba091592a5d92e0d0b72b93f8",
+          "workingTree": "head"
         }
       ],
-      "verifiedAt": "2026-10-19T20:31:34.904Z",
-      "verifiedAtCommit": "9c38eec4a95b29f9b500cf3722707e67667f743e",
+      "verifiedAt": "2026-10-19T23:00:10.797Z",
+      "verifiedAtCommit": "59bf70eeb865de1ba091592a5d92e0d0b72b93f8",
       "supersedes": [],
       "supersededBy": null,
       "history": [
@@ -234,10 +238,47 @@
           ],
           "previousVerifiedAt": "2026-10-19T17:51:44.084Z",
           "previousVerifiedAtCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77"
+        },
+        {
+          "action": "reconfirmed",
+          "at": "2026-10-19T23:00:10.797Z",
+          "workId": "PF-0019",
+          "candidateId": "K-001",
+          "previousEvidence": [
+            {
+              "type": "runtime",
+              "description": "node src/cli.js context status (passed)",
+              "workId": "PF-0016",
+              "verificationRunId": "V-001"
+            },
+            {
+              "type": "repository",
+              "path": "package.json",
+              "contentHash": "sha256:ab69e21ec6b61c111c490c1f690b8d02f79f2a8aa9deaa8e90e2245a91d7d8fe",
+              "gitCommit": "9c38eec4a95b29f9b500cf3722707e67667f743e",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "README.md",
+              "contentHash": "sha256:06a4f04488ac3eeeab9ef8ea38148e50af86e05f1c6194eaeebef5e1094fa987",
+              "gitCommit": "9c38eec4a95b29f9b500cf3722707e67667f743e",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "docs/architecture.md",
+              "contentHash": "sha256:7b599fa216c1435db0f5e6eda9614a84eb2e05a229b13e3f19002336b50b3a25",
+              "gitCommit": "9c38eec4a95b29f9b500cf3722707e67667f743e",
+              "workingTree": "modified"
+            }
+          ],
+          "previousVerifiedAt": "2026-10-19T20:31:34.904Z",
+          "previousVerifiedAtCommit": "9c38eec4a95b29f9b500cf3722707e67667f743e"
         }
       ],
       "createdAt": "2026-10-12T20:06:11.387Z",
-      "updatedAt": "2026-10-19T20:31:34.904Z"
+      "updatedAt": "2026-10-19T23:00:10.797Z"
     },
     {
       "id": "CTX-0002",
@@ -252,29 +293,35 @@
       },
       "evidence": [
         {
+          "type": "runtime",
+          "description": "script /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/readme.afL1rt/doc-checks.sh (passed)",
+          "workId": "PF-0019",
+          "verificationRunId": "V-002"
+        },
+        {
           "type": "repository",
           "path": "README.md",
-          "contentHash": "sha256:06a4f04488ac3eeeab9ef8ea38148e50af86e05f1c6194eaeebef5e1094fa987",
-          "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+          "contentHash": "sha256:74eafa93f1b578a26753b598903ec052858c26fbde65e1768c0fcc77f7f253a6",
+          "gitCommit": "59bf70eeb865de1ba091592a5d92e0d0b72b93f8",
           "workingTree": "modified"
         },
         {
           "type": "repository",
           "path": "docs/using-yallaflow.md",
           "contentHash": "sha256:72c4199993117f234d0aa7bb2737ae83880d48f3725ca39bf4634b39d7701faa",
-          "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
-          "workingTree": "modified"
+          "gitCommit": "59bf70eeb865de1ba091592a5d92e0d0b72b93f8",
+          "workingTree": "head"
         },
         {
           "type": "repository",
           "path": "docs/shared-projects.md",
           "contentHash": "sha256:f1a3f9c629a5311922d224759aef881457321302c7a22abdc29efd809d079a7d",
-          "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+          "gitCommit": "59bf70eeb865de1ba091592a5d92e0d0b72b93f8",
           "workingTree": "head"
         }
       ],
-      "verifiedAt": "2026-10-19T16:37:31.948Z",
-      "verifiedAtCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+      "verifiedAt": "2026-10-19T23:00:11.038Z",
+      "verifiedAtCommit": "59bf70eeb865de1ba091592a5d92e0d0b72b93f8",
       "supersedes": [],
       "supersededBy": null,
       "history": [
@@ -404,10 +451,41 @@
           ],
           "previousVerifiedAt": "2026-10-15T09:44:33.205Z",
           "previousVerifiedAtCommit": "6c01a54ba71cea6254b4e10391ca1c2cb40916c4"
+        },
+        {
+          "action": "reconfirmed",
+          "at": "2026-10-19T23:00:11.038Z",
+          "workId": "PF-0019",
+          "candidateId": "K-002",
+          "previousEvidence": [
+            {
+              "type": "repository",
+              "path": "README.md",
+              "contentHash": "sha256:06a4f04488ac3eeeab9ef8ea38148e50af86e05f1c6194eaeebef5e1094fa987",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "docs/using-yallaflow.md",
+              "contentHash": "sha256:72c4199993117f234d0aa7bb2737ae83880d48f3725ca39bf4634b39d7701faa",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "docs/shared-projects.md",
+              "contentHash": "sha256:f1a3f9c629a5311922d224759aef881457321302c7a22abdc29efd809d079a7d",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "head"
+            }
+          ],
+          "previousVerifiedAt": "2026-10-19T16:37:31.948Z",
+          "previousVerifiedAtCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77"
         }
       ],
       "createdAt": "2026-10-12T20:06:11.387Z",
-      "updatedAt": "2026-10-19T16:37:31.948Z"
+      "updatedAt": "2026-10-19T23:00:11.038Z"
     },
     {
       "id": "CTX-0003",
@@ -6697,36 +6775,42 @@
       },
       "evidence": [
         {
+          "type": "runtime",
+          "description": "script /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/readme.afL1rt/doc-checks.sh (passed)",
+          "workId": "PF-0019",
+          "verificationRunId": "V-002"
+        },
+        {
           "type": "repository",
           "path": "package.json",
           "contentHash": "sha256:ab69e21ec6b61c111c490c1f690b8d02f79f2a8aa9deaa8e90e2245a91d7d8fe",
-          "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
-          "workingTree": "modified"
+          "gitCommit": "59bf70eeb865de1ba091592a5d92e0d0b72b93f8",
+          "workingTree": "head"
         },
         {
           "type": "repository",
           "path": "README.md",
-          "contentHash": "sha256:06a4f04488ac3eeeab9ef8ea38148e50af86e05f1c6194eaeebef5e1094fa987",
-          "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+          "contentHash": "sha256:74eafa93f1b578a26753b598903ec052858c26fbde65e1768c0fcc77f7f253a6",
+          "gitCommit": "59bf70eeb865de1ba091592a5d92e0d0b72b93f8",
           "workingTree": "modified"
         },
         {
           "type": "repository",
           "path": "docs/installation.md",
           "contentHash": "sha256:50b6dc5b265f2ce62f698a0cc0f6af7fc4200fb83e8f6f6063af6cb9ff012e56",
-          "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+          "gitCommit": "59bf70eeb865de1ba091592a5d92e0d0b72b93f8",
           "workingTree": "head"
         },
         {
           "type": "repository",
           "path": "docs/releasing.md",
           "contentHash": "sha256:74f4d57d0c295b1223c31400d74a73a4e8d2ba69fb175a7a3b6a5402da37da8d",
-          "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
-          "workingTree": "modified"
+          "gitCommit": "59bf70eeb865de1ba091592a5d92e0d0b72b93f8",
+          "workingTree": "head"
         }
       ],
-      "verifiedAt": "2026-10-19T16:37:35.852Z",
-      "verifiedAtCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+      "verifiedAt": "2026-10-19T23:00:11.267Z",
+      "verifiedAtCommit": "59bf70eeb865de1ba091592a5d92e0d0b72b93f8",
       "supersedes": [
         "CTX-0004"
       ],
@@ -6820,10 +6904,48 @@
           ],
           "previousVerifiedAt": "2026-10-15T09:44:37.910Z",
           "previousVerifiedAtCommit": "6c01a54ba71cea6254b4e10391ca1c2cb40916c4"
+        },
+        {
+          "action": "reconfirmed",
+          "at": "2026-10-19T23:00:11.267Z",
+          "workId": "PF-0019",
+          "candidateId": "K-003",
+          "previousEvidence": [
+            {
+              "type": "repository",
+              "path": "package.json",
+              "contentHash": "sha256:ab69e21ec6b61c111c490c1f690b8d02f79f2a8aa9deaa8e90e2245a91d7d8fe",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "README.md",
+              "contentHash": "sha256:06a4f04488ac3eeeab9ef8ea38148e50af86e05f1c6194eaeebef5e1094fa987",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "docs/installation.md",
+              "contentHash": "sha256:50b6dc5b265f2ce62f698a0cc0f6af7fc4200fb83e8f6f6063af6cb9ff012e56",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "docs/releasing.md",
+              "contentHash": "sha256:74f4d57d0c295b1223c31400d74a73a4e8d2ba69fb175a7a3b6a5402da37da8d",
+              "gitCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77",
+              "workingTree": "modified"
+            }
+          ],
+          "previousVerifiedAt": "2026-10-19T16:37:35.852Z",
+          "previousVerifiedAtCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77"
         }
       ],
       "createdAt": "2026-10-13T12:25:21.927Z",
-      "updatedAt": "2026-10-19T16:37:35.852Z"
+      "updatedAt": "2026-10-19T23:00:11.267Z"
     },
     {
       "id": "CTX-0059",
@@ -8167,7 +8289,7 @@
     {
       "id": "CTX-0069",
       "area": "convention",
-      "state": "current",
+      "state": "superseded",
       "confidence": "confirmed",
       "summary": "Documentation set: - README.md is the simple first-use journey; docs/using-yallaflow.md is the practical developer guide. - docs/cli.md is the command reference. - docs/architecture.md, docs/project-memory.md and docs/shared-projects.md cover the design; docs/connected-requirements-and-quality.md is the guide to ticket import, AI QC and Smart Demo. - docs/security.md and docs/limitations.md cover trust boundaries and gaps; docs/releasing.md covers the release policy. - docs/upgrading-to-*.md are per-version upgrade notes; .github/release-notes/ holds GitHub release notes.",
       "provenance": "repository",
@@ -8241,7 +8363,7 @@
       "supersedes": [
         "CTX-0040"
       ],
-      "supersededBy": null,
+      "supersededBy": "CTX-0084",
       "history": [
         {
           "action": "introduced",
@@ -8432,10 +8554,17 @@
           ],
           "previousVerifiedAt": "2026-10-19T20:31:39.180Z",
           "previousVerifiedAtCommit": "9c38eec4a95b29f9b500cf3722707e67667f743e"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-10-19T23:00:11.502Z",
+          "supersededBy": "CTX-0084",
+          "workId": "PF-0019",
+          "candidateId": "K-004"
         }
       ],
       "createdAt": "2026-10-19T16:37:37.712Z",
-      "updatedAt": "2026-10-19T22:48:07.033Z"
+      "updatedAt": "2026-10-19T23:00:11.502Z"
     },
     {
       "id": "CTX-0070",
@@ -9826,7 +9955,97 @@
       ],
       "createdAt": "2026-10-19T22:47:46.925Z",
       "updatedAt": "2026-10-19T22:47:46.925Z"
+    },
+    {
+      "id": "CTX-0084",
+      "area": "convention",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Documentation set: - README.md is the concise landing page (value proposition, badges, quick start, three Mermaid diagrams, what's new, links to the guides); docs/using-yallaflow.md is the practical developer guide. - docs/cli.md is the command reference. - docs/architecture.md, docs/project-memory.md and docs/shared-projects.md cover the design; docs/connected-requirements-and-quality.md is the guide to ticket import, AI QC and Smart Demo. - docs/security.md and docs/limitations.md cover trust boundaries and gaps; docs/releasing.md covers the release policy. - docs/upgrading-to-*.md are per-version upgrade notes; .github/release-notes/ holds GitHub release notes.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0019",
+        "candidateId": "K-004"
+      },
+      "evidence": [
+        {
+          "type": "runtime",
+          "description": "script /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/readme.afL1rt/doc-checks.sh (passed)",
+          "workId": "PF-0019",
+          "verificationRunId": "V-002"
+        },
+        {
+          "type": "runtime",
+          "description": "node src/cli.js context status (passed)"
+        },
+        {
+          "type": "repository",
+          "path": "README.md",
+          "contentHash": "sha256:74eafa93f1b578a26753b598903ec052858c26fbde65e1768c0fcc77f7f253a6",
+          "gitCommit": "59bf70eeb865de1ba091592a5d92e0d0b72b93f8",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "docs/using-yallaflow.md",
+          "contentHash": "sha256:72c4199993117f234d0aa7bb2737ae83880d48f3725ca39bf4634b39d7701faa",
+          "gitCommit": "59bf70eeb865de1ba091592a5d92e0d0b72b93f8",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "docs/cli.md",
+          "contentHash": "sha256:dbe26363133b990bddd34915d6a0960a4947a6e3a2defe955816aad3a3de414a",
+          "gitCommit": "59bf70eeb865de1ba091592a5d92e0d0b72b93f8",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "docs/architecture.md",
+          "contentHash": "sha256:7b599fa216c1435db0f5e6eda9614a84eb2e05a229b13e3f19002336b50b3a25",
+          "gitCommit": "59bf70eeb865de1ba091592a5d92e0d0b72b93f8",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "docs/connected-requirements-and-quality.md",
+          "contentHash": "sha256:488f9501ef828bf99748583ec362e44dbfa0525e5d8b590462a8f37d482c079a",
+          "gitCommit": "59bf70eeb865de1ba091592a5d92e0d0b72b93f8",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "docs/limitations.md",
+          "contentHash": "sha256:4a770a674b558cf67debbe8c7646192b3b2fce4a78d2f69195310d30078794e3",
+          "gitCommit": "59bf70eeb865de1ba091592a5d92e0d0b72b93f8",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "docs/upgrading-to-v1.1.0.md",
+          "contentHash": "sha256:3b452bbc424672d751447af6d7d55e288790a0ab11468777cac0e075a9fe3e66",
+          "gitCommit": "59bf70eeb865de1ba091592a5d92e0d0b72b93f8",
+          "workingTree": "head"
+        }
+      ],
+      "verifiedAt": "2026-10-19T23:00:11.502Z",
+      "verifiedAtCommit": "59bf70eeb865de1ba091592a5d92e0d0b72b93f8",
+      "supersedes": [
+        "CTX-0069"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-10-19T23:00:11.502Z",
+          "workId": "PF-0019",
+          "candidateId": "K-004",
+          "supersedes": "CTX-0069"
+        }
+      ],
+      "createdAt": "2026-10-19T23:00:11.502Z",
+      "updatedAt": "2026-10-19T23:00:11.502Z"
     }
   ],
-  "updatedAt": "2026-10-19T22:48:07.781Z"
+  "updatedAt": "2026-10-19T23:00:11.502Z"
 }

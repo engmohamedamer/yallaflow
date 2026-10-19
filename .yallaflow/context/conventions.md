@@ -87,26 +87,26 @@
   - src/knowledge/constants.js (repository @ 032f32c)
   - docs/upgrading-to-v1.0.md (repository @ 032f32c)
 
-<!-- yallaflow-fact:CTX-0069 -->
-### CTX-0069 — Documentation set: - README.md is the simple first-use journey; docs/using-yallaflow.md is the practical developer guide. - docs/cli.md is the command reference. - docs/architecture.md, docs/project-memory.md and docs/shared-projects.md cover the design; docs/connected-requirements-and-quality.md is the guide to ticket import, AI QC and Smart Demo. - docs/security.md and docs/limitations.md cover trust boundaries and gaps; docs/releasing.md covers the release policy. - docs/upgrading-to-*.md are per-version upgrade notes; .github/release-notes/ holds GitHub release notes.
+<!-- yallaflow-fact:CTX-0084 -->
+### CTX-0084 — Documentation set: - README.md is the concise landing page (value proposition, badges, quick start, three Mermaid diagrams, what's new, links to the guides); docs/using-yallaflow.md is the practical developer guide. - docs/cli.md is the command reference. - docs/architecture.md, docs/project-memory.md and docs/shared-projects.md cover the design; docs/connected-requirements-and-quality.md is the guide to ticket import, AI QC and Smart Demo. - docs/security.md and docs/limitations.md cover trust boundaries and gaps; docs/releasing.md covers the release policy. - docs/upgrading-to-*.md are per-version upgrade notes; .github/release-notes/ holds GitHub release notes.
 
 - **State:** current
 - **Confidence:** confirmed
 - **Provenance:** repository
-- **Source work:** PF-0011
-- **Knowledge ID:** K-027
-- **Promoted at:** 2026-10-19T16:37:37.712Z
-- **Supersedes:** CTX-0040
-- **Verified:** 2026-10-19T22:48:07.033Z (commit d3a70c5)
+- **Source work:** PF-0019
+- **Knowledge ID:** K-004
+- **Promoted at:** 2026-10-19T23:00:11.502Z
+- **Supersedes:** CTX-0069
+- **Verified:** 2026-10-19T23:00:11.502Z (commit 59bf70e)
 - **Evidence:**
-  - node src/cli.js context status (passed) (runtime, PF-0018 V-001)
+  - script /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/readme.afL1rt/doc-checks.sh (passed) (runtime, PF-0019 V-002)
   - node src/cli.js context status (passed) (runtime)
-  - README.md (repository @ d3a70c5)
-  - docs/using-yallaflow.md (repository @ d3a70c5)
-  - docs/cli.md (repository @ d3a70c5)
-  - docs/architecture.md (repository @ d3a70c5)
-  - docs/connected-requirements-and-quality.md (repository @ d3a70c5)
-  - docs/limitations.md (repository @ d3a70c5)
-  - docs/upgrading-to-v1.1.0.md (repository @ d3a70c5)
+  - README.md (repository @ 59bf70e)
+  - docs/using-yallaflow.md (repository @ 59bf70e)
+  - docs/cli.md (repository @ 59bf70e)
+  - docs/architecture.md (repository @ 59bf70e)
+  - docs/connected-requirements-and-quality.md (repository @ 59bf70e)
+  - docs/limitations.md (repository @ 59bf70e)
+  - docs/upgrading-to-v1.1.0.md (repository @ 59bf70e)
 
 <!-- yallaflow-context:end -->

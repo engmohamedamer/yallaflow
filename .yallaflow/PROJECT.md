@@ -17,12 +17,13 @@ brownfield
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-001)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-19T20:31:34.904Z (commit 9c38eec)
+- **Verified:** 2026-10-19T23:00:10.797Z (commit 59bf70e)
 - **Evidence:**
-  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
-  - package.json (repository @ 9c38eec)
-  - README.md (repository @ 9c38eec)
-  - docs/architecture.md (repository @ 9c38eec)
+  - script /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/readme.afL1rt/doc-checks.sh (passed) (runtime, PF-0019 V-002)
+  - node src/cli.js context status (passed) (runtime)
+  - package.json (repository @ 59bf70e)
+  - README.md (repository @ 59bf70e)
+  - docs/architecture.md (repository @ 59bf70e)
 
 <!-- yallaflow-fact:CTX-0002 -->
 ### CTX-0002 — It serves developers who use AI coding agents on Greenfield and Brownfield repositories, alone or as a team sharing one project through ordinary Git (Shared Projects). The normal journey is install, then `yallaflow init`, then open the agent and describe the work; the agent orients itself through YallaFlow automatically.
@@ -32,11 +33,12 @@ brownfield
 - **Provenance:** repository
 - **From baseline:** PF-0002 (BF-002)
 - **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-19T16:37:31.948Z (commit 032f32c)
+- **Verified:** 2026-10-19T23:00:11.038Z (commit 59bf70e)
 - **Evidence:**
-  - README.md (repository @ 032f32c)
-  - docs/using-yallaflow.md (repository @ 032f32c)
-  - docs/shared-projects.md (repository @ 032f32c)
+  - script /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/readme.afL1rt/doc-checks.sh (passed) (runtime, PF-0019 V-002)
+  - README.md (repository @ 59bf70e)
+  - docs/using-yallaflow.md (repository @ 59bf70e)
+  - docs/shared-projects.md (repository @ 59bf70e)
 
 <!-- yallaflow-fact:CTX-0003 -->
 ### CTX-0003 — Core product principles: discover before asking; understand before changing; prove before claiming; remember after finishing; revalidate before trusting stale knowledge. Work history is immutable while project memory evolves. Durable state beats conversational memory. Investigation is read-only.
@@ -62,12 +64,13 @@ brownfield
 - **Knowledge ID:** K-001
 - **Promoted at:** 2026-10-13T12:25:21.927Z
 - **Supersedes:** CTX-0004
-- **Verified:** 2026-10-19T16:37:35.852Z (commit 032f32c)
+- **Verified:** 2026-10-19T23:00:11.267Z (commit 59bf70e)
 - **Evidence:**
-  - package.json (repository @ 032f32c)
-  - README.md (repository @ 032f32c)
-  - docs/installation.md (repository @ 032f32c)
-  - docs/releasing.md (repository @ 032f32c)
+  - script /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/readme.afL1rt/doc-checks.sh (passed) (runtime, PF-0019 V-002)
+  - package.json (repository @ 59bf70e)
+  - README.md (repository @ 59bf70e)
+  - docs/installation.md (repository @ 59bf70e)
+  - docs/releasing.md (repository @ 59bf70e)
 
 <!-- yallaflow-fact:CTX-0067 -->
 ### CTX-0067 — Core modules: CLI entry and argument parsing (src/cli.js); command handlers (src/commands/); workspace, IDs, lifecycle, progress and verification evidence (src/core/); routing and guidance (src/behavior/); Skill Registry (src/skills/); Agent Contract and bootstraps (src/agent/); project-memory ledger (src/context/); knowledge promotion (src/knowledge/); Brownfield baseline and the project-understanding gate (src/baseline/); delivery convergence (src/delivery/); Shared Projects (src/shared/); source intake (src/intake/), including the tracker providers (src/intake/providers/: GitHub, Jira, Azure DevOps adapters, the normalized ticket, and the only network client, used solely by intake ticket --fetch); optional quality delivery (src/quality/: QC and Smart Demo ledgers, local artifacts, reports); repository inventory (src/inventory/); discovery purpose (src/purpose/); durable secret redaction (src/security/); decomposition, questions, reviews, reconciliation, and limitations.

@@ -1,0 +1,6 @@
+headings: 10 relative links: 23 mermaid blocks: 3
+PASS structure, relative links and anchors
+PASS badge images reachable
+PASS npm package page target exists (npmjs.com blocks curl; checked via registry)
+PASS README.md is in the package
+Mermaid: parsed+rendered 3/3 diagrams with mermaid 10.9.1 and 11.4.1, default and dark themes; full README rendered with github-markdown-css light/dark (screenshots in /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/readme.afL1rt)
