@@ -119,11 +119,10 @@
 - **Knowledge ID:** K-005
 - **Promoted at:** 2026-10-28T12:52:54.424Z
 - **Supersedes:** CTX-0086
-- **Verified:** 2026-10-28T12:52:54.424Z (commit 222730b)
+- **Verified:** 2026-10-28T13:37:53.289Z (commit ee942a7)
 - **Evidence:**
-  - site/index.html (repository @ 222730b)
-  - site/favicon.svg (repository @ 222730b)
-  - site/media/yallaflow-promo.mp4 (repository @ 222730b)
-  - the maintainer decided on 2026-10-28 to keep only the 30-second promo on the website and link the full demo on LinkedIn instead of self-hosting it (user-confirmed)
+  - site/index.html (repository @ ee942a7)
+  - site/favicon.svg (repository @ ee942a7)
+  - grep -c '<meta name="google-site-verification" content="3R7WptzIqENffyyYsLfwZY4B75xEgjSkio1YAyk9erc">' site/index.html | grep -qx 1 && python3 -I /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/check-site.py site 2>/dev/null | grep -E '^(FAIL|[0-9]+ failure)' && python3 -I /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/check-site.py site >/dev/null 2>&1 && git diff --stat && git diff --quiet HEAD -- src resources docs package.json package-lock.json .github CHANGELOG.md README.md && echo 'only site/index.html changed outside .yallaflow' (passed) (runtime, PF-0022 V-036)
 
 <!-- yallaflow-context:end -->

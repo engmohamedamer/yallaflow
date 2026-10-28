@@ -25,3 +25,6 @@ Created: 2026-10-28T10:29:12.996Z
 - 2026-10-28T12:49:46.187Z Stage corrected: VERIFICATION → IMPLEMENTATION
 - 2026-10-28T12:49:46.743Z Stage: IMPLEMENTATION → VERIFICATION
 - 2026-10-28T12:52:54.668Z Stage: VERIFICATION → DONE
+- 2026-10-28T13:37:30.382Z Reopened: DONE → IMPLEMENTATION (Add the Google Search Console HTML-tag verification meta (google-site-verification) to site/index.html so the maintainer can verify the URL-prefix property and submit the sitemap.)
+- 2026-10-28T13:37:39.178Z Stage: IMPLEMENTATION → VERIFICATION
+- 2026-10-28T13:37:53.543Z Stage: VERIFICATION → DONE

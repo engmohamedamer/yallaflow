@@ -11,7 +11,7 @@
     "reviewRequired": true
   },
   "createdAt": "2026-10-28T10:29:12.996Z",
-  "updatedAt": "2026-10-28T12:52:54.668Z",
+  "updatedAt": "2026-10-28T13:37:53.543Z",
   "title": "Brand visibility and GitHub SEO: add a static GitHub Pages site (site/), a Pages deploy workflow isolated from release.yml, and small README discoverability edits; no product, version, or release change",
   "routingConfidence": "high",
   "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
@@ -83,9 +83,15 @@
         "V-034",
         "V-035"
       ]
+    },
+    {
+      "completedAt": "2026-10-28T13:37:53.543Z",
+      "verificationRunIds": [
+        "V-036"
+      ]
     }
   ],
-  "lastInvalidationAt": "2026-10-28T12:49:46.187Z",
+  "lastInvalidationAt": "2026-10-28T13:37:30.382Z",
   "lifecycleHistory": [
     {
       "action": "reopen",
@@ -107,6 +113,13 @@
       "toStage": "IMPLEMENTATION",
       "reason": "Maintainer decision: do not self-host the full 8-minute demo; link to it on LinkedIn (https://lnkd.in/p/dG-JC_xq) from the video and resources sections, opening in a new tab with rel=noopener noreferrer. Promo stays self-hosted.",
       "changedAt": "2026-10-28T12:38:03.297Z"
+    },
+    {
+      "action": "reopen",
+      "fromStage": "DONE",
+      "toStage": "IMPLEMENTATION",
+      "reason": "Add the Google Search Console HTML-tag verification meta (google-site-verification) to site/index.html so the maintainer can verify the URL-prefix property and submit the sitemap.",
+      "changedAt": "2026-10-28T13:37:30.382Z"
     }
   ]
 }

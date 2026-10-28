@@ -101,8 +101,28 @@
       "factId": "CTX-0087",
       "promotedAt": "2026-10-28T12:52:54.424Z",
       "target": "context/conventions.md"
+    },
+    {
+      "id": "K-006",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Brand identity for public surfaces (website, social images, videos): name YallaFlow; official tagline 'Give AI your project, not just your prompt.'; brand mark is the >> double chevron from the demo video end card (first chevron #4ed0a5, second #6485ce, rounded strokes); dark navy ground (#0a111f) with teal accents is the primary theme. The project website lives in site/ (served at https://engmohamedamer.github.io/yallaflow/, outside the npm package), with the mark as an inline SVG symbol in site/index.html and as site/favicon.svg. Only the 30-second promo is self-hosted (site/media/); the full 8-minute demo is not hosted in the repository and is linked externally on LinkedIn (https://lnkd.in/p/dG-JC_xq).",
+      "evidence": [
+        "site/index.html",
+        "site/favicon.svg",
+        "verification:V-036"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0087"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-28T13:37:47.976Z",
+      "factId": "CTX-0087",
+      "promotedAt": "2026-10-28T13:37:53.289Z",
+      "target": "context/conventions.md"
     }
   ],
-  "updatedAt": "2026-10-28T12:52:54.424Z",
-  "reviewedAt": "2026-10-28T12:52:54.424Z"
+  "updatedAt": "2026-10-28T13:37:53.289Z",
+  "reviewedAt": "2026-10-28T13:37:53.289Z"
 }

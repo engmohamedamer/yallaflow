@@ -10366,31 +10366,26 @@
         {
           "type": "repository",
           "path": "site/index.html",
-          "contentHash": "sha256:9bf47c971c6888af19a3f6a7352aab010a91b6c05a5fe36200258997f03ce6ed",
-          "gitCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230",
-          "workingTree": "untracked"
+          "contentHash": "sha256:82d6e981b852ca973b7c00ac695c05bc5e31d4e88707edcac09f365684857797",
+          "gitCommit": "ee942a715f0849596af940ea1067dfcc53a87803",
+          "workingTree": "modified"
         },
         {
           "type": "repository",
           "path": "site/favicon.svg",
           "contentHash": "sha256:47a1972c86d909e0819949284e510f43d7675fa61d1dd23eb2ddac0ef03ea70e",
-          "gitCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230",
-          "workingTree": "untracked"
+          "gitCommit": "ee942a715f0849596af940ea1067dfcc53a87803",
+          "workingTree": "head"
         },
         {
-          "type": "repository",
-          "path": "site/media/yallaflow-promo.mp4",
-          "contentHash": "sha256:ba55cfd29a14cfafea797892812b2204533de61d8a0c81e884ff0bef354a1bb4",
-          "gitCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230",
-          "workingTree": "untracked"
-        },
-        {
-          "type": "user-confirmed",
-          "description": "the maintainer decided on 2026-10-28 to keep only the 30-second promo on the website and link the full demo on LinkedIn instead of self-hosting it"
+          "type": "runtime",
+          "description": "grep -c '<meta name=\"google-site-verification\" content=\"3R7WptzIqENffyyYsLfwZY4B75xEgjSkio1YAyk9erc\">' site/index.html | grep -qx 1 && python3 -I /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/check-site.py site 2>/dev/null | grep -E '^(FAIL|[0-9]+ failure)' && python3 -I /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/check-site.py site >/dev/null 2>&1 && git diff --stat && git diff --quiet HEAD -- src resources docs package.json package-lock.json .github CHANGELOG.md README.md && echo 'only site/index.html changed outside .yallaflow' (passed)",
+          "workId": "PF-0022",
+          "verificationRunId": "V-036"
         }
       ],
-      "verifiedAt": "2026-10-28T12:52:54.424Z",
-      "verifiedAtCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230",
+      "verifiedAt": "2026-10-28T13:37:53.289Z",
+      "verifiedAtCommit": "ee942a715f0849596af940ea1067dfcc53a87803",
       "supersedes": [
         "CTX-0086"
       ],
@@ -10402,11 +10397,46 @@
           "workId": "PF-0022",
           "candidateId": "K-005",
           "supersedes": "CTX-0086"
+        },
+        {
+          "action": "reconfirmed",
+          "at": "2026-10-28T13:37:53.289Z",
+          "workId": "PF-0022",
+          "candidateId": "K-006",
+          "previousEvidence": [
+            {
+              "type": "repository",
+              "path": "site/index.html",
+              "contentHash": "sha256:9bf47c971c6888af19a3f6a7352aab010a91b6c05a5fe36200258997f03ce6ed",
+              "gitCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "site/favicon.svg",
+              "contentHash": "sha256:47a1972c86d909e0819949284e510f43d7675fa61d1dd23eb2ddac0ef03ea70e",
+              "gitCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "site/media/yallaflow-promo.mp4",
+              "contentHash": "sha256:ba55cfd29a14cfafea797892812b2204533de61d8a0c81e884ff0bef354a1bb4",
+              "gitCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "user-confirmed",
+              "description": "the maintainer decided on 2026-10-28 to keep only the 30-second promo on the website and link the full demo on LinkedIn instead of self-hosting it"
+            }
+          ],
+          "previousVerifiedAt": "2026-10-28T12:52:54.424Z",
+          "previousVerifiedAtCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230"
         }
       ],
       "createdAt": "2026-10-28T12:52:54.424Z",
-      "updatedAt": "2026-10-28T12:52:54.424Z"
+      "updatedAt": "2026-10-28T13:37:53.289Z"
     }
   ],
-  "updatedAt": "2026-10-28T12:52:54.424Z"
+  "updatedAt": "2026-10-28T13:37:53.289Z"
 }

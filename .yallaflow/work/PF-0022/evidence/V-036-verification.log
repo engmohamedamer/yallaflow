@@ -1,0 +1,9 @@
+0 failure(s)
+ .yallaflow/state/current.yaml          |  6 +++---
+ .yallaflow/work/PF-0022/knowledge.yaml |  5 ++---
+ .yallaflow/work/PF-0022/meta.yaml      | 13 +++++++++---
+ .yallaflow/work/PF-0022/progress.md    |  2 ++
+ .yallaflow/work/PF-0022/progress.yaml  | 36 ++++++++++++++++++----------------
+ site/index.html                        |  1 +
+ 6 files changed, 37 insertions(+), 26 deletions(-)
+only site/index.html changed outside .yallaflow

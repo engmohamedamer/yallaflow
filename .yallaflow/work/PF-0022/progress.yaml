@@ -29,26 +29,20 @@
     },
     "implementation": {
       "status": "completed",
-      "startedAt": "2026-10-28T12:38:03.297Z",
-      "completedAt": "2026-10-28T12:49:46.552Z",
-      "summary": "Added 'Watch the full demo on LinkedIn' (https://lnkd.in/p/dG-JC_xq, verified to resolve to a public LinkedIn post 'YallaFlow in Action — From Setup to Delivery' with an 8:16 video) under the 30-second video's chapter list and as a Resources card; both open in a new tab with rel=noopener noreferrer, an external-link icon and screen-reader text '(opens in a new tab)'. Promo caption reworded to be layout-independent ('in the chapter list on this page'). Full demo is not self-hosted.",
+      "startedAt": "2026-10-28T13:37:30.382Z",
+      "completedAt": "2026-10-28T13:37:39.008Z",
+      "summary": "Added <meta name=\"google-site-verification\"> (Search Console HTML-tag method, token supplied by the maintainer) to the head of site/index.html. No other change.",
       "evidence": [
         "site/index.html"
       ]
     },
     "verification": {
       "status": "completed",
-      "startedAt": "2026-10-28T12:52:49.583Z",
-      "completedAt": "2026-10-28T12:52:49.583Z",
-      "summary": "Final: site checks (links, SEO metadata, JSON-LD, sitemap/robots, media rules, size budget) V-032; axe 0 violations at 4 widths x 2 themes V-033; keyboard 30 focus stops with visible focus V-034; LinkedIn links new-tab + rel=noopener noreferrer, no trackers/autoplay, no other videos or >1 MB files in the tree, product unchanged, npm pack 1.1.0 with no website files V-035; npm run check 766/766 V-029; external links all 200 incl. lnkd.in V-031; npm registry latest = 1.1.0 V-030.",
+      "startedAt": "2026-10-28T13:37:47.811Z",
+      "completedAt": "2026-10-28T13:37:47.811Z",
+      "summary": "Verification meta present exactly once; full site checks pass (0 failures); only site/index.html changed outside .yallaflow (+1 line) V-036.",
       "evidence": [
-        "verification:V-029",
-        "verification:V-030",
-        "verification:V-031",
-        "verification:V-032",
-        "verification:V-033",
-        "verification:V-034",
-        "verification:V-035"
+        "verification:V-036"
       ]
     }
   },
@@ -116,7 +110,21 @@
       "to": "in_progress",
       "reason": "Video caption says 'listed beside the player', which is wrong on mobile where the chapter list is above the player",
       "changedAt": "2026-10-28T12:49:46.182Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Add the Google Search Console HTML-tag verification meta (google-site-verification) to site/index.html so the maintainer can verify the URL-prefix property and submit the sitemap.",
+      "changedAt": "2026-10-28T13:37:30.382Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Add the Google Search Console HTML-tag verification meta (google-site-verification) to site/index.html so the maintainer can verify the URL-prefix property and submit the sitemap.",
+      "changedAt": "2026-10-28T13:37:30.382Z"
     }
   ],
-  "updatedAt": "2026-10-28T12:52:49.583Z"
+  "updatedAt": "2026-10-28T13:37:47.811Z"
 }
