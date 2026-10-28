@@ -20,20 +20,21 @@
   - package.json (repository @ d3a70c5)
   - docs/limitations.md (repository @ d3a70c5)
 
-<!-- yallaflow-fact:CTX-0059 -->
-### CTX-0059 — The only CI is .github/workflows/release.yml, triggered when a GitHub Release is published: a guard job (tag = v+package version, prerelease flag matches, tag on main, version not already on npm — an already-published version ends the run with a notice), a test job running npm ci and npm run check on Node 20, 22 and 24 with full Git history, and a publish job on Node 24 that smoke-tests the packed tarball and runs npm publish with provenance through npm Trusted Publishing (OIDC id-token, no stored npm token). There is no pull-request CI and no container configuration; day-to-day validation is local per docs/releasing.md.
+<!-- yallaflow-fact:CTX-0085 -->
+### CTX-0085 — There are two GitHub Actions workflows. .github/workflows/release.yml is triggered when a GitHub Release is published: a guard job (tag = v+package version, prerelease flag matches, tag on main, version not already on npm — an already-published version ends the run with a notice), a test job running npm ci and npm run check on Node 20, 22 and 24 with full Git history, and a publish job on Node 24 that smoke-tests the packed tarball and runs npm publish with provenance through npm Trusted Publishing (OIDC id-token, no stored npm token). .github/workflows/pages.yml deploys the static website in site/ to GitHub Pages (https://engmohamedamer.github.io/yallaflow/) on pushes to main that touch site/** or the workflow, or on manual dispatch, using OIDC Pages deployment; it never builds, packs, or publishes the package. site/ is outside package.json files, so it never ships in the npm tarball. There is no pull-request CI and no container configuration; day-to-day validation is local per docs/releasing.md.
 
 - **State:** current
 - **Confidence:** confirmed
 - **Provenance:** repository
-- **Source work:** PF-0004
-- **Knowledge ID:** K-002
-- **Promoted at:** 2026-10-13T12:25:22.356Z
-- **Supersedes:** CTX-0034
-- **Verified:** 2026-10-19T16:37:36.068Z (commit 032f32c)
+- **Source work:** PF-0022
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-10-28T10:40:41.176Z
+- **Supersedes:** CTX-0059
+- **Verified:** 2026-10-28T12:33:28.972Z (commit 222730b)
 - **Evidence:**
-  - .github/workflows/release.yml (repository @ 032f32c)
-  - docs/releasing.md (repository @ 032f32c)
-  - PATH=/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/d1aeff28-7394-41fa-aeea-ba8a14616a0b/scratchpad/node/node-v24.21.0-linux-x64/bin:$PATH; node --version && npm test (passed) (runtime)
+  - .github/workflows/pages.yml (repository @ 222730b)
+  - .github/workflows/release.yml (repository @ 222730b)
+  - npm pack --dry-run --json 2>/dev/null | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const p=JSON.parse(s)[0];const f=p.files.map(x=>x.path);const bad=f.filter(x=>/^(site|\.github|\.yallaflow)\//.test(x)||/\.(mp4|webm|mov|jpe?g|png)$/i.test(x));console.log(p.name+"@"+p.version, f.length+" files,", (p.size/1024).toFixed(0)+" KB packed; site/media/images leaked:", bad.length, bad.join(" "));process.exit(bad.length||p.version!=="1.1.0"?1:0)})' (passed) (runtime, PF-0022 V-019)
+  - python3 -I -c "import yaml; d=yaml.safe_load(open('.github/workflows/pages.yml')); on=d[True]; assert sorted(on)==['push','workflow_dispatch'] and on['push']['branches']==['main'] and on['push']['paths']==['site/**','.github/workflows/pages.yml']; steps=d['jobs']['deploy']['steps']; uses=[s.get('uses','').split('@')[0] for s in steps]; assert uses==['actions/checkout','actions/configure-pages','actions/upload-pages-artifact','actions/deploy-pages'] and not any('run' in s for s in steps); assert d['permissions']=={'contents':'read'} and d['jobs']['deploy']['permissions']=={'contents':'read','pages':'write','id-token':'<redacted>'}; assert all(len(s['uses'].split('@')[1])==40 for s in steps); print('pages.yml isolated, least-privilege, SHA-pinned')" && git diff --quiet HEAD -- .github/workflows/release.yml && echo release.yml-unchanged (passed) (runtime, PF-0022 V-025)
 
 <!-- yallaflow-context:end -->

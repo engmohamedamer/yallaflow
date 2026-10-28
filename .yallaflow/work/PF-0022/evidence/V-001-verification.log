@@ -1,0 +1,51 @@
+PASS index.html: html lang
+PASS index.html: exactly one h1
+PASS index.html: no skipped heading levels [1, 2, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 3, 3, 3, 2]
+PASS index.html: absolute site URL https://engmohamedamer.github.io/yallaflow/
+PASS index.html: internal /yallaflow/favicon.svg -> 200
+PASS index.html: anchor #main
+PASS index.html: internal /yallaflow/ -> 200
+PASS index.html: anchor #how-it-works
+PASS index.html: anchor #capabilities
+PASS index.html: anchor #quick-start
+PASS index.html: anchor #resources
+PASS title (70 chars): YallaFlow — Project memory and verified workflows for AI coding agents
+PASS meta description length 147
+PASS canonical
+PASS meta og:title
+PASS meta og:description
+PASS meta og:url
+PASS meta og:image
+PASS meta og:type
+PASS meta twitter:card
+PASS meta twitter:image
+PASS og:url equals canonical
+PASS og:image resolves
+PASS twitter:image resolves
+PASS JSON-LD parses: ['SoftwareApplication', 'WebSite']
+PASS JSON-LD has no ratings/offers/org claims
+PASS JSON-LD version matches package.json
+PASS tagline present verbatim
+PASS 404.html: html lang
+PASS 404.html: exactly one h1
+PASS 404.html: no skipped heading levels [1]
+PASS 404.html: internal /yallaflow/favicon.svg -> 200
+PASS 404.html: internal /yallaflow/ -> 200
+PASS robots.txt served and points at sitemap
+PASS sitemap.xml parses with ['https://engmohamedamer.github.io/yallaflow/']
+PASS favicon.svg served and well-formed
+
+0 failure(s)
+127.0.0.1 - - [28/Oct/2026 13:32:07] "GET /yallaflow/ HTTP/1.1" 200 -
+127.0.0.1 - - [28/Oct/2026 13:32:07] "GET /yallaflow/favicon.svg HTTP/1.1" 200 -
+127.0.0.1 - - [28/Oct/2026 13:32:07] "GET /yallaflow/favicon.svg HTTP/1.1" 200 -
+127.0.0.1 - - [28/Oct/2026 13:32:07] "GET /yallaflow/ HTTP/1.1" 200 -
+127.0.0.1 - - [28/Oct/2026 13:32:07] "GET /yallaflow/ HTTP/1.1" 200 -
+127.0.0.1 - - [28/Oct/2026 13:32:07] "GET /yallaflow/og-image.png HTTP/1.1" 200 -
+127.0.0.1 - - [28/Oct/2026 13:32:07] "GET /yallaflow/og-image.png HTTP/1.1" 200 -
+127.0.0.1 - - [28/Oct/2026 13:32:07] "GET /yallaflow/favicon.svg HTTP/1.1" 200 -
+127.0.0.1 - - [28/Oct/2026 13:32:07] "GET /yallaflow/favicon.svg HTTP/1.1" 200 -
+127.0.0.1 - - [28/Oct/2026 13:32:07] "GET /yallaflow/ HTTP/1.1" 200 -
+127.0.0.1 - - [28/Oct/2026 13:32:07] "GET /yallaflow/ HTTP/1.1" 200 -
+127.0.0.1 - - [28/Oct/2026 13:32:07] "GET /yallaflow/robots.txt HTTP/1.1" 200 -
+127.0.0.1 - - [28/Oct/2026 13:32:07] "GET /yallaflow/favicon.svg HTTP/1.1" 200 -

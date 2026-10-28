@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-10-28T10:29:25.756Z",
+      "completedAt": "2026-10-28T10:29:25.756Z",
+      "summary": "Audit: repo has no GitHub description, topics, homepage or Pages site; no logo/image brand assets exist (brand = name, tagline, README voice); package.json files ships docs/, so a site under docs/ would leak into the npm tarball; only CI is release.yml (on: release published). Site goes in site/ (excluded from files), deployed by a separate Pages workflow on push to main paths site/**.",
+      "evidence": [
+        "package.json",
+        ".github/workflows/release.yml",
+        "README.md"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-10-28T10:29:26.059Z",
+      "completedAt": "2026-10-28T10:29:26.059Z",
+      "summary": "Requested delta: static site at site/ for https://engmohamedamer.github.io/yallaflow/ with SEO metadata, robots, sitemap, favicon, JSON-LD, OG image; separate deploy-pages workflow; small README additions (website link, Pages-friendly wording). No CLI, version, dependency, or release change; no commit/push/deploy/settings change without approval."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-10-28T10:29:26.383Z",
+      "completedAt": "2026-10-28T10:29:26.383Z",
+      "summary": "Plan: site/index.html (inline CSS, no JS deps), site/favicon.svg, site/og-image.svg + rendered og-image.png, site/robots.txt, site/sitemap.xml, site/404.html; .github/workflows/pages.yml (push main paths site/** + workflow_dispatch, actions/upload-pages-artifact + deploy-pages, pages:write id-token:<redacted>); README: website link + badge. Validate links, metadata, npm pack --dry-run, npm run check."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-10-28T12:38:03.297Z",
+      "completedAt": "2026-10-28T12:49:46.552Z",
+      "summary": "Added 'Watch the full demo on LinkedIn' (https://lnkd.in/p/dG-JC_xq, verified to resolve to a public LinkedIn post 'YallaFlow in Action — From Setup to Delivery' with an 8:16 video) under the 30-second video's chapter list and as a Resources card; both open in a new tab with rel=noopener noreferrer, an external-link icon and screen-reader text '(opens in a new tab)'. Promo caption reworded to be layout-independent ('in the chapter list on this page'). Full demo is not self-hosted.",
+      "evidence": [
+        "site/index.html"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-10-28T12:52:49.583Z",
+      "completedAt": "2026-10-28T12:52:49.583Z",
+      "summary": "Final: site checks (links, SEO metadata, JSON-LD, sitemap/robots, media rules, size budget) V-032; axe 0 violations at 4 widths x 2 themes V-033; keyboard 30 focus stops with visible focus V-034; LinkedIn links new-tab + rel=noopener noreferrer, no trackers/autoplay, no other videos or >1 MB files in the tree, product unchanged, npm pack 1.1.0 with no website files V-035; npm run check 766/766 V-029; external links all 200 incl. lnkd.in V-031; npm registry latest = 1.1.0 V-030.",
+      "evidence": [
+        "verification:V-029",
+        "verification:V-030",
+        "verification:V-031",
+        "verification:V-032",
+        "verification:V-033",
+        "verification:V-034",
+        "verification:V-035"
+      ]
+    }
+  },
+  "rulings": [
+    {
+      "decision": "site/index.html was edited (tabindex=\"0\" on the three pre.term blocks and the install command) during the VERIFICATION stage, without workflow authorization; adopted for review and verification",
+      "reason": "axe-core reported scrollable-region-focusable on mobile; the fix was applied before reopening to implementation",
+      "costIfWrong": "An extra keyboard tab stop on each code block; no product or package impact",
+      "createdAt": "2026-10-28T11:37:24.809Z"
+    }
+  ],
+  "history": [
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Pre-commit review: remove the hard-coded 1.1.0 from the website (visible note and JSON-LD softwareVersion) so the site needs no edit per release; npm stays the single version source.",
+      "changedAt": "2026-10-28T11:31:15.316Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Pre-commit review: remove the hard-coded 1.1.0 from the website (visible note and JSON-LD softwareVersion) so the site needs no edit per release; npm stays the single version source.",
+      "changedAt": "2026-10-28T11:31:15.316Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Adopt the accessibility fix found by the axe-core scan during verification (keyboard-focusable scrollable code blocks)",
+      "changedAt": "2026-10-28T11:37:31.240Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Landing-page redesign of the uncommitted site/: dark navy + teal identity from the promo videos, >> mark as favicon/brand mark, two-column hero with conceptual workflow visual, self-hosted 30s promo and compressed full demo (site/media/), simplified sections. Same objective; still no product, version, or release change.",
+      "changedAt": "2026-10-28T11:56:35.730Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Landing-page redesign of the uncommitted site/: dark navy + teal identity from the promo videos, >> mark as favicon/brand mark, two-column hero with conceptual workflow visual, self-hosted 30s promo and compressed full demo (site/media/), simplified sections. Same objective; still no product, version, or release change.",
+      "changedAt": "2026-10-28T11:56:35.730Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Maintainer decision: do not self-host the full 8-minute demo; link to it on LinkedIn (https://lnkd.in/p/dG-JC_xq) from the video and resources sections, opening in a new tab with rel=noopener noreferrer. Promo stays self-hosted.",
+      "changedAt": "2026-10-28T12:38:03.297Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Maintainer decision: do not self-host the full 8-minute demo; link to it on LinkedIn (https://lnkd.in/p/dG-JC_xq) from the video and resources sections, opening in a new tab with rel=noopener noreferrer. Promo stays self-hosted.",
+      "changedAt": "2026-10-28T12:38:03.297Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Video caption says 'listed beside the player', which is wrong on mobile where the chapter list is above the player",
+      "changedAt": "2026-10-28T12:49:46.182Z"
+    }
+  ],
+  "updatedAt": "2026-10-28T12:52:49.583Z"
+}

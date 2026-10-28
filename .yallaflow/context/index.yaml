@@ -6950,7 +6950,7 @@
     {
       "id": "CTX-0059",
       "area": "environment",
-      "state": "current",
+      "state": "superseded",
       "confidence": "confirmed",
       "summary": "The only CI is .github/workflows/release.yml, triggered when a GitHub Release is published: a guard job (tag = v+package version, prerelease flag matches, tag on main, version not already on npm — an already-published version ends the run with a notice), a test job running npm ci and npm run check on Node 20, 22 and 24 with full Git history, and a publish job on Node 24 that smoke-tests the packed tarball and runs npm publish with provenance through npm Trusted Publishing (OIDC id-token, no stored npm token). There is no pull-request CI and no container configuration; day-to-day validation is local per docs/releasing.md.",
       "provenance": "repository",
@@ -6983,7 +6983,7 @@
       "supersedes": [
         "CTX-0034"
       ],
-      "supersededBy": null,
+      "supersededBy": "CTX-0085",
       "history": [
         {
           "action": "introduced",
@@ -7021,10 +7021,17 @@
           ],
           "previousVerifiedAt": "2026-10-13T12:25:22.356Z",
           "previousVerifiedAtCommit": "c433e619abc24e1a9c8993349365d23e3880001d"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-10-28T10:40:41.176Z",
+          "supersededBy": "CTX-0085",
+          "workId": "PF-0022",
+          "candidateId": "K-001"
         }
       ],
       "createdAt": "2026-10-13T12:25:22.356Z",
-      "updatedAt": "2026-10-19T16:37:36.068Z"
+      "updatedAt": "2026-10-28T10:40:41.176Z"
     },
     {
       "id": "CTX-0060",
@@ -10160,7 +10167,246 @@
       ],
       "createdAt": "2026-10-19T23:00:11.502Z",
       "updatedAt": "2026-10-19T23:00:11.502Z"
+    },
+    {
+      "id": "CTX-0085",
+      "area": "environment",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "There are two GitHub Actions workflows. .github/workflows/release.yml is triggered when a GitHub Release is published: a guard job (tag = v+package version, prerelease flag matches, tag on main, version not already on npm — an already-published version ends the run with a notice), a test job running npm ci and npm run check on Node 20, 22 and 24 with full Git history, and a publish job on Node 24 that smoke-tests the packed tarball and runs npm publish with provenance through npm Trusted Publishing (OIDC id-token, no stored npm token). .github/workflows/pages.yml deploys the static website in site/ to GitHub Pages (https://engmohamedamer.github.io/yallaflow/) on pushes to main that touch site/** or the workflow, or on manual dispatch, using OIDC Pages deployment; it never builds, packs, or publishes the package. site/ is outside package.json files, so it never ships in the npm tarball. There is no pull-request CI and no container configuration; day-to-day validation is local per docs/releasing.md.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0022",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": ".github/workflows/pages.yml",
+          "contentHash": "sha256:105d80f6c0969ac3b7c56d420cd77e587ee9d0107dd9498d3860f025e6174f34",
+          "gitCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": ".github/workflows/release.yml",
+          "contentHash": "sha256:125e655925cfe9cd2902494aa63101ef3c50ef127308fa4815d37aab2d424cf7",
+          "gitCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230",
+          "workingTree": "head"
+        },
+        {
+          "type": "runtime",
+          "description": "npm pack --dry-run --json 2>/dev/null | node -e 'let s=\"\";process.stdin.on(\"data\",d=>s+=d).on(\"end\",()=>{const p=JSON.parse(s)[0];const f=p.files.map(x=>x.path);const bad=f.filter(x=>/^(site|\\.github|\\.yallaflow)\\//.test(x)||/\\.(mp4|webm|mov|jpe?g|png)$/i.test(x));console.log(p.name+\"@\"+p.version, f.length+\" files,\", (p.size/1024).toFixed(0)+\" KB packed; site/media/images leaked:\", bad.length, bad.join(\" \"));process.exit(bad.length||p.version!==\"1.1.0\"?1:0)})' (passed)",
+          "workId": "PF-0022",
+          "verificationRunId": "V-019"
+        },
+        {
+          "type": "runtime",
+          "description": "python3 -I -c \"import yaml; d=yaml.safe_load(open('.github/workflows/pages.yml')); on=d[True]; assert sorted(on)==['push','workflow_dispatch'] and on['push']['branches']==['main'] and on['push']['paths']==['site/**','.github/workflows/pages.yml']; steps=d['jobs']['deploy']['steps']; uses=[s.get('uses','').split('@')[0] for s in steps]; assert uses==['actions/checkout','actions/configure-pages','actions/upload-pages-artifact','actions/deploy-pages'] and not any('run' in s for s in steps); assert d['permissions']=={'contents':'read'} and d['jobs']['deploy']['permissions']=={'contents':'read','pages':'write','id-token':'<redacted>'}; assert all(len(s['uses'].split('@')[1])==40 for s in steps); print('pages.yml isolated, least-privilege, SHA-pinned')\" && git diff --quiet HEAD -- .github/workflows/release.yml && echo release.yml-unchanged (passed)",
+          "workId": "PF-0022",
+          "verificationRunId": "V-025"
+        }
+      ],
+      "verifiedAt": "2026-10-28T12:33:28.972Z",
+      "verifiedAtCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230",
+      "supersedes": [
+        "CTX-0059"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-10-28T10:40:41.176Z",
+          "workId": "PF-0022",
+          "candidateId": "K-001",
+          "supersedes": "CTX-0059"
+        },
+        {
+          "action": "reconfirmed",
+          "at": "2026-10-28T11:47:06.874Z",
+          "workId": "PF-0022",
+          "candidateId": "K-002",
+          "previousEvidence": [
+            {
+              "type": "repository",
+              "path": ".github/workflows/release.yml",
+              "contentHash": "sha256:125e655925cfe9cd2902494aa63101ef3c50ef127308fa4815d37aab2d424cf7",
+              "gitCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": ".github/workflows/pages.yml",
+              "contentHash": "sha256:105d80f6c0969ac3b7c56d420cd77e587ee9d0107dd9498d3860f025e6174f34",
+              "gitCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "package.json",
+              "contentHash": "sha256:ab69e21ec6b61c111c490c1f690b8d02f79f2a8aa9deaa8e90e2245a91d7d8fe",
+              "gitCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "npm pack --dry-run --json 2>/dev/null | node -e 'let s=\"\";process.stdin.on(\"data\",d=>s+=d).on(\"end\",()=>{const p=JSON.parse(s)[0];const f=p.files.map(x=>x.path);const bad=f.filter(x=>/^(site|\\.github|\\.yallaflow)\\//.test(x));console.log(p.name+\"@\"+p.version, f.length+\" files\", \"site/.github/.yallaflow leaked:\", bad.length);process.exit(bad.length||p.version!==\"1.1.0\"?1:0)})' (passed)",
+              "workId": "PF-0022",
+              "verificationRunId": "V-004"
+            }
+          ],
+          "previousVerifiedAt": "2026-10-28T10:40:41.176Z",
+          "previousVerifiedAtCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230"
+        },
+        {
+          "action": "reconfirmed",
+          "at": "2026-10-28T12:33:28.972Z",
+          "workId": "PF-0022",
+          "candidateId": "K-003",
+          "previousEvidence": [
+            {
+              "type": "repository",
+              "path": ".github/workflows/pages.yml",
+              "contentHash": "sha256:105d80f6c0969ac3b7c56d420cd77e587ee9d0107dd9498d3860f025e6174f34",
+              "gitCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": ".github/workflows/release.yml",
+              "contentHash": "sha256:125e655925cfe9cd2902494aa63101ef3c50ef127308fa4815d37aab2d424cf7",
+              "gitCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "npm pack --dry-run --json 2>/dev/null | node -e 'let s=\"\";process.stdin.on(\"data\",d=>s+=d).on(\"end\",()=>{const p=JSON.parse(s)[0];const f=p.files.map(x=>x.path);const bad=f.filter(x=>/^(site|\\.github|\\.yallaflow)\\//.test(x));console.log(p.name+\"@\"+p.version, f.length+\" files\", \"site/.github/.yallaflow leaked:\", bad.length);process.exit(bad.length||p.version!==\"1.1.0\"?1:0)})' (passed)",
+              "workId": "PF-0022",
+              "verificationRunId": "V-011"
+            },
+            {
+              "type": "runtime",
+              "description": "python3 -I -c \"import yaml; d=yaml.safe_load(open('.github/workflows/pages.yml')); on=d[True]; assert sorted(on)==['push','workflow_dispatch'] and on['push']['branches']==['main'] and on['push']['paths']==['site/**','.github/workflows/pages.yml']; steps=d['jobs']['deploy']['steps']; uses=[s.get('uses','').split('@')[0] for s in steps]; assert uses==['actions/checkout','actions/configure-pages','actions/upload-pages-artifact','actions/deploy-pages'] and not any('run' in s for s in steps); assert d['permissions']=={'contents':'read'} and d['jobs']['deploy']['permissions']=={'contents':'read','pages':'write','id-token':'<redacted>'}; assert all(len(s['uses'].split('@')[1])==40 for s in steps); print('pages.yml isolated, least-privilege, SHA-pinned')\" (passed)",
+              "workId": "PF-0022",
+              "verificationRunId": "V-014"
+            }
+          ],
+          "previousVerifiedAt": "2026-10-28T11:47:06.874Z",
+          "previousVerifiedAtCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230"
+        }
+      ],
+      "createdAt": "2026-10-28T10:40:41.176Z",
+      "updatedAt": "2026-10-28T12:33:28.972Z"
+    },
+    {
+      "id": "CTX-0086",
+      "area": "convention",
+      "state": "superseded",
+      "confidence": "confirmed",
+      "summary": "Brand identity for public surfaces (website, social images, videos): name YallaFlow; official tagline 'Give AI your project, not just your prompt.'; brand mark is the >> double chevron from the demo video end card (first chevron #4ed0a5, second #6485ce, rounded strokes); dark navy ground (#0a111f) with teal accents is the primary theme. The project website lives in site/ (served at https://engmohamedamer.github.io/yallaflow/, outside the npm package), with the mark as an inline SVG symbol in site/index.html and as site/favicon.svg; website media is self-hosted in site/media/.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0022",
+        "candidateId": "K-004"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "site/favicon.svg",
+          "contentHash": "sha256:47a1972c86d909e0819949284e510f43d7675fa61d1dd23eb2ddac0ef03ea70e",
+          "gitCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "site/index.html",
+          "contentHash": "sha256:b32d7d36bdae8db4cf55c8aa2080b6e1918116f21ec824a1170ba2acba1c817a",
+          "gitCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "user-confirmed",
+          "description": "the maintainer directed the dark navy and teal identity from the promotional videos and the >> mark from preview.mp4 as the favicon and brand mark (2026-10-28)"
+        }
+      ],
+      "verifiedAt": "2026-10-28T12:33:29.218Z",
+      "verifiedAtCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230",
+      "supersedes": [],
+      "supersededBy": "CTX-0087",
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-10-28T12:33:29.218Z",
+          "workId": "PF-0022",
+          "candidateId": "K-004"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-10-28T12:52:54.424Z",
+          "supersededBy": "CTX-0087",
+          "workId": "PF-0022",
+          "candidateId": "K-005"
+        }
+      ],
+      "createdAt": "2026-10-28T12:33:29.218Z",
+      "updatedAt": "2026-10-28T12:52:54.424Z"
+    },
+    {
+      "id": "CTX-0087",
+      "area": "convention",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Brand identity for public surfaces (website, social images, videos): name YallaFlow; official tagline 'Give AI your project, not just your prompt.'; brand mark is the >> double chevron from the demo video end card (first chevron #4ed0a5, second #6485ce, rounded strokes); dark navy ground (#0a111f) with teal accents is the primary theme. The project website lives in site/ (served at https://engmohamedamer.github.io/yallaflow/, outside the npm package), with the mark as an inline SVG symbol in site/index.html and as site/favicon.svg. Only the 30-second promo is self-hosted (site/media/); the full 8-minute demo is not hosted in the repository and is linked externally on LinkedIn (https://lnkd.in/p/dG-JC_xq).",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0022",
+        "candidateId": "K-005"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "site/index.html",
+          "contentHash": "sha256:9bf47c971c6888af19a3f6a7352aab010a91b6c05a5fe36200258997f03ce6ed",
+          "gitCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "site/favicon.svg",
+          "contentHash": "sha256:47a1972c86d909e0819949284e510f43d7675fa61d1dd23eb2ddac0ef03ea70e",
+          "gitCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "site/media/yallaflow-promo.mp4",
+          "contentHash": "sha256:ba55cfd29a14cfafea797892812b2204533de61d8a0c81e884ff0bef354a1bb4",
+          "gitCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "user-confirmed",
+          "description": "the maintainer decided on 2026-10-28 to keep only the 30-second promo on the website and link the full demo on LinkedIn instead of self-hosting it"
+        }
+      ],
+      "verifiedAt": "2026-10-28T12:52:54.424Z",
+      "verifiedAtCommit": "222730bceb7166acfb17bd63a55da4ab9ccb2230",
+      "supersedes": [
+        "CTX-0086"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-10-28T12:52:54.424Z",
+          "workId": "PF-0022",
+          "candidateId": "K-005",
+          "supersedes": "CTX-0086"
+        }
+      ],
+      "createdAt": "2026-10-28T12:52:54.424Z",
+      "updatedAt": "2026-10-28T12:52:54.424Z"
     }
   ],
-  "updatedAt": "2026-10-19T23:24:08.957Z"
+  "updatedAt": "2026-10-28T12:52:54.424Z"
 }

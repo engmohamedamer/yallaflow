@@ -15,6 +15,8 @@ YallaFlow is an engineering governance layer for AI coding agents. **You describ
 
 It works with **Claude Code** and **Codex**, runs locally, and keeps everything in your repository.
 
+**Website:** [engmohamedamer.github.io/yallaflow](https://engmohamedamer.github.io/yallaflow/) · **npm:** [yallaflow](https://www.npmjs.com/package/yallaflow) · **Docs:** [Using YallaFlow](docs/using-yallaflow.md)
+
 ## Quick start
 
 Requires **Node.js ≥ 20.16.0**.
@@ -157,6 +159,8 @@ yallaflow doctor     # integrity check
 Everything else is in the [CLI reference](docs/cli.md).
 
 ## Documentation
+
+The YallaFlow website, [engmohamedamer.github.io/yallaflow](https://engmohamedamer.github.io/yallaflow/), gives a one-page overview. The guides live in this repository:
 
 | Guide | What it covers |
 | --- | --- |

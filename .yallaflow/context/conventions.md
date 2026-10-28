@@ -109,4 +109,21 @@
   - docs/limitations.md (repository @ 59bf70e)
   - docs/upgrading-to-v1.1.0.md (repository @ 59bf70e)
 
+<!-- yallaflow-fact:CTX-0087 -->
+### CTX-0087 — Brand identity for public surfaces (website, social images, videos): name YallaFlow; official tagline 'Give AI your project, not just your prompt.'; brand mark is the >> double chevron from the demo video end card (first chevron #4ed0a5, second #6485ce, rounded strokes); dark navy ground (#0a111f) with teal accents is the primary theme. The project website lives in site/ (served at https://engmohamedamer.github.io/yallaflow/, outside the npm package), with the mark as an inline SVG symbol in site/index.html and as site/favicon.svg. Only the 30-second promo is self-hosted (site/media/); the full 8-minute demo is not hosted in the repository and is linked externally on LinkedIn (https://lnkd.in/p/dG-JC_xq).
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0022
+- **Knowledge ID:** K-005
+- **Promoted at:** 2026-10-28T12:52:54.424Z
+- **Supersedes:** CTX-0086
+- **Verified:** 2026-10-28T12:52:54.424Z (commit 222730b)
+- **Evidence:**
+  - site/index.html (repository @ 222730b)
+  - site/favicon.svg (repository @ 222730b)
+  - site/media/yallaflow-promo.mp4 (repository @ 222730b)
+  - the maintainer decided on 2026-10-28 to keep only the 30-second promo on the website and link the full demo on LinkedIn instead of self-hosting it (user-confirmed)
+
 <!-- yallaflow-context:end -->

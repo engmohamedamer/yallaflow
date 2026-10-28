@@ -1,0 +1,108 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "environment",
+      "source": "implementation-runtime",
+      "summary": "There are two GitHub Actions workflows. .github/workflows/release.yml is triggered when a GitHub Release is published: a guard job (tag = v+package version, prerelease flag matches, tag on main, version not already on npm — an already-published version ends the run with a notice), a test job running npm ci and npm run check on Node 20, 22 and 24 with full Git history, and a publish job on Node 24 that smoke-tests the packed tarball and runs npm publish with provenance through npm Trusted Publishing (OIDC id-token, no stored npm token). .github/workflows/pages.yml deploys the static website in site/ to GitHub Pages (https://engmohamedamer.github.io/yallaflow/) on pushes to main that touch site/** or the workflow, or on manual dispatch, using OIDC Pages deployment; it never builds, packs, or publishes the package. site/ is outside package.json files, so it never ships in the npm tarball. There is no pull-request CI and no container configuration; day-to-day validation is local per docs/releasing.md.",
+      "evidence": [
+        ".github/workflows/release.yml",
+        ".github/workflows/pages.yml",
+        "package.json",
+        "verification:V-004"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0059"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-28T10:40:34.505Z",
+      "factId": "CTX-0085",
+      "promotedAt": "2026-10-28T10:40:41.176Z",
+      "target": "context/environments.md"
+    },
+    {
+      "id": "K-002",
+      "kind": "environment",
+      "source": "implementation-runtime",
+      "summary": "There are two GitHub Actions workflows. .github/workflows/release.yml is triggered when a GitHub Release is published: a guard job (tag = v+package version, prerelease flag matches, tag on main, version not already on npm — an already-published version ends the run with a notice), a test job running npm ci and npm run check on Node 20, 22 and 24 with full Git history, and a publish job on Node 24 that smoke-tests the packed tarball and runs npm publish with provenance through npm Trusted Publishing (OIDC id-token, no stored npm token). .github/workflows/pages.yml deploys the static website in site/ to GitHub Pages (https://engmohamedamer.github.io/yallaflow/) on pushes to main that touch site/** or the workflow, or on manual dispatch, using OIDC Pages deployment; it never builds, packs, or publishes the package. site/ is outside package.json files, so it never ships in the npm tarball. There is no pull-request CI and no container configuration; day-to-day validation is local per docs/releasing.md.",
+      "evidence": [
+        ".github/workflows/pages.yml",
+        ".github/workflows/release.yml",
+        "verification:V-011",
+        "verification:V-014"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0085"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-28T11:47:06.709Z",
+      "factId": "CTX-0085",
+      "promotedAt": "2026-10-28T11:47:06.874Z",
+      "target": "context/environments.md"
+    },
+    {
+      "id": "K-003",
+      "kind": "environment",
+      "source": "implementation-runtime",
+      "summary": "There are two GitHub Actions workflows. .github/workflows/release.yml is triggered when a GitHub Release is published: a guard job (tag = v+package version, prerelease flag matches, tag on main, version not already on npm — an already-published version ends the run with a notice), a test job running npm ci and npm run check on Node 20, 22 and 24 with full Git history, and a publish job on Node 24 that smoke-tests the packed tarball and runs npm publish with provenance through npm Trusted Publishing (OIDC id-token, no stored npm token). .github/workflows/pages.yml deploys the static website in site/ to GitHub Pages (https://engmohamedamer.github.io/yallaflow/) on pushes to main that touch site/** or the workflow, or on manual dispatch, using OIDC Pages deployment; it never builds, packs, or publishes the package. site/ is outside package.json files, so it never ships in the npm tarball. There is no pull-request CI and no container configuration; day-to-day validation is local per docs/releasing.md.",
+      "evidence": [
+        ".github/workflows/pages.yml",
+        ".github/workflows/release.yml",
+        "verification:V-019",
+        "verification:V-025"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0085"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-28T12:33:18.731Z",
+      "factId": "CTX-0085",
+      "promotedAt": "2026-10-28T12:33:28.972Z",
+      "target": "context/environments.md"
+    },
+    {
+      "id": "K-004",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Brand identity for public surfaces (website, social images, videos): name YallaFlow; official tagline 'Give AI your project, not just your prompt.'; brand mark is the >> double chevron from the demo video end card (first chevron #4ed0a5, second #6485ce, rounded strokes); dark navy ground (#0a111f) with teal accents is the primary theme. The project website lives in site/ (served at https://engmohamedamer.github.io/yallaflow/, outside the npm package), with the mark as an inline SVG symbol in site/index.html and as site/favicon.svg; website media is self-hosted in site/media/.",
+      "evidence": [
+        "site/favicon.svg",
+        "site/index.html",
+        "user:the maintainer directed the dark navy and teal identity from the promotional videos and the >> mark from preview.mp4 as the favicon and brand mark (2026-10-28)"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-10-28T12:33:28.818Z",
+      "factId": "CTX-0086",
+      "promotedAt": "2026-10-28T12:33:29.218Z",
+      "target": "context/conventions.md"
+    },
+    {
+      "id": "K-005",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Brand identity for public surfaces (website, social images, videos): name YallaFlow; official tagline 'Give AI your project, not just your prompt.'; brand mark is the >> double chevron from the demo video end card (first chevron #4ed0a5, second #6485ce, rounded strokes); dark navy ground (#0a111f) with teal accents is the primary theme. The project website lives in site/ (served at https://engmohamedamer.github.io/yallaflow/, outside the npm package), with the mark as an inline SVG symbol in site/index.html and as site/favicon.svg. Only the 30-second promo is self-hosted (site/media/); the full 8-minute demo is not hosted in the repository and is linked externally on LinkedIn (https://lnkd.in/p/dG-JC_xq).",
+      "evidence": [
+        "site/index.html",
+        "site/favicon.svg",
+        "site/media/yallaflow-promo.mp4",
+        "user:the maintainer decided on 2026-10-28 to keep only the 30-second promo on the website and link the full demo on LinkedIn instead of self-hosting it"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0086"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-28T12:52:49.750Z",
+      "factId": "CTX-0087",
+      "promotedAt": "2026-10-28T12:52:54.424Z",
+      "target": "context/conventions.md"
+    }
+  ],
+  "updatedAt": "2026-10-28T12:52:54.424Z",
+  "reviewedAt": "2026-10-28T12:52:54.424Z"
+}

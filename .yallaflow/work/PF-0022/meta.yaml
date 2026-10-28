@@ -1,0 +1,112 @@
+{
+  "id": "PF-0022",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Brand visibility and GitHub SEO: add a static GitHub Pages site (site/), a Pages deploy workflow isolated from release.yml, and small README discoverability edits; no product, version, or release change",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-10-28T10:29:12.996Z",
+  "updatedAt": "2026-10-28T12:52:54.668Z",
+  "title": "Brand visibility and GitHub SEO: add a static GitHub Pages site (site/), a Pages deploy workflow isolated from release.yml, and small README discoverability edits; no product, version, or release change",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-10-28T10:29:13.009Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-10-28T10:40:44.016Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004",
+        "V-005",
+        "V-006",
+        "V-007"
+      ]
+    },
+    {
+      "completedAt": "2026-10-28T11:47:07.136Z",
+      "verificationRunIds": [
+        "V-008",
+        "V-009",
+        "V-010",
+        "V-011",
+        "V-012",
+        "V-013",
+        "V-014",
+        "V-015"
+      ]
+    },
+    {
+      "completedAt": "2026-10-28T12:33:29.475Z",
+      "verificationRunIds": [
+        "V-016",
+        "V-017",
+        "V-018",
+        "V-019",
+        "V-020",
+        "V-021",
+        "V-022",
+        "V-023",
+        "V-024",
+        "V-025"
+      ]
+    },
+    {
+      "completedAt": "2026-10-28T12:52:54.668Z",
+      "verificationRunIds": [
+        "V-032",
+        "V-033",
+        "V-034",
+        "V-035"
+      ]
+    }
+  ],
+  "lastInvalidationAt": "2026-10-28T12:49:46.187Z",
+  "lifecycleHistory": [
+    {
+      "action": "reopen",
+      "fromStage": "DONE",
+      "toStage": "IMPLEMENTATION",
+      "reason": "Pre-commit review: remove the hard-coded 1.1.0 from the website (visible note and JSON-LD softwareVersion) so the site needs no edit per release; npm stays the single version source.",
+      "changedAt": "2026-10-28T11:31:15.316Z"
+    },
+    {
+      "action": "reopen",
+      "fromStage": "DONE",
+      "toStage": "IMPLEMENTATION",
+      "reason": "Landing-page redesign of the uncommitted site/: dark navy + teal identity from the promo videos, >> mark as favicon/brand mark, two-column hero with conceptual workflow visual, self-hosted 30s promo and compressed full demo (site/media/), simplified sections. Same objective; still no product, version, or release change.",
+      "changedAt": "2026-10-28T11:56:35.730Z"
+    },
+    {
+      "action": "reopen",
+      "fromStage": "DONE",
+      "toStage": "IMPLEMENTATION",
+      "reason": "Maintainer decision: do not self-host the full 8-minute demo; link to it on LinkedIn (https://lnkd.in/p/dG-JC_xq) from the video and resources sections, opening in a new tab with rel=noopener noreferrer. Promo stays self-hosted.",
+      "changedAt": "2026-10-28T12:38:03.297Z"
+    }
+  ]
+}
