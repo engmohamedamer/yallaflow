@@ -5,7 +5,7 @@ import { startCommand } from './commands/start.js';
 import { statusCommand } from './commands/status.js';
 import { resumeCommand } from './commands/resume.js';
 import { doctorCommand } from './commands/doctor.js';
-import { newWorkCommand } from './commands/work.js';
+import { newWorkCommand, splitCommand } from './commands/work.js';
 import { advanceCommand } from './commands/advance.js';
 import { verifyCommand, verifyListCommand, verifyScriptCommand, verifyShellCommand } from './commands/verify.js';
 import { routeCommand } from './commands/route.js';
@@ -79,7 +79,7 @@ import { INTERACTION_MODES, GATE_NAMES } from './behavior/interaction.js';
 const VALID_PROJECT_TYPES = new Set(['greenfield', 'brownfield']);
 
 function help() {
-  console.log(`YallaFlow foundation CLI\n\nGive AI your project, not just your prompt.\n\nUsage:\n  yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]\n  yallaflow start [request]\n  yallaflow request --help\n  yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]\n  yallaflow intake ticket <payload-file|ticket-ref> [--provider github|jira|azure-devops] [--work <work-id>] [--reason TEXT] [--fetch [--attachments]] [--attachment <file>]... [--title TITLE] [--max-comments N]\n  yallaflow source --help\n  yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]\n  yallaflow baseline --help\n  yallaflow guide [work-id]\n  yallaflow ready [work-id]\n  yallaflow skill <skill-id> [--work <work-id>]\n  yallaflow checkpoint --help\n  yallaflow question --help\n  yallaflow knowledge --help\n  yallaflow requirement --help\n  yallaflow convergence --help\n  yallaflow impact --help\n  yallaflow context --help\n  yallaflow upgrade status|plan\n  yallaflow brief\n  yallaflow inspect\n  yallaflow limitation --help\n  yallaflow agent --help\n  yallaflow decompose --help\n  yallaflow progress <parent-id>\n  yallaflow next <parent-id>\n  yallaflow approve <work-id> --stage GATE [--note TEXT]\n  yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]\n  yallaflow handoff [work-id]\n  yallaflow feature <title> --scope SCOPE\n  yallaflow bug <title> --scope SCOPE\n  yallaflow investigate <title> --scope SCOPE\n  yallaflow change <title> --scope SCOPE\n  yallaflow refactor <title> --scope SCOPE\n  yallaflow release <title> --scope SCOPE\n  yallaflow purpose --help\n  yallaflow finish [work-id] [--verbose]\n  yallaflow qc --help\n  yallaflow demo --help\n  yallaflow shared --help\n  yallaflow status\n  yallaflow resume [work-id]\n  yallaflow doctor\n  yallaflow advance [work-id]\n  yallaflow verify [work-id] -- <executable> [args...]\n  yallaflow verify [work-id] --shell "<command>"\n  yallaflow verify [work-id] --script <path>\n  yallaflow verify list [work-id]\n  yallaflow reopen <work-id> --to implementation|verification|review --reason REASON\n  yallaflow --version\n`);
+  console.log(`YallaFlow foundation CLI\n\nGive AI your project, not just your prompt.\n\nUsage:\n  yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]\n  yallaflow start [request]\n  yallaflow request --help\n  yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]\n  yallaflow intake ticket <payload-file|ticket-ref> [--provider github|jira|azure-devops] [--work <work-id>] [--reason TEXT] [--fetch [--attachments]] [--attachment <file>]... [--title TITLE] [--max-comments N]\n  yallaflow source --help\n  yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]\n  yallaflow baseline --help\n  yallaflow guide [work-id]\n  yallaflow ready [work-id]\n  yallaflow skill <skill-id> [--work <work-id>]\n  yallaflow checkpoint --help\n  yallaflow question --help\n  yallaflow knowledge --help\n  yallaflow requirement --help\n  yallaflow convergence --help\n  yallaflow impact --help\n  yallaflow context --help\n  yallaflow upgrade status|plan\n  yallaflow brief\n  yallaflow inspect\n  yallaflow limitation --help\n  yallaflow agent --help\n  yallaflow decompose --help\n  yallaflow progress <parent-id>\n  yallaflow next <parent-id>\n  yallaflow approve <work-id> --stage GATE [--note TEXT]\n  yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]\n  yallaflow handoff [work-id]\n  yallaflow feature <title> --scope SCOPE\n  yallaflow bug <title> --scope SCOPE\n  yallaflow investigate <title> --scope SCOPE\n  yallaflow change <title> --scope SCOPE\n  yallaflow refactor <title> --scope SCOPE\n  yallaflow release <title> --scope SCOPE\n  yallaflow purpose --help\n  yallaflow finish [work-id] [--verbose]\n  yallaflow qc --help\n  yallaflow demo --help\n  yallaflow shared --help\n  yallaflow status\n  yallaflow resume [work-id]\n  yallaflow doctor\n  yallaflow work split <PF-####> [--dry-run]\n  yallaflow advance [work-id]\n  yallaflow verify [work-id] -- <executable> [args...]\n  yallaflow verify [work-id] --shell "<command>"\n  yallaflow verify [work-id] --script <path>\n  yallaflow verify list [work-id]\n  yallaflow reopen <work-id> --to implementation|verification|review --reason REASON\n  yallaflow --version\n`);
 }
 
 function decomposeHelp() {
@@ -148,7 +148,7 @@ function limitationHelp() {
 }
 
 function sourceHelp() {
-  console.log(`Usage:\n  yallaflow source list\n  yallaflow source show <source-id> [--content]\n`);
+  console.log(`Usage:\n  yallaflow source list\n  yallaflow source show <source-id> [--content]\n  yallaflow source split <SRC-####> [--dry-run]\n`);
 }
 
 function checkpointHelp() {
@@ -181,6 +181,7 @@ const USAGE = {
   resume: 'yallaflow resume [work-id]',
   ready: 'yallaflow ready [work-id]',
   doctor: 'yallaflow doctor',
+  work: 'yallaflow work split <PF-####> [--dry-run]',
   advance: 'yallaflow advance [work-id]',
   verify: 'yallaflow verify [work-id] -- <executable> [args...]\n  yallaflow verify [work-id] --shell "<command>"\n  yallaflow verify [work-id] --script <path>\n  yallaflow verify list [work-id]',
   reopen: 'yallaflow reopen <work-id> --to implementation|verification|review --reason REASON',
@@ -297,7 +298,8 @@ const NAMESPACE_ACTIONS = {
   },
   source: {
     list: 'yallaflow source list',
-    show: 'yallaflow source show <source-id> [--content]'
+    show: 'yallaflow source show <source-id> [--content]',
+    split: 'yallaflow source split <SRC-####> [--dry-run]'
   },
   intake: {
     add: 'yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]',
@@ -482,6 +484,11 @@ async function main() {
       const { positionals } = parseOptions(actionArgs, {});
       if (positionals.length) throw new Error('Usage: yallaflow source list');
       return sourceCommand('list');
+    }
+    if (action === 'split') {
+      const { values, positionals } = parseOptions(actionArgs, { 'dry-run': { type: 'boolean' } });
+      if (positionals.length !== 1) throw new Error(`Usage: ${NAMESPACE_ACTIONS.source.split}`);
+      return splitCommand('source', positionals[0], { dryRun: values['dry-run'] });
     }
     if (action === 'show') {
       const { values, positionals } = parseOptions(actionArgs, { content: { type: 'boolean' } });
@@ -673,6 +680,12 @@ async function main() {
     return readyCommand(rest[0]);
   }
   if (command === 'doctor') return doctorCommand();
+  if (command === 'work') {
+    const [action, ...actionArgs] = rest;
+    const { values, positionals } = parseOptions(actionArgs, { 'dry-run': { type: 'boolean' } });
+    if (action !== 'split' || positionals.length !== 1) throw new Error(`Usage: ${USAGE.work}`);
+    return splitCommand('work', positionals[0], { dryRun: values['dry-run'] });
+  }
   if (command === 'advance') {
     if (rest.length > 1) throw new Error('Usage: yallaflow advance [work-id]');
     return advanceCommand(rest[0]);

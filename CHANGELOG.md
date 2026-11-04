@@ -6,7 +6,13 @@ All notable changes to YallaFlow are documented here. The format loosely follows
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- **ID collision detection and repair.** In a single-user workspace two branches can allocate the same `PF-####` or `SRC-####`; after the merge one directory holds two records, and `doctor` reported only symptoms (a ledger "without delivery-convergence", a source that "does not link back", a progress ledger on another registry version). That also blocked `shared enable` — the fix for collisions — for exactly the teams that needed it.
+  - `doctor` now names each collision (`work ID collision: PF-0156 holds 2 work items merged from different branches — … Run yallaflow work split PF-0156 …`). Identity is `meta.createdAt` / `source.capturedAt` across the Git history reachable from HEAD (`--full-history`, so the side a merge discarded is still seen). One `git log` and one `git cat-file --batch`; no history means not checked.
+  - `yallaflow work split <PF-####> [--dry-run]` and `yallaflow source split <SRC-####> [--dry-run]` restore every other record from its own commit under a new ID (`renumberedFrom` records the old ID, the identity, and the commit), take its files out of the shared directory, and relink sources (a work reference follows the source with its file name). Attribution is by content only; anything that matches neither side stops the split with nothing written. Never commits.
+  - `source.json` accepts an optional, validated `renumberedFrom`.
+  - The read-only Git allowlist test now also scans `gitText(root, [...])` call sites and allows `log`, `cat-file`, `merge-base`, and `hash-object` (never `-w`).
 
 ## [1.1.0] - 2026-10-19 — Connected Requirements & Optional AI Quality Delivery
 

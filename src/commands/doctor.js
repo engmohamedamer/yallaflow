@@ -17,6 +17,7 @@ import { describeBootstrapState, inspectAllBootstraps } from '../agent/bootstrap
 import { checkDeliveryIntegrity } from '../delivery/integrity.js';
 import { checkQualityIntegrity } from '../quality/integrity.js';
 import { checkWorkRecordOwnership } from '../core/ownership.js';
+import { describeCollision, detectAllCollisions } from '../core/collisions.js';
 
 export async function doctorCommand() {
   const root = await findProjectRoot();
@@ -135,6 +136,17 @@ export async function collectDoctorReport(root, { verifyMedia = false } = {}) {
     else checks.push([`lifecycle integrity (${work.length} work item(s) checked)`, true]);
   } catch (error) {
     checks.push([`lifecycle integrity: ${error instanceof Error ? error.message : String(error)}`, false]);
+  }
+
+  // ID collisions: one legacy PF-#### or SRC-#### directory that held two records from
+  // two branches. Other failures of those records are symptoms; `yallaflow work split` /
+  // `source split` is the repair. Without Git history this cannot be known.
+  try {
+    const { available, collisions } = await detectAllCollisions(root);
+    for (const collision of collisions) checks.push([describeCollision(collision), false]);
+    if (!collisions.length) checks.push([available ? 'ID collisions (none in Git history)' : 'ID collisions (not checked: no Git history)', true]);
+  } catch (error) {
+    checks.push([`ID collisions: ${error instanceof Error ? error.message : String(error)}`, false]);
   }
 
   // Work-delivery state (v0.3.8): requirement identity, convergence, and impact.
