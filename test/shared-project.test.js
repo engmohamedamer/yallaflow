@@ -701,7 +701,10 @@ test('47/48/49/50/51. shared check is read-only, provider-neutral, passes a safe
 test('51/no-network: YallaFlow source never invokes mutating or network Git subcommands and calls no LLM provider', async () => {
   const srcDir = fileURLToPath(new URL('../src/', import.meta.url));
   const offenders = [];
-  const allowed = new Set(['status', 'rev-parse', 'diff', 'ls-files', 'ls-tree', 'check-ignore', 'symbolic-ref', 'config']);
+  // Work ID collision repair (core/collisions.js, core/split.js) reads history with
+  // log, cat-file (blob contents), merge-base --is-ancestor and hash-object without -w
+  // (hashes working files, writes no object) — all read-only and local.
+  const allowed = new Set(['status', 'rev-parse', 'diff', 'ls-files', 'ls-tree', 'check-ignore', 'symbolic-ref', 'config', 'log', 'cat-file', 'merge-base', 'hash-object']);
   async function walk(dir) {
     for (const entry of await readdir(dir, { withFileTypes: true })) {
       const full = path.join(dir, entry.name);
@@ -709,7 +712,8 @@ test('51/no-network: YallaFlow source never invokes mutating or network Git subc
       else if (entry.name.endsWith('.js')) {
         const text = await readFile(full, 'utf8');
         for (const match of text.matchAll(/spawnSync\('git', \[\s*'([a-z-]+)'/g)) if (!allowed.has(match[1])) offenders.push(`${entry.name}: git ${match[1]}`);
-        for (const match of text.matchAll(/git\(root, \['([a-z-]+)'/g)) if (!allowed.has(match[1])) offenders.push(`${entry.name}: git ${match[1]}`);
+        for (const match of text.matchAll(/git(?:Text)?\(root, \['([a-z-]+)'/g)) if (!allowed.has(match[1])) offenders.push(`${entry.name}: git ${match[1]}`);
+        if (/'hash-object'[^\]]*'(?:-w|--write)'/.test(text)) offenders.push(`${entry.name}: git hash-object -w`);
         // v1.1.0: the only network client is the explicit, opt-in `intake ticket --fetch`
         // provider layer (src/intake/providers/); it is guarded separately below.
         const providerLayer = path.relative(srcDir, full).startsWith(`intake${path.sep}providers${path.sep}`);

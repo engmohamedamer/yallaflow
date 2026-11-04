@@ -4,14 +4,15 @@ import { STORED_SOURCE_ID_PATTERN, STORED_WORK_ID_PATTERN } from '../core/ids.js
 
 const V1_RECORD_FIELDS = new Set([
   'schemaVersion', 'id', 'sourceType', 'sourceName', 'sourceRef',
-  'contentType', 'rawText', 'capturedAt', 'metadata', 'linkedWork'
+  'contentType', 'rawText', 'capturedAt', 'metadata', 'linkedWork', 'renumberedFrom'
 ]);
 const V1_METADATA_FIELDS = new Set(['sizeBytes', 'sha256', 'extension']);
 
 const V2_RECORD_FIELDS = new Set([
   'schemaVersion', 'id', 'sourceType', 'sourceName', 'detectedFormat', 'contentType',
-  'contentAvailability', 'capturedAt', 'original', 'representation', 'rawText', 'metadata', 'linkedWork'
+  'contentAvailability', 'capturedAt', 'original', 'representation', 'rawText', 'metadata', 'linkedWork', 'renumberedFrom'
 ]);
+const RENUMBERED_FROM_FIELDS = new Set(['id', 'identity', 'commit', 'reason', 'at']);
 const ORIGINAL_FIELDS = new Set(['path', 'sha256', 'sizeBytes']);
 const REPRESENTATION_FIELDS = new Set(['type', 'path', 'sizeBytes']);
 
@@ -47,6 +48,7 @@ export function validateSourceRecord(record, label = '<unknown>') {
 
 function validateV1Record(record, label) {
   rejectUnknownFields(record, V1_RECORD_FIELDS, `source record ${label}`);
+  assertRenumberedFrom(record.renumberedFrom, label);
   if (!STORED_SOURCE_ID_PATTERN.test(record.id)) throw new Error(`Invalid source ID ${JSON.stringify(record.id)}.`);
   if (!SOURCE_TYPES.includes(record.sourceType)) {
     throw new Error(`Source record ${label} has unsupported sourceType ${JSON.stringify(record.sourceType)}.`);
@@ -72,6 +74,7 @@ function validateV1Record(record, label) {
 
 function validateV2Record(record, label) {
   rejectUnknownFields(record, V2_RECORD_FIELDS, `source record ${label}`);
+  assertRenumberedFrom(record.renumberedFrom, label);
   if (!STORED_SOURCE_ID_PATTERN.test(record.id)) throw new Error(`Invalid source ID ${JSON.stringify(record.id)}.`);
   if (!SOURCE_TYPES.includes(record.sourceType)) {
     throw new Error(`Source record ${label} has unsupported sourceType ${JSON.stringify(record.sourceType)}.`);
@@ -134,6 +137,17 @@ function assertSha256(value, label) {
 function assertLinkedWork(linkedWork, label) {
   if (!Array.isArray(linkedWork) || linkedWork.some((id) => !STORED_WORK_ID_PATTERN.test(id))) {
     throw new Error(`Source record ${label} linkedWork must be an array of work IDs.`);
+  }
+}
+
+// Written by `yallaflow source split`: where a source that shared a collided ID came from.
+function assertRenumberedFrom(value, label) {
+  if (value === undefined) return;
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error(`Source record ${label} renumberedFrom must be an object.`);
+  rejectUnknownFields(value, RENUMBERED_FROM_FIELDS, `source renumberedFrom for ${label}`);
+  if (!STORED_SOURCE_ID_PATTERN.test(value.id)) throw new Error(`Source record ${label} renumberedFrom.id must be a source ID.`);
+  for (const field of RENUMBERED_FROM_FIELDS) {
+    if (field !== 'id' && !isNonEmptyString(value[field])) throw new Error(`Source record ${label} renumberedFrom requires non-empty ${field}.`);
   }
 }
 

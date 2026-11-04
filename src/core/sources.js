@@ -129,6 +129,14 @@ export async function linkSourceToWork(root, sourceId, workId) {
   return record;
 }
 
+export async function unlinkSourceFromWork(root, sourceId, workId) {
+  const record = await loadSource(root, sourceId);
+  record.linkedWork = record.linkedWork.filter((id) => id !== workId);
+  validateSourceRecord(record, sourceId);
+  await writeYaml(sourceRecordPath(root, sourceId), record);
+  return record;
+}
+
 // Version-aware text accessor: v1 always inlines rawText; v2 inlines it only for
 // native-text sources and otherwise reads the separate representation file;
 // original-only sources have no text at all. Abstracts the schema difference away

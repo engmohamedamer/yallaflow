@@ -47,7 +47,7 @@ install YallaFlow
 
 - whether `.yallaflow/` is tracked by Git (Shared Mode refuses when it is gitignored),
 - project understanding: is there an approved baseline? (recommended before sharing),
-- project-memory health and context schema (an unhealthy workspace is refused),
+- project-memory health and context schema (an unhealthy workspace is refused — including one where two branches already allocated the same `PF-####`/`SRC-####`; see [Repairing ID collisions](#repairing-id-collisions-from-before-sharing)),
 - the **integration branch** — from `origin/HEAD` or `git config init.defaultBranch` when locally available, otherwise you name it: `--integration-branch <branch>`. YallaFlow never assumes `main` and never asks a remote,
 - agent adapters (`CLAUDE.md` / `AGENTS.md`) — without them a teammate's agent has to be told about YallaFlow,
 - the size of durable sources kept in Git,
@@ -107,6 +107,21 @@ Two developers starting from the same Git base must never create the same work o
 | `K-`, `Q-`, `V-`, `CV-`, `IM-`, `REQ-`/`AC-`, `DL-`, `BF-`, `RC-` | per work item | unique within their work item |
 
 Existing `PF-####`, `SRC-####`, and `CTX-####` IDs stay readable forever and are never rewritten. A single-user workspace keeps allocating `PF-####`.
+
+#### Repairing ID collisions from before sharing
+
+A team that worked in a single-user workspace before sharing may already have collided: two branches each allocated the next `PF-####` (or `SRC-####`), and the merge left one directory holding one side's `meta.yaml`/`work.md` (or `source.json`) with the other side's ledgers merged in beside them. `yallaflow doctor` names each one (`work ID collision: PF-0156 holds 2 work items …`), identified by `meta.createdAt` / `source.capturedAt` across the Git history reachable from HEAD — the other failures of those records are symptoms.
+
+Repair them before `shared enable`, sources first or work first (the result is the same):
+
+```text
+yallaflow source split SRC-0021 --dry-run   # preview
+yallaflow source split SRC-0021
+yallaflow work split PF-0156
+yallaflow doctor                            # then commit .yallaflow/
+```
+
+The record that is in the directory now keeps the ID; every other one is restored from its own commit (the newest one before the other record's files reached it) under a new ID, with `renumberedFrom` recording where it came from. Attribution is by content only, so a file edited after the merge or merged from both sides stops the split until a person brings it back to one side's version with Git.
 
 ### 4. Memory base
 
