@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-06T16:08:04.001Z",
+      "completedAt": "2026-11-06T16:08:04.001Z",
+      "summary": "Approved research in research/agent-interaction (CAPABILITY_MATRIX, RECOMMENDED_ARCHITECTURE, AGENT_WORKSPACE_UX) plus real evidence: Codex 7/7 on ChatGPT Plus via codex-acp; Claude Channels 5/5 chat, hooks, Stop-hook final message, and permission relay allow/deny/timeout verified on the owner's session via project ask rules (evidence/poc-claude/relay-log.jsonl). Console reuse: server guards, event stream, runner, watcher, Create Work, explicit activation.",
+      "evidence": [
+        "research/agent-interaction/CAPABILITY_MATRIX.md",
+        "src/console/server.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T16:08:04.502Z",
+      "completedAt": "2026-11-06T16:08:04.502Z",
+      "summary": "REQ-001..005 / AC-001..005 recorded from the owner's authorization (SRC-0024).",
+      "evidence": [
+        "user:SRC-0024"
+      ]
+    },
+    "design-exploration": {
+      "status": "completed",
+      "startedAt": "2026-11-06T16:08:04.833Z",
+      "completedAt": "2026-11-06T16:08:04.833Z",
+      "summary": "Design per research/agent-interaction/RECOMMENDED_ARCHITECTURE.md and AGENT_WORKSPACE_UX.md: Codex bridge-owned via ACP client (zero deps), Claude user-owned via a zero-dependency MCP channel server shipped in the package that dials the console bridge over localhost with a separate bridge token, plus a command-hook forwarder; capability records drive one UI; sessions stored in .yallaflow/local/agent-sessions.",
+      "evidence": [
+        "research/agent-interaction/RECOMMENDED_ARCHITECTURE.md"
+      ]
+    },
+    "specification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T16:08:20.521Z",
+      "completedAt": "2026-11-06T16:08:20.521Z",
+      "summary": "Specification in work.md: components, routes, CLI, gating (Codex opt-in, Claude experimental opt-in), security, UI; AC-001..005.",
+      "evidence": [
+        ".yallaflow/work/PF-0037/work.md"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-06T16:08:29.788Z",
+      "completedAt": "2026-11-06T16:08:29.788Z",
+      "summary": "Plan in work.md: 9 steps (bridge core, console and CLI, UI, tests with fixtures, real Codex walkthrough, browser regression, independent security review, docs and version 1.3.0, full suite and readiness report).",
+      "evidence": [
+        ".yallaflow/work/PF-0037/work.md"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-06T17:03:16.419Z",
+      "completedAt": "2026-11-06T17:38:17.609Z",
+      "summary": "Agent Workspace for v1.3.0 (src/agents/, resources/agents/, console agent and bridge routes, Agent panel, yallaflow agents, console --agents/--experimental-claude, docs, version 1.3.0). Independent security review: 8 findings fixed with regressions. Independent re-review of those fixes: no high-severity issue; fixed: ACP spawn-failure hang, Claude sends fail closed until mode reported, hooks bound to one Claude session, correlation only when unambiguous, Codex modes allowlist-only, session ended if its record can't be written, undelivered verdicts reported, Claude refused while Codex owns the checkout. Process-group cleanup and live-link TOCTOU documented as limitations.",
+      "evidence": [
+        "src/agents/bridge.js",
+        "test/agent-bridge.test.js",
+        "src/agents/claude.js",
+        "src/agents/acp.js",
+        "docs/limitations.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T17:43:17.074Z",
+      "completedAt": "2026-11-06T17:43:17.074Z",
+      "summary": "Full suite 848/848 on the final code (V-004), including 12 agent-bridge tests (simulated providers) with all security regressions. Real-provider evidence unchanged: Codex end-to-end on ChatGPT Plus; Claude relay in the PoC session.",
+      "evidence": [
+        "verification:V-004"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-06T17:43:17.541Z",
+      "completedAt": "2026-11-06T17:43:17.541Z",
+      "summary": "All 5 acceptance criteria satisfied against V-004.",
+      "evidence": [
+        "verification:V-004"
+      ]
+    },
+    "code-review": {
+      "status": "completed",
+      "startedAt": "2026-11-06T17:43:17.720Z",
+      "completedAt": "2026-11-06T17:43:17.720Z",
+      "summary": "Two independent security reviews on isolated copies. Review 1: 8 findings, all fixed with regression tests. Review 2 of the fixes: no high-severity issue; 2 medium (spawn-failure hang, fail-open mode check) and 4 low fixed; 2 low (process-group cleanup, live-link TOCTOU) documented in docs/limitations.md. No browser page can approve permissions or change modes; bridge routes refuse any Origin.",
+      "evidence": [
+        "src/agents/local-files.js",
+        "test/agent-bridge.test.js",
+        "verification:V-004"
+      ]
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Architecture guards AC-108 (provider-name confinement) and 51/no-network (LLM provider references) were scoped to admit the owner-approved v1.3.0 agents layer: src/agents/, commands/agents.js, commands/console.js, console/server.js. The agents layer stays under a network ban (no fetch, http(s) URLs, node:https, node:net); core/ownership.js was made provider-neutral instead of exempted.",
+      "reason": "The approved Hybrid Agent Bridge architecture deliberately adds a provider-aware local layer; the guards predate it. The openai match is the API-key variable the adapter environment strips.",
+      "costIfWrong": "Provider knowledge could spread beyond the agents layer unnoticed; the guard still pins the allowed set explicitly.",
+      "createdAt": "2026-11-06T16:52:25.341Z"
+    },
+    {
+      "decision": "V-001 failed 846/847: the codex permission test read decisions.jsonl before the asynchronous best-effort append landed under full-suite load. The test now waits for the log; the product behavior (decision applies first, log after) is unchanged.",
+      "reason": "Test timing race, not a product defect; isolated runs passed.",
+      "costIfWrong": "A real decision-log write failure could be masked by the wait; the assertion still requires all three entries.",
+      "createdAt": "2026-11-06T17:09:27.916Z"
+    },
+    {
+      "decision": "Claude Code sends fail closed while its permission mode is unknown (MODE_UNKNOWN until a hook reports permission_mode); hooks are bound to the first Claude session seen per channel.",
+      "reason": "Independent re-review: bypass refusal failed open before the first hook and could be spoofed by a second session's hooks. The PoC showed permission_mode on UserPromptSubmit; SessionStart is configured and expected to carry it, but that is not yet observed with a real session.",
+      "costIfWrong": "If SessionStart does not carry permission_mode, the first console message waits until the user types once in Claude Code; documented in limitations and LOCAL_TRIAL.",
+      "createdAt": "2026-11-06T17:33:13.395Z"
+    }
+  ],
+  "history": [
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Independent re-review of the security fixes: medium/low findings fixed or documented after the earlier checkpoint",
+      "changedAt": "2026-11-06T17:38:07.940Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Downstream of implementation revision: Independent re-review of the security fixes: medium/low findings fixed or documented after the earlier checkpoint",
+      "changedAt": "2026-11-06T17:38:07.940Z"
+    },
+    {
+      "skill": "delivery-convergence",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Downstream of implementation revision: Independent re-review of the security fixes: medium/low findings fixed or documented after the earlier checkpoint",
+      "changedAt": "2026-11-06T17:38:07.940Z"
+    }
+  ],
+  "updatedAt": "2026-11-06T17:43:17.720Z"
+}

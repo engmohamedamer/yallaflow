@@ -1,0 +1,462 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-06T17:24:21.634Z",
+      "stage": "IMPLEMENTATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+        "verificationRunIds": [
+          "V-002"
+        ]
+      },
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "Codex handshake requires _auth/status_update kind=account and refuses otherwise (SUBSCRIPTION_REQUIRED); adapterEnvironment strips OPENAI_API_KEY/CODEX_API_KEY/OPENAI_BASE_URL/org/project; Claude detection requires authMethod claude.ai; tests cover the refused non-subscription login and the stripped env.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/codex.js",
+              "contentHash": "sha256:9434930184a1db421220c840168732e1826128a723562a1cf229ddcb89282335",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/agents/detect.js",
+              "contentHash": "sha256:63e110e8b073567b827ade0168677f902400701259a6a9e0205728595c20a70c",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-bridge.test.js",
+              "contentHash": "sha256:c6f01cb219bd8bed5df0f2c8230e9638487ccad825db35dc667d292cb350b63d",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0037",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "ACP-fixture tests cover start, streaming, follow-up, allow/deny/timeout, cancel, resume after console restart, crash, unsupported controls; real Codex walkthrough on ChatGPT Plus passed through the UI; channel server and hook forwarder tested against an MCP client fixture.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/agent-bridge.test.js",
+              "contentHash": "sha256:c6f01cb219bd8bed5df0f2c8230e9638487ccad825db35dc667d292cb350b63d",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test-support/fake-acp-agent.mjs",
+              "contentHash": "sha256:d86f997faf67289e50fdd385e1c97b18c49079e76e9748180d839922289316e8",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0037",
+              "verificationRunId": "V-002"
+            },
+            {
+              "type": "runtime",
+              "description": "real Codex walkthrough on ChatGPT Plus (research/agent-interaction/screenshots/walk-01..08)"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "Re-run after the security fixes: 72/72 combinations (Chromium, Firefox, WebKit x light/dark x 1440/390 x en/ar x Codex/Claude/Flow) with zero overflow, zero contrast findings, no console errors; Stop/End not rendered for Claude per its capability record.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:84996e24540b65aafe2c1001ce85f979285d85b254e372d4e6b7996e1c3beb98",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "3-engine smoke on simulated providers after security fixes, 72/72 clean"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "Start/connect never change activeWork (asserted); Make it active runs yallaflow activate through Core; records under .yallaflow/local are git-ignored (asserted); full suite 847/847.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/bridge.js",
+              "contentHash": "sha256:19778d2d559c9c4e5882c6a9163e678bade25cb3eeb5d88a9b504162425862c3",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-bridge.test.js",
+              "contentHash": "sha256:c6f01cb219bd8bed5df0f2c8230e9638487ccad825db35dc667d292cb350b63d",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0037",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "Security tests cover opt-in, 401, 403, read-only, bridge token never in browser payloads, 409 second session (including concurrent starts), session id validation, bypass/empty/escalated modes, timeout deny, symlink writes, channel takeover, disconnect deny, nested workspaces. Independent security review: 8 findings, all fixed with regression tests; no unresolved high-severity issue.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/agent-bridge.test.js",
+              "contentHash": "sha256:c6f01cb219bd8bed5df0f2c8230e9638487ccad825db35dc667d292cb350b63d",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/agents/local-files.js",
+              "contentHash": "sha256:58f21eabdd473bc7b6629a2c780623d8437ed9d5362de874dfc3f68b82b9af64",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0037",
+              "verificationRunId": "V-002"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    },
+    {
+      "id": "CV-002",
+      "recordedAt": "2026-11-06T17:38:03.435Z",
+      "stage": "IMPLEMENTATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+        "verificationRunIds": [
+          "V-003"
+        ]
+      },
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "Codex handshake requires _auth/status_update kind=account and refuses otherwise (SUBSCRIPTION_REQUIRED); adapterEnvironment strips OPENAI_API_KEY/CODEX_API_KEY/OPENAI_BASE_URL/org/project; Claude detection requires authMethod claude.ai; tests cover the refused non-subscription login and the stripped env.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/codex.js",
+              "contentHash": "sha256:9434930184a1db421220c840168732e1826128a723562a1cf229ddcb89282335",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/agents/detect.js",
+              "contentHash": "sha256:63e110e8b073567b827ade0168677f902400701259a6a9e0205728595c20a70c",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-bridge.test.js",
+              "contentHash": "sha256:5b68bfb92c76dd09e97c8cbfd7841210277cdb36261bc08fc8a6803f9b1869b0",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0037",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "ACP-fixture tests cover start, streaming, follow-up, allow/deny/timeout, cancel, resume after console restart, crash, unsupported controls; real Codex walkthrough on ChatGPT Plus passed through the UI; channel server and hook forwarder tested against an MCP client fixture.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/agent-bridge.test.js",
+              "contentHash": "sha256:5b68bfb92c76dd09e97c8cbfd7841210277cdb36261bc08fc8a6803f9b1869b0",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test-support/fake-acp-agent.mjs",
+              "contentHash": "sha256:d86f997faf67289e50fdd385e1c97b18c49079e76e9748180d839922289316e8",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0037",
+              "verificationRunId": "V-003"
+            },
+            {
+              "type": "runtime",
+              "description": "real Codex walkthrough on ChatGPT Plus (research/agent-interaction/screenshots/walk-01..08)"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "Re-run after the security fixes: 72/72 combinations (Chromium, Firefox, WebKit x light/dark x 1440/390 x en/ar x Codex/Claude/Flow) with zero overflow, zero contrast findings, no console errors; Stop/End not rendered for Claude per its capability record.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:84996e24540b65aafe2c1001ce85f979285d85b254e372d4e6b7996e1c3beb98",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "3-engine smoke on simulated providers after security fixes, 72/72 clean"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "Start/connect never change activeWork (asserted); Make it active runs yallaflow activate through Core; records under .yallaflow/local are git-ignored (asserted); full suite 847/847.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/bridge.js",
+              "contentHash": "sha256:0762ab7fd3f95023e7ef8ef4fdf4690f527495aeb1d1c65b0123f74dce5c040f",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-bridge.test.js",
+              "contentHash": "sha256:5b68bfb92c76dd09e97c8cbfd7841210277cdb36261bc08fc8a6803f9b1869b0",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0037",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "Security tests cover opt-in, 401, 403, read-only, bridge token never in browser payloads, 409 second session (including concurrent starts), session id validation, bypass/empty/escalated modes, timeout deny, symlink writes, channel takeover, disconnect deny, nested workspaces. Independent security review: 8 findings, all fixed with regression tests; no unresolved high-severity issue.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/agent-bridge.test.js",
+              "contentHash": "sha256:5b68bfb92c76dd09e97c8cbfd7841210277cdb36261bc08fc8a6803f9b1869b0",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/agents/local-files.js",
+              "contentHash": "sha256:58f21eabdd473bc7b6629a2c780623d8437ed9d5362de874dfc3f68b82b9af64",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0037",
+              "verificationRunId": "V-003"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    },
+    {
+      "id": "CV-003",
+      "recordedAt": "2026-11-06T17:43:17.250Z",
+      "stage": "IMPLEMENTATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+        "verificationRunIds": [
+          "V-004"
+        ]
+      },
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "Codex handshake requires _auth/status_update kind=account and refuses otherwise (SUBSCRIPTION_REQUIRED); adapterEnvironment strips OPENAI_API_KEY/CODEX_API_KEY/OPENAI_BASE_URL/org/project; Claude detection requires authMethod claude.ai; tests cover the refused non-subscription login and the stripped env.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/codex.js",
+              "contentHash": "sha256:9434930184a1db421220c840168732e1826128a723562a1cf229ddcb89282335",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/agents/detect.js",
+              "contentHash": "sha256:63e110e8b073567b827ade0168677f902400701259a6a9e0205728595c20a70c",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-bridge.test.js",
+              "contentHash": "sha256:5b68bfb92c76dd09e97c8cbfd7841210277cdb36261bc08fc8a6803f9b1869b0",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0037",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "ACP-fixture tests cover start, streaming, follow-up, allow/deny/timeout, cancel, resume after console restart, crash, unsupported controls; real Codex walkthrough on ChatGPT Plus passed through the UI; channel server and hook forwarder tested against an MCP client fixture.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/agent-bridge.test.js",
+              "contentHash": "sha256:5b68bfb92c76dd09e97c8cbfd7841210277cdb36261bc08fc8a6803f9b1869b0",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test-support/fake-acp-agent.mjs",
+              "contentHash": "sha256:d86f997faf67289e50fdd385e1c97b18c49079e76e9748180d839922289316e8",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0037",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "real Codex walkthrough on ChatGPT Plus (research/agent-interaction/screenshots/walk-01..08)"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "Re-run after the security fixes: 72/72 combinations (Chromium, Firefox, WebKit x light/dark x 1440/390 x en/ar x Codex/Claude/Flow) with zero overflow, zero contrast findings, no console errors; Stop/End not rendered for Claude per its capability record.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:84996e24540b65aafe2c1001ce85f979285d85b254e372d4e6b7996e1c3beb98",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "3-engine smoke on simulated providers after security fixes, 72/72 clean"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "Start/connect never change activeWork (asserted); Make it active runs yallaflow activate through Core; records under .yallaflow/local are git-ignored (asserted); full suite 847/847.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/bridge.js",
+              "contentHash": "sha256:0762ab7fd3f95023e7ef8ef4fdf4690f527495aeb1d1c65b0123f74dce5c040f",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-bridge.test.js",
+              "contentHash": "sha256:5b68bfb92c76dd09e97c8cbfd7841210277cdb36261bc08fc8a6803f9b1869b0",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0037",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "Security tests cover opt-in, 401, 403, read-only, bridge token never in browser payloads, 409 second session (including concurrent starts), session id validation, bypass/empty/escalated modes, timeout deny, symlink writes, channel takeover, disconnect deny, nested workspaces. Independent security review: 8 findings, all fixed with regression tests; no unresolved high-severity issue.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/agent-bridge.test.js",
+              "contentHash": "sha256:5b68bfb92c76dd09e97c8cbfd7841210277cdb36261bc08fc8a6803f9b1869b0",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/agents/local-files.js",
+              "contentHash": "sha256:58f21eabdd473bc7b6629a2c780623d8437ed9d5362de874dfc3f68b82b9af64",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0037",
+              "verificationRunId": "V-004"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-06T17:43:17.250Z"
+}

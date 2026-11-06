@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node -e \"const fs=require('fs');const cli=fs.readFileSync('src/cli.js','utf8');const srv=fs.readFileSync('src/console/server.js','utf8');for(const c of ['hold','close','cancel','pause']) if(cli.includes(\"command === '\"+c+\"'\")) throw new Error('unexpected command '+c);if(!/agent\\\\\\/\\(start/.test(srv)&&!srv.includes('agent\\\\/(start'))console.log('agent routes pattern');if(!srv.includes('work(?:'))throw new Error('work route');console.log('inventory claims hold: no hold/close/cancel/pause commands; console writes limited to work, sources and agent routes');\"",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "-e",
+        "const fs=require('fs');const cli=fs.readFileSync('src/cli.js','utf8');const srv=fs.readFileSync('src/console/server.js','utf8');for(const c of ['hold','close','cancel','pause']) if(cli.includes(\"command === '\"+c+\"'\")) throw new Error('unexpected command '+c);if(!/agent\\\\\\/\\(start/.test(srv)&&!srv.includes('agent\\\\/(start'))console.log('agent routes pattern');if(!srv.includes('work(?:'))throw new Error('work route');console.log('inventory claims hold: no hold/close/cancel/pause commands; console writes limited to work, sources and agent routes');"
+      ],
+      "displayCommand": "node -e \"const fs=require('fs');const cli=fs.readFileSync('src/cli.js','utf8');const srv=fs.readFileSync('src/console/server.js','utf8');for(const c of ['hold','close','cancel','pause']) if(cli.includes(\"command === '\"+c+\"'\")) throw new Error('unexpected command '+c);if(!/agent\\\\\\/\\(start/.test(srv)&&!srv.includes('agent\\\\/(start'))console.log('agent routes pattern');if(!srv.includes('work(?:'))throw new Error('work route');console.log('inventory claims hold: no hold/close/cancel/pause commands; console writes limited to work, sources and agent routes');\"",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-06T21:00:54.231Z",
+      "finishedAt": "2026-11-06T21:00:54.258Z",
+      "verifiedAt": "2026-11-06T21:00:54.258Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

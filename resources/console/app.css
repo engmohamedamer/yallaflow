@@ -479,3 +479,49 @@ dialog.create [hidden] { display: none !important; }
 html[lang="en"] dialog.create .seg span::first-letter { text-transform: uppercase; }
 :root[data-theme="dark"] .chip.new { color: #3fd0bf; }
 .fcard .grow .chip { justify-self: start; }
+
+/* Agent Workspace (v1.3.0, opt-in): one panel for every provider */
+.panel.agent { margin-top: 18px; display: grid; gap: 12px; }
+.agent .ahead { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.agent .ahead h2 { font-size: 20px; }
+.agent .apicks { display: flex; gap: 10px; flex-wrap: wrap; }
+.agent .apick { position: relative; flex: 1 1 220px; }
+.agent .apick input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.agent .apick > span { display: grid; gap: 2px; border: 1px solid var(--line); border-radius: 16px; padding: 10px 14px; background: var(--bg); }
+.agent .apick input:checked + span { border-color: var(--nile); box-shadow: 0 0 0 2px color-mix(in srgb, var(--nile) 35%, transparent); }
+.agent .apick input:focus-visible + span { outline: 2px solid var(--nile); outline-offset: 2px; }
+.agent .apick.off > span { opacity: .75; }
+.agent .apick small { color: var(--muted); font-size: 13px; }
+.agent .apick i.exp { justify-self: start; }
+.agent i.exp { font-style: normal; font-size: 12px; color: var(--amber); border: 1px solid color-mix(in srgb, var(--amber) 50%, transparent); border-radius: 999px; padding: 0 8px; }
+.agent .aprob { margin: 0; padding-inline-start: 20px; color: var(--clay); font-size: 14px; }
+.agent select { font: inherit; color: inherit; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 4px 8px; margin-inline-start: 6px; }
+.agent .linkbtn { background: none; border: 0; color: var(--nile-2); text-decoration: underline; cursor: pointer; font: inherit; padding: 0 2px; }
+:root[data-theme="dark"] .agent .linkbtn { color: var(--nile); }
+.agent .abar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.agent .awarn { background: var(--amber-soft); color: var(--ink); border-radius: 12px; padding: 8px 12px; font-size: 14px; }
+.agent .alaunch { border: 1px dashed var(--line); border-radius: 14px; padding: 10px 12px; display: grid; gap: 8px; }
+.agent .alaunch .cli { white-space: pre-wrap; word-break: break-all; }
+.agent .astream { max-height: 460px; overflow-y: auto; display: grid; gap: 8px; padding: 4px 2px; }
+.agent .amsg { justify-self: start; max-width: min(720px, 92%); background: var(--bg); border: 1px solid var(--line); border-radius: 16px; padding: 8px 12px; }
+.agent .amsg p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.agent .amsg.me { justify-self: end; background: var(--nile-soft); border-color: transparent; }
+.agent .atool { font-size: 13px; color: var(--muted); padding-inline-start: 6px; overflow-wrap: anywhere; }
+.agent .atool.done span { color: var(--palm-ink); } .agent .atool.fail span { color: var(--clay); }
+:root[data-theme="dark"] .agent .atool.done span { color: var(--palm); }
+.agent .anote { font-size: 13px; color: var(--muted); text-align: center; }
+.agent .anote.warn, .agent .warn { color: var(--amber); font-weight: 600; }
+.agent .aperm { border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; display: grid; gap: 8px; background: var(--card); }
+.agent .aperm.open { border-color: var(--dusk); background: color-mix(in srgb, var(--dusk-soft) 55%, var(--card)); }
+.agent .aperm .ptag { font-size: 12px; font-weight: 600; color: var(--dusk); border: 1px solid color-mix(in srgb, var(--dusk) 45%, transparent); border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
+.agent .pdetail { margin: 0; font-size: 12px; background: var(--bg); border-radius: 10px; padding: 6px 8px; white-space: pre-wrap; word-break: break-all; max-height: 160px; overflow: auto; }
+.agent .acompose { display: flex; gap: 8px; align-items: flex-end; }
+.agent .acompose textarea { flex: 1; font: inherit; color: inherit; background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 8px 12px; resize: vertical; min-height: 44px; }
+.agent .acompose textarea:focus-visible { outline: 2px solid var(--nile); outline-offset: 2px; }
+@media (max-width: 640px) { .agent .acompose { flex-direction: column; align-items: stretch; } .agent .astream { max-height: 360px; } }
+/* contrast fixes (v1.3.0): bell count badge, agent permission tag, warning chip */
+.bell b { background: #b3362a; color: #fff; }
+:root[data-theme="dark"] .bell b { background: var(--clay); color: #0b1022; }
+.agent .aperm .ptag { color: var(--ink); border-color: var(--dusk); }
+.chip.wait { color: #6f4a00; }
+:root[data-theme="dark"] .chip.wait { color: var(--amber); }

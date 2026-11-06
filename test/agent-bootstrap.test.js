@@ -140,6 +140,9 @@ test('AC-108: provider knowledge stays in src/agent and the agent command surfac
       else if (absolute.endsWith('.js')) {
         const relative = path.relative(src, absolute).split(path.sep).join('/');
         if (relative.startsWith('agent/') || ['cli.js', 'commands/agent.js'].includes(relative)) continue;
+        // v1.3.0 Agent Workspace (owner-approved architecture, PF-0037): the provider-aware
+        // session layer lives in src/agents/ and its CLI/console entry points, nowhere else.
+        if (relative.startsWith('agents/') || ['commands/agents.js', 'commands/console.js', 'console/server.js'].includes(relative)) continue;
         if (/\b(claude|codex|CLAUDE\.md|AGENTS\.md)\b/i.test(await readFile(absolute, 'utf8'))) offenders.push(relative);
       }
     }

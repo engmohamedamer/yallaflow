@@ -18,6 +18,36 @@ Known gaps and deliberate boundaries. Planned work is tracked in [`roadmap.md`](
   - **No agent sessions.** It never starts, stops, or observes agents. A worktree is shown as a Git checkout with its recorded YallaFlow state, never as a live agent session.
   - **Insights are partial.** They cover only recorded data (creation and completion times, verification runs). YallaFlow does not record time per station or waiting time.
   - **Browser coverage.** It is tested in Chromium, Firefox and WebKit through Playwright on Linux. It has not been tested in desktop Safari, on Windows or macOS hosts, or with screen readers.
+- **Agent Workspace (1.3.0).**
+  - **Codex** needs the separately installed `@agentclientprotocol/codex-acp` 2.x adapter, a third-party package. The adapter wraps Codex's App Server, which OpenAI labels experimental; its behavior can change between Codex versions.
+  - **Claude Code is not included.** The Claude Code connection is not part of the release. It exists as an experiment in development builds only, until Anthropic confirms that a third-party tool may distribute it.
+  - **Permission enforcement is the provider's.** YallaFlow denies unanswered requests it receives. It can't see or block actions a provider approves on its own.
+  - **One managed session per checkout.** Live attach to a Codex session running in a terminal is not supported.
+  - **Process cleanup has limits.** Ending a Codex session ends the adapter's process group. On Linux, it also ends every process the adapter started. Still:
+    - **macOS:** a command Codex starts in its own session falls outside the group and is not tracked.
+    - **Linux:** processes are sampled every second and at each tool event. A process that detaches itself in the second before an adapter crash, or by double fork, can be missed.
+    - **Any platform:** a fully detached process can't be tracked without OS containment. YallaFlow uses no cgroups and no job objects.
+    - **The panel says what was checked:**
+      - after a crash, or where only the process group is visible (macOS), it adds that detached processes are not tracked;
+      - on Windows, only the adapter is stopped, and the panel and the terminal say the started processes could not be checked.
+    - **A forced stop still cleans up.** A second Ctrl-C while the console is stopping, or a closed terminal (SIGHUP), kills every agent process group at once.
+    - **What happened with Codex 0.164.0 on Linux:** Codex ended its own commands itself, even when `codex app-server` was killed. When processes survive, the console lists them instead of claiming a clean stop.
+  - **A crashed `app-server` is noticed late.** If `codex app-server` dies but the adapter keeps running, the panel shows the session as ready until the next message fails. Then end and resume the session.
+  - **Local write checks and live links.** Local files are never written through a symbolic link.
+    - **Linux:** writes resolve their folders through opened handles, so a link swapped in after the check can't redirect them.
+    - **macOS and Windows:** the check happens just before the write. A swap in that instant is not excluded.
+    - **Not a sandbox:** a process running as you outside the agent's sandbox can change these files anyway.
+  - **One agent console per checkout.** The lock follows the workspace lock's rules: process identity, and the same host only. Another checkout of the same repository (a Git worktree) is separate and has its own session.
+    - **Some locks never go stale on their own:**
+      - a lock from a different host name (for example after the machine name changed);
+      - a crashed holder whose process can't be identified (no `/proc`, as on macOS) while its pid is reused.
+
+      Such a lock blocks agent sessions until it is deleted. The message names the file: `.yallaflow/local/agent-console.lock`.
+    - **The owner re-checks the lock** before each action and claims it again if it was removed (`git clean`). Until the next action, a second console could take it.
+  - **Other links in `.yallaflow/local/`:**
+    - **Hard links:** the decision log refuses to append to a file that has other hard links.
+    - **Not fully race-free:** lock reclaim and release, and folder creation, use plain paths. The worst case is an empty folder created, or a stray `agent-console.lock` removed, outside the checkout. No content is written outside it.
+  - **Allow for session relies on Codex.** YallaFlow picks only options Codex labels as session-scoped, by their known adapter IDs (codex-acp 2.5.0). Codex itself enforces that scope.
 - **Workspace lock: known edges.**
   - A lock left by a crash is removed by the next command once its holder is known to be gone: the pid is dead, a zombie, or reused; or the machine rebooted.
   - A lock whose holder cannot be identified (no process start time, which happens outside Linux) can be removed with `doctor --clear-lock` once it is an hour old.

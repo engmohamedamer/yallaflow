@@ -22,6 +22,8 @@ import { exists } from '../utils/fs.js';
 import { loadSource, loadSourceText, sourceOriginalPath } from '../core/sources.js';
 import { isSourceId, isWorkId } from '../core/ids.js';
 import { HttpError, MAX_JSON_BYTES, attachFile, createWork, validateCreateBody } from './create.js';
+import { AgentBridge } from '../agents/bridge.js';
+import { loadClaude } from '../agents/experimental.js';
 
 const UI_DIR = fileURLToPath(new URL('../../resources/console/', import.meta.url));
 const UI_FILES = Object.freeze({
@@ -36,6 +38,10 @@ const UI_FILES = Object.freeze({
 
 // The only routes that accept POST: create a work item, and attach a file to it.
 const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/work(?:\/[^/]+\/sources)?$/;
+// Agent Interaction (v1.3.0, only with --agents): the Agent Workspace's actions.
+const AGENT_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/agent\/(start|message|permission|cancel|end|resume|connect|disconnect|activate)$/;
+// The Claude channel server and hook forwarder (bridge token, never a browser).
+const BRIDGE_ROUTE = /^\/api\/agent-bridge\/claude\/(stream|event|hook)$/;
 
 const PAGE_CSP = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; " +
   "frame-src blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
@@ -67,7 +73,9 @@ export function projectId(root) {
   return createHash('sha256').update(root).digest('hex').slice(0, 10);
 }
 
-export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', token = randomBytes(24).toString('hex'), poll = false, missing = [], readOnly = false } = {}) {
+export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', token = randomBytes(24).toString('hex'), poll = false, missing = [], readOnly = false, agents = false, experimentalClaude = false, agentEnv = process.env } = {}) {
+  // Agent Interaction needs writes; --read-only keeps the console genuinely read-only.
+  const agentsOn = Boolean(agents) && !readOnly;
   const runner = createRunner();
   const projects = await Promise.all(roots.map(async (root) => ({ id: projectId(root), root, name: (await projectName(root)) ?? path.basename(root) })));
   const byId = new Map(projects.map((entry) => [entry.id, entry]));
@@ -97,6 +105,12 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     const origin = request.headers.origin;
     if (origin && !allowedHosts.map((entry) => `http://${entry}`).includes(origin)) return send(response, 403, { error: { code: 'FORBIDDEN_ORIGIN', message: 'Foreign origin.' } });
     const url = new URL(request.url, `http://${request.headers.host}`);
+    if (BRIDGE_ROUTE.test(url.pathname)) return handleBridge(request, response, url);
+    if (request.method === 'POST' && agentsOn && AGENT_ROUTE.test(url.pathname)) {
+      if (!authorized(request)) return send(response, 401, { error: { code: 'UNAUTHORIZED', message: 'Missing or wrong console token. Open the link printed by `yallaflow console`.' } });
+      if (!origin) return send(response, 403, { error: { code: 'FORBIDDEN_ORIGIN', message: 'An agent action needs the console page as its Origin.' } });
+      return handleAgent(request, response, url);
+    }
     if (request.method === 'POST') {
       // Writes: only the Create Work routes, only with the token, our own Origin and the exact type.
       if (readOnly || !WRITE_ROUTE.test(url.pathname)) return send(response, 405, { error: { code: 'READ_ONLY', message: readOnly ? 'This console was started with --read-only.' : 'Only Create Work accepts POST.' } }, { Allow: 'GET, HEAD' });
@@ -111,7 +125,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
 
     const parts = url.pathname.split('/').filter(Boolean); // ['api', ...]
     if (parts.length === 2 && parts[1] === 'projects') {
-      return send(response, 200, { projects: projects.map(({ id, name, root }) => ({ id, name, root })), unavailable: missing, readOnly });
+      return send(response, 200, { projects: projects.map(({ id, name, root }) => ({ id, name, root })), unavailable: missing, readOnly, agents: { enabled: agentsOn, claude: agentsOn && Boolean(experimentalClaude) } });
     }
     if (parts.length === 2 && parts[1] === 'events') {
       if (request.method !== 'GET') return send(response, 405, { error: { code: 'METHOD', message: 'The event stream is GET only.' } }, { Allow: 'GET' });
@@ -125,6 +139,10 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     }
     if (rest.length === 2 && rest[0] === 'work' && isWorkId(rest[1])) {
       return send(response, 200, await runner.get(project.root, `work:${rest[1]}`, ['work', 'show', rest[1], '--json']));
+    }
+    if (rest.length === 1 && rest[0] === 'agent') {
+      if (!agentsOn) return send(response, 200, { enabled: false });
+      return send(response, 200, await bridge.status(project.id));
     }
     if (rest.length === 1 && rest[0] === 'worktrees') {
       return send(response, 200, await teamView(project));
@@ -156,6 +174,77 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       return send(response, result.duplicate ? 200 : 201, result);
     }
     return send(response, 404, { error: { code: 'NOT_FOUND', message: 'Not found.' } });
+  }
+
+  // ----- Agent Workspace actions (browser token + Origin, JSON only) -----
+  async function handleAgent(request, response, url) {
+    const type = String(request.headers['content-type'] ?? '').split(';')[0].trim().toLowerCase();
+    if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+    const parts = url.pathname.split('/').filter(Boolean);
+    const project = byId.get(parts[2]);
+    if (!project) return send(response, 404, { error: { code: 'NOT_FOUND', message: 'Unknown project.' } });
+    const body = await readJsonBody(request);
+    const action = parts[4];
+    const workId = body.workId === undefined || body.workId === null ? null : String(body.workId);
+    if (workId !== null && !isWorkId(workId)) return send(response, 400, { error: { code: 'BAD_WORK', message: 'Invalid work item.' } });
+    switch (action) {
+      case 'start':
+        if (body.provider !== 'codex') return send(response, 400, { error: { code: 'UNSUPPORTED', message: 'Only Codex sessions are started by YallaFlow.' } });
+        return send(response, 201, await bridge.startCodex(project.id, { workId, mode: 'mode' in body ? body.mode : undefined }));
+      case 'resume':
+        return send(response, 201, await bridge.resumeCodex(project.id, String(body.recordId ?? ''), { mode: 'mode' in body ? body.mode : undefined }));
+      case 'message':
+        return send(response, 202, await bridge.message(project.id, body.text));
+      case 'permission':
+        return send(response, 200, bridge.answerPermission(project.id, String(body.requestId ?? ''), String(body.decision ?? '')));
+      case 'cancel':
+        return send(response, 200, bridge.cancel(project.id));
+      case 'end':
+        return send(response, 200, await bridge.end(project.id));
+      case 'connect': {
+        if (body.provider !== 'claude' || !experimentalClaude) return send(response, 400, { error: { code: 'UNSUPPORTED', message: 'Claude Code sessions are not enabled in this console.' } });
+        const files = await (await loadClaude()).writeClaudeLaunchFiles(project.root);
+        const summary = await bridge.connectClaude(project.id, { workId });
+        return send(response, 200, { ...summary, launch: { command: files.command } });
+      }
+      case 'disconnect':
+        return send(response, 200, await bridge.disconnectClaude(project.id));
+      case 'activate': {
+        if (!workId) return send(response, 400, { error: { code: 'BAD_WORK', message: 'Name the work item to activate.' } });
+        return send(response, 200, await bridge.activate(project.id, workId));
+      }
+      default:
+        return send(response, 404, { error: { code: 'NOT_FOUND', message: 'Not found.' } });
+    }
+  }
+
+  // ----- Claude channel server + hook forwarder (bridge token; never a browser) -----
+  async function handleBridge(request, response, url) {
+    if (!agentsOn || !experimentalClaude) return send(response, 404, { error: { code: 'NOT_FOUND', message: 'Not found.' } });
+    if (request.headers.origin) return send(response, 403, { error: { code: 'FORBIDDEN_ORIGIN', message: 'Not for browsers.' } });
+    const header = String(request.headers.authorization ?? '');
+    const target = bridge.projectByBridgeToken(header.startsWith('Bearer ') ? header.slice(7) : '');
+    if (!target) return send(response, 401, { error: { code: 'UNAUTHORIZED', message: 'Missing or wrong bridge token.' } });
+    const kind = url.pathname.split('/').pop();
+    if (kind === 'stream') {
+      if (request.method !== 'GET') return send(response, 405, { error: { code: 'METHOD', message: 'GET only.' } });
+      const pid = Number(url.searchParams.get('pid'));
+      if (!target.owner) return send(response, 409, { error: { code: 'CHECKOUT_LOCKED', message: 'Another YallaFlow console owns agent sessions in this checkout.' } });
+      if (target.session?.provider === 'codex') return send(response, 409, { error: { code: 'SESSION_ACTIVE', message: 'A Codex session owns this checkout. End it first.' } });
+      if (target.claude.streamBusy()) return send(response, 409, { error: { code: 'CHANNEL_ACTIVE', message: 'A Claude Code channel is already connected to this project.' } });
+      response.writeHead(200, { ...BASE_HEADERS, 'Content-Type': 'text/event-stream; charset=utf-8', Connection: 'keep-alive' });
+      response.write(': connected\n\n');
+      target.claude.attachStream(response, { pid: Number.isInteger(pid) ? pid : null });
+      return;
+    }
+    if (request.method !== 'POST') return send(response, 405, { error: { code: 'METHOD', message: 'POST only.' } });
+    const body = await readJsonBody(request);
+    if (kind === 'event') {
+      target.claude.onChannelEvent(body).catch(() => {});
+      return send(response, 200, { ok: true });
+    }
+    target.claude.onHook(body);
+    return send(response, 200, {});
   }
 
   // Worktrees of a project, each with its own recorded YallaFlow state and changed files.
@@ -213,19 +302,49 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     server.listen(port, host, () => resolve(server.address()));
   });
 
-  return {
+  const bridge = agentsOn ? new AgentBridge({
+    projects,
+    port: listening.port,
+    claude: Boolean(experimentalClaude),
+    env: agentEnv,
+    broadcast: (projectId, event) => {
+      const message = `data: ${JSON.stringify({ type: 'agent', project: projectId, event })}\n\n`;
+      for (const client of clients) client.write(message);
+    },
+    // Activation is an explicit user action, carried out by Core itself.
+    runActivate: async (root, workId) => {
+      const result = await runner.write(root, ['activate', workId]);
+      if (result.status !== 0) throw Object.assign(new Error((result.stderr || result.stdout).trim().split('\n')[0] || 'Activation failed.'), { status: 422, code: 'ACTIVATE_REFUSED' });
+      return { ok: true, workId };
+    }
+  }) : null;
+  const api = {
     url: `http://127.0.0.1:${listening.port}/`,
     port: listening.port,
     token,
     projects,
     watchModes: watchers.map((entry) => entry.mode),
+    agents: { enabled: agentsOn, claude: agentsOn && Boolean(experimentalClaude) },
+    // Resolves to the agent sessions whose processes could not all be ended (empty when
+    // everything stopped), so the caller can say so instead of claiming a clean stop.
     async close() {
+      const incomplete = (await bridge?.close()) ?? [];
       clearInterval(heartbeat);
       for (const watcher of watchers) watcher.close();
       for (const client of clients) client.end();
       await new Promise((resolve) => server.close(resolve));
+      return incomplete;
     }
   };
+  try {
+    await bridge?.open();
+  } catch (error) {
+    // For example a symbolic link where the bridge file goes: nothing is left listening.
+    await api.close().catch(() => {});
+    server.closeAllConnections?.();
+    throw error;
+  }
+  return api;
 }
 
 async function serveUi(pathname, response) {

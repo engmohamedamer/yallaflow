@@ -148,6 +148,10 @@ Each checkout has one **active work item**: the one `guide`, `status` and `brief
 - **Deferred items never take focus on their own.** Routing, advancing or checkpointing such an item leaves the active item unchanged.
 - **Switching is explicit.** `yallaflow activate <id>` makes an item the active one and prints which item it replaced.
 
+## Agent Workspace (1.3.0, opt-in)
+
+With `yallaflow console --agents`, a work item gets an **Agent** panel for working with Codex (managed sessions on your ChatGPT login). See [`agents.md`](agents.md).
+
 ## Security
 
 - **Listening and requests.** The server listens on `127.0.0.1` only and requires the per-run token (401). It refuses a foreign `Host` (421) and a foreign `Origin` (403). Reads are `GET`/`HEAD`.

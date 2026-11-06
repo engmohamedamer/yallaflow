@@ -562,4 +562,22 @@ print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_commo
   - test/console-create.test.js (repository @ bdb5e90)
   - npm test (passed) (runtime, PF-0032 V-004)
 
+<!-- yallaflow-fact:CTX-0102 -->
+### CTX-0102 — Agent Workspace (v1.3.0, opt-in via 'yallaflow console --agents'): provider-aware code is confined to src/agents/ (plus commands/agents.js and the console entry points), which makes no network calls of its own. Codex is a managed session through the user-installed ACP adapter codex-acp, refused unless it reports a ChatGPT account login, with API-key variables stripped from its environment. Claude Code is experimental (--experimental-claude): the user starts it and it joins through the bundled Channels MCP server (resources/agents/claude-channel.mjs) and command hooks, authenticated by a per-run bridge token in .yallaflow/local/agent-bridge.json. One managed session per checkout; unanswered permissions are denied after YALLAFLOW_AGENT_PERMISSION_TIMEOUT_MS (default 5 min); full-access/bypass modes are never used; session records live in git-ignored .yallaflow/local/agent-sessions/; activation only through yallaflow activate.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0037
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-06T17:43:40.304Z
+- **Verified:** 2026-11-06T17:43:40.304Z (commit bdb5e90)
+- **Evidence:**
+  - src/agents/bridge.js (repository @ bdb5e90)
+  - src/agents/codex.js (repository @ bdb5e90)
+  - src/agents/claude.js (repository @ bdb5e90)
+  - resources/agents/claude-channel.mjs (repository @ bdb5e90)
+  - docs/agents.md (repository @ bdb5e90)
+  - npm test (passed) (runtime, PF-0037 V-002)
+
 <!-- yallaflow-context:end -->

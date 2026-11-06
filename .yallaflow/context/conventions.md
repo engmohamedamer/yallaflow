@@ -141,4 +141,35 @@
   - docs/releasing.md (repository @ bdb5e90)
   - /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/rc-smoke.sh (passed) (runtime, PF-0029 V-007)
 
+<!-- yallaflow-fact:CTX-0103 -->
+### CTX-0103 — Agent integrations use only the developer's existing subscription and locally authenticated tools: no API keys, no API billing, no credential extraction or proxying; for Claude Code no Agent SDK, claude -p, or third-party ACP adapter on subscription auth; YallaFlow never launches Claude Code or accepts its warnings for the user.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0037
+- **Knowledge ID:** K-002
+- **Promoted at:** 2026-11-06T17:43:40.566Z
+- **Verified:** 2026-11-06T17:43:40.566Z (commit bdb5e90)
+- **Evidence:**
+  - docs/agents.md (repository @ bdb5e90)
+  - src/agents/codex.js (repository @ bdb5e90)
+  - owner mandated subscription-only agent interaction, SRC-0024 (user-confirmed)
+
+<!-- yallaflow-fact:CTX-0104 -->
+### CTX-0104 — Agent Workspace safety rules: a provider permission is chosen by its exact option id, never by ACP kind alone (codex-acp shares allow_always between session-scoped and persistent rules); Codex adapters run in their own process group and a session end reports a cleanup result scoped to what could be observed, never a clean stop it could not verify; one agent-enabled console per checkout holds .yallaflow/local/agent-console.lock.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0038
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-06T19:24:23.662Z
+- **Verified:** 2026-11-06T19:24:23.662Z (commit bdb5e90)
+- **Evidence:**
+  - src/agents/codex.js (repository @ bdb5e90)
+  - src/agents/acp.js (repository @ bdb5e90)
+  - src/agents/checkout-lock.js (repository @ bdb5e90)
+  - npm test (passed) (runtime, PF-0038 V-002)
+
 <!-- yallaflow-context:end -->

@@ -716,7 +716,12 @@ test('51/no-network: YallaFlow source never invokes mutating or network Git subc
         // v1.2.0: the console (src/console/) is a loopback HTTP *server* (node:http on
         // 127.0.0.1, asserted below); it makes no outbound request and calls no provider.
         const consoleLayer = path.relative(srcDir, full).startsWith(`console${path.sep}`);
-        const network = consoleLayer
+        // v1.3.0 Agent Workspace (src/agents/, commands/agents.js): local agent processes only. It may
+        // name providers (for example the OPENAI_API_KEY it strips) but still makes no network call.
+        const agentsLayer = path.relative(srcDir, full).startsWith(`agents${path.sep}`) || path.relative(srcDir, full) === path.join('commands', 'agents.js');
+        const network = agentsLayer
+          ? /\bfetch\(|https?:\/\/|node:https?['"]|node:net['"]|http\.request|http\.get\(/i
+          : consoleLayer
           ? /\bfetch\(|https:\/\/|http:\/\/(?!127\.0\.0\.1|\$\{)|node:https['"]|node:net['"]|http\.request|http\.get\(|anthropic|openai/i
           : /\bfetch\(|https?:\/\/(?!claude\.com)|node:https?['"]|node:net['"]|anthropic|openai/i;
         if (!providerLayer && network.test(text)) offenders.push(`${entry.name}: network/provider reference`);

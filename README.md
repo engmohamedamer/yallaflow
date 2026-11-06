@@ -82,6 +82,10 @@ flowchart TB
 
 The depth adapts to the work. A bounded bug fix goes from root-cause analysis straight to the fix, while architectural work gets a reviewed design, specification, or plan. Nothing is called done without fresh verification evidence, and work that carries acceptance criteria is checked against them before it closes. What was learned becomes reviewed project knowledge. [Workflows in detail →](docs/workflows.md)
 
+## What's new in 1.3.0
+
+- **Agent Workspace** (opt-in, `yallaflow console --agents`): work with Codex from the console using your own ChatGPT subscription. You get chat, live activity, and tool-permission requests next to the Flow. No API keys, ever. [Agent Workspace →](docs/agents.md)
+
 ## What's new in 1.2.0
 
 - **A local console.** `yallaflow console` opens a browser view of your projects, in Arabic or English:

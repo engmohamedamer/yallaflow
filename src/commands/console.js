@@ -1,3 +1,5 @@
+import { killAllAgentsNow } from '../agents/acp.js';
+import { CLAUDE_NOT_INCLUDED, claudeIncluded } from '../agents/experimental.js';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { findProjectRoot } from '../core/workspace.js';
@@ -13,7 +15,10 @@ const DEFAULT_PORT = 4747;
 // Projects shown: the current workspace (if any), every --project, then the saved list
 // (`yallaflow console add|remove|list`). A saved project whose folder is gone is reported
 // as unavailable, never dropped silently.
-export async function consoleCommand({ port, open = true, projects = [], poll = false, readOnly = false } = {}) {
+export async function consoleCommand({ port, open = true, projects = [], poll = false, readOnly = false, agents = false, experimentalClaude = false } = {}) {
+  if (readOnly && agents) throw new Error('--agents needs writes; it cannot be combined with --read-only.');
+  if (experimentalClaude && !agents) throw new Error('--experimental-claude needs --agents.');
+  if (experimentalClaude && !claudeIncluded()) throw new Error(CLAUDE_NOT_INCLUDED);
   const roots = [];
   const missing = [];
   const here = await findProjectRoot(process.cwd());
@@ -29,9 +34,10 @@ export async function consoleCommand({ port, open = true, projects = [], poll = 
     else missing.push(entry.root);
   }
   if (!roots.length) throw new Error('No YallaFlow project to show. Run it inside a project, pass --project DIR, or save one with `yallaflow console add DIR`.');
-  const server = await listen(roots, port, poll, missing, readOnly);
+  const server = await listen(roots, port, poll, missing, readOnly, { agents, experimentalClaude });
   const link = `${server.url}#token=${server.token}`;
   console.log(readOnly ? 'YallaFlow console is running (read-only).' : 'YallaFlow console is running. It can create work items; everything else is read-only (--read-only turns creation off).');
+  if (server.agents?.enabled) console.log(`Agent Workspace: on (Codex${server.agents.claude ? ', Claude Code experimental' : ''}). Agents use your own subscriptions; YallaFlow never uses API keys.`);
   console.log(`\nOpen: ${link}\n`);
   for (const project of server.projects) console.log(`Project: ${project.name} (${project.root})`);
   for (const root of missing) console.log(`Unavailable (folder or workspace missing): ${root}`);
@@ -39,25 +45,43 @@ export async function consoleCommand({ port, open = true, projects = [], poll = 
   console.log('The link carries a private token for this run only. Press Ctrl-C to stop.');
   if (open) openBrowser(link);
 
+  // Agent processes run in their own process group, so the terminal's signals do not reach
+  // them: the console ends them. A second Ctrl-C while stopping, or a closed terminal
+  // (SIGHUP), kills every agent group at once instead of leaving it behind.
+  let stopping = false;
   await new Promise((resolve) => {
-    const stop = () => resolve();
-    process.once('SIGINT', stop);
-    process.once('SIGTERM', stop);
+    const stop = () => {
+      if (stopping) {
+        killAllAgentsNow();
+        process.exit(130);
+      }
+      stopping = true;
+      resolve();
+    };
+    process.on('SIGINT', stop);
+    process.on('SIGTERM', stop);
+    process.on('SIGHUP', stop);
   });
-  await server.close();
+  process.once('exit', killAllAgentsNow);
+  const incomplete = await server.close();
+  for (const entry of incomplete ?? []) {
+    console.log(entry.cleanup.verified === false
+      ? `\nWarning: the Codex adapter in ${entry.project} was stopped, but on this system YallaFlow cannot check the processes it started. Check them yourself.`
+      : `\nWarning: a Codex session in ${entry.project} was ended, but these processes it started are still running and could not be stopped: ${entry.cleanup.survivors.join(', ')}. Check them yourself (for example with \`ps -p <pid>\`).`);
+  }
   console.log('\nConsole stopped.');
 }
 
-async function listen(roots, port, poll, missing, readOnly) {
-  if (port !== undefined) return startConsoleServer({ roots, port, poll, missing, readOnly });
+async function listen(roots, port, poll, missing, readOnly, extra = {}) {
+  if (port !== undefined) return startConsoleServer({ roots, port, poll, missing, readOnly, ...extra });
   for (let candidate = DEFAULT_PORT; candidate < DEFAULT_PORT + 10; candidate++) {
     try {
-      return await startConsoleServer({ roots, port: candidate, poll, missing, readOnly });
+      return await startConsoleServer({ roots, port: candidate, poll, missing, readOnly, ...extra });
     } catch (error) {
       if (error.code !== 'EADDRINUSE') throw error;
     }
   }
-  return startConsoleServer({ roots, port: 0, poll, missing, readOnly });
+  return startConsoleServer({ roots, port: 0, poll, missing, readOnly, ...extra });
 }
 
 function openBrowser(url) {

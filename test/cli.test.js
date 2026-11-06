@@ -10,10 +10,11 @@ test('exposes the YallaFlow product and CLI identity', async () => {
   assert.equal(pkg.license, 'MIT');
   assert.deepEqual(pkg.repository, { type: 'git', url: 'git+https://github.com/engmohamedamer/yallaflow.git' });
   assert.deepEqual(pkg.publishConfig, { access: 'public' });
-  assert.deepEqual(pkg.files, ['src', 'resources', 'docs', 'README.md', 'CHANGELOG.md', 'LICENSE']);
+  // The experimental Claude Code connection (development builds only) never enters a package.
+  assert.deepEqual(pkg.files, ['src', 'resources', 'docs', 'README.md', 'CHANGELOG.md', 'LICENSE', '!src/agents/claude.js', '!src/agents/claude-files.js', '!src/agents/claude-detect.js', '!resources/agents/claude-channel.mjs', '!resources/agents/claude-hook.mjs', '!docs/agents-claude-experimental.md']);
   assert.equal(pkg.description, 'AI-agnostic engineering governance layer for coding agents: durable project memory, adaptive workflows, and evidence-backed delivery.');
   assert.deepEqual(pkg.bin, { yallaflow: 'src/cli.js' });
-  assert.equal(pkg.version, '1.2.0');
+  assert.equal(pkg.version, '1.3.0');
 
   const result = spawnSync(process.execPath, ['src/cli.js', '--help'], { encoding: 'utf8' });
   assert.equal(result.status, 0);

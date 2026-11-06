@@ -8,6 +8,31 @@ All notable changes to YallaFlow are documented here. The format loosely follows
 
 Nothing yet.
 
+## [1.3.0] - unreleased (in development) — Agent Workspace
+
+Opt-in. Uses only the developer's existing Codex (ChatGPT) subscription: no API keys, no API billing, no credential handling. Codex is the supported provider. A Claude Code connection is not included, pending Anthropic's confirmation. Guide: [`docs/agents.md`](docs/agents.md).
+
+### Added
+- **Agent Workspace** in the console (`yallaflow console --agents`).
+  - **What it is.** One panel on the work item for chatting with a coding agent, following its activity, and answering its tool-permission requests, next to YallaFlow's own Flow.
+  - **Capability-driven.** The panel offers a control only when the provider can perform it.
+- **Codex managed sessions.** They run through the user-installed Codex ACP adapter on the user's own ChatGPT login and support:
+  - start, streaming replies and follow-up messages;
+  - Allow once / Allow for session / Deny;
+  - automatic denial of unanswered requests;
+  - Stop, End, and resume after console restarts or adapter crashes.
+  - **Safeguards.** API-key environment variables are removed from the adapter, start is refused without a ChatGPT login, and full-access modes are never offered.
+- **`yallaflow agents detect`** (read-only provider detection).
+- **Session records** in `.yallaflow/local/agent-sessions/` (git-ignored). **Make it active** in the panel runs `yallaflow activate` explicitly; nothing auto-activates.
+- **Safety guarantees.**
+  - **Codex process cleanup.** Ending a session ends the adapter's process group, plus, on Linux, every process the adapter started. If anything survives, the panel and the terminal list it; a clean stop is never claimed.
+  - **One agent console per checkout,** across console processes (`.yallaflow/local/agent-console.lock`).
+  - **Allow for session** selects only Codex's session-scoped option, never a persistent rule. Deny is always one-time.
+  - **Race-free local writes on Linux.** Writes under `.yallaflow/local/` resolve their folders through opened handles, so a swapped symbolic link cannot redirect them.
+
+### Fixed
+- The console's bell badge and warning chip now meet WCAG AA contrast in light and dark themes.
+
 ## [1.2.0] - unreleased (prepared 2026-11-06) — Flow Console, read contract & workspace lock
 
 Backward compatible. The Agent Contract, bootstrap blocks, Skill Registry, Knowledge Policy, and all workspace schema versions are unchanged. No new runtime dependency. Guide: [`docs/console.md`](docs/console.md). Upgrade notes: [`docs/upgrading-to-v1.2.0.md`](docs/upgrading-to-v1.2.0.md).

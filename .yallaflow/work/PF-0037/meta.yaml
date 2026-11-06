@@ -1,0 +1,66 @@
+{
+  "id": "PF-0037",
+  "type": "feature",
+  "scope": "architectural",
+  "routingStatus": "routed",
+  "rawRequest": "Agent Interaction (v1.3.0): Agent Bridge with Codex managed sessions via ACP and Claude Code Channels connection, unified Agent Workspace in the console",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-06T16:07:38.232Z",
+  "updatedAt": "2026-11-06T17:43:48.713Z",
+  "title": "Agent Interaction (v1.3.0): Agent Bridge with Codex managed sessions via ACP and Claude Code Channels connection, unified Agent Workspace in the console",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope architectural`.",
+  "routedAt": "2026-11-06T16:07:38.244Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "brainstorm",
+    "specify",
+    "plan",
+    "implement",
+    "verify",
+    "converge",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "design-exploration",
+      "specification",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "delivery-convergence",
+      "code-review"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0024",
+      "type": "file",
+      "name": "owner-agent-interaction-autonomous-authorization-2026-11-06.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-06T16:07:38.792Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ],
+  "lastInvalidationAt": "2026-11-06T17:38:07.945Z",
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-06T17:43:48.713Z",
+      "verificationRunIds": [
+        "V-004"
+      ]
+    }
+  ]
+}

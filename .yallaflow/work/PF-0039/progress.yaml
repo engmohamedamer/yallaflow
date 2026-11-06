@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-06T19:41:36.255Z",
+      "completedAt": "2026-11-06T19:41:36.418Z",
+      "summary": "Main tree: 33 modified + 43 untracked (1.2.0 work, PF-0023..36, research/ untracked and not ignored), old stash (v0.3.10) left alone; release.yml publishes on GitHub Release with tag==v+version and tag-on-origin/main guard, Node 20/22/24 tests, provenance; Claude integration core is 4 files plus glue in bridge/server/detect/agents/UI; stale RC sidecar"
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-06T19:41:36.575Z",
+      "completedAt": "2026-11-06T19:41:36.738Z",
+      "summary": "DEV = release tree + experimental Claude set (claude.js, claude-files.js, claude-detect.js, resources/agents/claude-*.mjs, docs/agents-claude-experimental.md, test/agent-claude-experimental.test.js); dynamic imports and clear refusal when absent; package.json files negations; rehearsal in a scratch clone without remote; artifacts; acceptance environment; review"
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-06T20:53:54.553Z",
+      "completedAt": "2026-11-06T20:53:54.872Z",
+      "summary": "Claude integration separated (experimental set, dynamic loading, clear refusal, files negations, docs split, tests split); lazy checkout claim and read-only status/listing; run-wide test user-config isolation with guard tests; Node 20 fixture fix; cleared auth wait timer; reproducible build script, test matrix, browser harness, release procedure, acceptance environment; RC checksum corrected; leaked test files cleaned up with owner approval"
+    },
+    "verification": {
+      "status": "pending"
+    },
+    "code-review": {
+      "status": "pending"
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Test-isolation regression: agent tests started real console processes that loaded the developer's saved console registry; with the PF-0038 eager checkout claim they wrote .yallaflow/local/.gitignore and agent-console.lock into YaSchools/portal, Vult and govultlinks (no records, code or tracked files touched). Fixed: claim only on session start, read-only status/listing, per-process temporary user config preloaded by npm test, guard tests. Cleanup approved by the owner and done with backups in YallaFlow-backups/2026-11-06-leaked-test-files (6 files removed, 2 empty dirs removed, Vult pf0186-requirements.json unchanged, git status unchanged in all three).",
+      "reason": "Owner approved a narrowly scoped cleanup; tests must never touch saved real projects",
+      "costIfWrong": "Future test runs could write runtime files into real registered projects",
+      "createdAt": "2026-11-06T20:37:20.709Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-06T20:53:54.872Z"
+}

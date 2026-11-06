@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-06T18:47:46.715Z",
+      "completedAt": "2026-11-06T18:47:47.350Z",
+      "summary": "Observed real codex-acp 2.5.0 process tree and termination; read adapter permission options; identified persistent allow_always options, in-memory-only slot, and symlink race model"
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T18:47:46.878Z",
+      "completedAt": "2026-11-06T18:47:52.018Z",
+      "summary": "6 requirements, 9 acceptance criteria from SRC-0025; no material ambiguity"
+    },
+    "design-exploration": {
+      "status": "completed",
+      "startedAt": "2026-11-06T18:47:47.034Z",
+      "completedAt": "2026-11-06T18:47:52.178Z",
+      "summary": "Chosen: process group + verified cleanup; Linux fd-anchored writes; console-level per-checkout lock reusing lock.js identity; session-scoped option ids"
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-06T18:47:47.193Z",
+      "completedAt": "2026-11-06T18:47:52.342Z",
+      "summary": "Edit acp.js, codex.js, bridge.js, local-files.js, lock.js (exports), server.js, console.js, app.js, fake agent, tests, docs, delivery"
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-06T19:09:35.874Z",
+      "completedAt": "2026-11-06T19:19:20.683Z",
+      "summary": "Review fixes: cleanup reports coverage (tracked/group/none) and Windows as unverified; 1 s + tool-event sampling; stopStarting ends the adapter at once and reports CANCELLED; SIGHUP and second-signal synchronous group kill; nlink check on appends; memoized claims; owner re-checks lock nonce; lock message names the file; regression test + mutation checks; real Codex re-check"
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T19:24:08.493Z",
+      "completedAt": "2026-11-06T19:24:08.493Z",
+      "summary": "V-002: full suite passed after review fixes; real Codex probe re-run clean; patch reproduces DEV tree; packaged build installs",
+      "evidence": [
+        "verification:V-002"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-06T19:24:14.546Z",
+      "completedAt": "2026-11-06T19:24:14.765Z",
+      "summary": "9/9 acceptance criteria satisfied (CV recorded)"
+    },
+    "code-review": {
+      "status": "completed",
+      "startedAt": "2026-11-06T19:24:14.968Z",
+      "completedAt": "2026-11-06T19:24:15.779Z",
+      "summary": "Independent review on an isolated copy: 9 findings; 1-8 fixed with regression tests and mutation checks, 9 documented (ruling); no high-severity issue remains"
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Review findings 1-8 fixed; finding 9 (lock reclaim/release and mkdir use plain paths) documented as a residual limitation, not fixed",
+      "reason": "Worst case is an empty directory created or a stray agent-console.lock removed outside the checkout; no content written outside; fixing needs fd-relative rename/link primitives Node lacks",
+      "costIfWrong": "A planted link could cause a stray empty directory or lock-file removal outside the checkout",
+      "createdAt": "2026-11-06T19:19:20.845Z"
+    },
+    {
+      "decision": "Cleanup 'complete' is scoped to what YallaFlow can observe (coverage field); the UI adds an untracked-detached caveat after crashes and on group-only platforms",
+      "reason": "A process that fully detaches before sampling cannot be seen without OS containment (cgroups/job objects), which is out of scope; real Codex 0.164.0 on Linux left no process in any tested path",
+      "costIfWrong": "A detached process could survive a crashed session with only a generic caveat shown",
+      "createdAt": "2026-11-06T19:19:21.010Z"
+    }
+  ],
+  "history": [
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Independent review on an isolated copy found 9 issues (crash-path overclaim, Windows unverified reported clean, hard-link append, End/stop during startup, forced-exit cleanup, claim race, unrecoverable foreign lock, owner re-check, unanchored lock ops)",
+      "changedAt": "2026-11-06T19:19:20.513Z"
+    }
+  ],
+  "updatedAt": "2026-11-06T19:24:15.779Z"
+}

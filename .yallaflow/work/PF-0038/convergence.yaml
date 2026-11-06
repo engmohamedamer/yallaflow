@@ -1,0 +1,327 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-06T19:24:08.663Z",
+      "stage": "IMPLEMENTATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+        "verificationRunIds": [
+          "V-002"
+        ]
+      },
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "Adapter spawned detached (own process group); end/crash/console stop signal the group TERM then KILL plus Linux-tracked descendants (start-time checked), then check survivors. Test with a SIGTERM-ignoring command in the group and a setsid command passes and fails when grouping/tracking is removed; real Codex 0.164.0: running sleep and codex-code-mode-host gone after End and after a simulated app-server crash.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/acp.js",
+              "contentHash": "sha256:7d7f12411daea217a8cb6e5ae7692a3201c934b4ffb3479a926ac052794ee0ae",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/agents/codex.js",
+              "contentHash": "sha256:0d5fe338aafeb8595bf6b149a323cf16d29f57624378baa84a6044b1cc66645a",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-bridge.test.js",
+              "contentHash": "sha256:2790983b858741d62bc6fd605dab7f62c8a57f95da9aad6516121c94dbd3a5ec",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0038",
+              "verificationRunId": "V-002"
+            },
+            {
+              "type": "runtime",
+              "description": "real codex-acp 2.5.0 probe, cleanup complete, no codex or sleep processes left"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Survivors are carried in session.ended.cleanup, saved in the session record, returned from server.close and printed by the console; the panel lists the pids; Windows reports verified:false with a could-not-check message; crash and group-only coverage add an untracked-detached caveat. Tests cover the survivor path through AgentBridge.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/bridge.js",
+              "contentHash": "sha256:ea21a3e10b8ed52027756321083396e42b8ec273b24190ba93f2429ccd655f33",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:d8ec6ce52f8f8ea05555c04d584a09fcd6aaa62a39f55c96e8503dbb21d923ee",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/console.js",
+              "contentHash": "sha256:924f517c5c6b29c37a6fd8a4c3c17a09a7c2f7d954ae7f87589bb13c98fc9468",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-bridge.test.js",
+              "contentHash": "sha256:2790983b858741d62bc6fd605dab7f62c8a57f95da9aad6516121c94dbd3a5ec",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0038",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "On Linux safeWriteFile/safeAppendFile/safeRemove walk root to target with O_DIRECTORY|O_NOFOLLOW handles and write through /proc/self/fd; other platforms re-check with lstat; appends refuse hard-linked files. Tests swap a checked directory for a link and plant a hard link; both refused, nothing written outside.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/local-files.js",
+              "contentHash": "sha256:17adf574654827c9d517c3f88f6c6a459974dfc30fecb7c8a1999387ce1864bc",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-bridge.test.js",
+              "contentHash": "sha256:2790983b858741d62bc6fd605dab7f62c8a57f95da9aad6516121c94dbd3a5ec",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0038",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "Threat model (supervised agent with write access to the checkout) and residuals (non-Linux check window, plain-path lock operations, not a sandbox against same-user processes) stated in both documents without claiming isolation.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "docs/limitations.md",
+              "contentHash": "sha256:d77aff3fedd5f5fe170e739f656dc86175b1222d59546bbfaa1c19b7097c70f6",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "docs/agents.md",
+              "contentHash": "sha256:5347cfbd4680ad1e280af3ea031e788ccff4604e8a59ddd7f7a7029e29cc8924",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/agents/local-files.js",
+              "contentHash": "sha256:17adf574654827c9d517c3f88f6c6a459974dfc30fecb7c8a1999387ce1864bc",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "agent-console.lock with lock.js process identity; non-owner start/resume/connect/stream refused with CHECKOUT_LOCKED naming the holder; lazily reclaimed when the holder dies; owner re-checks its nonce; claims memoized. Tested with a separate console process (SIGKILLed, lock reclaimed) and with the packaged build across two real console processes.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/checkout-lock.js",
+              "contentHash": "sha256:9d0128d00aad3fefec1b2ffb5efe0b3cba613c89f577fed57602e7cce57c79c4",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/agents/bridge.js",
+              "contentHash": "sha256:ea21a3e10b8ed52027756321083396e42b8ec273b24190ba93f2429ccd655f33",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:e64fde2656f63e394fb07ac816dc16af3016952d8871ca8e44d72d520aad6e28",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-bridge.test.js",
+              "contentHash": "sha256:2790983b858741d62bc6fd605dab7f62c8a57f95da9aad6516121c94dbd3a5ec",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0038",
+              "verificationRunId": "V-002"
+            },
+            {
+              "type": "runtime",
+              "description": "packaged 1.3.0 two consoles on one checkout, second refused with CHECKOUT_LOCKED"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "optionFor selects allow_session only from SESSION_SCOPED_OPTIONS by id, deny only reject_once else cancelled; bridge offers only mappable decisions. Fixture lists the persistent exec-policy option before the session option; test fails with the previous by-kind selection.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/codex.js",
+              "contentHash": "sha256:0d5fe338aafeb8595bf6b149a323cf16d29f57624378baa84a6044b1cc66645a",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/agents/bridge.js",
+              "contentHash": "sha256:ea21a3e10b8ed52027756321083396e42b8ec273b24190ba93f2429ccd655f33",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test-support/fake-acp-agent.mjs",
+              "contentHash": "sha256:fa255560db61538a88fb4815ced3c871f271520d572ce5ae90efa3f459b5c0ce",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-bridge.test.js",
+              "contentHash": "sha256:2790983b858741d62bc6fd605dab7f62c8a57f95da9aad6516121c94dbd3a5ec",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0038",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "The bridge keeps no decision for reuse (decisions.jsonl is a log only); test shows a new session asks again and work stays inactive; the only workflow action is explicit activate; docs state what Allow for session covers and that gates remain human commands with no technical lock against an agent running yallaflow approve.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/bridge.js",
+              "contentHash": "sha256:ea21a3e10b8ed52027756321083396e42b8ec273b24190ba93f2429ccd655f33",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "docs/agents.md",
+              "contentHash": "sha256:5347cfbd4680ad1e280af3ea031e788ccff4604e8a59ddd7f7a7029e29cc8924",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-bridge.test.js",
+              "contentHash": "sha256:2790983b858741d62bc6fd605dab7f62c8a57f95da9aad6516121c94dbd3a5ec",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0038",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-008",
+          "status": "satisfied",
+          "reason": "Delivery folder holds RELEASE_DEPENDENCY_AND_INTEGRATION.md, ANTHROPIC_COMPLIANCE_DECISION.md, updated LOCAL_TRIAL.md, rebuilt patch (verified to reproduce the DEV tree from the 1.2.0 tree) and tarball (installed, --version 1.3.0) with SHA256SUMS; Claude remains behind --experimental-claude and is described as not verified end to end.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "research/agent-interaction/delivery/RELEASE_DEPENDENCY_AND_INTEGRATION.md",
+              "contentHash": "sha256:0d90ad69fc007ffc904346ee6151607971bbe425742a85b2ff7755625a984f39",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "research/agent-interaction/delivery/ANTHROPIC_COMPLIANCE_DECISION.md",
+              "contentHash": "sha256:19c11172bdff9e1d7e62b740b789521abf46ec8bf09ed174c5239b43c209297d",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "research/agent-interaction/delivery/LOCAL_TRIAL.md",
+              "contentHash": "sha256:07eed55f7bc2cda4ad63faed5857c8c51c86ee9dabf87c23da5ce852d0fa15f1",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "research/agent-interaction/delivery/SHA256SUMS",
+              "contentHash": "sha256:bd64dea402ddb569884a02dc75c7810f9cbf155c802ca5e677d29f8401aeb810",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-009",
+          "status": "satisfied",
+          "reason": "Full suite passes in DEV; the main working tree has no file modified since this pass began and the RC tarball sha256 is still bbad23be5806aa46; risk assessment delivered in the final report.",
+          "evidence": [
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0038",
+              "verificationRunId": "V-002"
+            },
+            {
+              "type": "runtime",
+              "description": "main repo find -newer showed no changes; RC sha256 bbad23be5806aa46"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-06T19:24:08.663Z"
+}

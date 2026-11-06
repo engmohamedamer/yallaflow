@@ -84,7 +84,7 @@ export async function readLock(root) {
 
 // { stale, verified }: verified = the holder was positively identified as alive (same
 // pid AND same process start time) — false when only the pid could be checked.
-function liveness(holder) {
+export function liveness(holder) {
   if (!holder || holder.host !== os.hostname() || !Number.isInteger(holder.pid)) return { stale: false, verified: false };
   if (holder.pid === process.pid) return { stale: false, verified: true };
   const currentBoot = bootId();
@@ -150,16 +150,16 @@ export async function acquireWorkspaceLock(root, { command = 'yallaflow', timeou
 
 // nonce: this acquisition's identity — release and stale removal act only on the exact
 // lock they judged, never on one another process has taken meanwhile.
-function lockRecord(command, nonce) {
+export function lockRecord(command, nonce, extra = {}) {
   const boot = bootId();
   const start = processStart(process.pid);
-  return `${JSON.stringify({ pid: process.pid, host: os.hostname(), startedAt: new Date().toISOString(), command, nonce, ...(boot ? { boot } : {}), ...(start ? { start } : {}) })}\n`;
+  return `${JSON.stringify({ pid: process.pid, host: os.hostname(), startedAt: new Date().toISOString(), command, nonce, ...(boot ? { boot } : {}), ...(start ? { start } : {}), ...extra })}\n`;
 }
 
 // Atomic create-if-absent of a complete file: write a private temp file, then link it
 // to the lock path (EEXIST when held). Where hard links are unsupported, fall back to an
 // exclusive create (the 30 s unreadable rule covers its tiny crash window).
-async function createLockFile(file, content) {
+export async function createLockFile(file, content) {
   const temp = `${file}.${process.pid}.${randomBytes(4).toString('hex')}.new`;
   await writeFile(temp, content, { flag: 'wx' });
   try {
@@ -234,7 +234,7 @@ async function removeEmptyLocalDir(file) {
 // Claim the stale lock by renaming it to a name only this process knows (atomic: one
 // contender wins), then delete it only if it is still the stale holder we judged. If a
 // live process took the lock in between, give that lock back.
-async function removeStaleLock(file, holder) {
+export async function removeStaleLock(file, holder) {
   const claim = `${file}.stale.${process.pid}.${randomBytes(4).toString('hex')}`;
   try {
     await rename(file, claim);

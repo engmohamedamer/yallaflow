@@ -101,6 +101,7 @@
         projects = listed.projects;
         unavailable = listed.unavailable ?? [];
         readOnly = listed.readOnly !== false;
+        agentsOn = Boolean(listed.agents?.enabled);
         if (!projects.some((p) => p.id === pid)) pid = projects[0]?.id ?? null;
       }
       const next = await api(`/api/p/${pid}/snapshot`);
@@ -257,6 +258,7 @@
       <section class="ihead">${ring(it.completion, 132, 13)}<div><div class="row tiny muted"><span class="ltr">${esc(it.id)}</span><span>· ${L(TYPE[it.type] ?? { ar: 'لسه متصنفش', en: 'unrouted' })}</span>${it.scope ? `<span class="ltr">· ${esc(it.scope)}</span>` : ''}${it.stage ? `<span class="ltr">· ${esc(it.stage)}</span>` : ''}</div><h1>${esc(it.title)}</h1><p style="font-size:18px;color:var(--ink-2);margin-top:4px">${headline}</p><p class="tiny muted" style="margin-top:4px">${formula()}</p></div>
 </section>
       ${nextCard(it)}
+      ${agentPanel(it)}
       <section class="chain" id="chain"><article class="node start ${it.state === 'new' ? 'active' : 'done'}" data-st="-1" style="--hue:var(--ink-2)"><div class="st-head"><span class="st-ico" aria-hidden="true">＋</span><div class="st-name">${A('الطلب', 'Request')}</div></div><div class="st-out">${it.state === 'new' ? A('جديد', 'new') : A('اتسلّم لـ «افهم»', 'handed to Understand')}</div>
           <p class="small clamp3">${esc(d?.request?.raw ?? it.title)}</p>${(d?.sources ?? []).map((s) => `<button class="flink" data-file="${esc(s.id)}">${fileIcon(s)} <span class="ltr">${esc(s.name)}</span></button>`).join('')}<button class="flink more2" data-dtab="req" data-jump>${A('الطلب كامل ↓', 'Full request ↓')}</button>
           <div class="handoff"><span class="k">${A('اتعمل', 'Created')}</span>${ago(it.createdAt)}</div></article>${it.stations.map((s0, i) => {
@@ -274,6 +276,151 @@
       ${d ? detailsSection(it, d) : `<p class="muted" style="margin-top:20px">${A('بيحمّل التفاصيل…', 'Loading details…')}</p>`}
       <section class="panel" style="margin-top:20px"><h2 style="font-size:18px">${A('سجل التسليمات', 'Handoff history')}</h2><ul class="tl">${historyItems(d).join('') || `<li><span class="d"></span>${A('لسه مفيش تسليمات.', 'No handoffs yet.')}</li>`}</ul></section>
       ${devPanel(A('أوامر الشغلانة دي', 'Commands for this item'), [...(actionCmd ? [actionCmd] : []), `yallaflow guide ${it.id}`, `yallaflow work show ${it.id} --json`])}`;
+  }
+
+  // ---------- Agent Workspace (v1.3.0, opt-in): one panel for every provider ----------
+  // Controls come only from the provider's capability record; the bridge never claims more.
+  let agentsOn = false;
+  let agent = null; // { pid, status, events: [] }
+  let agentDraft = '';
+  let agentBusy = false;
+  let agentError = null;
+  let agentProvider = null;
+  let agentMode = 'workspace-write';
+  let agentLaunch = null;
+  const PROVIDER = { codex: 'Codex', claude: 'Claude Code' };
+  const MODE_LABEL = {
+    'read-only': { ar: 'قراءة بس، كل تغيير بيستأذن', en: 'Read-only: every change asks first' },
+    'workspace-write': { ar: 'يعدّل ملفات المشروع من غير ما يسأل', en: 'Edits project files without asking' },
+    default: { ar: 'يدوي: بيستأذن قبل الأفعال', en: 'Manual: asks before actions' },
+    manual: { ar: 'يدوي: بيستأذن قبل الأفعال', en: 'Manual: asks before actions' },
+    auto: { ar: 'تلقائي: Claude Code بيوافق على أغلب الأفعال بنفسه', en: 'Auto: Claude Code approves most actions itself' },
+    acceptEdits: { ar: 'بيقبل التعديلات من غير ما يسأل', en: 'Accepts edits without asking' },
+    plan: { ar: 'تخطيط بس', en: 'Plan only' },
+    dontAsk: { ar: 'بيرفض أي حاجة محتاجة إذن', en: 'Denies anything that needs approval' },
+    bypassPermissions: { ar: 'متخطي كل الأذونات: YallaFlow مش هيبعت رسايل للجلسة دي', en: 'Skips every permission: YallaFlow will not send messages to this session' }
+  };
+  const isForbidden = (mode) => /full-access|bypass|dangerous|yolo|skip/i.test(String(mode ?? ''));
+  const autoApproves = (mode) => ['workspace-write', 'auto', 'acceptEdits'].includes(mode);
+  async function agentPost(action, body) {
+    return post(`/api/p/${pid}/agent/${action}`, JSON.stringify(body ?? {}), { 'Content-Type': 'application/json' });
+  }
+  async function loadAgent() {
+    if (!agentsOn || route().v !== 'item') return;
+    try { agent = { pid, ...(await api(`/api/p/${pid}/agent`)) }; agentError = null; } catch (e) { agentError = e.message; }
+  }
+  function onAgentEvent(projectId, event) {
+    if (!agent || agent.pid !== projectId) return;
+    agent.events.push(event);
+    if (agent.events.length > 400) agent.events.splice(0, agent.events.length - 400);
+    if (event.type === 'permission.requested') agent.pending.push(event);
+    if (event.type === 'permission.resolved') agent.pending = agent.pending.filter((p) => p.requestId !== event.requestId);
+    if (['session.started', 'session.ended', 'session.connected', 'session.disconnected', 'turn.started', 'turn.ended', 'mode.changed', 'work.activated'].includes(event.type)) {
+      loadAgent().then(renderAgent);
+      return;
+    }
+    renderAgent();
+  }
+  // Re-render only the panel, keeping the composer text and focus.
+  function renderAgent() {
+    const host = document.getElementById('agent');
+    const it = byId(route().id);
+    if (!host || !it) return;
+    const focused = document.activeElement?.matches?.('[data-agent-input]');
+    host.outerHTML = agentPanel(it);
+    const stream = document.querySelector('#agent .astream');
+    if (stream) stream.scrollTop = stream.scrollHeight;
+    if (focused) { const box = document.querySelector('[data-agent-input]'); if (box) { box.focus(); box.setSelectionRange(box.value.length, box.value.length); } }
+  }
+  // Turn the event list into readable entries: message deltas join into one bubble.
+  function agentEntries(events) {
+    const out = [];
+    let bubble = null;
+    let repliedThisTurn = false;
+    for (const ev of events) {
+      if (ev.type === 'message.delta') { if (!bubble) { bubble = { kind: 'agent', text: '' }; out.push(bubble); } bubble.text += ev.text; continue; }
+      bubble = null;
+      if (ev.type === 'message.sent') { out.push({ kind: 'user', text: ev.text }); repliedThisTurn = false; }
+      else if (ev.type === 'message.done') { out.push({ kind: 'agent', text: ev.text }); repliedThisTurn = true; }
+      else if (ev.type === 'tool.started') out.push({ kind: 'tool', id: ev.toolCallId, title: ev.title, status: ev.status });
+      else if (ev.type === 'tool.updated') { const t = [...out].reverse().find((x) => x.kind === 'tool' && x.id === ev.toolCallId); if (t) t.status = ev.status ?? t.status; }
+      else if (ev.type === 'permission.requested') out.push({ ...ev, toolKind: ev.kind, kind: 'perm' });
+      else if (ev.type === 'permission.resolved') { const p = out.find((x) => x.kind === 'perm' && x.requestId === ev.requestId); if (p) { p.decision = ev.decision; p.by = ev.by; } }
+      else if (ev.type === 'permission.overridden') { const p = out.find((x) => x.kind === 'perm' && x.requestId === ev.requestId); out.push({ kind: 'note', warn: true, text: ev.detail }); if (p) p.overridden = true; }
+      else if (ev.type === 'turn.ended') { if (ev.finalMessage && !repliedThisTurn) out.push({ kind: 'agent', text: ev.finalMessage }); if (ev.stopReason === 'cancelled') out.push({ kind: 'note', text: A('اتوقف.', 'Stopped.') }); }
+      else if (ev.type === 'session.started') out.push({ kind: 'note', text: ev.resumed ? A('الجلسة رجعت.', 'Session resumed.') : A('الجلسة بدأت.', 'Session started.') });
+      else if (ev.type === 'session.ended') {
+        // Never a plain "ended" when processes the agent started could not be stopped.
+        const left = ev.cleanup && ev.cleanup.complete === false ? ev.cleanup.survivors ?? [] : null;
+        const base = ev.reason === 'crashed' ? A('الجلسة وقفت فجأة. تقدر ترجّعها.', 'The session stopped unexpectedly. You can resume it.') : A('الجلسة خلصت.', 'Session ended.');
+        const c = ev.cleanup;
+        const tail = left && left.length ? A(`بس فيه عمليات بدأها الوكيل لسه شغّالة وYallaFlow ماقدرش يوقفها: ${left.join('، ')}. اتأكد منها بنفسك.`, `But processes the agent started are still running and YallaFlow could not stop them: ${left.join(', ')}. Check them yourself.`)
+          : c && c.verified === false ? A('YallaFlow وقّف الوكيل بس، وماقدرش يتأكد إن العمليات اللي بدأها وقفت. اتأكد بنفسك.', 'YallaFlow stopped the agent itself but could not check the processes it started. Check them yourself.')
+          : c && (c.coverage === 'group' || ev.reason === 'crashed') ? A('العمليات اللي فصلت نفسها عن الجلسة مش بتتتبّع.', 'Processes that detached themselves from the session are not tracked.')
+          : '';
+        out.push({ kind: 'note', warn: ev.reason === 'crashed' || Boolean(left), text: tail ? `${base} ${tail}` : base });
+      }
+      else if (ev.type === 'session.connected') out.push({ kind: 'note', text: A('Claude Code متوصّل.', 'Claude Code connected.') });
+      else if (ev.type === 'session.disconnected') out.push({ kind: 'note', warn: true, text: A('Claude Code اتفصل (الجلسة أو القناة وقفت).', 'Claude Code disconnected (the session or its channel stopped).') });
+      else if (ev.type === 'work.activated') out.push({ kind: 'note', text: A(`${ev.workId} بقت الشغلانة النشطة.`, `${ev.workId} is now the active work item.`) });
+      else if (ev.type === 'error') out.push({ kind: 'note', warn: true, text: ev.message });
+    }
+    return out.slice(-80);
+  }
+  function permCard(p) {
+    const open = !p.decision;
+    const label = { allow: A('اتسمح', 'Allowed'), allow_session: A('اتسمح للجلسة', 'Allowed for this session'), deny: A('اترفض', 'Denied'), elsewhere: A('اتجاوب عليه في Claude Code', 'Answered in Claude Code') }[p.decision] ?? '';
+    const by = p.by === 'timeout' ? A('(محدش ردّ، فاترفض تلقائي)', '(no answer, denied automatically)') : p.by && p.by !== 'user' && p.decision !== 'elsewhere' ? `(${esc(p.by)})` : '';
+    const sentNote = p.provider === 'claude' && p.decision ? `<span class="tiny muted">${A('Claude Code بيطبّق أول رد يوصله (الكونسول أو الترمينال).', 'Claude Code applies the first answer it receives (console or terminal).')}</span>` : '';
+    return `<div class="aperm ${open ? 'open' : ''}"><div class="row"><span class="ptag">${A('إذن للأداة', 'Tool permission')}</span><b class="grow">${esc(p.title)}</b></div>${p.detail ? `<pre class="pdetail" dir="ltr">${esc(p.detail)}</pre>` : ''}
+      ${open ? `<div class="row">${p.decisions.map((d) => `<button class="btn sm ${d === 'deny' ? 'ghost' : 'go'}" data-agent-perm="${esc(p.requestId)}" data-decision="${d}">${{ allow: A('اسمح مرة', 'Allow once'), allow_session: A('اسمح للجلسة', 'Allow for session'), deny: A('ارفض', 'Deny') }[d]}</button>`).join('')}<span class="tiny muted">${A('لو محدش ردّ هيترفض تلقائي.', 'Unanswered requests are denied automatically.')}</span></div>` : `<div class="tiny ${p.overridden ? 'warn' : 'muted'}">${label} ${by}</div>${sentNote}`}</div>`;
+  }
+  function agentPanel(it) {
+    if (!agentsOn) return '';
+    if (!agent || agent.pid !== pid) return `<section class="panel agent" id="agent"><p class="muted">${A('بيحمّل مساحة الوكيل…', 'Loading the agent workspace…')}</p></section>`;
+    const s = agent.session;
+    const provider = (id) => agent.providers.find((p) => p.id === id);
+    const isActive = snap?.project?.activeWork === it.id;
+    const activation = isActive ? `<span class="chip done"><i></i>${A('الشغلانة النشطة', 'Active work item')}</span>` : `<span class="tiny muted">${A('مش الشغلانة النشطة.', 'Not the active work item.')}</span> <button class="btn sm ghost" data-agent-activate="${esc(it.id)}">${A('خلّيها النشطة', 'Make it active')}</button>`;
+    const head = `<div class="ahead"><h2>${A('الوكيل', 'Agent')}</h2><span class="grow"></span>${activation}</div>`;
+    const err = agentError ? `<div class="errbar data small">${esc(agentError)}</div>` : '';
+    if (!s && agent.lockedBy) return `<section class="panel agent" id="agent">${head}${err}<div class="awarn" role="status">${A('جلسات الوكيل في النسخة دي من المشروع تبع كونسول YallaFlow تاني شغّال. استخدمه، أو اقفله الأول.', 'Agent sessions in this checkout belong to another running YallaFlow console. Use that console, or stop it first.')}</div><p class="tiny muted" dir="ltr">${esc(agent.lockedBy.message)}</p></section>`;
+    if (!s || (s.workId && s.workId !== it.id && s.provider === 'codex')) {
+      if (s) return `<section class="panel agent" id="agent">${head}${err}<p class="small">${A(`فيه جلسة ${PROVIDER[s.provider]} شغّالة على`, `A ${PROVIDER[s.provider]} session is active for`)} <a href="#/item/${encodeURIComponent(s.workId)}" class="ltr">${esc(s.workId)}</a>. ${A('جلسة واحدة بس في كل نسخة من المشروع.', 'Only one agent session runs per checkout.')}</p></section>`;
+      const choice = agentProvider ?? agent.providers.find((p) => p.ready)?.id ?? 'codex';
+      const p = provider(choice);
+      const picks = agent.providers.map((x) => `<label class="apick ${x.ready ? '' : 'off'}"><input type="radio" name="agentProvider" value="${x.id}" ${x.id === choice ? 'checked' : ''}><span><b>${PROVIDER[x.id]}</b>${x.experimental ? ` <i class="exp">${A('تجريبي', 'experimental')}</i>` : ''}<small>${x.ready ? (x.id === 'codex' ? A('اشتراك ChatGPT بتاعك', 'Your ChatGPT subscription') : A(`اشتراك Claude بتاعك${x.auth?.plan ? ` (${x.auth.plan})` : ''}`, `Your Claude subscription${x.auth?.plan ? ` (${x.auth.plan})` : ''}`)) : A('مش جاهز', 'Not ready')}</small></span></label>`).join('');
+      const problems = p && !p.ready ? `<ul class="aprob">${p.problems.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : '';
+      let action = '';
+      if (p?.ready && p.capabilities.start) action = `<div class="row"><label class="small">${A('الصلاحيات', 'Permissions')} <select data-agent-mode>${p.capabilities.modes.map((m) => `<option value="${m}" ${m === agentMode ? 'selected' : ''}>${L(MODE_LABEL[m])}</option>`).join('')}</select></label><span class="grow"></span><button class="btn go" data-agent-start ${agentBusy ? 'disabled' : ''}>${A('ابدأ جلسة Codex', 'Start Codex session')}</button></div>${agent.resumable.length ? `<div class="tiny muted">${A('جلسات سابقة:', 'Earlier sessions:')} ${agent.resumable.map((r) => `<button class="linkbtn" data-agent-resume="${esc(r.id)}">${esc(r.workId ?? '—')} · ${ago(r.startedAt)}</button>`).join(' ')}</div>` : ''}`;
+      else if (p?.ready && p.id === 'claude') action = `<div class="row"><span class="small grow">${A('Claude Code بيشتغل في الترمينال بتاعك باشتراكك. YallaFlow بيتوصّل بيه بس، مش بيشغّله.', 'Claude Code runs in your terminal with your subscription. YallaFlow connects to it; it never runs it.')}</span><button class="btn go" data-agent-connect ${agentBusy ? 'disabled' : ''}>${A('وصّل Claude Code', 'Connect Claude Code')}</button></div>`;
+      return `<section class="panel agent" id="agent">${head}${err}<div class="apicks">${picks}</div>${problems}${action}<p class="tiny muted">${A('الوكيل بيستخدم اشتراكك الموجود بس، من غير مفاتيح API. أذونات الأدوات مش موافقات YallaFlow.', 'Agents use only your existing subscription, never API keys. Tool permissions are not YallaFlow approvals.')}</p></section>`;
+    }
+    const cap = provider(s.provider)?.capabilities ?? {};
+    const modeChip = s.mode ? `<span class="chip ${autoApproves(s.mode) ? 'wait' : 'todo'}" title="${esc(L(MODE_LABEL[s.mode] ?? { ar: s.mode, en: s.mode }))}">${esc(s.mode)}</span>` : '';
+    const warn = isForbidden(s.mode) ? `<div class="awarn" role="alert">⛔ ${esc(L(MODE_LABEL.bypassPermissions))}. ${A('غيّر الوضع من Claude Code.', 'Change the mode in Claude Code.')}</div>` : autoApproves(s.mode) ? `<div class="awarn">⚠ ${esc(L(MODE_LABEL[s.mode]))}. ${A('مش كل فعل هيظهر هنا كطلب إذن.', 'Not every action will appear here as a permission request.')}</div>` : '';
+    const state = s.provider === 'claude' && !s.connected ? A('مستني Claude Code', 'Waiting for Claude Code') : s.status === 'working' ? A('شغّال…', 'Working…') : s.status === 'starting' ? A('بيبدأ…', 'Starting…') : A('جاهز', 'Ready');
+    const controls = [
+      cap.stop && s.status === 'working' ? `<button class="btn sm ghost" data-agent-cancel>${A('وقّف', 'Stop')}</button>` : '',
+      cap.end ? `<button class="btn sm ghost" data-agent-end>${A('اقفل الجلسة', 'End session')}</button>` : '',
+      s.provider === 'claude' ? `<button class="btn sm ghost" data-agent-disconnect>${A('افصل من YallaFlow', 'Unlink')}</button>` : ''
+    ].join('');
+    const launch = s.provider === 'claude' && !s.connected && agentLaunch ? `<div class="alaunch"><p class="small">${A('شغّل Claude Code بنفسك في فولدر المشروع بالأمر ده. Claude Code هيعرض تحذير القناة التجريبية والقرار ليك.', 'Start Claude Code yourself in the project folder with this command. Claude Code shows its own development-channel warning; the decision is yours.')}</p><pre class="cli" dir="ltr">${esc(agentLaunch)}</pre><button class="btn sm ghost" data-copy="${esc(agentLaunch)}">${A('انسخ', 'Copy')}</button></div>` : '';
+    const entries = agentEntries(agent.events).map((e) => e.kind === 'user' ? `<div class="amsg me"><p>${esc(e.text)}</p></div>` : e.kind === 'agent' ? `<div class="amsg"><p>${esc(e.text)}</p></div>` : e.kind === 'tool' ? `<div class="atool ${e.status === 'failed' ? 'fail' : e.status === 'completed' ? 'done' : ''}"><span>${e.status === 'completed' ? '✓' : e.status === 'failed' ? '✕' : '●'}</span> ${esc(e.title)}</div>` : e.kind === 'perm' ? permCard(e) : `<div class="anote ${e.warn ? 'warn' : ''}">${esc(e.text)}</div>`).join('');
+    const canSend = cap.send && (s.provider === 'codex' ? s.status === 'idle' : s.connected);
+    return `<section class="panel agent" id="agent">${head}${err}
+      <div class="abar"><b>${PROVIDER[s.provider]}</b>${s.provider === 'claude' ? ` <i class="exp">${A('تجريبي', 'experimental')}</i>` : ''}<span class="chip active"><i></i>${esc(state)}</span>${s.auth ? `<span class="chip todo">${esc(s.auth)}</span>` : ''}${modeChip}<span class="grow"></span>${controls}</div>
+      ${warn}${launch}
+      <div class="astream" aria-live="polite">${entries || `<p class="tiny muted">${A(`اكتب للوكيل، مثلاً: «كمّل ${it.id}».`, `Message the agent, for example: "Continue ${it.id}".`)}</p>`}</div>
+      <form class="acompose" data-agent-form><textarea data-agent-input rows="2" maxlength="20000" placeholder="${A(`اكتب لـ ${PROVIDER[s.provider]}…`, `Message ${PROVIDER[s.provider]}…`)}" ${canSend ? '' : 'disabled'}>${esc(agentDraft)}</textarea><button class="btn go" type="submit" ${canSend && !agentBusy ? '' : 'disabled'}>${A('ابعت', 'Send')}</button></form>
+      ${s.provider === 'claude' ? `<p class="tiny muted">${A('الإيقاف والإنهاء بيتعملوا من Claude Code نفسه (Esc). الردود بتوصل كرسايل كاملة.', 'Stop and end happen in Claude Code itself (Esc). Replies arrive as whole messages.')}</p>` : ''}</section>`;
+  }
+  async function agentAction(action, body, after) {
+    agentBusy = true; agentError = null; renderAgent();
+    try { const result = await agentPost(action, body); after?.(result); } catch (e) { agentError = e.message; }
+    agentBusy = false;
+    await loadAgent();
+    renderAgent();
   }
 
   // The one thing to do next, in plain words, from Core's verdict (never computed here).
@@ -382,20 +529,20 @@
   function celebrate() { if (reduced) return; const c = document.createElement('div'); c.className = 'celebrate'; const cols = ['#3d8bfd', '#8a63e8', '#0fae9d', '#f1a131', '#1d9a5a']; c.innerHTML = Array.from({ length: 40 }, (_, k) => `<i style="left:${Math.random() * 100}%;background:${cols[k % 5]};animation-delay:${Math.random() * 0.4}s"></i>`).join(''); document.body.appendChild(c); setTimeout(() => c.remove(), 2200); }
 
   // ---------- attention: what needs a person (from Core's state; nothing is inferred) ----------
-  const needs = () => items().filter((it) => it.state === 'you' || it.state === 'fail').map((it) => ({
+  const needs = () => [...(agent?.pid === pid ? agent.pending.map((p) => ({ it: byId(route().id) ?? { id: '', title: '' }, agentPerm: true, reason: A(`إذن للوكيل: ${p.title}`, `Agent permission: ${p.title}`) })) : []), ...items().filter((it) => it.state === 'you' || it.state === 'fail').map((it) => ({
     it,
     reason: it.state === 'fail'
       ? A('آخر تحقق فشل', 'the latest verification failed')
       : it.waitingFor?.kind === 'review'
         ? A(`مستني مراجعتك (${it.waitingFor.gate})`, `waiting for your review (${it.waitingFor.gate})`)
         : A(`مستني إجابتك على ${(it.waitingFor?.questions ?? []).join('، ')}`, `waiting for your answer to ${(it.waitingFor?.questions ?? []).join(', ')}`)
-  }));
+  }))];
   let bellOpen = false;
   let browserAlerts = store.get('alerts', false);
   function notesPanel() {
     const list = needs();
     return `<div class="notes" role="dialog" aria-label="${A('محتاج انتباهك', 'Needs your attention')}"><b>${A('محتاج انتباهك', 'Needs your attention')}</b>
-      <ul>${list.map(({ it, reason }) => `<li class="unread"><span class="dg-ic">${it.state === 'fail' ? '✕' : '◆'}</span><a href="#/item/${encodeURIComponent(it.id)}"><span class="ltr">${esc(it.id)}</span> ${esc(it.title)}<br><span class="tiny muted">${reason}</span></a></li>`).join('') || `<li class="muted">${A('مفيش حاجة مستنياك دلوقتي.', 'Nothing needs you right now.')}</li>`}</ul>
+      <ul>${list.map(({ it, reason }) => `<li class="unread"><span class="dg-ic">${it.state === 'fail' ? '✕' : '◆'}</span><a href="#/item/${encodeURIComponent(it.id)}"><span class="ltr">${esc(it.id)}</span> ${esc(it.title)}<br><span class="tiny muted">${esc(reason)}</span></a></li>`).join('') || `<li class="muted">${A('مفيش حاجة مستنياك دلوقتي.', 'Nothing needs you right now.')}</li>`}</ul>
       <label class="tiny"><input type="checkbox" data-alerts ${browserAlerts ? 'checked' : ''}> ${A('نبّهني من المتصفح لما حاجة جديدة تستناني', 'Alert me in the browser when something new needs me')}</label></div>`;
   }
   function alertNew(previous) {
@@ -650,12 +797,15 @@
     if (theme) document.documentElement.dataset.theme = theme; else delete document.documentElement.dataset.theme;
     const r = route();
     const hadQ = document.activeElement?.matches?.('[data-q]');
+    const hadAgent = document.activeElement?.matches?.('[data-agent-input]');
     document.title = (snap?.counts?.you ? `(${snap.counts.you}) ` : '') + 'YallaFlow' + (snap?.project?.name ? ` · ${snap.project.name}` : '');
     const views = { item: () => viewItem(r.id), lines: viewLines, team: viewTeam, insights: viewInsights, projects: viewProjects, map: viewMap };
     const body = !snap ? `<p class="muted" style="margin-top:40px;text-align:center">${error ? '' : A('بيحمّل…', 'Loading…')}</p>` : (views[r.v] ?? viewMap)();
     document.getElementById('app').innerHTML = topbar(r) + `<main>${banner()}${body}</main>`;
     requestAnimationFrame(placeConnectors);
     if (hadQ) { const q = document.querySelector('[data-q]'); if (q) { q.focus(); q.setSelectionRange(q.value.length, q.value.length); } }
+    if (hadAgent) { const box = document.querySelector('[data-agent-input]'); if (box) { box.focus(); box.setSelectionRange(box.value.length, box.value.length); } }
+    const stream = document.querySelector('#agent .astream'); if (stream) stream.scrollTop = stream.scrollHeight;
   }
 
   // Pipes between consecutive stations, measured from the layout (RTL and LTR).
@@ -717,6 +867,7 @@
 
   async function loadForView() {
     const v = route().v;
+    if (v === 'item') await loadAgent();
     if (v === 'team') await loadTeam();
     else if (v === 'projects') await loadOverview();
   }
@@ -784,6 +935,7 @@
             if (!line) continue;
             const event = JSON.parse(line.slice(6));
             if (event.type === 'change' && event.project === pid) await refresh();
+            else if (event.type === 'agent') onAgentEvent(event.project, event.event);
           }
         }
       } catch { /* retry below */ }
@@ -807,6 +959,19 @@
     }
     closeDrawer(); bellOpen = false; dtab = 'delivery'; const v = route().v; if (v === 'item') { detail = null; render(); await load(); } else if (v === 'team' || v === 'projects') { render(); await loadForView(); } render(); scrollTo(0, 0); });
   document.addEventListener('click', (e) => {
+    const ag = e.target.closest('[data-agent-start],[data-agent-connect],[data-agent-cancel],[data-agent-end],[data-agent-disconnect],[data-agent-perm],[data-agent-activate],[data-agent-resume]');
+    if (ag) {
+      const workId = route().id;
+      if (ag.hasAttribute('data-agent-start')) agentAction('start', { provider: 'codex', workId, mode: agentMode });
+      else if (ag.hasAttribute('data-agent-connect')) agentAction('connect', { provider: 'claude', workId }, (r) => { agentLaunch = r.launch?.command ?? null; });
+      else if (ag.hasAttribute('data-agent-cancel')) agentAction('cancel', {});
+      else if (ag.hasAttribute('data-agent-end')) agentAction('end', {});
+      else if (ag.hasAttribute('data-agent-disconnect')) agentAction('disconnect', {}, () => { agentLaunch = null; });
+      else if (ag.dataset.agentPerm) agentAction('permission', { requestId: ag.dataset.agentPerm, decision: ag.dataset.decision });
+      else if (ag.dataset.agentActivate) agentAction('activate', { workId: ag.dataset.agentActivate }, () => refresh());
+      else if (ag.dataset.agentResume) agentAction('resume', { recordId: ag.dataset.agentResume, mode: agentMode });
+      return;
+    }
     const cwx = e.target.closest('[data-create],[data-cw-cancel],[data-cw-open],[data-cw-retry]');
     if (cwx) {
       if (cwx.hasAttribute('data-create')) openCreate();
@@ -838,9 +1003,15 @@
     else if (x.hasAttribute('data-more')) { const b = x.previousElementSibling; b.classList.toggle('clamp'); x.textContent = b.classList.contains('clamp') ? A('اقرأ الطلب كله ↓', 'Read the whole request ↓') : A('أقل ↑', 'Less ↑'); }
     else if (x.dataset.copy) copy(x.dataset.copy);
   });
-  document.addEventListener('input', (e) => { if (e.target.matches('[data-q]')) { flt.q = e.target.value; render(); } });
-  document.addEventListener('submit', (e) => { if (e.target.matches('[data-create-form]')) { e.preventDefault(); submitCreate(e.target); } });
+  document.addEventListener('input', (e) => { if (e.target.matches('[data-q]')) { flt.q = e.target.value; render(); } else if (e.target.matches('[data-agent-input]')) agentDraft = e.target.value; });
+  document.addEventListener('keydown', (e) => { if (e.target.matches?.('[data-agent-input]') && e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); e.target.form.requestSubmit(); } });
+  document.addEventListener('submit', (e) => {
+    if (e.target.matches('[data-create-form]')) { e.preventDefault(); submitCreate(e.target); }
+    else if (e.target.matches('[data-agent-form]')) { e.preventDefault(); const text = agentDraft.trim(); if (!text) return; agentDraft = ''; agentAction('message', { text }); }
+  });
   document.addEventListener('change', async (e) => {
+    if (e.target.matches('[data-agent-mode]')) { agentMode = e.target.value; return; }
+    if (e.target.matches('input[name="agentProvider"]')) { agentProvider = e.target.value; renderAgent(); return; }
     if (e.target.matches('dialog.create input[name="type"]')) {
       const size = e.target.form.querySelector('[data-size]');
       size.hidden = !e.target.value;

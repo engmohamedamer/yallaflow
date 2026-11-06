@@ -11383,7 +11383,177 @@
       ],
       "createdAt": "2026-11-06T14:02:31.492Z",
       "updatedAt": "2026-11-06T14:02:31.492Z"
+    },
+    {
+      "id": "CTX-0102",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Agent Workspace (v1.3.0, opt-in via 'yallaflow console --agents'): provider-aware code is confined to src/agents/ (plus commands/agents.js and the console entry points), which makes no network calls of its own. Codex is a managed session through the user-installed ACP adapter codex-acp, refused unless it reports a ChatGPT account login, with API-key variables stripped from its environment. Claude Code is experimental (--experimental-claude): the user starts it and it joins through the bundled Channels MCP server (resources/agents/claude-channel.mjs) and command hooks, authenticated by a per-run bridge token in .yallaflow/local/agent-bridge.json. One managed session per checkout; unanswered permissions are denied after YALLAFLOW_AGENT_PERMISSION_TIMEOUT_MS (default 5 min); full-access/bypass modes are never used; session records live in git-ignored .yallaflow/local/agent-sessions/; activation only through yallaflow activate.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0037",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/agents/bridge.js",
+          "contentHash": "sha256:0762ab7fd3f95023e7ef8ef4fdf4690f527495aeb1d1c65b0123f74dce5c040f",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/agents/codex.js",
+          "contentHash": "sha256:9434930184a1db421220c840168732e1826128a723562a1cf229ddcb89282335",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/agents/claude.js",
+          "contentHash": "sha256:7c50b540ef5dc02f8fecbb61e0c15e878bc5070e0bc9393bd4889c882e8a0311",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "resources/agents/claude-channel.mjs",
+          "contentHash": "sha256:8600473220d92e8e2627c5322e751e5ed1393e135fa400c98250ede3be8ac6f1",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "docs/agents.md",
+          "contentHash": "sha256:84a4f8289b2154f4664134fefa8cca87a8f3d4cb4bcf0cdca6c07ef1b3e8878b",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "npm test (passed)",
+          "workId": "PF-0037",
+          "verificationRunId": "V-002"
+        }
+      ],
+      "verifiedAt": "2026-11-06T17:43:40.304Z",
+      "verifiedAtCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-06T17:43:40.304Z",
+          "workId": "PF-0037",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-06T17:43:40.304Z",
+      "updatedAt": "2026-11-06T17:43:40.304Z"
+    },
+    {
+      "id": "CTX-0103",
+      "area": "convention",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Agent integrations use only the developer's existing subscription and locally authenticated tools: no API keys, no API billing, no credential extraction or proxying; for Claude Code no Agent SDK, claude -p, or third-party ACP adapter on subscription auth; YallaFlow never launches Claude Code or accepts its warnings for the user.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0037",
+        "candidateId": "K-002"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "docs/agents.md",
+          "contentHash": "sha256:84a4f8289b2154f4664134fefa8cca87a8f3d4cb4bcf0cdca6c07ef1b3e8878b",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/agents/codex.js",
+          "contentHash": "sha256:9434930184a1db421220c840168732e1826128a723562a1cf229ddcb89282335",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "user-confirmed",
+          "description": "owner mandated subscription-only agent interaction, SRC-0024"
+        }
+      ],
+      "verifiedAt": "2026-11-06T17:43:40.566Z",
+      "verifiedAtCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-06T17:43:40.566Z",
+          "workId": "PF-0037",
+          "candidateId": "K-002"
+        }
+      ],
+      "createdAt": "2026-11-06T17:43:40.566Z",
+      "updatedAt": "2026-11-06T17:43:40.566Z"
+    },
+    {
+      "id": "CTX-0104",
+      "area": "convention",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Agent Workspace safety rules: a provider permission is chosen by its exact option id, never by ACP kind alone (codex-acp shares allow_always between session-scoped and persistent rules); Codex adapters run in their own process group and a session end reports a cleanup result scoped to what could be observed, never a clean stop it could not verify; one agent-enabled console per checkout holds .yallaflow/local/agent-console.lock.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0038",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/agents/codex.js",
+          "contentHash": "sha256:0d5fe338aafeb8595bf6b149a323cf16d29f57624378baa84a6044b1cc66645a",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/agents/acp.js",
+          "contentHash": "sha256:7d7f12411daea217a8cb6e5ae7692a3201c934b4ffb3479a926ac052794ee0ae",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/agents/checkout-lock.js",
+          "contentHash": "sha256:9d0128d00aad3fefec1b2ffb5efe0b3cba613c89f577fed57602e7cce57c79c4",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "npm test (passed)",
+          "workId": "PF-0038",
+          "verificationRunId": "V-002"
+        }
+      ],
+      "verifiedAt": "2026-11-06T19:24:23.662Z",
+      "verifiedAtCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-06T19:24:23.662Z",
+          "workId": "PF-0038",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-06T19:24:23.662Z",
+      "updatedAt": "2026-11-06T19:24:23.662Z"
     }
   ],
-  "updatedAt": "2026-11-06T14:02:31.492Z"
+  "updatedAt": "2026-11-06T19:24:23.662Z"
 }

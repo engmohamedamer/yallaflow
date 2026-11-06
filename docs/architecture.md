@@ -626,6 +626,27 @@ QC policy is advisory (default) or strict. Strict quality approval is *computed*
   - **Writes.** `POST` is served only on the two Create Work routes. A write requires the console's Origin and the exact content type, and is size-limited. `--read-only` refuses it with 405.
   - **Data and previews.** Data is addressed by ID. The page has a strict CSP, and source previews are served from an allowlist with a sandbox CSP and `nosniff`. Preserved originals and extracted text are confined to their source directory.
 
+## Agent Workspace (v1.3.0)
+
+`src/agents/` is a thin bridge inside the console process (no daemon, no new dependency).
+
+- **Contract.** `events.js` defines `yallaflow.agent-event/1` and per-provider capability records. The UI renders only what a record allows.
+- **Codex** (`codex.js`, `acp.js`).
+  - **Process.** A dependency-free ACP client spawns the user-installed `codex-acp` (argv only, cwd = project root). Its environment carries no API keys.
+  - **Gates.** A session starts only after the adapter reports a ChatGPT account login, and modes matching full-access/bypass are refused.
+  - **Permissions.** Requests become console permission cards.
+- **Claude Code.** Not part of releases. An experimental channel-based connection exists in development builds only (`docs/agents-claude-experimental.md`). Shared code loads it on demand through `experimental.js`, which refuses when its files are absent.
+- **Bridge** (`bridge.js`).
+  - **Concurrency.** One session per project root.
+  - **Permissions.** The pending-permission map denies on timeout, on session end, and on console shutdown.
+  - **Local records.** Records and decisions live in `.yallaflow/local/agent-sessions/`.
+  - **Activation.** Only an explicit `yallaflow activate` through the runner.
+- **Routes.**
+  - `POST /api/p/<pid>/agent/*`: browser token, required Origin, JSON.
+  - `GET /api/p/<pid>/agent`.
+  - Bridge routes (development builds with the Claude connection only): bridge token, no Origin.
+  - `--read-only` disables all of them.
+
 ## Project knowledge promotion
 
 ```text

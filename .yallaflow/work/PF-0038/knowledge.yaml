@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Agent Workspace safety rules: a provider permission is chosen by its exact option id, never by ACP kind alone (codex-acp shares allow_always between session-scoped and persistent rules); Codex adapters run in their own process group and a session end reports a cleanup result scoped to what could be observed, never a clean stop it could not verify; one agent-enabled console per checkout holds .yallaflow/local/agent-console.lock.",
+      "evidence": [
+        "src/agents/codex.js",
+        "src/agents/acp.js",
+        "src/agents/checkout-lock.js",
+        "verification:V-002"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-06T19:24:22.725Z",
+      "factId": "CTX-0104",
+      "promotedAt": "2026-11-06T19:24:23.662Z",
+      "target": "context/conventions.md"
+    }
+  ],
+  "updatedAt": "2026-11-06T19:24:23.662Z",
+  "reviewedAt": "2026-11-06T19:24:23.662Z"
+}

@@ -1,0 +1,64 @@
+{
+  "id": "PF-0038",
+  "type": "change",
+  "scope": "architectural",
+  "routingStatus": "routed",
+  "rawRequest": "Agent Workspace v1.3.0 final stabilization: Codex process lifecycle, symlink race mitigation, cross-process one-session lock, session-scoped allow verification, delivery docs",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-06T18:41:33.808Z",
+  "updatedAt": "2026-11-06T19:24:27.396Z",
+  "title": "Agent Workspace v1.3.0 final stabilization: Codex process lifecycle, symlink race mitigation, cross-process one-session lock, session-scoped allow verification, delivery docs",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope architectural`.",
+  "routedAt": "2026-11-06T18:41:33.819Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "brainstorm",
+    "plan",
+    "implement",
+    "verify",
+    "converge",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "design-exploration",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "delivery-convergence",
+      "code-review"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0025",
+      "type": "file",
+      "name": "owner-stabilization-request.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-06T18:41:37.995Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ],
+  "lastInvalidationAt": "2026-11-06T19:19:20.519Z",
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-06T19:24:27.396Z",
+      "verificationRunIds": [
+        "V-002"
+      ]
+    }
+  ]
+}

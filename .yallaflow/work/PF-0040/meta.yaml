@@ -1,0 +1,45 @@
+{
+  "id": "PF-0040",
+  "type": "investigation",
+  "scope": "architectural",
+  "routingStatus": "routed",
+  "rawRequest": "Manual acceptance UX findings: work management, project onboarding and overview, dev runtime, new project wizard (design and release impact)",
+  "status": "DONE",
+  "readOnly": true,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-06T20:56:42.539Z",
+  "updatedAt": "2026-11-06T21:01:02.845Z",
+  "title": "Manual acceptance UX findings: work management, project onboarding and overview, dev runtime, new project wizard (design and release impact)",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow investigate --scope architectural`.",
+  "routedAt": "2026-11-06T20:56:42.551Z",
+  "workflow": "investigation",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "verification"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0027",
+      "type": "file",
+      "name": "owner-manual-acceptance-ux-findings.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-06T20:56:42.758Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ]
+}

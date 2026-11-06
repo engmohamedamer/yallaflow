@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-06T21:00:44.467Z",
+      "completedAt": "2026-11-06T21:00:44.635Z",
+      "summary": "Inventoried console routes, CLI lifecycle commands, derived paused state, inspect/framework hints; no hold/close, runner or scaffolding exists",
+      "evidence": [
+        "src/console/server.js",
+        "src/flow/stations.js",
+        "src/inventory/frameworks.js"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-06T21:00:53.549Z",
+      "completedAt": "2026-11-06T21:00:53.717Z",
+      "summary": "Confirmed causes of the UX gaps: the console exposes only create/attach/activate by design (docs/console.md); Core has no hold/close lifecycle, no runtime runner and no scaffolding; stack detection covers few ecosystems",
+      "evidence": [
+        "docs/console.md",
+        "src/cli.js",
+        "src/inventory/frameworks.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T21:00:58.377Z",
+      "completedAt": "2026-11-06T21:00:58.542Z",
+      "summary": "Inventory claims checked mechanically (V-001); design and prototype delivered for owner review",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-06T21:00:58.542Z"
+}

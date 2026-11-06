@@ -1,0 +1,320 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "Codex process lifecycle: ending or stopping a Codex session terminates the adapter and every process it started where the platform allows it, without breaking provider behavior; if any process cannot be terminated, the console never reports the session as fully stopped.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0025",
+          "locator": "1"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T18:47:29.589Z",
+      "updatedAt": "2026-11-06T18:47:29.589Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "Local writes under .yallaflow/local/ are reassessed against the actual local threat model, with a portable mitigation of the symbolic-link race where feasible and an honest residual limitation that does not overstate workspace isolation.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0025",
+          "locator": "2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T18:47:29.589Z",
+      "updatedAt": "2026-11-06T18:47:29.589Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "The one-agent-session-per-checkout rule holds across separate console processes, not only within one server instance.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0025",
+          "locator": "3"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T18:47:29.589Z",
+      "updatedAt": "2026-11-06T18:47:29.589Z"
+    },
+    {
+      "id": "REQ-004",
+      "statement": "Allow for Session never extends beyond the provider session it was given in, never selects a persistent provider rule, and never approves or bypasses a YallaFlow approval gate.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0025",
+          "locator": "5"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T18:47:29.589Z",
+      "updatedAt": "2026-11-06T18:47:29.589Z"
+    },
+    {
+      "id": "REQ-005",
+      "statement": "Delivery documentation: exact release dependency on 1.2.0 and a safe integration path that preserves the 1.2.0 working tree; final local trial instructions for the packaged build (Codex, and the experimental Claude connection only when explicitly authorized); the Anthropic compliance decision documented separately; Claude stays experimental, off by default, and not claimed as verified.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0025",
+          "locator": "4, 6, 7, 8"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T18:47:29.589Z",
+      "updatedAt": "2026-11-06T18:47:29.589Z"
+    },
+    {
+      "id": "REQ-006",
+      "statement": "Appropriate regressions run and a concise final risk assessment is produced; no new features, no commit, tag, push, publish, and no change to the v1.2.0 release candidate or the main working tree.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0025",
+          "locator": "9, constraints"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T18:47:29.589Z",
+      "updatedAt": "2026-11-06T18:47:29.589Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "On POSIX the adapter runs in its own process group; end, crash and console shutdown signal the whole group (TERM then KILL) and then check that the group and the known descendants are gone; a test shows a grandchild that ignores SIGTERM is terminated.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0025",
+          "locator": "1"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T18:47:29.589Z",
+      "updatedAt": "2026-11-06T18:47:29.589Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "When a process survives termination (for example one that left the process group), the session-ended event and the panel say that cleanup is incomplete and list the process ids, and the console's terminal output says so on shutdown; a test covers it.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0025",
+          "locator": "1"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T18:47:29.589Z",
+      "updatedAt": "2026-11-06T18:47:29.589Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-002",
+      "statement": "On Linux, writes under .yallaflow/local/ resolve every directory through opened directory handles with O_NOFOLLOW so a swap after the check cannot redirect them; elsewhere the existing checks stay and the residual race is documented; a test exercises the anchored path.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0025",
+          "locator": "2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T18:47:29.589Z",
+      "updatedAt": "2026-11-06T18:47:29.589Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-002",
+      "statement": "docs/limitations.md and docs/agents.md state the threat model and the residual limitation without claiming workspace isolation or sandboxing.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0025",
+          "locator": "2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T18:47:29.589Z",
+      "updatedAt": "2026-11-06T18:47:29.589Z"
+    },
+    {
+      "id": "AC-005",
+      "requirement": "REQ-003",
+      "statement": "An agent-enabled console takes a per-checkout lock that records its process identity; a second console process on the same checkout cannot start or connect an agent session (409 with the holder named) while the first is alive, and recovers the lock when the holder is gone; a test uses two separate console processes.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0025",
+          "locator": "3"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T18:47:29.589Z",
+      "updatedAt": "2026-11-06T18:47:29.589Z"
+    },
+    {
+      "id": "AC-006",
+      "requirement": "REQ-004",
+      "statement": "Allow for session maps only to the provider's session-scoped options (by option id); persistent options (exec-policy prefix rules, future-host rules, MCP always-allow) are never selected; deny never selects a persistent reject; the button is not offered when no session-scoped option exists; tests cover these cases.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0025",
+          "locator": "5"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T18:47:29.589Z",
+      "updatedAt": "2026-11-06T18:47:29.589Z"
+    },
+    {
+      "id": "AC-007",
+      "requirement": "REQ-004",
+      "statement": "YallaFlow stores no permission decision for reuse; a new or resumed session asks again; no bridge path approves a YallaFlow gate; the documentation states what Allow for session covers and that gates remain human commands.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0025",
+          "locator": "5"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T18:47:29.589Z",
+      "updatedAt": "2026-11-06T18:47:29.589Z"
+    },
+    {
+      "id": "AC-008",
+      "requirement": "REQ-005",
+      "statement": "Delivery folder contains a release dependency and integration document, updated LOCAL_TRIAL.md for the rebuilt packaged build, a separate Anthropic compliance decision document, rebuilt patch/tarball with checksums; Claude remains behind --experimental-claude and is described as not verified end-to-end.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0025",
+          "locator": "4, 6, 7, 8"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T18:47:29.589Z",
+      "updatedAt": "2026-11-06T18:47:29.589Z"
+    },
+    {
+      "id": "AC-009",
+      "requirement": "REQ-006",
+      "statement": "Full test suite passes in the DEV workspace; the 1.2.0 release-candidate tarball hash and the main working tree are unchanged; a final risk assessment is reported.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0025",
+          "locator": "9"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T18:47:29.589Z",
+      "updatedAt": "2026-11-06T18:47:29.589Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-06T18:47:29.589Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-06T18:47:29.589Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-06T18:47:29.589Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-004",
+      "at": "2026-11-06T18:47:29.589Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-005",
+      "at": "2026-11-06T18:47:29.589Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-006",
+      "at": "2026-11-06T18:47:29.589Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-06T18:47:29.589Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-06T18:47:29.589Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-06T18:47:29.589Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-11-06T18:47:29.589Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-005",
+      "at": "2026-11-06T18:47:29.589Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-006",
+      "at": "2026-11-06T18:47:29.589Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-007",
+      "at": "2026-11-06T18:47:29.589Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-008",
+      "at": "2026-11-06T18:47:29.589Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-009",
+      "at": "2026-11-06T18:47:29.589Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-06T18:47:29.589Z"
+}

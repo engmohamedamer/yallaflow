@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Agent Workspace (v1.3.0, opt-in via 'yallaflow console --agents'): provider-aware code is confined to src/agents/ (plus commands/agents.js and the console entry points), which makes no network calls of its own. Codex is a managed session through the user-installed ACP adapter codex-acp, refused unless it reports a ChatGPT account login, with API-key variables stripped from its environment. Claude Code is experimental (--experimental-claude): the user starts it and it joins through the bundled Channels MCP server (resources/agents/claude-channel.mjs) and command hooks, authenticated by a per-run bridge token in .yallaflow/local/agent-bridge.json. One managed session per checkout; unanswered permissions are denied after YALLAFLOW_AGENT_PERMISSION_TIMEOUT_MS (default 5 min); full-access/bypass modes are never used; session records live in git-ignored .yallaflow/local/agent-sessions/; activation only through yallaflow activate.",
+      "evidence": [
+        "src/agents/bridge.js",
+        "src/agents/codex.js",
+        "src/agents/claude.js",
+        "resources/agents/claude-channel.mjs",
+        "docs/agents.md",
+        "verification:V-002"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-06T17:24:54.609Z",
+      "factId": "CTX-0102",
+      "promotedAt": "2026-11-06T17:43:40.304Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-002",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Agent integrations use only the developer's existing subscription and locally authenticated tools: no API keys, no API billing, no credential extraction or proxying; for Claude Code no Agent SDK, claude -p, or third-party ACP adapter on subscription auth; YallaFlow never launches Claude Code or accepts its warnings for the user.",
+      "evidence": [
+        "docs/agents.md",
+        "src/agents/codex.js",
+        "user:owner mandated subscription-only agent interaction, SRC-0024"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-06T17:24:58.342Z",
+      "factId": "CTX-0103",
+      "promotedAt": "2026-11-06T17:43:40.566Z",
+      "target": "context/conventions.md"
+    }
+  ],
+  "updatedAt": "2026-11-06T17:43:40.566Z",
+  "reviewedAt": "2026-11-06T17:43:40.566Z"
+}
