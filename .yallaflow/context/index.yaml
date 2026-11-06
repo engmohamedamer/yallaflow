@@ -11553,7 +11553,62 @@
       ],
       "createdAt": "2026-11-06T19:24:23.662Z",
       "updatedAt": "2026-11-06T19:24:23.662Z"
+    },
+    {
+      "id": "CTX-0105",
+      "area": "business-rule",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Work lifecycle (1.4.0): a work item's lifecycle status (open, on hold, closed without delivery) is separate from its workflow stage: meta.lifecycle is absent when open, every change is audited in work/<id>/lifecycle.yaml, holds preserve stage and evidence, CLOSED is never DONE or delivered and is left out of completion; held or closed work refuses every progress command (CLI dispatcher guard under the workspace lock plus core checks); baseline and reconciliation items are never held or closed; the first hold/close requires explicit confirmation to raise the project's minimum YallaFlow version to 1.4.0, written atomically with the change.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0041",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/core/lifecycle.js",
+          "contentHash": "sha256:58b7a15de2345e2aaddec390f16111d6e95444b2a129d41417a63f1fa5a4d8f8",
+          "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/cli.js",
+          "contentHash": "sha256:9ec2f38a835b8c17ba8db44e2d8fe499bcaff6b3086fb0d774aa5d677ca4b0db",
+          "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/work-lifecycle.test.js",
+          "contentHash": "sha256:e0682728fc6b49a388733200dd22eb7a7b77582bf9ccd4dd0b50129eee6e5563",
+          "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "npm run check (passed)",
+          "workId": "PF-0041",
+          "verificationRunId": "V-002"
+        }
+      ],
+      "verifiedAt": "2026-11-06T22:11:27.966Z",
+      "verifiedAtCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-06T22:11:27.966Z",
+          "workId": "PF-0041",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-06T22:11:27.966Z",
+      "updatedAt": "2026-11-06T22:11:27.966Z"
     }
   ],
-  "updatedAt": "2026-11-06T19:24:23.662Z"
+  "updatedAt": "2026-11-06T22:11:27.966Z"
 }

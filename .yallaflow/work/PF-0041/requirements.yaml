@@ -1,0 +1,298 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "Work items have a lifecycle status separate from the workflow stage: open (default, also for every existing record), on hold, or closed. The stage, progress, requirements and evidence are never rewritten by a lifecycle change.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0028",
+          "locator": "2.3"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T21:17:52.924Z",
+      "updatedAt": "2026-11-06T21:17:52.924Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "Hold is temporary: an explicit, audited Core operation with a reason that preserves stage, progress, requirements and evidence; resume returns the item to exactly the same valid state.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0028",
+          "locator": "2.1"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T21:17:52.924Z",
+      "updatedAt": "2026-11-06T21:17:52.924Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "Close without delivery is an explicit, audited Core operation with an outcome (cancelled, superseded, duplicate) and a reason; a closed item is never counted as delivered, verified, completed or DONE.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0028",
+          "locator": "2.2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T21:17:52.924Z",
+      "updatedAt": "2026-11-06T21:17:52.924Z"
+    },
+    {
+      "id": "REQ-004",
+      "statement": "Reopening a closed item is explicit, audited and subject to the existing Core validation rules; it returns the item to its preserved stage and state.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0028",
+          "locator": "2.4"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T21:17:52.924Z",
+      "updatedAt": "2026-11-06T21:17:52.924Z"
+    },
+    {
+      "id": "REQ-005",
+      "statement": "Held and closed items cannot be progressed (advance, checkpoint, verify, requirements, convergence, impact, finish, activation and similar mutations) until resumed or reopened; the refusal names the operation that lifts it. Holding or closing the active item clears the active focus.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0028",
+          "locator": "2.1-2.6"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T21:17:52.924Z",
+      "updatedAt": "2026-11-06T21:17:52.924Z"
+    },
+    {
+      "id": "REQ-006",
+      "statement": "Backward compatibility: every existing work record and CLI command behaves as before; a workspace that uses hold or close requires YallaFlow >= 1.4.0 so older CLIs stop before mutating items they cannot understand.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0028",
+          "locator": "2.5"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T21:17:52.924Z",
+      "updatedAt": "2026-11-06T21:17:52.924Z"
+    },
+    {
+      "id": "REQ-007",
+      "statement": "Read surfaces (status, brief, next, guide, snapshot, work show, Flow states, completion metrics, console) show held and closed items truthfully and exclude closed items from delivered/completed counts.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0028",
+          "locator": "2.2, 2.3"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T21:17:52.924Z",
+      "updatedAt": "2026-11-06T21:17:52.924Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "meta.lifecycle is absent for open items (old records unchanged) and holds {state, since, reason, ...}; meta.status (stage) is identical before hold/close and after resume/reopen; every lifecycle change is appended to an audit ledger and progress.md.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0028",
+          "locator": "2.3"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T21:17:52.924Z",
+      "updatedAt": "2026-11-06T21:17:52.924Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-002",
+      "statement": "`yallaflow work hold <id> --reason` and `yallaflow work resume <id>` exist; a test shows stage, checkpoint ledger, requirements and verification evidence byte-identical across hold and resume.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0028",
+          "locator": "2.1, 2.7"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T21:17:52.924Z",
+      "updatedAt": "2026-11-06T21:17:52.924Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-003",
+      "statement": "`yallaflow work close <id> --outcome cancelled|superseded|duplicate --reason [--by <work-id>]` exists; DONE items cannot be closed; a closed item is excluded from done/delivered counts and never reaches 100% completion in snapshot, status and insights; tests cover it.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0028",
+          "locator": "2.2, 2.7"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T21:17:52.924Z",
+      "updatedAt": "2026-11-06T21:17:52.924Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-004",
+      "statement": "`yallaflow reopen <id> --reason` on a closed item reopens it at its preserved stage with an audit record; the existing DONE reopen (`--to`) is unchanged; tests cover both.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0028",
+          "locator": "2.4, 2.7"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T21:17:52.924Z",
+      "updatedAt": "2026-11-06T21:17:52.924Z"
+    },
+    {
+      "id": "AC-005",
+      "requirement": "REQ-005",
+      "statement": "A central guard refuses progress mutations on held and closed items with a message naming resume or reopen; holding or closing the active item clears current.yaml activeWork; tests cover advance, checkpoint, verify, finish, activate and requirement record.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0028",
+          "locator": "2.7"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T21:17:52.924Z",
+      "updatedAt": "2026-11-06T21:17:52.924Z"
+    },
+    {
+      "id": "AC-006",
+      "requirement": "REQ-006",
+      "statement": "Old project records (frozen fixtures and an existing v1.1.0/1.2.0 workspace) read and progress exactly as before; the first hold/close raises config yallaflow.minimumVersion to 1.4.0 (never lowers it) and a frozen older CLI refuses mutations while still reading; the full existing suite passes.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0028",
+          "locator": "2.5, 2.7"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T21:17:52.924Z",
+      "updatedAt": "2026-11-06T21:17:52.924Z"
+    },
+    {
+      "id": "AC-007",
+      "requirement": "REQ-007",
+      "statement": "Flow item state reports 'held' and 'closed' (snapshot schema extended additively); next skips held/closed items; status/brief/work show/guide name the lifecycle state and the lifting command; tests cover snapshot and completion metrics.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0028",
+          "locator": "2.2, 2.3, 2.7"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T21:17:52.924Z",
+      "updatedAt": "2026-11-06T21:17:52.924Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-06T21:17:52.924Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-06T21:17:52.924Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-06T21:17:52.924Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-004",
+      "at": "2026-11-06T21:17:52.924Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-005",
+      "at": "2026-11-06T21:17:52.924Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-006",
+      "at": "2026-11-06T21:17:52.924Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-007",
+      "at": "2026-11-06T21:17:52.924Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-06T21:17:52.924Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-06T21:17:52.924Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-06T21:17:52.924Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-11-06T21:17:52.924Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-005",
+      "at": "2026-11-06T21:17:52.924Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-006",
+      "at": "2026-11-06T21:17:52.924Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-007",
+      "at": "2026-11-06T21:17:52.924Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-06T21:17:52.924Z"
+}

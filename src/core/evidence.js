@@ -1,3 +1,4 @@
+import { assertWorkProgressAllowed } from './lifecycle.js';
 import path from 'node:path';
 import { readdir } from 'node:fs/promises';
 import { exists } from '../utils/fs.js';
@@ -45,6 +46,7 @@ export async function nextVerificationRunId(root, workId) {
 // Append-only: every call adds a new run rather than overwriting. Old runs (including
 // a normalized legacy record) are preserved as history in the same file.
 export async function recordVerification(root, workId, record, now = new Date().toISOString()) {
+  await assertWorkProgressAllowed(root, workId, 'recording verification');
   const ledger = await loadLedger(root, workId);
   const run = {
     id: nextRunId(ledger.runs),

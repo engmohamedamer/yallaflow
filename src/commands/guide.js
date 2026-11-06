@@ -1,3 +1,4 @@
+import { lifecycleLabel, lifecycleOf } from '../core/lifecycle.js';
 import path from 'node:path';
 import { exists } from '../utils/fs.js';
 import { projectUnderstandingGate } from '../baseline/understanding.js';
@@ -70,6 +71,15 @@ export async function guideCommand(requestedWorkId) {
   }
   printOpenQuestions(readiness.questions);
   if (delivery.lines.length) console.log(`\n${delivery.lines.join('\n')}`);
+  // 1.4.0: a held or closed item authorizes nothing until it is resumed or reopened.
+  const lifecycle = lifecycleOf(meta);
+  if (lifecycle !== 'open') {
+    console.log('\nApplication code modification: NOT AUTHORIZED');
+    console.log(`Reason: ${meta.id} is ${lifecycleLabel(meta)}`);
+    console.log(`\nBLOCKER:\n${meta.id} is ${lifecycleLabel(meta)}`);
+    console.log(`\nNEXT VALID ACTION:\n${lifecycle === 'on_hold' ? `yallaflow work resume ${meta.id}` : `yallaflow reopen ${meta.id} --reason "..."`}`);
+    return;
+  }
   console.log(`\nApplication code modification: ${result.modification.authorized ? 'AUTHORIZED' : 'NOT AUTHORIZED'}`);
   console.log(`Reason: ${result.modification.reason}`);
   const atCompletionStage = isKnowledgeReviewStage(meta, stage);

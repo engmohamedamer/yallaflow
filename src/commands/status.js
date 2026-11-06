@@ -1,3 +1,4 @@
+import { lifecycleLabel, lifecycleOf } from '../core/lifecycle.js';
 import { findProjectRoot, getCurrentState, listWork } from '../core/workspace.js';
 import { loadWorkProgress } from '../core/progress.js';
 import { buildBehaviorGuidance } from '../behavior/guidance.js';
@@ -21,6 +22,7 @@ export async function statusCommand() {
     if (item.routingStatus === 'pending') {
       console.log(`\n${item.id}`);
       console.log('Routing: pending');
+      if (item.lifecycle) console.log(`Lifecycle: ${lifecycleLabel(item)}`);
       if (item.sources?.length) console.log(`Source: ${formatSourceList(item.sources)}`);
       else console.log(`Raw request: ${item.rawRequest}`);
       console.log('Next: classify work type and scope');
@@ -36,10 +38,11 @@ export async function statusCommand() {
       console.log(`${item.type} / ${item.scope}`);
       if (item.sources?.length) console.log(`Source: ${formatSourceList(item.sources)}`);
       console.log(`Stage: ${stage}`);
+      if (item.lifecycle) console.log(`Lifecycle: ${lifecycleLabel(item)}`);
       console.log(`Behavior: ${guidance.progress.completedCount}/${guidance.progress.totalCount} completed`);
       console.log(`Current skill: ${guidance.progress.current?.skillId ?? 'none'}`);
       console.log(`Delivery: ${readiness.deliveryStatus ?? 'not ready'}`);
-      console.log(`Write access: ${guidance.modification.authorized ? 'authorized' : 'blocked'}`);
+      console.log(`Write access: ${guidance.modification.authorized && lifecycleOf(item) === 'open' ? 'authorized' : 'blocked'}`);
       if (delivery.pendingImpact) console.log(`Impact: ${delivery.pendingImpact.id} pending assessment`);
       continue;
     }

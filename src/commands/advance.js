@@ -7,7 +7,7 @@ export async function advanceCommand(requestedWorkId) {
   const result = await advanceActiveWork(root, requestedWorkId);
   console.log(`${result.id}: ${result.from} → ${result.to}`);
   if (result.to === 'DONE') {
-    console.log('Work item closed. Durable work state has been recorded.');
+    console.log('Work item completed (DONE). Durable work state has been recorded.');
     return;
   }
   // Report the next boundary immediately (read-only) instead of making the agent

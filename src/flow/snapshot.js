@@ -4,6 +4,7 @@
 //
 // Fields are only ever added within a schema major version (SemVer for the contract):
 // yallaflow.snapshot/1 and yallaflow.work/1. Schemas: resources/schemas/.
+import { lifecycleLabel } from '../core/lifecycle.js';
 import path from 'node:path';
 import { readdir } from 'node:fs/promises';
 import { getCurrentState, getConfig, isSharedWorkspace, workspacePath } from '../core/workspace.js';
@@ -48,7 +49,9 @@ export async function collectSnapshot(root, { now = new Date().toISOString() } =
     }
   }
   invalid.sort((a, b) => a.id.localeCompare(b.id));
-  const open = items.filter((item) => item.state !== 'done');
+  // Closed work is neither done nor open: it never counts toward delivery or progress.
+  const counted = items.filter((item) => item.state !== 'closed');
+  const open = counted.filter((item) => item.state !== 'done');
   return {
     schema: SNAPSHOT_SCHEMA,
     generatedAt: now,
@@ -59,7 +62,7 @@ export async function collectSnapshot(root, { now = new Date().toISOString() } =
       shared: Boolean(shared),
       activeWork: state.activeWork ?? null
     },
-    completion: items.length ? Math.round(items.reduce((sum, item) => sum + item.completion, 0) / items.length) : 0,
+    completion: counted.length ? Math.round(counted.reduce((sum, item) => sum + item.completion, 0) / counted.length) : 0,
     // The average completion of open (not DONE) valid work only; null when nothing is open,
     // so a project whose recorded work is all DONE is never shown as "100% complete".
     openCompletion: open.length ? Math.round(open.reduce((sum, item) => sum + item.completion, 0) / open.length) : null,
@@ -105,7 +108,7 @@ async function readWorkMetas(root) {
 }
 
 function countStates(items) {
-  const counts = { new: 0, active: 0, you: 0, fail: 0, paused: 0, done: 0 };
+  const counts = { new: 0, active: 0, you: 0, fail: 0, paused: 0, done: 0, held: 0, closed: 0 };
   for (const item of items) counts[item.state] = (counts[item.state] ?? 0) + 1;
   return counts;
 }
@@ -123,8 +126,16 @@ async function collectItem(root, meta, state, metas = null) {
     parent: meta.parent ?? null,
     sourceCount: meta.sources?.length ?? 0,
     createdAt: meta.createdAt ?? null,
-    updatedAt: meta.updatedAt ?? null
+    updatedAt: meta.updatedAt ?? null,
+    lifecycle: meta.lifecycle ?? null
   };
+  // 1.4.0: held or closed work shows its lifecycle and the command that lifts it.
+  const lifecycleState = meta.lifecycle?.state === 'closed' ? 'closed' : meta.lifecycle?.state === 'on_hold' ? 'held' : null;
+  const lift = lifecycleState === 'held' ? `yallaflow work resume ${meta.id}` : `yallaflow reopen ${meta.id} --reason "..."`;
+  if (lifecycleState && meta.routingStatus === 'pending') {
+    const stations = buildStations({ workflow: null, stages: [], stage: null, state: lifecycleState });
+    return { ...base, state: lifecycleState, completion: 0, currentStation: null, stations: stations.stations, waitingFor: null, blocker: lifecycleLabel(meta), nextAction: lift };
+  }
   if (meta.routingStatus === 'pending') {
     const stations = buildStations({ workflow: null, stages: [], stage: null, state: 'new' });
     return { ...base, state: 'new', completion: 0, currentStation: null, stations: stations.stations, waitingFor: null, blocker: null, nextAction: `yallaflow route ${meta.id} --type TYPE --scope SCOPE --confidence LEVEL --reason "..."` };
@@ -166,9 +177,9 @@ async function collectItem(root, meta, state, metas = null) {
     completion: flow.completion,
     currentStation: flow.currentStation,
     stations: flow.stations,
-    waitingFor,
-    blocker: verdict.final ? null : verdict.allowed ? null : verdict.blocker ?? null,
-    nextAction: verdict.final ? null : verdict.action ?? null,
+    waitingFor: lifecycleState ? null : waitingFor,
+    blocker: lifecycleState ? lifecycleLabel(meta) : verdict.final ? null : verdict.allowed ? null : verdict.blocker ?? null,
+    nextAction: lifecycleState ? lift : verdict.final ? null : verdict.action ?? null,
     latestVerification: latest ? { id: latest.id, success: Boolean(latest.success), at: latest.verifiedAt ?? latest.finishedAt ?? null } : null,
     verificationRuns: { total: runs.length, passed: runs.filter((run) => run.success).length },
     completedAt: stage === 'DONE' ? (meta.completionHistory?.at(-1)?.completedAt ?? null) : null,
@@ -182,8 +193,10 @@ async function childSteps(root, meta, metas) {
   if (!decomposition.exists || !['executing', 'complete'].includes(decomposition.ledger.status)) return null;
   const all = metas ?? new Map((await readWorkMetas(root)).metas.map((entry) => [entry.id, entry]));
   return decomposition.ledger.children.filter((child) => child.required !== false && child.workId).map((child) => {
-    const status = all.get(child.workId)?.status;
-    return { id: child.workId, status: status === 'DONE' ? 'done' : status && status !== 'INTAKE' ? 'now' : 'todo' };
+    const childMeta = all.get(child.workId);
+    const status = childMeta?.status;
+    const lifecycle = childMeta?.lifecycle?.state === 'closed' ? 'closed' : childMeta?.lifecycle?.state === 'on_hold' ? 'held' : null;
+    return { id: child.workId, status: status === 'DONE' ? 'done' : lifecycle ?? (status && status !== 'INTAKE' ? 'now' : 'todo') };
   });
 }
 

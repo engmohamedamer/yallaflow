@@ -305,6 +305,8 @@ async function childAssessmentProblem(root, workId, childId, assessmentId, crite
     return `convergence evidence names unknown work item ${childId}`;
   }
   if (meta.parent !== workId) return `convergence evidence must cite a direct decomposition child of ${workId}; ${childId} is not one`;
+  // 1.4.0: closed work was not delivered, so its findings prove nothing for the parent.
+  if (meta.lifecycle?.state === 'closed') return `${childId} was closed without delivery (${meta.lifecycle.outcome}); its findings can't prove a parent criterion`;
   const ledger = (await loadWorkConvergence(root, meta)).ledger;
   const assessment = ledger.assessments.find((entry) => entry.id === assessmentId);
   if (!assessment) return `convergence assessment ${childId}/${assessmentId} does not exist`;

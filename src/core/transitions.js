@@ -1,3 +1,4 @@
+import { assertProgressAllowed } from './lifecycle.js';
 import path from 'node:path';
 import { exists } from '../utils/fs.js';
 import { readYaml, writeYaml } from './yaml.js';
@@ -35,6 +36,7 @@ export async function advanceActiveWork(root, requestedWorkId) {
   const metaFile = path.join(workDir, 'meta.yaml');
   if (!await exists(metaFile)) throw new Error(`Work item ${workId} was not found.`);
   const meta = await readYaml(metaFile);
+  assertProgressAllowed(meta, 'advancing');
   if (meta.routingStatus === 'pending') throw new Error(`${meta.id} is awaiting routing. Run \`yallaflow route\` first.`);
   const isActive = workId === state.activeWork;
   const current = isActive ? (state.stage ?? meta.status) : meta.status;

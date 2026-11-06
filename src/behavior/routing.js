@@ -1,3 +1,4 @@
+import { assertProgressAllowed } from '../core/lifecycle.js';
 import path from 'node:path';
 import { readdir } from 'node:fs/promises';
 import { CONFIDENCE_LEVELS, SCOPES, WORK_TYPES } from './constants.js';
@@ -161,6 +162,7 @@ export async function activateWorkItem(root, workId) {
   if (!await exists(metaFile)) throw new Error(`Work item ${workId} was not found.`);
   const meta = await readYaml(metaFile);
   if (meta.status === 'DONE') throw new Error(`${workId} is DONE. Reopen it with \`yallaflow reopen\` to work on it again.`);
+  assertProgressAllowed(meta, 'activating it');
   const state = await getCurrentState(root);
   const previous = state.activeWork ?? null;
   const now = new Date().toISOString();

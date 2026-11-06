@@ -36,8 +36,26 @@ import { BASELINE_AREAS, BASELINE_FACT_SOURCES, BASELINE_FACT_STATUSES } from '.
 // A and B are skipped for a decomposed parent (status executing/complete): its
 // 'implementation' checkpoint is never meant to complete — its required children are
 // the implementation (see decomposition-graph checks below).
+// 1.4.0 lifecycle block (PF-0041): well-formed, never on DONE work.
+export function checkLifecycleIntegrity(meta) {
+  const lifecycle = meta.lifecycle;
+  if (lifecycle === undefined) return [];
+  const issues = [];
+  if (!lifecycle || typeof lifecycle !== 'object' || !['on_hold', 'closed'].includes(lifecycle.state)) {
+    return [`${meta.id}: lifecycle must be on_hold or closed (absent when open); found ${JSON.stringify(lifecycle)}.`];
+  }
+  if (meta.status === 'DONE') issues.push(`${meta.id}: DONE work cannot be ${lifecycle.state === 'closed' ? 'closed' : 'on hold'}.`);
+  if (typeof lifecycle.since !== 'string' || typeof lifecycle.reason !== 'string' || !lifecycle.reason.trim()) issues.push(`${meta.id}: lifecycle needs since and a non-empty reason.`);
+  if (lifecycle.state === 'closed') {
+    if (!['cancelled', 'superseded', 'duplicate'].includes(lifecycle.outcome)) issues.push(`${meta.id}: closed work needs an outcome (cancelled, superseded, duplicate).`);
+    if (lifecycle.outcome !== 'cancelled' && !lifecycle.by) issues.push(`${meta.id}: ${lifecycle.outcome} work must name the item it was ${lifecycle.outcome} by.`);
+  }
+  return issues;
+}
+
 export async function checkWorkIntegrity(root, meta) {
-  if (meta.routingStatus === 'pending') return [];
+  const lifecycleIssues = checkLifecycleIntegrity(meta);
+  if (meta.routingStatus === 'pending') return lifecycleIssues;
   const stage = meta.status;
   const progress = await loadWorkProgress(root, meta);
   const { contract, ledger } = progress;
@@ -116,6 +134,7 @@ export async function checkWorkIntegrity(root, meta) {
     if (status !== 'approved') issues.push(`${meta.id}: ${gateName} checkpoint is completed but its review is ${status}.`);
   }
 
+  issues.unshift(...lifecycleIssues);
   return issues;
 }
 

@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-06T21:17:33.386Z",
+      "completedAt": "2026-11-06T21:17:33.715Z",
+      "summary": "Stage lives in meta.status; DONE guards are scattered (routing activate, delivery assess/convergence); no central write guard; derived 'paused' in flow/stations itemState; existing reopen (DONE->stage --to); project compatibility gate config.yallaflow.minimumVersion makes older CLIs (>=0.3.10) refuse mutations; 'resume' is already a CLI command name (session resumption)",
+      "evidence": [
+        "src/core/transitions.js",
+        "src/behavior/routing.js",
+        "src/flow/stations.js",
+        "src/shared/config.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T21:17:33.544Z",
+      "completedAt": "2026-11-06T21:17:53.089Z",
+      "summary": "7 requirements / 7 acceptance criteria from the owner's lifecycle decision (SRC-0028); no open business ambiguity"
+    },
+    "design-exploration": {
+      "status": "completed",
+      "startedAt": "2026-11-06T21:18:10.178Z",
+      "completedAt": "2026-11-06T21:18:10.346Z",
+      "summary": "Chosen: meta.lifecycle block + lifecycle.yaml ledger (stage untouched); commands under 'work' (hold/resume/close) and reopen for closed; central guard; minimumVersion raise for older-CLI safety. Rejected: CLOSED as a workflow stage/station (owner rule 3), top-level 'resume' (name taken)"
+    },
+    "specification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T21:18:10.517Z",
+      "completedAt": "2026-11-06T21:23:53.512Z",
+      "summary": "Revised: confirmation-gated minimum-version raise (--accept-minimum-version 1.4.0 / console dialog), atomic writes with rollback, older CLI behaviour verified by experiment, Shared Project rules, extended regression test list"
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-06T21:28:21.370Z",
+      "completedAt": "2026-11-06T21:28:21.532Z",
+      "summary": "7-step plan recorded in work.md: lifecycle core module with atomic writes, central guard wiring, CLI, read surfaces, version/docs, regression tests, verification"
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-06T21:48:56.081Z",
+      "completedAt": "2026-11-06T22:00:12.779Z",
+      "summary": "Review fixes: conservative id detection (any token or --opt=value before --), guard inside the workspace lock, baseline and reconciliation items refuse hold/close, closed --by target refused, closed child findings rejected as parent convergence evidence, finish/handoff/resume state the lifecycle, 'Work item completed (DONE)' wording, held/closed child steps, accurate version wording; tests extended (flag-first, equals form, approve/feedback/knowledge/intake, finish/handoff output, baseline refusal) with a mutation check"
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T22:11:12.276Z",
+      "completedAt": "2026-11-06T22:11:12.450Z",
+      "summary": "V-002: npm run check 863/863 on Node 22; 863/863 on Node 20.16; lifecycle tests with mutation checks",
+      "evidence": [
+        "verification:V-002"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-06T22:11:13.268Z",
+      "completedAt": "2026-11-06T22:11:13.620Z",
+      "summary": "7/7 acceptance criteria satisfied"
+    },
+    "code-review": {
+      "status": "completed",
+      "startedAt": "2026-11-06T22:11:13.443Z",
+      "completedAt": "2026-11-06T22:11:13.809Z",
+      "summary": "Independent review on an isolated copy: 3 high, 3 medium, 7 low; high and medium fixed with tests, low items fixed or documented (ruling)"
+    }
+  },
+  "rulings": [
+    {
+      "decision": "The PF-0041 specification text was not written into work.md at the first review: the edit targeted a heading this feature template does not have and matched nothing. The owner's first review therefore saw only the agent's chat summary. The complete revised specification is now written into the template's Specification sections, and the gate is presented again for review.",
+      "reason": "Accurate audit trail of what the owner reviewed",
+      "costIfWrong": "An approval could be recorded against a specification that was not in the record",
+      "createdAt": "2026-11-06T21:24:33.302Z"
+    },
+    {
+      "decision": "The central write guard sits at the CLI dispatcher (the single entry point every write path uses, console included) with defense-in-depth checks in core advance, activate, checkpoint, checkpoint revise and verification recording",
+      "reason": "Core has no single write choke point; a write-level backstop would fire mid-operation and break read commands that refresh gate state",
+      "costIfWrong": "A future command that bypasses the dispatcher and the core checks could progress held or closed work",
+      "createdAt": "2026-11-06T21:48:56.620Z"
+    },
+    {
+      "decision": "Agent Contract bumped to v11: lifecycle.yaml added to the CLI-owned list (required by the existing ownership invariant test) plus a short rule that agents hold/close/resume/reopen only on the developer's explicit request and never pass --accept-minimum-version without their confirmation",
+      "reason": "Existing invariant: every CLI-owned file is named in the contract; agents must not take lifecycle decisions on their own",
+      "costIfWrong": "Projects see their AGENT.md reported as outdated until agent refresh",
+      "createdAt": "2026-11-06T21:48:56.899Z"
+    },
+    {
+      "decision": "Review findings H1-H3, M1-M3, L1, L2, L4, L5 fixed. Not changed: L3 (closing a decomposed parent leaves children open; a closed required child blocks the parent, consistent with 'closed is never DONE'), L6 (snapshot/1 enum extension documented as additive), L7 (cosmetic). No dedicated test for M1 (convergence on a closed child) yet: the check is a one-line guard in childAssessmentProblem.",
+      "reason": "Remaining items are documented behaviour or cosmetic; M1 test needs a full decomposition fixture",
+      "costIfWrong": "A regression in the M1 check would not be caught by a dedicated test",
+      "createdAt": "2026-11-06T22:00:13.028Z"
+    }
+  ],
+  "history": [
+    {
+      "skill": "specification",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Owner requested changes: explicit confirmation before raising the minimum version, atomic raise with the lifecycle change, verified older-CLI behaviour, Shared Project and regression tests",
+      "changedAt": "2026-11-06T21:23:53.348Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Independent review: guard missed ids after options (H1), held/closed baseline and reconciliation could be approved to DONE (H2/H3), closed child as parent convergence evidence (M1), guard ran before the lock (M2), misleading finish/handoff/resume output (M3), low items",
+      "changedAt": "2026-11-06T22:00:12.518Z"
+    }
+  ],
+  "updatedAt": "2026-11-06T22:11:13.809Z"
+}

@@ -1,0 +1,298 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-06T22:11:12.811Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+        "verificationRunIds": [
+          "V-002"
+        ]
+      },
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "meta.lifecycle is absent for open items and set only by lifecycle operations; meta.status is never written by them; each change appends to work/<id>/lifecycle.yaml and progress.md; the hold/resume test compares the record and ledgers before and after.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/core/lifecycle.js",
+              "contentHash": "sha256:58b7a15de2345e2aaddec390f16111d6e95444b2a129d41417a63f1fa5a4d8f8",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/work-lifecycle.test.js",
+              "contentHash": "sha256:e0682728fc6b49a388733200dd22eb7a7b77582bf9ccd4dd0b50129eee6e5563",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0041",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "work hold/resume exist; the test shows stage, progress.yaml and the evidence tree identical across hold and resume, resume returns the same record apart from updatedAt, and never activates.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/lifecycle.js",
+              "contentHash": "sha256:315d314f363deb87c86c1f97bd49cfbf6c3e37b33c02569e953abe5e25489666",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/cli.js",
+              "contentHash": "sha256:9ec2f38a835b8c17ba8db44e2d8fe499bcaff6b3086fb0d774aa5d677ca4b0db",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/work-lifecycle.test.js",
+              "contentHash": "sha256:e0682728fc6b49a388733200dd22eb7a7b77582bf9ccd4dd0b50129eee6e5563",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0041",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "work close with cancelled/superseded/duplicate and --by rules (required, not self, not a closed target); DONE refused; snapshot counts closed separately, leaves it out of project and open completion, never 100; brief reports it; tests cover each rule.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/core/lifecycle.js",
+              "contentHash": "sha256:58b7a15de2345e2aaddec390f16111d6e95444b2a129d41417a63f1fa5a4d8f8",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/flow/snapshot.js",
+              "contentHash": "sha256:04e7eab8fb20c250d6fe839897ad46af383d3c1fa4d13ce707ca7174d16b5464",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/work-lifecycle.test.js",
+              "contentHash": "sha256:e0682728fc6b49a388733200dd22eb7a7b77582bf9ccd4dd0b50129eee6e5563",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0041",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "reopen of a closed item reopens it at its preserved stage with an audit event, refuses --to, requires a reason; the DONE reopen with --to is unchanged; normal stage rules apply afterwards; tested.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/cli.js",
+              "contentHash": "sha256:9ec2f38a835b8c17ba8db44e2d8fe499bcaff6b3086fb0d774aa5d677ca4b0db",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/core/lifecycle.js",
+              "contentHash": "sha256:58b7a15de2345e2aaddec390f16111d6e95444b2a129d41417a63f1fa5a4d8f8",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/work-lifecycle.test.js",
+              "contentHash": "sha256:e0682728fc6b49a388733200dd22eb7a7b77582bf9ccd4dd0b50129eee6e5563",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0041",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "Central guard in the CLI dispatcher, under the workspace lock, finds every referenced work id in any argument shape and falls back to the active item; core checks in advance, activate, checkpoint, checkpoint revise and verification recording; hold/close clear the active focus; the test covers advance, checkpoint, revise, verify, activate, intake add, question add, requirement record, request revise, knowledge review, feedback, approve, flag-first and --opt=value forms, and fails when the guard is disabled or the old id detection is restored.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/cli.js",
+              "contentHash": "sha256:9ec2f38a835b8c17ba8db44e2d8fe499bcaff6b3086fb0d774aa5d677ca4b0db",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/core/transitions.js",
+              "contentHash": "sha256:4f8208d734b2b9c149ad6abeeb2e038cf47425cee8e3f1054175f129d5129aa4",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/core/progress.js",
+              "contentHash": "sha256:5067d0fc779e137c20afe2af3a65ad9a13fe518017db7074dd50c842f250a8c2",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/core/evidence.js",
+              "contentHash": "sha256:3e06e26adf6f739841d8c8be3ccccc5c931a80f9d136c9a17eefed96c2a944a4",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/behavior/routing.js",
+              "contentHash": "sha256:9cd9c235c2df583972b46861939c1b5b6c32683bbf3149e6dc25e45808e7839b",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/work-lifecycle.test.js",
+              "contentHash": "sha256:e0682728fc6b49a388733200dd22eb7a7b77582bf9ccd4dd0b50129eee6e5563",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0041",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "Existing records read and progress unchanged (old-records test, full suite 863/863 on Node 22 and 20.16); the first hold/close refuses without --accept-minimum-version 1.4.0 and changes nothing, then raises atomically (failure-injection test after every write); Shared Project policy preserved and only raised; the frozen v1.1.0 CLI refuses mutations on a 1.4.0 project while reading it, and the installed 1.2.0 and 1.3.0 CLIs and consoles were verified to refuse too.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/core/lifecycle.js",
+              "contentHash": "sha256:58b7a15de2345e2aaddec390f16111d6e95444b2a129d41417a63f1fa5a4d8f8",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/work-lifecycle.test.js",
+              "contentHash": "sha256:e0682728fc6b49a388733200dd22eb7a7b77582bf9ccd4dd0b50129eee6e5563",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0041",
+              "verificationRunId": "V-002"
+            },
+            {
+              "type": "runtime",
+              "description": "installed yallaflow 1.1.0/1.2.0/1.3.0 refused every mutation on a project requiring 1.4.0, project files byte-unchanged"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "Flow states held/closed and a lifecycle field in the snapshot (schema extended additively); readyChildren excludes held/closed children; status, brief, guide, work show, finish, handoff and resume label the lifecycle and name the lifting command; doctor validates the block and warns on an active held/closed item; tested.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/flow/stations.js",
+              "contentHash": "sha256:6369399ddbe72d5d75b375cfcdac126b34e8cc7d1f210933b27844d41d01caa8",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/flow/snapshot.js",
+              "contentHash": "sha256:04e7eab8fb20c250d6fe839897ad46af383d3c1fa4d13ce707ca7174d16b5464",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/decomposition/store.js",
+              "contentHash": "sha256:3c279f6e2f7483628c12648d29478c135e84e931190ce0a2a2192bc435156213",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/guide.js",
+              "contentHash": "sha256:323397cbf9659218e87b4fb75cd8282d5f966e9252dac68793ef55ff9563724b",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/finish.js",
+              "contentHash": "sha256:89dd484f3088b621776b08c4791aee4ac9a836a8a854f84c919c7e887e9a1d7a",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/core/integrity.js",
+              "contentHash": "sha256:64b8a67e66e804a9583397e78c35afa4b9400860329cadd32643a7d9b18d7360",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/work-lifecycle.test.js",
+              "contentHash": "sha256:e0682728fc6b49a388733200dd22eb7a7b77582bf9ccd4dd0b50129eee6e5563",
+              "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0041",
+              "verificationRunId": "V-002"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-06T22:11:12.811Z"
+}

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0028",
+  "sourceType": "file",
+  "sourceName": "owner-decision-workspace-lifecycle.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-11-06T21:16:29.281Z",
+  "original": {
+    "path": "sources/SRC-0028/owner-decision-workspace-lifecycle.md",
+    "sha256": "edd51282562482c00e33a0e67abe0382f7adb094a80c40f6f54883450169df97",
+    "sizeBytes": 1795
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0041"
+  ],
+  "rawText": "# Owner design decisions (2026-11-06) for the workspace evolution (from PF-0040 proposal)\n\n1. Gate approvals from the web console: Yes, with confirmation (approve / request changes on review screens, explicit confirm dialog, recorded as a console approval with the note; never automatic, never from an agent session).\n2. Hold / Close — owner's words: \"I approve Option 1: both Hold/Resume and Close without delivery. However, please make these lifecycle semantics explicit before implementation:\n   1. HOLD is temporary. It must preserve the current workflow stage, progress, requirements, and evidence. Resume returns to the same valid state.\n   2. CLOSED is not DONE. Cancelled, superseded, or duplicate work must never be counted as delivered, verified, or completed.\n   3. Prefer separating lifecycle status from workflow stage where appropriate, rather than adding an artificial delivery station to the Flow.\n   4. Reopening a closed item must be explicit, audited, and subject to the existing Core validation rules.\n   5. Preserve backward compatibility with all existing YallaFlow work records and CLI commands.\n   6. UI actions must call canonical Core operations. No arbitrary drag-and-drop stage changes or bypassed review gates.\n   7. Add regression tests for hold, resume, close, reopen, completion metrics, active work, and old project records.\n   Record this as my explicit design decision and proceed through the approved YallaFlow workflow. Do not interpret it as approval to publish either release or bypass any remaining verification.\"\n3. Runtime profile: committed and shared (.yallaflow/runtime.yaml), confirmed once per checkout before the first run.\n4. Implement first: Work management + Project Overview (phase 1.4.0), on a feature branch with tests, without releasing.\n"
+}

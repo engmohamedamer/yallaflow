@@ -65,4 +65,20 @@
   - test/work-routing.test.js (repository @ 9c38eec)
   - docs/upgrading-to-v1.0.1.md (repository @ 9c38eec)
 
+<!-- yallaflow-fact:CTX-0105 -->
+### CTX-0105 — Work lifecycle (1.4.0): a work item's lifecycle status (open, on hold, closed without delivery) is separate from its workflow stage: meta.lifecycle is absent when open, every change is audited in work/<id>/lifecycle.yaml, holds preserve stage and evidence, CLOSED is never DONE or delivered and is left out of completion; held or closed work refuses every progress command (CLI dispatcher guard under the workspace lock plus core checks); baseline and reconciliation items are never held or closed; the first hold/close requires explicit confirmation to raise the project's minimum YallaFlow version to 1.4.0, written atomically with the change.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0041
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-06T22:11:27.966Z
+- **Verified:** 2026-11-06T22:11:27.966Z (commit b700b2c)
+- **Evidence:**
+  - src/core/lifecycle.js (repository @ b700b2c)
+  - src/cli.js (repository @ b700b2c)
+  - test/work-lifecycle.test.js (repository @ b700b2c)
+  - npm run check (passed) (runtime, PF-0041 V-002)
+
 <!-- yallaflow-context:end -->

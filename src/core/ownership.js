@@ -17,6 +17,7 @@ import { redactSecrets } from '../security/redact.js';
 //   human      deliberate human-owned settings and content
 export const STATE_OWNERSHIP = Object.freeze([
   { path: 'work/<id>/meta.yaml', owner: 'cli', via: 'start, route, intake, advance, reopen, baseline, context reconcile', pattern: new RegExp(`^work/${WORK_ID_SOURCE}/meta\\.yaml$`) },
+  { path: 'work/<id>/lifecycle.yaml', owner: 'cli', via: '1.4.0 work hold, work resume, work close, reopen (closed work): append-only lifecycle audit ledger', pattern: new RegExp(`^work/${WORK_ID_SOURCE}/lifecycle\\.yaml$`) },
   { path: 'work/<id>/progress.yaml', owner: 'cli', via: 'checkpoint, checkpoint revise', pattern: new RegExp(`^work/${WORK_ID_SOURCE}/progress\\.yaml$`) },
   { path: 'work/<id>/progress.md', owner: 'cli', via: 'append-only lifecycle log written by every lifecycle command', pattern: new RegExp(`^work/${WORK_ID_SOURCE}/progress\\.md$`) },
   { path: 'work/<id>/knowledge.yaml', owner: 'cli', via: 'knowledge propose|promote|reject|review', pattern: new RegExp(`^work/${WORK_ID_SOURCE}/knowledge\\.yaml$`) },

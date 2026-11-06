@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "gates": {
+    "specification": {
+      "status": "approved",
+      "respondedAt": "2026-11-06T21:28:07.814Z",
+      "note": "Approved by the owner in the agent session (2026-11-06): 'Approve specification' for the revised PF-0041 specification (confirmation-gated atomic minimum-version raise, verified older-CLI behaviour, Shared Project and regression tests)",
+      "history": [
+        {
+          "status": "awaiting_review",
+          "at": "2026-11-06T21:18:11.534Z"
+        },
+        {
+          "status": "changes_requested",
+          "at": "2026-11-06T21:22:20.111Z",
+          "note": "Owner selected 'Request changes' in the agent session (2026-11-06); details pending from the owner"
+        },
+        {
+          "status": "approved",
+          "at": "2026-11-06T21:28:07.814Z",
+          "note": "Approved by the owner in the agent session (2026-11-06): 'Approve specification' for the revised PF-0041 specification (confirmation-gated atomic minimum-version raise, verified older-CLI behaviour, Shared Project and regression tests)"
+        }
+      ]
+    },
+    "plan": {
+      "status": "approved",
+      "respondedAt": "2026-11-06T21:31:38.792Z",
+      "note": "Approved by the owner in the agent session (2026-11-06): 'Approve plan' for the 7-step PF-0041 implementation plan (feature branch only, no push/release)",
+      "history": [
+        {
+          "status": "awaiting_review",
+          "at": "2026-11-06T21:28:21.719Z"
+        },
+        {
+          "status": "approved",
+          "at": "2026-11-06T21:31:38.792Z",
+          "note": "Approved by the owner in the agent session (2026-11-06): 'Approve plan' for the 7-step PF-0041 implementation plan (feature branch only, no push/release)"
+        }
+      ]
+    }
+  },
+  "updatedAt": "2026-11-06T21:31:38.792Z"
+}

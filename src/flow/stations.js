@@ -71,9 +71,13 @@ export function stationForSkill(skillId) {
 //   fail    — at a verify stage and the latest verification run failed
 //   active  — the workspace's active work item (this checkout)
 //   paused  — routed and in progress, but not the active item and not waiting on a person
+//   held    — (1.4.0) explicitly on hold; the stage and progress are preserved
+//   closed  — (1.4.0) closed without delivery; never done, delivered or verified
 export function itemState({ meta, stage, waitingForHuman, latestRunFailed, active }) {
-  if (meta.routingStatus === 'pending' || stage === 'INTAKE' || !stage) return 'new';
   if (stage === 'DONE') return 'done';
+  if (meta.lifecycle?.state === 'closed') return 'closed';
+  if (meta.lifecycle?.state === 'on_hold') return 'held';
+  if (meta.routingStatus === 'pending' || stage === 'INTAKE' || !stage) return 'new';
   if (waitingForHuman) return 'you';
   if (latestRunFailed && stationForStage(stage) === 'verify') return 'fail';
   if (active) return 'active';

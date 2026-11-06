@@ -153,6 +153,36 @@ yallaflow reopen PF-0001 --to review --reason "A second reviewer is required."
 
 Reopen requires DONE work, reactivates it at the matching stage, resets downstream checkpoints (including `delivery-convergence` when reopening to implementation or verification, whose findings then become stale; and knowledge review when reopening to implementation), and appends to `meta.lifecycleHistory`. Evidence, checkpoint history, and knowledge candidates are never deleted. After a reopen to implementation or verification, fresh verification is required again (a reopen to review keeps the existing verification and convergence current); reaching DONE again adds a second `completionHistory` entry. Workflows without an implementation or verification stage (investigations) cannot be reopened.
 
+## On hold and closed work (1.4.0)
+
+A work item's **lifecycle status** is separate from its **stage**: holding or closing never moves the stage, and resuming or reopening never skips one.
+
+```bash
+yallaflow work hold PF-0007 --reason "Waiting for the client's data export"
+yallaflow work resume PF-0007
+yallaflow work close PF-0008 --outcome superseded --by PF-0011 --reason "Replaced by the new pricing model"
+yallaflow reopen PF-0008 --reason "The client wants the old model after all"
+```
+
+- **On hold** is temporary.
+  - **Preserved:** the stage, checkpoints, requirements, convergence and verification evidence.
+  - **Resume** returns the item to exactly that state. It doesn't make it active; `yallaflow activate` does.
+- **Closed without delivery** (`cancelled`, `superseded`, `duplicate`) is never DONE.
+  - It never counts as delivered, verified or completed, and project completion leaves it out.
+  - DONE work can't be closed or held.
+  - `superseded` and `duplicate` name the other item with `--by`.
+- **Reopen** of closed work returns it to its preserved stage. The normal rules apply from there on. `--to` is only for DONE work.
+- **Nothing progresses while held or closed.**
+  - Every command that would change the item refuses, and names `work resume` or `reopen`.
+  - Holding or closing the active item clears the active focus.
+  - Reading (`status`, `brief`, `guide`, `work show`, `snapshot`) keeps working.
+- **Audit:** every change is appended to `work/<id>/lifecycle.yaml` and noted in `progress.md`.
+- **Compatibility:**
+  - **One-time confirmation:** the first hold or close in a project requires YallaFlow >= 1.4.0 from then on, so it asks first: run it again with `--accept-minimum-version 1.4.0`.
+  - **Older CLIs** (1.3.x and earlier) can still read the project, but refuse to change it.
+  - **Shared Projects:** the requirement reaches the team when the branch is merged.
+  - **Rollback:** a failed operation leaves every file as it was.
+
 ## Structured questions
 
 > **A material business or architecture decision is durable state, not a line of chat.**

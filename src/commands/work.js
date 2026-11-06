@@ -1,3 +1,4 @@
+import { lifecycleLabel } from '../core/lifecycle.js';
 import { findProjectRoot, getConfig } from '../core/workspace.js';
 import { understandingNotice } from '../baseline/understanding.js';
 import { createRoutedWork } from '../behavior/routing.js';
@@ -29,6 +30,7 @@ export async function newWorkCommand(type, title, scope, commandName = type) {
   console.log(`Type: ${meta.type} / Scope: ${meta.scope}`);
   console.log(`Workflow: ${meta.workflow}`);
   console.log(`Stage: ${meta.status}`);
+  if (meta.lifecycle) console.log(`Lifecycle: ${lifecycleLabel(meta)}`);
   console.log(`Behavior contract: registry v${meta.behaviorContract.registryVersion} (pinned) — ${meta.behaviorContract.skills.join(', ')}`);
   if (meta.readOnly) console.log('Safety: read-only; application code changes are not authorized by this workflow.');
   console.log(`Path: .yallaflow/work/${meta.id}/work.md`);

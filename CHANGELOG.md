@@ -8,6 +8,27 @@ All notable changes to YallaFlow are documented here. The format loosely follows
 
 Nothing yet.
 
+## [1.4.0] - unreleased (in development) — Work lifecycle
+
+### Added
+- **Hold and resume work** (`yallaflow work hold|resume`).
+  - A temporary hold keeps the stage, checkpoints, requirements and evidence.
+  - Resume returns the item to the same state, and does not activate it.
+- **Close without delivery** (`yallaflow work close --outcome cancelled|superseded|duplicate`).
+  - Closed work is never DONE, delivered, verified or completed, and project completion leaves it out.
+  - Reopen closed work with `yallaflow reopen <id> --reason`.
+- **Lifecycle status separate from the workflow stage.**
+  - Data: the `meta.lifecycle` block and the `work/<id>/lifecycle.yaml` audit ledger.
+  - Snapshot: Flow states `held` and `closed` and a `lifecycle` field, an additive extension of `yallaflow.snapshot/1`.
+  - Commands: `status`, `brief`, `guide` and `work show` label the lifecycle; `doctor` checks it.
+- **One central guard.** Held or closed work refuses every progress command, and names the command that lifts it.
+
+### Changed
+- **Agent Contract v11:** agents hold, close, resume or reopen work only when the developer explicitly asks, and never progress held or closed work. Refresh with `yallaflow agent refresh`.
+- **Compatibility.** The first hold or close in a project asks for confirmation (`--accept-minimum-version 1.4.0`). It then records that the project requires YallaFlow >= 1.4.0, atomically with the change.
+  - **Older CLIs** (1.1.x–1.3.x, verified) still read such a project and refuse to change it.
+  - **Untouched:** projects that never hold or close work.
+
 ## [1.3.0] - unreleased (in development) — Agent Workspace
 
 Opt-in. Uses only the developer's existing Codex (ChatGPT) subscription: no API keys, no API billing, no credential handling. Codex is the supported provider. A Claude Code connection is not included, pending Anthropic's confirmation. Guide: [`docs/agents.md`](docs/agents.md).

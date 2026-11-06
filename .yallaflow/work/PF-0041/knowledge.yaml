@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "business-rule",
+      "source": "implementation-runtime",
+      "summary": "Work lifecycle (1.4.0): a work item's lifecycle status (open, on hold, closed without delivery) is separate from its workflow stage: meta.lifecycle is absent when open, every change is audited in work/<id>/lifecycle.yaml, holds preserve stage and evidence, CLOSED is never DONE or delivered and is left out of completion; held or closed work refuses every progress command (CLI dispatcher guard under the workspace lock plus core checks); baseline and reconciliation items are never held or closed; the first hold/close requires explicit confirmation to raise the project's minimum YallaFlow version to 1.4.0, written atomically with the change.",
+      "evidence": [
+        "src/core/lifecycle.js",
+        "src/cli.js",
+        "test/work-lifecycle.test.js",
+        "verification:V-002"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-06T22:11:24.250Z",
+      "factId": "CTX-0105",
+      "promotedAt": "2026-11-06T22:11:27.966Z",
+      "target": "context/business-rules.md"
+    }
+  ],
+  "updatedAt": "2026-11-06T22:11:27.966Z",
+  "reviewedAt": "2026-11-06T22:11:27.966Z"
+}

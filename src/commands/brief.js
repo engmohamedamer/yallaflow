@@ -76,7 +76,9 @@ export async function briefCommand() {
   // Work.
   out(`Active work: ${active ? `${active.id} — ${oneLine(active.title ?? active.type ?? 'work')} (${state.stage ?? active.status ?? 'pending routing'})` : 'none'}`);
   if (recent) out(`Most recent work: ${recent.id} ${recent.status ?? (recent.routingStatus === 'pending' ? 'PENDING' : '')} — ${title(recent)}`);
-  out(`Work items: ${work.length} (${done} DONE) · Sources: ${report.sources.length}${report.sources.length ? ` (latest ${report.sources.at(-1).id})` : ''}`);
+  const held = work.filter((item) => item.lifecycle?.state === 'on_hold').length;
+  const closed = work.filter((item) => item.lifecycle?.state === 'closed').length;
+  out(`Work items: ${work.length} (${done} DONE${held ? `, ${held} on hold` : ''}${closed ? `, ${closed} closed without delivery` : ''}) · Sources: ${report.sources.length}${report.sources.length ? ` (latest ${report.sources.at(-1).id})` : ''}`);
   const delivery = active ? await loadDeliverySummary(root, active) : { applies: false, lines: [] };
   const lens = active ? describePurpose(await loadWorkPurpose(root, active.id).catch(() => null)) : null;
   if (lens) out(`Discovery lens (${active.id}): ${lens}`);

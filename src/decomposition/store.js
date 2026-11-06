@@ -160,7 +160,9 @@ export async function childProgressView(root, ledger) {
     }
     const done = childMeta.status === 'DONE';
     const isActive = state.activeWork === child.workId;
-    const status = done ? 'done' : blockedBy.length ? 'blocked' : isActive ? 'active' : 'ready';
+    // 1.4.0: held or closed children are never ready (closed is never done).
+    const lifecycle = childMeta.lifecycle?.state === 'closed' ? 'closed' : childMeta.lifecycle?.state === 'on_hold' ? 'held' : null;
+    const status = done ? 'done' : lifecycle ?? (blockedBy.length ? 'blocked' : isActive ? 'active' : 'ready');
     results.push({ ...child, meta: childMeta, state: status, blockedBy });
   }
   return results;

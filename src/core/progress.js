@@ -1,3 +1,4 @@
+import { assertProgressAllowed, assertWorkProgressAllowed } from './lifecycle.js';
 import path from 'node:path';
 import { exists } from '../utils/fs.js';
 import { findSkill } from '../skills/registry.js';
@@ -46,6 +47,7 @@ export async function checkpointWork(root, workId, input, now = new Date().toISO
   const metaFile = path.join(workspacePath(root), 'work', workId, 'meta.yaml');
   if (!await exists(metaFile)) throw new Error(`Work item ${workId} was not found.`);
   const meta = await readYaml(metaFile);
+  assertProgressAllowed(meta, 'recording a checkpoint');
   if (meta.routingStatus === 'pending') throw new Error(`${workId} is awaiting routing. Run \`yallaflow route\` first.`);
 
   const loaded = await loadWorkProgress(root, meta);
@@ -83,6 +85,7 @@ export async function checkpointWork(root, workId, input, now = new Date().toISO
 
 export async function reviseCheckpoint(root, workId, input, now = new Date().toISOString()) {
   if (!isNonEmptyString(input.reason)) throw new Error('Checkpoint correction requires a non-empty --reason.');
+  await assertWorkProgressAllowed(root, workId, 'revising a checkpoint');
   if (!isNonEmptyString(input.skillId)) throw new Error('--skill must be a non-empty skill ID.');
   if (!['pending', 'in_progress', 'blocked'].includes(input.status)) {
     throw new Error('Checkpoint correction status must be pending, in_progress, or blocked. Use the normal checkpoint command to complete work.');

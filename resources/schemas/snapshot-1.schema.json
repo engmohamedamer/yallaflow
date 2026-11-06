@@ -26,7 +26,9 @@
       "required": ["new", "active", "you", "fail", "paused", "done"],
       "properties": {
         "new": { "type": "integer" }, "active": { "type": "integer" }, "you": { "type": "integer" },
-        "fail": { "type": "integer" }, "paused": { "type": "integer" }, "done": { "type": "integer" }
+        "fail": { "type": "integer" }, "paused": { "type": "integer" }, "done": { "type": "integer" },
+        "held": { "type": "integer", "description": "On hold (lifecycle). Added in 1.4.0." },
+        "closed": { "type": "integer", "description": "Closed without delivery (lifecycle); never counted as done. Added in 1.4.0." }
       }
     },
     "items": { "type": "array", "items": { "$ref": "#/$defs/item" } },
@@ -57,7 +59,16 @@
         "routing": { "enum": ["pending", "routed"] },
         "stage": { "type": ["string", "null"] },
         "parent": { "type": ["string", "null"] },
-        "state": { "enum": ["new", "active", "you", "fail", "paused", "done"] },
+        "state": { "enum": ["new", "active", "you", "fail", "paused", "done", "held", "closed"], "description": "held and closed (lifecycle status, separate from the stage) were added in 1.4.0." },
+        "lifecycle": {
+          "type": ["object", "null"],
+          "description": "Lifecycle status (1.4.0): null when open; on hold or closed without delivery otherwise. The stage is unchanged by it.",
+          "properties": {
+            "state": { "enum": ["on_hold", "closed"] }, "since": { "type": "string" }, "reason": { "type": "string" },
+            "outcome": { "enum": ["cancelled", "superseded", "duplicate"] }, "by": { "type": "string" }
+          },
+          "required": ["state", "since", "reason"]
+        },
         "completion": { "type": "integer", "minimum": 0, "maximum": 100 },
         "currentStation": { "enum": ["understand", "decide", "change", "verify", "remember", null] },
         "stations": { "type": "array", "minItems": 5, "maxItems": 5, "items": { "$ref": "#/$defs/station" } },
@@ -82,7 +93,7 @@
       "required": ["key", "status", "steps"],
       "properties": {
         "key": { "enum": ["understand", "decide", "change", "verify", "remember"] },
-        "status": { "enum": ["done", "na", "todo", "active", "you", "fail", "paused"] },
+        "status": { "enum": ["done", "na", "todo", "active", "you", "fail", "paused", "held", "closed"] },
         "steps": {
           "type": "array",
           "items": {

@@ -1,3 +1,4 @@
+import { lifecycleLabel, lifecycleOf } from '../core/lifecycle.js';
 import path from 'node:path';
 import { exists } from '../utils/fs.js';
 import { findProjectRoot, getCurrentState, workspacePath } from '../core/workspace.js';
@@ -68,7 +69,11 @@ export async function handoffCommand(requestedWorkId) {
   const { ledger: reviewLedger } = await loadReviews(root, workId);
 
   const reconciliation = meta.reconciliation ? await reconciliationSummaryLines(root, meta) : null;
-  const primaryObjective = reconciliation && meta.status !== 'DONE'
+  const lifecycle = lifecycleOf(meta);
+  if (lifecycle !== 'open') console.log(`\nLIFECYCLE:\n${meta.id} is ${lifecycleLabel(meta)}. Nothing progresses until it is ${lifecycle === 'on_hold' ? `resumed (yallaflow work resume ${meta.id})` : `reopened (yallaflow reopen ${meta.id} --reason "...")`}, and only when the developer asks.`);
+  const primaryObjective = lifecycle !== 'open'
+    ? null
+    : reconciliation && meta.status !== 'DONE'
     ? 'Reconcile legacy project context.'
     : delivery.pendingImpact
       ? guidance.nextObjective

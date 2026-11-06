@@ -1,3 +1,4 @@
+import { lifecycleLabel, lifecycleOf } from '../core/lifecycle.js';
 import path from 'node:path';
 import { exists } from '../utils/fs.js';
 import { findProjectRoot, getCurrentState, listWork, loadWorkMetaOrThrow, workspacePath } from '../core/workspace.js';
@@ -95,7 +96,9 @@ export async function assessFinish(root, meta) {
     return { ready, developer, agent, detail };
   }
 
-  if (meta.routingStatus === 'pending' || meta.status !== 'DONE') {
+  if (lifecycleOf(meta) !== 'open') {
+    block(`${meta.id} is ${lifecycleLabel(meta)}; it is not finished and is not being worked on.`, lifecycleOf(meta) === 'on_hold' ? `only if the developer asks: yallaflow work resume ${meta.id}` : `only if the developer asks: yallaflow reopen ${meta.id} --reason "..."`);
+  } else if (meta.routingStatus === 'pending' || meta.status !== 'DONE') {
     block('Not finished yet — the task is still in progress.', `yallaflow guide ${meta.id} (current stage: ${meta.status ?? 'awaiting routing'})`);
   } else {
     const verification = await latestVerification(root, meta.id);

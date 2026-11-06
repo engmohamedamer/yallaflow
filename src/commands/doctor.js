@@ -210,6 +210,15 @@ export async function collectDoctorReport(root, { verifyMedia = false } = {}) {
   const warnings = [];
   warnings.push(...deliveryWarnings);
   warnings.push(...qualityWarnings);
+  // 1.4.0: hold and close clear the active focus; an active held or closed item means the
+  // state was changed by hand or by an older tool.
+  try {
+    const activeId = (await getCurrentState(root)).activeWork;
+    const active = activeId ? (await listWork(root)).find((item) => item.id === activeId) : null;
+    if (active?.lifecycle) warnings.push(`${active.id} is the active work item but is ${active.lifecycle.state === 'closed' ? 'closed' : 'on hold'}; activate other work or ${active.lifecycle.state === 'closed' ? 'reopen' : 'resume'} it.`);
+  } catch {
+    // reported by the state checks above
+  }
   try {
     for (const item of await listWork(root)) warnings.push(...(await checkWorkRecordOwnership(root, item)));
   } catch (error) {
