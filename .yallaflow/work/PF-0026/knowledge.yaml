@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Concurrency (v1.2.0): every command that can write .yallaflow holds an exclusive-create workspace lock at .yallaflow/local/lock {pid, host, startedAt, command}, taken in src/cli.js (needsWorkspaceLock/dispatch); read-only commands, init and help never take it; verify takes it only around recording its run. It is re-entrant per process, waits up to 10 s (YALLAFLOW_LOCK_TIMEOUT_MS), removes a stale lock (dead pid on this host) by atomic rename-claim, never removes another host's lock, and deletes local/ again when empty so single-user workspaces still have no local/. doctor reports it; doctor --clear-lock removes only a stale one. writeYaml is atomic (unique temp name + rename with retry).",
+      "evidence": [
+        "src/utils/lock.js",
+        "src/cli.js",
+        "src/core/yaml.js",
+        "src/utils/fs.js",
+        "verification:V-010"
+      ],
+      "confidence": "confirmed",
+      "provenance": "repository",
+      "status": "promoted",
+      "createdAt": "2026-11-05T22:42:24.590Z",
+      "factId": "CTX-0092",
+      "promotedAt": "2026-11-05T22:42:24.873Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-05T22:42:24.873Z",
+  "reviewedAt": "2026-11-05T22:42:24.873Z"
+}

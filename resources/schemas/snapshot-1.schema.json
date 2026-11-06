@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "yallaflow.snapshot/1",
+  "title": "YallaFlow project snapshot (yallaflow snapshot --json)",
+  "description": "Fields are only added within schema version 1. Stations and completion are computed by Core.",
+  "type": "object",
+  "required": ["schema", "generatedAt", "yallaflowVersion", "project", "completion", "counts", "items"],
+  "properties": {
+    "schema": { "const": "yallaflow.snapshot/1" },
+    "generatedAt": { "type": "string" },
+    "yallaflowVersion": { "type": "string" },
+    "project": {
+      "type": "object",
+      "required": ["name", "shared", "activeWork"],
+      "properties": {
+        "name": { "type": "string" },
+        "kind": { "type": ["string", "null"] },
+        "shared": { "type": "boolean" },
+        "activeWork": { "type": ["string", "null"] }
+      }
+    },
+    "completion": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "openCompletion": { "type": ["integer", "null"], "minimum": 0, "maximum": 100, "description": "Average completion of open (not DONE) valid items; null when no work is open. Added in 1.2.0." },
+    "counts": {
+      "type": "object",
+      "required": ["new", "active", "you", "fail", "paused", "done"],
+      "properties": {
+        "new": { "type": "integer" }, "active": { "type": "integer" }, "you": { "type": "integer" },
+        "fail": { "type": "integer" }, "paused": { "type": "integer" }, "done": { "type": "integer" }
+      }
+    },
+    "items": { "type": "array", "items": { "$ref": "#/$defs/item" } },
+    "invalid": {
+      "type": "array",
+      "description": "Work items whose records fail Core validation. They are not in items and never count as valid, in progress or proven; their records are untouched. Run yallaflow doctor. Added in 1.2.0.",
+      "items": {
+        "type": "object",
+        "required": ["id", "code", "message"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": ["string", "null"] },
+          "code": { "const": "WORK_ITEM_INVALID" },
+          "message": { "type": "string" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "item": {
+      "type": "object",
+      "required": ["id", "type", "scope", "title", "routing", "stage", "state", "completion", "currentStation", "stations", "waitingFor", "blocker", "nextAction", "sourceCount"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": ["string", "null"] },
+        "scope": { "type": ["string", "null"] },
+        "title": { "type": "string" },
+        "routing": { "enum": ["pending", "routed"] },
+        "stage": { "type": ["string", "null"] },
+        "parent": { "type": ["string", "null"] },
+        "state": { "enum": ["new", "active", "you", "fail", "paused", "done"] },
+        "completion": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "currentStation": { "enum": ["understand", "decide", "change", "verify", "remember", null] },
+        "stations": { "type": "array", "minItems": 5, "maxItems": 5, "items": { "$ref": "#/$defs/station" } },
+        "waitingFor": {
+          "type": ["object", "null"],
+          "required": ["kind", "action"],
+          "properties": { "kind": { "enum": ["review", "question"] }, "gate": { "type": ["string", "null"] }, "questions": { "type": "array", "items": { "type": "string" } }, "action": { "type": "string" } }
+        },
+        "blocker": { "type": ["string", "null"] },
+        "nextAction": { "type": ["string", "null"] },
+        "sourceCount": { "type": "integer" },
+        "latestVerification": { "type": ["object", "null"] },
+        "verificationRuns": { "type": "object", "required": ["total", "passed"], "properties": { "total": { "type": "integer" }, "passed": { "type": "integer" } } },
+        "completedAt": { "type": ["string", "null"] },
+        "lastActivityAt": { "type": ["string", "null"] },
+        "createdAt": { "type": ["string", "null"] },
+        "updatedAt": { "type": ["string", "null"] }
+      }
+    },
+    "station": {
+      "type": "object",
+      "required": ["key", "status", "steps"],
+      "properties": {
+        "key": { "enum": ["understand", "decide", "change", "verify", "remember"] },
+        "status": { "enum": ["done", "na", "todo", "active", "you", "fail", "paused"] },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "kind", "status"],
+            "properties": { "id": { "type": "string" }, "kind": { "enum": ["stage", "checkpoint", "knowledge", "child"] }, "status": { "enum": ["done", "now", "todo"] }, "at": { "type": "string" } }
+          }
+        }
+      }
+    }
+  }
+}

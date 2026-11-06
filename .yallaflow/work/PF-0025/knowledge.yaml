@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Machine-readable read contract (v1.2.0): 'yallaflow snapshot --json' (schema yallaflow.snapshot/1) and 'yallaflow work show <id> --json' (yallaflow.work/1), schemas in resources/schemas/. Collectors in src/flow/snapshot.js use only existing readers with evaluateAdvance mutate:false. The five Flow stations (Understand, Decide, Change, Verify, Remember), item state (new/active/you/fail/paused/done) and completion % (20% per station; the current one counts done steps plus half the step in progress) are computed only in src/flow/stations.js, never in a UI. Schema fields are only added within a major schema version; --json errors are {error:{code,message}} with exit 1.",
+      "evidence": [
+        "src/flow/stations.js",
+        "src/flow/snapshot.js",
+        "src/commands/snapshot.js",
+        "resources/schemas/snapshot-1.schema.json",
+        "verification:V-007"
+      ],
+      "confidence": "confirmed",
+      "provenance": "repository",
+      "status": "promoted",
+      "createdAt": "2026-11-05T22:27:16.401Z",
+      "factId": "CTX-0091",
+      "promotedAt": "2026-11-05T22:27:21.180Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-05T22:27:21.180Z",
+  "reviewedAt": "2026-11-05T22:27:21.180Z"
+}

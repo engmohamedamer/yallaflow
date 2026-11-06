@@ -1,0 +1,46 @@
+TAP version 13
+# Subtest: parallel starts allocate distinct work IDs and leave valid state
+ok 1 - parallel starts allocate distinct work IDs and leave valid state
+  ---
+  duration_ms: 934.249572
+  type: 'test'
+  ...
+# Subtest: parallel mutating commands across items and verifications keep every ledger intact
+ok 2 - parallel mutating commands across items and verifications keep every ledger intact
+  ---
+  duration_ms: 2030.272018
+  type: 'test'
+  ...
+# Subtest: a stale lock from a dead process is reported, then recovered automatically
+ok 3 - a stale lock from a dead process is reported, then recovered automatically
+  ---
+  duration_ms: 361.262423
+  type: 'test'
+  ...
+# Subtest: doctor --clear-lock removes a stale lock and refuses a live one
+ok 4 - doctor --clear-lock removes a stale lock and refuses a live one
+  ---
+  duration_ms: 327.341439
+  type: 'test'
+  ...
+# Subtest: a live holder is waited for; past the timeout the command fails and changes nothing
+ok 5 - a live holder is waited for; past the timeout the command fails and changes nothing
+  ---
+  duration_ms: 1586.486602
+  type: 'test'
+  ...
+# Subtest: the lock is re-entrant inside one process and read commands never take it
+ok 6 - the lock is re-entrant inside one process and read commands never take it
+  ---
+  duration_ms: 291.395509
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5588.499154

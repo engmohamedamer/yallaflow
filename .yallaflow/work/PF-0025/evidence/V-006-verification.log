@@ -1,0 +1,106 @@
+TAP version 13
+# Subtest: every workflow stage except INTAKE and DONE maps to exactly one station
+ok 1 - every workflow stage except INTAKE and DONE maps to exactly one station
+  ---
+  duration_ms: 1.651589
+  type: 'test'
+  ...
+# Subtest: a bug at ROOT_CAUSE: Understand done, Decide current with half of the step in progress
+ok 2 - a bug at ROOT_CAUSE: Understand done, Decide current with half of the step in progress
+  ---
+  duration_ms: 1.170043
+  type: 'test'
+  ...
+# Subtest: an investigation never changes code: Change is not applicable and counts in full
+ok 3 - an investigation never changes code: Change is not applicable and counts in full
+  ---
+  duration_ms: 0.203169
+  type: 'test'
+  ...
+# Subtest: the final stage counts as finished once verification is complete; Remember becomes current
+ok 4 - the final stage counts as finished once verification is complete; Remember becomes current
+  ---
+  duration_ms: 0.171757
+  type: 'test'
+  ...
+# Subtest: pinned convergence and code-review are Verify steps
+ok 5 - pinned convergence and code-review are Verify steps
+  ---
+  duration_ms: 0.234597
+  type: 'test'
+  ...
+# Subtest: DONE is 100% and every station is done; a new item is 0% with no current station
+ok 6 - DONE is 100% and every station is done; a new item is 0% with no current station
+  ---
+  duration_ms: 0.248075
+  type: 'test'
+  ...
+# Subtest: item state: a person is waited on before failure, activity, or pause
+ok 7 - item state: a person is waited on before failure, activity, or pause
+  ---
+  duration_ms: 0.168459
+  type: 'test'
+  ...
+# Subtest: completion formula is the documented arithmetic
+ok 8 - completion formula is the documented arithmetic
+  ---
+  duration_ms: 0.132348
+  type: 'test'
+  ...
+# Subtest: refactor and release place their stages and compute completion
+ok 9 - refactor and release place their stages and compute completion
+  ---
+  duration_ms: 0.406684
+  type: 'test'
+  ...
+# Subtest: snapshot --json validates and places each item in the flow
+ok 10 - snapshot --json validates and places each item in the flow
+  ---
+  duration_ms: 1032.790565
+  type: 'test'
+  ...
+# Subtest: a requested human review gate is reported as waiting for you
+ok 11 - a requested human review gate is reported as waiting for you
+  ---
+  duration_ms: 724.842539
+  type: 'test'
+  ...
+# Subtest: an open material question is reported as waiting for you
+ok 12 - an open material question is reported as waiting for you
+  ---
+  duration_ms: 730.712088
+  type: 'test'
+  ...
+# Subtest: work show --json returns every section and validates
+ok 13 - work show --json returns every section and validates
+  ---
+  duration_ms: 1028.222179
+  type: 'test'
+  ...
+# Subtest: errors are one JSON document with a code and exit status 1
+ok 14 - errors are one JSON document with a code and exit status 1
+  ---
+  duration_ms: 151.612366
+  type: 'test'
+  ...
+# Subtest: read commands never modify .yallaflow, the working tree, or .git/index
+ok 15 - read commands never modify .yallaflow, the working tree, or .git/index
+  ---
+  duration_ms: 1182.473111
+  type: 'test'
+  ...
+# Subtest: snapshot reads a legacy v0.3.6 workspace fixture without writing to it
+ok 16 - snapshot reads a legacy v0.3.6 workspace fixture without writing to it
+  ---
+  duration_ms: 471.711965
+  type: 'test'
+  ...
+1..16
+# tests 16
+# suites 0
+# pass 16
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5413.830836

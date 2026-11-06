@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0022",
+  "sourceType": "file",
+  "sourceName": "owner-subscription-requirement-2026-11-06.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-11-06T15:23:57.705Z",
+  "original": {
+    "path": "sources/SRC-0022/owner-subscription-requirement-2026-11-06.md",
+    "sha256": "dbed4f5a7930642fbd76d3791715c9ddca79662010b78513e8ec9434998b401f",
+    "sizeBytes": 1700
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0035"
+  ],
+  "rawText": "# Owner clarification: subscription-based authentication is mandatory (2026-11-06, agent session)\n\nSubscription-based authentication is a mandatory product requirement, not an optional feature. No API keys,\nno separate API billing, no new AI provider account. Use existing, locally authenticated Claude Code and Codex\ninstallations with their normal subscriptions.\n1. Codex: verify interactive ACP/App Server integration using the existing ChatGPT subscription login.\n2. Claude Code: investigate the compliant ways to interact with the official, unmodified Claude Code binary\n   using the existing Claude subscription; evaluate Anthropic's current restrictions on third-party Agent SDK\n   integrations; do not assume an ACP adapter is permitted merely because authentication succeeds.\n3. Evaluate whether ACP still meets this requirement, or whether a native CLI-based, hybrid or other supported\n   integration is better.\n4. YallaFlow must never extract, copy, store or proxy subscription OAuth credentials to bypass provider\n   restrictions; authentication stays owned by each provider's official tools.\n5. Distinguish reusing the authenticated subscription from resuming/attaching to an existing conversation.\n6. No silent fallback to API keys or API billing; if a path cannot work with a subscription in a supported,\n   compliant way, mark it unsupported and propose alternatives.\n7. Preserve the normal Claude Code and Codex experience: tools, permissions, skills, MCP, sessions, limits.\nUpdate the research and recommendation. No production implementation, no paid experiments, no release changes.\nPriority: genuine interactive agent sessions using the subscriptions developers already pay for.\n"
+}

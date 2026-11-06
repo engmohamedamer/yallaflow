@@ -1,0 +1,43 @@
+{
+  "id": "PF-0033",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console: after choosing a theme, every click toggles light/dark and collapses open panels",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-06T14:40:19.571Z",
+  "updatedAt": "2026-11-06T14:47:22.301Z",
+  "title": "Console: after choosing a theme, every click toggles light/dark and collapses open panels",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-11-06T14:40:19.584Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-06T14:47:22.301Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

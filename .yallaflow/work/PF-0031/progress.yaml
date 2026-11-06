@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-06T11:09:46.090Z",
+      "completedAt": "2026-11-06T11:09:46.090Z",
+      "summary": "Vult (feat/platform-crm) PF-0091 is a merge of two different work items that both took ID PF-0091 on separate branches (change created f78e71ef2 under registry v8; investigation created decb0a57b under v9; merge d3cc5f37a kept meta/work.md from one side and progress.yaml/evidence from the other). 1.1.0 fails identically (status: Write access blocked). 13 more items show the pattern (requirements/convergence without delivery-convergence). collectSnapshot loops collectItem with no per-item isolation so one throw fails the whole project; the UI maps any API error to the red 'offline' chip; zero items yield completion 0 and an empty board; paused items share the generic chip.",
+      "evidence": [
+        "src/flow/snapshot.js",
+        "src/core/progress.js",
+        "resources/console/app.js",
+        "src/commands/doctor.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T11:10:32.320Z",
+      "completedAt": "2026-11-06T11:10:32.320Z",
+      "summary": "Owner-approved (SRC-0017/SRC-0018): (1) one invalid work item never hides a project: snapshot lists it under an additive invalid[] with its exact error, excluded from items, counts and completion, never counted as valid or proven; records untouched. (2) doctor names a probable merge-related work-ID collision (ledger registry/skills not matching the pinned contract, ledger or delivery records older than the item, delivery files without delivery-convergence) with the Git commits that added each side, read-only, no repair. (3) console: zero items -> onboarding card, no ring/0%; no open work -> 'all N recorded items are done', not project 100%; completion labelled as open recorded work; idle work neutral, never styled as waiting/blocked; a CLI data error is shown as a project-data problem, only a network failure as offline.",
+      "evidence": [
+        "user:SRC-0018"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-06T11:10:41.356Z",
+      "completedAt": "2026-11-06T11:10:41.356Z",
+      "summary": "snapshot.js: tolerant per-directory meta read + per-item try/catch -> invalid[{id,title,code:WORK_ITEM_INVALID,message}], counts/completion from valid items only, additive openCompletion (null when no open work); schema adds both fields; work show of an invalid item returns WORK_ITEM_INVALID. doctor.js: collision diagnosis section (read-only; git log --diff-filter=A for meta/progress). app.js/app.css: data-error vs offline (HTTP error with code vs network), integrity panel listing invalid items, onboarding card for zero items, all-done card, open-work ring label, paused neutral chip/node, 'old' badge only for you/fail. Tests: Vult-shaped mixed-ledger fixture (snapshot partial, work show code, doctor diagnosis), zero-item snapshot, all-done, schema validation; browser screenshots.",
+      "evidence": [
+        "src/flow/snapshot.js",
+        "src/commands/doctor.js",
+        "resources/console/app.js"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-06T11:10:44.931Z",
+      "completedAt": "2026-11-06T11:22:30.528Z",
+      "summary": "snapshot: tolerant meta read and per-item isolation; Core validation failures, delivery-integrity errors and source-link mismatches move an item to additive invalid[] (WORK_ITEM_INVALID), excluded from items/counts/completion; additive openCompletion; work show on an invalid item returns WORK_ITEM_INVALID (src/flow/snapshot.js, schema, checkSourceLinkIntegrity exported). doctor: read-only probable work-ID collision diagnosis with signals and adding commits (src/core/collisions.js, src/commands/doctor.js). Console: offline vs token vs project-data banners; integrity panel; onboarding for zero items; all-recorded-work-done card; open-work ring; neutral idle chip/node; old badge only for you/fail. Docs: CHANGELOG, console.md, cli.md, limitations.md. Tests: test/console-acceptance.test.js (merged collision via real git merge, exact registry-mismatch message, unreadable meta, zero items, console 200 with invalid). Vult read-only: 122 valid + 17 invalid, .yallaflow untouched.",
+      "evidence": [
+        "src/flow/snapshot.js",
+        "src/core/collisions.js",
+        "src/commands/doctor.js",
+        "resources/console/app.js",
+        "test/console-acceptance.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T11:28:50.594Z",
+      "completedAt": "2026-11-06T11:28:50.594Z",
+      "summary": "Full suite 818/818 (V-001), including 5 new acceptance tests; Vult read-only check: snapshot 122 valid + 17 invalid, doctor names 17 probable collisions with adding commits, Vult .yallaflow unchanged; browser screenshots of Vult flow, integrity panel and empty project (Chromium, 0 console errors).",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-06T11:28:50.594Z"
+}

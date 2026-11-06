@@ -18,13 +18,29 @@ import { checkDeliveryIntegrity } from '../delivery/integrity.js';
 import { checkQualityIntegrity } from '../quality/integrity.js';
 import { checkWorkRecordOwnership } from '../core/ownership.js';
 
-export async function doctorCommand() {
+import { clearStaleLock, readLock } from '../utils/lock.js';
+import { diagnoseCollisions } from '../core/collisions.js';
+
+export async function doctorCommand({ clearLock = false } = {}) {
   const root = await findProjectRoot();
   if (!root) throw new Error('FAIL No .yallaflow workspace found.');
+  if (clearLock) {
+    const result = await clearStaleLock(root);
+    console.log(`${result.cleared ? 'Cleared' : 'Not cleared'}: ${result.reason}.`);
+    if (!result.cleared && result.reason !== 'no lock is held') process.exitCode = 1;
+    return;
+  }
   const { checks, warnings } = await collectDoctorReport(root, { verifyMedia: true });
+  const lock = await readLock(root);
+  if (lock) warnings.push(lock.unreadable
+    ? 'workspace lock: .yallaflow/local/lock is unreadable; if no YallaFlow command is running, remove it with `yallaflow doctor --clear-lock`'
+    : lock.stale
+      ? `workspace lock: stale lock left by \`${lock.command}\` (pid ${lock.pid}, since ${lock.startedAt}); the next writer removes it, or run \`yallaflow doctor --clear-lock\``
+      : `workspace lock: held by \`${lock.command}\` (pid ${lock.pid} on ${lock.host}, since ${lock.startedAt})`);
   const failed = checks.filter(([, ok]) => !ok);
   for (const [name, ok] of checks) console.log(`${ok ? 'PASS' : 'FAIL'} ${name}`);
   for (const warning of warnings) console.log(`WARN ${warning}`);
+  if (failed.length) await printCollisionDiagnosis(root);
   if (failed.length) {
     process.exitCode = 1;
     console.log(`\n${failed.length} check(s) failed.`);
@@ -32,6 +48,28 @@ export async function doctorCommand() {
     console.log('\nWorkspace healthy.');
     if (warnings.length) console.log(`${warnings.length} warning(s) — informational only, does not affect workspace health.`);
   }
+}
+
+// Names probable merge-related work-ID collisions behind the failures above (read-only).
+async function printCollisionDiagnosis(root) {
+  let found = [];
+  try {
+    found = await diagnoseCollisions(root, await listWork(root));
+  } catch {
+    return; // the failures above already describe what could not be read
+  }
+  if (!found.length) return;
+  console.log(`\nProbable work-ID collisions (${found.length}) — read-only diagnosis; nothing was changed:`);
+  for (const entry of found) {
+    console.log(`  ${entry.id}${entry.title ? ` — ${entry.title}` : ''}`);
+    for (const signal of entry.signals) console.log(`    - ${signal}`);
+    if (entry.added?.meta.length) console.log(`    meta.yaml added in: ${entry.added.meta.join(' | ')}`);
+    if (entry.added?.progress.length) console.log(`    progress.yaml added in: ${entry.added.progress.join(' | ')}`);
+    if (entry.added?.requirements.length) console.log(`    requirements.yaml added in: ${entry.added.requirements.join(' | ')}`);
+  }
+  console.log('  Likely cause: two branches created the same plain work or source ID, and a Git merge combined two different items in one folder.');
+  console.log('  Keep these records exactly as they are and do not edit them by hand; a repair is a separate, reviewed step.');
+  console.log('  New collisions are prevented by branch-safe IDs (Shared Project mode, docs/shared-projects.md).');
 }
 
 // The complete read-only integrity report — shared by `doctor` (which prints it) and

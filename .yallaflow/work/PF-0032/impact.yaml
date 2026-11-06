@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "impacts": [
+    {
+      "id": "IM-001",
+      "status": "assessed",
+      "raisedAt": "2026-11-06T13:28:09.334Z",
+      "stageAtRaise": "IMPLEMENTATION",
+      "triggers": [
+        {
+          "type": "source",
+          "source": "SRC-0019",
+          "at": "2026-11-06T13:28:09.334Z"
+        },
+        {
+          "type": "requirements",
+          "changes": [
+            {
+              "id": "REQ-002",
+              "action": "revised",
+              "from": "active",
+              "to": "active"
+            },
+            {
+              "id": "REQ-004",
+              "action": "revised",
+              "from": "active",
+              "to": "active"
+            },
+            {
+              "id": "AC-002",
+              "action": "revised",
+              "from": "active",
+              "to": "active"
+            },
+            {
+              "id": "AC-004",
+              "action": "revised",
+              "from": "active",
+              "to": "active"
+            }
+          ],
+          "at": "2026-11-06T13:28:18.994Z"
+        }
+      ],
+      "assessment": {
+        "assessedAt": "2026-11-06T13:28:30.027Z",
+        "summary": "Owner focus decision (SRC-0019): console-created items are never activated automatically; attachment content availability must be reported.",
+        "stages": {
+          "context-discovery": {
+            "verdict": "unaffected",
+            "reason": "The discovered facts about focus, routing and intake are unchanged."
+          },
+          "requirement-clarification": {
+            "verdict": "affected",
+            "reason": "REQ-002/REQ-004 and AC-002/AC-004 were revised from the owner's decision."
+          },
+          "design-exploration": {
+            "verdict": "affected",
+            "reason": "The chosen activation rule changes from 'defer only when an unfinished item is active' to 'never activate'."
+          },
+          "specification": {
+            "verdict": "affected",
+            "reason": "The spec's activation semantics and the attachment-result reporting change."
+          },
+          "implementation-planning": {
+            "verdict": "unaffected",
+            "reason": "Same plan steps and files; only the rule inside them changes."
+          },
+          "implementation": {
+            "verdict": "affected",
+            "reason": "Core keep-active rule, CLI messages, server/UI attachment availability and tests change."
+          },
+          "delivery-convergence": {
+            "verdict": "affected",
+            "reason": "AC-002 and AC-004 changed and must be re-assessed."
+          }
+        },
+        "applied": {
+          "revised": [
+            "requirement-clarification",
+            "design-exploration",
+            "specification",
+            "implementation"
+          ],
+          "stage": {
+            "from": "IMPLEMENTATION",
+            "to": "CLARIFICATION"
+          },
+          "convergenceInvalidated": true
+        }
+      }
+    }
+  ],
+  "updatedAt": "2026-11-06T13:28:30.027Z"
+}

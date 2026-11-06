@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-06T15:54:03.172Z",
+      "completedAt": "2026-11-06T15:54:03.172Z",
+      "summary": "Pre-flight: Claude Code 2.1.319 contains channel and permission-relay support; claude.ai Team login; org managed settings channelsEnabled=true; no user permission defaults. Development channel required the owner's interactive approval (warning + MCP consent), given by the owner.",
+      "evidence": [
+        "research/agent-interaction/CAPABILITY_MATRIX.md"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-06T15:54:03.849Z",
+      "completedAt": "2026-11-06T15:54:03.849Z",
+      "summary": "Claude channel PoC, exactly 5 turns on the owner's subscription in a disposable repo: chat in/out 5/5, follow-up, console restart, 52 hook events, Stop hook carries last_assistant_message 5/5, explicit activation then agent checkpoint recorded by Core. Permission relay not exercised: built-in default auto mode (v2.1.283+) approved Write/Bash without dialogs. Cancel unsupported. Unified Agent Workspace UX defined with capability records (AGENT_WORKSPACE_UX.md); D1 request drafted, not sent.",
+      "evidence": [
+        "research/agent-interaction/evidence/poc-claude/driver-log.jsonl",
+        "research/agent-interaction/AGENT_WORKSPACE_UX.md",
+        "research/agent-interaction/ANTHROPIC_REQUEST_DRAFT.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T15:54:04.218Z",
+      "completedAt": "2026-11-06T15:54:04.218Z",
+      "summary": "Evidence and deliverables present; 5 turns used; no API key; no production or release-candidate change.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-06T15:54:04.218Z"
+}

@@ -8,6 +8,56 @@ All notable changes to YallaFlow are documented here. The format loosely follows
 
 Nothing yet.
 
+## [1.2.0] - unreleased (prepared 2026-11-06) — Flow Console, read contract & workspace lock
+
+Backward compatible. The Agent Contract, bootstrap blocks, Skill Registry, Knowledge Policy, and all workspace schema versions are unchanged. No new runtime dependency. Guide: [`docs/console.md`](docs/console.md). Upgrade notes: [`docs/upgrading-to-v1.2.0.md`](docs/upgrading-to-v1.2.0.md).
+
+### Added
+
+- **`yallaflow console`**: a local, read-only web console.
+  - **The flow.** New → Understand → Decide → Change → Verify → Remember → Done.
+  - **Each work item.** Its next step from YallaFlow's own verdict, its station chain with what each station handed off, and a Delivery view (acceptance criteria with convergence and the verification runs cited as evidence).
+  - **Attachments.** The request, plus previews of preserved originals.
+  - **Attention.** A list of what waits for a person, with optional browser notifications, and a "since you were away" summary built from recorded entries.
+  - **Worktrees.** Each Git worktree with its recorded state and changed files, and a warning when two change the same file. Worktrees are never presented as agent sessions.
+  - **Insights.** From recorded data only.
+  - **Display.** Arabic RTL and English, light and dark, reduced motion.
+  - **One action: Create Work.** A requirement in your own words, an optional type and size (or "let my agent decide"), and optional files (up to 50 MB each, Core's text-extraction limit). The console runs Core's own `start`, `route` and `intake add`. It never makes the new item active, records "created from the console, identity not verified", and turns a retried request into the same item. It reports what YallaFlow could do with each file (text readable, text extracted, or original kept without text, with the reason). If a file fails, the created item is kept and the failure is reported. `--read-only` turns creation off.
+  - **Everything else is read-only.** It never approves, answers, runs commands or starts an agent, and every other action place names the CLI command.
+  - **Local and private.** Loopback only, with a per-run token, Host/Origin checks, ID-addressed data, a strict CSP, and sandboxed previews. Writes are `POST` on the two Create Work routes only, and need the console's own Origin, the exact content type, and size limits.
+- **`yallaflow console add [DIR] | remove DIR | list`**: a user-level project list (mode 0600), never inside a repository. Saved projects that are gone are shown as unavailable.
+- **`yallaflow snapshot [--json]`** and **`yallaflow work show <id> [--json]`**: the versioned read contract (schemas `yallaflow.snapshot/1`, `yallaflow.work/1` in `resources/schemas/`).
+  - **Computed by Core.** The five Flow stations, the item state (`new`, `active`, `you`, `fail`, `paused`, `done`), and the completion %.
+  - **Evidence-aware.** Verify finishes only with a fresh successful run and, where required, current convergence. A reopened checkpoint brings its station back. Nothing short of DONE reaches 100%.
+  - **Errors.** A failure is one JSON document, `{"error":{"code","message"}}`, with exit code 1.
+- **Workspace write lock** (`.yallaflow/local/lock`), so several agents can safely use one checkout.
+  - **Who takes it.** Every writing command. `verify` takes it only to record a finished run, and `intake ticket --fetch` only after its network fetch. Read-only commands, dry runs and the console never take it.
+  - **Waiting.** Up to 60 s (`YALLAFLOW_LOCK_TIMEOUT_MS`), then a clear "busy" error that changes nothing.
+  - **Recovery.**
+    - The lock is created atomically and is never empty.
+    - It is stale when its holder is gone: dead, zombie, pid reused, rebooted, or taken before the last boot.
+    - It is removed by atomic rename-claim, nonce-checked.
+- **`yallaflow doctor --clear-lock`**, and `doctor` reports a held, stale or unreadable lock.
+- **`yallaflow start --keep-active -- <request>`** creates a work item without making it active, whether or not another item is active (it is recorded as deferred). Routing or progress on a deferred item never moves the focus. Without the option `start` behaves as before.
+- **`yallaflow activate <work-id>`**, the explicit way to switch the active work item.
+- **`doctor` names probable work-ID collisions.** When records fail because two branches created the same plain work or source ID and a Git merge combined them, `doctor` lists the signals and the commits that added each side. It is read-only and never repairs anything.
+
+### Changed
+
+- **Atomic state files.** Structured state files are written atomically (unique temp file, then rename, keeping the file's permissions).
+- **`verify`.** It prints the verified command's output before recording, and waits up to 5 minutes for the lock instead of discarding a finished run.
+- **Single-user workspaces.** They still keep no `.yallaflow/local/` directory between commands. A lock left there by a crash is git-ignored and removed by the next command.
+- **Help.** The help text lists the new commands.
+
+### Fixed
+
+- **One damaged work item no longer hides a project.** `snapshot --json` lists it under a new `invalid` array with Core's own message. It is never counted as open, done or proven work, and its records are left untouched. `work show` on it fails with `WORK_ITEM_INVALID`.
+- **The console tells three failures apart:** the console is unreachable (offline), the link lacks its token, or YallaFlow reported a problem in the project's records.
+- **Empty and finished projects.** A project with no work shows a welcome instead of an empty 0% board. When all recorded work is done, the console says exactly that, not "project 100%". The overall percentage now covers open recorded work only (`openCompletion`).
+- **Idle work** is shown in a neutral style, never as waiting for you or blocked.
+- `source show --content` (and the console) refuse an extracted-text path that leaves the source's own directory.
+- Two YallaFlow commands writing at the same moment could lose a work item or allocate the same ID. A race test of 16 parallel starts collided in 20 of 20 rounds on 1.1.0, and in 0 of 20 with the lock.
+
 ## [1.1.0] - 2026-10-19 — Connected Requirements & Optional AI Quality Delivery
 
 Three optional, independent capabilities. Projects that do not use them see no change: no new configuration, files, dependencies, background services, or network access. Guide: [`docs/connected-requirements-and-quality.md`](docs/connected-requirements-and-quality.md).

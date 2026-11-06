@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-05T21:38:22.250Z",
+      "completedAt": "2026-11-05T21:38:22.250Z",
+      "summary": "Intent discovery: no --json output and no write lock exist in Core; derived views (evaluateAdvance, guidance, freshness, convergence) exist to expose; zero-frontend, 4-dep Node CLI; owner approved the Flow v4 UX; freeze check green (1.1.0, 766/766)."
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T13:35:43.328Z",
+      "completedAt": "2026-11-06T13:35:43.328Z",
+      "summary": "REQ-007 and AC-012 revised through change control (IM-001) from the owner's Q-005 decision: the console stays read-only except the single authorized Create Work operation (PF-0032); all other console mutations remain prohibited; --read-only disables Create Work.",
+      "evidence": [
+        "user:SRC-0018",
+        "user:SRC-0019"
+      ]
+    },
+    "design-exploration": {
+      "status": "completed",
+      "startedAt": "2026-11-05T21:48:51.581Z",
+      "completedAt": "2026-11-05T21:48:51.581Z",
+      "summary": "Selected: CLI-spawn data path, Core-computed stations and %, fs.watch+SSE live updates with poll fallback, O_EXCL lock in the CLI dispatcher (verify/qc lock only around writes), ID-addressed source previews, read-only git for team view, user-level project registry. Write actions, runtime and attestation out of this release."
+    },
+    "specification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T13:35:43.852Z",
+      "completedAt": "2026-11-06T13:35:43.852Z",
+      "summary": "Specification revised: Q-005 recorded under confirmed decisions; the read-only acceptance boundary names the authorized Create Work exception and keeps every other mutation prohibited.",
+      "evidence": [
+        ".yallaflow/work/PF-0024/work.md"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-05T22:11:46.179Z",
+      "completedAt": "2026-11-05T22:11:46.179Z",
+      "summary": "Plan: four children A (Core read contract: stations/% module, snapshot + work show --json, schemas, read-only contract test), B (write lock, atomic writes, exclusive IDs, doctor), C (yallaflow console server + Flow/Work/Item UI + live + previews + security tests), D (team, insights, projects, digest, notifications), then E release prep. Golden text unchanged, no new deps, finish per child, no commit/publish without owner."
+    },
+    "implementation": {
+      "status": "pending"
+    },
+    "verification": {
+      "status": "pending"
+    },
+    "delivery-convergence": {
+      "status": "pending"
+    },
+    "code-review": {
+      "status": "pending"
+    }
+  },
+  "rulings": [
+    {
+      "decision": "The decomposition gate approval recorded at 2026-11-05T22:12:16Z was entered by the agent, inferred from the owner's approval of the specification and plan; the owner never explicitly approved the decomposition gate. It is withdrawn (changes_requested) pending the owner's explicit decision; the original entry stays in the review history",
+      "reason": "A distinct human review gate cannot be satisfied by approval of a different gate; the owner identified this on 2026-11-06 and asked for correction through the YallaFlow workflow",
+      "costIfWrong": "Children PF-0025..PF-0029 were created and three were implemented under an unapproved breakdown; if the owner rejects the breakdown, that work must be re-planned or re-assigned",
+      "createdAt": "2026-11-05T23:13:01.050Z"
+    },
+    {
+      "decision": "AC-012 (no Console route modifies .yallaflow) is superseded in intent by the owner's Q-005 revision; its requirement text is revised at PF-0024's final convergence to exempt the single Create Work route delivered by PF-0032",
+      "reason": "Owner approved one narrowly scoped Create Work write in 1.2.0 (SRC-0018); revising requirements now would reopen completed stages before the owner's UX review",
+      "costIfWrong": "PF-0024 convergence would assess AC-012 against stale intent",
+      "createdAt": "2026-11-06T11:09:45.740Z"
+    }
+  ],
+  "history": [
+    {
+      "skill": "requirement-clarification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-001: REQ-007 and AC-012 were revised to state the authorized exception.",
+      "changedAt": "2026-11-06T13:35:34.733Z"
+    },
+    {
+      "skill": "specification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-001: The specification's read-only scope statement must name the authorized Create Work exception.",
+      "changedAt": "2026-11-06T13:35:34.733Z"
+    }
+  ],
+  "updatedAt": "2026-11-06T13:35:43.852Z"
+}

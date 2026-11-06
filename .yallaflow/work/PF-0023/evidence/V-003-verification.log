@@ -1,0 +1,10 @@
+session span 10:28:53Z – 14:10:40Z = 221.8 min; human prompts: 10; API requests: 220; tool calls: 244
+tokens: input 476  cache_read 52,588,811  cache_write 373,376  output 200,473
+model-side time (gaps <10 min before requests): 32.8 min; idle gaps ≥10 min: 0.0 min
+  yf-verify:test-suite           33.50 min     4 calls
+  yf-workflow                     5.18 min    50 calls
+  yf-workflow                                                  req   50  cr  10,278,518  cw    84,796  out  29,125
+  yf-verify:test-suite                                         req    4  cr     791,934  cw     6,341  out   4,530
+window 113.0 min; requests 97; tool calls 91; tokens {'cache_read': 9457512, 'cache_write': 106483, 'output': 41576}
+requests that only ran yallaflow workflow commands: 14 (14%), cache_read 1,379,345 (15%)
+  yf-verify:other               15.57 min  4 calls

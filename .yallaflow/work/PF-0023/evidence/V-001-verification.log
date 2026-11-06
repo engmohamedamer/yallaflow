@@ -1,0 +1,4 @@
+sh is: /usr/bin/dash; pipefail available in sh: no
+V-001 passed exit 0 shell "false | cat"
+V-002 passed exit 0 shell "sh -c 'exit 2' | tail -1"
+V-003 failed exit 1 argv "false"

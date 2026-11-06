@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "yallaflow.work/1",
+  "title": "YallaFlow work item detail (yallaflow work show <id> --json)",
+  "description": "Fields are only added within schema version 1. `item` has the same shape as a snapshot item.",
+  "type": "object",
+  "required": ["schema", "generatedAt", "yallaflowVersion", "item", "request", "sources", "checkpoints", "history", "questions", "requirements", "criteria", "verification", "children"],
+  "properties": {
+    "schema": { "const": "yallaflow.work/1" },
+    "generatedAt": { "type": "string" },
+    "yallaflowVersion": { "type": "string" },
+    "item": { "type": "object", "required": ["id", "state", "completion", "stations"] },
+    "request": { "type": "object", "required": ["raw", "title"], "properties": { "raw": { "type": ["string", "null"] }, "title": { "type": ["string", "null"] } } },
+    "sources": { "type": "array", "items": { "type": "object", "required": ["id", "name", "available"], "properties": { "id": { "type": "string" }, "name": { "type": "string" }, "format": { "type": ["string", "null"] }, "contentType": { "type": ["string", "null"] }, "contentAvailability": { "enum": ["native-text", "extracted", "original-only", null] }, "availabilityNote": { "type": ["string", "null"] }, "sizeBytes": { "type": ["integer", "null"] }, "available": { "type": "boolean" } } } },
+    "checkpoints": { "type": "array", "items": { "type": "object", "required": ["skill", "status"], "properties": { "skill": { "type": "string" }, "station": { "enum": ["understand", "decide", "change", "verify", "remember", null] }, "status": { "type": "string" }, "summary": { "type": ["string", "null"] }, "completedAt": { "type": ["string", "null"] } } } },
+    "history": { "type": "array", "items": { "type": "object", "required": ["kind"] } },
+    "questions": { "type": "array", "items": { "type": "object", "required": ["id", "status", "question"] } },
+    "requirements": { "type": "array", "items": { "type": "object", "required": ["id", "statement"] } },
+    "criteria": { "type": "array", "items": { "type": "object", "required": ["id", "statement", "convergence", "evidence"], "properties": { "convergence": { "enum": ["satisfied", "partial", "missing", "contradicts", "not-assessed"] }, "evidence": { "type": "array", "items": { "type": "object", "required": ["type", "ref", "text"], "properties": { "type": { "type": ["string", "null"] }, "ref": { "type": ["string", "null"] }, "text": { "type": "string" } } } } } } },
+    "convergence": { "type": ["object", "null"] },
+    "knowledge": { "type": "object", "required": ["reviewStatus", "candidates"], "properties": { "reviewStatus": { "type": "string" }, "candidates": { "type": "array", "items": { "type": "object", "required": ["id", "status"] } } } },
+    "verification": { "type": "array", "items": { "type": "object", "required": ["id", "success"] } },
+    "children": { "type": "array", "items": { "type": "object", "required": ["key", "title"] } }
+  }
+}

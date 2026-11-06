@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "impacts": [
+    {
+      "id": "IM-001",
+      "status": "assessed",
+      "raisedAt": "2026-11-06T13:35:24.216Z",
+      "stageAtRaise": "IMPLEMENTATION",
+      "triggers": [
+        {
+          "type": "requirements",
+          "changes": [
+            {
+              "id": "REQ-007",
+              "action": "revised",
+              "from": "active",
+              "to": "active"
+            },
+            {
+              "id": "AC-012",
+              "action": "revised",
+              "from": "active",
+              "to": "active"
+            }
+          ],
+          "at": "2026-11-06T13:35:24.216Z"
+        }
+      ],
+      "assessment": {
+        "assessedAt": "2026-11-06T13:35:34.733Z",
+        "summary": "Owner-approved Q-003 revision (Q-005, SRC-0018/SRC-0019): REQ-007 and AC-012 now allow the single authorized Create Work operation (PF-0032) and keep every other console mutation prohibited.",
+        "stages": {
+          "context-discovery": {
+            "verdict": "unaffected",
+            "reason": "Discovered repository facts are unchanged."
+          },
+          "requirement-clarification": {
+            "verdict": "affected",
+            "reason": "REQ-007 and AC-012 were revised to state the authorized exception."
+          },
+          "design-exploration": {
+            "verdict": "unaffected",
+            "reason": "The phased design already planned actions after the read-only phase; the one action pulled into 1.2.0 is designed and delivered by PF-0032 under its own approved spec and plan."
+          },
+          "specification": {
+            "verdict": "affected",
+            "reason": "The specification's read-only scope statement must name the authorized Create Work exception."
+          },
+          "implementation-planning": {
+            "verdict": "unaffected",
+            "reason": "PF-0024's decomposition and children are unchanged; Create Work is planned in PF-0032."
+          }
+        },
+        "applied": {
+          "revised": [
+            "requirement-clarification",
+            "specification"
+          ],
+          "stage": {
+            "from": "IMPLEMENTATION",
+            "to": "CLARIFICATION"
+          },
+          "convergenceInvalidated": false
+        }
+      }
+    }
+  ],
+  "updatedAt": "2026-11-06T13:35:34.733Z"
+}

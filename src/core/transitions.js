@@ -77,7 +77,9 @@ export async function evaluateAdvance(root, meta, current, { mutate = false } = 
   const workflow = meta.workflow ?? meta.type;
   const next = nextStageForWork(meta, current);
   if (!next) return { allowed: false, next: null, final: true, error: `${id} is already at the final stage.`, blocker: null, action: null };
-  const blocked = (error, blocker, action) => ({ allowed: false, next, error, blocker, action });
+  // `human` (v1.2.0, additive): the blocker is a person's decision (a review gate), so
+  // read surfaces can say "waiting for you" without parsing the action text.
+  const blocked = (error, blocker, action, extra = {}) => ({ allowed: false, next, error, blocker, action, ...extra });
   // A legacy-context reconciliation has no meaningful investigation stages: it becomes
   // DONE only when `context reconcile apply` settles its last candidate (v0.3.7).
   if (meta.reconciliation) {
@@ -118,7 +120,8 @@ export async function evaluateAdvance(root, meta, current, { mutate = false } = 
     return blocked(
       `Cannot advance from ${current} to ${next}.\n\nBlocking requirements:\n` + blockers.map((entry) => `- ${entry.text}`).join('\n'),
       blockers[0].text,
-      blockers[0].action
+      blockers[0].action,
+      blockers[0].human ? { human: true, gate: blockers[0].gate } : {}
     );
   }
 
@@ -384,7 +387,7 @@ async function stageExitBlockers(root, meta, stage, contract, ledger, questionsL
         const gateName = SKILL_TO_GATE[requiredSkill];
         if (gateName) {
           const reviewBlocker = await reviewGateBlocker(root, meta.id, gateName, { mutate });
-          if (reviewBlocker) blockers.push({ text: reviewBlocker, action: `yallaflow approve ${meta.id} --stage ${gateName}   (human review; or: feedback ${meta.id} --stage ${gateName} --changes-requested)` });
+          if (reviewBlocker) blockers.push({ text: reviewBlocker, human: true, gate: gateName, action: `yallaflow approve ${meta.id} --stage ${gateName}   (human review; or: feedback ${meta.id} --stage ${gateName} --changes-requested)` });
         }
       }
     }

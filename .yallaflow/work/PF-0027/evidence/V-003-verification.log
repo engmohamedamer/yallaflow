@@ -1,0 +1,76 @@
+TAP version 13
+# Subtest: security: loopback host, token, origin, read-only methods and ID-only paths
+ok 1 - security: loopback host, token, origin, read-only methods and ID-only paths
+  ---
+  duration_ms: 596.062709
+  type: 'test'
+  ...
+# Subtest: serves the snapshot, work detail and preserved sources by ID
+ok 2 - serves the snapshot, work detail and preserved sources by ID
+  ---
+  duration_ms: 1075.690206
+  type: 'test'
+  ...
+# Subtest: live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+ok 3 - live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+  ---
+  duration_ms: 1315.833077
+  type: 'test'
+  ...
+# Subtest: the console never writes: browsing every route leaves the workspace byte-identical
+ok 4 - the console never writes: browsing every route leaves the workspace byte-identical
+  ---
+  duration_ms: 983.594583
+  type: 'test'
+  ...
+# Subtest: snapshot --json validates and places each item in the flow
+ok 5 - snapshot --json validates and places each item in the flow
+  ---
+  duration_ms: 1283.985927
+  type: 'test'
+  ...
+# Subtest: a requested human review gate is reported as waiting for you
+ok 6 - a requested human review gate is reported as waiting for you
+  ---
+  duration_ms: 888.770067
+  type: 'test'
+  ...
+# Subtest: an open material question is reported as waiting for you
+ok 7 - an open material question is reported as waiting for you
+  ---
+  duration_ms: 864.086432
+  type: 'test'
+  ...
+# Subtest: work show --json returns every section and validates
+ok 8 - work show --json returns every section and validates
+  ---
+  duration_ms: 1245.252929
+  type: 'test'
+  ...
+# Subtest: errors are one JSON document with a code and exit status 1
+ok 9 - errors are one JSON document with a code and exit status 1
+  ---
+  duration_ms: 160.133743
+  type: 'test'
+  ...
+# Subtest: read commands never modify .yallaflow, the working tree, or .git/index
+ok 10 - read commands never modify .yallaflow, the working tree, or .git/index
+  ---
+  duration_ms: 1356.650255
+  type: 'test'
+  ...
+# Subtest: snapshot reads a legacy v0.3.6 workspace fixture without writing to it
+ok 11 - snapshot reads a legacy v0.3.6 workspace fixture without writing to it
+  ---
+  duration_ms: 523.536924
+  type: 'test'
+  ...
+1..11
+# tests 11
+# suites 0
+# pass 11
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 7650.434938

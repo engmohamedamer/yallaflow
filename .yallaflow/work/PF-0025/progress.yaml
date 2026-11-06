@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-05T22:13:09.572Z",
+      "completedAt": "2026-11-05T22:13:09.572Z",
+      "summary": "Snapshot can compose existing loaders without touching text commands: listWork, getCurrentState, loadWorkProgress (skills ledger with completedAt), workflowStagesFor(meta), evaluateAdvance({mutate:false}) for blocker/action (human gates are the '(human review' blockers from stageExitBlockers; open material questions from loadWorkQuestions), loadDeliverySummary, latestVerification, loadWorkKnowledge reviewStatus. meta.status is the stage for non-active items; state.stage for the active one. No stage-transition timestamps exist; checkpoint completedAt does.",
+      "evidence": [
+        "src/commands/guide.js",
+        "src/core/transitions.js",
+        "src/commands/status.js",
+        "src/core/workflows.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-05T22:13:09.845Z",
+      "completedAt": "2026-11-05T22:13:09.845Z",
+      "summary": "Intent fixed by parent PF-0024 (approved spec, Q-001..Q-004). Station map: Understand = DISCOVERY/CLARIFICATION/QUESTION/REPRODUCE/EVIDENCE/TRACE/CURRENT_BEHAVIOR/REQUESTED_DELTA/BEHAVIOR_BASELINE/PRECHECK; Decide = DESIGN/SPEC/SPECIFICATION/PLAN/HYPOTHESIS/ROOT_CAUSE/FIX_PLAN/IMPACT_ANALYSIS/ACCEPTANCE_CRITERIA/FINDINGS; Change = IMPLEMENTATION/EXECUTION (na for investigation); Verify = VERIFICATION/CONCLUSION + convergence/code-review checkpoints; Remember = knowledge review. INTAKE/pending = New gate. Item state: you (human gate or open material question), fail (latest verification failed at verify), active (workspace active work), paused (otherwise), done, new."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-05T22:18:04.932Z",
+      "completedAt": "2026-11-05T22:18:04.932Z",
+      "summary": "Added src/flow/stations.js (stations, item state, completion), src/flow/snapshot.js (snapshot/1 and work/1 collectors over existing readers, mutate:false), src/commands/snapshot.js + cli wiring (snapshot [--json], work show <id> [--json], JSON errors), additive human/gate on review blockers in transitions.js, schemas in resources/schemas, test-support/schema.js, and 14 tests.",
+      "evidence": [
+        "src/flow/stations.js",
+        "src/flow/snapshot.js",
+        "src/commands/snapshot.js",
+        "src/core/transitions.js",
+        "src/cli.js",
+        "resources/schemas/snapshot-1.schema.json",
+        "test/snapshot-contract.test.js",
+        "test/flow-stations.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-05T22:22:36.524Z",
+      "completedAt": "2026-11-05T22:22:36.524Z",
+      "summary": "Fresh proof: syntax check (V-001), 14 new contract/station tests (V-002), text output of 14 read commands identical to v1.1.0 on this repo (V-003), snapshot and all 29 work-show outputs validate against v1 schemas with .yallaflow and .git/index unchanged (V-004), full suite 780/780 (V-005).",
+      "evidence": [
+        "verification:V-005"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-05T22:27:09.912Z",
+      "completedAt": "2026-11-05T22:27:09.912Z",
+      "summary": "AC-001..AC-003 (from PF-0024) satisfied with repository and verification evidence (V-003, V-004, V-006, V-007)."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-05T22:27:09.912Z"
+}

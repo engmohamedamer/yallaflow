@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-05T22:42:24.257Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+        "verificationRunIds": [
+          "V-007",
+          "V-010"
+        ]
+      },
+      "findings": [
+        {
+          "criterion": "PF-0024/AC-004",
+          "status": "satisfied",
+          "reason": "Parallel mutating commands (16 parallel starts x 20 rounds; question/checkpoint/advance/3 verifications on 4 items at once) leave 0 unparseable state files, 0 temp leftovers and 0 duplicate IDs (v1.1.0 collides in 20/20 rounds); a lock left by a dead process is reported by doctor, recovered by the next writer, and removed by doctor --clear-lock, which refuses a live holder.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/utils/lock.js",
+              "contentHash": "sha256:3ba5685ec0655a702aa6c8a49df9c2fa5f80426c8c439e4290e9afb01537e95c",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/cli.js",
+              "contentHash": "sha256:7aa810f9c990054dc6924a33455ef50088c24ab76301499774bd629838d93219",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/workspace-lock.test.js",
+              "contentHash": "sha256:329af8af7aff922551e8f7e167432b233ed6d990869305bf1376fdf3fd7aee7b",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/race-demo.mjs /home/engamer/Amasi/YallaFlow/src/cli.js (passed)",
+              "workId": "PF-0026",
+              "verificationRunId": "V-007"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0026",
+              "verificationRunId": "V-010"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-05T22:42:24.257Z"
+}

@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Verification evidence: 'yallaflow verify' runs argv commands by default (spawnSync with shell:false); --shell and --script are explicit alternatives. --shell runs through spawnSync shell:true, i.e. /bin/sh -c (dash on Debian/Ubuntu) without pipefail, so a pipeline's recorded exit status is that of its LAST element: 'false | cat' or '<test runner> | tail' is recorded as passed when the last command succeeds. verify sets no timeout and buffers stdout/stderr until the command exits (nothing is streamed). Each run is appended to work/<id>/evidence/verification.json with its full stdout/stderr log file, capturing up to 64 MiB of output (v1.1.0; Node's 1 MiB default had recorded verbose suites as failed); run IDs are allocated when a run finishes, so overlapping runs can be numbered out of start order. Recognizable secret values are redacted in the log and in the recorded command; the executed command is unchanged. Failed runs are kept. Optional QC and demo records never write this ledger.",
+      "evidence": [
+        "src/commands/verify.js",
+        "verification:V-001"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0073"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-28T14:14:05.047Z",
+      "factId": "CTX-0088",
+      "promotedAt": "2026-10-28T14:14:20.812Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-002",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Rules for reaching DONE (evaluateAdvance): - all required checkpoints are complete; - non-investigation work has fresh, successful verification evidence newer than the last invalidation; - convergence is complete where the contract requires it; - code review is complete where pinned; - knowledge review is complete. Reopen (DONE to implementation, verification or review, with a reason) cascades checkpoint invalidation and keeps the evidence. Reopening to implementation resets a reviewed knowledge review to pending, and 'knowledge review --none' is refused once any candidate exists (even already-promoted ones), so closing a reopened item again requires proposing and resolving a new candidate. A not-yet-DONE item cannot be reopened; returning from VERIFICATION to IMPLEMENTATION goes through 'checkpoint revise --skill implementation --status in_progress'.",
+      "evidence": [
+        "src/core/transitions.js",
+        "src/knowledge/store.js",
+        "src/commands/reopen.js"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0013"
+      },
+      "status": "promoted",
+      "createdAt": "2026-10-28T14:14:05.205Z",
+      "factId": "CTX-0089",
+      "promotedAt": "2026-10-28T14:14:21.057Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-003",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "CLI startup structure and its cost: src/cli.js statically imports all 33 command modules, and through the intake modules also officeparser, yauzl and @xmldom/xmldom (pdfjs-dist is already imported lazily in src/intake/extractors/pdf.js). A plain '--version' loads 134 files; startup is most of a typical command's ~0.2 s wall time on small workspaces, and stubbing the three intake libraries measured 34-41 ms (about 20%) faster per call (PF-0023, one machine). The test suite invokes the CLI as a child process per command (spawnSync of process.execPath src/cli.js in test-support/shared.js and test-support/optional.js); a 35-test sample spawned 324 CLI processes, so CLI startup cost is multiplied across the suite.",
+      "evidence": [
+        "src/cli.js",
+        "src/intake/adapters/office.js",
+        "test-support/shared.js",
+        "verification:V-002",
+        "verification:V-004"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-10-28T14:14:05.365Z",
+      "factId": "CTX-0090",
+      "promotedAt": "2026-10-28T14:14:21.297Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-10-28T14:14:21.297Z",
+  "reviewedAt": "2026-10-28T14:14:21.297Z"
+}

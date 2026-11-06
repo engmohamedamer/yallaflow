@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readdir, rm, writeFile } from 'node:fs/promises';
+import { readdir, rm, writeFile, realpath } from 'node:fs/promises';
 import { ensureDir, exists, readText } from '../utils/fs.js';
 import { readYaml, writeYaml } from './yaml.js';
 import { allocateScopedId, directoryNames, workspacePath } from './workspace.js';
@@ -137,7 +137,14 @@ export async function loadSourceText(root, record) {
   if (record.schemaVersion !== SOURCE_SCHEMA_VERSION) return record.rawText ?? null;
   if (record.contentAvailability === 'native-text') return record.rawText ?? null;
   if (record.contentAvailability === 'extracted' && record.representation) {
-    return readText(path.join(workspacePath(root), record.representation.path));
+    // A source record is Git content (Shared Projects): its representation path must stay
+    // inside this source's own directory.
+    const base = path.resolve(sourceDirPath(root, record.id));
+    const target = path.resolve(workspacePath(root), record.representation.path);
+    if (!target.startsWith(base + path.sep)) throw new Error(`${record.id}: its extracted text path leaves the source directory; refusing to read it.`);
+    const real = await realpath(target);
+    if (!real.startsWith((await realpath(base)) + path.sep)) throw new Error(`${record.id}: its extracted text path leaves the source directory; refusing to read it.`);
+    return readText(real);
   }
   return null;
 }

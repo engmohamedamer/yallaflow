@@ -1,0 +1,4 @@
+insights expected: 20|94%|172 / 183|3
+insights shown:    20|94%|172 / 183|3
+digest expected:   PF-0024,PF-0026,PF-0027,PF-0028,PF-0030
+digest shown:      PF-0026,PF-0027,PF-0028,PF-0030

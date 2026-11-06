@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-05T23:17:40.889Z",
+      "completedAt": "2026-11-05T23:17:40.889Z",
+      "summary": "Runtime lock experiments (temp workspaces): (1) kill -9 between lock create and write leaves an empty lock that blocks every writer until manual doctor --clear-lock (reproduced: 60 crash runs, next start refused); (2) a stale holder pid reused by an unrelated live process blocks writers forever and doctor --clear-lock refuses (no supported recovery); (3) atomic state writes held: 0 unparseable files, 0 temp leftovers, 0 partial work dirs after 60 kill -9 runs. Independent code review of the A-C diff running on an isolated copy.",
+      "evidence": [
+        "src/utils/lock.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-05T23:17:41.922Z",
+      "completedAt": "2026-11-05T23:17:41.922Z",
+      "summary": "Owner request 2026-11-06: validate A-C (diff review, lock stress incl. crashes, PID reuse, concurrency, shared projects; stations never imply proof when evidence is incomplete or stale; server security; read-only console; unchanged CLI behavior), correct the unsupported decomposition approval through the workflow (done in PF-0024: ruling, feedback, explicit owner approval), report critical findings, then Phase D."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-05T23:17:51.416Z",
+      "completedAt": "2026-11-05T23:17:51.416Z",
+      "summary": "Plan: (1) lock: create the lock file atomically (write a private temp file, then link() it to local/lock; fall back to exclusive open only where link is unsupported) so it is never empty; treat an unreadable lock older than 30 s as stale; record Linux boot id and process start ticks so a reused pid or a reboot is detected as stale; let doctor --clear-lock remove a lock older than 1 h when liveness cannot be proven; sweep leftover lock temp files; tests for each. (2) apply verified findings of the independent review (each recorded with evidence) to stations/completion, server and UI. (3) regression: full suite, text parity vs v1.1.0, console no-write test, lock race demo."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-05T23:38:29.585Z",
+      "completedAt": "2026-11-05T23:38:29.585Z",
+      "summary": "Fixed review/runtime findings: evidence-aware stations and 99% cap (H1), never-empty atomic lock + 30 s unreadable rule + boot/process-start/zombie liveness + 1 h unidentifiable clear (H2), verify shows output and waits to record (M1), per-acquire nonce (M2), source text containment in Core (M3), HEAD events 405, dry-run unlocked, mode-preserving atomic writes, single-quoted new-work command; 12 new tests.",
+      "evidence": [
+        "src/flow/stations.js",
+        "src/flow/snapshot.js",
+        "src/utils/lock.js",
+        "src/commands/verify.js",
+        "src/core/sources.js",
+        "src/console/server.js",
+        "test/workspace-lock.test.js",
+        "test/flow-stations.test.js",
+        "test/console-server.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-05T23:44:34.251Z",
+      "completedAt": "2026-11-05T23:44:34.251Z",
+      "summary": "Fresh proof: syntax (V-001), text output of 14 read commands identical to v1.1.0 (V-002), 60 kill -9 crashes then an unaided next command and 0 unparseable files (V-003), 20 rounds x 16 parallel starts with 0 collisions (V-004), snapshot + 30 work-show outputs schema-valid and read-only on this repository (V-005), full suite 805/805 (V-006).",
+      "evidence": [
+        "verification:V-006"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-05T23:44:34.251Z"
+}

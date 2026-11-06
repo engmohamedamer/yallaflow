@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-06T15:32:02.262Z",
+      "completedAt": "2026-11-06T15:32:02.262Z",
+      "summary": "Owner made subscription auth mandatory (SRC-0022). Verbatim Anthropic sources fetched: legal page (no claude.ai login or plan-credential routing by third-party products; unmodified binary with own subscription allowed), SDK note (restriction incl. Agent SDK agents unless approved), headless (-p is the Agent SDK via the CLI; --bare default ahead), Channels and reference (official MCP channel with chat and permission relay, claude.ai auth, research-preview allowlist), hooks (http type, PermissionRequest), agent view (claude agents --json supported). OpenAI app-server terms (local use tolerated).",
+      "evidence": [
+        "research/agent-interaction/SECURITY_AND_AUTH.md",
+        "research/agent-interaction/PROTOCOL_RESEARCH.md"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-06T15:32:02.926Z",
+      "completedAt": "2026-11-06T15:32:02.926Z",
+      "summary": "PoC in a disposable repo with real ACP adapters (scratch, slim install 88 MB): Codex on the owner's ChatGPT Plus login passed all 7 scenarios (stream, follow-up, allow, deny, default-deny timeout, cancel, resume after restart, SIGKILL recovery, explicit activation + agent checkpoint recorded by Core). Claude: free checks only (channel/permission strings in binary 2.1.319, agents --json works, adapter session/new without login). Conclusion: ACP stays for Codex; Claude via Agent SDK/ACP/-p unsupported on subscription; Claude via own session + YallaFlow channel + hooks is the compliant path, conditional on Anthropic clarification and a subscription PoC.",
+      "evidence": [
+        "research/agent-interaction/CAPABILITY_MATRIX.md",
+        "research/agent-interaction/evidence/poc/log-codex-turns.jsonl",
+        "research/agent-interaction/FEASIBILITY_RESULTS.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T15:32:03.279Z",
+      "completedAt": "2026-11-06T15:32:03.279Z",
+      "summary": "Deliverables updated (capability matrix, architecture, decision summary, security/auth, feasibility, alternatives, UX, protocol) with PoC logs; no API key used; no production or release-candidate change.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-06T15:32:03.279Z"
+}

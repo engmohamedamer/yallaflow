@@ -41,7 +41,7 @@ export async function resumeCommand(requestedWorkId) {
     console.log(meta.sources?.length
       ? 'Next: review the source and classify work type and scope with `yallaflow route`.'
       : 'Next: classify work type and scope with `yallaflow route`.');
-    if (!isActive) printInspectionNote(meta.id, state.activeWork);
+    if (!isActive) printInspectionNote(meta.id, state.activeWork, meta);
     return;
   }
   const stage = isActive ? state.stage : meta.status;
@@ -108,12 +108,14 @@ export async function resumeCommand(requestedWorkId) {
   console.log(`Reason: ${guidance.modification.reason}`);
   console.log(`\nRead: .yallaflow/work/${meta.id}/work.md, progress.md, and progress.yaml when present before taking action.`);
   console.log('Do not repeat completed discovery recorded in the ledger; trust durable evidence and git history over conversation memory.');
-  if (!isActive) printInspectionNote(meta.id, state.activeWork);
+  if (!isActive) printInspectionNote(meta.id, state.activeWork, meta);
 }
 
-function printInspectionNote(workId, activeWorkId) {
+function printInspectionNote(workId, activeWorkId, meta = null) {
   console.log(`\nThis command is inspecting ${workId} only; it does not change the active work item.`);
   console.log(activeWorkId ? `Current workspace focus remains ${activeWorkId}.` : 'No work item is currently active.');
+  // v1.2.0: an item created without activation (for example from the console) says how to activate it.
+  if (meta?.activation?.deferred) console.log(`${workId} was created without being made active. Work on it by its ID, or make it the active work item with \`yallaflow activate ${workId}\`.`);
 }
 
 function printReopenContext(meta) {

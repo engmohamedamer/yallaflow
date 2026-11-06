@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node -e \"const fs=require('fs');for(const f of ['CAPABILITY_MATRIX','RECOMMENDED_ARCHITECTURE','DECISION_SUMMARY','SECURITY_AND_AUTH','FEASIBILITY_RESULTS']) if(!fs.readFileSync('research/agent-interaction/'+f+'.md','utf8').includes('2026-11-06')) throw new Error(f);for(const l of ['turns','resume','crash','yallaflow']) fs.statSync('research/agent-interaction/evidence/poc/log-codex-'+l+'.jsonl');console.log('deliverables and PoC evidence present')\"",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "-e",
+        "const fs=require('fs');for(const f of ['CAPABILITY_MATRIX','RECOMMENDED_ARCHITECTURE','DECISION_SUMMARY','SECURITY_AND_AUTH','FEASIBILITY_RESULTS']) if(!fs.readFileSync('research/agent-interaction/'+f+'.md','utf8').includes('2026-11-06')) throw new Error(f);for(const l of ['turns','resume','crash','yallaflow']) fs.statSync('research/agent-interaction/evidence/poc/log-codex-'+l+'.jsonl');console.log('deliverables and PoC evidence present')"
+      ],
+      "displayCommand": "node -e \"const fs=require('fs');for(const f of ['CAPABILITY_MATRIX','RECOMMENDED_ARCHITECTURE','DECISION_SUMMARY','SECURITY_AND_AUTH','FEASIBILITY_RESULTS']) if(!fs.readFileSync('research/agent-interaction/'+f+'.md','utf8').includes('2026-11-06')) throw new Error(f);for(const l of ['turns','resume','crash','yallaflow']) fs.statSync('research/agent-interaction/evidence/poc/log-codex-'+l+'.jsonl');console.log('deliverables and PoC evidence present')\"",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-06T15:32:03.088Z",
+      "finishedAt": "2026-11-06T15:32:03.115Z",
+      "verifiedAt": "2026-11-06T15:32:03.115Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

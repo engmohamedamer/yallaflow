@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "gates": {
+    "specification": {
+      "status": "approved",
+      "respondedAt": "2026-11-05T22:11:41.174Z",
+      "note": "Approved by the owner in the agent session (2026-11-06): \"approve the specification and the plan\"",
+      "history": [
+        {
+          "status": "approved",
+          "at": "2026-11-05T22:11:41.174Z",
+          "note": "Approved by the owner in the agent session (2026-11-06): \"approve the specification and the plan\""
+        }
+      ]
+    },
+    "plan": {
+      "status": "approved",
+      "respondedAt": "2026-11-05T22:11:50.668Z",
+      "note": "Approved by the owner in the agent session (2026-11-06): \"approve the specification and the plan\" (plan presented as phases A-E)",
+      "history": [
+        {
+          "status": "approved",
+          "at": "2026-11-05T22:11:50.668Z",
+          "note": "Approved by the owner in the agent session (2026-11-06): \"approve the specification and the plan\" (plan presented as phases A-E)"
+        }
+      ]
+    },
+    "decomposition": {
+      "status": "approved",
+      "respondedAt": "2026-11-05T23:14:43.855Z",
+      "note": "Approved by the owner in the agent session (2026-11-06): \"I explicitly approve the proposed five-child decomposition for PF-0024 (PF-0025 through PF-0029), with the existing scope and dependencies unchanged. This approval is for the work breakdown only.\"",
+      "history": [
+        {
+          "status": "awaiting_review",
+          "at": "2026-11-05T22:12:09.242Z"
+        },
+        {
+          "status": "approved",
+          "at": "2026-11-05T22:12:16.488Z",
+          "note": "Owner approved \"the specification and the plan\" (2026-11-06); this decomposition is that plan's phase table A-E unchanged (same children, order, dependencies and AC assignment)."
+        },
+        {
+          "status": "changes_requested",
+          "at": "2026-11-05T23:13:01.185Z",
+          "note": "Withdrawn at the owner's request (2026-11-06): the earlier approval was recorded by the agent from the plan approval, not by an explicit owner decision on this gate. Awaiting the owner's explicit decision."
+        },
+        {
+          "status": "approved",
+          "at": "2026-11-05T23:14:43.855Z",
+          "note": "Approved by the owner in the agent session (2026-11-06): \"I explicitly approve the proposed five-child decomposition for PF-0024 (PF-0025 through PF-0029), with the existing scope and dependencies unchanged. This approval is for the work breakdown only.\""
+        }
+      ]
+    }
+  },
+  "updatedAt": "2026-11-05T23:14:43.855Z"
+}

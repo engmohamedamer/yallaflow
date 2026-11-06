@@ -1,0 +1,45 @@
+{
+  "id": "PF-0034",
+  "type": "investigation",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Agent Interaction architecture challenge: evaluate interactive Claude Code / Codex sessions from the Web Console (research only)",
+  "status": "DONE",
+  "readOnly": true,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-06T14:50:29.305Z",
+  "updatedAt": "2026-11-06T15:08:09.907Z",
+  "title": "Agent Interaction architecture challenge: evaluate interactive Claude Code / Codex sessions from the Web Console (research only)",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow investigate --scope bounded`.",
+  "routedAt": "2026-11-06T14:50:29.318Z",
+  "workflow": "investigation",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "verification"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0020",
+      "type": "file",
+      "name": "owner-agent-interaction-brief-2026-11-06.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-06T14:50:29.523Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ]
+}

@@ -1,0 +1,184 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-05T23:02:27.202Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+        "verificationRunIds": [
+          "V-003",
+          "V-005"
+        ]
+      },
+      "findings": [
+        {
+          "criterion": "PF-0024/AC-005",
+          "status": "satisfied",
+          "reason": "yallaflow console renders map, work lines and two item views of this repository in Arabic RTL and English at 1440 px and 390 px: 16 of 16 combinations without horizontal page scroll and with 0 browser console errors (Chromium via playwright-cli).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:9dca201fd35f1991e41ac4e4103e21890f46a646af9a7e9d9340098841457b70",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.css",
+              "contentHash": "sha256:c27843083c40e6db0f6101a224fa3299195530d8dcabc13e0aafecf5c1dd303c",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "playwright-cli on 127.0.0.1:4792, 2026-11-06, ar/en x 1440/390 x #/map #/lines #/item/PF-0024 #/item/PF-0026: all ok, 0 console errors"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0024/AC-006",
+          "status": "satisfied",
+          "reason": "A CLI write reaches an open event stream in under 2 s and invalidates the cache (automated test); in the browser a CLI advance moved an item from Understand to Decide with the baton animation, card slide, ring 8% to 11% and a toast.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/watch.js",
+              "contentHash": "sha256:01f9e6ca92ed32095598a0de92832e29b0b8d79ec64dbfcbc3afc0fcb04ea1f6",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:1869c429617866363b787ad632ffa827158dbf8136390a714d2269dd2e882150",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:87fd16e6076da0c173fc480f60106e12a529b5f8263aab42efb48aee9abf0979",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --test test/console-server.test.js test/snapshot-contract.test.js (passed)",
+              "workId": "PF-0027",
+              "verificationRunId": "V-003"
+            },
+            {
+              "type": "runtime",
+              "description": "demo workspace, yallaflow advance PF-0001 with the console open: baton captured mid-flight, card moved to Decide"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0024/AC-007",
+          "status": "satisfied",
+          "reason": "Automated security test: no token 401, wrong token 401, foreign Host 421, foreign Origin 403, POST/DELETE 405, traversal and unknown project 404; the server binds 127.0.0.1 and the no-network guard asserts it never binds all interfaces.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:1869c429617866363b787ad632ffa827158dbf8136390a714d2269dd2e882150",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:87fd16e6076da0c173fc480f60106e12a529b5f8263aab42efb48aee9abf0979",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/shared-project.test.js",
+              "contentHash": "sha256:72f41f5848b9cf715c2eeb7aa5defcfa913d9aaba6023122568bc0a4405b6422",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0027",
+              "verificationRunId": "V-005"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0024/AC-008",
+          "status": "satisfied",
+          "reason": "Preserved originals are served by ID: an image (image/png) and text (sandboxed text/plain) in the automated test; in the browser an image, a PDF and a Markdown source previewed in the drawer; handoffs open their checkpoint summaries and evidence.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:1869c429617866363b787ad632ffa827158dbf8136390a714d2269dd2e882150",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:9dca201fd35f1991e41ac4e4103e21890f46a646af9a7e9d9340098841457b70",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:87fd16e6076da0c173fc480f60106e12a529b5f8263aab42efb48aee9abf0979",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --test test/console-server.test.js test/snapshot-contract.test.js (passed)",
+              "workId": "PF-0027",
+              "verificationRunId": "V-003"
+            },
+            {
+              "type": "runtime",
+              "description": "SRC-0014 FLOW_V4.md preview on this repository; handoff drawer of PF-0025"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0024/AC-012",
+          "status": "satisfied",
+          "reason": "Browsing every route (UI, snapshot, work show, every source original and text, plus a refused POST) leaves the workspace including .git/index byte-identical in the automated hash test; the console takes no workspace lock and issues only read commands.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:87fd16e6076da0c173fc480f60106e12a529b5f8263aab42efb48aee9abf0979",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/runner.js",
+              "contentHash": "sha256:75af1ff4c8e18c3f9f9e9fbd3cf6c92c62c0bfc664576ca3b4f8783e00ea8e13",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0027",
+              "verificationRunId": "V-005"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-05T23:02:27.202Z"
+}

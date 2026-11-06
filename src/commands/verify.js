@@ -8,6 +8,9 @@ import { writeFile } from 'node:fs/promises';
 import { ensureDir } from '../utils/fs.js';
 import { redactSecrets } from '../security/redact.js';
 import { nextVerificationRunId, recordVerification, listVerificationRuns } from '../core/evidence.js';
+import { withWorkspaceLock } from '../utils/lock.js';
+
+const RECORD_LOCK_TIMEOUT_MS = 5 * 60 * 1000;
 import { findProjectRoot, getCurrentState, workspacePath } from '../core/workspace.js';
 import { readYaml } from '../core/yaml.js';
 import { loadWorkProgress, reviseCheckpoint } from '../core/progress.js';
@@ -62,6 +65,26 @@ async function runVerification(root, workId, execution) {
   const { executionMode, executable, args, displayCommand, result } = await execution(root);
   const finishedAt = new Date().toISOString();
   const output = `${result.stdout ?? ''}${result.stderr ?? ''}`;
+  // The verified command ran without the workspace lock; recording the run (ID, log,
+  // ledger, and any checkpoint reopen) holds it (v1.2.0, src/utils/lock.js). Its output is
+  // shown first, and recording waits patiently: a finished run is never thrown away
+  // because another command was briefly writing.
+  if (output) process.stdout.write(output);
+  const run = await withWorkspaceLock(root, `yallaflow verify ${resolvedWorkId}`, () => recordRun(root, meta, resolvedWorkId, executionMode, executable, args, displayCommand, result, output, startedAt, finishedAt), { timeoutMs: RECORD_LOCK_TIMEOUT_MS });
+  console.log(`Verification ${run.status.toUpperCase()} (exit ${run.exitCode ?? 'unknown'}) — ${run.id} [${executionMode}].`);
+  if (!run.success) {
+    process.exitCode = 1;
+    if (run.checkpointReopened) console.log(`Verification checkpoint reopened (in_progress): ${run.checkpointReopened}`);
+  }
+}
+
+async function recordRun(root, staleMeta, resolvedWorkId, executionMode, executable, args, displayCommand, result, output, startedAt, finishedAt) {
+  // The work item may have changed while the command ran (another agent finished it):
+  // re-read it under the lock and never record new proof on DONE work.
+  const meta = await readYaml(path.join(workspacePath(root), 'work', resolvedWorkId, 'meta.yaml'));
+  if (meta.status === 'DONE') {
+    throw new Error(`${meta.id} became DONE while the verified command ran; this run was not recorded.\n\nReopen the work before recording new verification evidence:\nyallaflow reopen ${meta.id} --to verification --reason "..."`);
+  }
   const runId = await nextVerificationRunId(root, resolvedWorkId);
   const logName = `${runId}-verification.log`;
   const evidenceDir = path.join(workspacePath(root), 'work', resolvedWorkId, 'evidence');
@@ -82,12 +105,11 @@ async function runVerification(root, workId, execution) {
     log: logName
   };
   const run = await recordVerification(root, resolvedWorkId, record);
-  if (output) process.stdout.write(output);
-  console.log(`Verification ${run.status.toUpperCase()} (exit ${run.exitCode ?? 'unknown'}) — ${run.id} [${executionMode}].`);
   if (!run.success) {
-    process.exitCode = 1;
-    await invalidateCompletedVerification(root, meta, run);
+    const reopened = await invalidateCompletedVerification(root, meta, run);
+    if (reopened) return { ...run, checkpointReopened: reopened };
   }
+  return run;
 }
 
 // A completed verification checkpoint claims the work is proven. A later failed run
@@ -96,11 +118,11 @@ async function runVerification(root, workId, execution) {
 // never leaving a state doctor would reject.
 async function invalidateCompletedVerification(root, meta, run) {
   const progress = await loadWorkProgress(root, meta);
-  if (progress.ledger.skills.verification?.status !== 'completed') return;
+  if (progress.ledger.skills.verification?.status !== 'completed') return null;
   const reason = `Verification ${run.id} failed after the verification checkpoint was completed.`;
   const result = await reviseCheckpoint(root, meta.id, { skillId: 'verification', status: 'in_progress', reason });
   await reconcileStageAfterCheckpointRevision(root, result.meta, 'verification', reason);
-  console.log(`Verification checkpoint reopened (in_progress): ${reason}`);
+  return reason;
 }
 
 export async function verifyCommand(argv, requestedWorkId) {

@@ -82,6 +82,18 @@ flowchart TB
 
 The depth adapts to the work. A bounded bug fix goes from root-cause analysis straight to the fix, while architectural work gets a reviewed design, specification, or plan. Nothing is called done without fresh verification evidence, and work that carries acceptance criteria is checked against them before it closes. What was learned becomes reviewed project knowledge. [Workflows in detail →](docs/workflows.md)
 
+## What's new in 1.2.0
+
+- **A local console.** `yallaflow console` opens a browser view of your projects, in Arabic or English:
+  - one action, **Create work**: a requirement in your own words and an optional BRD become a work item your agent continues;
+  - the flow from New to Done across five stations, with completion % computed by YallaFlow from evidence;
+  - what waits for you, and each item's next step;
+  - acceptance criteria with their verification evidence;
+  - attachments, Git worktrees, and insights from recorded data.
+  [Console →](docs/console.md)
+- **Safe for several agents.** A workspace write lock means two agents in one checkout never overwrite each other's records or get the same ID.
+- **A read contract for scripts.** `yallaflow snapshot --json` and `yallaflow work show <id> --json` provide versioned JSON.
+
 ## What's new in 1.1.0
 
 Three **optional** capabilities. If you don't use them, nothing changes.
@@ -135,15 +147,14 @@ A maintainer runs `yallaflow init`, approves the project understanding, runs `ya
 
 > **Developers work with Git. Agents work with YallaFlow.**
 
-## Upgrading from 1.0.x
+## Upgrading
 
 ```bash
-npm install -g yallaflow@1.1.0
-yallaflow agent refresh   # updates only YallaFlow-managed blocks (AGENT.md, CLAUDE.md, AGENTS.md)
+npm install -g yallaflow@1.2.0
 yallaflow doctor
 ```
 
-Existing work items, project memory and sources are unchanged. [Upgrading to 1.1.0 →](docs/upgrading-to-v1.1.0.md)
+Existing work items, project memory and sources are unchanged, and 1.2.0 needs no `agent refresh`. [Upgrading to 1.2.0 →](docs/upgrading-to-v1.2.0.md) · [from 1.0.x: 1.1.0 →](docs/upgrading-to-v1.1.0.md)
 
 ## Commands you might run yourself
 
@@ -154,6 +165,7 @@ yallaflow init       # once per project
 yallaflow brief      # what YallaFlow knows and what's in progress
 yallaflow status     # workflow state
 yallaflow doctor     # integrity check
+yallaflow console    # the flow in your browser; create work from there
 ```
 
 Everything else is in the [CLI reference](docs/cli.md).
@@ -170,6 +182,7 @@ The YallaFlow website, [engmohamedamer.github.io/yallaflow](https://engmohamedam
 | [Shared Projects](docs/shared-projects.md) | one project understanding for the whole team, through Git |
 | [Canonical workflows](docs/workflows.md) | Greenfield, Brownfield, bugs, features, investigations, teams |
 | [Project memory](docs/project-memory.md) | durable context, evidence and freshness |
+| [Console](docs/console.md) | the local browser view and Create Work |
 | [CLI reference](docs/cli.md) | every command and flag |
 | [Architecture](docs/architecture.md) | internal concepts and design |
 | [Security](docs/security.md) | trust model, secret redaction, network boundary |

@@ -1,0 +1,331 @@
+{
+  "schemaVersion": 1,
+  "revision": 2,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "The Console offers one Create Work action: choose the project, enter a natural-language requirement, optionally choose a work type (feature, bug, change, investigation) with a scope, or leave classification to the agent without any classification being invented.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0018",
+          "locator": "decision 2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T11:32:04.053Z",
+      "updatedAt": "2026-11-06T11:32:04.053Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "An optional supported requirement file (BRD, PDF, office document, text, image) can be attached; a failed attachment is reported without hiding the created work item. The console reports each attachment's actual content availability (text read natively, text extracted, or preserved as the original only with no readable text).",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0018",
+          "locator": "decision 2, 4"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0019",
+          "locator": "4"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T11:32:04.053Z",
+      "updatedAt": "2026-11-06T13:28:18.994Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "Creation runs only through existing Core commands (start, route, intake add) with their validation, workspace lock and audit; the created item appears immediately in the Flow with its real next valid action, and the user can continue with Claude Code or Codex. No agent is started.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0018",
+          "locator": "decision 2"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0017",
+          "locator": "2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T11:32:04.053Z",
+      "updatedAt": "2026-11-06T11:32:04.053Z"
+    },
+    {
+      "id": "REQ-004",
+      "statement": "Creating work from the Console never activates it: creation and activation are separate actions. A console-created item never becomes the active work item automatically (whether or not another item is active), activation happens only through an explicit Core command, and existing CLI behavior is unchanged.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0018",
+          "locator": "decision 3"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0019",
+          "locator": "focus decision"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T11:32:04.053Z",
+      "updatedAt": "2026-11-06T13:28:18.994Z"
+    },
+    {
+      "id": "REQ-005",
+      "statement": "Writes are safe: authenticated, Host/Origin enforced, no shell interpolation, upload limits within intake constraints, temporary files cleaned up, retries cannot silently duplicate, provenance recorded as an unverified local-user console attestation, and read-only mode disables every mutation.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0018",
+          "locator": "decision 4"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T11:32:04.053Z",
+      "updatedAt": "2026-11-06T11:32:04.053Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "In a browser, Create Work with only a requirement creates an unclassified item (routing pending); with type and scope it creates a routed item of that type and scope; the dialog never preselects a type or scope.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0018",
+          "locator": "decision 2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T11:32:04.053Z",
+      "updatedAt": "2026-11-06T11:32:04.053Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-002",
+      "statement": "An attached file is preserved as a source linked to the new item; an unsupported, empty or oversized file is refused with a message while the created item stays visible and openable. Each attached file's reported availability equals its source record (native-text, extracted, or original-only), including a file whose text cannot be extracted.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0018",
+          "locator": "decision 4"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0019",
+          "locator": "4"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T11:32:04.053Z",
+      "updatedAt": "2026-11-06T13:28:18.994Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-003",
+      "statement": "After creation the item page opens on the item, which is listed in the Flow, and its next step equals Core's nextAction/waitingFor from snapshot; work items are created only by spawning the yallaflow CLI.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0018",
+          "locator": "decision 2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T11:32:04.053Z",
+      "updatedAt": "2026-11-06T11:32:04.053Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-004",
+      "statement": "A console create never changes state/current.yaml, whether another item is active or none is; routing, advancing or checkpointing the new item does not change it; 'yallaflow activate <id>' does; CLI start/route/feature without the new options behave exactly as before (existing tests pass).",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0019",
+          "locator": "focus decision"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T11:32:04.053Z",
+      "updatedAt": "2026-11-06T13:28:18.994Z"
+    },
+    {
+      "id": "AC-005",
+      "requirement": "REQ-005",
+      "statement": "Security tests pass: POST without token 401, foreign or missing Origin 403, foreign Host 421, wrong content type 415, oversized body 413, read-only mode 405 with no button; shell metacharacters in the requirement are stored verbatim and nothing executes; the temp upload directory is gone afterwards; a repeated request ID returns the same item; concurrent creates get distinct IDs; meta records attestation {recordedVia: console, verified: false}.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0018",
+          "locator": "decision 4"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T11:32:04.053Z",
+      "updatedAt": "2026-11-06T11:32:04.053Z"
+    },
+    {
+      "id": "AC-006",
+      "requirement": "REQ-001",
+      "statement": "The interface keeps the Flow design: one Create Work entry point in the top bar (plus the empty-project welcome), no repeated command buttons; Arabic RTL and English, light and dark, keyboard operable, no console errors in Chromium, Firefox and WebKit.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0017",
+          "locator": "4"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T11:32:04.053Z",
+      "updatedAt": "2026-11-06T11:32:04.053Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-06T11:32:04.053Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-06T11:32:04.053Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-06T11:32:04.053Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-004",
+      "at": "2026-11-06T11:32:04.053Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-005",
+      "at": "2026-11-06T11:32:04.053Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-06T11:32:04.053Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-06T11:32:04.053Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-06T11:32:04.053Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-11-06T11:32:04.053Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-005",
+      "at": "2026-11-06T11:32:04.053Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-006",
+      "at": "2026-11-06T11:32:04.053Z",
+      "revision": 1
+    },
+    {
+      "action": "revised",
+      "id": "REQ-002",
+      "at": "2026-11-06T13:28:18.994Z",
+      "revision": 2,
+      "previous": {
+        "id": "REQ-002",
+        "statement": "An optional supported requirement file (BRD, PDF, office document, text, image) can be attached; a failed attachment is reported without hiding the created work item.",
+        "provenance": [
+          {
+            "type": "source",
+            "source": "SRC-0018",
+            "locator": "decision 2, 4"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "REQ-004",
+      "at": "2026-11-06T13:28:18.994Z",
+      "revision": 2,
+      "previous": {
+        "id": "REQ-004",
+        "statement": "Creating from the Console never replaces an existing active task: a backward-compatible Core option creates without activating, existing CLI behavior is unchanged, and activation happens only through an explicit, defined command, never because progress is recorded on the new item.",
+        "provenance": [
+          {
+            "type": "source",
+            "source": "SRC-0018",
+            "locator": "decision 3"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "AC-002",
+      "at": "2026-11-06T13:28:18.994Z",
+      "revision": 2,
+      "previous": {
+        "id": "AC-002",
+        "requirement": "REQ-002",
+        "statement": "An attached file is preserved as a source linked to the new item; an unsupported, empty or oversized file is refused with a message while the created item stays visible and openable.",
+        "provenance": [
+          {
+            "type": "source",
+            "source": "SRC-0018",
+            "locator": "decision 4"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "AC-004",
+      "at": "2026-11-06T13:28:18.994Z",
+      "revision": 2,
+      "previous": {
+        "id": "AC-004",
+        "requirement": "REQ-004",
+        "statement": "With another unfinished item active, a Console create leaves state/current.yaml unchanged; routing or checkpointing the new item does not change it; 'yallaflow activate <id>' does; CLI start/route/feature without the new option behave exactly as before (existing tests pass).",
+        "provenance": [
+          {
+            "type": "source",
+            "source": "SRC-0018",
+            "locator": "decision 3"
+          }
+        ],
+        "status": "active"
+      }
+    }
+  ],
+  "updatedAt": "2026-11-06T13:28:18.994Z"
+}

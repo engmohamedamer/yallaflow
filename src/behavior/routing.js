@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { readdir } from 'node:fs/promises';
 import { CONFIDENCE_LEVELS, SCOPES, WORK_TYPES } from './constants.js';
 import { resolveWorkflowPolicy } from './policy.js';
 import { exists, readText } from '../utils/fs.js';
@@ -77,6 +78,10 @@ export async function createPendingIntake(root, rawRequest, options = {}) {
     : undefined;
   const titleHint = options.titleHint !== undefined ? normalizeTitleHint(options.titleHint) : undefined;
 
+  const attestation = options.attestation
+    ? { recordedVia: options.attestation.recordedVia, verified: false, ...(options.attestation.requestId ? { requestId: options.attestation.requestId } : {}), at: new Date().toISOString() }
+    : null;
+  const keptActive = options.keepActive ? await unfinishedActiveWork(root) : null;
   const id = await nextWorkId(root);
   const now = new Date().toISOString();
   const meta = {
@@ -89,6 +94,10 @@ export async function createPendingIntake(root, rawRequest, options = {}) {
     readOnly: true,
     ...(sources?.length ? { sources } : {}),
     ...(titleHint ? { titleHint } : {}),
+    ...(attestation ? { attestation } : {}),
+    // --keep-active: creation never activates (owner decision, 1.2.0). keptActive records
+    // the unfinished item that stays in focus, or null when none is active.
+    ...(options.keepActive ? { activation: { deferred: true, keptActive, at: new Date().toISOString() } } : {}),
     knowledgePolicy: {
       version: KNOWLEDGE_POLICY_VERSION,
       reviewRequired: true
@@ -101,16 +110,68 @@ export async function createPendingIntake(root, rawRequest, options = {}) {
   // execution/) exists until the first artifact that needs it is written.
   await writeYaml(path.join(workDir, 'meta.yaml'), meta);
   await writeRedactedText(path.join(workDir, 'work.md'), pendingWorkTemplate(meta));
-  await writeRedactedText(path.join(workDir, 'progress.md'), `# Work Ledger — ${id}\n\nCreated: ${now}\n\n- ${now} Routing: pending\n`);
+  await writeRedactedText(path.join(workDir, 'progress.md'), `# Work Ledger — ${id}\n\nCreated: ${now}\n\n- ${now} Routing: pending\n${meta.attestation ? `- ${now} Created from the YallaFlow console (local user, identity not verified)\n` : ''}${meta.activation?.deferred ? `- ${now} Not made the active work item${meta.activation.keptActive ? `: ${meta.activation.keptActive} stays active in this checkout` : ''} (yallaflow activate ${id} makes it active)\n` : ''}`);
   // Shared Project: the project-memory state this work starts from (no-op otherwise).
   await recordWorkMemoryBase(root, id, now);
-  await writeCurrentState(root, {
-    schemaVersion: 1,
-    activeWork: id,
-    stage: null,
-    updatedAt: now
-  });
+  if (!meta.activation?.deferred) {
+    await writeCurrentState(root, {
+      schemaVersion: 1,
+      activeWork: id,
+      stage: null,
+      updatedAt: now
+    });
+  }
   return meta;
+}
+
+// v1.2.0 `start --keep-active`: the checkout's unfinished active work item, if any. An item
+// created with keepActive is always deferred; this only records what stayed in focus.
+async function unfinishedActiveWork(root) {
+  const state = await getCurrentState(root);
+  if (!state.activeWork) return null;
+  const metaFile = path.join(workspacePath(root), 'work', state.activeWork, 'meta.yaml');
+  if (!await exists(metaFile)) return null;
+  const active = await readYaml(metaFile);
+  return active.status === 'DONE' ? null : active.id;
+}
+
+// v1.2.0: the work item a console request already created (request IDs make retries safe).
+// Called under the workspace lock, so a concurrent retry sees the first one's item.
+export async function findWorkByRequestId(root, requestId) {
+  const workDir = path.join(workspacePath(root), 'work');
+  if (!requestId || !await exists(workDir)) return null;
+  for (const entry of await readdir(workDir, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const metaFile = path.join(workDir, entry.name, 'meta.yaml');
+    if (!await exists(metaFile)) continue;
+    try {
+      const meta = await readYaml(metaFile);
+      if (meta.attestation?.requestId === requestId) return meta;
+    } catch {
+      // an unreadable item cannot own this request; doctor reports it
+    }
+  }
+  return null;
+}
+
+// v1.2.0 `yallaflow activate <work-id>`: the only explicit way to change which work item
+// is this checkout's active focus. It clears a deferral and changes no other record.
+export async function activateWorkItem(root, workId) {
+  const metaFile = path.join(workspacePath(root), 'work', workId, 'meta.yaml');
+  if (!await exists(metaFile)) throw new Error(`Work item ${workId} was not found.`);
+  const meta = await readYaml(metaFile);
+  if (meta.status === 'DONE') throw new Error(`${workId} is DONE. Reopen it with \`yallaflow reopen\` to work on it again.`);
+  const state = await getCurrentState(root);
+  const previous = state.activeWork ?? null;
+  const now = new Date().toISOString();
+  if (meta.activation?.deferred) {
+    meta.activation = { ...meta.activation, deferred: false, activatedAt: now };
+    meta.updatedAt = now;
+    await writeYaml(metaFile, meta);
+  }
+  await writeCurrentState(root, { schemaVersion: 1, activeWork: workId, stage: meta.routingStatus === 'pending' ? null : meta.status, updatedAt: now });
+  if (previous !== workId) await appendRedactedText(path.join(workspacePath(root), 'work', workId, 'progress.md'), `- ${now} Activated: now the active work item${previous ? ` (was ${previous})` : ''}\n`, 'utf8');
+  return { id: workId, previous };
 }
 
 export async function routeWorkItem(root, workId, input) {
@@ -155,12 +216,16 @@ export async function routeWorkItem(root, workId, input) {
   await writeRedactedText(workFile, currentWork.replace(/^# .*$/m, `# ${meta.id} — ${title}`));
   await appendRedactedText(workFile, routedWorkAppendix(meta), 'utf8');
   await appendRedactedText(path.join(workDir, 'progress.md'), `- ${now} Routing: routed as ${meta.type} + ${meta.scope} (${meta.routingConfidence})\n`, 'utf8');
-  await writeCurrentState(root, {
-    schemaVersion: 1,
-    activeWork: workId,
-    stage: policy.initialStage,
-    updatedAt: now
-  });
+  // A deferred item (created with --keep-active) never takes the checkout's focus by being
+  // routed; only `yallaflow activate` does. Everything else keeps the pre-1.2.0 behavior.
+  if (!meta.activation?.deferred) {
+    await writeCurrentState(root, {
+      schemaVersion: 1,
+      activeWork: workId,
+      stage: policy.initialStage,
+      updatedAt: now
+    });
+  }
   return meta;
 }
 

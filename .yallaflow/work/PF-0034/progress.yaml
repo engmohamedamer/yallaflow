@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-06T15:07:59.277Z",
+      "completedAt": "2026-11-06T15:07:59.277Z",
+      "summary": "Current YallaFlow state verified in source (CURRENT_STATE.md): no agent process is ever spawned; integration is instruction files only; console server guards, event stream, runner, watcher, Create Work, read contract, lock and explicit activation are reusable; 4 runtime deps, no native addons. Provider research (Claude Agent SDK/CLI, Codex App Server/SDK/CLI, ACP, MCP, PTY, frameworks) and a SquadKit 1.0.0 study done with official sources and local read-only checks (evidence/).",
+      "evidence": [
+        "research/agent-interaction/CURRENT_STATE.md",
+        "research/agent-interaction/PROTOCOL_RESEARCH.md",
+        "src/console/server.js"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-06T15:08:09.038Z",
+      "completedAt": "2026-11-06T15:08:09.038Z",
+      "summary": "Hypothesis (Session Manager + native adapters) challenged against 7 options (0 none, A native, B ACP, C PTY, D frameworks, E hybrid, F agent-side). Evidence: both vendors expose rich local interfaces with interactive approvals (Claude Agent SDK canUseTool; Codex App Server approval requests); Codex TS SDK and plain headless CLIs cannot do approvals; ACP adapters exist for both and the Claude adapter handshake succeeded; PTY needs a native Linux build and gives no structured permissions; frameworks do not host CC/Codex. Conclusion: modify into a thin console-resident Agent Bridge with ACP as the seam and user-installed adapters; native only for gaps. Blocking decision D1: Claude subscription policy for SDK-based products. Unverified: real turns, permission round-trips, cancel/resume (N1-N6, need approval).",
+      "evidence": [
+        "research/agent-interaction/ALTERNATIVE_ARCHITECTURES.md",
+        "research/agent-interaction/RECOMMENDED_ARCHITECTURE.md",
+        "research/agent-interaction/DECISION_SUMMARY.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T15:08:09.405Z",
+      "completedAt": "2026-11-06T15:08:09.405Z",
+      "summary": "All 8 deliverables present in research/agent-interaction/ with raw evidence; experiments were initialize/list-only (no model turn, no usage); production code and the release candidate unchanged (tarball sha256 bbad23be…, HEAD bdb5e90).",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-06T15:08:09.405Z"
+}

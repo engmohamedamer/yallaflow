@@ -1,0 +1,55 @@
+{
+  "id": "PF-0035",
+  "type": "investigation",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Agent Bridge feasibility PoC: real ACP adapters for Claude Code and Codex in a disposable repository (no production code)",
+  "status": "DONE",
+  "readOnly": true,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-06T15:20:41.056Z",
+  "updatedAt": "2026-11-06T15:32:08.686Z",
+  "title": "Agent Bridge feasibility PoC: real ACP adapters for Claude Code and Codex in a disposable repository (no production code)",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow investigate --scope bounded`.",
+  "routedAt": "2026-11-06T15:20:41.069Z",
+  "workflow": "investigation",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "verification"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0021",
+      "type": "file",
+      "name": "owner-agent-bridge-feasibility-2026-11-06.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-06T15:20:41.253Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0022",
+      "type": "file",
+      "name": "owner-subscription-requirement-2026-11-06.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-06T15:23:57.721Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ]
+}

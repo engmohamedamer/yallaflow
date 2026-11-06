@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-05T22:27:53.707Z",
+      "completedAt": "2026-11-05T22:27:53.707Z",
+      "summary": "No lock exists. Mutating commands are dispatched from src/cli.js main() after assertCompatibleForCommand; read-only commands are listed in READ_ONLY_COMMANDS/READ_ONLY_ACTIONS. writeYaml (src/core/yaml.js) is non-atomic (writeText); writeTextAtomic uses a pid-only temp name. verify runs the user command first, then allocates V-### and appends (src/commands/verify.js runVerification). STATE_OWNERSHIP (src/core/ownership.js) lists local/ files. ID allocation (allocateScopedId) is directory-scan based, so it is safe once every allocating command holds the lock.",
+      "evidence": [
+        "src/cli.js",
+        "src/core/yaml.js",
+        "src/utils/fs.js",
+        "src/commands/verify.js",
+        "src/core/ownership.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-05T22:27:53.985Z",
+      "completedAt": "2026-11-05T22:27:53.985Z",
+      "summary": "Per approved PF-0024 design: exclusive-create lock at .yallaflow/local/lock {pid, host, startedAt, command}; taken in the dispatcher for every mutating command (not init, help, version or read-only commands); verify takes it only around ID allocation, the log, the ledger append and any checkpoint reopen; retry with backoff up to 10 s then a clear error naming the holder; stale = holder pid dead on this host (removed automatically, reported by doctor, doctor --clear-lock removes a stale lock and refuses a live one); structured writes atomic with unique temp names."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-05T22:30:47.818Z",
+      "completedAt": "2026-11-05T22:30:47.818Z",
+      "summary": "Workspace lock (src/utils/lock.js) taken by the CLI dispatcher for every mutating command, verify locks only its recording, atomic writeYaml with unique temp names and rename retry, doctor lock report and --clear-lock, local/lock ownership entry, 6 concurrency tests; v1.1.0 race demo loses work items in 4/5 rounds, lock 0/5.",
+      "evidence": [
+        "src/utils/lock.js",
+        "src/cli.js",
+        "src/commands/verify.js",
+        "src/utils/fs.js",
+        "src/core/yaml.js",
+        "src/commands/doctor.js",
+        "test/workspace-lock.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-05T22:42:24.108Z",
+      "completedAt": "2026-11-05T22:42:24.108Z",
+      "summary": "Fresh proof: syntax (V-008), text output of 14 read commands identical to v1.1.0 (V-009), lock tests 7/7 (in full suite), race demo 20 rounds x 16 parallel starts: v1.1.0 collides 20/20, lock 0/20 (V-007), full suite 789/789 (V-010). Earlier failures V-003 (my relative path) and V-006 (local/ invariant) are kept in the ledger and fixed.",
+      "evidence": [
+        "verification:V-010"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-05T22:42:24.440Z",
+      "completedAt": "2026-11-05T22:42:24.440Z",
+      "summary": "AC-004 satisfied (V-007, V-010)."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-05T22:42:24.440Z"
+}

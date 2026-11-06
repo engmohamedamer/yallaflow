@@ -15,7 +15,8 @@ export async function routeCommand(workId, decision) {
   console.log(`Required capabilities: ${item.requiredCapabilities.join(', ')}`);
   console.log(`Behavior contract: registry v${item.behaviorContract.registryVersion} (pinned)`);
   if (item.readOnly) console.log('Safety: read-only; application code changes are not authorized by this route.');
-  console.log('Next: yallaflow resume');
+  if (item.activation?.deferred) console.log(`Not made active (it was created with --keep-active). Next: yallaflow guide ${item.id}, or \`yallaflow activate ${item.id}\` to make it the active work item.`);
+  else console.log('Next: yallaflow resume');
   const notice = await understandingNotice(root, { kind: (await getConfig(root)).project?.kind, workMeta: item });
   if (notice.length) console.log(`\n${notice.join('\n')}`);
 }

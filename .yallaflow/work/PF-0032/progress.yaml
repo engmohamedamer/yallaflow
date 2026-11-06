@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-06T11:31:39.563Z",
+      "completedAt": "2026-11-06T11:31:39.563Z",
+      "summary": "Work creation (createPendingIntake/routeWorkItem in src/behavior/routing.js) always sets state/current.yaml activeWork; advance only updates state for the already-active item; resume/guide <id> inspect without changing focus; there is no explicit activate command. start's CLI parsing joins all argv (src/cli.js). intake add <id> <file> links sources (MAX_SOURCE_BYTES 200 MB, extraction 50 MB, format tables in src/intake/constants.js). The console server answers GET/HEAD only with Host/Origin/Bearer checks; runner.js spawns the CLI with argv (no shell) and caches reads. Q-004 fixed console provenance as an attestation {recordedVia: console, verified: false}, never a default identity. Brownfield gate (assertEngineeringWorkAllowed) refuses creation before an approved baseline.",
+      "evidence": [
+        "src/behavior/routing.js",
+        "src/core/transitions.js",
+        "src/cli.js",
+        "src/console/server.js",
+        "src/intake/constants.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T13:28:44.691Z",
+      "completedAt": "2026-11-06T13:28:44.691Z",
+      "summary": "Intent revised from the owner's focus decision (SRC-0019): REQ-004/AC-004 now require that a console-created item never becomes active automatically, even when nothing is active; REQ-002/AC-002 now require each attachment's actual content availability (native-text, extracted, original-only incl. failed extraction) to be reported.",
+      "evidence": [
+        "user:SRC-0019"
+      ]
+    },
+    "design-exploration": {
+      "status": "completed",
+      "startedAt": "2026-11-06T13:28:45.053Z",
+      "completedAt": "2026-11-06T13:28:45.053Z",
+      "summary": "Activation: --keep-active always defers (keptActive records the unfinished active item or null); Core start without the option unchanged; activate stays the only switch. Availability: the attach response carries the source record's contentAvailability and extraction note; the UI lists every file's result and the Attachments tab tags each source.",
+      "evidence": [
+        ".yallaflow/work/PF-0032/work.md"
+      ]
+    },
+    "specification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T13:28:45.386Z",
+      "completedAt": "2026-11-06T13:28:45.386Z",
+      "summary": "Specification revised (work.md Design and UI): --keep-active never activates; console reports per-file content availability; all else as approved.",
+      "evidence": [
+        ".yallaflow/work/PF-0032/work.md"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-06T11:45:17.445Z",
+      "completedAt": "2026-11-06T11:45:17.445Z",
+      "summary": "Plan in work.md (Implementation Plan): 1 Core (start flag parsing with legacy fallback, attestation/deferral in createPendingIntake, request-ID lookup under the lock, routeWorkItem focus skip, activate command, intake add --via console, help/docs); 2 console server POST routes with guards, serialized uncached runner write, --read-only, projects.readOnly; 3 UI dialog/create/attach/partial-success/next step; 4 tests (Core activation/back-compat/idempotency/concurrency, server security, temp cleanup, retry, read-only, browser 3 engines); 5 docs. Upload cap = Core MAX_EXTRACTION_INPUT_BYTES per the owner's 'respect Core limits' requirement (ruling).",
+      "evidence": [
+        ".yallaflow/work/PF-0032/work.md"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-06T13:42:10.502Z",
+      "completedAt": "2026-11-06T13:50:55.203Z",
+      "summary": "Walkthrough fixes: availability chip placed under the file name; stations of an unclassified item render as 'not yet' (item page and work list); resume on a deferred item prints how to activate it (test added).",
+      "evidence": [
+        "src/behavior/routing.js",
+        "src/console/create.js",
+        "src/flow/snapshot.js",
+        "resources/console/app.js",
+        "test/console-create.test.js",
+        "src/commands/resume.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T14:02:21.415Z",
+      "completedAt": "2026-11-06T14:02:21.415Z",
+      "summary": "Full suite 835/835 (V-004). Browser regression Chromium/Firefox/WebKit x light/dark x 1440/390 x EN/AR x 5 pages = 120 checks, 0 findings, 0 console errors. Acceptance walkthrough on the packed build: existing project (copy of oldapps/youtuber with PF-0003 active) and a new project; created a feature with a DOCX (text extracted) and PNG (original kept, no text) and an unclassified Arabic request with a PDF (text extracted); state/current.yaml byte-identical through create, resume, advance and checkpoint; activate switched focus explicitly; nothing active stayed null in the new project after create and route.",
+      "evidence": [
+        "verification:V-004",
+        "test/console-create.test.js"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-06T14:02:22.095Z",
+      "completedAt": "2026-11-06T14:02:22.095Z",
+      "summary": "All 6 criteria (AC-002/AC-004 as revised) satisfied with V-004, tests and the walkthrough."
+    },
+    "code-review": {
+      "status": "completed",
+      "startedAt": "2026-11-06T14:02:22.272Z",
+      "completedAt": "2026-11-06T14:02:22.272Z",
+      "summary": "Reviewed the delta since the independent review: keep-active now always defers (routing.js, start.js messages), availabilityOf reads the stored source record only, availabilityNote is additive in work show (schema updated), UI result view and chips escape all values, resume hint is read-only; no new write path, guard or argv change. Earlier independent review findings remain fixed (regression tests pass).",
+      "evidence": [
+        "verification:V-004"
+      ]
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Console upload cap = Core's MAX_EXTRACTION_INPUT_BYTES (50 MB), imported from src/intake/constants.js instead of a separate 25 MB console constant",
+      "reason": "The owner required the console to respect the actual Core intake limits and named 20 MB; the code has no 20 MB limit: MAX_SOURCE_BYTES is 200 MB per source and MAX_EXTRACTION_INPUT_BYTES is 50 MB (larger files are preserved without text). Importing the extraction limit keeps one source of truth and guarantees every console attachment can be read as text. Reported to the owner for confirmation.",
+      "costIfWrong": "If the owner wants a lower cap (for example 20 MB), it is one constant in src/console/server.js; no stored data depends on it",
+      "createdAt": "2026-11-06T11:45:09.057Z"
+    }
+  ],
+  "history": [
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Independent security review (isolated copy) reproduced 5 defects: route title starting with '-' parsed as an option (lost classification), start request '--help' returned 500, concurrent identical uploads both stored, long non-ASCII file name leaked a temp folder and 500, parseStartArgs changed legacy 'start --via x ...' behavior. Fixing with regression tests.",
+      "changedAt": "2026-11-06T13:02:16.167Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Owner decision (2026-11-06): console-created items must never become the active work item automatically, even when nothing is active; also report attachment content availability accurately (including original-only files).",
+      "changedAt": "2026-11-06T13:28:09.129Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Owner decision (2026-11-06): console-created items must never become the active work item automatically, even when nothing is active; also report attachment content availability accurately (including original-only files).",
+      "changedAt": "2026-11-06T13:28:09.129Z"
+    },
+    {
+      "skill": "delivery-convergence",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Owner decision (2026-11-06): console-created items must never become the active work item automatically, even when nothing is active; also report attachment content availability accurately (including original-only files).",
+      "changedAt": "2026-11-06T13:28:09.129Z"
+    },
+    {
+      "skill": "code-review",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Owner decision (2026-11-06): console-created items must never become the active work item automatically, even when nothing is active; also report attachment content availability accurately (including original-only files).",
+      "changedAt": "2026-11-06T13:28:09.129Z"
+    },
+    {
+      "skill": "requirement-clarification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-001: REQ-002/REQ-004 and AC-002/AC-004 were revised from the owner's decision.",
+      "changedAt": "2026-11-06T13:28:30.027Z"
+    },
+    {
+      "skill": "design-exploration",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-001: The chosen activation rule changes from 'defer only when an unfinished item is active' to 'never activate'.",
+      "changedAt": "2026-11-06T13:28:30.027Z"
+    },
+    {
+      "skill": "specification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-001: The spec's activation semantics and the attachment-result reporting change.",
+      "changedAt": "2026-11-06T13:28:30.027Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "in_progress",
+      "to": "pending",
+      "reason": "Impact IM-001: Core keep-active rule, CLI messages, server/UI attachment availability and tests change.",
+      "changedAt": "2026-11-06T13:28:30.027Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Acceptance walkthrough found two UI issues and one agent-guidance gap after V-003: attachment cards squeezed file names, an unclassified item showed its stations as 'not needed here' with the investigation note, and resume gave no hint how to activate a deferred item. Fixing and re-verifying.",
+      "changedAt": "2026-11-06T13:50:55.028Z"
+    }
+  ],
+  "updatedAt": "2026-11-06T14:02:22.272Z"
+}

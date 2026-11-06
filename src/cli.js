@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 import { parseArgs } from 'node:util';
 import { initCommand } from './commands/init.js';
-import { startCommand } from './commands/start.js';
+import { activateCommand, startCommand } from './commands/start.js';
 import { statusCommand } from './commands/status.js';
 import { resumeCommand } from './commands/resume.js';
 import { doctorCommand } from './commands/doctor.js';
 import { newWorkCommand } from './commands/work.js';
+import { snapshotCommand, workShowCommand } from './commands/snapshot.js';
+import { withWorkspaceLock } from './utils/lock.js';
+import { consoleCommand, consoleProjectsCommand } from './commands/console.js';
 import { advanceCommand } from './commands/advance.js';
 import { verifyCommand, verifyListCommand, verifyScriptCommand, verifyShellCommand } from './commands/verify.js';
 import { routeCommand } from './commands/route.js';
@@ -79,7 +82,7 @@ import { INTERACTION_MODES, GATE_NAMES } from './behavior/interaction.js';
 const VALID_PROJECT_TYPES = new Set(['greenfield', 'brownfield']);
 
 function help() {
-  console.log(`YallaFlow foundation CLI\n\nGive AI your project, not just your prompt.\n\nUsage:\n  yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]\n  yallaflow start [request]\n  yallaflow request --help\n  yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]\n  yallaflow intake ticket <payload-file|ticket-ref> [--provider github|jira|azure-devops] [--work <work-id>] [--reason TEXT] [--fetch [--attachments]] [--attachment <file>]... [--title TITLE] [--max-comments N]\n  yallaflow source --help\n  yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]\n  yallaflow baseline --help\n  yallaflow guide [work-id]\n  yallaflow ready [work-id]\n  yallaflow skill <skill-id> [--work <work-id>]\n  yallaflow checkpoint --help\n  yallaflow question --help\n  yallaflow knowledge --help\n  yallaflow requirement --help\n  yallaflow convergence --help\n  yallaflow impact --help\n  yallaflow context --help\n  yallaflow upgrade status|plan\n  yallaflow brief\n  yallaflow inspect\n  yallaflow limitation --help\n  yallaflow agent --help\n  yallaflow decompose --help\n  yallaflow progress <parent-id>\n  yallaflow next <parent-id>\n  yallaflow approve <work-id> --stage GATE [--note TEXT]\n  yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]\n  yallaflow handoff [work-id]\n  yallaflow feature <title> --scope SCOPE\n  yallaflow bug <title> --scope SCOPE\n  yallaflow investigate <title> --scope SCOPE\n  yallaflow change <title> --scope SCOPE\n  yallaflow refactor <title> --scope SCOPE\n  yallaflow release <title> --scope SCOPE\n  yallaflow purpose --help\n  yallaflow finish [work-id] [--verbose]\n  yallaflow qc --help\n  yallaflow demo --help\n  yallaflow shared --help\n  yallaflow status\n  yallaflow resume [work-id]\n  yallaflow doctor\n  yallaflow advance [work-id]\n  yallaflow verify [work-id] -- <executable> [args...]\n  yallaflow verify [work-id] --shell "<command>"\n  yallaflow verify [work-id] --script <path>\n  yallaflow verify list [work-id]\n  yallaflow reopen <work-id> --to implementation|verification|review --reason REASON\n  yallaflow --version\n`);
+  console.log(`YallaFlow foundation CLI\n\nGive AI your project, not just your prompt.\n\nUsage:\n  yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]\n  yallaflow start [request]\n  yallaflow start --keep-active -- <request>\n  yallaflow activate <work-id>\n  yallaflow request --help\n  yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]\n  yallaflow intake ticket <payload-file|ticket-ref> [--provider github|jira|azure-devops] [--work <work-id>] [--reason TEXT] [--fetch [--attachments]] [--attachment <file>]... [--title TITLE] [--max-comments N]\n  yallaflow source --help\n  yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]\n  yallaflow baseline --help\n  yallaflow guide [work-id]\n  yallaflow ready [work-id]\n  yallaflow skill <skill-id> [--work <work-id>]\n  yallaflow checkpoint --help\n  yallaflow question --help\n  yallaflow knowledge --help\n  yallaflow requirement --help\n  yallaflow convergence --help\n  yallaflow impact --help\n  yallaflow context --help\n  yallaflow upgrade status|plan\n  yallaflow brief\n  yallaflow inspect\n  yallaflow limitation --help\n  yallaflow agent --help\n  yallaflow decompose --help\n  yallaflow progress <parent-id>\n  yallaflow next <parent-id>\n  yallaflow approve <work-id> --stage GATE [--note TEXT]\n  yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]\n  yallaflow handoff [work-id]\n  yallaflow feature <title> --scope SCOPE\n  yallaflow bug <title> --scope SCOPE\n  yallaflow investigate <title> --scope SCOPE\n  yallaflow change <title> --scope SCOPE\n  yallaflow refactor <title> --scope SCOPE\n  yallaflow release <title> --scope SCOPE\n  yallaflow purpose --help\n  yallaflow finish [work-id] [--verbose]\n  yallaflow qc --help\n  yallaflow demo --help\n  yallaflow shared --help\n  yallaflow status\n  yallaflow snapshot [--json]\n  yallaflow console [--port N] [--no-open] [--project DIR]... [--read-only]\n  yallaflow work show <work-id> [--json]\n  yallaflow resume [work-id]\n  yallaflow doctor [--clear-lock]\n  yallaflow advance [work-id]\n  yallaflow verify [work-id] -- <executable> [args...]\n  yallaflow verify [work-id] --shell "<command>"\n  yallaflow verify [work-id] --script <path>\n  yallaflow verify list [work-id]\n  yallaflow reopen <work-id> --to implementation|verification|review --reason REASON\n  yallaflow --version\n`);
 }
 
 function decomposeHelp() {
@@ -172,15 +175,19 @@ function parseOptions(args, allowed) {
 // asking for help can never reach a mutating command handler (GAP-CLI-001).
 const USAGE = {
   init: 'yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]',
-  start: 'yallaflow start [request]',
+  start: 'yallaflow start [request]\n  yallaflow start --keep-active -- <request>',
+  activate: 'yallaflow activate <work-id>',
   intake: 'yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]\n  yallaflow intake ticket <payload-file|ticket-ref> [--provider github|jira|azure-devops] [--work <work-id>] [--reason TEXT] [--fetch [--attachments]] [--attachment <file>]... [--title TITLE] [--max-comments N]',
   guide: 'yallaflow guide [work-id]',
   skill: 'yallaflow skill <skill-id> [--work <work-id>]',
   route: 'yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]',
   status: 'yallaflow status',
+  snapshot: 'yallaflow snapshot [--json]',
+  console: 'yallaflow console [--port N] [--no-open] [--project DIR]... [--read-only]\n  yallaflow console add [DIR] | remove DIR | list',
+  work: 'yallaflow work show <work-id> [--json]',
   resume: 'yallaflow resume [work-id]',
   ready: 'yallaflow ready [work-id]',
-  doctor: 'yallaflow doctor',
+  doctor: 'yallaflow doctor [--clear-lock]',
   advance: 'yallaflow advance [work-id]',
   verify: 'yallaflow verify [work-id] -- <executable> [args...]\n  yallaflow verify [work-id] --shell "<command>"\n  yallaflow verify [work-id] --script <path>\n  yallaflow verify list [work-id]',
   reopen: 'yallaflow reopen <work-id> --to implementation|verification|review --reason REASON',
@@ -342,6 +349,8 @@ const PAYLOAD_BOUNDARY_COMMANDS = new Set(['verify']);
 // option's own value (`--text "Document --help behavior"`, `start "...--help..."`) is
 // never mistaken for the flag — those arrive as one argv entry, not as `--help` itself.
 function helpScanScope(command, rest) {
+  // `start <options> -- <request>` (v1.2.0): the request after `--` is the user's text.
+  if (command === 'start' && startOptionsEnd(rest) !== -1) return rest.slice(0, startOptionsEnd(rest));
   if (!PAYLOAD_BOUNDARY_COMMANDS.has(command)) return rest;
   const sepIndex = rest.indexOf('--');
   return sepIndex === -1 ? rest : rest.slice(0, sepIndex);
@@ -381,7 +390,7 @@ async function deliveryCommand(command, rest) {
 // yallaflow.minimumVersion). An older CLI stops before any project-state mutation;
 // read-only orientation, inspection, and integrity commands still run so the developer
 // sees why. YallaFlow never self-updates or downloads anything.
-const READ_ONLY_COMMANDS = new Set(['brief', 'doctor', 'status', 'inspect', 'upgrade', 'handoff', 'resume', 'ready', 'guide', 'progress', 'next', 'finish', 'skill', 'source']);
+const READ_ONLY_COMMANDS = new Set(['snapshot', 'work', 'console', 'brief', 'doctor', 'status', 'inspect', 'upgrade', 'handoff', 'resume', 'ready', 'guide', 'progress', 'next', 'finish', 'skill', 'source']);
 const READ_ONLY_ACTIONS = {
   shared: ['status', 'check'], context: ['status', 'list', 'show', 'history', 'affected'], knowledge: ['list'], question: ['list'],
   verify: ['list'], baseline: ['status', 'show'], decompose: ['status'], requirement: ['list', 'show'], convergence: ['status', 'show'],
@@ -411,6 +420,56 @@ async function main() {
   if (helpScanScope(command, rest).some(isHelpToken)) return printCommandHelp(command, rest);
 
   await assertCompatibleForCommand(command, rest);
+  if (!needsWorkspaceLock(command, rest)) return dispatch(command, rest);
+  const root = await findProjectRoot();
+  if (!root) return dispatch(command, rest);
+  const label = ['yallaflow', command, ...rest.filter((token) => !token.startsWith('-')).slice(0, 2)].join(' ');
+  return withWorkspaceLock(root, label, () => dispatch(command, rest));
+}
+
+// v1.2.0: every command that can write .yallaflow holds the workspace lock
+// (src/utils/lock.js) for its whole run, so concurrent agents never interleave writes or
+// allocate the same ID. Read-only commands never take it. `verify` takes it itself, only
+// around recording, never while the verified command runs. `init` creates the workspace.
+function needsWorkspaceLock(command, rest) {
+  if (command === 'init' || command === 'verify' || READ_ONLY_COMMANDS.has(command)) return false;
+  const action = rest[0];
+  if (READ_ONLY_ACTIONS[command]?.includes(action)) return false;
+  if (command === 'context' && action === 'reconcile' && ['status', 'show', 'preview'].includes(rest[1])) return false;
+  if (command === 'context' && !action) return false;
+  // Dry runs report without writing — only where the command defines --dry-run.
+  if (rest.includes('--dry-run') && ((command === 'shared' && ['integrate', 'enable'].includes(action)) || (command === 'context' && action === 'adopt') || (command === 'agent' && ['refresh', 'setup'].includes(action)))) return false;
+  // A fetching ticket import locks itself only after the network part (commands/intake.js).
+  if (command === 'intake' && action === 'ticket' && rest.includes('--fetch')) return false;
+  return true;
+}
+
+// `start [--keep-active] [--via console --request-id ID] -- <request>` (v1.2.0). The new
+// options apply only as leading tokens closed by `--`; any other invocation (the whole
+// argv joined as the request) behaves exactly as before.
+const START_OPTIONS = { '--keep-active': 0, '--via': 1, '--request-id': 1 };
+function startOptionsEnd(rest) {
+  let index = 0;
+  while (index < rest.length && rest[index] in START_OPTIONS) index += 1 + START_OPTIONS[rest[index]];
+  return index > 0 && rest[index] === '--' ? index : -1;
+}
+export function parseStartArgs(rest) {
+  const end = startOptionsEnd(rest);
+  if (end === -1) return [rest.join(' ')];
+  const options = {};
+  for (let index = 0; index < end; index++) {
+    const token = rest[index];
+    if (token === '--keep-active') options.keepActive = true;
+    else if (token === '--via') options.via = rest[++index];
+    else if (token === '--request-id') options.requestId = rest[++index];
+  }
+  if (options.via !== undefined && options.via !== 'console') throw new Error('--via must be console');
+  if (options.requestId !== undefined && !/^[A-Za-z0-9-]{8,64}$/.test(options.requestId)) throw new Error('--request-id must be 8-64 letters, digits or hyphens');
+  if (options.requestId && !options.via) throw new Error('--request-id requires --via console');
+  return [rest.slice(end + 1).join(' '), options];
+}
+
+async function dispatch(command, rest) {
 
   if (command === 'init') {
     const { values } = parseOptions(rest, { name: { type: 'string' }, type: { type: 'string' }, mode: { type: 'string' } });
@@ -419,7 +478,11 @@ async function main() {
     return initCommand({ name: values.name, type: values.type, mode: values.mode });
   }
 
-  if (command === 'start') return startCommand(rest.join(' '));
+  if (command === 'start') return startCommand(...parseStartArgs(rest));
+  if (command === 'activate') {
+    if (rest.length !== 1) throw new Error('Usage: yallaflow activate <work-id>');
+    return activateCommand(rest[0]);
+  }
   if (command === 'request') {
     const [action, ...actionArgs] = rest;
     if (action !== 'revise') throw new Error('Usage: yallaflow request revise <work-id> --text TEXT --reason TEXT');
@@ -429,10 +492,11 @@ async function main() {
   }
   if (command === 'intake') {
     if (rest[0] === 'add') {
-      const { values, positionals } = parseOptions(rest.slice(1), { reason: { type: 'string' } });
+      const { values, positionals } = parseOptions(rest.slice(1), { reason: { type: 'string' }, via: { type: 'string' } });
       if (positionals.length < 2) throw new Error('Usage: yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]');
+      if (values.via !== undefined && values.via !== 'console') throw new Error('--via must be console');
       const [workId, ...files] = positionals;
-      return intakeAddCommand(workId, files, { reason: values.reason });
+      return intakeAddCommand(workId, files, { reason: values.reason, via: values.via });
     }
     if (rest[0] === 'ticket') {
       const { values, positionals } = parseOptions(rest.slice(1), {
@@ -664,6 +728,27 @@ async function main() {
     });
   }
   if (command === 'status') return statusCommand();
+  if (command === 'console') {
+    const { values, positionals } = parseOptions(rest, { port: { type: 'string' }, 'no-open': { type: 'boolean' }, project: { type: 'string', multiple: true }, poll: { type: 'boolean' }, 'read-only': { type: 'boolean' } });
+    if (['add', 'remove', 'list'].includes(positionals[0])) {
+      if (positionals.length > 2 || (positionals[0] === 'list' && positionals.length > 1)) throw new Error('Usage: yallaflow console add [DIR] | remove DIR | list');
+      return consoleProjectsCommand(positionals[0], positionals[1]);
+    }
+    if (positionals.length) throw new Error('Usage: yallaflow console [--port N] [--no-open] [--project DIR]... [--read-only]\n  yallaflow console add [DIR] | remove DIR | list');
+    const port = values.port === undefined ? undefined : Number(values.port);
+    if (port !== undefined && !(Number.isInteger(port) && port >= 0 && port < 65536)) throw new Error('--port must be a number between 0 and 65535');
+    return consoleCommand({ port, open: !values['no-open'], projects: values.project ?? [], poll: values.poll, readOnly: Boolean(values['read-only']) });
+  }
+  if (command === 'snapshot') {
+    const { values, positionals } = parseOptions(rest, { json: { type: 'boolean' } });
+    if (positionals.length) throw new Error('Usage: yallaflow snapshot [--json]');
+    return snapshotCommand({ json: values.json });
+  }
+  if (command === 'work') {
+    const { values, positionals } = parseOptions(rest, { json: { type: 'boolean' } });
+    if (positionals[0] !== 'show' || positionals.length !== 2) throw new Error('Usage: yallaflow work show <work-id> [--json]');
+    return workShowCommand(positionals[1], { json: values.json });
+  }
   if (command === 'resume') {
     if (rest.length > 1) throw new Error('Usage: yallaflow resume [work-id]');
     return resumeCommand(rest[0]);
@@ -672,7 +757,11 @@ async function main() {
     if (rest.length > 1) throw new Error('Usage: yallaflow ready [work-id]');
     return readyCommand(rest[0]);
   }
-  if (command === 'doctor') return doctorCommand();
+  if (command === 'doctor') {
+    const { values, positionals } = parseOptions(rest, { 'clear-lock': { type: 'boolean' } });
+    if (positionals.length) throw new Error('Usage: yallaflow doctor [--clear-lock]');
+    return doctorCommand({ clearLock: values['clear-lock'] });
+  }
   if (command === 'advance') {
     if (rest.length > 1) throw new Error('Usage: yallaflow advance [work-id]');
     return advanceCommand(rest[0]);

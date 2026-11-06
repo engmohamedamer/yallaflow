@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Machine-readable read contract (v1.2.0): 'yallaflow snapshot --json' (schema yallaflow.snapshot/1) and 'yallaflow work show <id> --json' (yallaflow.work/1), schemas in resources/schemas/, collected in src/flow/snapshot.js from existing readers with evaluateAdvance mutate:false. The five Flow stations, item state and completion are computed only in src/flow/stations.js and are evidence-aware: Verify (and so Remember) finishes only with a fresh successful run (not predating lastInvalidationAt) and, where required, a currently converged assessment; a checkpoint reopened behind the stage brings its station back; a decomposed parent's Change station is its required children; nothing but DONE reaches 100% (non-DONE capped at 99). One damaged item never fails the snapshot: an unreadable meta.yaml, a Core validation failure, a delivery-integrity error or a source-link mismatch moves the item to the additive invalid[] ({id,title,code:WORK_ITEM_INVALID,message}), excluded from items, counts and completion; lifecycle-position checks (e.g. a gate not yet requested) stay in doctor only. openCompletion averages open items (null when none). --json errors are {error:{code,message}} with exit 1; work show on an invalid item returns WORK_ITEM_INVALID.",
+      "evidence": [
+        "src/flow/snapshot.js",
+        "src/flow/stations.js",
+        "test/console-acceptance.test.js",
+        "verification:V-001"
+      ],
+      "confidence": "confirmed",
+      "provenance": "repository",
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0094"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-06T11:29:11.754Z",
+      "factId": "CTX-0097",
+      "promotedAt": "2026-11-06T11:29:15.157Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-002",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Work-ID collisions: outside a Shared Project, work (PF-####) and source (SRC-####) IDs are plain sequence numbers, so two branches can create the same ID and a Git merge can combine two different items in one folder (seen in a real project: ledger registry/skills not matching the pinned contract, ledger entries older than the item, delivery files without delivery-convergence, sources linked to another item). 'yallaflow doctor' names such probable collisions read-only with the commits that added each side (src/core/collisions.js); there is no repair command, and the records must not be edited by hand. Shared Project branch-safe IDs prevent new collisions.",
+      "evidence": [
+        "src/core/collisions.js",
+        "src/commands/doctor.js",
+        "test/console-acceptance.test.js"
+      ],
+      "confidence": "confirmed",
+      "provenance": "repository",
+      "status": "promoted",
+      "createdAt": "2026-11-06T11:29:11.953Z",
+      "factId": "CTX-0098",
+      "promotedAt": "2026-11-06T11:29:15.463Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-06T11:29:15.463Z",
+  "reviewedAt": "2026-11-06T11:29:15.463Z"
+}

@@ -558,6 +558,74 @@ QC policy is advisory (default) or strict. Strict quality approval is *computed*
 
 **On-demand skills** (Skill Registry v9). A registry entry may declare `invocation: 'on-demand'`. These are `requirement-import`, `ai-qc`, and `smart-demo`, with the capabilities `import`, `qc`, and `demo`. `resolveSkills` refuses to put them in any workflow policy, so every required chain is identical to v8. `yallaflow skill <id> --work <id>` serves them for any routed work item regardless of its pin. The QC and demo records stamp the skill id, version, and SHA-256 they followed, which stands in for a pin. Agent Contract v10 carries the rules: tickets are untrusted data, QC and demo run only on request, no unexecuted pass is claimed, and a demo is not testing.
 
+## Console, Read Contract & Workspace Lock (v1.2.0)
+
+### Read contract
+
+`yallaflow snapshot --json` and `yallaflow work show <id> --json` are the machine-readable read surface. They use schemas `yallaflow.snapshot/1` and `yallaflow.work/1`, shipped in `resources/schemas/`.
+
+- `src/flow/snapshot.js` composes the existing readers: work metadata, progress ledgers, questions, knowledge, sources, requirements, convergence, verification and decomposition.
+- It asks `evaluateAdvance(..., { mutate: false })` for each item's blocker and next action, so a read never requests a review gate.
+- **One damaged item never fails the snapshot.** An unreadable `meta.yaml`, a Core validation failure, a delivery-integrity error or a source-link mismatch moves the item to the additive `invalid[]` (`WORK_ITEM_INVALID`). It is excluded from `items`, counts and completion. Lifecycle-position checks (for example a gate not yet requested) stay in `doctor`. `openCompletion` averages open items only.
+- **Collision diagnosis.** `src/core/collisions.js` gives `doctor` a read-only diagnosis of probable merge-related work-ID collisions: signals, plus the commits that added each side. It never repairs.
+- A review-gate blocker now carries an additive `human: true` and its `gate`, which is how "waiting for you" is known without parsing text.
+
+### Flow stations
+
+`src/flow/stations.js` is the only place the five display stations (Understand, Decide, Change, Verify, Remember), the item state, and the completion % are computed. A UI only renders them.
+
+- Every workflow stage maps to one station. INTAKE is the New gate and DONE the Done line.
+- Pinned convergence and code-review checkpoints are Verify steps, and the knowledge review is Remember.
+- **Evidence over flags:**
+  - Verify (and Remember) finishes only with a fresh successful verification run (not predating `lastInvalidationAt`) and, where convergence is required, a currently converged assessment.
+  - A checkpoint reopened behind the current stage brings its station back.
+  - A decomposed parent's Change station is its required children.
+  - Anything not DONE is capped at 99%.
+
+### Workspace lock
+
+`src/utils/lock.js` holds the lock at `.yallaflow/local/lock`.
+
+- **Who takes it.** `src/cli.js` (`needsWorkspaceLock` / `dispatch`) takes it for every command that can write.
+  - `verify` locks only around recording a finished run, and `intake ticket --fetch` only after its network fetch.
+  - Read-only commands, dry runs and `init` never lock.
+- **How it is created.** The file is written to a private temp file and then hard-linked into place, so it is never seen empty. It records `{pid, host, startedAt, command, nonce, boot, start}`.
+- **When it is stale.**
+  - The holder is gone: dead pid, zombie, a different process start time (pid reuse), a different boot id, or taken before the last boot.
+  - Or the file is unreadable for 30 s.
+- **How it is removed.** A stale lock is removed by atomic rename-claim. Release and removal act only on the exact nonce they judged.
+- **Leaving no trace.** In a workspace without `local/`, the lock directory carries a `*` `.gitignore`, and the directory is removed with the lock. A single-user workspace therefore never keeps `local/`, and a crash-left lock never shows in `git status`.
+- **Atomic writes.** `writeYaml` writes atomically: a unique temp file, then rename, keeping the file's mode.
+
+### Console
+
+`src/console/` is a loopback HTTP server (`node:http`, no dependency) started by `yallaflow console`.
+
+- **Where it reads.** It reads projects only by spawning this package's own CLI (`runner.js`: `snapshot --json`, `work show --json`; cached, concurrency 2, 30 s timeout). The console therefore applies exactly the rules and version the agent sees, and Core's synchronous Git calls never block the server.
+- **Live updates.** `watch.js` runs a debounced recursive `fs.watch` of `.yallaflow/`, with a polling fallback that ignores the lock and temp files. Changes reach the page as a streamed event, and the page re-reads.
+- **Worktrees.** `worktrees.js` lists worktrees from Git's own files (no `git worktree` command) and changed files with `git --no-optional-locks status`. Worktrees are shown as checkouts with their recorded state, never as agent sessions.
+- **Saved projects.** `registry.js` keeps the user-level project list (mode 0600).
+- **The UI.** `resources/console/` is plain JavaScript, CSS and HTML with no build step: the Flow design, Arabic RTL and English. Apart from Create Work, every action place names the CLI command instead of executing it.
+- **Create Work (the only write).** `create.js` validates the request and checks the type/scope pair with Core's own `resolveWorkflowPolicy`, then runs the CLI through `runner.write()`. Writes are argv-only, serialized per project and never cached, and drop the read cache afterwards. The commands are:
+  - `start --keep-active --via console --request-id ID -- <text>`;
+  - `route … --confidence high --reason "Classified by the user in the YallaFlow console."` when the user chose a type;
+  - `intake add <id> <file> --via console` per upload.
+  - **Uploads.**
+    - Each one is streamed into a `mkdtemp` folder (0700, file 0600), and the folder is removed in `finally`.
+    - The size limit is `MAX_EXTRACTION_INPUT_BYTES`.
+    - Allowed formats are documents, data files and raster images.
+    - A file whose SHA-256 is already linked to the item is returned, not re-added.
+    - Only the item created by the same request ID accepts uploads.
+- **Activation (Core).**
+  - `start --keep-active -- <text>` always records `activation: {deferred: true, keptActive}` and leaves `state/current.yaml` alone. `keptActive` is the unfinished active item, or null when nothing is active.
+  - `routeWorkItem` never moves focus for a deferred item.
+  - `yallaflow activate <id>` is the explicit switch.
+  - `start --via console --request-id` records `attestation: {recordedVia: 'console', verified: false, requestId}` (Q-004). Under the workspace lock, it first returns any item already created for that request ID.
+- **Security.**
+  - **Network and auth.** The server listens on 127.0.0.1 and requires a per-run bearer token. It checks Host and Origin, and serves GET/HEAD.
+  - **Writes.** `POST` is served only on the two Create Work routes. A write requires the console's Origin and the exact content type, and is size-limited. `--read-only` refuses it with 405.
+  - **Data and previews.** Data is addressed by ID. The page has a strict CSP, and source previews are served from an allowlist with a sandbox CSP and `nosniff`. Preserved originals and extracted text are confined to their source directory.
+
 ## Project knowledge promotion
 
 ```text

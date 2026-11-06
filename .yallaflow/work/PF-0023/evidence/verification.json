@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/repro-pipe.sh",
+      "executionMode": "argv",
+      "executable": "bash",
+      "args": [
+        "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/repro-pipe.sh"
+      ],
+      "displayCommand": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/repro-pipe.sh",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-28T14:10:39.408Z",
+      "finishedAt": "2026-10-28T14:10:40.197Z",
+      "verifiedAt": "2026-10-28T14:10:40.197Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "python3 -I /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/bench-summary.py /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/bench.json",
+      "executionMode": "argv",
+      "executable": "python3",
+      "args": [
+        "-I",
+        "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/bench-summary.py",
+        "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/bench.json"
+      ],
+      "displayCommand": "python3 -I /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/bench-summary.py /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/bench.json",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-28T14:10:40.350Z",
+      "finishedAt": "2026-10-28T14:10:40.373Z",
+      "verifiedAt": "2026-10-28T14:10:40.373Z",
+      "log": "V-002-verification.log"
+    },
+    {
+      "id": "V-003",
+      "command": "python3 -I /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/analyze.py /home/engamer/.claude/projects/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0.jsonl --json /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/session.json 2>/dev/null > /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/session-summary.txt && python3 -I /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/window.py /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/sekaya.json 2026-10-28T08:10:00Z 2026-10-28T10:03:00Z > /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/sekaya-summary.txt && head -3 /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/session-summary.txt && grep -E 'yf-workflow|yf-verify:test-suite' /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/session-summary.txt | head -4 && cat /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/sekaya-summary.txt | head -3",
+      "executionMode": "shell",
+      "executable": "python3 -I /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/analyze.py /home/engamer/.claude/projects/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0.jsonl --json /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/session.json 2>/dev/null > /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/session-summary.txt && python3 -I /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/window.py /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/sekaya.json 2026-10-28T08:10:00Z 2026-10-28T10:03:00Z > /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/sekaya-summary.txt && head -3 /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/session-summary.txt && grep -E 'yf-workflow|yf-verify:test-suite' /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/session-summary.txt | head -4 && cat /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/sekaya-summary.txt | head -3",
+      "args": [],
+      "displayCommand": "python3 -I /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/analyze.py /home/engamer/.claude/projects/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0.jsonl --json /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/session.json 2>/dev/null > /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/session-summary.txt && python3 -I /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/window.py /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/sekaya.json 2026-10-28T08:10:00Z 2026-10-28T10:03:00Z > /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/sekaya-summary.txt && head -3 /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/session-summary.txt && grep -E 'yf-workflow|yf-verify:test-suite' /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/session-summary.txt | head -4 && cat /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/sekaya-summary.txt | head -3",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-28T14:10:51.562Z",
+      "finishedAt": "2026-10-28T14:10:51.730Z",
+      "verifiedAt": "2026-10-28T14:10:51.730Z",
+      "log": "V-003-verification.log"
+    },
+    {
+      "id": "V-004",
+      "command": "python3 -I -c \"\nimport json,collections\nrows=[json.loads(l) for l in open('/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/probe.jsonl')]\nassert len(rows)>0\nprint('sample: test/work-routing, test/pilot-hardening, test/context-schema (35 tests, 47.2 s wall)')\nprint('CLI child processes:', len(rows), '| sum child wall s:', round(sum(r['ms'] for r in rows)/1000,1), '| median child ms:', sorted(r['ms'] for r in rows)[len(rows)//2])\nprint('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_common(8)))\"",
+      "executionMode": "argv",
+      "executable": "python3",
+      "args": [
+        "-I",
+        "-c",
+        "\nimport json,collections\nrows=[json.loads(l) for l in open('/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/probe.jsonl')]\nassert len(rows)>0\nprint('sample: test/work-routing, test/pilot-hardening, test/context-schema (35 tests, 47.2 s wall)')\nprint('CLI child processes:', len(rows), '| sum child wall s:', round(sum(r['ms'] for r in rows)/1000,1), '| median child ms:', sorted(r['ms'] for r in rows)[len(rows)//2])\nprint('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_common(8)))"
+      ],
+      "displayCommand": "python3 -I -c \"\nimport json,collections\nrows=[json.loads(l) for l in open('/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/probe.jsonl')]\nassert len(rows)>0\nprint('sample: test/work-routing, test/pilot-hardening, test/context-schema (35 tests, 47.2 s wall)')\nprint('CLI child processes:', len(rows), '| sum child wall s:', round(sum(r['ms'] for r in rows)/1000,1), '| median child ms:', sorted(r['ms'] for r in rows)[len(rows)//2])\nprint('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_common(8)))\"",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-10-28T14:10:51.881Z",
+      "finishedAt": "2026-10-28T14:10:51.904Z",
+      "verifiedAt": "2026-10-28T14:10:51.904Z",
+      "log": "V-004-verification.log"
+    }
+  ]
+}

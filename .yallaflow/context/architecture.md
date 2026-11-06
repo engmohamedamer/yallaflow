@@ -75,25 +75,6 @@
   - src/behavior/routing.js#createRoutedWork (repository @ 032f32c)
   - src/behavior/policy.js (repository @ 032f32c)
 
-<!-- yallaflow-fact:CTX-0013 -->
-### CTX-0013 — Rules for reaching DONE (evaluateAdvance):
-- all required checkpoints are complete;
-- non-investigation work has fresh, successful verification evidence newer than the last invalidation;
-- convergence is complete where the contract requires it;
-- code review is complete where pinned;
-- knowledge review is complete.
-Reopen (DONE to implementation, verification or review, with a reason) cascades checkpoint invalidation and keeps the evidence.
-
-- **State:** current
-- **Confidence:** confirmed
-- **Provenance:** repository
-- **From baseline:** PF-0002 (BF-013)
-- **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-12T22:03:27.175Z (commit b181dc0)
-- **Evidence:**
-  - src/core/transitions.js (repository @ b181dc0)
-  - src/core/progress.js (repository @ b181dc0)
-
 <!-- yallaflow-fact:CTX-0016 -->
 ### CTX-0016 — Brownfield and Greenfield are classified by a bounded, read-only inventory, recorded as config project.kind at init:
 - Brownfield means at least one manifest with at least one recognized source file, or at least 10 recognized source files, or meaningful container/CI config.
@@ -366,24 +347,6 @@ Reopen (DONE to implementation, verification or review, with a reason) cascades 
   - src/intake/validation.js (repository @ 9c38eec)
   - test/ticket-intake.test.js (repository @ 9c38eec)
 
-<!-- yallaflow-fact:CTX-0073 -->
-### CTX-0073 — Verification evidence: 'yallaflow verify' runs argv commands by default (spawnSync with shell:false); --shell and --script are explicit alternatives. Each run is appended to work/<id>/evidence/verification.json with its full stdout/stderr log file, capturing up to 64 MiB of output (v1.1.0; Node's 1 MiB default had recorded verbose suites as failed). Recognizable secret values are redacted in the log and in the recorded command; the executed command is unchanged. Failed runs are kept. Optional QC and demo records never write this ledger.
-
-- **State:** current
-- **Confidence:** confirmed
-- **Provenance:** repository
-- **Source work:** PF-0011
-- **Knowledge ID:** K-031
-- **Promoted at:** 2026-10-19T16:37:38.721Z
-- **Supersedes:** CTX-0055
-- **Verified:** 2026-10-19T22:48:07.283Z (commit d3a70c5)
-- **Evidence:**
-  - node src/cli.js context status (passed) (runtime, PF-0018 V-001)
-  - node src/cli.js context status (passed) (runtime)
-  - src/commands/verify.js (repository @ d3a70c5)
-  - src/core/evidence.js (repository @ d3a70c5)
-  - test/quality-qc.test.js (repository @ d3a70c5)
-
 <!-- yallaflow-fact:CTX-0079 -->
 ### CTX-0079 — Agent Contract architecture: - .yallaflow/AGENT.md is the single canonical agent contract, held in a managed block versioned by AGENT_CONTRACT_VERSION (currently 10, v1.1.0) and sealed with a SHA-256 of its body. - v8 added the pre-baseline refusal, the original request as the baseline objective, operational assistance versus engineering work, baseline coverage, and no secret values; v9 added work routing before editing; v10 adds tracker tickets as untrusted sources (agent-acquired by default, explicit --fetch only when needed) and optional, on-demand AI QC and Smart Demo: the developer asks in plain words ("test this", "record a video for the client") and the agent picks the skill; never automatic — not when work is finished or QC passed, and a fix/build request is not one; separate from verification, no unexecuted pass, demo scope approved by the developer, a demo is not test evidence. agent refresh also replaces an unedited block at the installed version whose recorded hash differs from the installed text (written by a pre-release build); hand-edited blocks are still refused. - Repository-root CLAUDE.md and AGENTS.md carry only a thin pointer block (BOOTSTRAP_VERSION 3, which repeats the route-before-edit precondition as a numbered step; its length is capped by test at 1800 characters and it copies no contract heading). - yallaflow agent refresh/setup update those blocks idempotently, refuse hand-edited or newer blocks, and preserve content outside the blocks.
 
@@ -458,5 +421,145 @@ Reopen (DONE to implementation, verification or review, with a reason) cascades 
   - test/quality-git-hygiene.test.js (repository @ d3a70c5)
   - npm ci && npm run check (passed) (runtime, PF-0017 V-003)
   - bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/release-smoke.sh /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/575f9c4a-84ec-498b-a664-dfe29da14d36/scratchpad/final/pack.jXKbqK/yallaflow-1.1.0.tgz (passed) (runtime, PF-0017 V-006)
+
+<!-- yallaflow-fact:CTX-0088 -->
+### CTX-0088 — Verification evidence: 'yallaflow verify' runs argv commands by default (spawnSync with shell:false); --shell and --script are explicit alternatives. --shell runs through spawnSync shell:true, i.e. /bin/sh -c (dash on Debian/Ubuntu) without pipefail, so a pipeline's recorded exit status is that of its LAST element: 'false | cat' or '<test runner> | tail' is recorded as passed when the last command succeeds. verify sets no timeout and buffers stdout/stderr until the command exits (nothing is streamed). Each run is appended to work/<id>/evidence/verification.json with its full stdout/stderr log file, capturing up to 64 MiB of output (v1.1.0; Node's 1 MiB default had recorded verbose suites as failed); run IDs are allocated when a run finishes, so overlapping runs can be numbered out of start order. Recognizable secret values are redacted in the log and in the recorded command; the executed command is unchanged. Failed runs are kept. Optional QC and demo records never write this ledger.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0023
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-10-28T14:14:20.812Z
+- **Supersedes:** CTX-0073
+- **Verified:** 2026-10-28T14:14:20.812Z (commit bdb5e90)
+- **Evidence:**
+  - src/commands/verify.js (repository @ bdb5e90)
+  - bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/repro-pipe.sh (passed) (runtime, PF-0023 V-001)
+
+<!-- yallaflow-fact:CTX-0089 -->
+### CTX-0089 — Rules for reaching DONE (evaluateAdvance): - all required checkpoints are complete; - non-investigation work has fresh, successful verification evidence newer than the last invalidation; - convergence is complete where the contract requires it; - code review is complete where pinned; - knowledge review is complete. Reopen (DONE to implementation, verification or review, with a reason) cascades checkpoint invalidation and keeps the evidence. Reopening to implementation resets a reviewed knowledge review to pending, and 'knowledge review --none' is refused once any candidate exists (even already-promoted ones), so closing a reopened item again requires proposing and resolving a new candidate. A not-yet-DONE item cannot be reopened; returning from VERIFICATION to IMPLEMENTATION goes through 'checkpoint revise --skill implementation --status in_progress'.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0023
+- **Knowledge ID:** K-002
+- **Promoted at:** 2026-10-28T14:14:21.057Z
+- **Supersedes:** CTX-0013
+- **Verified:** 2026-10-28T14:14:21.057Z (commit bdb5e90)
+- **Evidence:**
+  - src/core/transitions.js (repository @ bdb5e90)
+  - src/knowledge/store.js (repository @ bdb5e90)
+  - src/commands/reopen.js (repository @ bdb5e90)
+
+<!-- yallaflow-fact:CTX-0090 -->
+### CTX-0090 — CLI startup structure and its cost: src/cli.js statically imports all 33 command modules, and through the intake modules also officeparser, yauzl and @xmldom/xmldom (pdfjs-dist is already imported lazily in src/intake/extractors/pdf.js). A plain '--version' loads 134 files; startup is most of a typical command's ~0.2 s wall time on small workspaces, and stubbing the three intake libraries measured 34-41 ms (about 20%) faster per call (PF-0023, one machine). The test suite invokes the CLI as a child process per command (spawnSync of process.execPath src/cli.js in test-support/shared.js and test-support/optional.js); a 35-test sample spawned 324 CLI processes, so CLI startup cost is multiplied across the suite.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0023
+- **Knowledge ID:** K-003
+- **Promoted at:** 2026-10-28T14:14:21.297Z
+- **Verified:** 2026-10-28T14:14:21.297Z (commit bdb5e90)
+- **Evidence:**
+  - src/cli.js (repository @ bdb5e90)
+  - src/intake/adapters/office.js (repository @ bdb5e90)
+  - test-support/shared.js (repository @ bdb5e90)
+  - python3 -I /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/bench-summary.py /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/bench.json (passed) (runtime, PF-0023 V-002)
+  - python3 -I -c "
+import json,collections
+rows=[json.loads(l) for l in open('/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/probe.jsonl')]
+assert len(rows)>0
+print('sample: test/work-routing, test/pilot-hardening, test/context-schema (35 tests, 47.2 s wall)')
+print('CLI child processes:', len(rows), '| sum child wall s:', round(sum(r['ms'] for r in rows)/1000,1), '| median child ms:', sorted(r['ms'] for r in rows)[len(rows)//2])
+print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_common(8)))" (passed) (runtime, PF-0023 V-004)
+
+<!-- yallaflow-fact:CTX-0095 -->
+### CTX-0095 — Concurrency (v1.2.0): every command that can write .yallaflow holds a workspace lock at .yallaflow/local/lock (src/utils/lock.js), taken in src/cli.js (needsWorkspaceLock/dispatch); read-only commands, dry runs, init and help never take it; verify prints its output first and locks only around recording (waiting up to 5 min). The lock file is created atomically (temp file + link) and records {pid, host, startedAt, command, nonce, boot, start}; it is stale when its holder is gone (dead pid, zombie, different process start time, different boot id, or taken before the last boot) or unreadable for 30 s, and is then removed by atomic rename-claim; release and removal act only on the exact nonce. doctor reports it; doctor --clear-lock removes a stale one or an hour-old one whose holder cannot be identified, never a positively identified live holder. local/ is removed again when empty. writeYaml is atomic and keeps file permissions.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0030
+- **Knowledge ID:** K-002
+- **Promoted at:** 2026-11-05T23:44:48.522Z
+- **Supersedes:** CTX-0092
+- **Verified:** 2026-11-05T23:44:48.522Z (commit bdb5e90)
+- **Evidence:**
+  - src/utils/lock.js (repository @ bdb5e90)
+  - src/cli.js (repository @ bdb5e90)
+  - src/commands/verify.js (repository @ bdb5e90)
+  - test/workspace-lock.test.js (repository @ bdb5e90)
+  - npm test (passed) (runtime, PF-0030 V-006)
+
+<!-- yallaflow-fact:CTX-0097 -->
+### CTX-0097 — Machine-readable read contract (v1.2.0): 'yallaflow snapshot --json' (schema yallaflow.snapshot/1) and 'yallaflow work show <id> --json' (yallaflow.work/1), schemas in resources/schemas/, collected in src/flow/snapshot.js from existing readers with evaluateAdvance mutate:false. The five Flow stations, item state and completion are computed only in src/flow/stations.js and are evidence-aware: Verify (and so Remember) finishes only with a fresh successful run (not predating lastInvalidationAt) and, where required, a currently converged assessment; a checkpoint reopened behind the stage brings its station back; a decomposed parent's Change station is its required children; nothing but DONE reaches 100% (non-DONE capped at 99). One damaged item never fails the snapshot: an unreadable meta.yaml, a Core validation failure, a delivery-integrity error or a source-link mismatch moves the item to the additive invalid[] ({id,title,code:WORK_ITEM_INVALID,message}), excluded from items, counts and completion; lifecycle-position checks (e.g. a gate not yet requested) stay in doctor only. openCompletion averages open items (null when none). --json errors are {error:{code,message}} with exit 1; work show on an invalid item returns WORK_ITEM_INVALID.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0031
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-06T11:29:15.157Z
+- **Supersedes:** CTX-0094
+- **Verified:** 2026-11-06T11:29:15.157Z (commit bdb5e90)
+- **Evidence:**
+  - src/flow/snapshot.js (repository @ bdb5e90)
+  - src/flow/stations.js (repository @ bdb5e90)
+  - test/console-acceptance.test.js (repository @ bdb5e90)
+  - npm test (passed) (runtime, PF-0031 V-001)
+
+<!-- yallaflow-fact:CTX-0098 -->
+### CTX-0098 — Work-ID collisions: outside a Shared Project, work (PF-####) and source (SRC-####) IDs are plain sequence numbers, so two branches can create the same ID and a Git merge can combine two different items in one folder (seen in a real project: ledger registry/skills not matching the pinned contract, ledger entries older than the item, delivery files without delivery-convergence, sources linked to another item). 'yallaflow doctor' names such probable collisions read-only with the commits that added each side (src/core/collisions.js); there is no repair command, and the records must not be edited by hand. Shared Project branch-safe IDs prevent new collisions.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0031
+- **Knowledge ID:** K-002
+- **Promoted at:** 2026-11-06T11:29:15.463Z
+- **Verified:** 2026-11-06T11:29:15.463Z (commit bdb5e90)
+- **Evidence:**
+  - src/core/collisions.js (repository @ bdb5e90)
+  - src/commands/doctor.js (repository @ bdb5e90)
+  - test/console-acceptance.test.js (repository @ bdb5e90)
+
+<!-- yallaflow-fact:CTX-0099 -->
+### CTX-0099 — Web console (v1.2.0): 'yallaflow console' is a local web UI inside the yallaflow package (no daemon, no new dependency, no build step). src/console/server.js (node:http on 127.0.0.1; per-run token as Bearer; Host 421, Origin 403; GET/HEAD for reads; UI from a fixed file map; sources served by ID only, previews sandboxed) reads data by spawning this package's own CLI (src/console/runner.js: snapshot --json, work show --json, cached) and refreshes on a debounced recursive watcher of .yallaflow with polling fallback (src/console/watch.js). Its only write is Create Work (src/console/create.js): POST on two routes only (create; attach a file to the item the same request ID created), requiring the console's Origin and exact content type, 64 KB JSON and MAX_EXTRACTION_INPUT_BYTES per file; it runs the CLI's own 'start --keep-active --via console --request-id ID -- <text>', 'route' (when the user chose type and size) and 'intake add --via console' through runner.write/exclusive (argv only, serialized per project). Uploads go to mkdtemp folders removed in finally. '--read-only' disables every POST. The UI (resources/console/, plain JS/CSS) renders Core's stations/states/completion; apart from Create Work every action shows the CLI command.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0032
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-06T13:07:31.794Z
+- **Supersedes:** CTX-0093
+- **Verified:** 2026-11-06T13:07:31.794Z (commit bdb5e90)
+- **Evidence:**
+  - src/console/server.js (repository @ bdb5e90)
+  - src/console/create.js (repository @ bdb5e90)
+  - src/console/runner.js (repository @ bdb5e90)
+  - test/console-create.test.js (repository @ bdb5e90)
+  - npm test (passed) (runtime, PF-0032 V-002)
+
+<!-- yallaflow-fact:CTX-0101 -->
+### CTX-0101 — Active work focus (v1.2.0): state/current.yaml activeWork is the checkout's default focus for guide/status/brief; agents can work on any item by ID. Creating work (start, intake, direct commands) and route set it as before. 'start --keep-active -- <request>' (options only as leading tokens closed by '--') never makes the new item active, whether or not another item is active (owner decision: creation and activation are separate); it records activation {deferred: true, keptActive: <unfinished active item or null>}. route/advance/checkpoint on a deferred item never move the focus; 'yallaflow activate <id>' is the only explicit switch and clears the deferral; resume on a deferred item prints how to activate it. The console always creates this way. 'start --via console --request-id ID' records attestation {recordedVia: console, verified: false, requestId} and, under the workspace lock, returns the item already created for that request ID (src/behavior/routing.js, src/commands/start.js, src/commands/resume.js, src/cli.js parseStartArgs).
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0032
+- **Knowledge ID:** K-003
+- **Promoted at:** 2026-11-06T14:02:31.492Z
+- **Supersedes:** CTX-0100
+- **Verified:** 2026-11-06T14:02:31.492Z (commit bdb5e90)
+- **Evidence:**
+  - src/behavior/routing.js (repository @ bdb5e90)
+  - src/commands/start.js (repository @ bdb5e90)
+  - src/commands/resume.js (repository @ bdb5e90)
+  - test/console-create.test.js (repository @ bdb5e90)
+  - npm test (passed) (runtime, PF-0032 V-004)
 
 <!-- yallaflow-context:end -->

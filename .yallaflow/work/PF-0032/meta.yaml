@@ -1,0 +1,101 @@
+{
+  "id": "PF-0032",
+  "type": "feature",
+  "scope": "architectural",
+  "routingStatus": "routed",
+  "rawRequest": "Console Create Work: one authenticated create-work action through Core intake/routing, with a backward-compatible no-activate Core option",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-06T11:09:06.852Z",
+  "updatedAt": "2026-11-06T14:02:31.764Z",
+  "title": "Console Create Work: one authenticated create-work action through Core intake/routing, with a backward-compatible no-activate Core option",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope architectural`.",
+  "routedAt": "2026-11-06T11:09:06.865Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "brainstorm",
+    "specify",
+    "plan",
+    "implement",
+    "verify",
+    "converge",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "design-exploration",
+      "specification",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "delivery-convergence",
+      "code-review"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0017",
+      "type": "file",
+      "name": "owner-acceptance-findings-2026-11-06.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-06T11:09:22.992Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0018",
+      "type": "file",
+      "name": "owner-approval-2026-11-06.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-06T11:09:22.995Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0019",
+      "type": "file",
+      "name": "owner-focus-decision-2026-11-06.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-06T13:28:09.334Z",
+      "workStatusAtLink": "IMPLEMENTATION",
+      "relationship": "work-input"
+    }
+  ],
+  "lastInvalidationAt": "2026-11-06T13:50:55.032Z",
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-06T13:07:32.337Z",
+      "verificationRunIds": [
+        "V-002"
+      ]
+    },
+    {
+      "completedAt": "2026-11-06T14:02:31.764Z",
+      "verificationRunIds": [
+        "V-004"
+      ]
+    }
+  ],
+  "lifecycleHistory": [
+    {
+      "action": "reopen",
+      "fromStage": "DONE",
+      "toStage": "IMPLEMENTATION",
+      "reason": "Owner decision (2026-11-06): console-created items must never become the active work item automatically, even when nothing is active; also report attachment content availability accurately (including original-only files).",
+      "changedAt": "2026-11-06T13:28:09.129Z"
+    }
+  ]
+}

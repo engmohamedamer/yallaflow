@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "status": "executing",
+  "requirementsUniverse": [],
+  "acceptanceCriteriaUniverse": [],
+  "children": [
+    {
+      "key": "read-contract",
+      "title": "Core read contract: Flow stations and completion %, snapshot and work show --json",
+      "type": "feature",
+      "scope": "bounded",
+      "required": true,
+      "requirements": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003"
+      ],
+      "acceptanceCriteria": [
+        "AC-001",
+        "AC-002",
+        "AC-003"
+      ],
+      "dependsOn": [],
+      "workId": "PF-0025"
+    },
+    {
+      "key": "write-lock",
+      "title": "Workspace write lock, atomic writes and exclusive ID allocation",
+      "type": "feature",
+      "scope": "bounded",
+      "required": true,
+      "requirements": [
+        "REQ-004"
+      ],
+      "acceptanceCriteria": [
+        "AC-004"
+      ],
+      "dependsOn": [],
+      "workId": "PF-0026"
+    },
+    {
+      "key": "console-core",
+      "title": "yallaflow console: local read-only server and Flow, Work and Item views with live updates and previews",
+      "type": "feature",
+      "scope": "bounded",
+      "required": true,
+      "requirements": [
+        "REQ-005",
+        "REQ-006",
+        "REQ-007",
+        "REQ-008"
+      ],
+      "acceptanceCriteria": [
+        "AC-005",
+        "AC-006",
+        "AC-007",
+        "AC-008",
+        "AC-012"
+      ],
+      "dependsOn": [
+        "read-contract"
+      ],
+      "workId": "PF-0027"
+    },
+    {
+      "key": "console-extras",
+      "title": "Console team view, insights, projects, digest and notifications",
+      "type": "feature",
+      "scope": "bounded",
+      "required": true,
+      "requirements": [
+        "REQ-009"
+      ],
+      "acceptanceCriteria": [
+        "AC-009",
+        "AC-010"
+      ],
+      "dependsOn": [
+        "console-core"
+      ],
+      "workId": "PF-0028"
+    },
+    {
+      "key": "release-prep",
+      "title": "Console docs, CHANGELOG and 1.2.0 release preparation (no publish)",
+      "type": "change",
+      "scope": "bounded",
+      "required": true,
+      "requirements": [
+        "REQ-010"
+      ],
+      "acceptanceCriteria": [
+        "AC-011"
+      ],
+      "dependsOn": [
+        "read-contract",
+        "write-lock",
+        "console-core",
+        "console-extras"
+      ],
+      "workId": "PF-0029"
+    }
+  ],
+  "history": [
+    {
+      "action": "proposed",
+      "at": "2026-11-05T22:12:08.941Z"
+    },
+    {
+      "action": "validated",
+      "at": "2026-11-05T22:12:09.103Z"
+    },
+    {
+      "action": "executed",
+      "at": "2026-11-05T22:12:16.621Z",
+      "childrenCreated": true
+    }
+  ],
+  "proposedAt": "2026-11-05T22:12:08.941Z",
+  "updatedAt": "2026-11-05T22:12:16.621Z",
+  "validatedAt": "2026-11-05T22:12:09.103Z",
+  "executedAt": "2026-11-05T22:12:16.621Z"
+}

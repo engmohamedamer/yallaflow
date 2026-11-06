@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-06T14:40:24.895Z",
+      "completedAt": "2026-11-06T14:40:24.895Z",
+      "summary": "Owner report: any click toggles light/dark and collapses panels. The theme button is <button data-theme>; render() also sets document.documentElement.dataset.theme (<html data-theme=...>) once a theme is chosen; the delegated click handler uses e.target.closest('[...],[data-theme],...'), so every click inside the page resolves to <html> and toggles the theme, and the re-render closes open <details>.",
+      "evidence": [
+        "resources/console/app.js"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-06T14:40:45.629Z",
+      "completedAt": "2026-11-06T14:40:45.629Z",
+      "summary": "Reproduced in Chromium: after pressing the theme button, clicking a plain heading flips <html data-theme> dark->light->dark. Root cause: the delegated click handler's closest('[data-theme]') matches the <html data-theme> element that render() sets, so any click is treated as the theme button and the re-render closes open details. Fix: give the button its own attribute (data-theme-toggle) and match only that.",
+      "evidence": [
+        "resources/console/app.js",
+        "runtime:playwright-repro-theme-flips-on-heading-click"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-06T14:42:06.573Z",
+      "completedAt": "2026-11-06T14:42:06.573Z",
+      "summary": "The theme button now carries data-theme-toggle and the delegated click handler matches only that, so <html data-theme> no longer turns every click into a theme toggle (resources/console/app.js). Regression test in test/console-acceptance.test.js fails on the old selector list (checked against a reconstruction of the old code).",
+      "evidence": [
+        "resources/console/app.js",
+        "test/console-acceptance.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T14:47:21.769Z",
+      "completedAt": "2026-11-06T14:47:21.769Z",
+      "summary": "Full suite 836/836 (V-001). Browser check in Chromium, Firefox and WebKit: after toggling to dark, clicks on a heading and a station keep dark, the For developers panel stays open after a click elsewhere, the button toggles back to light; 0 console errors.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-06T14:47:21.769Z"
+}

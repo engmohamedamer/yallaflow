@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node -e \"const fs=require('fs');const need=['CURRENT_STATE','PROTOCOL_RESEARCH','ALTERNATIVE_ARCHITECTURES','FEASIBILITY_RESULTS','SECURITY_AND_AUTH','RECOMMENDED_ARCHITECTURE','UX_FLOW','DECISION_SUMMARY'];for(const n of need){const t=fs.readFileSync('research/agent-interaction/'+n+'.md','utf8');if(t.length<1500)throw new Error(n+' too short')}console.log('8 deliverables present')\"",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "-e",
+        "const fs=require('fs');const need=['CURRENT_STATE','PROTOCOL_RESEARCH','ALTERNATIVE_ARCHITECTURES','FEASIBILITY_RESULTS','SECURITY_AND_AUTH','RECOMMENDED_ARCHITECTURE','UX_FLOW','DECISION_SUMMARY'];for(const n of need){const t=fs.readFileSync('research/agent-interaction/'+n+'.md','utf8');if(t.length<1500)throw new Error(n+' too short')}console.log('8 deliverables present')"
+      ],
+      "displayCommand": "node -e \"const fs=require('fs');const need=['CURRENT_STATE','PROTOCOL_RESEARCH','ALTERNATIVE_ARCHITECTURES','FEASIBILITY_RESULTS','SECURITY_AND_AUTH','RECOMMENDED_ARCHITECTURE','UX_FLOW','DECISION_SUMMARY'];for(const n of need){const t=fs.readFileSync('research/agent-interaction/'+n+'.md','utf8');if(t.length<1500)throw new Error(n+' too short')}console.log('8 deliverables present')\"",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-06T15:08:09.198Z",
+      "finishedAt": "2026-11-06T15:08:09.226Z",
+      "verifiedAt": "2026-11-06T15:08:09.226Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

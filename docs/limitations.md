@@ -1,11 +1,33 @@
-# Current Limitations (1.1)
+# Current Limitations (1.2)
 
 Known gaps and deliberate boundaries. Planned work is tracked in [`roadmap.md`](roadmap.md).
 
 ## Scope and distribution
 
 - **Node.js CLI.** Requires Node.js ≥ 20.16.0 on the developer's machine and in CI (not in your application). Install from npm (`npm install -g yallaflow`).
-- **Local-first; teams share through Git.** A single-user workspace is the default. A Shared Project ([`shared-projects.md`](shared-projects.md)) shares project memory through ordinary Git; there is no server, locking, real-time visibility, accounts, or permissions.
+- **Local-first; teams share through Git.**
+  - A single-user workspace is the default.
+  - A Shared Project ([`shared-projects.md`](shared-projects.md)) shares project memory through ordinary Git.
+  - There is no hosted server, no accounts, and no permissions.
+  - From 1.2.0 a workspace lock serializes YallaFlow's own writes within one checkout. It does not coordinate separate clones or worktrees; those meet through Git.
+  - The local console ([`console.md`](console.md)) is a view on your own machine, not a shared service. Its one action is Create Work.
+- **The console's only action is Create Work.**
+  - **No other actions.** It can't approve, answer, change work, or run commands. Those stay in the CLI and your agent, and the console names the command instead.
+  - **Identity is not verified.** Work created from the console records "local user, identity not verified". Anyone holding the per-run link on your machine can create work while the console runs. `--read-only` turns creation off.
+  - **One file per request, up to 50 MB.** The console can't attach archives, code files or SVG; use `yallaflow intake add` for those.
+  - **No agent sessions.** It never starts, stops, or observes agents. A worktree is shown as a Git checkout with its recorded YallaFlow state, never as a live agent session.
+  - **Insights are partial.** They cover only recorded data (creation and completion times, verification runs). YallaFlow does not record time per station or waiting time.
+  - **Browser coverage.** It is tested in Chromium, Firefox and WebKit through Playwright on Linux. It has not been tested in desktop Safari, on Windows or macOS hosts, or with screen readers.
+- **Workspace lock: known edges.**
+  - A lock left by a crash is removed by the next command once its holder is known to be gone: the pid is dead, a zombie, or reused; or the machine rebooted.
+  - A lock whose holder cannot be identified (no process start time, which happens outside Linux) can be removed with `doctor --clear-lock` once it is an hour old.
+  - An extremely narrow takeover window remains when three or more processes race to remove the same stale lock at once. The per-acquisition nonce keeps a holder from deleting another's lock.
+  - Locks are not supported on network file systems shared between machines.
+- **Work-ID collisions across branches have no repair command yet.**
+  - **Why they happen.** Outside a Shared Project, work and source IDs are plain sequence numbers. Two branches can each create `PF-0091`, and a Git merge then combines two different items in one folder.
+  - **What 1.2.0 does.** It shows such an item as a record YallaFlow cannot validate, never counts it, and `doctor` names the probable collision and the commits behind it.
+  - **What it does not do.** It does not separate the two items. Keep the records as they are; a supported, audited repair is planned separately.
+  - **Prevention.** Branch-safe IDs (Shared Project mode) prevent new collisions.
 - **Platform coverage.** The regression suite runs in POSIX environments (developed and released on Linux); Windows has not been verified.
 - **Agent compliance is guidance.** YallaFlow governs through its Agent Contract and deterministic CLI gates; it cannot stop an agent or person from editing files directly (see [`security.md`](security.md#what-yallaflow-does-not-enforce)). First-party agent setup covers Claude Code and Codex; other agents can follow `.yallaflow/AGENT.md` when pointed to it.
 

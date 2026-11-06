@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-06T00:07:34.742Z",
+      "completedAt": "2026-11-06T00:07:34.742Z",
+      "summary": "Release inputs: docs/releasing.md checklist (check, doctor, audit, pack, packed-candidate smoke test, provider scan, diff --check, CHANGELOG, version bump; tag/publish only with approval), CHANGELOG [Unreleased], docs (cli.md, architecture.md, limitations.md says no locking, installation.md, upgrading-to-v1.1.0.md pattern). Remaining lock risks: intake ticket --fetch holds the lock for the whole network fetch (dispatcher lock); a lock left by a crash in a non-shared workspace shows in git status.",
+      "evidence": [
+        "docs/releasing.md",
+        "docs/limitations.md",
+        "src/commands/intake.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T00:07:35.010Z",
+      "completedAt": "2026-11-06T00:07:35.010Z",
+      "summary": "Owner 2026-11-06 Phase E scope: final review of all changed files; full user journey (open project, select, create requirement, track flow, inspect evidence, resume via CLI) with read-only parts identified; console on clean installs and existing workspaces with documented startup/upgrade; remaining lock risks (network fetch under lock, transient lock in git status); npm package contents, dependencies, compatibility, install and upgrade; docs, CHANGELOG, architecture and limitations matching the implementation; accessibility and cross-browser smoke tests with untested platforms documented; full suite and a release-readiness report. No unrelated features or redesign. Stop before commit, tag, push, GitHub Release or npm publish."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-06T00:07:40.889Z",
+      "completedAt": "2026-11-06T00:07:40.889Z",
+      "summary": "Plan: (1) independent final review of the changed files on an isolated copy, verified findings fixed; (2) lock risks: intake ticket --fetch fetches outside the lock and locks only to write (re-checking the target work); a lock created in a workspace without local/ writes local/.gitignore ('*') so a crash-left lock never shows in git status, removed with the lock; (3) version 1.2.0 in package.json and src/version.js only (domain versions unchanged unless proven otherwise); (4) docs: new docs/console.md and docs/upgrading-to-v1.2.0.md, updates to cli.md, architecture.md, limitations.md, installation.md, README, CHANGELOG [1.2.0]; (5) packed-candidate smoke test from an isolated prefix on a clean and an existing workspace; user-journey script; accessibility and cross-browser smoke tests; (6) full suite, release checklist, readiness report. No commit/tag/push/release/publish."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-06T00:29:55.120Z",
+      "completedAt": "2026-11-06T00:29:55.120Z",
+      "summary": "Docs (console, upgrade 1.2.0, cli, architecture, limitations, installation, releasing, README, CHANGELOG), version 1.2.0 (domain versions unchanged), lock risks (fetch outside lock, gitignored transient local/, 60 s wait), final-review fixes (planted gitdir, verify DONE race, dry-run scope, Windows start, console remove), journey fixes (evidence refs, token adoption, 401 handling), CSS pruning and WCAG AA contrast fixes, new tests.",
+      "evidence": [
+        "docs/console.md",
+        "CHANGELOG.md",
+        "src/console/worktrees.js",
+        "src/commands/verify.js",
+        "src/commands/intake.js",
+        "resources/console/app.css"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T00:36:44.762Z",
+      "completedAt": "2026-11-06T00:36:44.762Z",
+      "summary": "Fresh proof: syntax (V-001), text output of 14 read commands identical to v1.1.0 (V-002), schema-valid read-only contracts on this repository (V-003), 60 kill -9 crashes recover unaided (V-004), 20x16 parallel starts with 0 collisions (V-005), full suite 813/813 (V-006), release-candidate tarball installs into an isolated prefix and init/snapshot/doctor/console work (V-007). Also: upgrade from a real npm 1.1.0 workspace and back; cross-browser 36/36 (Chromium, Firefox, WebKit x 1440/390 x 6 pages, 0 errors); WCAG AA contrast clean in light and dark; npm audit = the documented file-type advisory only.",
+      "evidence": [
+        "verification:V-006",
+        "verification:V-007"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-06T00:36:44.762Z"
+}

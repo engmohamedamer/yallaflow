@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "npm run check:syntax",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check:syntax"
+      ],
+      "displayCommand": "npm run check:syntax",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-06T00:29:55.423Z",
+      "finishedAt": "2026-11-06T00:30:00.977Z",
+      "verifiedAt": "2026-11-06T00:30:00.977Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/text-parity.sh",
+      "executionMode": "argv",
+      "executable": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/text-parity.sh",
+      "args": [],
+      "displayCommand": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/text-parity.sh",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-06T00:30:01.124Z",
+      "finishedAt": "2026-11-06T00:30:08.164Z",
+      "verifiedAt": "2026-11-06T00:30:08.164Z",
+      "log": "V-002-verification.log"
+    },
+    {
+      "id": "V-003",
+      "command": "node /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/validate-repo.mjs",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/validate-repo.mjs"
+      ],
+      "displayCommand": "node /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/validate-repo.mjs",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-06T00:30:08.314Z",
+      "finishedAt": "2026-11-06T00:30:14.363Z",
+      "verifiedAt": "2026-11-06T00:30:14.363Z",
+      "log": "V-003-verification.log"
+    },
+    {
+      "id": "V-004",
+      "command": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/crash-test.sh",
+      "executionMode": "argv",
+      "executable": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/crash-test.sh",
+      "args": [],
+      "displayCommand": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/crash-test.sh",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-06T00:30:14.519Z",
+      "finishedAt": "2026-11-06T00:30:47.164Z",
+      "verifiedAt": "2026-11-06T00:30:47.164Z",
+      "log": "V-004-verification.log"
+    },
+    {
+      "id": "V-005",
+      "command": "node /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/race-demo.mjs /home/engamer/Amasi/YallaFlow/src/cli.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/race-demo.mjs",
+        "/home/engamer/Amasi/YallaFlow/src/cli.js"
+      ],
+      "displayCommand": "node /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/race-demo.mjs /home/engamer/Amasi/YallaFlow/src/cli.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-06T00:30:47.307Z",
+      "finishedAt": "2026-11-06T00:31:19.470Z",
+      "verifiedAt": "2026-11-06T00:31:19.470Z",
+      "log": "V-005-verification.log"
+    },
+    {
+      "id": "V-006",
+      "command": "npm test",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "test"
+      ],
+      "displayCommand": "npm test",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-06T00:31:19.616Z",
+      "finishedAt": "2026-11-06T00:36:07.905Z",
+      "verifiedAt": "2026-11-06T00:36:07.905Z",
+      "log": "V-006-verification.log"
+    },
+    {
+      "id": "V-007",
+      "command": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/rc-smoke.sh",
+      "executionMode": "argv",
+      "executable": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/rc-smoke.sh",
+      "args": [],
+      "displayCommand": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/rc-smoke.sh",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-06T00:36:26.406Z",
+      "finishedAt": "2026-11-06T00:36:35.964Z",
+      "verifiedAt": "2026-11-06T00:36:35.964Z",
+      "log": "V-007-verification.log"
+    }
+  ]
+}

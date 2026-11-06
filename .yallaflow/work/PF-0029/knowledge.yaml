@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Release preparation for the Console (v1.2.0): the user guide is docs/console.md and upgrade notes docs/upgrading-to-v1.2.0.md; docs/limitations.md records the console's read-only boundary, the lock's known edges and the browser coverage (Chromium, Firefox, WebKit via Playwright on Linux; not desktop Safari, Windows/macOS hosts or screen readers); the release checklist's network scan treats src/console/ as a loopback-only server, never a client.",
+      "evidence": [
+        "docs/console.md",
+        "docs/limitations.md",
+        "docs/releasing.md",
+        "verification:V-007"
+      ],
+      "confidence": "confirmed",
+      "provenance": "repository",
+      "status": "promoted",
+      "createdAt": "2026-11-06T00:36:54.391Z",
+      "factId": "CTX-0096",
+      "promotedAt": "2026-11-06T00:36:54.667Z",
+      "target": "context/conventions.md"
+    }
+  ],
+  "updatedAt": "2026-11-06T00:36:54.667Z",
+  "reviewedAt": "2026-11-06T00:36:54.667Z"
+}

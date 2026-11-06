@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Web console (v1.2.0): 'yallaflow console' is a read-only local web UI inside the yallaflow package (no daemon, no new dependency, no build step). src/console/server.js (node:http on 127.0.0.1; per-run token as Bearer; Host 421, Origin 403, GET/HEAD only 405; UI from a fixed file map; sources served by ID only, previews sandboxed) reads data by spawning this package's own CLI (src/console/runner.js: snapshot --json, work show --json, cached) and refreshes on a debounced recursive watcher of .yallaflow with polling fallback (src/console/watch.js), streaming change events. The UI is plain JS/CSS in resources/console/ (Flow v4 design); it derives no rules, only renders Core's stations/states/completion, and every action shows the exact CLI command instead of executing it.",
+      "evidence": [
+        "src/console/server.js",
+        "src/console/runner.js",
+        "src/commands/console.js",
+        "resources/console/app.js",
+        "verification:V-005"
+      ],
+      "confidence": "confirmed",
+      "provenance": "repository",
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0008"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-05T23:02:27.630Z",
+      "factId": "CTX-0093",
+      "promotedAt": "2026-11-05T23:02:27.912Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-05T23:02:27.912Z",
+  "reviewedAt": "2026-11-05T23:02:27.912Z"
+}

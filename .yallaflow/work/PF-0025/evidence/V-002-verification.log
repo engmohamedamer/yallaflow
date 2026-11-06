@@ -1,0 +1,94 @@
+TAP version 13
+# Subtest: every workflow stage except INTAKE and DONE maps to exactly one station
+ok 1 - every workflow stage except INTAKE and DONE maps to exactly one station
+  ---
+  duration_ms: 1.714483
+  type: 'test'
+  ...
+# Subtest: a bug at ROOT_CAUSE: Understand done, Decide current with half of the step in progress
+ok 2 - a bug at ROOT_CAUSE: Understand done, Decide current with half of the step in progress
+  ---
+  duration_ms: 1.162088
+  type: 'test'
+  ...
+# Subtest: an investigation never changes code: Change is not applicable and counts in full
+ok 3 - an investigation never changes code: Change is not applicable and counts in full
+  ---
+  duration_ms: 0.201786
+  type: 'test'
+  ...
+# Subtest: the final stage counts as finished once verification is complete; Remember becomes current
+ok 4 - the final stage counts as finished once verification is complete; Remember becomes current
+  ---
+  duration_ms: 0.186586
+  type: 'test'
+  ...
+# Subtest: pinned convergence and code-review are Verify steps
+ok 5 - pinned convergence and code-review are Verify steps
+  ---
+  duration_ms: 0.234875
+  type: 'test'
+  ...
+# Subtest: DONE is 100% and every station is done; a new item is 0% with no current station
+ok 6 - DONE is 100% and every station is done; a new item is 0% with no current station
+  ---
+  duration_ms: 0.254553
+  type: 'test'
+  ...
+# Subtest: item state: a person is waited on before failure, activity, or pause
+ok 7 - item state: a person is waited on before failure, activity, or pause
+  ---
+  duration_ms: 0.166233
+  type: 'test'
+  ...
+# Subtest: completion formula is the documented arithmetic
+ok 8 - completion formula is the documented arithmetic
+  ---
+  duration_ms: 0.151917
+  type: 'test'
+  ...
+# Subtest: snapshot --json validates and places each item in the flow
+ok 9 - snapshot --json validates and places each item in the flow
+  ---
+  duration_ms: 1000.189872
+  type: 'test'
+  ...
+# Subtest: a requested human review gate is reported as waiting for you
+ok 10 - a requested human review gate is reported as waiting for you
+  ---
+  duration_ms: 691.482936
+  type: 'test'
+  ...
+# Subtest: an open material question is reported as waiting for you
+ok 11 - an open material question is reported as waiting for you
+  ---
+  duration_ms: 683.925462
+  type: 'test'
+  ...
+# Subtest: work show --json returns every section and validates
+ok 12 - work show --json returns every section and validates
+  ---
+  duration_ms: 971.354623
+  type: 'test'
+  ...
+# Subtest: errors are one JSON document with a code and exit status 1
+ok 13 - errors are one JSON document with a code and exit status 1
+  ---
+  duration_ms: 140.507984
+  type: 'test'
+  ...
+# Subtest: read commands never modify .yallaflow, the working tree, or .git/index
+ok 14 - read commands never modify .yallaflow, the working tree, or .git/index
+  ---
+  duration_ms: 1138.386215
+  type: 'test'
+  ...
+1..14
+# tests 14
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4710.023725

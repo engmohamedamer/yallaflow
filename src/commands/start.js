@@ -1,14 +1,25 @@
 import { findProjectRoot, getConfig, getCurrentState } from '../core/workspace.js';
 import { understandingNotice } from '../baseline/understanding.js';
-import { createPendingIntake } from '../behavior/routing.js';
+import { activateWorkItem, createPendingIntake, findWorkByRequestId } from '../behavior/routing.js';
 import { CONFIDENCE_LEVELS, SCOPES, WORK_TYPES } from '../behavior/constants.js';
 
-export async function startCommand(rawRequest = '') {
+// keepActive (v1.2.0, opt-in): create without activating; the checkout's focus is unchanged.
+// via/requestId (v1.2.0): record who asked (an unverified console attestation, Q-004) and
+// make a retried request return the item it already created instead of a duplicate.
+export async function startCommand(rawRequest = '', { keepActive = false, via = null, requestId = null } = {}) {
   const root = await findProjectRoot();
   if (!root) throw new Error('No .yallaflow workspace found. Run `yallaflow init` first.');
   if (rawRequest) {
-    const item = await createPendingIntake(root, rawRequest);
+    if (requestId) {
+      const existing = await findWorkByRequestId(root, requestId);
+      if (existing) {
+        console.log(`Already created ${existing.id} for request ${requestId}; nothing new was created.`);
+        return;
+      }
+    }
+    const item = await createPendingIntake(root, rawRequest, { keepActive, ...(via ? { attestation: { recordedVia: via, requestId } } : {}) });
     console.log(`Created ${item.id}`);
+    if (item.activation?.deferred) console.log(`Not made active${item.activation.keptActive ? `: ${item.activation.keptActive} stays the active work item in this checkout` : ' (no work item is active in this checkout)'}. Work on ${item.id} by its ID, or run \`yallaflow activate ${item.id}\`.`);
     console.log('Routing: pending');
     console.log(`Raw request: ${item.rawRequest}`);
     console.log('\nAgent routing contract:');
@@ -33,4 +44,14 @@ export async function startCommand(rawRequest = '') {
   console.log('  yallaflow release "<title>" --scope SCOPE      Release work');
   console.log('  yallaflow status                   Project engineering status');
   console.log('\nOr create an unclassified intake: yallaflow start "<request>"');
+}
+
+// `yallaflow activate <work-id>` (v1.2.0): the explicit focus switch.
+export async function activateCommand(workId) {
+  const root = await findProjectRoot();
+  if (!root) throw new Error('No .yallaflow workspace found. Run `yallaflow init` first.');
+  if (!workId) throw new Error('Usage: yallaflow activate <work-id>');
+  const result = await activateWorkItem(root, workId);
+  console.log(result.previous === result.id ? `${result.id} is already the active work item.` : `${result.id} is now the active work item${result.previous ? ` (was ${result.previous})` : ''}.`);
+  console.log(`Next: yallaflow guide ${result.id}`);
 }

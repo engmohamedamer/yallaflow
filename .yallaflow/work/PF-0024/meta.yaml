@@ -1,0 +1,77 @@
+{
+  "id": "PF-0024",
+  "type": "feature",
+  "scope": "architectural",
+  "routingStatus": "routed",
+  "rawRequest": "Build the YallaFlow Flow Console: a local web console (Flow v4 design, research/next-gen-console) on top of a versioned Core --json read contract, delivered in phases: Core read contract and concurrency lock first, then read-only Console, then attested actions, new work, and the multi-agent team view",
+  "status": "IMPLEMENTATION",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-05T21:37:47.754Z",
+  "updatedAt": "2026-11-06T13:35:47.566Z",
+  "title": "Flow Console: Core --json read contract, concurrency lock, and local web console (phased)",
+  "routingConfidence": "high",
+  "routingReason": "New public machine-readable output contract (--json, SemVer-governed), a new concurrency lock touching every mutating command, a new optional package with a local HTTP server and security boundary, and later additive attestation fields in committed ledgers (irreversible). Cross-module and public-API impact warrant architectural depth with specification and plan review.",
+  "routedAt": "2026-11-05T21:37:52.118Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "brainstorm",
+    "specify",
+    "plan",
+    "implement",
+    "verify",
+    "converge",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "design-exploration",
+      "specification",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "delivery-convergence",
+      "code-review"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0014",
+      "type": "file",
+      "name": "FLOW_V4.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-05T21:46:48.220Z",
+      "workStatusAtLink": "CLARIFICATION",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0015",
+      "type": "file",
+      "name": "DECISION_SUMMARY.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-05T21:46:48.380Z",
+      "workStatusAtLink": "CLARIFICATION",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0016",
+      "type": "file",
+      "name": "TARGET_ARCHITECTURE.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-05T21:46:48.541Z",
+      "workStatusAtLink": "CLARIFICATION",
+      "relationship": "work-input"
+    }
+  ]
+}

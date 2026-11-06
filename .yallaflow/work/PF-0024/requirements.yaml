@@ -1,0 +1,510 @@
+{
+  "schemaVersion": 1,
+  "revision": 2,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "Core exposes a versioned machine-readable project snapshot (yallaflow snapshot --json) with each work item's five Flow stations, steps, completion %, waiting-for-human state, blocker and next action, computed by Core.",
+      "provenance": [
+        {
+          "type": "request"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0014"
+        },
+        {
+          "type": "question",
+          "question": "Q-003"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-05T21:48:51.441Z",
+      "updatedAt": "2026-11-05T21:48:51.441Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "Core exposes full work-item detail (yallaflow work show <id> --json): request, sources, requirements and criteria with convergence, questions, checkpoints with summaries and times, verification runs, revisions and next action.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0014"
+        },
+        {
+          "type": "question",
+          "question": "Q-003"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-05T21:48:51.441Z",
+      "updatedAt": "2026-11-05T21:48:51.441Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "Read commands, including every --json output, never modify .yallaflow, the working tree or .git/index, and existing text outputs stay unchanged.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0016"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-05T21:48:51.441Z",
+      "updatedAt": "2026-11-05T21:48:51.441Z"
+    },
+    {
+      "id": "REQ-004",
+      "statement": "Concurrent mutating CLI commands from several agents never corrupt state or allocate duplicate IDs: a workspace write lock with stale-lock recovery.",
+      "provenance": [
+        {
+          "type": "request"
+        },
+        {
+          "type": "question",
+          "question": "Q-003"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-05T21:48:51.441Z",
+      "updatedAt": "2026-11-05T21:48:51.441Z"
+    },
+    {
+      "id": "REQ-005",
+      "statement": "yallaflow console starts a local read-only web console implementing the approved Flow v4 design: flow map with New gate, five stations and Done line, work lines, and item view with history and a details panel.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-001"
+        },
+        {
+          "type": "question",
+          "question": "Q-002"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0014"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-05T21:48:51.441Z",
+      "updatedAt": "2026-11-05T21:48:51.441Z"
+    },
+    {
+      "id": "REQ-006",
+      "statement": "Changes made through the CLI appear in an open console without reload, with handoff and handback motion.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0014"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-05T21:48:51.441Z",
+      "updatedAt": "2026-11-05T21:48:51.441Z"
+    },
+    {
+      "id": "REQ-007",
+      "statement": "The console is local and safe: loopback only, per-run token, Host and Origin checks, ID-addressed data, no external requests. Reads are GET/HEAD; the only write is the owner-authorized Create Work (POST on its two routes, through Core commands), and --read-only disables it.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0016"
+        },
+        {
+          "type": "question",
+          "question": "Q-005"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-05T21:48:51.441Z",
+      "updatedAt": "2026-11-06T13:35:24.216Z"
+    },
+    {
+      "id": "REQ-008",
+      "statement": "Attachments (preserved sources) and handoff artifacts can be opened and previewed from the item view.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0014"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-05T21:48:51.441Z",
+      "updatedAt": "2026-11-05T21:48:51.441Z"
+    },
+    {
+      "id": "REQ-009",
+      "statement": "The team view shows each git worktree's agent lane (branch, current item and station, changed files) and warns when two worktrees change the same file; insights, projects, digest and notifications follow Flow v4.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0014"
+        },
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-05T21:48:51.441Z",
+      "updatedAt": "2026-11-05T21:48:51.441Z"
+    },
+    {
+      "id": "REQ-010",
+      "statement": "No new runtime dependency and no build step: the UI ships as static assets inside the yallaflow package on Node >= 20.16.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-001"
+        },
+        {
+          "type": "question",
+          "question": "Q-002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-05T21:48:51.441Z",
+      "updatedAt": "2026-11-05T21:48:51.441Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "snapshot --json validates against schema yallaflow.snapshot/1 on every test fixture and on this repository, and completion % matches the documented formula in unit tests for each workflow type.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0014"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-05T21:48:51.441Z",
+      "updatedAt": "2026-11-05T21:48:51.441Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-002",
+      "statement": "work show --json validates against yallaflow.work/1 and returns every listed section for a feature item that has requirements, convergence, questions and sources.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-05T21:48:51.441Z",
+      "updatedAt": "2026-11-05T21:48:51.441Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-003",
+      "statement": "A contract test hashes .yallaflow and .git/index before and after every --json read command and finds no change; golden text outputs of brief, status and guide are unchanged.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0016"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-05T21:48:51.441Z",
+      "updatedAt": "2026-11-05T21:48:51.441Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-004",
+      "statement": "A stress test of parallel mutating commands produces 0 corrupted files and 0 duplicate IDs; a lock left by a killed process is reported by doctor and removed by doctor --clear-lock.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-05T21:48:51.441Z",
+      "updatedAt": "2026-11-05T21:48:51.441Z"
+    },
+    {
+      "id": "AC-005",
+      "requirement": "REQ-005",
+      "statement": "yallaflow console renders map, work and item views for this repository with no browser console errors in Arabic RTL and English, at 1440 px and 390 px without horizontal page scroll.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0014"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-05T21:48:51.441Z",
+      "updatedAt": "2026-11-05T21:48:51.441Z"
+    },
+    {
+      "id": "AC-006",
+      "requirement": "REQ-006",
+      "statement": "A checkpoint recorded through the CLI appears in an open console within 2 seconds on Linux, and the station change animates.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0014"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-05T21:48:51.441Z",
+      "updatedAt": "2026-11-05T21:48:51.441Z"
+    },
+    {
+      "id": "AC-007",
+      "requirement": "REQ-007",
+      "statement": "Security tests pass: foreign Host 421, missing token 401, foreign Origin 403, path traversal 404, non-GET 405; the server listens on 127.0.0.1 only.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0016"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-05T21:48:51.441Z",
+      "updatedAt": "2026-11-05T21:48:51.441Z"
+    },
+    {
+      "id": "AC-008",
+      "requirement": "REQ-008",
+      "statement": "Opening an image, a PDF and a text source from the item view previews the preserved original, and a handoff opens its checkpoint summary.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0014"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-05T21:48:51.441Z",
+      "updatedAt": "2026-11-05T21:48:51.441Z"
+    },
+    {
+      "id": "AC-009",
+      "requirement": "REQ-009",
+      "statement": "With two worktrees on different items the team view shows two lanes, and shows a conflict warning when both change the same path.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-05T21:48:51.441Z",
+      "updatedAt": "2026-11-05T21:48:51.441Z"
+    },
+    {
+      "id": "AC-010",
+      "requirement": "REQ-009",
+      "statement": "Insights values equal those computed from checkpoint timestamps on a fixture; the digest lists only events after the stored last-visit time.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0014"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-05T21:48:51.441Z",
+      "updatedAt": "2026-11-05T21:48:51.441Z"
+    },
+    {
+      "id": "AC-011",
+      "requirement": "REQ-010",
+      "statement": "npm pack lists no new dependency in package.json, the UI is served without any build step, and npm test passes in full.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-05T21:48:51.441Z",
+      "updatedAt": "2026-11-05T21:48:51.441Z"
+    },
+    {
+      "id": "AC-012",
+      "requirement": "REQ-007",
+      "statement": "No Console route modifies .yallaflow, the working tree or .git/index (hash test around a scripted browsing session), except the authorized Create Work operation: POST create and attach, which change .yallaflow only through Core start/route/intake add for the item created; every other Console mutation is prohibited and refused, and --read-only refuses Create Work too.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-003"
+        },
+        {
+          "type": "question",
+          "question": "Q-005"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-05T21:48:51.441Z",
+      "updatedAt": "2026-11-06T13:35:24.216Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-05T21:48:51.441Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-05T21:48:51.441Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-05T21:48:51.441Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-004",
+      "at": "2026-11-05T21:48:51.441Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-005",
+      "at": "2026-11-05T21:48:51.441Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-006",
+      "at": "2026-11-05T21:48:51.441Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-007",
+      "at": "2026-11-05T21:48:51.441Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-008",
+      "at": "2026-11-05T21:48:51.441Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-009",
+      "at": "2026-11-05T21:48:51.441Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-010",
+      "at": "2026-11-05T21:48:51.441Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-05T21:48:51.441Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-05T21:48:51.441Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-05T21:48:51.441Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-11-05T21:48:51.441Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-005",
+      "at": "2026-11-05T21:48:51.441Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-006",
+      "at": "2026-11-05T21:48:51.441Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-007",
+      "at": "2026-11-05T21:48:51.441Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-008",
+      "at": "2026-11-05T21:48:51.441Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-009",
+      "at": "2026-11-05T21:48:51.441Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-010",
+      "at": "2026-11-05T21:48:51.441Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-011",
+      "at": "2026-11-05T21:48:51.441Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-012",
+      "at": "2026-11-05T21:48:51.441Z",
+      "revision": 1
+    },
+    {
+      "action": "revised",
+      "id": "REQ-007",
+      "at": "2026-11-06T13:35:24.216Z",
+      "revision": 2,
+      "previous": {
+        "id": "REQ-007",
+        "statement": "The console is local and safe: loopback only, per-run token, Host and Origin checks, GET only, ID-addressed data, no external requests.",
+        "provenance": [
+          {
+            "type": "source",
+            "source": "SRC-0016"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "AC-012",
+      "at": "2026-11-06T13:35:24.216Z",
+      "revision": 2,
+      "previous": {
+        "id": "AC-012",
+        "requirement": "REQ-007",
+        "statement": "No Console route modifies .yallaflow, the working tree or .git/index (hash test around a scripted browsing session).",
+        "provenance": [
+          {
+            "type": "question",
+            "question": "Q-003"
+          }
+        ],
+        "status": "active"
+      }
+    }
+  ],
+  "updatedAt": "2026-11-06T13:35:24.216Z"
+}

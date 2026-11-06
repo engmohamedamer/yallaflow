@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0017",
+  "sourceType": "file",
+  "sourceName": "owner-acceptance-findings-2026-11-06.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-11-06T11:09:22.972Z",
+  "original": {
+    "path": "sources/SRC-0017/owner-acceptance-findings-2026-11-06.md",
+    "sha256": "959c9cfc228f2f3e98a0b21d713a010902de1169ffc3abb84c14e5fc3ea4b331",
+    "sizeBytes": 1639
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0032"
+  ],
+  "rawText": "# YallaFlow 1.2.0 — Real-Project Acceptance Findings (owner, 2026-11-06, agent session)\n\nTested the Release Candidate on three projects: one existing project works; Vult API fails to load\n(\"Progress ledger for PF-0091 uses registry v8, but its Behavior Contract uses registry v9.\"); a new\nproject opens but has no usable way to create a new work item from the Console.\n\n1. Vult API compatibility failure — investigate exact cause; do not blindly rewrite registry versions,\n   checkpoints, pinned contracts or evidence; propose the smallest safe auditable solution; one invalid\n   work item should not necessarily prevent the whole project from displaying; distinguish project data\n   errors from an offline Console.\n2. Interactive New Work — select project; create feature/bug/change/investigation; natural-language\n   requirement; optional BRD/requirement attachment; create through existing Core; show the item\n   immediately in the Flow with its actual next valid action; keep continuing with Claude Code/Codex.\n   No second work engine, no duplicated lifecycle rules, no auto-start of an agent. All mutations use\n   Core validation, locking and audit. Review local API authorization and CSRF before enabling writes.\n3. Empty project: helpful onboarding state, not an empty board with misleading 0%. Completed tracked\n   work is distinct from completion of the whole software project. Do not show an inactive task as\n   blocked or a project-data error as offline.\n4. Preserve the Flow UI; clean, simple, polished; no Copy Command buttons everywhere; one clear Create\n   Work action, contextual next steps, progressive disclosure.\n"
+}

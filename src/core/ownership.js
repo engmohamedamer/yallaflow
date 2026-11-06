@@ -43,6 +43,8 @@ export const STATE_OWNERSHIP = Object.freeze([
   { path: 'work/<id>/purpose.yaml', owner: 'cli', via: 'purpose set, baseline start --objective (discovery purpose and preservation intent; never project truth)', pattern: new RegExp(`^work/${WORK_ID_SOURCE}/purpose\\.yaml$`) },
   { path: 'local/identity.yaml', owner: 'cli', via: 'Shared Project: created on first branch-safe ID allocation (this checkout only; gitignored, never committed)', pattern: /^local\/identity\.yaml$/ },
   { path: 'local/state/current.yaml', owner: 'cli', via: 'Shared Project: this developer\'s active-work focus (gitignored, never committed)', pattern: /^local\/state\/current\.yaml$/ },
+  { path: 'local/lock', owner: 'runtime', via: 'v1.2.0 workspace write lock: held by every mutating command only while it runs, then removed (never committed); a stale one is cleared by doctor --clear-lock', pattern: /^local\/lock$/ },
+  { path: 'local/.gitignore', owner: 'runtime', via: 'v1.2.0: written with the workspace lock only when local/ did not exist (single-user workspaces), so a crash-left lock stays out of git status; removed with the lock', pattern: /^local\/\.gitignore$/ },
   { path: '.gitignore', owner: 'human', via: 'written once by shared enable (ignores local/); keep the local/ rule', pattern: /^\.gitignore$/ },
   { path: 'config.yaml', owner: 'human', via: 'deliberate project settings (interaction mode, gate overrides)', pattern: /^config\.yaml$/ }
 ]);

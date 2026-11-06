@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-05T22:43:16.914Z",
+      "completedAt": "2026-11-05T22:43:16.914Z",
+      "summary": "Inputs ready: snapshot/1 and work/1 contracts (PF-0025), workspace lock (PF-0026), approved Flow v4 prototype (SRC-0014; research/next-gen-console/flow-v4) whose leg model maps 1:1 to snapshot stations (done/na/todo/active/you/fail/paused; steps done/now/todo). Node 22 here supports recursive fs.watch on Linux; xdg-open/open exist; package 'files' ships src and resources. No fonttools available to subset the font to woff2. Agent identity per checkpoint is not recorded in Core, so the console cannot name Claude/Codex per station.",
+      "evidence": [
+        "src/flow/snapshot.js",
+        "package.json",
+        "research/next-gen-console/flow-v4/assets/app.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-05T22:43:17.193Z",
+      "completedAt": "2026-11-05T22:43:17.193Z",
+      "summary": "Scope per approved spec: 'yallaflow console [--port N] [--no-open] [--project DIR]...' read-only command; node:http loopback server (Host 421, Origin 403, token 401, non-GET 405, ID-addressed paths, strict CSP); spawns its own CLI for snapshot/work show with cache invalidated by a debounced recursive watcher (poll fallback) and streamed change events; preserved source originals by ID (images, PDF, text allowlist) fetched by the UI as blobs; UI = Flow v4 map (New gate, 5 stations, Done line, filters, station cap), work lines, item chain with history, details tabs and attachment/handoff drawers; every action place shows the exact CLI command instead of executing it. Team, insights, projects, digest and notifications are PF-0028."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-05T22:51:14.628Z",
+      "completedAt": "2026-11-05T22:51:14.628Z",
+      "summary": "yallaflow console: loopback read-only server (token, Host/Origin, GET-only, ID-only paths, sandboxed source previews), CLI-spawn runner with cache, debounced recursive watcher + streamed events, Flow v4 UI on real data (map, lines, item with handoffs from checkpoint summaries, history, details tabs, attachment and artifact drawers, live baton/handback animation, commands instead of actions), additive station/knowledge in work show, 4 server tests.",
+      "evidence": [
+        "src/console/server.js",
+        "src/console/runner.js",
+        "src/console/watch.js",
+        "src/commands/console.js",
+        "resources/console/app.js",
+        "test/console-server.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-05T23:02:27.062Z",
+      "completedAt": "2026-11-05T23:02:27.062Z",
+      "summary": "Fresh proof: syntax (V-001, V-002), console + contract tests (V-003, V-006), full suite 793/793 after narrowly amending the no-network guard (V-005; V-004 failure kept), browser matrix 16/16 clean on this repository, live handoff observed.",
+      "evidence": [
+        "verification:V-005"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-05T23:02:27.481Z",
+      "completedAt": "2026-11-05T23:02:27.481Z",
+      "summary": "AC-005, AC-006, AC-007, AC-008, AC-012 satisfied."
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Ship the Readex Pro font as the original TTF (278 KB, OFL with licence) instead of a woff2 subset",
+      "reason": "No font tooling (fonttools) is available and adding a build dependency contradicts Q-002 (no build step); the size is acceptable for a local console and can be reduced later without any behavior change",
+      "costIfWrong": "Package about 0.2 MB larger than planned; no functional impact",
+      "createdAt": "2026-11-05T22:43:17.784Z"
+    },
+    {
+      "decision": "Amended the no-network guard test (test/shared-project.test.js 51) to allow node:http only under src/console/ as a loopback server, still forbidding outbound fetch/http(s) requests, node:net/https and providers there, and added assertions that the console binds 127.0.0.1 and never all interfaces",
+      "reason": "The approved specification (REQ-007) introduces a loopback-only local server; the guard's intent (no outbound network, no LLM provider) is preserved and tightened for the new module rather than weakened globally",
+      "costIfWrong": "If the console later needed outbound access, the guard would no longer catch it only if the exact allowed forms were used; the added bind assertions cover the main risk of exposing the server",
+      "createdAt": "2026-11-05T22:56:23.352Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-05T23:02:27.481Z"
+}

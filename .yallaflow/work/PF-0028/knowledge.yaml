@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Console phase D (v1.2.0): saved projects live in a user-level file (src/console/registry.js; YALLAFLOW_CONSOLE_CONFIG, else XDG/APPDATA yallaflow/console.json, mode 0600) managed by 'yallaflow console add|remove|list'; worktree visibility reads Git's own files plus 'git --no-optional-locks status' (src/console/worktrees.js) and never claims agent sessions; attention, digest and insights are computed in the UI only from Core's snapshot/work show fields (state, waitingFor, recorded timestamps, verification counts); developer commands appear only in one collapsible panel per page.",
+      "evidence": [
+        "src/console/registry.js",
+        "src/console/worktrees.js",
+        "resources/console/app.js",
+        "verification:V-005"
+      ],
+      "confidence": "confirmed",
+      "provenance": "repository",
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0093"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-05T23:59:27.956Z",
+      "factId": "CTX-0093",
+      "promotedAt": "2026-11-05T23:59:28.236Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-05T23:59:28.236Z",
+  "reviewedAt": "2026-11-05T23:59:28.236Z"
+}

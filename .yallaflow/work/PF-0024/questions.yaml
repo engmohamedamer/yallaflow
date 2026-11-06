@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "questions": [
+    {
+      "id": "Q-001",
+      "category": "architecture",
+      "question": "Where does the Console ship: inside the yallaflow package as 'yallaflow console', or as a separate optional package?",
+      "status": "resolved",
+      "material": true,
+      "proposal": "Inside yallaflow: one install, zero new dependencies, Console always matches the CLI version.",
+      "createdAt": "2026-11-05T21:46:47.116Z",
+      "updatedAt": "2026-11-05T21:47:04.589Z",
+      "answer": "Owner (2026-11-05, in the agent session): inside yallaflow itself as 'yallaflow console'.",
+      "resolution": "Accepted as the owner's decision.",
+      "resolvedAt": "2026-11-05T21:47:04.589Z"
+    },
+    {
+      "id": "Q-002",
+      "category": "architecture",
+      "question": "UI stack: plain JavaScript like the approved Flow v4 prototype, or React + Vite?",
+      "status": "resolved",
+      "material": true,
+      "proposal": "Plain JavaScript, no build step, no dependencies, reusing the Flow v4 prototype.",
+      "createdAt": "2026-11-05T21:46:47.249Z",
+      "updatedAt": "2026-11-05T21:47:04.730Z",
+      "answer": "Owner (2026-11-05): plain JavaScript like the prototype, no build, no dependencies.",
+      "resolution": "Accepted as the owner's decision.",
+      "resolvedAt": "2026-11-05T21:47:04.730Z"
+    },
+    {
+      "id": "Q-003",
+      "category": "business",
+      "question": "What is the first release: read-only Console plus the Core --json contract and write lock, or read-only plus actions (answer, approve, new work)?",
+      "status": "resolved",
+      "material": true,
+      "createdAt": "2026-11-05T21:46:58.061Z",
+      "updatedAt": "2026-11-05T21:47:04.864Z",
+      "answer": "Owner (2026-11-05, in the agent session): read-only display plus the lock first; actions in a later phase.",
+      "resolution": "Accepted as the owner's decision.",
+      "resolvedAt": "2026-11-05T21:47:04.864Z"
+    },
+    {
+      "id": "Q-004",
+      "category": "business",
+      "question": "How is an approval made from the Console recorded in the committed ledgers?",
+      "status": "resolved",
+      "material": true,
+      "createdAt": "2026-11-05T21:46:58.196Z",
+      "updatedAt": "2026-11-05T21:47:05.003Z",
+      "answer": "Owner (2026-11-05): record it as done from the console with identity unverified (additive attestation {recordedVia: console, claimedBy?, verified: false}); never a default identity. Applies to the later actions phase.",
+      "resolution": "Accepted as the owner's decision.",
+      "resolvedAt": "2026-11-05T21:47:05.003Z"
+    },
+    {
+      "id": "Q-005",
+      "category": "business",
+      "question": "Q-003 revision after real-project acceptance (SRC-0017): should 1.2.0 keep a strictly read-only Console, or add one narrowly scoped Create Work action?",
+      "status": "resolved",
+      "material": true,
+      "createdAt": "2026-11-06T11:09:29.739Z",
+      "updatedAt": "2026-11-06T11:09:34.619Z",
+      "answer": "Owner (2026-11-06, in the agent session, SRC-0018): \"I explicitly approve revising Q-003 from a strictly read-only Console to a Console with one narrowly scoped, authenticated Create Work capability.\" Other Console mutations, approvals, agent execution and chat stay out of scope for 1.2.0. Delivered by PF-0032; read-only mode must disable all mutations.",
+      "resolution": "Q-003 revised: one Create Work write (PF-0032); everything else in the Console stays read-only.",
+      "resolvedAt": "2026-11-06T11:09:34.619Z"
+    }
+  ],
+  "updatedAt": "2026-11-06T11:09:34.619Z"
+}

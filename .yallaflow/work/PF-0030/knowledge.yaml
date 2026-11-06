@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Machine-readable read contract (v1.2.0): 'yallaflow snapshot --json' (schema yallaflow.snapshot/1) and 'yallaflow work show <id> --json' (yallaflow.work/1), schemas in resources/schemas/, collected in src/flow/snapshot.js from existing readers with evaluateAdvance mutate:false. The five Flow stations, item state and completion are computed only in src/flow/stations.js and are evidence-aware: Verify (and so Remember) finishes only with a fresh successful run (not predating lastInvalidationAt) and, where required, a currently converged assessment; a checkpoint reopened behind the stage brings its station back; a decomposed parent's Change station is its required children; nothing but DONE reaches 100% (non-DONE capped at 99). --json errors are {error:{code,message}} with exit 1.",
+      "evidence": [
+        "src/flow/stations.js",
+        "src/flow/snapshot.js",
+        "test/flow-stations.test.js",
+        "verification:V-006"
+      ],
+      "confidence": "confirmed",
+      "provenance": "repository",
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0091"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-05T23:44:47.667Z",
+      "factId": "CTX-0094",
+      "promotedAt": "2026-11-05T23:44:48.262Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-002",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Concurrency (v1.2.0): every command that can write .yallaflow holds a workspace lock at .yallaflow/local/lock (src/utils/lock.js), taken in src/cli.js (needsWorkspaceLock/dispatch); read-only commands, dry runs, init and help never take it; verify prints its output first and locks only around recording (waiting up to 5 min). The lock file is created atomically (temp file + link) and records {pid, host, startedAt, command, nonce, boot, start}; it is stale when its holder is gone (dead pid, zombie, different process start time, different boot id, or taken before the last boot) or unreadable for 30 s, and is then removed by atomic rename-claim; release and removal act only on the exact nonce. doctor reports it; doctor --clear-lock removes a stale one or an hour-old one whose holder cannot be identified, never a positively identified live holder. local/ is removed again when empty. writeYaml is atomic and keeps file permissions.",
+      "evidence": [
+        "src/utils/lock.js",
+        "src/cli.js",
+        "src/commands/verify.js",
+        "test/workspace-lock.test.js",
+        "verification:V-006"
+      ],
+      "confidence": "confirmed",
+      "provenance": "repository",
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0092"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-05T23:44:47.812Z",
+      "factId": "CTX-0095",
+      "promotedAt": "2026-11-05T23:44:48.522Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-003",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Web console (v1.2.0) remains read-only and loopback-only after the stabilization review; source extracted text is confined to its source directory in Core (loadSourceText) and HEAD never opens the event stream.",
+      "evidence": [
+        "src/console/server.js",
+        "src/core/sources.js",
+        "test/console-server.test.js",
+        "verification:V-006"
+      ],
+      "confidence": "confirmed",
+      "provenance": "repository",
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0093"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-05T23:44:47.957Z",
+      "factId": "CTX-0093",
+      "promotedAt": "2026-11-05T23:44:48.769Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-05T23:44:48.769Z",
+  "reviewedAt": "2026-11-05T23:44:48.769Z"
+}

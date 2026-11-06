@@ -1,0 +1,3 @@
+sample: test/work-routing, test/pilot-hardening, test/context-schema (35 tests, 47.2 s wall)
+CLI child processes: 324 | sum child wall s: 116.0 | median child ms: 378.556884765625
+by command: {'advance': 56, 'checkpoint': 34, 'context': 32, 'init': 25, 'doctor': 25, 'baseline': 24, 'brief': 16, 'start': 15}

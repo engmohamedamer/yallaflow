@@ -1,0 +1,45 @@
+{
+  "id": "PF-0031",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console 1.2.0 acceptance fixes: show invalid work items as integrity warnings, doctor merge-collision diagnosis, empty/completed/paused project states, data error vs offline",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-06T11:09:03.077Z",
+  "updatedAt": "2026-11-06T11:29:19.091Z",
+  "title": "Console 1.2.0 acceptance fixes: show invalid work items as integrity warnings, doctor merge-collision diagnosis, empty/completed/paused project states, data error vs offline",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-06T11:09:03.091Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-06T11:29:19.091Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

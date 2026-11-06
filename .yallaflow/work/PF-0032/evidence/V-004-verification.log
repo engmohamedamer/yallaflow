@@ -1,0 +1,5083 @@
+
+> yallaflow@1.2.0 test
+> node --test
+
+TAP version 13
+# Subtest: AC-101: setup creates the provider file, or appends the block leaving existing content byte-for-byte
+ok 1 - AC-101: setup creates the provider file, or appends the block leaving existing content byte-for-byte
+  ---
+  duration_ms: 747.081297
+  type: 'test'
+  ...
+# Subtest: AC-102/AC-104: setup is idempotent and --dry-run writes nothing
+ok 2 - AC-102/AC-104: setup is idempotent and --dry-run writes nothing
+  ---
+  duration_ms: 1069.90778
+  type: 'test'
+  ...
+# Subtest: AC-103: a hand-edited block is refused without --preserve-existing, then kept verbatim with it
+ok 3 - AC-103: a hand-edited block is refused without --preserve-existing, then kept verbatim with it
+  ---
+  duration_ms: 1465.760513
+  type: 'test'
+  ...
+# Subtest: AC-105/AC-106: status reads state from markers; refresh updates only unmodified outdated blocks and never downgrades
+ok 4 - AC-105/AC-106: status reads state from markers; refresh updates only unmodified outdated blocks and never downgrades
+  ---
+  duration_ms: 3165.210695
+  type: 'test'
+  ...
+# Subtest: AC-105: a broken block or another provider's block is reported, never rewritten
+ok 5 - AC-105: a broken block or another provider's block is reported, never rewritten
+  ---
+  duration_ms: 419.862573
+  type: 'test'
+  ...
+# Subtest: AC-107: provider blocks point to AGENT.md and never restate its rules
+ok 6 - AC-107: provider blocks point to AGENT.md and never restate its rules
+  ---
+  duration_ms: 0.839591
+  type: 'test'
+  ...
+# Subtest: AC-108: provider knowledge stays in src/agent and the agent command surface
+ok 7 - AC-108: provider knowledge stays in src/agent and the agent command surface
+  ---
+  duration_ms: 121.461935
+  type: 'test'
+  ...
+# Subtest: bootstrap files are classified as repository-root projections; help never writes
+ok 8 - bootstrap files are classified as repository-root projections; help never writes
+  ---
+  duration_ms: 1881.443989
+  type: 'test'
+  ...
+# Subtest: a new workspace gets a versioned, current agent contract and no warnings
+ok 9 - a new workspace gets a versioned, current agent contract and no warnings
+  ---
+  duration_ms: 1407.297315
+  type: 'test'
+  ...
+# Subtest: an unmodified v0.3.5 AGENT.md is detected read-only and replaced only by refresh
+ok 10 - an unmodified v0.3.5 AGENT.md is detected read-only and replaced only by refresh
+  ---
+  duration_ms: 2463.867691
+  type: 'test'
+  ...
+# Subtest: an unmodified v0.1–v0.3.4 AGENT.md is detected read-only and replaced only by refresh
+ok 11 - an unmodified v0.1–v0.3.4 AGENT.md is detected read-only and replaced only by refresh
+  ---
+  duration_ms: 2529.10418
+  type: 'test'
+  ...
+# Subtest: a customized pre-v0.3.6 AGENT.md is never silently replaced; --preserve-existing keeps it verbatim
+ok 12 - a customized pre-v0.3.6 AGENT.md is never silently replaced; --preserve-existing keeps it verbatim
+  ---
+  duration_ms: 1918.516475
+  type: 'test'
+  ...
+# Subtest: an outdated managed block is updated in place; content outside the block is untouched
+ok 13 - an outdated managed block is updated in place; content outside the block is untouched
+  ---
+  duration_ms: 1203.109516
+  type: 'test'
+  ...
+# Subtest: hand edits inside the managed block are detected and preserved, never overwritten
+ok 14 - hand edits inside the managed block are detected and preserved, never overwritten
+  ---
+  duration_ms: 1217.618861
+  type: 'test'
+  ...
+# Subtest: a contract from a newer YallaFlow is not downgraded
+ok 15 - a contract from a newer YallaFlow is not downgraded
+  ---
+  duration_ms: 815.681864
+  type: 'test'
+  ...
+# Subtest: a missing AGENT.md is recreated by refresh
+ok 16 - a missing AGENT.md is recreated by refresh
+  ---
+  duration_ms: 965.805002
+  type: 'test'
+  ...
+# Subtest: agent contract (v2+) teaches scope-required direct commands
+ok 17 - agent contract (v2+) teaches scope-required direct commands
+  ---
+  duration_ms: 1.260757
+  type: 'test'
+  ...
+# Subtest: a v1 managed contract is reported outdated, read-only, by agent status, status, and doctor
+ok 18 - a v1 managed contract is reported outdated, read-only, by agent status, status, and doctor
+  ---
+  duration_ms: 3001.771101
+  type: 'test'
+  ...
+# Subtest: refresh upgrades a v1 block to the installed contract in place, preserves custom instructions, and is idempotent
+ok 19 - refresh upgrades a v1 block to the installed contract in place, preserves custom instructions, and is idempotent
+  ---
+  duration_ms: 1525.0853
+  type: 'test'
+  ...
+# Subtest: a hand-edited v1 block is still never overwritten without --preserve-existing
+ok 20 - a hand-edited v1 block is still never overwritten without --preserve-existing
+  ---
+  duration_ms: 1487.412698
+  type: 'test'
+  ...
+# Subtest: the installed CLI refuses to downgrade a newer contract
+ok 21 - the installed CLI refuses to downgrade a newer contract
+  ---
+  duration_ms: 1113.904977
+  type: 'test'
+  ...
+# Subtest: agent contract (v3+) teaches reconciliation, immutable history, and state ownership
+ok 22 - agent contract (v3+) teaches reconciliation, immutable history, and state ownership
+  ---
+  duration_ms: 1.499357
+  type: 'test'
+  ...
+# Subtest: a real v0.3.6 (v2) managed block upgrades to the installed contract in place and keeps project text
+ok 23 - a real v0.3.6 (v2) managed block upgrades to the installed contract in place and keeps project text
+  ---
+  duration_ms: 1719.119685
+  type: 'test'
+  ...
+# Subtest: agent contract v4+ teaches requirement identity, convergence, and change impact
+ok 24 - agent contract v4+ teaches requirement identity, convergence, and change impact
+  ---
+  duration_ms: 0.778017
+  type: 'test'
+  ...
+# Subtest: a real v0.3.7 (v3) managed block upgrades to the current contract in place and keeps project text
+ok 25 - a real v0.3.7 (v3) managed block upgrades to the current contract in place and keeps project text
+  ---
+  duration_ms: 1835.025269
+  type: 'test'
+  ...
+# Subtest: v0.3.9: agent contract v5 teaches Brownfield onboarding, the app-code vs read-only distinction, documents, NEEDS CARE, and Git-free freshness
+ok 26 - v0.3.9: agent contract v5 teaches Brownfield onboarding, the app-code vs read-only distinction, documents, NEEDS CARE, and Git-free freshness
+  ---
+  duration_ms: 1.022845
+  type: 'test'
+  ...
+# Subtest: v0.3.9: a real v0.3.8 (v4) managed block is reported outdated, never rewritten on read, and upgrades to v5 only on explicit refresh
+ok 27 - v0.3.9: a real v0.3.8 (v4) managed block is reported outdated, never rewritten on read, and upgrades to v5 only on explicit refresh
+  ---
+  duration_ms: 4498.525392
+  type: 'test'
+  ...
+# Subtest: a brownfield baseline can be started with no active work
+ok 28 - a brownfield baseline can be started with no active work
+  ---
+  duration_ms: 42.462388
+  type: 'test'
+  ...
+# Subtest: baseline discovery is read-only
+ok 29 - baseline discovery is read-only
+  ---
+  duration_ms: 341.762317
+  type: 'test'
+  ...
+# Subtest: baseline reuses normal YallaFlow work primitives (checkpoint, work item, progress ledger)
+ok 30 - baseline reuses normal YallaFlow work primitives (checkpoint, work item, progress ledger)
+  ---
+  duration_ms: 54.723803
+  type: 'test'
+  ...
+# Subtest: draft requires the repository-baseline checkpoint to be completed first
+ok 31 - draft requires the repository-baseline checkpoint to be completed first
+  ---
+  duration_ms: 24.139128
+  type: 'test'
+  ...
+# Subtest: a confirmed fact requires evidence
+ok 32 - a confirmed fact requires evidence
+  ---
+  duration_ms: 80.309257
+  type: 'test'
+  ...
+# Subtest: an inferred fact requires evidence
+ok 33 - an inferred fact requires evidence
+  ---
+  duration_ms: 31.66813
+  type: 'test'
+  ...
+# Subtest: an unresolved fact is representable
+ok 34 - an unresolved fact is representable
+  ---
+  duration_ms: 23.00747
+  type: 'test'
+  ...
+# Subtest: repository/runtime/user-confirmed provenance is preserved
+ok 35 - repository/runtime/user-confirmed provenance is preserved
+  ---
+  duration_ms: 24.771619
+  type: 'test'
+  ...
+# Subtest: a draft baseline does not mutate durable project context until approved
+ok 36 - a draft baseline does not mutate durable project context until approved
+  ---
+  duration_ms: 35.71375
+  type: 'test'
+  ...
+# Subtest: baseline approval promotes drafted facts into durable project docs
+ok 37 - baseline approval promotes drafted facts into durable project docs
+  ---
+  duration_ms: 73.189706
+  type: 'test'
+  ...
+# Subtest: changes-requested does not promote a stale draft
+ok 38 - changes-requested does not promote a stale draft
+  ---
+  duration_ms: 395.120653
+  type: 'test'
+  ...
+# Subtest: PROJECT.md is updated after approval
+ok 39 - PROJECT.md is updated after approval
+  ---
+  duration_ms: 68.188901
+  type: 'test'
+  ...
+# Subtest: context docs are populated after approval, and prior deterministic content is preserved
+ok 40 - context docs are populated after approval, and prior deterministic content is preserved
+  ---
+  duration_ms: 427.747031
+  type: 'test'
+  ...
+# Subtest: a fresh agent can consume an approved baseline without rediscovery
+ok 41 - a fresh agent can consume an approved baseline without rediscovery
+  ---
+  duration_ms: 494.019255
+  type: 'test'
+  ...
+# Subtest: baseline never treats prior chat/conversation text as evidence — evidence must be explicit references
+ok 42 - baseline never treats prior chat/conversation text as evidence — evidence must be explicit references
+  ---
+  duration_ms: 49.032026
+  type: 'test'
+  ...
+# Subtest: greenfield projects are unaffected by the baseline subsystem
+ok 43 - greenfield projects are unaffected by the baseline subsystem
+  ---
+  duration_ms: 356.520468
+  type: 'test'
+  ...
+# Subtest: starting a baseline after one is already approved is refused, with no workspace mutation
+ok 44 - starting a baseline after one is already approved is refused, with no workspace mutation
+  ---
+  duration_ms: 116.013046
+  type: 'test'
+  ...
+# Subtest: CLI: baseline start after approval is refused with an actionable message
+ok 45 - CLI: baseline start after approval is refused with an actionable message
+  ---
+  duration_ms: 2340.462369
+  type: 'test'
+  ...
+# Subtest: CLI: baseline start is idempotent and resumes the existing work item
+ok 46 - CLI: baseline start is idempotent and resumes the existing work item
+  ---
+  duration_ms: 720.961647
+  type: 'test'
+  ...
+# Subtest: CLI: full baseline flow end to end from a real JSON file
+ok 47 - CLI: full baseline flow end to end from a real JSON file
+  ---
+  duration_ms: 2382.989478
+  type: 'test'
+  ...
+# Subtest: completed checkpoint can be revised explicitly
+ok 48 - completed checkpoint can be revised explicitly
+  ---
+  duration_ms: 120.570067
+  type: 'test'
+  ...
+# Subtest: correction history persists
+ok 49 - correction history persists
+  ---
+  duration_ms: 81.095205
+  type: 'test'
+  ...
+# Subtest: correction without reason rejected
+ok 50 - correction without reason rejected
+  ---
+  duration_ms: 452.259196
+  type: 'test'
+  ...
+# Subtest: restart preserves corrected state
+ok 51 - restart preserves corrected state
+  ---
+  duration_ms: 405.283676
+  type: 'test'
+  ...
+# Subtest: corrected checkpoint can revoke readiness
+ok 52 - corrected checkpoint can revoke readiness
+  ---
+  duration_ms: 86.821451
+  type: 'test'
+  ...
+# Subtest: lifecycle never silently contradicts checkpoint state
+ok 53 - lifecycle never silently contradicts checkpoint state
+  ---
+  duration_ms: 71.055437
+  type: 'test'
+  ...
+# Subtest: reverting an earlier stage checkpoint corrects the current stage backward
+ok 54 - reverting an earlier stage checkpoint corrects the current stage backward
+  ---
+  duration_ms: 440.684463
+  type: 'test'
+  ...
+# Subtest: start --help creates no work and prints help
+ok 55 - start --help creates no work and prints help
+  ---
+  duration_ms: 330.909598
+  type: 'test'
+  ...
+# Subtest: start -h creates no work
+ok 56 - start -h creates no work
+  ---
+  duration_ms: 379.74228
+  type: 'test'
+  ...
+# Subtest: verify --help never attempts to run a verification command
+ok 57 - verify --help never attempts to run a verification command
+  ---
+  duration_ms: 356.500432
+  type: 'test'
+  ...
+# Subtest: help is non-mutating across every command namespace
+ok 58 - help is non-mutating across every command namespace
+  ---
+  duration_ms: 14648.415476
+  type: 'test'
+  ...
+# Subtest: an unknown option returns an actionable error without mutating state
+ok 59 - an unknown option returns an actionable error without mutating state
+  ---
+  duration_ms: 581.538245
+  type: 'test'
+  ...
+# Subtest: exposes the YallaFlow product and CLI identity
+ok 60 - exposes the YallaFlow product and CLI identity
+  ---
+  duration_ms: 291.023472
+  type: 'test'
+  ...
+# Subtest: namespace help is concise and discoverable
+ok 61 - namespace help is concise and discoverable
+  ---
+  duration_ms: 1269.655984
+  type: 'test'
+  ...
+# Subtest: a merge-collided work item is listed as invalid and never hides the project
+ok 62 - a merge-collided work item is listed as invalid and never hides the project
+  ---
+  duration_ms: 4016.346057
+  type: 'test'
+  ...
+# Subtest: the exact Vult message: a ledger pinned to another registry version
+ok 63 - the exact Vult message: a ledger pinned to another registry version
+  ---
+  duration_ms: 1560.857002
+  type: 'test'
+  ...
+# Subtest: an unreadable meta.yaml is reported, not fatal
+ok 64 - an unreadable meta.yaml is reported, not fatal
+  ---
+  duration_ms: 1589.695154
+  type: 'test'
+  ...
+# Subtest: zero work items: no completion is claimed
+ok 65 - zero work items: no completion is claimed
+  ---
+  duration_ms: 1146.537381
+  type: 'test'
+  ...
+# Subtest: console: an invalid item is a data warning in a 200 snapshot, not a failed project
+ok 66 - console: an invalid item is a data warning in a 200 snapshot, not a failed project
+  ---
+  duration_ms: 3431.132269
+  type: 'test'
+  ...
+# YallaFlow foundation CLI
+# Give AI your project, not just your prompt.
+# Usage:
+#   yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]
+#   yallaflow start [request]
+#   yallaflow start --keep-active -- <request>
+#   yallaflow activate <work-id>
+#   yallaflow request --help
+#   yallaflow intake <file> [<file> ...] [--title TITLE]
+#   yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]
+#   yallaflow intake ticket <payload-file|ticket-ref> [--provider github|jira|azure-devops] [--work <work-id>] [--reason TEXT] [--fetch [--attachments]] [--attachment <file>]... [--title TITLE] [--max-comments N]
+#   yallaflow source --help
+#   yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]
+#   yallaflow baseline --help
+#   yallaflow guide [work-id]
+#   yallaflow ready [work-id]
+#   yallaflow skill <skill-id> [--work <work-id>]
+#   yallaflow checkpoint --help
+#   yallaflow question --help
+#   yallaflow knowledge --help
+#   yallaflow requirement --help
+#   yallaflow convergence --help
+#   yallaflow impact --help
+#   yallaflow context --help
+#   yallaflow upgrade status|plan
+#   yallaflow brief
+#   yallaflow inspect
+#   yallaflow limitation --help
+#   yallaflow agent --help
+#   yallaflow decompose --help
+#   yallaflow progress <parent-id>
+#   yallaflow next <parent-id>
+#   yallaflow approve <work-id> --stage GATE [--note TEXT]
+#   yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]
+#   yallaflow handoff [work-id]
+#   yallaflow feature <title> --scope SCOPE
+#   yallaflow bug <title> --scope SCOPE
+#   yallaflow investigate <title> --scope SCOPE
+#   yallaflow change <title> --scope SCOPE
+#   yallaflow refactor <title> --scope SCOPE
+#   yallaflow release <title> --scope SCOPE
+#   yallaflow purpose --help
+#   yallaflow finish [work-id] [--verbose]
+#   yallaflow qc --help
+#   yallaflow demo --help
+#   yallaflow shared --help
+#   yallaflow status
+#   yallaflow snapshot [--json]
+#   yallaflow console [--port N] [--no-open] [--project DIR]... [--read-only]
+#   yallaflow work show <work-id> [--json]
+#   yallaflow resume [work-id]
+#   yallaflow doctor [--clear-lock]
+#   yallaflow advance [work-id]
+#   yallaflow verify [work-id] -- <executable> [args...]
+#   yallaflow verify [work-id] --shell "<command>"
+#   yallaflow verify [work-id] --script <path>
+#   yallaflow verify list [work-id]
+#   yallaflow reopen <work-id> --to implementation|verification|review --reason REASON
+#   yallaflow --version
+# Subtest: start without new options behaves exactly as before (focus moves to the new item)
+ok 67 - start without new options behaves exactly as before (focus moves to the new item)
+  ---
+  duration_ms: 1923.003089
+  type: 'test'
+  ...
+# Subtest: parseStartArgs: new options only as leading tokens; anything else is the legacy request
+ok 68 - parseStartArgs: new options only as leading tokens; anything else is the legacy request
+  ---
+  duration_ms: 2.597016
+  type: 'test'
+  ...
+# Subtest: --keep-active never replaces unfinished active work; routing and checkpoints never move focus; activate does
+ok 69 - --keep-active never replaces unfinished active work; routing and checkpoints never move focus; activate does
+  ---
+  duration_ms: 2720.898826
+  type: 'test'
+  ...
+# Subtest: --keep-active never activates, even when no work item is active (owner decision)
+ok 70 - --keep-active never activates, even when no work item is active (owner decision)
+  ---
+  duration_ms: 1573.215341
+  type: 'test'
+  ...
+# Subtest: console create with nothing active leaves nothing active
+ok 71 - console create with nothing active leaves nothing active
+  ---
+  duration_ms: 1305.551831
+  type: 'test'
+  ...
+# Subtest: attachments report what YallaFlow could actually do with each file
+ok 72 - attachments report what YallaFlow could actually do with each file
+  ---
+  duration_ms: 3027.966244
+  type: 'test'
+  ...
+# Subtest: request IDs: a retried or concurrent request creates exactly one item, with an unverified console attestation
+ok 73 - request IDs: a retried or concurrent request creates exactly one item, with an unverified console attestation
+  ---
+  duration_ms: 1018.102451
+  type: 'test'
+  ...
+# Subtest: helpers: titles come from the user's words; file names are reduced safely
+ok 74 - helpers: titles come from the user's words; file names are reduced safely
+  ---
+  duration_ms: 0.765878
+  type: 'test'
+  ...
+# Subtest: POST guards: token, Origin, Host, content type, size, read-only, unknown routes
+ok 75 - POST guards: token, Origin, Host, content type, size, read-only, unknown routes
+  ---
+  duration_ms: 121.002056
+  type: 'test'
+  ...
+# Subtest: create: unclassified and classified items through Core; shell text stored verbatim; focus kept
+ok 76 - create: unclassified and classified items through Core; shell text stored verbatim; focus kept
+  ---
+  duration_ms: 4787.196989
+  type: 'test'
+  ...
+# Subtest: create: concurrent requests get distinct IDs; repeated ones never duplicate
+ok 77 - create: concurrent requests get distinct IDs; repeated ones never duplicate
+  ---
+  duration_ms: 4911.648234
+  type: 'test'
+  ...
+# Subtest: brownfield without approved understanding: Core refuses and nothing is created
+ok 78 - brownfield without approved understanding: Core refuses and nothing is created
+  ---
+  duration_ms: 503.212317
+  type: 'test'
+  ...
+# Subtest: attachments: preserved through intake, deduplicated on retry, refused safely, temp files removed, item kept
+ok 79 - attachments: preserved through intake, deduplicated on retry, refused safely, temp files removed, item kept
+  ---
+  duration_ms: 3947.169071
+  type: 'test'
+  ...
+# Subtest: an oversized upload is refused before it is stored
+ok 80 - an oversized upload is refused before it is stored
+  ---
+  duration_ms: 4114.919485
+  type: 'test'
+  ...
+# Subtest: review: requests starting with "-" keep their classification; "--help" is plain text
+ok 81 - review: requests starting with "-" keep their classification; "--help" is plain text
+  ---
+  duration_ms: 4707.575569
+  type: 'test'
+  ...
+# Subtest: review: two identical uploads at once store one copy; a long non-ASCII name is shortened, not leaked
+ok 82 - review: two identical uploads at once store one copy; a long non-ASCII name is shortened, not leaked
+  ---
+  duration_ms: 2118.45367
+  type: 'test'
+  ...
+# Subtest: resume on a deferred item says how to activate it, and changes nothing
+ok 83 - resume on a deferred item says how to activate it, and changes nothing
+  ---
+  duration_ms: 1930.088224
+  type: 'test'
+  ...
+# Subtest: console add/list/remove keep a user-level project list and never touch the project
+ok 84 - console add/list/remove keep a user-level project list and never touch the project
+  ---
+  duration_ms: 2108.676303
+  type: 'test'
+  ...
+# Subtest: snapshot items carry recorded completion time and verification counts
+ok 85 - snapshot items carry recorded completion time and verification counts
+  ---
+  duration_ms: 1688.985866
+  type: 'test'
+  ...
+# Subtest: worktrees: listed from Git files, changed files and overlaps reported, Git never written
+ok 86 - worktrees: listed from Git files, changed files and overlaps reported, Git never written
+  ---
+  duration_ms: 1255.640906
+  type: 'test'
+  ...
+# Subtest: a planted worktree gitdir is ignored: nothing is read or run outside real worktrees
+ok 87 - a planted worktree gitdir is ignored: nothing is read or run outside real worktrees
+  ---
+  duration_ms: 519.904011
+  type: 'test'
+  ...
+# Subtest: verify never records a run on work that became DONE while it ran
+ok 88 - verify never records a run on work that became DONE while it ran
+  ---
+  duration_ms: 799.614103
+  type: 'test'
+  ...
+# Subtest: security: loopback host, token, origin, read-only methods and ID-only paths
+ok 89 - security: loopback host, token, origin, read-only methods and ID-only paths
+  ---
+  duration_ms: 1315.97319
+  type: 'test'
+  ...
+# Subtest: serves the snapshot, work detail and preserved sources by ID
+ok 90 - serves the snapshot, work detail and preserved sources by ID
+  ---
+  duration_ms: 2400.232304
+  type: 'test'
+  ...
+# Subtest: live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+ok 91 - live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+  ---
+  duration_ms: 3858.096761
+  type: 'test'
+  ...
+# Subtest: the console never writes: browsing every route leaves the workspace byte-identical
+ok 92 - the console never writes: browsing every route leaves the workspace byte-identical
+  ---
+  duration_ms: 2810.371159
+  type: 'test'
+  ...
+# Subtest: extracted text cannot be read outside its source directory; HEAD never opens the event stream
+ok 93 - extracted text cannot be read outside its source directory; HEAD never opens the event stream
+  ---
+  duration_ms: 2830.563114
+  type: 'test'
+  ...
+# Subtest: a v0.3.5 workspace is fully readable and never migrated on read
+ok 94 - a v0.3.5 workspace is fully readable and never migrated on read
+  ---
+  duration_ms: 5275.146026
+  type: 'test'
+  ...
+# Subtest: context status explains unadopted legacy context without creating anything
+ok 95 - context status explains unadopted legacy context without creating anything
+  ---
+  duration_ms: 1244.966917
+  type: 'test'
+  ...
+# Subtest: a new promotion in an unadopted v0.3.5 workspace creates the ledger lazily and leaves legacy sections intact
+ok 96 - a new promotion in an unadopted v0.3.5 workspace creates the ledger lazily and leaves legacy sections intact
+  ---
+  duration_ms: 945.574577
+  type: 'test'
+  ...
+# Subtest: blind multi-item context adopt is refused with zero mutation and points to reconciliation
+ok 97 - blind multi-item context adopt is refused with zero mutation and points to reconciliation
+  ---
+  duration_ms: 1250.749861
+  type: 'test'
+  ...
+# Subtest: provably trivial adoption (one legacy item, no current facts) still works as in v0.3.6
+ok 98 - provably trivial adoption (one legacy item, no current facts) still works as in v0.3.6
+  ---
+  duration_ms: 2235.721978
+  type: 'test'
+  ...
+# Subtest: reconciliation imports legacy facts as distinct NEW facts, retires legacy sections, and never touches work records
+ok 99 - reconciliation imports legacy facts as distinct NEW facts, retires legacy sections, and never touches work records
+  ---
+  duration_ms: 4447.87718
+  type: 'test'
+  ...
+# Subtest: reconciliation leaves a hand-edited legacy section in place, reports it, and doctor asks for review
+ok 100 - reconciliation leaves a hand-edited legacy section in place, reports it, and doctor asks for review
+  ---
+  duration_ms: 3776.545348
+  type: 'test'
+  ...
+# Subtest: a reconciled legacy fact can then be superseded through normal work
+ok 101 - a reconciled legacy fact can then be superseded through normal work
+  ---
+  duration_ms: 3385.321593
+  type: 'test'
+  ...
+# Subtest: v0.3.5 knowledge candidates without v0.3.6 fields still validate and list
+ok 102 - v0.3.5 knowledge candidates without v0.3.6 fields still validate and list
+  ---
+  duration_ms: 522.44097
+  type: 'test'
+  ...
+# Subtest: a healthy ledger passes doctor
+ok 103 - a healthy ledger passes doctor
+  ---
+  duration_ms: 697.023591
+  type: 'test'
+  ...
+# Subtest: supersedes pointing at an unknown fact is an ERROR
+ok 104 - supersedes pointing at an unknown fact is an ERROR
+  ---
+  duration_ms: 619.755993
+  type: 'test'
+  ...
+# Subtest: duplicate IDs, impossible states, and a superseded-yet-current fact are detected
+ok 105 - duplicate IDs, impossible states, and a superseded-yet-current fact are detected
+  ---
+  duration_ms: 619.278158
+  type: 'test'
+  ...
+# Subtest: malformed evidence metadata and provenance are detected
+ok 106 - malformed evidence metadata and provenance are detected
+  ---
+  duration_ms: 614.689686
+  type: 'test'
+  ...
+# Subtest: a disputed fact without a dispute record, and a missing origin work item, are detected
+ok 107 - a disputed fact without a dispute record, and a missing origin work item, are detected
+  ---
+  duration_ms: 667.235054
+  type: 'test'
+  ...
+# Subtest: a superseded fact still rendered as current is projection drift
+ok 108 - a superseded fact still rendered as current is projection drift
+  ---
+  duration_ms: 2462.024373
+  type: 'test'
+  ...
+# Subtest: human edits outside the managed block are not drift
+ok 109 - human edits outside the managed block are not drift
+  ---
+  duration_ms: 756.222277
+  type: 'test'
+  ...
+# Subtest: a discovery limitation promoted as a fact is detected
+ok 110 - a discovery limitation promoted as a fact is detected
+  ---
+  duration_ms: 858.475572
+  type: 'test'
+  ...
+# Subtest: stale context is a warning, never structural corruption
+ok 111 - stale context is a warning, never structural corruption
+  ---
+  duration_ms: 773.504683
+  type: 'test'
+  ...
+# Subtest: validateContextLedger detects supersession cycles
+ok 112 - validateContextLedger detects supersession cycles
+  ---
+  duration_ms: 1.670546
+  type: 'test'
+  ...
+# Subtest: mutations refuse to build on a corrupt ledger
+ok 113 - mutations refuse to build on a corrupt ledger
+  ---
+  duration_ms: 202.525908
+  type: 'test'
+  ...
+# Subtest: unchanged evidence path remains fresh
+ok 114 - unchanged evidence path remains fresh
+  ---
+  duration_ms: 427.966299
+  type: 'test'
+  ...
+# Subtest: changed evidence path makes the fact may-be-stale — and never auto-supersedes or edits it
+ok 115 - changed evidence path makes the fact may-be-stale — and never auto-supersedes or edits it
+  ---
+  duration_ms: 2780.684555
+  type: 'test'
+  ...
+# Subtest: committing the change still reports may-be-stale (evidence differs from the verified content)
+ok 116 - committing the change still reports may-be-stale (evidence differs from the verified content)
+  ---
+  duration_ms: 258.242765
+  type: 'test'
+  ...
+# Subtest: deleted evidence path is reported as stale evidence
+ok 117 - deleted evidence path is reported as stale evidence
+  ---
+  duration_ms: 665.463111
+  type: 'test'
+  ...
+# Subtest: a fact without any verification point reports unknown freshness
+ok 118 - a fact without any verification point reports unknown freshness
+  ---
+  duration_ms: 691.147633
+  type: 'test'
+  ...
+# Subtest: outside Git, content hashes still provide mechanical freshness; no commit is recorded
+ok 119 - outside Git, content hashes still provide mechanical freshness; no commit is recorded
+  ---
+  duration_ms: 160.02146
+  type: 'test'
+  ...
+# Subtest: directory evidence uses Git diff against the recorded commit
+ok 120 - directory evidence uses Git diff against the recorded commit
+  ---
+  duration_ms: 248.783077
+  type: 'test'
+  ...
+# Subtest: reconfirm after targeted revalidation makes a stale fact fresh again
+ok 121 - reconfirm after targeted revalidation makes a stale fact fresh again
+  ---
+  duration_ms: 310.152816
+  type: 'test'
+  ...
+# Subtest: superseded facts are historical and excluded from freshness warnings
+ok 122 - superseded facts are historical and excluded from freshness warnings
+  ---
+  duration_ms: 983.709276
+  type: 'test'
+  ...
+# Subtest: change impact maps changed paths to facts mechanically (context affected)
+ok 123 - change impact maps changed paths to facts mechanically (context affected)
+  ---
+  duration_ms: 2076.574361
+  type: 'test'
+  ...
+# Subtest: handoff surfaces stale facts that this work relates to
+ok 124 - handoff surfaces stale facts that this work relates to
+  ---
+  duration_ms: 1471.187291
+  type: 'test'
+  ...
+# Subtest: ledger transitions are atomic: an invalid transition writes nothing
+ok 125 - ledger transitions are atomic: an invalid transition writes nothing
+  ---
+  duration_ms: 238.082434
+  type: 'test'
+  ...
+# Subtest: the canonical context ledger is created by the first promotion and never by reads
+ok 126 - the canonical context ledger is created by the first promotion and never by reads
+  ---
+  duration_ms: 2914.299786
+  type: 'test'
+  ...
+# Subtest: facts receive stable, sequential CTX IDs that never change on later promotions
+ok 127 - facts receive stable, sequential CTX IDs that never change on later promotions
+  ---
+  duration_ms: 355.869648
+  type: 'test'
+  ...
+# Subtest: confidence (confirmed/inferred/unresolved) is separate from semantic state (current)
+ok 128 - confidence (confirmed/inferred/unresolved) is separate from semantic state (current)
+  ---
+  duration_ms: 426.861358
+  type: 'test'
+  ...
+# Subtest: provenance, originating work, and structured evidence are preserved
+ok 129 - provenance, originating work, and structured evidence are preserved
+  ---
+  duration_ms: 262.000871
+  type: 'test'
+  ...
+# Subtest: evidence records location and hash only — secret file contents are never copied into the ledger
+ok 130 - evidence records location and hash only — secret file contents are never copied into the ledger
+  ---
+  duration_ms: 283.643364
+  type: 'test'
+  ...
+# Subtest: verification:V-\#\#\# evidence must reference a real verification run of the work item
+ok 131 - verification:V-\#\#\# evidence must reference a real verification run of the work item
+  ---
+  duration_ms: 238.951031
+  type: 'test'
+  ...
+# Subtest: promotion updates the Markdown projection and leaves human content untouched
+ok 132 - promotion updates the Markdown projection and leaves human content untouched
+  ---
+  duration_ms: 293.454285
+  type: 'test'
+  ...
+# Subtest: the originating work item remains unchanged by later project-memory evolution
+ok 133 - the originating work item remains unchanged by later project-memory evolution
+  ---
+  duration_ms: 442.803397
+  type: 'test'
+  ...
+# Subtest: a second unrelated fact appends safely without disturbing the first
+ok 134 - a second unrelated fact appends safely without disturbing the first
+  ---
+  duration_ms: 364.082896
+  type: 'test'
+  ...
+# Subtest: supersede: old fact becomes historical, new fact current, lineage consistent both ways
+ok 135 - supersede: old fact becomes historical, new fact current, lineage consistent both ways
+  ---
+  duration_ms: 951.449206
+  type: 'test'
+  ...
+# Subtest: supersede rejects unknown, malformed, and already-superseded targets
+ok 136 - supersede rejects unknown, malformed, and already-superseded targets
+  ---
+  duration_ms: 270.170638
+  type: 'test'
+  ...
+# Subtest: two candidates cannot both supersede the same fact (no duplicate current identity)
+ok 137 - two candidates cannot both supersede the same fact (no duplicate current identity)
+  ---
+  duration_ms: 333.125587
+  type: 'test'
+  ...
+# Subtest: knowledge evolution requires resolvable evidence, not a bare free-text reference
+ok 138 - knowledge evolution requires resolvable evidence, not a bare free-text reference
+  ---
+  duration_ms: 226.089483
+  type: 'test'
+  ...
+# Subtest: reconfirm keeps the same fact identity, refreshes evidence, and creates no duplicate
+ok 139 - reconfirm keeps the same fact identity, refreshes evidence, and creates no duplicate
+  ---
+  duration_ms: 242.045906
+  type: 'test'
+  ...
+# Subtest: reconfirm must use the fact's own kind
+ok 140 - reconfirm must use the fact's own kind
+  ---
+  duration_ms: 205.950682
+  type: 'test'
+  ...
+# Subtest: dispute marks the fact disputed, retains conflicting evidence, and surfaces uncertainty in Markdown
+ok 141 - dispute marks the fact disputed, retains conflicting evidence, and surfaces uncertainty in Markdown
+  ---
+  duration_ms: 693.901294
+  type: 'test'
+  ...
+# Subtest: a disputed fact cannot be disputed again, and resolution preserves dispute history
+ok 142 - a disputed fact cannot be disputed again, and resolution preserves dispute history
+  ---
+  duration_ms: 280.438074
+  type: 'test'
+  ...
+# Subtest: reconfirming a disputed fact settles it back to current
+ok 143 - reconfirming a disputed fact settles it back to current
+  ---
+  duration_ms: 322.219537
+  type: 'test'
+  ...
+# Subtest: decision (ADR) candidates cannot carry context-fact relations
+ok 144 - decision (ADR) candidates cannot carry context-fact relations
+  ---
+  duration_ms: 139.438381
+  type: 'test'
+  ...
+# Subtest: CLI: knowledge propose --supersedes, context show, list, and history expose lineage
+ok 145 - CLI: knowledge propose --supersedes, context show, list, and history expose lineage
+  ---
+  duration_ms: 3533.639732
+  type: 'test'
+  ...
+# Subtest: CLI: context status summarizes areas and is strictly read-only
+ok 146 - CLI: context status summarizes areas and is strictly read-only
+  ---
+  duration_ms: 612.607032
+  type: 'test'
+  ...
+# Subtest: context help never mutates state
+ok 147 - context help never mutates state
+  ---
+  duration_ms: 1217.251937
+  type: 'test'
+  ...
+# Subtest: ledger commits although projection fails; doctor detects drift; render repairs; retry adds nothing
+ok 148 - ledger commits although projection fails; doctor detects drift; render repairs; retry adds nothing
+  ---
+  duration_ms: 3787.765589
+  type: 'test'
+  ...
+# Subtest: a failed supersede keeps full lineage; retry after repair creates no extra fact or history
+ok 149 - a failed supersede keeps full lineage; retry after repair creates no extra fact or history
+  ---
+  duration_ms: 947.520528
+  type: 'test'
+  ...
+# Subtest: a failed reconfirm is not applied twice on retry
+ok 150 - a failed reconfirm is not applied twice on retry
+  ---
+  duration_ms: 254.213582
+  type: 'test'
+  ...
+# Subtest: a failed baseline approval keeps its facts; retry approves without duplicating them
+ok 151 - a failed baseline approval keeps its facts; retry approves without duplicating them
+  ---
+  duration_ms: 772.442997
+  type: 'test'
+  ...
+# Subtest: a real v0.3.6 v1 ledger is read as-is, and stays v1 through ordinary v0.3.7 work
+ok 152 - a real v0.3.6 v1 ledger is read as-is, and stays v1 through ordinary v0.3.7 work
+  ---
+  duration_ms: 8899.933122
+  type: 'test'
+  ...
+# Subtest: reconciling a real v0.3.6 fact writes valid v2: origin becomes origins[0], no duplicates, stable key order
+ok 153 - reconciling a real v0.3.6 fact writes valid v2: origin becomes origins[0], no duplicates, stable key order
+  ---
+  duration_ms: 3856.34271
+  type: 'test'
+  ...
+# Subtest: v2 round-trips: a no-op mutation and later ordinary work keep v2 and every prior fact unchanged
+ok 154 - v2 round-trips: a no-op mutation and later ordinary work keep v2 and every prior fact unchanged
+  ---
+  duration_ms: 2868.736753
+  type: 'test'
+  ...
+# Subtest: doctor catches malformed and divergent provenance for both schemas
+ok 155 - doctor catches malformed and divergent provenance for both schemas
+  ---
+  duration_ms: 5456.143099
+  type: 'test'
+  ...
+# Subtest: a ledger from a newer YallaFlow is refused up front, reported by upgrade status/brief, and never modified
+ok 156 - a ledger from a newer YallaFlow is refused up front, reported by upgrade status/brief, and never modified
+  ---
+  duration_ms: 3870.475648
+  type: 'test'
+  ...
+# Subtest: mixed versions: v0.3.6 keeps reading v1 ledgers v0.3.7 writes, and refuses v2 on its schemaVersion check
+ok 157 - mixed versions: v0.3.6 keeps reading v1 ledgers v0.3.7 writes, and refuses v2 on its schemaVersion check
+  ---
+  duration_ms: 15460.903657
+  type: 'test'
+  ...
+# Subtest: PLAN_READY work can begin decomposition
+ok 158 - PLAN_READY work can begin decomposition
+  ---
+  duration_ms: 183.931511
+  type: 'test'
+  ...
+# Subtest: work not ready for decomposition is rejected
+ok 159 - work not ready for decomposition is rejected
+  ---
+  duration_ms: 67.392985
+  type: 'test'
+  ...
+# Subtest: proposed children preserve the parent relation and remain a normal work item once created
+ok 160 - proposed children preserve the parent relation and remain a normal work item once created
+  ---
+  duration_ms: 200.467624
+  type: 'test'
+  ...
+# Subtest: requirement and acceptance-criteria references are preserved on the child
+ok 161 - requirement and acceptance-criteria references are preserved on the child
+  ---
+  duration_ms: 207.62554
+  type: 'test'
+  ...
+# Subtest: unassigned requirement/acceptance-criteria coverage can be reported
+ok 162 - unassigned requirement/acceptance-criteria coverage can be reported
+  ---
+  duration_ms: 143.538837
+  type: 'test'
+  ...
+# Subtest: cross-cutting duplicate requirement references remain representable, not invalid
+ok 163 - cross-cutting duplicate requirement references remain representable, not invalid
+  ---
+  duration_ms: 148.494762
+  type: 'test'
+  ...
+# Subtest: required and deferred/optional children are supported
+ok 164 - required and deferred/optional children are supported
+  ---
+  duration_ms: 129.776337
+  type: 'test'
+  ...
+# Subtest: a decomposition with structural errors is rejected at propose time
+ok 165 - a decomposition with structural errors is rejected at propose time
+  ---
+  duration_ms: 125.38336
+  type: 'test'
+  ...
+# Subtest: validate transitions proposed to validated and reports traceability
+ok 166 - validate transitions proposed to validated and reports traceability
+  ---
+  duration_ms: 142.122332
+  type: 'test'
+  ...
+# Subtest: execute requires validation first
+ok 167 - execute requires validation first
+  ---
+  duration_ms: 138.040473
+  type: 'test'
+  ...
+# Subtest: execute is the explicit boundary between planning and executing; it never advances the parent by itself
+ok 168 - execute is the explicit boundary between planning and executing; it never advances the parent by itself
+  ---
+  duration_ms: 166.318235
+  type: 'test'
+  ...
+# Subtest: the parent cannot leave IMPLEMENTATION until every required child is DONE
+ok 169 - the parent cannot leave IMPLEMENTATION until every required child is DONE
+  ---
+  duration_ms: 152.984435
+  type: 'test'
+  ...
+# Subtest: a decomposed parent view shows done/active/ready/blocked children
+ok 170 - a decomposed parent view shows done/active/ready/blocked children
+  ---
+  duration_ms: 166.153458
+  type: 'test'
+  ...
+# Subtest: AC-301: every finding status is recorded exactly as declared, with normalized evidence
+ok 171 - AC-301: every finding status is recorded exactly as declared, with normalized evidence
+  ---
+  duration_ms: 316.674535
+  type: 'test'
+  ...
+# Subtest: AC-302: unsupported claims are rejected with zero mutation
+ok 172 - AC-302: unsupported claims are rejected with zero mutation
+  ---
+  duration_ms: 251.718127
+  type: 'test'
+  ...
+# Subtest: AC-302: withdrawn criteria are not assessed; assessment needs the verified implementation
+ok 173 - AC-302: withdrawn criteria are not assessed; assessment needs the verified implementation
+  ---
+  duration_ms: 186.08174
+  type: 'test'
+  ...
+# Subtest: AC-401: DONE is blocked by partial, missing, contradicting, not-assessed, and stale criteria and by open unrequested behavior
+ok 174 - AC-401: DONE is blocked by partial, missing, contradicting, not-assessed, and stale criteria and by open unrequested behavior
+  ---
+  duration_ms: 1367.249259
+  type: 'test'
+  ...
+# Subtest: AC-402: non-applicable and legacy work reaches DONE without any convergence ceremony
+ok 175 - AC-402: non-applicable and legacy work reaches DONE without any convergence ceremony
+  ---
+  duration_ms: 548.312372
+  type: 'test'
+  ...
+# Subtest: AC-403: SPEC_READY and PLAN_READY need no convergence; architectural DONE does
+ok 176 - AC-403: SPEC_READY and PLAN_READY need no convergence; architectural DONE does
+  ---
+  duration_ms: 171.574386
+  type: 'test'
+  ...
+# Subtest: AC-404: reopen and checkpoint revision invalidate convergence through the cascade; history stays
+ok 177 - AC-404: reopen and checkpoint revision invalidate convergence through the cascade; history stays
+  ---
+  duration_ms: 319.760116
+  type: 'test'
+  ...
+# Subtest: change/architectural requires convergence; change/bounded never does
+ok 178 - change/architectural requires convergence; change/bounded never does
+  ---
+  duration_ms: 158.724115
+  type: 'test'
+  ...
+# Subtest: M6: guide, resume, handoff, and brief show a compact delivery block, never the full ledger
+ok 179 - M6: guide, resume, handoff, and brief show a compact delivery block, never the full ledger
+  ---
+  duration_ms: 3282.503063
+  type: 'test'
+  ...
+# Subtest: AC-501: a source attached before the intent is fixed, or to DONE work, raises no impact
+ok 180 - AC-501: a source attached before the intent is fixed, or to DONE work, raises no impact
+  ---
+  duration_ms: 1061.172859
+  type: 'test'
+  ...
+# Subtest: AC-501/502: a source attached after the specification raises a pending impact that blocks progress and writes
+ok 181 - AC-501/502: a source attached after the specification raises a pending impact that blocks progress and writes
+  ---
+  duration_ms: 3807.215785
+  type: 'test'
+  ...
+# Subtest: AC-503: the assessment covers every completed stage with a reason and respects mechanical rules
+ok 182 - AC-503: the assessment covers every completed stage with a reason and respects mechanical rules
+  ---
+  duration_ms: 617.176081
+  type: 'test'
+  ...
+# Subtest: AC-504/505: affected stages are revised through the audited path; unaffected stay; evidence is kept and goes stale
+ok 183 - AC-504/505: affected stages are revised through the audited path; unaffected stay; evidence is kept and goes stale
+  ---
+  duration_ms: 1614.324613
+  type: 'test'
+  ...
+# Subtest: AC-505: an architectural spec revision moves the stage back while the unaffected design stays completed
+ok 184 - AC-505: an architectural spec revision moves the stage back while the unaffected design stays completed
+  ---
+  duration_ms: 679.809447
+  type: 'test'
+  ...
+# Subtest: requirement changes after the intent is fixed raise an impact; an all-unaffected assessment invalidates nothing
+ok 185 - requirement changes after the intent is fixed raise an impact; an all-unaffected assessment invalidates nothing
+  ---
+  duration_ms: 639.090838
+  type: 'test'
+  ...
+# Subtest: an impact assessment is refused when nothing is pending, and a CLI assessment reports what it revised
+ok 186 - an impact assessment is refused when nothing is pending, and a CLI assessment reports what it revised
+  ---
+  duration_ms: 1156.952036
+  type: 'test'
+  ...
+# Subtest: AC-207: with a parent requirements ledger, child coverage must resolve against it
+ok 187 - AC-207: with a parent requirements ledger, child coverage must resolve against it
+  ---
+  duration_ms: 1526.9388
+  type: 'test'
+  ...
+# Subtest: AC-701: doctor fails on delivery contradictions and warns (only) on evidence drift
+ok 188 - AC-701: doctor fails on delivery contradictions and warns (only) on evidence drift
+  ---
+  duration_ms: 7839.166794
+  type: 'test'
+  ...
+# Subtest: AC-701: delivery state on work without a delivery contract is a contradiction
+ok 189 - AC-701: delivery state on work without a delivery contract is a contradiction
+  ---
+  duration_ms: 629.22095
+  type: 'test'
+  ...
+# Subtest: AC-501: attaching a source to DONE work stays a recovered source and raises no impact
+ok 190 - AC-501: attaching a source to DONE work stays a recovered source and raises no impact
+  ---
+  duration_ms: 1472.985863
+  type: 'test'
+  ...
+# Subtest: AC-702: a v0.3.7-routed workspace reads, reports, and passes doctor with zero bytes changed
+ok 191 - AC-702: a v0.3.7-routed workspace reads, reports, and passes doctor with zero bytes changed
+  ---
+  duration_ms: 5899.225214
+  type: 'test'
+  ...
+# Subtest: every file a delivery lifecycle writes has a declared owner, and bootstrap files are repository-root projections
+ok 192 - every file a delivery lifecycle writes has a declared owner, and bootstrap files are repository-root projections
+  ---
+  duration_ms: 1201.131488
+  type: 'test'
+  ...
+# Subtest: lifecycle invariant: command-reachable delivery states pass doctor
+ok 193 - lifecycle invariant: command-reachable delivery states pass doctor
+  ---
+  duration_ms: 2049.413427
+  type: 'test'
+  ...
+# Subtest: lifecycle invariant: a parent revising an inherited criterion stales the child without corrupting it
+ok 194 - lifecycle invariant: a parent revising an inherited criterion stales the child without corrupting it
+  ---
+  duration_ms: 986.481869
+  type: 'test'
+  ...
+# Subtest: policy: convergence is required exactly for feature (bounded, architectural) and change/architectural
+ok 195 - policy: convergence is required exactly for feature (bounded, architectural) and change/architectural
+  ---
+  duration_ms: 3.271668
+  type: 'test'
+  ...
+# Subtest: AC-201: requirements are recorded with stable IDs, provenance, and history
+ok 196 - AC-201: requirements are recorded with stable IDs, provenance, and history
+  ---
+  duration_ms: 94.074276
+  type: 'test'
+  ...
+# Subtest: AC-201: duplicate IDs, bad formats, and unknown parents reject the whole file with zero mutation
+ok 197 - AC-201: duplicate IDs, bad formats, and unknown parents reject the whole file with zero mutation
+  ---
+  duration_ms: 53.579783
+  type: 'test'
+  ...
+# Subtest: AC-202: withdrawn/deferred need a reason, stay visible, and IDs are never removed
+ok 198 - AC-202: withdrawn/deferred need a reason, stay visible, and IDs are never removed
+  ---
+  duration_ms: 495.513474
+  type: 'test'
+  ...
+# Subtest: AC-204: the intent checkpoint of a delivery-convergence contract requires acceptance criteria
+ok 199 - AC-204: the intent checkpoint of a delivery-convergence contract requires acceptance criteria
+  ---
+  duration_ms: 112.472859
+  type: 'test'
+  ...
+# Subtest: AC-205: work without a delivery-convergence contract stays valid and cannot record requirements
+ok 200 - AC-205: work without a delivery-convergence contract stays valid and cannot record requirements
+  ---
+  duration_ms: 3097.687911
+  type: 'test'
+  ...
+# Subtest: AC-206: requirement/convergence/impact read commands never mutate
+ok 201 - AC-206: requirement/convergence/impact read commands never mutate
+  ---
+  duration_ms: 7271.699212
+  type: 'test'
+  ...
+# Subtest: record via CLI: invalid JSON and missing files are refused before anything is read into state
+ok 202 - record via CLI: invalid JSON and missing files are refused before anything is read into state
+  ---
+  duration_ms: 2104.819387
+  type: 'test'
+  ...
+# Subtest: recording requirements on DONE work is refused (history is immutable; controlled DONE fixture)
+ok 203 - recording requirements on DONE work is refused (history is immutable; controlled DONE fixture)
+  ---
+  duration_ms: 41.340672
+  type: 'test'
+  ...
+# Subtest: H1: a parent cannot withdraw a criterion an in-flight child answers for; a DONE child only warns
+ok 204 - H1: a parent cannot withdraw a criterion an in-flight child answers for; a DONE child only warns
+  ---
+  duration_ms: 1366.150838
+  type: 'test'
+  ...
+# Subtest: H2: revising the intent checkpoint does not reopen intent while downstream work stands
+ok 205 - H2: revising the intent checkpoint does not reopen intent while downstream work stands
+  ---
+  duration_ms: 795.104922
+  type: 'test'
+  ...
+# Subtest: H3: convergence evidence must be a direct child's satisfied finding for that criterion, and goes stale with it
+ok 206 - H3: convergence evidence must be a direct child's satisfied finding for that criterion, and goes stale with it
+  ---
+  duration_ms: 513.32568
+  type: 'test'
+  ...
+# Subtest: M1: convergence cannot be recorded before verification is complete
+ok 207 - M1: convergence cannot be recorded before verification is complete
+  ---
+  duration_ms: 101.774604
+  type: 'test'
+  ...
+# Subtest: M3: reopen to review keeps verification and convergence current and doctor healthy
+ok 208 - M3: reopen to review keeps verification and convergence current and doctor healthy
+  ---
+  duration_ms: 805.343059
+  type: 'test'
+  ...
+# Subtest: L1/L2: YallaFlow state is not evidence; zero-padded twins of an ID are refused
+ok 209 - L1/L2: YallaFlow state is not evidence; zero-padded twins of an ID are refused
+  ---
+  duration_ms: 236.222946
+  type: 'test'
+  ...
+# Subtest: L3: CLAUDE.md symlinked to AGENTS.md is reported as shared, not malformed
+ok 210 - L3: CLAUDE.md symlinked to AGENTS.md is reported as shared, not malformed
+  ---
+  duration_ms: 2098.498227
+  type: 'test'
+  ...
+# Subtest: a valid dependency is accepted
+ok 211 - a valid dependency is accepted
+  ---
+  duration_ms: 185.388772
+  type: 'test'
+  ...
+# Subtest: an unknown dependency is rejected
+ok 212 - an unknown dependency is rejected
+  ---
+  duration_ms: 155.697186
+  type: 'test'
+  ...
+# Subtest: a self-dependency is rejected
+ok 213 - a self-dependency is rejected
+  ---
+  duration_ms: 135.804129
+  type: 'test'
+  ...
+# Subtest: a dependency cycle is rejected
+ok 214 - a dependency cycle is rejected
+  ---
+  duration_ms: 132.392526
+  type: 'test'
+  ...
+# Subtest: a child blocked by an incomplete dependency is not executable, and dependency completion unblocks it
+ok 215 - a child blocked by an incomplete dependency is not executable, and dependency completion unblocks it
+  ---
+  duration_ms: 1180.733465
+  type: 'test'
+  ...
+# Subtest: multiple ready children are reported without YallaFlow choosing one
+ok 216 - multiple ready children are reported without YallaFlow choosing one
+  ---
+  duration_ms: 647.903293
+  type: 'test'
+  ...
+# Subtest: direct feature --scope bounded creates routed work with a pinned Behavior Contract
+ok 217 - direct feature --scope bounded creates routed work with a pinned Behavior Contract
+  ---
+  duration_ms: 1015.866037
+  type: 'test'
+  ...
+# Subtest: direct investigate --scope bounded is read-only with a pinned read-only contract
+ok 218 - direct investigate --scope bounded is read-only with a pinned read-only contract
+  ---
+  duration_ms: 1532.400326
+  type: 'test'
+  ...
+# Subtest: direct bug --scope spike gets the read-only investigation workflow contract
+ok 219 - direct bug --scope spike gets the read-only investigation workflow contract
+  ---
+  duration_ms: 994.120017
+  type: 'test'
+  ...
+# Subtest: every direct type/scope uses the canonical policy: governed fields equal start → route
+ok 220 - every direct type/scope uses the canonical policy: governed fields equal start → route
+  ---
+  duration_ms: 34361.862642
+  type: 'test'
+  ...
+# Subtest: guide works immediately on direct-created work
+ok 221 - guide works immediately on direct-created work
+  ---
+  duration_ms: 1522.147033
+  type: 'test'
+  ...
+# Subtest: verification and knowledge gates are identical to routed work, and doctor is healthy after correct completion
+ok 222 - verification and knowledge gates are identical to routed work, and doctor is healthy after correct completion
+  ---
+  duration_ms: 12422.76043
+  type: 'test'
+  ...
+# Subtest: a direct command without --scope creates nothing and mutates zero workspace state
+ok 223 - a direct command without --scope creates nothing and mutates zero workspace state
+  ---
+  duration_ms: 3910.642633
+  type: 'test'
+  ...
+# Subtest: old contract-less legacy work remains readable
+ok 224 - old contract-less legacy work remains readable
+  ---
+  duration_ms: 4104.586435
+  type: 'test'
+  ...
+# Subtest: no v0.3.6 creation path can produce contract-less work
+ok 225 - no v0.3.6 creation path can produce contract-less work
+  ---
+  duration_ms: 5809.573198
+  type: 'test'
+  ...
+# Subtest: a limitation is recorded in the work item only (discovery.yaml)
+ok 226 - a limitation is recorded in the work item only (discovery.yaml)
+  ---
+  duration_ms: 85.760595
+  type: 'test'
+  ...
+# Subtest: no limitations file is created when unused, including by reads
+ok 227 - no limitations file is created when unused, including by reads
+  ---
+  duration_ms: 1938.966239
+  type: 'test'
+  ...
+# Subtest: limitation types and areas are validated
+ok 228 - limitation types and areas are validated
+  ---
+  duration_ms: 43.680498
+  type: 'test'
+  ...
+# Subtest: a limitation cannot be proposed as project knowledge, so it never reaches database.md
+ok 229 - a limitation cannot be proposed as project knowledge, so it never reaches database.md
+  ---
+  duration_ms: 88.734946
+  type: 'test'
+  ...
+# Subtest: limitations appear in handoff as work-scoped, not as project facts
+ok 230 - limitations appear in handoff as work-scoped, not as project facts
+  ---
+  duration_ms: 1059.128955
+  type: 'test'
+  ...
+# Subtest: a baseline records runtime-unavailable limitations for review but never promotes them
+ok 231 - a baseline records runtime-unavailable limitations for review but never promotes them
+  ---
+  duration_ms: 1426.539849
+  type: 'test'
+  ...
+# Subtest: a baseline fact may not restate one of its own discovery limitations
+ok 232 - a baseline fact may not restate one of its own discovery limitations
+  ---
+  duration_ms: 64.878116
+  type: 'test'
+  ...
+# Subtest: detects framework markers without an LLM
+ok 233 - detects framework markers without an LLM
+  ---
+  duration_ms: 20.451092
+  type: 'test'
+  ...
+# Subtest: doctor reports a healthy workspace with no work items
+ok 234 - doctor reports a healthy workspace with no work items
+  ---
+  duration_ms: 592.970149
+  type: 'test'
+  ...
+# Subtest: doctor detects a DONE stage with an incomplete implementation checkpoint
+ok 235 - doctor detects a DONE stage with an incomplete implementation checkpoint
+  ---
+  duration_ms: 929.829764
+  type: 'test'
+  ...
+# Subtest: doctor detects a completed verification checkpoint with no verification evidence
+ok 236 - doctor detects a completed verification checkpoint with no verification evidence
+  ---
+  duration_ms: 1004.378483
+  type: 'test'
+  ...
+# Subtest: doctor detects an impossible DONE state missing required review/knowledge
+ok 237 - doctor detects an impossible DONE state missing required review/knowledge
+  ---
+  duration_ms: 799.305806
+  type: 'test'
+  ...
+# Subtest: doctor considers a healthy reopened work item passing
+ok 238 - doctor considers a healthy reopened work item passing
+  ---
+  duration_ms: 814.851317
+  type: 'test'
+  ...
+# Subtest: an untracked, ungitignored .yallaflow produces a WARN, not a FAIL, and the workspace still reports healthy
+ok 239 - an untracked, ungitignored .yallaflow produces a WARN, not a FAIL, and the workspace still reports healthy
+  ---
+  duration_ms: 1191.293574
+  type: 'test'
+  ...
+# Subtest: a gitignored .yallaflow produces no warning at all
+ok 240 - a gitignored .yallaflow produces no warning at all
+  ---
+  duration_ms: 1153.052428
+  type: 'test'
+  ...
+# Subtest: a tracked .yallaflow produces no warning at all
+ok 241 - a tracked .yallaflow produces no warning at all
+  ---
+  duration_ms: 1101.879674
+  type: 'test'
+  ...
+# Subtest: genuine structural corruption remains a hard FAIL even when Git tracking is fine
+ok 242 - genuine structural corruption remains a hard FAIL even when Git tracking is fine
+  ---
+  duration_ms: 1048.924748
+  type: 'test'
+  ...
+# Subtest: outside a Git repository, no warning is produced
+ok 243 - outside a Git repository, no warning is produced
+  ---
+  duration_ms: 1104.621904
+  type: 'test'
+  ...
+# Subtest: an image source is linked to an existing (routed) work item
+ok 244 - an image source is linked to an existing (routed) work item
+  ---
+  duration_ms: 2077.067503
+  type: 'test'
+  ...
+# Subtest: a source is immutable: re-capture never overwrites, and tampering is detected
+ok 245 - a source is immutable: re-capture never overwrites, and tampering is detected
+  ---
+  duration_ms: 4416.628591
+  type: 'test'
+  ...
+# Subtest: a dangling source reference is an integrity error
+ok 246 - a dangling source reference is an integrity error
+  ---
+  duration_ms: 2698.245078
+  type: 'test'
+  ...
+# Subtest: the source survives a fresh-agent handoff and resume, with the path to open
+ok 247 - the source survives a fresh-agent handoff and resume, with the path to open
+  ---
+  duration_ms: 3783.747502
+  type: 'test'
+  ...
+# Subtest: a source is distinguishable from verification evidence
+ok 248 - a source is distinguishable from verification evidence
+  ---
+  duration_ms: 3175.617606
+  type: 'test'
+  ...
+# Subtest: no parallel attachment system: capture goes through sources/, never work/<id>/attachments
+ok 249 - no parallel attachment system: capture goes through sources/, never work/<id>/attachments
+  ---
+  duration_ms: 2144.011832
+  type: 'test'
+  ...
+# Subtest: an artifact the Agent could not access is recorded as uncaptured, never as a preserved source
+ok 250 - an artifact the Agent could not access is recorded as uncaptured, never as a preserved source
+  ---
+  duration_ms: 3099.164132
+  type: 'test'
+  ...
+# Subtest: artifact guidance is part of the generated Agent contract
+ok 251 - artifact guidance is part of the generated Agent contract
+  ---
+  duration_ms: 520.31326
+  type: 'test'
+  ...
+# Subtest: every workflow stage except INTAKE and DONE maps to exactly one station
+ok 252 - every workflow stage except INTAKE and DONE maps to exactly one station
+  ---
+  duration_ms: 3.565026
+  type: 'test'
+  ...
+# Subtest: a bug at ROOT_CAUSE: Understand done, Decide current with half of the step in progress
+ok 253 - a bug at ROOT_CAUSE: Understand done, Decide current with half of the step in progress
+  ---
+  duration_ms: 3.886482
+  type: 'test'
+  ...
+# Subtest: an investigation never changes code: Change is not applicable and counts in full
+ok 254 - an investigation never changes code: Change is not applicable and counts in full
+  ---
+  duration_ms: 0.588545
+  type: 'test'
+  ...
+# Subtest: the final stage counts as finished once verification is complete; Remember becomes current
+ok 255 - the final stage counts as finished once verification is complete; Remember becomes current
+  ---
+  duration_ms: 0.526597
+  type: 'test'
+  ...
+# Subtest: pinned convergence and code-review are Verify steps
+ok 256 - pinned convergence and code-review are Verify steps
+  ---
+  duration_ms: 0.694985
+  type: 'test'
+  ...
+# Subtest: DONE is 100% and every station is done; a new item is 0% with no current station
+ok 257 - DONE is 100% and every station is done; a new item is 0% with no current station
+  ---
+  duration_ms: 0.913207
+  type: 'test'
+  ...
+# Subtest: item state: a person is waited on before failure, activity, or pause
+ok 258 - item state: a person is waited on before failure, activity, or pause
+  ---
+  duration_ms: 0.5154
+  type: 'test'
+  ...
+# Subtest: completion formula is the documented arithmetic
+ok 259 - completion formula is the documented arithmetic
+  ---
+  duration_ms: 0.379018
+  type: 'test'
+  ...
+# Subtest: refactor and release place their stages and compute completion
+ok 260 - refactor and release place their stages and compute completion
+  ---
+  duration_ms: 1.265057
+  type: 'test'
+  ...
+# Subtest: evidence, not checkpoint flags, finishes Verify: stale runs or convergence keep it open
+ok 261 - evidence, not checkpoint flags, finishes Verify: stale runs or convergence keep it open
+  ---
+  duration_ms: 1.439354
+  type: 'test'
+  ...
+# Subtest: a checkpoint reopened behind the current stage brings its station back
+ok 262 - a checkpoint reopened behind the current stage brings its station back
+  ---
+  duration_ms: 0.699055
+  type: 'test'
+  ...
+# Subtest: a decomposed parent shows its children as Change progress
+ok 263 - a decomposed parent shows its children as Change progress
+  ---
+  duration_ms: 0.564802
+  type: 'test'
+  ...
+# Subtest: reopened work prominently exposes the reopen reason as the primary unresolved objective
+ok 264 - reopened work prominently exposes the reopen reason as the primary unresolved objective
+  ---
+  duration_ms: 1393.428354
+  type: 'test'
+  ...
+# Subtest: a checkpoint revision reason is visible as the primary objective
+ok 265 - a checkpoint revision reason is visible as the primary objective
+  ---
+  duration_ms: 743.828025
+  type: 'test'
+  ...
+# Subtest: an active write-authorization blocker is visible as the primary objective when nothing else applies
+ok 266 - an active write-authorization blocker is visible as the primary objective when nothing else applies
+  ---
+  duration_ms: 609.95141
+  type: 'test'
+  ...
+# Subtest: an optional handoff note can be recorded and is preserved without duplicating checkpoints
+ok 267 - an optional handoff note can be recorded and is preserved without duplicating checkpoints
+  ---
+  duration_ms: 555.076613
+  type: 'test'
+  ...
+# Subtest: handoff remains read-only
+ok 268 - handoff remains read-only
+  ---
+  duration_ms: 566.525189
+  type: 'test'
+  ...
+# Subtest: Git state surfaced by handoff is read-only
+ok 269 - Git state surfaced by handoff is read-only
+  ---
+  duration_ms: 587.679997
+  type: 'test'
+  ...
+# Subtest: DONE work cannot incorrectly report project complete while the parent is incomplete
+ok 270 - DONE work cannot incorrectly report project complete while the parent is incomplete
+  ---
+  duration_ms: 1481.72781
+  type: 'test'
+  ...
+# Subtest: handoff works for active work
+ok 271 - handoff works for active work
+  ---
+  duration_ms: 627.894184
+  type: 'test'
+  ...
+# Subtest: handoff works for DONE work
+ok 272 - handoff works for DONE work
+  ---
+  duration_ms: 728.164716
+  type: 'test'
+  ...
+# Subtest: handoff works for an explicit non-active work ID and is read-only
+ok 273 - handoff works for an explicit non-active work ID and is read-only
+  ---
+  duration_ms: 610.710602
+  type: 'test'
+  ...
+# Subtest: handoff includes blockers, open questions, and review-gate state
+ok 274 - handoff includes blockers, open questions, and review-gate state
+  ---
+  duration_ms: 636.166584
+  type: 'test'
+  ...
+# Subtest: parent handoff includes child progress, dependencies, and traceability gaps
+ok 275 - parent handoff includes child progress, dependencies, and traceability gaps
+  ---
+  duration_ms: 735.971835
+  type: 'test'
+  ...
+# Subtest: handoff never mutates workspace state or Git
+ok 276 - handoff never mutates workspace state or Git
+  ---
+  duration_ms: 543.695265
+  type: 'test'
+  ...
+# Subtest: every released skill instruction version is immutable bytes with a recorded hash; the registry is v9
+ok 277 - every released skill instruction version is immutable bytes with a recorded hash; the registry is v9
+  ---
+  duration_ms: 56.304983
+  type: 'test'
+  ...
+# Subtest: editing a released instruction in place is detected (doctor / skill fail), never silently served
+ok 278 - editing a released instruction in place is detected (doctor / skill fail), never silently served
+  ---
+  duration_ms: 117.197261
+  type: 'test'
+  ...
+# Subtest: work pinned under registry v5 resolves exactly the v0.3.9 instructions after upgrading; v6 work resolves v2
+ok 279 - work pinned under registry v5 resolves exactly the v0.3.9 instructions after upgrading; v6 work resolves v2
+  ---
+  duration_ms: 2566.78664
+  type: 'test'
+  ...
+# Subtest: first-use gate: an un-understood Brownfield project refuses normal work outright; the baseline is the next valid action, then work continues
+ok 280 - first-use gate: an un-understood Brownfield project refuses normal work outright; the baseline is the next valid action, then work continues
+  ---
+  duration_ms: 12502.25537
+  type: 'test'
+  ...
+# Subtest: first-use gate: work created before the gate (an older YallaFlow) cannot write, reopen, or be routed; read-only work proceeds; Greenfield is never gated
+ok 281 - first-use gate: work created before the gate (an older YallaFlow) cannot write, reopen, or be routed; read-only work proceeds; Greenfield is never gated
+  ---
+  duration_ms: 16376.335956
+  type: 'test'
+  ...
+# Subtest: knowledge schema: v1 stays v1 and readable by v0.3.9; Shared Project shapes are v2 and v0.3.9 refuses them without changing a byte
+ok 282 - knowledge schema: v1 stays v1 and readable by v0.3.9; Shared Project shapes are v2 and v0.3.9 refuses them without changing a byte
+  ---
+  duration_ms: 10799.039547
+  type: 'test'
+  ...
+# Subtest: 1. `start --help` shows YallaFlow help and mutates nothing
+ok 283 - 1. `start --help` shows YallaFlow help and mutates nothing
+  ---
+  duration_ms: 513.597687
+  type: 'test'
+  ...
+# Subtest: 2. `baseline start --help` shows the baseline-start usage line and mutates nothing
+ok 284 - 2. `baseline start --help` shows the baseline-start usage line and mutates nothing
+  ---
+  duration_ms: 489.897519
+  type: 'test'
+  ...
+# Subtest: 3. `request revise --help` shows the request-revise usage line and mutates nothing
+ok 285 - 3. `request revise --help` shows the request-revise usage line and mutates nothing
+  ---
+  duration_ms: 497.108207
+  type: 'test'
+  ...
+# Subtest: 4. `verify <id> -- node --help` runs node --help as verification, not YallaFlow help
+ok 286 - 4. `verify <id> -- node --help` runs node --help as verification, not YallaFlow help
+  ---
+  duration_ms: 702.773783
+  type: 'test'
+  ...
+# Subtest: 5. `verify <id> -- npm test -- --help` treats everything after the separator as child argv
+ok 287 - 5. `verify <id> -- npm test -- --help` treats everything after the separator as child argv
+  ---
+  duration_ms: 663.967771
+  type: 'test'
+  ...
+# Subtest: 6. `start` with request text containing "--help" creates the intake normally
+ok 288 - 6. `start` with request text containing "--help" creates the intake normally
+  ---
+  duration_ms: 663.093379
+  type: 'test'
+  ...
+# Subtest: 7. `request revise` with option text containing "--help" revises normally, not treated as help
+ok 289 - 7. `request revise` with option text containing "--help" revises normally, not treated as help
+  ---
+  duration_ms: 522.608142
+  type: 'test'
+  ...
+# Subtest: nested YallaFlow help remains zero-mutation when a work-id is also present
+ok 290 - nested YallaFlow help remains zero-mutation when a work-id is also present
+  ---
+  duration_ms: 526.874848
+  type: 'test'
+  ...
+# Subtest: `--help` positioned before the -- separator still triggers YallaFlow help (it is unambiguously YallaFlow-scoped)
+ok 291 - `--help` positioned before the -- separator still triggers YallaFlow help (it is unambiguously YallaFlow-scoped)
+  ---
+  duration_ms: 498.878036
+  type: 'test'
+  ...
+# Subtest: init creates CLAUDE.md and AGENTS.md with the current bootstrap block pointing to .yallaflow/AGENT.md
+ok 292 - init creates CLAUDE.md and AGENTS.md with the current bootstrap block pointing to .yallaflow/AGENT.md
+  ---
+  duration_ms: 2231.909456
+  type: 'test'
+  ...
+# Subtest: init preserves existing CLAUDE.md and AGENTS.md content byte-for-byte and only adds the managed block
+ok 293 - init preserves existing CLAUDE.md and AGENTS.md content byte-for-byte and only adds the managed block
+  ---
+  duration_ms: 1662.195945
+  type: 'test'
+  ...
+# Subtest: a symlinked CLAUDE.md → AGENTS.md gets one shared block; an outdated block is updated; a current one is left alone
+ok 294 - a symlinked CLAUDE.md → AGENTS.md gets one shared block; an outdated block is updated; a current one is left alone
+  ---
+  duration_ms: 1076.929371
+  type: 'test'
+  ...
+# Subtest: init refuses an unsafe agent file before writing anything: no workspace, no files touched
+ok 295 - init refuses an unsafe agent file before writing anything: no workspace, no files touched
+  ---
+  duration_ms: 1066.062519
+  type: 'test'
+  ...
+# Subtest: a failure while installing the bootstrap rolls init back: no half-configured workspace, agent files restored
+ok 296 - a failure while installing the bootstrap rolls init back: no half-configured workspace, agent files restored
+  ---
+  duration_ms: 1058.548296
+  type: 'test'
+  ...
+# Subtest: init stays idempotent: a second init refuses and changes nothing; explicit agent setup and refresh still work
+ok 297 - init stays idempotent: a second init refuses and changes nothing; explicit agent setup and refresh still work
+  ---
+  duration_ms: 3019.73186
+  type: 'test'
+  ...
+# Subtest: help never mutates; existing v0.3.10 workspaces without bootstrap files stay readable and unchanged by reads
+ok 298 - help never mutates; existing v0.3.10 workspaces without bootstrap files stay readable and unchanged by reads
+  ---
+  duration_ms: 4735.026611
+  type: 'test'
+  ...
+# Subtest: team: the maintainer runs init once and commits; a teammate clone needs no init and no agent setup
+ok 299 - team: the maintainer runs init once and commits; a teammate clone needs no init and no agent setup
+  ---
+  duration_ms: 1897.644583
+  type: 'test'
+  ...
+# Subtest: existing .yallaflow on the filesystem blocks init
+ok 300 - existing .yallaflow on the filesystem blocks init
+  ---
+  duration_ms: 1049.063752
+  type: 'test'
+  ...
+# Subtest: legacy .projectflow blocks init
+ok 301 - legacy .projectflow blocks init
+  ---
+  duration_ms: 621.778845
+  type: 'test'
+  ...
+# Subtest: Git-tracked .yallaflow missing from the working tree blocks init
+ok 302 - Git-tracked .yallaflow missing from the working tree blocks init
+  ---
+  duration_ms: 1072.451365
+  type: 'test'
+  ...
+# Subtest: a failed init mutates zero files
+ok 303 - a failed init mutates zero files
+  ---
+  duration_ms: 1085.081112
+  type: 'test'
+  ...
+# Subtest: a project with no Git repository at all still initializes normally
+ok 304 - a project with no Git repository at all still initializes normally
+  ---
+  duration_ms: 550.724412
+  type: 'test'
+  ...
+# Subtest: native text intake: sample.txt
+ok 305 - native text intake: sample.txt
+  ---
+  duration_ms: 672.870291
+  type: 'test'
+  ...
+# Subtest: native text intake: sample.md
+ok 306 - native text intake: sample.md
+  ---
+  duration_ms: 553.60635
+  type: 'test'
+  ...
+# Subtest: native text intake: sample.json
+ok 307 - native text intake: sample.json
+  ---
+  duration_ms: 559.54408
+  type: 'test'
+  ...
+# Subtest: native text intake: sample.jsonl
+ok 308 - native text intake: sample.jsonl
+  ---
+  duration_ms: 607.610909
+  type: 'test'
+  ...
+# Subtest: native text intake: sample.yaml
+ok 309 - native text intake: sample.yaml
+  ---
+  duration_ms: 541.249279
+  type: 'test'
+  ...
+# Subtest: native text intake: sample.xml
+ok 310 - native text intake: sample.xml
+  ---
+  duration_ms: 520.024856
+  type: 'test'
+  ...
+# Subtest: native text intake: sample.html
+ok 311 - native text intake: sample.html
+  ---
+  duration_ms: 580.63372
+  type: 'test'
+  ...
+# Subtest: native text intake: sample.csv
+ok 312 - native text intake: sample.csv
+  ---
+  duration_ms: 562.028841
+  type: 'test'
+  ...
+# Subtest: native text intake: sample.tsv
+ok 313 - native text intake: sample.tsv
+  ---
+  duration_ms: 564.390822
+  type: 'test'
+  ...
+# Subtest: native text intake: sample.toml
+ok 314 - native text intake: sample.toml
+  ---
+  duration_ms: 593.226888
+  type: 'test'
+  ...
+# Subtest: office intake: docx
+ok 315 - office intake: docx
+  ---
+  duration_ms: 641.955277
+  type: 'test'
+  ...
+# Subtest: office intake: pptx produces per-slide sections
+ok 316 - office intake: pptx produces per-slide sections
+  ---
+  duration_ms: 535.484212
+  type: 'test'
+  ...
+# Subtest: office intake: xlsx produces a sheet table with the real sheet name
+ok 317 - office intake: xlsx produces a sheet table with the real sheet name
+  ---
+  duration_ms: 550.282871
+  type: 'test'
+  ...
+# Subtest: office intake: rtf
+ok 318 - office intake: rtf
+  ---
+  duration_ms: 550.017032
+  type: 'test'
+  ...
+# Subtest: office intake: odt
+ok 319 - office intake: odt
+  ---
+  duration_ms: 590.649507
+  type: 'test'
+  ...
+# Subtest: office intake: ods
+ok 320 - office intake: ods
+  ---
+  duration_ms: 616.650505
+  type: 'test'
+  ...
+# Subtest: office intake: odp
+ok 321 - office intake: odp
+  ---
+  duration_ms: 610.267085
+  type: 'test'
+  ...
+# Subtest: PDF intake produces per-page sections
+ok 322 - PDF intake produces per-page sections
+  ---
+  duration_ms: 1312.241116
+  type: 'test'
+  ...
+# Subtest: image intake preserves original without claiming extraction: sample.png
+ok 323 - image intake preserves original without claiming extraction: sample.png
+  ---
+  duration_ms: 602.642494
+  type: 'test'
+  ...
+# Subtest: image intake preserves original without claiming extraction: sample.jpg
+ok 324 - image intake preserves original without claiming extraction: sample.jpg
+  ---
+  duration_ms: 507.815567
+  type: 'test'
+  ...
+# Subtest: image intake preserves original without claiming extraction: sample.svg
+ok 325 - image intake preserves original without claiming extraction: sample.svg
+  ---
+  duration_ms: 561.315449
+  type: 'test'
+  ...
+# Subtest: PNG dimensions are read from the header
+ok 326 - PNG dimensions are read from the header
+  ---
+  duration_ms: 519.3096
+  type: 'test'
+  ...
+# Subtest: unsupported binary is accepted as original-only, not rejected
+ok 327 - unsupported binary is accepted as original-only, not rejected
+  ---
+  duration_ms: 537.153916
+  type: 'test'
+  ...
+# Subtest: a dangerous archive extension is preserved, never auto-unpacked
+ok 328 - a dangerous archive extension is preserved, never auto-unpacked
+  ---
+  duration_ms: 536.883989
+  type: 'test'
+  ...
+# Subtest: corrupt DOCX degrades to original-only instead of failing intake
+ok 329 - corrupt DOCX degrades to original-only instead of failing intake
+  ---
+  duration_ms: 565.602201
+  type: 'test'
+  ...
+# Subtest: corrupt PDF degrades to original-only instead of failing intake
+ok 330 - corrupt PDF degrades to original-only instead of failing intake
+  ---
+  duration_ms: 1104.340637
+  type: 'test'
+  ...
+# Subtest: fake extension (non-zip content named .docx) is detected and preserved as binary
+ok 331 - fake extension (non-zip content named .docx) is detected and preserved as binary
+  ---
+  duration_ms: 555.984858
+  type: 'test'
+  ...
+# Subtest: path traversal attempts are rejected at the validation boundary
+ok 332 - path traversal attempts are rejected at the validation boundary
+  ---
+  duration_ms: 37.873608
+  type: 'test'
+  ...
+# Subtest: malicious filename with embedded traversal sequences is sanitized to its basename
+ok 333 - malicious filename with embedded traversal sequences is sanitized to its basename
+  ---
+  duration_ms: 534.861449
+  type: 'test'
+  ...
+# Subtest: zero-byte file is rejected
+ok 334 - zero-byte file is rejected
+  ---
+  duration_ms: 556.803544
+  type: 'test'
+  ...
+# Subtest: oversize source file is rejected with a clear error, never silently truncated
+ok 335 - oversize source file is rejected with a clear error, never silently truncated
+  ---
+  duration_ms: 517.248925
+  type: 'test'
+  ...
+# Subtest: a file exceeding the extraction limit is preserved as original-only rather than parsed
+ok 336 - a file exceeding the extraction limit is preserved as original-only rather than parsed
+  ---
+  duration_ms: 875.055423
+  type: 'test'
+  ...
+# Subtest: rollback: a persisted source can be removed if the owning work item fails to be created
+ok 337 - rollback: a persisted source can be removed if the owning work item fails to be created
+  ---
+  duration_ms: 30.142296
+  type: 'test'
+  ...
+# Subtest: duplicate intake does not overwrite; checksum match is reported
+ok 338 - duplicate intake does not overwrite; checksum match is reported
+  ---
+  duration_ms: 1134.48898
+  type: 'test'
+  ...
+# Subtest: restart preserves source relationship and checksum
+ok 339 - restart preserves source relationship and checksum
+  ---
+  duration_ms: 661.635386
+  type: 'test'
+  ...
+# Subtest: intake accepts multiple files at once, creating one work item with several sources
+ok 340 - intake accepts multiple files at once, creating one work item with several sources
+  ---
+  duration_ms: 670.122299
+  type: 'test'
+  ...
+# Subtest: intake add attaches an additional source to an existing work item
+ok 341 - intake add attaches an additional source to an existing work item
+  ---
+  duration_ms: 1158.277881
+  type: 'test'
+  ...
+# Subtest: intake add works after the work item has been routed
+ok 342 - intake add works after the work item has been routed
+  ---
+  duration_ms: 2204.704099
+  type: 'test'
+  ...
+# Subtest: source list shows format and content availability
+ok 343 - source list shows format and content availability
+  ---
+  duration_ms: 1158.294624
+  type: 'test'
+  ...
+# Subtest: source show --content explains when no text representation exists
+ok 344 - source show --content explains when no text representation exists
+  ---
+  duration_ms: 1041.673016
+  type: 'test'
+  ...
+# Subtest: source show --content prints extracted text for office documents
+ok 345 - source show --content prints extracted text for office documents
+  ---
+  duration_ms: 1100.235469
+  type: 'test'
+  ...
+# Subtest: guide and resume expose format and content availability
+ok 346 - guide and resume expose format and content availability
+  ---
+  duration_ms: 1562.852428
+  type: 'test'
+  ...
+# Subtest: legacy (schemaVersion 1) sources remain readable without migration
+ok 347 - legacy (schemaVersion 1) sources remain readable without migration
+  ---
+  duration_ms: 928.550295
+  type: 'test'
+  ...
+# Subtest: new sources are always written as the current schema version
+ok 348 - new sources are always written as the current schema version
+  ---
+  duration_ms: 517.064868
+  type: 'test'
+  ...
+# Subtest: existing text start still works, unaffected by universal file intake
+ok 349 - existing text start still works, unaffected by universal file intake
+  ---
+  duration_ms: 491.736461
+  type: 'test'
+  ...
+# Subtest: old workspace without sources/ loads, and read-only commands never create it
+ok 350 - old workspace without sources/ loads, and read-only commands never create it
+  ---
+  duration_ms: 1491.39706
+  type: 'test'
+  ...
+# Subtest: optional title and no routing inference
+ok 351 - optional title and no routing inference
+  ---
+  duration_ms: 649.861919
+  type: 'test'
+  ...
+# Subtest: AC-005: a bare .git (including a real empty `git init`) is Greenfield
+ok 352 - AC-005: a bare .git (including a real empty `git init`) is Greenfield
+  ---
+  duration_ms: 40.994001
+  type: 'test'
+  ...
+# Subtest: AC-005: an `npm init`-only package.json, or any manifest without source, is Greenfield
+ok 353 - AC-005: an `npm init`-only package.json, or any manifest without source, is Greenfield
+  ---
+  duration_ms: 31.543983
+  type: 'test'
+  ...
+# Subtest: AC-005: a manifest with one recognized source file is Brownfield
+ok 354 - AC-005: a manifest with one recognized source file is Brownfield
+  ---
+  duration_ms: 4.816122
+  type: 'test'
+  ...
+# Subtest: AC-005: the source-file threshold is the named constant — 9 files Greenfield, 10 Brownfield
+ok 355 - AC-005: the source-file threshold is the named constant — 9 files Greenfield, 10 Brownfield
+  ---
+  duration_ms: 69.923066
+  type: 'test'
+  ...
+# Subtest: AC-005: meaningful container/CI configuration is Brownfield; empty or comment-only is not
+ok 356 - AC-005: meaningful container/CI configuration is Brownfield; empty or comment-only is not
+  ---
+  duration_ms: 50.79443
+  type: 'test'
+  ...
+# Subtest: AC-006: an APD-shaped tree with only nested applications and no Git is Brownfield
+ok 357 - AC-006: an APD-shaped tree with only nested applications and no Git is Brownfield
+  ---
+  duration_ms: 107.614201
+  type: 'test'
+  ...
+# Subtest: AC-001: traversal is deterministic, skips ignored directories, and never follows symlinks
+ok 358 - AC-001: traversal is deterministic, skips ignored directories, and never follows symlinks
+  ---
+  duration_ms: 138.211095
+  type: 'test'
+  ...
+# Subtest: AC-001: depth and entry bounds are enforced and reported, never silent
+ok 359 - AC-001: depth and entry bounds are enforced and reported, never silent
+  ---
+  duration_ms: 56.54662
+  type: 'test'
+  ...
+# Subtest: AC-002: nested manifests, per-extension counts, documents, and hints — and nothing is persisted
+ok 360 - AC-002: nested manifests, per-extension counts, documents, and hints — and nothing is persisted
+  ---
+  duration_ms: 98.701763
+  type: 'test'
+  ...
+# Subtest: AC-003: Angular majors per nested application; Spring Boot from parent, BOM property, or a bare reference
+ok 361 - AC-003: Angular majors per nested application; Spring Boot from parent, BOM property, or a bare reference
+  ---
+  duration_ms: 31.334885
+  type: 'test'
+  ...
+# Subtest: AC-003: exactly the approved framework list, deterministic majors, and no semantic labels
+ok 362 - AC-003: exactly the approved framework list, deterministic majors, and no semantic labels
+  ---
+  duration_ms: 2.375898
+  type: 'test'
+  ...
+# Subtest: AC-003: malformed or unreadable manifests are reported, never thrown
+ok 363 - AC-003: malformed or unreadable manifests are reported, never thrown
+  ---
+  duration_ms: 8.876002
+  type: 'test'
+  ...
+# Subtest: AC-004: documentation candidates come from intake-owned formats and are labelled with intake handling
+ok 364 - AC-004: documentation candidates come from intake-owned formats and are labelled with intake handling
+  ---
+  duration_ms: 102.841349
+  type: 'test'
+  ...
+# Subtest: review: unreadable container/CI files and directories are reported as unreadable, not as empty
+ok 365 - review: unreadable container/CI files and directories are reported as unreadable, not as empty
+  ---
+  duration_ms: 3.074886
+  type: 'test'
+  ...
+# Subtest: review: Maven ${property} versions — kept when unresolvable, resolved from project-level (not profile) properties
+ok 366 - review: Maven ${property} versions — kept when unresolvable, resolved from project-level (not profile) properties
+  ---
+  duration_ms: 0.560711
+  type: 'test'
+  ...
+# Subtest: review: Gradle comments are ignored; a BOM-prefixed package.json still yields hints
+ok 367 - review: Gradle comments are ignored; a BOM-prefixed package.json still yields hints
+  ---
+  duration_ms: 0.254426
+  type: 'test'
+  ...
+# Subtest: review: Dockerfile.* and *.Dockerfile are recognized; oversized manifests are reported, not read
+ok 368 - review: Dockerfile.* and *.Dockerfile are recognized; oversized manifests are reported, not read
+  ---
+  duration_ms: 7.830074
+  type: 'test'
+  ...
+# Subtest: investigation: DONE is consistently blocked until proof exists, then DONE and doctor is healthy
+ok 369 - investigation: DONE is consistently blocked until proof exists, then DONE and doctor is healthy
+  ---
+  duration_ms: 10343.463188
+  type: 'test'
+  ...
+# Subtest: bug spike (read-only investigation workflow) follows the same DONE rule
+ok 370 - bug spike (read-only investigation workflow) follows the same DONE rule
+  ---
+  duration_ms: 8814.016585
+  type: 'test'
+  ...
+# Subtest: DONE feature work: verify is refused with the reopen path, and works after reopen
+ok 371 - DONE feature work: verify is refused with the reopen path, and works after reopen
+  ---
+  duration_ms: 11881.043417
+  type: 'test'
+  ...
+# Subtest: a failing verification after the checkpoint was completed reopens it instead of leaving an invalid state
+ok 372 - a failing verification after the checkpoint was completed reopens it instead of leaving an invalid state
+  ---
+  duration_ms: 4732.604926
+  type: 'test'
+  ...
+# Subtest: verification on DONE work is refused and never appended to the closed history
+ok 373 - verification on DONE work is refused and never appended to the closed history
+  ---
+  duration_ms: 8884.691733
+  type: 'test'
+  ...
+# Subtest: proposes a work-scoped knowledge candidate
+ok 374 - proposes a work-scoped knowledge candidate
+  ---
+  duration_ms: 90.819459
+  type: 'test'
+  ...
+# Subtest: candidate survives restart and can be listed by the CLI
+ok 375 - candidate survives restart and can be listed by the CLI
+  ---
+  duration_ms: 1079.838811
+  type: 'test'
+  ...
+# Subtest: knowledge list distinguishes pending review with no candidates
+ok 376 - knowledge list distinguishes pending review with no candidates
+  ---
+  duration_ms: 538.225186
+  type: 'test'
+  ...
+# Subtest: promotes architecture knowledge to project context
+ok 377 - promotes architecture knowledge to project context
+  ---
+  duration_ms: 383.284963
+  type: 'test'
+  ...
+# Subtest: promotes OSS CORS integration knowledge without execution noise
+ok 378 - promotes OSS CORS integration knowledge without execution noise
+  ---
+  duration_ms: 312.474256
+  type: 'test'
+  ...
+# Subtest: rejects a temporary knowledge candidate with a reason
+ok 379 - rejects a temporary knowledge candidate with a reason
+  ---
+  duration_ms: 139.761969
+  type: 'test'
+  ...
+# Subtest: rejected candidate cannot be promoted
+ok 380 - rejected candidate cannot be promoted
+  ---
+  duration_ms: 161.923337
+  type: 'test'
+  ...
+# Subtest: duplicate promotion of the same candidate is prevented
+ok 381 - duplicate promotion of the same candidate is prevented
+  ---
+  duration_ms: 255.535525
+  type: 'test'
+  ...
+# Subtest: unknown knowledge kind is rejected deterministically
+ok 382 - unknown knowledge kind is rejected deterministically
+  ---
+  duration_ms: 64.204523
+  type: 'test'
+  ...
+# Subtest: candidate evidence persists across reload
+ok 383 - candidate evidence persists across reload
+  ---
+  duration_ms: 46.799172
+  type: 'test'
+  ...
+# Subtest: knowledge review --none records reviewed-none explicitly
+ok 384 - knowledge review --none records reviewed-none explicitly
+  ---
+  duration_ms: 143.5912
+  type: 'test'
+  ...
+# Subtest: pending review is distinct from reviewed with no candidates
+ok 385 - pending review is distinct from reviewed with no candidates
+  ---
+  duration_ms: 237.083025
+  type: 'test'
+  ...
+# Subtest: resume shows pending knowledge review near completion
+ok 386 - resume shows pending knowledge review near completion
+  ---
+  duration_ms: 697.531596
+  type: 'test'
+  ...
+# Subtest: guide reminds near-complete work without creating knowledge automatically
+ok 387 - guide reminds near-complete work without creating knowledge automatically
+  ---
+  duration_ms: 616.217006
+  type: 'test'
+  ...
+# Subtest: knowledge list, guide, and resume reads never create knowledge.yaml
+ok 388 - knowledge list, guide, and resume reads never create knowledge.yaml
+  ---
+  duration_ms: 1560.308869
+  type: 'test'
+  ...
+# Subtest: promoted context knowledge contains source-work traceability
+ok 389 - promoted context knowledge contains source-work traceability
+  ---
+  duration_ms: 257.457942
+  type: 'test'
+  ...
+# Subtest: decision promotion creates an ADR with supplied semantics
+ok 390 - decision promotion creates an ADR with supplied semantics
+  ---
+  duration_ms: 165.156562
+  type: 'test'
+  ...
+# Subtest: promoted ADR retains source work and knowledge identity
+ok 391 - promoted ADR retains source work and knowledge identity
+  ---
+  duration_ms: 150.613834
+  type: 'test'
+  ...
+# Subtest: local ruling can seed an ADR candidate without being mutated
+ok 392 - local ruling can seed an ADR candidate without being mutated
+  ---
+  duration_ms: 113.601411
+  type: 'test'
+  ...
+# Subtest: legacy work loads without knowledge state or a required policy
+ok 393 - legacy work loads without knowledge state or a required policy
+  ---
+  duration_ms: 46.469692
+  type: 'test'
+  ...
+# Subtest: legacy work is not retroactively blocked at DONE
+ok 394 - legacy work is not retroactively blocked at DONE
+  ---
+  duration_ms: 161.179039
+  type: 'test'
+  ...
+# Subtest: new-policy work requires knowledge review before DONE
+ok 395 - new-policy work requires knowledge review before DONE
+  ---
+  duration_ms: 725.969576
+  type: 'test'
+  ...
+# Subtest: knowledge state is never duplicated into state/current
+ok 396 - knowledge state is never duplicated into state/current
+  ---
+  duration_ms: 42.09049
+  type: 'test'
+  ...
+# Subtest: the running Node version satisfies the declared engines.node contract
+ok 397 - the running Node version satisfies the declared engines.node contract
+  ---
+  duration_ms: 2.331774
+  type: 'test'
+  ...
+# Subtest: pdfjs-dist is pinned to a version that officially declares Node >=20 support
+ok 398 - pdfjs-dist is pinned to a version that officially declares Node >=20 support
+  ---
+  duration_ms: 10.112703
+  type: 'test'
+  ...
+# Subtest: every installed dependency officially supports YallaFlow's declared Node floor — no engines mismatch anywhere in the tree
+ok 399 - every installed dependency officially supports YallaFlow's declared Node floor — no engines mismatch anywhere in the tree
+  ---
+  duration_ms: 48.382701
+  type: 'test'
+  ...
+# Subtest: PDF extraction actually works on this Node runtime with the pinned pdfjs-dist version
+ok 400 - PDF extraction actually works on this Node runtime with the pinned pdfjs-dist version
+  ---
+  duration_ms: 732.348429
+  type: 'test'
+  ...
+# Subtest: registry v9 declares on-demand skills, and no workflow policy requires any of them
+ok 401 - registry v9 declares on-demand skills, and no workflow policy requires any of them
+  ---
+  duration_ms: 9.322493
+  type: 'test'
+  ...
+# Subtest: the invocation field is validated
+ok 402 - the invocation field is validated
+  ---
+  duration_ms: 0.504122
+  type: 'test'
+  ...
+# Subtest: an on-demand skill is served for DONE work and for work pinned to an older registry, without changing it
+ok 403 - an on-demand skill is served for DONE work and for work pinned to an older registry, without changing it
+  ---
+  duration_ms: 9758.082982
+  type: 'test'
+  ...
+# Subtest: an on-demand skill is never checkpointed into the lifecycle, and pending work must be routed first
+ok 404 - an on-demand skill is never checkpointed into the lifecycle, and pending work must be routed first
+  ---
+  duration_ms: 3583.609572
+  type: 'test'
+  ...
+# Subtest: AC-007/AC-008: inspect on an APD-shaped repository without a workspace — text only, zero bytes, next: init
+ok 405 - AC-007/AC-008: inspect on an APD-shaped repository without a workspace — text only, zero bytes, next: init
+  ---
+  duration_ms: 635.536564
+  type: 'test'
+  ...
+# Subtest: AC-007: inspect exposes no --json (text only) and its help is non-mutating
+ok 406 - AC-007: inspect exposes no --json (text only) and its help is non-mutating
+  ---
+  duration_ms: 1068.463433
+  type: 'test'
+  ...
+# Subtest: AC-006: init classifies an APD-shaped tree as brownfield and writes a labelled init-time snapshot of nested hints
+ok 407 - AC-006: init classifies an APD-shaped tree as brownfield and writes a labelled init-time snapshot of nested hints
+  ---
+  duration_ms: 629.395655
+  type: 'test'
+  ...
+# Subtest: AC-005/AC-006: init boundaries — bare git and npm-init are greenfield, --type still overrides
+ok 408 - AC-005/AC-006: init boundaries — bare git and npm-init are greenfield, --type still overrides
+  ---
+  duration_ms: 1612.726537
+  type: 'test'
+  ...
+# Subtest: AC-009/AC-011: APD-shaped onboarding through the existing baseline lifecycle ends at human approval
+ok 409 - AC-009/AC-011: APD-shaped onboarding through the existing baseline lifecycle ends at human approval
+  ---
+  duration_ms: 10177.944543
+  type: 'test'
+  ...
+# Subtest: AC-012/AC-013: the project-first brief explains the project with fixed per-area caps and a bounded, mechanical NEEDS CARE
+ok 410 - AC-012/AC-013: the project-first brief explains the project with fixed per-area caps and a bounded, mechanical NEEDS CARE
+  ---
+  duration_ms: 4003.82733
+  type: 'test'
+  ...
+# Subtest: oneLine: code-point truncation, whitespace normalization, short text untouched
+ok 411 - oneLine: code-point truncation, whitespace normalization, short text untouched
+  ---
+  duration_ms: 0.531342
+  type: 'test'
+  ...
+# Subtest: fresh-session context reuse: a new session learns the project from brief, and changed evidence surfaces as NEEDS CARE
+ok 412 - fresh-session context reuse: a new session learns the project from brief, and changed evidence surfaces as NEEDS CARE
+  ---
+  duration_ms: 4374.62913
+  type: 'test'
+  ...
+# Subtest: AC-014: without Git, context status explains hash freshness; changed files MAY_BE_STALE, missing STALE_EVIDENCE, directories UNKNOWN
+ok 413 - AC-014: without Git, context status explains hash freshness; changed files MAY_BE_STALE, missing STALE_EVIDENCE, directories UNKNOWN
+  ---
+  duration_ms: 3092.200177
+  type: 'test'
+  ...
+# Subtest: AC-014: a Git-backed workspace keeps the v0.3.8 context status output (no extra note)
+ok 414 - AC-014: a Git-backed workspace keeps the v0.3.8 context status output (no extra note)
+  ---
+  duration_ms: 2863.949347
+  type: 'test'
+  ...
+# Subtest: AC-016: every read command on a v0.3.8-shaped workspace (contract v4, pending work) mutates zero bytes
+ok 415 - AC-016: every read command on a v0.3.8-shaped workspace (contract v4, pending work) mutates zero bytes
+  ---
+  duration_ms: 8092.559124
+  type: 'test'
+  ...
+# Subtest: AC-011/AC-014: the repository-baseline skill guides inspect, material documents, durable vs transient state, and Git-free freshness
+ok 416 - AC-011/AC-014: the repository-baseline skill guides inspect, material documents, durable vs transient state, and Git-free freshness
+  ---
+  duration_ms: 495.268356
+  type: 'test'
+  ...
+# Subtest: review: the 45-line cap counts physical lines — multi-line titles are collapsed and the next command is never dropped
+ok 417 - review: the 45-line cap counts physical lines — multi-line titles are collapsed and the next command is never dropped
+  ---
+  duration_ms: 3351.619054
+  type: 'test'
+  ...
+# Subtest: review: a malformed baseline ledger never crashes brief or inspect — they point to doctor
+ok 418 - review: a malformed baseline ledger never crashes brief or inspect — they point to doctor
+  ---
+  duration_ms: 2188.018065
+  type: 'test'
+  ...
+# Subtest: review: nested hints written into tech-stack.md at init are bounded
+ok 419 - review: nested hints written into tech-stack.md at init are bounded
+  ---
+  duration_ms: 636.484773
+  type: 'test'
+  ...
+# Subtest: pre-freeze: a meaningful root Dockerfile that classifies Brownfield is also surfaced in the tech-stack snapshot
+ok 420 - pre-freeze: a meaningful root Dockerfile that classifies Brownfield is also surfaced in the tech-stack snapshot
+  ---
+  duration_ms: 1022.367949
+  type: 'test'
+  ...
+# Subtest: pre-freeze: every recognized container/CI kind is hinted with its paths; empty or comment-only files are not
+ok 421 - pre-freeze: every recognized container/CI kind is hinted with its paths; empty or comment-only files are not
+  ---
+  duration_ms: 580.505915
+  type: 'test'
+  ...
+# Subtest: a rejected QC plan or demo proposal says what was rejected, and explains work without criteria
+ok 422 - a rejected QC plan or demo proposal says what was rejected, and explains work without criteria
+  ---
+  duration_ms: 2695.769256
+  type: 'test'
+  ...
+# Subtest: one video per feature: scenarios shown in other recordings are not reported as "not shown"
+ok 423 - one video per feature: scenarios shown in other recordings are not reported as "not shown"
+  ---
+  duration_ms: 4386.292459
+  type: 'test'
+  ...
+# Subtest: QC and demo guidance explains browser dialogs from real playwright-cli behavior
+ok 424 - QC and demo guidance explains browser dialogs from real playwright-cli behavior
+  ---
+  duration_ms: 4.857745
+  type: 'test'
+  ...
+# Subtest: natural-language requests map to the on-demand skills, which never start without the developer
+ok 425 - natural-language requests map to the on-demand skills, which never start without the developer
+  ---
+  duration_ms: 4779.612867
+  type: 'test'
+  ...
+# Subtest: a project set up by an earlier build of the same contract version receives the final text on refresh
+ok 426 - a project set up by an earlier build of the same contract version receives the final text on refresh
+  ---
+  duration_ms: 2490.913754
+  type: 'test'
+  ...
+# Subtest: C: the sanitizer redacts secret values conservatively and idempotently, and leaves ordinary evidence alone
+ok 427 - C: the sanitizer redacts secret values conservatively and idempotently, and leaves ordinary evidence alone
+  ---
+  duration_ms: 141.961714
+  type: 'test'
+  ...
+# Subtest: A/B: suggested commands are shell-safe — the developer's text is one single-quoted argument
+ok 428 - A/B: suggested commands are shell-safe — the developer's text is one single-quoted argument
+  ---
+  duration_ms: 1152.470089
+  type: 'test'
+  ...
+# Subtest: A: decomposition cannot create child work before Brownfield understanding is approved
+ok 429 - A: decomposition cannot create child work before Brownfield understanding is approved
+  ---
+  duration_ms: 676.980761
+  type: 'test'
+  ...
+# Subtest: C: a lifecycle record written before redaction stays consistent after an internal.4 rewrite of meta.yaml
+ok 430 - C: a lifecycle record written before redaction stays consistent after an internal.4 rewrite of meta.yaml
+  ---
+  duration_ms: 2374.757509
+  type: 'test'
+  ...
+# Subtest: pilot: init → refused request → baseline with the request as objective → still refused while awaiting approval → approve → the original request continues on approved memory → another task
+ok 431 - pilot: init → refused request → baseline with the request as objective → still refused while awaiting approval → approve → the original request continues on approved memory → another task
+  ---
+  duration_ms: 20828.301523
+  type: 'test'
+  ...
+# Subtest: A: transient operational assistance and read-only orientation never need a baseline; Greenfield and approved Brownfield create work as before
+ok 432 - A: transient operational assistance and read-only orientation never need a baseline; Greenfield and approved Brownfield create work as before
+  ---
+  duration_ms: 10453.151217
+  type: 'test'
+  ...
+# Subtest: C: every YallaFlow-owned text path persists redacted values; source originals stay byte-for-byte; work records stay doctor-clean
+ok 433 - C: every YallaFlow-owned text path persists redacted values; source originals stay byte-for-byte; work records stay doctor-clean
+  ---
+  duration_ms: 5605.628114
+  type: 'test'
+  ...
+# Subtest: D: an internal.3-style approved workspace keeps human text; doctor warns about leftover placeholders and render retires only the untouched ones
+ok 434 - D: an internal.3-style approved workspace keeps human text; doctor warns about leftover placeholders and render retires only the untouched ones
+  ---
+  duration_ms: 3217.896275
+  type: 'test'
+  ...
+# Subtest: E: coverage is optional, validated, and a draft without it says so
+ok 435 - E: coverage is optional, validated, and a draft without it says so
+  ---
+  duration_ms: 4565.595662
+  type: 'test'
+  ...
+# Subtest: F: provenance distinguishes HEAD, modified, and untracked content; outside Git nothing is recorded and hashes still decide freshness
+ok 436 - F: provenance distinguishes HEAD, modified, and untracked content; outside Git nothing is recorded and hashes still decide freshness
+  ---
+  duration_ms: 8679.371738
+  type: 'test'
+  ...
+# Subtest: versions: package 1.2.0, Agent Contract v10, Skill Registry v9 with repository-baseline v4; released v3 bytes archived; old pins keep their bytes
+ok 437 - versions: package 1.2.0, Agent Contract v10, Skill Registry v9 with repository-baseline v4; released v3 bytes archived; old pins keep their bytes
+  ---
+  duration_ms: 3.738152
+  type: 'test'
+  ...
+# Subtest: compatibility: work pinned by internal.3 (registry v7) still receives repository-baseline v3 exactly
+ok 438 - compatibility: work pinned by internal.3 (registry v7) still receives repository-baseline v3 exactly
+  ---
+  duration_ms: 3649.258489
+  type: 'test'
+  ...
+# Subtest: compatibility: the frozen internal.3 CLI reads an internal.4 workspace (coverage, provenance, v8 contract, retired placeholders)
+ok 439 - compatibility: the frozen internal.3 CLI reads an internal.4 workspace (coverage, provenance, v8 contract, retired placeholders)
+  ---
+  duration_ms: 6119.634884
+  type: 'test'
+  ...
+# Subtest: pilot regression v2: SPEC_READY -> review -> PLAN_READY -> review -> decomposition -> approval -> child execution -> handoff -> parent DONE
+ok 440 - pilot regression v2: SPEC_READY -> review -> PLAN_READY -> review -> decomposition -> approval -> child execution -> handoff -> parent DONE
+  ---
+  duration_ms: 33463.10107
+  type: 'test'
+  ...
+# Subtest: Scenario A — Brownfield: undocumented repo -> baseline -> changes requested -> approved -> new bounded feature -> DONE
+ok 441 - Scenario A — Brownfield: undocumented repo -> baseline -> changes requested -> approved -> new bounded feature -> DONE
+  ---
+  duration_ms: 13625.219815
+  type: 'test'
+  ...
+# Subtest: Scenario B — Intake accident: start --help creates nothing; pending request corrected, then routed normally
+ok 442 - Scenario B — Intake accident: start --help creates nothing; pending request corrected, then routed normally
+  ---
+  duration_ms: 4004.66405
+  type: 'test'
+  ...
+# Subtest: Scenario C — Verify: argv, shell pipeline, script, failed, then successful, full history preserved
+ok 443 - Scenario C — Verify: argv, shell pipeline, script, failed, then successful, full history preserved
+  ---
+  duration_ms: 4144.859919
+  type: 'test'
+  ...
+# Subtest: Scenario D — Reopen/Handoff: DONE -> reopen for a specific defect -> handoff shows primary objective -> fix -> fresh verify -> DONE
+ok 444 - Scenario D — Reopen/Handoff: DONE -> reopen for a specific defect -> handoff shows primary objective -> fix -> fresh verify -> DONE
+  ---
+  duration_ms: 14007.95821
+  type: 'test'
+  ...
+# Subtest: Scenario 1 — read replica becomes active: supersede instead of contradictory append, no re-baseline
+ok 445 - Scenario 1 — read replica becomes active: supersede instead of contradictory append, no re-baseline
+  ---
+  duration_ms: 11122.896241
+  type: 'test'
+  ...
+# Subtest: Scenario 2 — evidence changes: MAY_BE_STALE → targeted revalidation → reconfirm → fresh
+ok 446 - Scenario 2 — evidence changes: MAY_BE_STALE → targeted revalidation → reconfirm → fresh
+  ---
+  duration_ms: 10683.346951
+  type: 'test'
+  ...
+# Subtest: Scenario 3 — production DB unavailable: runtime-unavailable limitation stays work-scoped
+ok 447 - Scenario 3 — production DB unavailable: runtime-unavailable limitation stays work-scoped
+  ---
+  duration_ms: 8825.678687
+  type: 'test'
+  ...
+# Subtest: Scenario 4 — new bounded task: no empty artifact directories; first verify creates evidence/
+ok 448 - Scenario 4 — new bounded task: no empty artifact directories; first verify creates evidence/
+  ---
+  duration_ms: 11667.093859
+  type: 'test'
+  ...
+# Subtest: pilot regression: DONE -> reopen -> revise -> re-verify -> re-review -> DONE again, CLI-only
+ok 449 - pilot regression: DONE -> reopen -> revise -> re-verify -> re-review -> DONE again, CLI-only
+  ---
+  duration_ms: 15732.461161
+  type: 'test'
+  ...
+# Subtest: checkpoint starts a skill and creates the durable ledger
+ok 450 - checkpoint starts a skill and creates the durable ledger
+  ---
+  duration_ms: 107.178326
+  type: 'test'
+  ...
+# Subtest: checkpoint completes a skill with durable summary and timestamps
+ok 451 - checkpoint completes a skill with durable summary and timestamps
+  ---
+  duration_ms: 132.990722
+  type: 'test'
+  ...
+# Subtest: checkpoint progress survives a separate CLI process
+ok 452 - checkpoint progress survives a separate CLI process
+  ---
+  duration_ms: 660.052701
+  type: 'test'
+  ...
+# Subtest: checkpoint completion rejects unmet skill prerequisites
+ok 453 - checkpoint completion rejects unmet skill prerequisites
+  ---
+  duration_ms: 52.343961
+  type: 'test'
+  ...
+# Subtest: blocked checkpoint is visible in resume
+ok 454 - blocked checkpoint is visible in resume
+  ---
+  duration_ms: 532.494495
+  type: 'test'
+  ...
+# Subtest: completed skill is not selected as current work again
+ok 455 - completed skill is not selected as current work again
+  ---
+  duration_ms: 107.637189
+  type: 'test'
+  ...
+# Subtest: checkpoint evidence persists structurally
+ok 456 - checkpoint evidence persists structurally
+  ---
+  duration_ms: 56.971195
+  type: 'test'
+  ...
+# Subtest: verification checkpoint uses the existing verification evidence gate
+ok 457 - verification checkpoint uses the existing verification evidence gate
+  ---
+  duration_ms: 69.965113
+  type: 'test'
+  ...
+# Subtest: local rulings persist in the work progress ledger
+ok 458 - local rulings persist in the work progress ledger
+  ---
+  duration_ms: 114.57861
+  type: 'test'
+  ...
+# Subtest: investigation never gains write authorization after all checkpoints complete
+ok 459 - investigation never gains write authorization after all checkpoints complete
+  ---
+  duration_ms: 75.813877
+  type: 'test'
+  ...
+# Subtest: implementation checkpoint cannot start before the workflow write stage
+ok 460 - implementation checkpoint cannot start before the workflow write stage
+  ---
+  duration_ms: 30.991596
+  type: 'test'
+  ...
+# Subtest: bug cannot enter implementation before debugging checkpoint
+ok 461 - bug cannot enter implementation before debugging checkpoint
+  ---
+  duration_ms: 129.345797
+  type: 'test'
+  ...
+# Subtest: bug can enter implementation after required debugging checkpoints
+ok 462 - bug can enter implementation after required debugging checkpoints
+  ---
+  duration_ms: 157.868305
+  type: 'test'
+  ...
+# Subtest: architectural feature requires all pre-implementation skills
+ok 463 - architectural feature requires all pre-implementation skills
+  ---
+  duration_ms: 186.927554
+  type: 'test'
+  ...
+# Subtest: v0.2.2 work without a ledger is readable as all pending
+ok 464 - v0.2.2 work without a ledger is readable as all pending
+  ---
+  duration_ms: 48.028379
+  type: 'test'
+  ...
+# Subtest: reading and presenting work without a ledger does not create one
+ok 465 - reading and presenting work without a ledger does not create one
+  ---
+  duration_ms: 1037.923077
+  type: 'test'
+  ...
+# Subtest: v0.2.1 derived Behavior Contract supports checkpoints without metadata mutation
+ok 466 - v0.2.1 derived Behavior Contract supports checkpoints without metadata mutation
+  ---
+  duration_ms: 60.151635
+  type: 'test'
+  ...
+# Subtest: v0.1 work still loads without creating a ledger
+ok 467 - v0.1 work still loads without creating a ledger
+  ---
+  duration_ms: 47.235627
+  type: 'test'
+  ...
+# Subtest: guide uses current checkpoint state
+ok 468 - guide uses current checkpoint state
+  ---
+  duration_ms: 559.646579
+  type: 'test'
+  ...
+# Subtest: status shows concise skill progress
+ok 469 - status shows concise skill progress
+  ---
+  duration_ms: 575.168626
+  type: 'test'
+  ...
+# Subtest: checkpoint on an unknown skill fails clearly
+ok 470 - checkpoint on an unknown skill fails clearly
+  ---
+  duration_ms: 41.960544
+  type: 'test'
+  ...
+# Subtest: checkpoint on a skill outside the Behavior Contract fails clearly
+ok 471 - checkpoint on a skill outside the Behavior Contract fails clearly
+  ---
+  duration_ms: 42.571953
+  type: 'test'
+  ...
+# Subtest: repeated completion is idempotent
+ok 472 - repeated completion is idempotent
+  ---
+  duration_ms: 31.114041
+  type: 'test'
+  ...
+# Subtest: progress is never duplicated into state/current
+ok 473 - progress is never duplicated into state/current
+  ---
+  duration_ms: 32.397197
+  type: 'test'
+  ...
+# Subtest: 1. an existing meaningful repository without an approved baseline reports PROJECT_UNDERSTANDING_REQUIRED
+ok 474 - 1. an existing meaningful repository without an approved baseline reports PROJECT_UNDERSTANDING_REQUIRED
+  ---
+  duration_ms: 1269.223099
+  type: 'test'
+  ...
+# Subtest: 2. a real work request on an un-understood project is refused and routes the Agent to the baseline first — without the developer asking
+ok 475 - 2. a real work request on an un-understood project is refused and routes the Agent to the baseline first — without the developer asking
+  ---
+  duration_ms: 2980.144705
+  type: 'test'
+  ...
+# Subtest: 3. an approved baseline unlocks normal work: no understanding notice, established state
+ok 476 - 3. an approved baseline unlocks normal work: no understanding notice, established state
+  ---
+  duration_ms: 2728.927156
+  type: 'test'
+  ...
+# Subtest: 4. a fresh developer never re-baselines: understanding is read from approved memory and a second baseline is refused
+ok 477 - 4. a fresh developer never re-baselines: understanding is read from approved memory and a second baseline is refused
+  ---
+  duration_ms: 2618.664771
+  type: 'test'
+  ...
+# Subtest: 5. an empty Greenfield project never triggers a Brownfield repository scan
+ok 478 - 5. an empty Greenfield project never triggers a Brownfield repository scan
+  ---
+  duration_ms: 1681.536744
+  type: 'test'
+  ...
+# Subtest: 6/7. a purpose-aware discovery lens and preservation intent are stored as work intent, never as project facts
+ok 479 - 6/7. a purpose-aware discovery lens and preservation intent are stored as work intent, never as project facts
+  ---
+  duration_ms: 6499.910007
+  type: 'test'
+  ...
+# Subtest: the Agent Contract and adapters teach automatic orientation, understanding first, purpose-aware discovery, and the finish protocol
+ok 480 - the Agent Contract and adapters teach automatic orientation, understanding first, purpose-aware discovery, and the finish protocol
+  ---
+  duration_ms: 2.729502
+  type: 'test'
+  ...
+# Subtest: a demo needs no QC: scope is prioritized, traced to criteria, and nothing is recorded at proposal time
+ok 481 - a demo needs no QC: scope is prioritized, traced to criteria, and nothing is recorded at proposal time
+  ---
+  duration_ms: 3604.208963
+  type: 'test'
+  ...
+# Subtest: recording is refused until the developer approves this exact proposal, with their words
+ok 482 - recording is refused until the developer approves this exact proposal, with their words
+  ---
+  duration_ms: 7705.161106
+  type: 'test'
+  ...
+# Subtest: video is optional; a recorded video and screenshots are stored locally with hashes; a missing video is refused
+ok 483 - video is optional; a recorded video and screenshots are stored locally with hashes; a missing video is refused
+  ---
+  duration_ms: 5431.640725
+  type: 'test'
+  ...
+# Subtest: every demo summary says it is not test evidence, and convergence refuses demo citations
+ok 484 - every demo summary says it is not test evidence, and convergence refuses demo citations
+  ---
+  duration_ms: 9462.791388
+  type: 'test'
+  ...
+# Subtest: privacy: non-local targets need --allow-remote, credentials in URLs are refused, and secrets in notes are redacted
+ok 485 - privacy: non-local targets need --allow-remote, credentials in URLs are refused, and secrets in notes are redacted
+  ---
+  duration_ms: 13236.572918
+  type: 'test'
+  ...
+# Subtest: demo help and status never write, and demo commands make no network call
+ok 486 - demo help and status never write, and demo commands make no network call
+  ---
+  duration_ms: 6277.010181
+  type: 'test'
+  ...
+# Subtest: an approval is bound to the proposal content: a hand-edited proposal loses it
+ok 487 - an approval is bound to the proposal content: a hand-edited proposal loses it
+  ---
+  duration_ms: 4088.203558
+  type: 'test'
+  ...
+# Subtest: a secret-like value in a demo step is redacted and the ledger stays valid
+ok 488 - a secret-like value in a demo step is redacted and the ledger stays valid
+  ---
+  duration_ms: 4201.604341
+  type: 'test'
+  ...
+# Subtest: by default only qc.json, demo.json and the ignore rule are committed; media and reports are ignored
+ok 489 - by default only qc.json, demo.json and the ignore rule are committed; media and reports are ignored
+  ---
+  duration_ms: 4703.574812
+  type: 'test'
+  ...
+# Subtest: the explicit opt-in commits media; reports stay local either way
+ok 490 - the explicit opt-in commits media; reports stay local either way
+  ---
+  duration_ms: 4403.324852
+  type: 'test'
+  ...
+# Subtest: a fresh clone reports missing local media plainly and never claims a report or verified files it does not have
+ok 491 - a fresh clone reports missing local media plainly and never claims a report or verified files it does not have
+  ---
+  duration_ms: 6373.276983
+  type: 'test'
+  ...
+# Subtest: files a pre-release build already committed stay tracked and on disk; doctor names the one-time command
+ok 492 - files a pre-release build already committed stay tracked and on disk; doctor names the one-time command
+  ---
+  duration_ms: 6808.007991
+  type: 'test'
+  ...
+# Subtest: a project's own quality/.gitignore is never overwritten
+ok 493 - a project's own quality/.gitignore is never overwritten
+  ---
+  duration_ms: 1870.78175
+  type: 'test'
+  ...
+# Subtest: the managed ignore rule follows quality.media.commit when it changes, in both directions
+ok 494 - the managed ignore rule follows quality.media.commit when it changes, in both directions
+  ---
+  duration_ms: 6901.145407
+  type: 'test'
+  ...
+# Subtest: the git rm hint never lists untracked paths or opted-in media
+ok 495 - the git rm hint never lists untracked paths or opted-in media
+  ---
+  duration_ms: 3213.268757
+  type: 'test'
+  ...
+# Subtest: with the opt-in, a pre-release media/.gitignore that still hides media is reported
+ok 496 - with the opt-in, a pre-release media/.gitignore that still hides media is reported
+  ---
+  duration_ms: 4959.734156
+  type: 'test'
+  ...
+# Subtest: outputs state media availability precisely
+ok 497 - outputs state media availability precisely
+  ---
+  duration_ms: 12866.527187
+  type: 'test'
+  ...
+# Subtest: a CRLF checkout of the managed rule is not rewritten
+ok 498 - a CRLF checkout of the managed rule is not rewritten
+  ---
+  duration_ms: 1651.13567
+  type: 'test'
+  ...
+# Subtest: a QC record on another branch never overwrites the first branch's git-ignored evidence
+ok 499 - a QC record on another branch never overwrites the first branch's git-ignored evidence
+  ---
+  duration_ms: 4315.01158
+  type: 'test'
+  ...
+# Subtest: overwritten or edited evidence is reported by doctor and status, never silently trusted
+ok 500 - overwritten or edited evidence is reported by doctor and status, never silently trusted
+  ---
+  duration_ms: 3584.996506
+  type: 'test'
+  ...
+# Subtest: a failed record removes only the media folder it created; identical files are stored once
+ok 501 - a failed record removes only the media folder it created; identical files are stored once
+  ---
+  duration_ms: 2669.176385
+  type: 'test'
+  ...
+# Subtest: Shared Projects allocate branch-safe QC and demo record IDs that citations accept
+ok 502 - Shared Projects allocate branch-safe QC and demo record IDs that citations accept
+  ---
+  duration_ms: 4302.720172
+  type: 'test'
+  ...
+# Subtest: IDs duplicated by merging two branches' ledgers are warned about, and citing them is refused
+ok 503 - IDs duplicated by merging two branches' ledgers are warned about, and citing them is refused
+  ---
+  duration_ms: 3658.822023
+  type: 'test'
+  ...
+# Subtest: a reader that closes the pipe early no longer crashes the CLI (EPIPE)
+ok 504 - a reader that closes the pipe early no longer crashes the CLI (EPIPE)
+  ---
+  duration_ms: 912.9099
+  type: 'test'
+  ...
+# Subtest: session start stays lightweight: brief and finish never read stored media; doctor and status verify it
+ok 505 - session start stays lightweight: brief and finish never read stored media; doctor and status verify it
+  ---
+  duration_ms: 4379.7887
+  type: 'test'
+  ...
+# Subtest: a closed pipe never changes a command's exit code or cuts it short
+ok 506 - a closed pipe never changes a command's exit code or cuts it short
+  ---
+  duration_ms: 3963.744466
+  type: 'test'
+  ...
+# Subtest: artifact paths cannot escape the media folder, on any platform
+ok 507 - artifact paths cannot escape the media folder, on any platform
+  ---
+  duration_ms: 478.145175
+  type: 'test'
+  ...
+# Subtest: upgrade status names a same-version contract from an earlier build plainly
+ok 508 - upgrade status names a same-version contract from an earlier build plainly
+  ---
+  duration_ms: 1074.901941
+  type: 'test'
+  ...
+# Subtest: a symbolic link inside media never makes doctor or a report read outside the media folder
+ok 509 - a symbolic link inside media never makes doctor or a report read outside the media folder
+  ---
+  duration_ms: 4267.06403
+  type: 'test'
+  ...
+# Subtest: QC runs on DONE work without rerouting or reopening it, and never touches verification or the lifecycle
+ok 510 - QC runs on DONE work without rerouting or reopening it, and never touches verification or the lifecycle
+  ---
+  duration_ms: 11321.958813
+  type: 'test'
+  ...
+# Subtest: QC is refused for unrouted work, and help never records anything
+ok 511 - QC is refused for unrouted work, and help never records anything
+  ---
+  duration_ms: 3130.646629
+  type: 'test'
+  ...
+# Subtest: functional scenarios trace to active acceptance criteria; uncovered criteria are reported
+ok 512 - functional scenarios trace to active acceptance criteria; uncovered criteria are reported
+  ---
+  duration_ms: 8591.055152
+  type: 'test'
+  ...
+# Subtest: honesty rules: no pass without executed steps and evidence; failures need reproduction; nothing is written on rejection
+ok 513 - honesty rules: no pass without executed steps and evidence; failures need reproduction; nothing is written on rejection
+  ---
+  duration_ms: 10153.530365
+  type: 'test'
+  ...
+# Subtest: a scenario may pass on a YallaFlow verification run only when that run passed
+ok 514 - a scenario may pass on a YallaFlow verification run only when that run passed
+  ---
+  duration_ms: 8348.821839
+  type: 'test'
+  ...
+# Subtest: a non-local target needs --allow-remote; credentials in a target URL are refused
+ok 515 - a non-local target needs --allow-remote; credentials in a target URL are refused
+  ---
+  duration_ms: 7591.536446
+  type: 'test'
+  ...
+# Subtest: advisory policy: failures are reported by status and finish, and never block completion
+ok 516 - advisory policy: failures are reported by status and finish, and never block completion
+  ---
+  duration_ms: 10832.988132
+  type: 'test'
+  ...
+# Subtest: strict policy: quality approval needs every required scenario to pass, separately from DONE
+ok 517 - strict policy: quality approval needs every required scenario to pass, separately from DONE
+  ---
+  duration_ms: 12369.131486
+  type: 'test'
+  ...
+# Subtest: strict policy can be the project default; work that never used QC is untouched by it
+ok 518 - strict policy can be the project default; work that never used QC is untouched by it
+  ---
+  duration_ms: 10662.827303
+  type: 'test'
+  ...
+# Subtest: convergence may cite a passed QC scenario; a failed one cannot support satisfied, and a later failure makes it stale
+ok 519 - convergence may cite a passed QC scenario; a failed one cannot support satisfied, and a later failure makes it stale
+  ---
+  duration_ms: 11067.904556
+  type: 'test'
+  ...
+# Subtest: artifacts: copied with hashes, git-excluded by default, opt-in commit; reports link locally and flag missing media
+ok 520 - artifacts: copied with hashes, git-excluded by default, opt-in commit; reports link locally and flag missing media
+  ---
+  duration_ms: 17011.312618
+  type: 'test'
+  ...
+# Subtest: doctor validates the QC ledger and its config; QC commands make no network call
+ok 521 - doctor validates the QC ledger and its config; QC commands make no network call
+  ---
+  duration_ms: 7456.996115
+  type: 'test'
+  ...
+# Subtest: a result counts only for the scenario definition it was recorded against
+ok 522 - a result counts only for the scenario definition it was recorded against
+  ---
+  duration_ms: 7482.764606
+  type: 'test'
+  ...
+# Subtest: a project-wide strict policy cannot be weakened by a plan
+ok 523 - a project-wide strict policy cannot be weakened by a plan
+  ---
+  duration_ms: 1131.423003
+  type: 'test'
+  ...
+# Subtest: a yallaflow-verified pass must rest on a verification run newer than the latest reopen
+ok 524 - a yallaflow-verified pass must rest on a verification run newer than the latest reopen
+  ---
+  duration_ms: 6546.073097
+  type: 'test'
+  ...
+# Subtest: finish survives an unreadable quality ledger, and ledgers never record local source paths
+ok 525 - finish survives an unreadable quality ledger, and ledgers never record local source paths
+  ---
+  duration_ms: 5837.675531
+  type: 'test'
+  ...
+# Subtest: a project that switches to strict judges an earlier advisory plan strictly
+ok 526 - a project that switches to strict judges an earlier advisory plan strictly
+  ---
+  duration_ms: 1504.128848
+  type: 'test'
+  ...
+# Subtest: add business question
+ok 527 - add business question
+  ---
+  duration_ms: 123.532013
+  type: 'test'
+  ...
+# Subtest: answer question
+ok 528 - answer question
+  ---
+  duration_ms: 72.066915
+  type: 'test'
+  ...
+# Subtest: architecture proposal
+ok 529 - architecture proposal
+  ---
+  duration_ms: 119.029596
+  type: 'test'
+  ...
+# Subtest: resolved questions persist
+ok 530 - resolved questions persist
+  ---
+  duration_ms: 68.345777
+  type: 'test'
+  ...
+# Subtest: open material questions affect readiness
+ok 531 - open material questions affect readiness
+  ---
+  duration_ms: 78.243252
+  type: 'test'
+  ...
+# Subtest: reading questions causes no mutation
+ok 532 - reading questions causes no mutation
+  ---
+  duration_ms: 1511.800893
+  type: 'test'
+  ...
+# Subtest: question CLI add, answer, and resolve round-trip
+ok 533 - question CLI add, answer, and resolve round-trip
+  ---
+  duration_ms: 1938.2955
+  type: 'test'
+  ...
+# Subtest: SPEC_READY: specification alone yields a spec-ready deliverable
+ok 534 - SPEC_READY: specification alone yields a spec-ready deliverable
+  ---
+  duration_ms: 685.881608
+  type: 'test'
+  ...
+# Subtest: PLAN_READY: specification and plan together yield a plan-ready deliverable without implementation
+ok 535 - PLAN_READY: specification and plan together yield a plan-ready deliverable without implementation
+  ---
+  duration_ms: 681.181626
+  type: 'test'
+  ...
+# Subtest: plan-ready does not imply implementation authorization
+ok 536 - plan-ready does not imply implementation authorization
+  ---
+  duration_ms: 347.861363
+  type: 'test'
+  ...
+# Subtest: full implementation DONE remains supported
+ok 537 - full implementation DONE remains supported
+  ---
+  duration_ms: 239.993876
+  type: 'test'
+  ...
+# Subtest: old pinned contracts remain unaffected by a newer registry version
+ok 538 - old pinned contracts remain unaffected by a newer registry version
+  ---
+  duration_ms: 47.127035
+  type: 'test'
+  ...
+# Subtest: new architectural work includes the specification skill in its pinned contract
+ok 539 - new architectural work includes the specification skill in its pinned contract
+  ---
+  duration_ms: 103.33848
+  type: 'test'
+  ...
+# Subtest: specification checkpoint persists across restart
+ok 540 - specification checkpoint persists across restart
+  ---
+  duration_ms: 647.457576
+  type: 'test'
+  ...
+# Subtest: knowledge review allowed at stable spec/plan endpoint without implementation evidence
+ok 541 - knowledge review allowed at stable spec/plan endpoint without implementation evidence
+  ---
+  duration_ms: 166.742086
+  type: 'test'
+  ...
+# Subtest: design/spec knowledge review is refused before a stable delivery endpoint
+ok 542 - design/spec knowledge review is refused before a stable delivery endpoint
+  ---
+  duration_ms: 69.073015
+  type: 'test'
+  ...
+# Subtest: a concise work title is displayed instead of the raw request
+ok 543 - a concise work title is displayed instead of the raw request
+  ---
+  duration_ms: 1028.374404
+  type: 'test'
+  ...
+# Subtest: a reviewed design/spec knowledge pass at a stable endpoint does not claim the whole work item is ready for DONE
+ok 544 - a reviewed design/spec knowledge pass at a stable endpoint does not claim the whole work item is ready for DONE
+  ---
+  duration_ms: 1225.73078
+  type: 'test'
+  ...
+# Subtest: resume surfaces open decisions and delivery readiness for architectural work
+ok 545 - resume surfaces open decisions and delivery readiness for architectural work
+  ---
+  duration_ms: 656.200709
+  type: 'test'
+  ...
+# Subtest: pilot: upgraded YaSchools-style workspace reconciles into one clean, traceable current truth
+ok 546 - pilot: upgraded YaSchools-style workspace reconciles into one clean, traceable current truth
+  ---
+  duration_ms: 13036.055515
+  type: 'test'
+  ...
+# Subtest: 1–4. start detects every legacy item as a candidate and preserves its full origin
+ok 547 - 1–4. start detects every legacy item as a candidate and preserves its full origin
+  ---
+  duration_ms: 1131.683802
+  type: 'test'
+  ...
+# Subtest: 2. RC IDs are stable: identical workspaces produce identical candidates, and start is idempotent
+ok 548 - 2. RC IDs are stable: identical workspaces produce identical candidates, and start is idempotent
+  ---
+  duration_ms: 1402.408071
+  type: 'test'
+  ...
+# Subtest: 5–6. an existing v0.3.6 ledger is supported; start and preview never touch memory, legacy docs, or history
+ok 549 - 5–6. an existing v0.3.6 ledger is supported; start and preview never touch memory, legacy docs, or history
+  ---
+  duration_ms: 1994.258641
+  type: 'test'
+  ...
+# Subtest: start is refused, with no mutation, when nothing legacy is pending
+ok 550 - start is refused, with no mutation, when nothing legacy is pending
+  ---
+  duration_ms: 524.536128
+  type: 'test'
+  ...
+# Subtest: 17 (exact duplicates). identical area + normalized text + evidence is flagged, never discarded
+ok 551 - 17 (exact duplicates). identical area + normalized text + evidence is flagged, never discarded
+  ---
+  duration_ms: 794.162608
+  type: 'test'
+  ...
+# Subtest: 7 + 11 + 14. NEW creates one fact; MERGE_WITH yields one semantic fact carrying both origins
+ok 552 - 7 + 11 + 14. NEW creates one fact; MERGE_WITH yields one semantic fact carrying both origins
+  ---
+  duration_ms: 652.847622
+  type: 'test'
+  ...
+# Subtest: 15. a three-way merge (chained merge-with / reconfirms) preserves every origin on one fact
+ok 553 - 15. a three-way merge (chained merge-with / reconfirms) preserves every origin on one fact
+  ---
+  duration_ms: 290.649048
+  type: 'test'
+  ...
+# Subtest: 8 + 38 + 39 + 41. RECONFIRMS / MERGE_WITH into an existing CTX add provenance only; its evidence, freshness, and history stay valid
+ok 554 - 8 + 38 + 39 + 41. RECONFIRMS / MERGE_WITH into an existing CTX add provenance only; its evidence, freshness, and history stay valid
+  ---
+  duration_ms: 975.995192
+  type: 'test'
+  ...
+# Subtest: 9 + 40. SUPERSEDES an existing CTX: the legacy candidate becomes current, CTX-0001 becomes lineage
+ok 555 - 9 + 40. SUPERSEDES an existing CTX: the legacy candidate becomes current, CTX-0001 becomes lineage
+  ---
+  duration_ms: 915.457276
+  type: 'test'
+  ...
+# Subtest: SUPERSEDES between candidates keeps both as lineage (refinement recorded as supersession)
+ok 556 - SUPERSEDES between candidates keeps both as lineage (refinement recorded as supersession)
+  ---
+  duration_ms: 311.478921
+  type: 'test'
+  ...
+# Subtest: 10. DISPUTES an existing CTX marks it disputed with the conflicting evidence; the candidate is not a fact
+ok 557 - 10. DISPUTES an existing CTX marks it disputed with the conflicting evidence; the candidate is not a fact
+  ---
+  duration_ms: 1020.403477
+  type: 'test'
+  ...
+# Subtest: 12. SKIP requires a reason and never enters project memory
+ok 558 - 12. SKIP requires a reason and never enters project memory
+  ---
+  duration_ms: 264.111512
+  type: 'test'
+  ...
+# Subtest: 13. LIMITATION requires a type, is recorded as a work-scoped limitation, and never enters project memory
+ok 559 - 13. LIMITATION requires a type, is recorded as a work-scoped limitation, and never enters project memory
+  ---
+  duration_ms: 2914.337646
+  type: 'test'
+  ...
+# Subtest: 16–17. single-origin v1 facts stay valid; duplicate origins are rejected within and across facts
+ok 560 - 16–17. single-origin v1 facts stay valid; duplicate origins are rejected within and across facts
+  ---
+  duration_ms: 252.874192
+  type: 'test'
+  ...
+# Subtest: 18–23. unknown RC/CTX, cycles, self-merge, conflicting and dangling relations are rejected with zero mutation
+ok 561 - 18–23. unknown RC/CTX, cycles, self-merge, conflicting and dangling relations are rejected with zero mutation
+  ---
+  duration_ms: 9245.918321
+  type: 'test'
+  ...
+# Subtest: 23. a hand-corrupted plan cannot be applied and nothing is mutated
+ok 562 - 23. a hand-corrupted plan cannot be applied and nothing is mutated
+  ---
+  duration_ms: 1496.980251
+  type: 'test'
+  ...
+# Subtest: 24–26. only an approved plan applies; changes-requested blocks; approval needs the checkpoint
+ok 563 - 24–26. only an approved plan applies; changes-requested blocks; approval needs the checkpoint
+  ---
+  duration_ms: 886.878034
+  type: 'test'
+  ...
+# Subtest: 27. an approved plan changed afterward requires re-review (via plan, or tampered by hand)
+ok 564 - 27. an approved plan changed afterward requires re-review (via plan, or tampered by hand)
+  ---
+  duration_ms: 1212.310189
+  type: 'test'
+  ...
+# Subtest: 28–31. preview is read-only and shows counts, resulting facts, merges, skips, limitations, and pending items
+ok 565 - 28–31. preview is read-only and shows counts, resulting facts, merges, skips, limitations, and pending items
+  ---
+  duration_ms: 1093.577431
+  type: 'test'
+  ...
+# Subtest: 32–34. repeated apply is idempotent: no duplicate facts, origins, or history
+ok 566 - 32–34. repeated apply is idempotent: no duplicate facts, origins, or history
+  ---
+  duration_ms: 1014.473547
+  type: 'test'
+  ...
+# Subtest: 35–36. a projection failure leaves canonical memory intact; render repairs; retry finishes without duplicates
+ok 567 - 35–36. a projection failure leaves canonical memory intact; render repairs; retry finishes without duplicates
+  ---
+  duration_ms: 2721.961926
+  type: 'test'
+  ...
+# Subtest: 37. no half-applied merge group: a failed ledger write applies nothing; the retry applies the whole group
+ok 568 - 37. no half-applied merge group: a failed ledger write applies nothing; the retry applies the whole group
+  ---
+  duration_ms: 423.542395
+  type: 'test'
+  ...
+# Subtest: 16 (questions). an ambiguous pair stays pending with a question while the approved subset applies
+ok 569 - 16 (questions). an ambiguous pair stays pending with a question while the approved subset applies
+  ---
+  duration_ms: 3901.186671
+  type: 'test'
+  ...
+# Subtest: applied decisions are history: they cannot be changed afterward
+ok 570 - applied decisions are history: they cannot be changed afterward
+  ---
+  duration_ms: 425.568829
+  type: 'test'
+  ...
+# Subtest: 42–45. reconciled sections stop being parallel truth, are archived verbatim, and hand-edited ones are kept for review
+ok 571 - 42–45. reconciled sections stop being parallel truth, are archived verbatim, and hand-edited ones are kept for review
+  ---
+  duration_ms: 1746.459678
+  type: 'test'
+  ...
+# Subtest: doctor: missing origins, orphaned plans, broken lineage, and a second open reconciliation are errors
+ok 572 - doctor: missing origins, orphaned plans, broken lineage, and a second open reconciliation are errors
+  ---
+  duration_ms: 3070.25168
+  type: 'test'
+  ...
+# Subtest: resolvePlan reports relations the ledger has moved past as state issues, not structural errors
+ok 573 - resolvePlan reports relations the ledger has moved past as state issues, not structural errors
+  ---
+  duration_ms: 334.76789
+  type: 'test'
+  ...
+# Subtest: help for every reconcile action never mutates, even on an approved plan
+ok 574 - help for every reconcile action never mutates, even on an approved plan
+  ---
+  duration_ms: 4476.515685
+  type: 'test'
+  ...
+# Subtest: a reconciliation work item cannot be advanced to DONE around its plan
+ok 575 - a reconciliation work item cannot be advanced to DONE around its plan
+  ---
+  duration_ms: 1281.217639
+  type: 'test'
+  ...
+# Subtest: a source captured during active work is a work input with link timing
+ok 576 - a source captured during active work is a work input with link timing
+  ---
+  duration_ms: 3013.016531
+  type: 'test'
+  ...
+# Subtest: file intake that creates new work records its sources as pending work inputs
+ok 577 - file intake that creates new work records its sources as pending work inputs
+  ---
+  duration_ms: 977.781566
+  type: 'test'
+  ...
+# Subtest: attaching a source to DONE work requires a reason and changes nothing when refused
+ok 578 - attaching a source to DONE work requires a reason and changes nothing when refused
+  ---
+  duration_ms: 9954.901148
+  type: 'test'
+  ...
+# Subtest: a post-DONE link records timing/status/reason, keeps DONE, and does not rewrite work history
+ok 579 - a post-DONE link records timing/status/reason, keeps DONE, and does not rewrite work history
+  ---
+  duration_ms: 10726.368136
+  type: 'test'
+  ...
+# Subtest: handoff, resume, and source show distinguish a recovered source from work inputs
+ok 580 - handoff, resume, and source show distinguish a recovered source from work inputs
+  ---
+  duration_ms: 12261.540661
+  type: 'test'
+  ...
+# Subtest: recovered-source audit metadata and checksum immutability are enforced by doctor
+ok 581 - recovered-source audit metadata and checksum immutability are enforced by doctor
+  ---
+  duration_ms: 10786.991058
+  type: 'test'
+  ...
+# Subtest: summaries never copy source contents: secrets in a source stay out of handoff/resume/guide/status
+ok 582 - summaries never copy source contents: secrets in a source stay out of handoff/resume/guide/status
+  ---
+  duration_ms: 5125.043523
+  type: 'test'
+  ...
+# Subtest: legacy work-level attachments/ directories stay readable and are ignored
+ok 583 - legacy work-level attachments/ directories stay readable and are ignored
+  ---
+  duration_ms: 4485.697669
+  type: 'test'
+  ...
+# Subtest: `yallaflow start --help` exits successfully, shows usage, and mutates nothing
+ok 584 - `yallaflow start --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 1271.778398
+  type: 'test'
+  ...
+# Subtest: `yallaflow start -h` exits successfully, shows usage, and mutates nothing
+ok 585 - `yallaflow start -h` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 606.598491
+  type: 'test'
+  ...
+# Subtest: `yallaflow baseline --help` exits successfully, shows usage, and mutates nothing
+ok 586 - `yallaflow baseline --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 665.458076
+  type: 'test'
+  ...
+# Subtest: `yallaflow baseline start --help` exits successfully, shows usage, and mutates nothing
+ok 587 - `yallaflow baseline start --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 713.539717
+  type: 'test'
+  ...
+# Subtest: `yallaflow baseline draft --help` exits successfully, shows usage, and mutates nothing
+ok 588 - `yallaflow baseline draft --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 618.779712
+  type: 'test'
+  ...
+# Subtest: `yallaflow baseline approve --help` exits successfully, shows usage, and mutates nothing
+ok 589 - `yallaflow baseline approve --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 615.523025
+  type: 'test'
+  ...
+# Subtest: `yallaflow request --help` exits successfully, shows usage, and mutates nothing
+ok 590 - `yallaflow request --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 598.290549
+  type: 'test'
+  ...
+# Subtest: `yallaflow request revise --help` exits successfully, shows usage, and mutates nothing
+ok 591 - `yallaflow request revise --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 668.998606
+  type: 'test'
+  ...
+# Subtest: `yallaflow verify --help` exits successfully, shows usage, and mutates nothing
+ok 592 - `yallaflow verify --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 629.087238
+  type: 'test'
+  ...
+# Subtest: `yallaflow verify list --help` exits successfully, shows usage, and mutates nothing
+ok 593 - `yallaflow verify list --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 581.426826
+  type: 'test'
+  ...
+# Subtest: `yallaflow decompose --help` exits successfully, shows usage, and mutates nothing
+ok 594 - `yallaflow decompose --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 592.988133
+  type: 'test'
+  ...
+# Subtest: `yallaflow decompose propose --help` exits successfully, shows usage, and mutates nothing
+ok 595 - `yallaflow decompose propose --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 654.723485
+  type: 'test'
+  ...
+# Subtest: `yallaflow checkpoint --help` exits successfully, shows usage, and mutates nothing
+ok 596 - `yallaflow checkpoint --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 563.697214
+  type: 'test'
+  ...
+# Subtest: `yallaflow knowledge --help` exits successfully, shows usage, and mutates nothing
+ok 597 - `yallaflow knowledge --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 638.599858
+  type: 'test'
+  ...
+# Subtest: `yallaflow question --help` exits successfully, shows usage, and mutates nothing
+ok 598 - `yallaflow question --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 623.913222
+  type: 'test'
+  ...
+# Subtest: `yallaflow requirement --help` exits successfully, shows usage, and mutates nothing
+ok 599 - `yallaflow requirement --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 633.324082
+  type: 'test'
+  ...
+# Subtest: `yallaflow requirement record PF-0001 --file requirements.json --help` exits successfully, shows usage, and mutates nothing
+ok 600 - `yallaflow requirement record PF-0001 --file requirements.json --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 630.334498
+  type: 'test'
+  ...
+# Subtest: `yallaflow convergence record PF-0001 --file convergence.json -h` exits successfully, shows usage, and mutates nothing
+ok 601 - `yallaflow convergence record PF-0001 --file convergence.json -h` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 612.185607
+  type: 'test'
+  ...
+# Subtest: `yallaflow impact assess PF-0001 --file impact.json --help` exits successfully, shows usage, and mutates nothing
+ok 602 - `yallaflow impact assess PF-0001 --file impact.json --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 636.002683
+  type: 'test'
+  ...
+# Subtest: `yallaflow agent setup claude --help` exits successfully, shows usage, and mutates nothing
+ok 603 - `yallaflow agent setup claude --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 647.519312
+  type: 'test'
+  ...
+# Subtest: `yallaflow intake ticket --help` exits successfully, shows usage, and mutates nothing
+ok 604 - `yallaflow intake ticket --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 715.738806
+  type: 'test'
+  ...
+# Subtest: `yallaflow intake ticket github:acme/shop\#7 --fetch --attachments --help` exits successfully, shows usage, and mutates nothing
+ok 605 - `yallaflow intake ticket github:acme/shop\#7 --fetch --attachments --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 707.804553
+  type: 'test'
+  ...
+# Subtest: `yallaflow qc --help` exits successfully, shows usage, and mutates nothing
+ok 606 - `yallaflow qc --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 528.996265
+  type: 'test'
+  ...
+# Subtest: `yallaflow qc record PF-0001 --file result.json --help` exits successfully, shows usage, and mutates nothing
+ok 607 - `yallaflow qc record PF-0001 --file result.json --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 644.350147
+  type: 'test'
+  ...
+# Subtest: `yallaflow demo --help` exits successfully, shows usage, and mutates nothing
+ok 608 - `yallaflow demo --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 575.32934
+  type: 'test'
+  ...
+# Subtest: `yallaflow demo approve PF-0001 --note Approved --help` exits successfully, shows usage, and mutates nothing
+ok 609 - `yallaflow demo approve PF-0001 --note Approved --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 689.574036
+  type: 'test'
+  ...
+# Subtest: a work-id positioned before --help is also non-mutating (not just rest[0])
+ok 610 - a work-id positioned before --help is also non-mutating (not just rest[0])
+  ---
+  duration_ms: 597.184727
+  type: 'test'
+  ...
+# Subtest: request revise --help with a work-id argument still mutates nothing
+ok 611 - request revise --help with a work-id argument still mutates nothing
+  ---
+  duration_ms: 652.466789
+  type: 'test'
+  ...
+# Subtest: a bare `verify --help` (before any -- separator) shows help and creates no evidence
+ok 612 - a bare `verify --help` (before any -- separator) shows help and creates no evidence
+  ---
+  duration_ms: 602.310776
+  type: 'test'
+  ...
+# Subtest: `--help` after the -- separator is payload for the verified command, not a YallaFlow help request
+ok 613 - `--help` after the -- separator is payload for the verified command, not a YallaFlow help request
+  ---
+  duration_ms: 652.862628
+  type: 'test'
+  ...
+# Subtest: an unrelated flag value that happens to contain "--help" text is not itself a false trigger for a real run
+ok 614 - an unrelated flag value that happens to contain "--help" text is not itself a false trigger for a real run
+  ---
+  duration_ms: 1033.365036
+  type: 'test'
+  ...
+# Subtest: IMPLEMENTATION cannot advance without the implementation checkpoint completed
+ok 615 - IMPLEMENTATION cannot advance without the implementation checkpoint completed
+  ---
+  duration_ms: 304.201444
+  type: 'test'
+  ...
+# Subtest: VERIFICATION cannot advance without the verification checkpoint completed
+ok 616 - VERIFICATION cannot advance without the verification checkpoint completed
+  ---
+  duration_ms: 274.250365
+  type: 'test'
+  ...
+# Subtest: DONE cannot be reached without the code-review checkpoint completed
+ok 617 - DONE cannot be reached without the code-review checkpoint completed
+  ---
+  duration_ms: 138.840252
+  type: 'test'
+  ...
+# Subtest: existing pre-implementation architectural gates remain valid
+ok 618 - existing pre-implementation architectural gates remain valid
+  ---
+  duration_ms: 54.285752
+  type: 'test'
+  ...
+# Subtest: revising implementation rolls the stage back and invalidates downstream checkpoints
+ok 619 - revising implementation rolls the stage back and invalidates downstream checkpoints
+  ---
+  duration_ms: 224.908589
+  type: 'test'
+  ...
+# Subtest: DONE checkpoint revision is rejected with reopen guidance
+ok 620 - DONE checkpoint revision is rejected with reopen guidance
+  ---
+  duration_ms: 192.476257
+  type: 'test'
+  ...
+# Subtest: reopen requires a non-empty reason
+ok 621 - reopen requires a non-empty reason
+  ---
+  duration_ms: 162.769529
+  type: 'test'
+  ...
+# Subtest: reopen rejects an invalid target stage
+ok 622 - reopen rejects an invalid target stage
+  ---
+  duration_ms: 245.747991
+  type: 'test'
+  ...
+# Subtest: reopen refuses work that is not DONE
+ok 623 - reopen refuses work that is not DONE
+  ---
+  duration_ms: 153.659152
+  type: 'test'
+  ...
+# Subtest: reopen to implementation resets downstream checkpoints and reactivates the work
+ok 624 - reopen to implementation resets downstream checkpoints and reactivates the work
+  ---
+  duration_ms: 204.495807
+  type: 'test'
+  ...
+# Subtest: reopen to verification keeps implementation completed
+ok 625 - reopen to verification keeps implementation completed
+  ---
+  duration_ms: 133.940425
+  type: 'test'
+  ...
+# Subtest: reopen to review keeps implementation and verification completed
+ok 626 - reopen to review keeps implementation and verification completed
+  ---
+  duration_ms: 259.299897
+  type: 'test'
+  ...
+# Subtest: reopen preserves prior lifecycle and completion history across multiple reopens
+ok 627 - reopen preserves prior lifecycle and completion history across multiple reopens
+  ---
+  duration_ms: 263.999747
+  type: 'test'
+  ...
+# Subtest: reopen never deletes previously promoted knowledge
+ok 628 - reopen never deletes previously promoted knowledge
+  ---
+  duration_ms: 234.634634
+  type: 'test'
+  ...
+# Subtest: fresh verification is required again before a second DONE, and stale evidence is rejected
+ok 629 - fresh verification is required again before a second DONE, and stale evidence is rejected
+  ---
+  duration_ms: 194.950896
+  type: 'test'
+  ...
+# Subtest: work can reach DONE a second time cleanly through public commands only
+ok 630 - work can reach DONE a second time cleanly through public commands only
+  ---
+  duration_ms: 3246.450665
+  type: 'test'
+  ...
+# Subtest: a pending raw request can be revised through a supported operation
+ok 631 - a pending raw request can be revised through a supported operation
+  ---
+  duration_ms: 65.855406
+  type: 'test'
+  ...
+# Subtest: revision requires a non-empty reason
+ok 632 - revision requires a non-empty reason
+  ---
+  duration_ms: 47.278241
+  type: 'test'
+  ...
+# Subtest: revision requires non-empty replacement text
+ok 633 - revision requires non-empty replacement text
+  ---
+  duration_ms: 55.911682
+  type: 'test'
+  ...
+# Subtest: revision history is preserved and auditable
+ok 634 - revision history is preserved and auditable
+  ---
+  duration_ms: 92.442973
+  type: 'test'
+  ...
+# Subtest: routed work cannot have its original request rewritten through this operation
+ok 635 - routed work cannot have its original request rewritten through this operation
+  ---
+  duration_ms: 88.786244
+  type: 'test'
+  ...
+# Subtest: a file-backed source remains byte-identical after a request correction
+ok 636 - a file-backed source remains byte-identical after a request correction
+  ---
+  duration_ms: 642.645515
+  type: 'test'
+  ...
+# Subtest: CLI: request revise corrects an accidental --help intake end to end
+ok 637 - CLI: request revise corrects an accidental --help intake end to end
+  ---
+  duration_ms: 2053.455465
+  type: 'test'
+  ...
+# Subtest: resume with no ID inspects the active work item
+ok 638 - resume with no ID inspects the active work item
+  ---
+  duration_ms: 611.79285
+  type: 'test'
+  ...
+# Subtest: resume with an explicit ID reads that work item without mutating the active pointer
+ok 639 - resume with an explicit ID reads that work item without mutating the active pointer
+  ---
+  duration_ms: 681.018992
+  type: 'test'
+  ...
+# Subtest: resume on an unknown work ID fails with an actionable error
+ok 640 - resume on an unknown work ID fails with an actionable error
+  ---
+  duration_ms: 557.997062
+  type: 'test'
+  ...
+# Subtest: DONE work can still be inspected explicitly by ID after it is no longer active
+ok 641 - DONE work can still be inspected explicitly by ID after it is no longer active
+  ---
+  duration_ms: 685.312659
+  type: 'test'
+  ...
+# Subtest: a pending (unrouted) work item can also be inspected explicitly without mutating focus
+ok 642 - a pending (unrouted) work item can also be inspected explicitly without mutating focus
+  ---
+  duration_ms: 579.059535
+  type: 'test'
+  ...
+# Subtest: default mode is adaptive
+ok 643 - default mode is adaptive
+  ---
+  duration_ms: 75.493801
+  type: 'test'
+  ...
+# Subtest: autonomous mode never adds an optional review blocker
+ok 644 - autonomous mode never adds an optional review blocker
+  ---
+  duration_ms: 155.587747
+  type: 'test'
+  ...
+# Subtest: adaptive mode blocks at the configured specification boundary until approved
+ok 645 - adaptive mode blocks at the configured specification boundary until approved
+  ---
+  duration_ms: 650.556521
+  type: 'test'
+  ...
+# Subtest: gated mode blocks at every configured stage boundary
+ok 646 - gated mode blocks at every configured stage boundary
+  ---
+  duration_ms: 103.958066
+  type: 'test'
+  ...
+# Subtest: changes_requested keeps the gate blocked
+ok 647 - changes_requested keeps the gate blocked
+  ---
+  duration_ms: 593.656673
+  type: 'test'
+  ...
+# Subtest: a material revision invalidates an existing approval, preserving history
+ok 648 - a material revision invalidates an existing approval, preserving history
+  ---
+  duration_ms: 211.452515
+  type: 'test'
+  ...
+# Subtest: hard safety gates cannot be bypassed by autonomous mode
+ok 649 - hard safety gates cannot be bypassed by autonomous mode
+  ---
+  duration_ms: 240.698245
+  type: 'test'
+  ...
+# Subtest: bounded production bug requires debugging and verification
+ok 650 - bounded production bug requires debugging and verification
+  ---
+  duration_ms: 3.024747
+  type: 'test'
+  ...
+# Subtest: architectural feature requires brainstorming, planning, and review
+ok 651 - architectural feature requires brainstorming, planning, and review
+  ---
+  duration_ms: 0.566154
+  type: 'test'
+  ...
+# Subtest: bounded feature does not require architectural planning
+ok 652 - bounded feature does not require architectural planning
+  ---
+  duration_ms: 1.946474
+  type: 'test'
+  ...
+# Subtest: investigation remains read-only without implementation authorization
+ok 653 - investigation remains read-only without implementation authorization
+  ---
+  duration_ms: 0.382491
+  type: 'test'
+  ...
+# Subtest: bug spike uses the read-only investigation workflow
+ok 654 - bug spike uses the read-only investigation workflow
+  ---
+  duration_ms: 0.565122
+  type: 'test'
+  ...
+# Subtest: feature spike is rejected instead of silently reinterpreted
+ok 655 - feature spike is rejected instead of silently reinterpreted
+  ---
+  duration_ms: 1.057749
+  type: 'test'
+  ...
+# Subtest: routing validation rejects an invalid work type
+ok 656 - routing validation rejects an invalid work type
+  ---
+  duration_ms: 1.963314
+  type: 'test'
+  ...
+# Subtest: routing validation rejects an invalid scope
+ok 657 - routing validation rejects an invalid scope
+  ---
+  duration_ms: 0.573519
+  type: 'test'
+  ...
+# Subtest: routing validation rejects invalid confidence and empty reasons
+ok 658 - routing validation rejects invalid confidence and empty reasons
+  ---
+  duration_ms: 1.105625
+  type: 'test'
+  ...
+# Subtest: routing validation rejects unknown fields
+ok 659 - routing validation rejects unknown fields
+  ---
+  duration_ms: 1.304497
+  type: 'test'
+  ...
+# Subtest: pending intake preserves the raw request and resume identifies routing next
+ok 660 - pending intake preserves the raw request and resume identifies routing next
+  ---
+  duration_ms: 978.441671
+  type: 'test'
+  ...
+# Subtest: routing decision survives a separate CLI process
+ok 661 - routing decision survives a separate CLI process
+  ---
+  duration_ms: 542.575766
+  type: 'test'
+  ...
+# Subtest: routed bug spike cannot enter an implementation stage
+ok 662 - routed bug spike cannot enter an implementation stage
+  ---
+  duration_ms: 188.419384
+  type: 'test'
+  ...
+# Subtest: pilot scenario 1 (36–39, 41): three developers, one memory base, independent deltas integrate cleanly; developer D reads one truth
+ok 663 - pilot scenario 1 (36–39, 41): three developers, one memory base, independent deltas integrate cleanly; developer D reads one truth
+  ---
+  duration_ms: 16283.478375
+  type: 'test'
+  ...
+# Subtest: pilot scenario 2 (40): A and B change the same fact differently — integration refuses silent overwrite, memory stays healthy
+ok 664 - pilot scenario 2 (40): A and B change the same fact differently — integration refuses silent overwrite, memory stays healthy
+  ---
+  duration_ms: 14089.707521
+  type: 'test'
+  ...
+# Subtest: 8/9/11. shared enable is explicit, records policy and version, never commits or pushes
+ok 665 - 8/9/11. shared enable is explicit, records policy and version, never commits or pushes
+  ---
+  duration_ms: 4338.017638
+  type: 'test'
+  ...
+# Subtest: 10. an unhealthy or non-Git workspace cannot enable sharing, and nothing changes
+ok 666 - 10. an unhealthy or non-Git workspace cannot enable sharing, and nothing changes
+  ---
+  duration_ms: 1896.099253
+  type: 'test'
+  ...
+# Subtest: 11. an incompatible YallaFlow stops before any project-state mutation; read-only orientation still explains why
+ok 667 - 11. an incompatible YallaFlow stops before any project-state mutation; read-only orientation still explains why
+  ---
+  duration_ms: 6799.796926
+  type: 'test'
+  ...
+# Subtest: 12/52. a single-user workspace is unchanged until sharing is enabled: same IDs, no memory records, reads write nothing
+ok 668 - 12/52. a single-user workspace is unchanged until sharing is enabled: same IDs, no memory records, reads write nothing
+  ---
+  duration_ms: 7634.978009
+  type: 'test'
+  ...
+# Subtest: 13/14/16. two branches from the same base create work and sources without ID or path collision, and merge cleanly
+ok 669 - 13/14/16. two branches from the same base create work and sources without ID or path collision, and merge cleanly
+  ---
+  duration_ms: 6174.470564
+  type: 'test'
+  ...
+# Subtest: 15. legacy PF-\#\#\#\# and SRC-\#\#\#\# stay readable and keep allocating in single-user mode; both forms coexist
+ok 670 - 15. legacy PF-\#\#\#\# and SRC-\#\#\#\# stay readable and keep allocating in single-user mode; both forms coexist
+  ---
+  duration_ms: 2863.809133
+  type: 'test'
+  ...
+# Subtest: checkout tags: 10 Crockford-base32 characters, an unbiased byte mapping, drawn from crypto.randomBytes
+ok 671 - checkout tags: 10 Crockford-base32 characters, an unbiased byte mapping, drawn from crypto.randomBytes
+  ---
+  duration_ms: 7.474898
+  type: 'test'
+  ...
+# Subtest: high-volume deterministic non-reuse: one checkout allocating thousands of IDs across branch switches never repeats a number
+ok 672 - high-volume deterministic non-reuse: one checkout allocating thousands of IDs across branch switches never repeats a number
+  ---
+  duration_ms: 10803.916074
+  type: 'test'
+  ...
+# Subtest: a copied checkout gets a fresh clone tag; the identity is local, gitignored, and needs no join command
+ok 673 - a copied checkout gets a fresh clone tag; the identity is local, gitignored, and needs no join command
+  ---
+  duration_ms: 6359.483504
+  type: 'test'
+  ...
+# Subtest: one checkout never reuses an ID across branch switches or stashes
+ok 674 - one checkout never reuses an ID across branch switches or stashes
+  ---
+  duration_ms: 3447.123592
+  type: 'test'
+  ...
+# Subtest: 17. every global namespace is branch-safe after a multi-branch merge; work-scoped IDs are safe by scope
+ok 675 - 17. every global namespace is branch-safe after a multi-branch merge; work-scoped IDs are safe by scope
+  ---
+  duration_ms: 7539.476009
+  type: 'test'
+  ...
+# Subtest: 18/19/20/21. work captures its memory base; unchanged, unrelated, and referenced changes are told apart
+ok 676 - 18/19/20/21. work captures its memory base; unchanged, unrelated, and referenced changes are told apart
+  ---
+  duration_ms: 4907.11673
+  type: 'test'
+  ...
+# Subtest: 22. without Git the memory base is still a deterministic content fingerprint
+ok 677 - 22. without Git the memory base is still a deterministic content fingerprint
+  ---
+  duration_ms: 154.31797
+  type: 'test'
+  ...
+# Subtest: 23/24/25/26. on a feature branch knowledge is staged work-locally; canonical memory is untouched; DONE and handoff stay coherent
+ok 678 - 23/24/25/26. on a feature branch knowledge is staged work-locally; canonical memory is untouched; DONE and handoff stay coherent
+  ---
+  duration_ms: 7350.936717
+  type: 'test'
+  ...
+# Subtest: a relation proposed against a fact that changes before promotion is refused at staging (revalidate first)
+ok 679 - a relation proposed against a fact that changes before promotion is refused at staging (revalidate first)
+  ---
+  duration_ms: 2351.174309
+  type: 'test'
+  ...
+# Subtest: 27/28/29/30/35. safe new facts, reconfirmations, supersessions, and exact duplicates integrate with full provenance
+ok 680 - 27/28/29/30/35. safe new facts, reconfirmations, supersessions, and exact duplicates integrate with full provenance
+  ---
+  duration_ms: 7315.579589
+  type: 'test'
+  ...
+# Subtest: 31/40. conflicting parallel supersessions block, never overwrite, and memory stays healthy until reconciled
+ok 681 - 31/40. conflicting parallel supersessions block, never overwrite, and memory stays healthy until reconciled
+  ---
+  duration_ms: 5812.963351
+  type: 'test'
+  ...
+# Subtest: 32. a stale base on a feature branch is detected before push, with developer-facing guidance
+ok 682 - 32. a stale base on a feature branch is detected before push, with developer-facing guidance
+  ---
+  duration_ms: 4491.363707
+  type: 'test'
+  ...
+# Subtest: 33/34. integration retry is idempotent and an interrupted or failed integration is never half-applied
+ok 683 - 33/34. integration retry is idempotent and an interrupted or failed integration is never half-applied
+  ---
+  duration_ms: 4430.775846
+  type: 'test'
+  ...
+# Subtest: integration is deterministic: two maintainers integrating the same merge produce identical files
+ok 684 - integration is deterministic: two maintainers integrating the same merge produce identical files
+  ---
+  duration_ms: 2521.456496
+  type: 'test'
+  ...
+# Subtest: doctor detects unsafe shared state: legacy IDs after sharing, local state committed or misplaced, bad metadata, missing CTX, missing provenance
+ok 685 - doctor detects unsafe shared state: legacy IDs after sharing, local state committed or misplaced, bad metadata, missing CTX, missing provenance
+  ---
+  duration_ms: 2213.707806
+  type: 'test'
+  ...
+# Subtest: 47/48/49/50/51. shared check is read-only, provider-neutral, passes a safe branch, and fails a stale one with actionable output
+ok 686 - 47/48/49/50/51. shared check is read-only, provider-neutral, passes a safe branch, and fails a stale one with actionable output
+  ---
+  duration_ms: 1865.446979
+  type: 'test'
+  ...
+# Subtest: 51/no-network: YallaFlow source never invokes mutating or network Git subcommands and calls no LLM provider
+ok 687 - 51/no-network: YallaFlow source never invokes mutating or network Git subcommands and calls no LLM provider
+  ---
+  duration_ms: 30.069161
+  type: 'test'
+  ...
+# Subtest: 42/43/44/45. the adapter orients automatically; finish speaks outcome language and keeps the audit in --verbose
+ok 688 - 42/43/44/45. the adapter orients automatically; finish speaks outcome language and keeps the audit in --verbose
+  ---
+  duration_ms: 2618.137296
+  type: 'test'
+  ...
+# Subtest: 53/54. single-user baseline, freshness, reconciliation helpers and durable sources behave as before
+ok 689 - 53/54. single-user baseline, freshness, reconciliation helpers and durable sources behave as before
+  ---
+  duration_ms: 944.618976
+  type: 'test'
+  ...
+# Subtest: read commands never write in a Shared Project — not even a fresh clone's local identity
+ok 690 - read commands never write in a Shared Project — not even a fresh clone's local identity
+  ---
+  duration_ms: 8828.875972
+  type: 'test'
+  ...
+# Subtest: built-in skill registry validates successfully
+ok 691 - built-in skill registry validates successfully
+  ---
+  duration_ms: 64.172761
+  type: 'test'
+  ...
+# Subtest: skill registry rejects duplicate IDs
+ok 692 - skill registry rejects duplicate IDs
+  ---
+  duration_ms: 1.600169
+  type: 'test'
+  ...
+# Subtest: skill registry rejects duplicate capability ownership
+ok 693 - skill registry rejects duplicate capability ownership
+  ---
+  duration_ms: 0.533397
+  type: 'test'
+  ...
+# Subtest: skill registry rejects unknown prerequisites
+ok 694 - skill registry rejects unknown prerequisites
+  ---
+  duration_ms: 0.835591
+  type: 'test'
+  ...
+# Subtest: skill registry rejects circular prerequisites
+ok 695 - skill registry rejects circular prerequisites
+  ---
+  duration_ms: 0.741909
+  type: 'test'
+  ...
+# Subtest: skill registry rejects missing instruction files
+ok 696 - skill registry rejects missing instruction files
+  ---
+  duration_ms: 4.599454
+  type: 'test'
+  ...
+# Subtest: skill registry rejects unsupported metadata values
+ok 697 - skill registry rejects unsupported metadata values
+  ---
+  duration_ms: 1.203091
+  type: 'test'
+  ...
+# Subtest: bounded bug capabilities resolve in deterministic order
+ok 698 - bounded bug capabilities resolve in deterministic order
+  ---
+  duration_ms: 1.06761
+  type: 'test'
+  ...
+# Subtest: architectural feature resolves design, specification, planning, and review chain
+ok 699 - architectural feature resolves design, specification, planning, and review chain
+  ---
+  duration_ms: 1.15755
+  type: 'test'
+  ...
+# Subtest: duplicate capabilities do not duplicate skills
+ok 700 - duplicate capabilities do not duplicate skills
+  ---
+  duration_ms: 1.403834
+  type: 'test'
+  ...
+# Subtest: unknown capabilities fail clearly
+ok 701 - unknown capabilities fail clearly
+  ---
+  duration_ms: 0.778975
+  type: 'test'
+  ...
+# Subtest: skill prerequisites are inserted automatically
+ok 702 - skill prerequisites are inserted automatically
+  ---
+  duration_ms: 0.452841
+  type: 'test'
+  ...
+# Subtest: new routed work receives a pinned registry v9 contract
+ok 703 - new routed work receives a pinned registry v9 contract
+  ---
+  duration_ms: 86.835596
+  type: 'test'
+  ...
+# Subtest: legacy routed work derives an unpinned contract without mutation
+ok 704 - legacy routed work derives an unpinned contract without mutation
+  ---
+  duration_ms: 66.444151
+  type: 'test'
+  ...
+# Subtest: investigation guidance never authorizes implementation
+ok 705 - investigation guidance never authorizes implementation
+  ---
+  duration_ms: 62.34127
+  type: 'test'
+  ...
+# Subtest: bug spike guidance never authorizes implementation
+ok 706 - bug spike guidance never authorizes implementation
+  ---
+  duration_ms: 86.320879
+  type: 'test'
+  ...
+# Subtest: bug guidance blocks writes before confirmed root cause
+ok 707 - bug guidance blocks writes before confirmed root cause
+  ---
+  duration_ms: 65.981455
+  type: 'test'
+  ...
+# Subtest: implementation stage authorizes writes when policy permits
+ok 708 - implementation stage authorizes writes when policy permits
+  ---
+  duration_ms: 81.640958
+  type: 'test'
+  ...
+# Subtest: guide command uses active work and reports the behavior gate
+ok 709 - guide command uses active work and reports the behavior gate
+  ---
+  duration_ms: 632.183051
+  type: 'test'
+  ...
+# Subtest: skill command prints installed package instructions
+ok 710 - skill command prints installed package instructions
+  ---
+  duration_ms: 517.391741
+  type: 'test'
+  ...
+# Subtest: invalid skill returns an actionable error
+ok 711 - invalid skill returns an actionable error
+  ---
+  duration_ms: 480.285099
+  type: 'test'
+  ...
+# Subtest: doctor validates the built-in Skill Registry
+ok 712 - doctor validates the built-in Skill Registry
+  ---
+  duration_ms: 562.299353
+  type: 'test'
+  ...
+# Subtest: snapshot --json validates and places each item in the flow
+ok 713 - snapshot --json validates and places each item in the flow
+  ---
+  duration_ms: 3708.215311
+  type: 'test'
+  ...
+# Subtest: a requested human review gate is reported as waiting for you
+ok 714 - a requested human review gate is reported as waiting for you
+  ---
+  duration_ms: 2528.104357
+  type: 'test'
+  ...
+# Subtest: an open material question is reported as waiting for you
+ok 715 - an open material question is reported as waiting for you
+  ---
+  duration_ms: 2582.627549
+  type: 'test'
+  ...
+# Subtest: work show --json returns every section and validates
+ok 716 - work show --json returns every section and validates
+  ---
+  duration_ms: 3678.712249
+  type: 'test'
+  ...
+# Subtest: errors are one JSON document with a code and exit status 1
+ok 717 - errors are one JSON document with a code and exit status 1
+  ---
+  duration_ms: 513.730385
+  type: 'test'
+  ...
+# Subtest: read commands never modify .yallaflow, the working tree, or .git/index
+ok 718 - read commands never modify .yallaflow, the working tree, or .git/index
+  ---
+  duration_ms: 4096.347702
+  type: 'test'
+  ...
+# Subtest: snapshot reads a legacy v0.3.6 workspace fixture without writing to it
+ok 719 - snapshot reads a legacy v0.3.6 workspace fixture without writing to it
+  ---
+  duration_ms: 1611.473839
+  type: 'test'
+  ...
+# Subtest: work show reports convergence evidence as stable references (run, path)
+ok 720 - work show reports convergence evidence as stable references (run, path)
+  ---
+  duration_ms: 8946.818918
+  type: 'test'
+  ...
+# Subtest: a new bounded task starts with only its lifecycle files
+ok 721 - a new bounded task starts with only its lifecycle files
+  ---
+  duration_ms: 1170.029678
+  type: 'test'
+  ...
+# Subtest: no empty evidence/, attachments/, or execution/ for any work-creation path
+ok 722 - no empty evidence/, attachments/, or execution/ for any work-creation path
+  ---
+  duration_ms: 221.464175
+  type: 'test'
+  ...
+# Subtest: decomposed children are created sparse too
+ok 723 - decomposed children are created sparse too
+  ---
+  duration_ms: 9744.795444
+  type: 'test'
+  ...
+# Subtest: the first verification lazily creates evidence/ with the ledger and log
+ok 724 - the first verification lazily creates evidence/ with the ledger and log
+  ---
+  duration_ms: 586.739345
+  type: 'test'
+  ...
+# Subtest: the first checkpoint lazily creates progress.yaml; knowledge.yaml only on a knowledge command
+ok 725 - the first checkpoint lazily creates progress.yaml; knowledge.yaml only on a knowledge command
+  ---
+  duration_ms: 607.094051
+  type: 'test'
+  ...
+# Subtest: file intake stores the original under workspace sources/ and creates no attachments/ directory
+ok 726 - file intake stores the original under workspace sources/ and creates no attachments/ directory
+  ---
+  duration_ms: 576.657524
+  type: 'test'
+  ...
+# Subtest: existing workspaces with eagerly created empty directories keep working and are never cleaned up
+ok 727 - existing workspaces with eagerly created empty directories keep working and are never cleaned up
+  ---
+  duration_ms: 3124.001923
+  type: 'test'
+  ...
+# Subtest: 54. every file a full lifecycle writes has a declared owner, and the agent contract names all CLI-owned state
+ok 728 - 54. every file a full lifecycle writes has a declared owner, and the agent contract names all CLI-owned state
+  ---
+  duration_ms: 6322.600741
+  type: 'test'
+  ...
+# Subtest: 55. hand-editing a CLI-recorded work.md lifecycle record is detected; narrative edits are not
+ok 729 - 55. hand-editing a CLI-recorded work.md lifecycle record is detected; narrative edits are not
+  ---
+  duration_ms: 1549.071037
+  type: 'test'
+  ...
+# Subtest: 55. hand-editing structured state is detected deterministically
+ok 730 - 55. hand-editing structured state is detected deterministically
+  ---
+  duration_ms: 6813.2345
+  type: 'test'
+  ...
+# Subtest: 56. supported CLI transitions leave the workspace doctor-clean with no ownership warnings
+ok 731 - 56. supported CLI transitions leave the workspace doctor-clean with no ownership warnings
+  ---
+  duration_ms: 6459.210218
+  type: 'test'
+  ...
+# Subtest: github adapter normalizes gh CLI JSON: criteria from the heading, bot comments flagged, uploaded files as attachments
+ok 732 - github adapter normalizes gh CLI JSON: criteria from the heading, bot comments flagged, uploaded files as attachments
+  ---
+  duration_ms: 26.940889
+  type: 'test'
+  ...
+# Subtest: github adapter normalizes the REST issue + comments wrapper
+ok 733 - github adapter normalizes the REST issue + comments wrapper
+  ---
+  duration_ms: 3.387655
+  type: 'test'
+  ...
+# Subtest: jira adapter reads ADF, finds the custom Acceptance Criteria field by name, and flags app comments
+ok 734 - jira adapter reads ADF, finds the custom Acceptance Criteria field by name, and flags app comments
+  ---
+  duration_ms: 3.462294
+  type: 'test'
+  ...
+# Subtest: azure devops adapter converts rich text, reads the acceptance-criteria field, and keeps only attached files
+ok 735 - azure devops adapter converts rich text, reads the acceptance-criteria field, and keeps only attached files
+  ---
+  duration_ms: 4.876826
+  type: 'test'
+  ...
+# Subtest: references resolve to exactly one provider; unrelated input does not
+ok 736 - references resolve to exactly one provider; unrelated input does not
+  ---
+  duration_ms: 2.520373
+  type: 'test'
+  ...
+# Subtest: markup helpers are mechanical: headings, lists, entities, scripts dropped
+ok 737 - markup helpers are mechanical: headings, lists, entities, scripts dropped
+  ---
+  duration_ms: 0.893017
+  type: 'test'
+  ...
+# Subtest: acceptance criteria are found in the formats real trackers use (found in live acceptance)
+ok 738 - acceptance criteria are found in the formats real trackers use (found in live acceptance)
+  ---
+  duration_ms: 1.761731
+  type: 'test'
+  ...
+# Subtest: a credentialed request never follows a redirect to another origin
+ok 739 - a credentialed request never follows a redirect to another origin
+  ---
+  duration_ms: 5.054247
+  type: 'test'
+  ...
+# Subtest: intake ticket imports an agent-supplied payload offline into a pending intake with a preserved original
+ok 740 - intake ticket imports an agent-supplied payload offline into a pending intake with a preserved original
+  ---
+  duration_ms: 2023.814367
+  type: 'test'
+  ...
+# Subtest: a normalized ticket needs no --provider; a raw payload without one is refused without writing
+ok 741 - a normalized ticket needs no --provider; a raw payload without one is refused without writing
+  ---
+  duration_ms: 2164.411521
+  type: 'test'
+  ...
+# Subtest: a ticket reference without --fetch stays offline and explains both paths
+ok 742 - a ticket reference without --fetch stays offline and explains both paths
+  ---
+  duration_ms: 1052.95764
+  type: 'test'
+  ...
+# Subtest: re-importing a ticket creates a new source that names the previous one; the earlier source never changes
+ok 743 - re-importing a ticket creates a new source that names the previous one; the earlier source never changes
+  ---
+  duration_ms: 1619.591589
+  type: 'test'
+  ...
+# Subtest: --work attaches like intake add: impact after intent is fixed, and DONE work needs --reason
+ok 744 - --work attaches like intake add: impact after intent is fixed, and DONE work needs --reason
+  ---
+  duration_ms: 13978.799201
+  type: 'test'
+  ...
+# Subtest: --attachment preserves agent-saved attachment files as their own linked sources
+ok 745 - --attachment preserves agent-saved attachment files as their own linked sources
+  ---
+  duration_ms: 1169.042214
+  type: 'test'
+  ...
+# Subtest: the Brownfield understanding gate refuses a new ticket intake before any write
+ok 746 - the Brownfield understanding gate refuses a new ticket intake before any write
+  ---
+  duration_ms: 1040.234916
+  type: 'test'
+  ...
+# Subtest: --fetch (GitHub) issues only GET requests with the env token, which never reaches state or output
+ok 747 - --fetch (GitHub) issues only GET requests with the env token, which never reaches state or output
+  ---
+  duration_ms: 1685.779272
+  type: 'test'
+  ...
+# Subtest: --fetch --attachments (Jira) downloads attachments from the same site as their own sources
+ok 748 - --fetch --attachments (Jira) downloads attachments from the same site as their own sources
+  ---
+  duration_ms: 1188.96222
+  type: 'test'
+  ...
+# Subtest: --fetch without credentials names the variable and writes nothing
+ok 749 - --fetch without credentials names the variable and writes nothing
+  ---
+  duration_ms: 1061.159898
+  type: 'test'
+  ...
+# Subtest: --fetch (Azure DevOps) reads the work item and its comments with the PAT
+ok 750 - --fetch (Azure DevOps) reads the work item and its comments with the PAT
+  ---
+  duration_ms: 1108.043485
+  type: 'test'
+  ...
+# Subtest: credentials only go to the hosted tracker or an explicitly configured host — never to a host named by a ticket URL
+ok 751 - credentials only go to the hosted tracker or an explicitly configured host — never to a host named by a ticket URL
+  ---
+  duration_ms: 3358.745517
+  type: 'test'
+  ...
+# Subtest: GitHub attachments download only from GitHub attachment hosts, never from look-alikes
+ok 752 - GitHub attachments download only from GitHub attachment hosts, never from look-alikes
+  ---
+  duration_ms: 1.728772
+  type: 'test'
+  ...
+# Subtest: no other command touches the network: init, start, route, intake, ticket import, verify, brief, status, doctor, finish
+ok 753 - no other command touches the network: init, start, route, intake, ticket import, verify, brief, status, doctor, finish
+  ---
+  duration_ms: 17584.286473
+  type: 'test'
+  ...
+# Subtest: config: requirements.providers is validated, and credentials are refused in config
+ok 754 - config: requirements.providers is validated, and credentials are refused in config
+  ---
+  duration_ms: 1597.368951
+  type: 'test'
+  ...
+# Subtest: --fetch does not hold the workspace lock during the network request (v1.2.0)
+ok 755 - --fetch does not hold the workspace lock during the network request (v1.2.0)
+  ---
+  duration_ms: 1727.100944
+  type: 'test'
+  ...
+# Subtest: bug follows deterministic workflow and DONE requires verification
+ok 756 - bug follows deterministic workflow and DONE requires verification
+  ---
+  duration_ms: 213.928067
+  type: 'test'
+  ...
+# Subtest: investigation has no implementation stage
+ok 757 - investigation has no implementation stage
+  ---
+  duration_ms: 122.922971
+  type: 'test'
+  ...
+# Subtest: 46. upgrade status, upgrade plan, and brief are strictly read-only
+ok 758 - 46. upgrade status, upgrade plan, and brief are strictly read-only
+  ---
+  duration_ms: 3158.140392
+  type: 'test'
+  ...
+# Subtest: 47. a v0.3.5 workspace: refresh the unversioned agent guidance, then reconcile legacy context
+ok 759 - 47. a v0.3.5 workspace: refresh the unversioned agent guidance, then reconcile legacy context
+  ---
+  duration_ms: 1330.439258
+  type: 'test'
+  ...
+# Subtest: 48. a v0.3.6 workspace (v2 contract, one CTX fact, legacy facts pending): refresh → reconcile
+ok 760 - 48. a v0.3.6 workspace (v2 contract, one CTX fact, legacy facts pending): refresh → reconcile
+  ---
+  duration_ms: 4092.248373
+  type: 'test'
+  ...
+# Subtest: 49. a fully current workspace reports no upgrade action
+ok 761 - 49. a fully current workspace reports no upgrade action
+  ---
+  duration_ms: 1208.822155
+  type: 'test'
+  ...
+# Subtest: 50 + 52. brief is a concise, project-first orientation: bounded current facts, no legacy dump, sources surfaced
+ok 762 - 50 + 52. brief is a concise, project-first orientation: bounded current facts, no legacy dump, sources surfaced
+  ---
+  duration_ms: 1439.443004
+  type: 'test'
+  ...
+# Subtest: 51. brief surfaces the active work item and points to resume
+ok 763 - 51. brief surfaces the active work item and points to resume
+  ---
+  duration_ms: 1011.770865
+  type: 'test'
+  ...
+# Subtest: 53. brief and handoff/resume surface reconciliation progress and blockers without dumping candidates
+ok 764 - 53. brief and handoff/resume surface reconciliation progress and blockers without dumping candidates
+  ---
+  duration_ms: 4424.178143
+  type: 'test'
+  ...
+# Subtest: brief outside a workspace explains that YallaFlow is not initialized
+ok 765 - brief outside a workspace explains that YallaFlow is not initialized
+  ---
+  duration_ms: 477.688089
+  type: 'test'
+  ...
+# Subtest: 57. a v0.3.6 canonical ledger and its projection read unchanged; render reproduces it byte-for-byte
+ok 766 - 57. a v0.3.6 canonical ledger and its projection read unchanged; render reproduces it byte-for-byte
+  ---
+  duration_ms: 8405.492708
+  type: 'test'
+  ...
+# Subtest: 57. the v0.3.6 ledger keeps evolving through ordinary v0.3.7 work
+ok 767 - 57. the v0.3.6 ledger keeps evolving through ordinary v0.3.7 work
+  ---
+  duration_ms: 6514.519761
+  type: 'test'
+  ...
+# Subtest: 59–60. durable sources and the verification ledger are unaffected
+ok 768 - 59–60. durable sources and the verification ledger are unaffected
+  ---
+  duration_ms: 2919.324113
+  type: 'test'
+  ...
+# Subtest: 61. pinned registry-v3 Behavior Contracts keep working; direct commands still require --scope
+ok 769 - 61. pinned registry-v3 Behavior Contracts keep working; direct commands still require --scope
+  ---
+  duration_ms: 1607.189284
+  type: 'test'
+  ...
+# Subtest: 62–63. reconciliation keeps the sparse workspace layout and leaves baseline rules intact
+ok 770 - 62–63. reconciliation keeps the sparse workspace layout and leaves baseline rules intact
+  ---
+  duration_ms: 4556.469653
+  type: 'test'
+  ...
+# Subtest: 58. v0.3.5 work history stays readable after its knowledge is reconciled
+ok 771 - 58. v0.3.5 work history stays readable after its knowledge is reconciled
+  ---
+  duration_ms: 8723.375536
+  type: 'test'
+  ...
+# Subtest: the frozen v1.0.1 CLI still reads a workspace that used tickets, QC, demos and qc: citations
+ok 772 - the frozen v1.0.1 CLI still reads a workspace that used tickets, QC, demos and qc: citations
+  ---
+  duration_ms: 18289.824796
+  type: 'test'
+  ...
+# Subtest: a workspace that never used the optional capabilities keeps the 1.0.x shape
+ok 773 - a workspace that never used the optional capabilities keeps the 1.0.x shape
+  ---
+  duration_ms: 2022.12326
+  type: 'test'
+  ...
+# Subtest: first verify creates run V-001
+ok 774 - first verify creates run V-001
+  ---
+  duration_ms: 81.87826
+  type: 'test'
+  ...
+# Subtest: second verify appends V-002 and old evidence remains
+ok 775 - second verify appends V-002 and old evidence remains
+  ---
+  duration_ms: 74.213233
+  type: 'test'
+  ...
+# Subtest: failed verification is recorded and does not delete history; latest success is what is checked
+ok 776 - failed verification is recorded and does not delete history; latest success is what is checked
+  ---
+  duration_ms: 88.979705
+  type: 'test'
+  ...
+# Subtest: legacy single-record evidence file remains readable and is not rewritten by reads
+ok 777 - legacy single-record evidence file remains readable and is not rewritten by reads
+  ---
+  duration_ms: 71.564279
+  type: 'test'
+  ...
+# Subtest: a new verify appended after legacy evidence upgrades the file, preserving the legacy run as V-001
+ok 778 - a new verify appended after legacy evidence upgrades the file, preserving the legacy run as V-001
+  ---
+  duration_ms: 37.149674
+  type: 'test'
+  ...
+# Subtest: yallaflow verify appends evidence and yallaflow verify list shows every run
+ok 779 - yallaflow verify appends evidence and yallaflow verify list shows every run
+  ---
+  duration_ms: 1440.176841
+  type: 'test'
+  ...
+# Subtest: verify list on a work item with no evidence reports clearly
+ok 780 - verify list on a work item with no evidence reports clearly
+  ---
+  duration_ms: 523.286978
+  type: 'test'
+  ...
+# Subtest: a command consuming stdin and producing stdout+stderr has all three captured correctly, with an accurate exit code
+ok 781 - a command consuming stdin and producing stdout+stderr has all three captured correctly, with an accurate exit code
+  ---
+  duration_ms: 597.775089
+  type: 'test'
+  ...
+# Subtest: a failing command with stdin/stdout/stderr is captured and does not erase a prior passing run
+ok 782 - a failing command with stdin/stdout/stderr is captured and does not erase a prior passing run
+  ---
+  duration_ms: 1133.279375
+  type: 'test'
+  ...
+# Subtest: direct argv preserves an argument containing spaces exactly
+ok 783 - direct argv preserves an argument containing spaces exactly
+  ---
+  duration_ms: 611.028391
+  type: 'test'
+  ...
+# Subtest: direct argv mode never invokes shell interpretation
+ok 784 - direct argv mode never invokes shell interpretation
+  ---
+  duration_ms: 604.3654
+  type: 'test'
+  ...
+# Subtest: explicit --shell mode supports a pipeline
+ok 785 - explicit --shell mode supports a pipeline
+  ---
+  duration_ms: 614.770319
+  type: 'test'
+  ...
+# Subtest: --script mode executes a script file and records its path
+ok 786 - --script mode executes a script file and records its path
+  ---
+  duration_ms: 578.916215
+  type: 'test'
+  ...
+# Subtest: a failed verification run is recorded, and a later success does not delete it
+ok 787 - a failed verification run is recorded, and a later success does not delete it
+  ---
+  duration_ms: 1052.97675
+  type: 'test'
+  ...
+# Subtest: stdin is inherited safely: piped input reaches the verification process without hanging
+ok 788 - stdin is inherited safely: piped input reaches the verification process without hanging
+  ---
+  duration_ms: 624.266678
+  type: 'test'
+  ...
+# Subtest: a legacy (schemaVersion-less) verification ledger remains readable, no migration on read
+ok 789 - a legacy (schemaVersion-less) verification ledger remains readable, no migration on read
+  ---
+  duration_ms: 545.241974
+  type: 'test'
+  ...
+# Subtest: verify list renders the execution mode for each run
+ok 790 - verify list renders the execution mode for each run
+  ---
+  duration_ms: 1555.144987
+  type: 'test'
+  ...
+# Subtest: contract v9 requires a routed, authorized work item before the first engineering edit
+ok 791 - contract v9 requires a routed, authorized work item before the first engineering edit
+  ---
+  duration_ms: 4.890014
+  type: 'test'
+  ...
+# Subtest: contract v9 keeps small changes lightweight and operational help outside work items
+ok 792 - contract v9 keeps small changes lightweight and operational help outside work items
+  ---
+  duration_ms: 0.57674
+  type: 'test'
+  ...
+# Subtest: contract v9 reuses covering active work and never duplicates it
+ok 793 - contract v9 reuses covering active work and never duplicates it
+  ---
+  duration_ms: 0.576203
+  type: 'test'
+  ...
+# Subtest: contract v9 documents recovery of an untracked edit without reverting, rewriting history, or backdating
+ok 794 - contract v9 documents recovery of an untracked edit without reverting, rewriting history, or backdating
+  ---
+  duration_ms: 0.565773
+  type: 'test'
+  ...
+# Subtest: bootstrap v3 carries the route-before-edit precondition for every provider and still defers to AGENT.md
+ok 795 - bootstrap v3 carries the route-before-edit precondition for every provider and still defers to AGENT.md
+  ---
+  duration_ms: 5.97499
+  type: 'test'
+  ...
+# Subtest: documentation lint: no agent-facing text, doc, or normal CLI output presents YallaFlow tracking as optional
+ok 796 - documentation lint: no agent-facing text, doc, or normal CLI output presents YallaFlow tracking as optional
+  ---
+  duration_ms: 2240.730883
+  type: 'test'
+  ...
+# Subtest: brief with no active work ties a new request to routing before the first edit
+ok 797 - brief with no active work ties a new request to routing before the first edit
+  ---
+  duration_ms: 2042.606433
+  type: 'test'
+  ...
+# Subtest: CLI path for the Sekaya scenario: the bounded UI change is not authorized until routed and advanced, then needs no human approval in adaptive mode
+ok 798 - CLI path for the Sekaya scenario: the bounded UI change is not authorized until routed and advanced, then needs no human approval in adaptive mode
+  ---
+  duration_ms: 16004.961572
+  type: 'test'
+  ...
+# Subtest: CLI path in gated mode: a bounded change stops at a human implementation review the agent must not self-approve
+ok 799 - CLI path in gated mode: a bounded change stops at a human implementation review the agent must not self-approve
+  ---
+  duration_ms: 6309.336945
+  type: 'test'
+  ...
+# Subtest: verification and finish requirements still hold for lightweight work
+ok 800 - verification and finish requirements still hold for lightweight work
+  ---
+  duration_ms: 5693.600629
+  type: 'test'
+  ...
+# Subtest: CLI path for active-work reuse: brief and status point to the covering item; an unrelated request becomes a separate item
+ok 801 - CLI path for active-work reuse: brief and status point to the covering item; an unrelated request becomes a separate item
+  ---
+  duration_ms: 2339.089098
+  type: 'test'
+  ...
+# Subtest: operational requests create no work item and change no YallaFlow state
+ok 802 - operational requests create no work item and change no YallaFlow state
+  ---
+  duration_ms: 5728.927274
+  type: 'test'
+  ...
+# Subtest: Brownfield gate and Greenfield freedom are unchanged for the Sekaya request
+ok 803 - Brownfield gate and Greenfield freedom are unchanged for the Sekaya request
+  ---
+  duration_ms: 1497.803693
+  type: 'test'
+  ...
+# Subtest: CLI path for recovery: an edit made before routing is kept, disclosed in a ruling, verified fresh, and dated when recorded
+ok 804 - CLI path for recovery: an edit made before routing is kept, disclosed in a ruling, verified fresh, and dated when recorded
+  ---
+  duration_ms: 5604.44518
+  type: 'test'
+  ...
+# Subtest: a v1.0.0 workspace (contract v8, bootstrap v2) reads as outdated, keeps working, and upgrades only on explicit refresh
+ok 805 - a v1.0.0 workspace (contract v8, bootstrap v2) reads as outdated, keeps working, and upgrades only on explicit refresh
+  ---
+  duration_ms: 1648.760853
+  type: 'test'
+  ...
+# Subtest: a v1.0.0 CLI on a refreshed workspace reports the newer contract and refuses to downgrade it
+ok 806 - a v1.0.0 CLI on a refreshed workspace reports the newer contract and refuses to downgrade it
+  ---
+  duration_ms: 1299.017026
+  type: 'test'
+  ...
+# Subtest: guide reports an unblocked stage with advance as the next valid action
+ok 807 - guide reports an unblocked stage with advance as the next valid action
+  ---
+  duration_ms: 2072.838975
+  type: 'test'
+  ...
+# Subtest: guide names the exact checkpoint command when a checkpoint blocks the stage
+ok 808 - guide names the exact checkpoint command when a checkpoint blocks the stage
+  ---
+  duration_ms: 7165.044131
+  type: 'test'
+  ...
+# Subtest: at the final boundary guide prefers argv verification and advance agrees
+ok 809 - at the final boundary guide prefers argv verification and advance agrees
+  ---
+  duration_ms: 9190.0542
+  type: 'test'
+  ...
+# Subtest: advance prints the next boundary after a successful transition
+ok 810 - advance prints the next boundary after a successful transition
+  ---
+  duration_ms: 1982.906887
+  type: 'test'
+  ...
+# Subtest: guide never requests a review gate (read-only); advance still does
+ok 811 - guide never requests a review gate (read-only); advance still does
+  ---
+  duration_ms: 3034.390189
+  type: 'test'
+  ...
+# Subtest: guide on DONE work reports no further action
+ok 812 - guide on DONE work reports no further action
+  ---
+  duration_ms: 7113.341787
+  type: 'test'
+  ...
+# Subtest: parallel starts allocate distinct work IDs and leave valid state
+ok 813 - parallel starts allocate distinct work IDs and leave valid state
+  ---
+  duration_ms: 3013.171444
+  type: 'test'
+  ...
+# Subtest: parallel mutating commands across items and verifications keep every ledger intact
+ok 814 - parallel mutating commands across items and verifications keep every ledger intact
+  ---
+  duration_ms: 5254.683729
+  type: 'test'
+  ...
+# Subtest: a stale lock from a dead process is reported, then recovered automatically
+ok 815 - a stale lock from a dead process is reported, then recovered automatically
+  ---
+  duration_ms: 1202.08902
+  type: 'test'
+  ...
+# Subtest: doctor --clear-lock removes a stale lock and refuses a live one
+ok 816 - doctor --clear-lock removes a stale lock and refuses a live one
+  ---
+  duration_ms: 1295.529904
+  type: 'test'
+  ...
+# Subtest: a live holder is waited for; past the timeout the command fails and changes nothing
+ok 817 - a live holder is waited for; past the timeout the command fails and changes nothing
+  ---
+  duration_ms: 1776.389547
+  type: 'test'
+  ...
+# Subtest: the lock is re-entrant inside one process and read commands never take it
+ok 818 - the lock is re-entrant inside one process and read commands never take it
+  ---
+  duration_ms: 1050.355704
+  type: 'test'
+  ...
+# Subtest: a single-user workspace has no local/ directory after a command, even a refused one
+ok 819 - a single-user workspace has no local/ directory after a command, even a refused one
+  ---
+  duration_ms: 1107.164312
+  type: 'test'
+  ...
+# Subtest: a crash can never leave an empty lock; an unreadable one is stale after 30 s
+ok 820 - a crash can never leave an empty lock; an unreadable one is stale after 30 s
+  ---
+  duration_ms: 1439.697378
+  type: 'test'
+  ...
+# Subtest: a reused pid (same pid, different process start) is recognized as stale
+ok 821 - a reused pid (same pid, different process start) is recognized as stale
+  ---
+  duration_ms: 529.742036
+  type: 'test'
+  ...
+# Subtest: the lock records the holder identity, and a positively identified live holder is never cleared
+ok 822 - the lock records the holder identity, and a positively identified live holder is never cleared
+  ---
+  duration_ms: 3116.085538
+  type: 'test'
+  ...
+# Subtest: doctor --clear-lock removes an hour-old lock whose holder cannot be identified
+ok 823 - doctor --clear-lock removes an hour-old lock whose holder cannot be identified
+  ---
+  duration_ms: 771.952512
+  type: 'test'
+  ...
+# Subtest: leftover lock temp files from a crash are swept
+ok 824 - leftover lock temp files from a crash are swept
+  ---
+  duration_ms: 404.535155
+  type: 'test'
+  ...
+# Subtest: a lock taken before the machine last booted is stale on any platform
+ok 825 - a lock taken before the machine last booted is stale on any platform
+  ---
+  duration_ms: 408.16163
+  type: 'test'
+  ...
+# Subtest: release removes only its own lock, never one taken over meanwhile
+ok 826 - release removes only its own lock, never one taken over meanwhile
+  ---
+  duration_ms: 20.601382
+  type: 'test'
+  ...
+# Subtest: verify waits to record a finished run and always shows its output (an exited, unreaped holder counts as gone)
+ok 827 - verify waits to record a finished run and always shows its output (an exited, unreaped holder counts as gone)
+  ---
+  duration_ms: 2075.822412
+  type: 'test'
+  ...
+# Subtest: a lock a crash leaves in a single-user workspace stays out of git status
+ok 828 - a lock a crash leaves in a single-user workspace stays out of git status
+  ---
+  duration_ms: 410.342239
+  type: 'test'
+  ...
+# Subtest: init → no ADRs/releases → commit → fresh clone → doctor is healthy
+ok 829 - init → no ADRs/releases → commit → fresh clone → doctor is healthy
+  ---
+  duration_ms: 5379.315082
+  type: 'test'
+  ...
+# Subtest: absent work/ is a failure only when durable state names active work
+ok 830 - absent work/ is a failure only when durable state names active work
+  ---
+  duration_ms: 1551.968267
+  type: 'test'
+  ...
+# Subtest: a lazy path that exists but is not a directory fails doctor
+ok 831 - a lazy path that exists but is not a directory fails doctor
+  ---
+  duration_ms: 1196.711307
+  type: 'test'
+  ...
+# Subtest: initializes durable project structure
+ok 832 - initializes durable project structure
+  ---
+  duration_ms: 50.645298
+  type: 'test'
+  ...
+# Subtest: refuses to create a parallel workspace beside a legacy workspace
+ok 833 - refuses to create a parallel workspace beside a legacy workspace
+  ---
+  duration_ms: 4.215762
+  type: 'test'
+  ...
+# Subtest: creates sequential work items and investigation is read-only
+ok 834 - creates sequential work items and investigation is read-only
+  ---
+  duration_ms: 112.111336
+  type: 'test'
+  ...
+# Subtest: loads v0.1 work metadata without requiring migration
+ok 835 - loads v0.1 work metadata without requiring migration
+  ---
+  duration_ms: 49.849891
+  type: 'test'
+  ...
+1..835
+# tests 835
+# suites 0
+# pass 835
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 280689.20989

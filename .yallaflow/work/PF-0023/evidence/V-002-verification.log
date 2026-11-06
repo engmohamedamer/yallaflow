@@ -1,0 +1,20 @@
+scenario                             1.0.1 med 1.1.0 med   delta 1.1.0 p95 1.1.0 max
+node -e 0 (bare Node startup)              nan      19.3    nan%      20.9      22.0
+--version (CLI startup)                  214.9     221.8    3.2%     265.6     279.9
+S  brief                                 249.2     257.0    3.1%     278.5     318.7
+S  status                                200.9     204.3    1.7%     216.9     228.7
+S  guide PF-0001                         205.7     209.0    1.6%     219.8     243.7
+S  doctor                                225.8     230.8    2.2%     243.2     261.8
+S  init (empty git repo)                 213.7     217.2    1.7%     228.7     236.2
+S  advance                               206.0     208.3    1.1%     221.0     238.4
+S  checkpoint --complete                 201.4     205.6    2.1%     213.2     229.6
+S  verify -- true                        204.6     207.4    1.4%     223.6     254.5
+M  brief (v1.0.1 repo)                   393.2     394.4    0.3%     402.0     448.2
+M  status (v1.0.1 repo)                  247.5     253.1    2.2%     263.1     307.7
+M  doctor (v1.0.1 repo)                  350.3     355.2    1.4%     396.5     496.9
+M  context status (v1.0.1 repo)          260.2     264.6    1.7%     309.9     326.6
+L  brief (HEAD repo)                       nan     692.1    nan%     715.6     725.7
+L  status (HEAD repo)                      nan     444.0    nan%     468.2     495.6
+L  doctor (HEAD repo)                      nan     638.0    nan%     680.5     765.1
+L  context status (HEAD repo)              nan     297.8    nan%     337.4     339.7
+L  guide PF-0022 (HEAD repo)               nan     222.3    nan%     228.5     236.2

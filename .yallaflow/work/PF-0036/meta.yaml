@@ -1,0 +1,45 @@
+{
+  "id": "PF-0036",
+  "type": "investigation",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Claude Code Channels feasibility PoC on the owner's subscription and unified Agent Workspace UX architecture (research only)",
+  "status": "DONE",
+  "readOnly": true,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-06T15:38:01.647Z",
+  "updatedAt": "2026-11-06T15:54:09.197Z",
+  "title": "Claude Code Channels feasibility PoC on the owner's subscription and unified Agent Workspace UX architecture (research only)",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow investigate --scope bounded`.",
+  "routedAt": "2026-11-06T15:38:01.658Z",
+  "workflow": "investigation",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "verification"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0023",
+      "type": "file",
+      "name": "owner-claude-channels-poc-decision-2026-11-06.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-06T15:38:01.850Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ]
+}

@@ -1,0 +1,408 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-06T13:07:14.397Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+        "verificationRunIds": [
+          "V-002"
+        ]
+      },
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "Create with only a requirement leaves routing pending; with type and scope it is routed to exactly that type/scope; the dialog preselects 'Let my agent decide' and shows size only after a type, with no default.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/console-create.test.js",
+              "contentHash": "sha256:0456a2704141b98403f21f89966b44723ebd5d1b9c91384bd02198a8d11f3b5d",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:f459bb1251a9035197a9f88bed315ea2015b635cc15b6a1e99e80ba6db6e402d",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0032",
+              "verificationRunId": "V-002"
+            },
+            {
+              "type": "runtime",
+              "description": "browser create of a feature/bounded item and an unclassified item on a scratch project"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Attached files are preserved through intake add and linked; unsupported (415), empty (400), oversized (413) and busy-workspace (503) uploads are refused with a message while the created item stays readable; retries do not duplicate.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/console-create.test.js",
+              "contentHash": "sha256:0456a2704141b98403f21f89966b44723ebd5d1b9c91384bd02198a8d11f3b5d",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/create.js",
+              "contentHash": "sha256:82fc20d5c29a9e317ae58a175fe93fc537350aeff845a2f229375e333d5de4b4",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0032",
+              "verificationRunId": "V-002"
+            },
+            {
+              "type": "runtime",
+              "description": "browser partial-success view after a refused .exe attachment"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "The server returns the item from work show --json and the page opens it; the next step is Core's nextAction (route command for pending, advance for routed); creation only spawns the CLI.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/create.js",
+              "contentHash": "sha256:82fc20d5c29a9e317ae58a175fe93fc537350aeff845a2f229375e333d5de4b4",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:e2db7dfef78ef9c0070c825ab60d6bd407a55590ce72bf4836995b868a1720bc",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-create.test.js",
+              "contentHash": "sha256:0456a2704141b98403f21f89966b44723ebd5d1b9c91384bd02198a8d11f3b5d",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0032",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "With an unfinished active item, console creates and routing/advance/checkpoint of the new item leave state/current.yaml unchanged; activate switches; legacy start/route/direct commands behave as before (full suite and back-compat tests).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/console-create.test.js",
+              "contentHash": "sha256:0456a2704141b98403f21f89966b44723ebd5d1b9c91384bd02198a8d11f3b5d",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/behavior/routing.js",
+              "contentHash": "sha256:9133bcfd326ed72a088cf1d3e071c5c65c773e7244797ced354deca6459cba49",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/cli.js",
+              "contentHash": "sha256:2c30241b0ea69d2bc2f8c6a8b4ef9aa69425f26d8a182002e58692c886706227",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0032",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "Guard, verbatim shell-text, temp-cleanup, request-ID, concurrency and attestation tests pass; an independent review on an isolated copy found no auth/Origin/CSRF/shell hole and its 5 defects are fixed with regression tests.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/console-create.test.js",
+              "contentHash": "sha256:0456a2704141b98403f21f89966b44723ebd5d1b9c91384bd02198a8d11f3b5d",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:e2db7dfef78ef9c0070c825ab60d6bd407a55590ce72bf4836995b868a1720bc",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0032",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "One Create work entry point in the top bar (icon-only on phones) plus the empty-project welcome; no new command buttons; 120 browser checks across Chromium, Firefox and WebKit, light/dark, 1440/390, Arabic/English with 0 errors, 0 overflow, 0 contrast findings.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:f459bb1251a9035197a9f88bed315ea2015b635cc15b6a1e99e80ba6db6e402d",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.css",
+              "contentHash": "sha256:158713094bde4e4529c76bb26ddbd1c6ae57a9a8ea1bf11de1a490cc0ab9e91c",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "playwright smoke 120 checks, 0 findings"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    },
+    {
+      "id": "CV-002",
+      "recordedAt": "2026-11-06T14:02:21.781Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 2,
+        "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+        "verificationRunIds": [
+          "V-004"
+        ]
+      },
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "Create with only a requirement leaves routing pending; with type and scope it is routed to exactly that type/scope; the dialog preselects 'Let my agent decide' and shows size only after a type, with no default.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/console-create.test.js",
+              "contentHash": "sha256:5db0e16e027d1f768a5fedd32952f39968abe00c9f53f136d3c87df19b83db98",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:4e7a7bccec721df750abb0f724296151a4bf53f2559de646454563e9da94235f",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0032",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "browser create of a feature/bounded item and an unclassified item on a scratch project"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Attached files are preserved through intake add and linked; unsupported (415), empty (400), oversized (413) and busy-workspace (503) uploads are refused with a message while the created item stays readable; retries do not duplicate. Each file's reported availability comes from its stored source record: native-text (Markdown), extracted (DOCX, PDF), original-only with the reason (PNG; a broken PDF reports the extraction failure), in the result view and the Attachments tab.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/console-create.test.js",
+              "contentHash": "sha256:5db0e16e027d1f768a5fedd32952f39968abe00c9f53f136d3c87df19b83db98",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/create.js",
+              "contentHash": "sha256:c1ad4849cb9f091003b63335e067ee1d40f5c83efd3c7b3ed229c19f04fb792a",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0032",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "browser partial-success view after a refused .exe attachment"
+            },
+            {
+              "type": "runtime",
+              "description": "walkthrough DOCX extracted, PNG original kept, PDF extracted"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "The server returns the item from work show --json and the page opens it; the next step is Core's nextAction (route command for pending, advance for routed); creation only spawns the CLI.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/create.js",
+              "contentHash": "sha256:c1ad4849cb9f091003b63335e067ee1d40f5c83efd3c7b3ed229c19f04fb792a",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:e2db7dfef78ef9c0070c825ab60d6bd407a55590ce72bf4836995b868a1720bc",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-create.test.js",
+              "contentHash": "sha256:5db0e16e027d1f768a5fedd32952f39968abe00c9f53f136d3c87df19b83db98",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0032",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "A console create never changes state/current.yaml, with another item active or with none (CLI and HTTP tests, walkthrough hash check); route/advance/checkpoint on the new item do not change it; activate does; start without the option still activates (test) and the full suite passes.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/console-create.test.js",
+              "contentHash": "sha256:5db0e16e027d1f768a5fedd32952f39968abe00c9f53f136d3c87df19b83db98",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/behavior/routing.js",
+              "contentHash": "sha256:ef8c703fd30967436f9d274814c4921ba4f6aad0172f14fbb306c650fcea4f83",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/cli.js",
+              "contentHash": "sha256:2c30241b0ea69d2bc2f8c6a8b4ef9aa69425f26d8a182002e58692c886706227",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0032",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "walkthrough state/current.yaml sha256 unchanged until yallaflow activate"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "Guard, verbatim shell-text, temp-cleanup, request-ID, concurrency and attestation tests pass; an independent review on an isolated copy found no auth/Origin/CSRF/shell hole and its 5 defects are fixed with regression tests.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/console-create.test.js",
+              "contentHash": "sha256:5db0e16e027d1f768a5fedd32952f39968abe00c9f53f136d3c87df19b83db98",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:e2db7dfef78ef9c0070c825ab60d6bd407a55590ce72bf4836995b868a1720bc",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0032",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "One Create work entry point in the top bar (icon-only on phones) plus the empty-project welcome; no new command buttons; 120 browser checks across Chromium, Firefox and WebKit, light/dark, 1440/390, Arabic/English with 0 errors, 0 overflow, 0 contrast findings.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:4e7a7bccec721df750abb0f724296151a4bf53f2559de646454563e9da94235f",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.css",
+              "contentHash": "sha256:cd2fbc1e00fbcc113170e66c6e776caf437ec47551c48735cc7c1ffa29f47afe",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "playwright smoke 120 checks, 0 findings"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-06T14:02:21.781Z"
+}

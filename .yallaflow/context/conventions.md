@@ -125,4 +125,20 @@
   - site/favicon.svg (repository @ ee942a7)
   - grep -c '<meta name="google-site-verification" content="3R7WptzIqENffyyYsLfwZY4B75xEgjSkio1YAyk9erc">' site/index.html | grep -qx 1 && python3 -I /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/check-site.py site 2>/dev/null | grep -E '^(FAIL|[0-9]+ failure)' && python3 -I /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/check-site.py site >/dev/null 2>&1 && git diff --stat && git diff --quiet HEAD -- src resources docs package.json package-lock.json .github CHANGELOG.md README.md && echo 'only site/index.html changed outside .yallaflow' (passed) (runtime, PF-0022 V-036)
 
+<!-- yallaflow-fact:CTX-0096 -->
+### CTX-0096 — Release preparation for the Console (v1.2.0): the user guide is docs/console.md and upgrade notes docs/upgrading-to-v1.2.0.md; docs/limitations.md records the console's read-only boundary, the lock's known edges and the browser coverage (Chromium, Firefox, WebKit via Playwright on Linux; not desktop Safari, Windows/macOS hosts or screen readers); the release checklist's network scan treats src/console/ as a loopback-only server, never a client.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0029
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-06T00:36:54.667Z
+- **Verified:** 2026-11-06T00:36:54.667Z (commit bdb5e90)
+- **Evidence:**
+  - docs/console.md (repository @ bdb5e90)
+  - docs/limitations.md (repository @ bdb5e90)
+  - docs/releasing.md (repository @ bdb5e90)
+  - /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/rc-smoke.sh (passed) (runtime, PF-0029 V-007)
+
 <!-- yallaflow-context:end -->

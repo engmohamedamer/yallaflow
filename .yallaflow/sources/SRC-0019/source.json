@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0019",
+  "sourceType": "file",
+  "sourceName": "owner-focus-decision-2026-11-06.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-11-06T13:28:09.318Z",
+  "original": {
+    "path": "sources/SRC-0019/owner-focus-decision-2026-11-06.md",
+    "sha256": "58ba924be20fa65a7d36313d6651d4dc6a137590a311aab77b6ee4a0c8692267",
+    "sizeBytes": 1277
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0032"
+  ],
+  "rawText": "# Owner decision on console focus and release preparation (2026-11-06, agent session)\n\n\"Console-created work items must never automatically become the active work item, even when no other\nitem is active. Creation and activation are separate actions. Activation must be explicit through\nYallaFlow's existing Core rules. Preserve the original CLI behavior.\"\n\nBefore release:\n1. Apply this focus decision and update the relevant regression tests.\n2. Revise AC-012 through the approved YallaFlow change-control process to explicitly allow the authorized\n   Create Work operation, while keeping all other Console mutations prohibited.\n3. Verify that invalid Vult records remain visible as integrity warnings and do not distort completion metrics.\n4. Ensure attachment content availability is reported accurately, including files that cannot be text-extracted.\n5. Run the full test suite and browser regression checks.\n6. Prepare a final acceptance walkthrough using an existing project and a new project: create work, attach\n   requirements, inspect the Flow, verify active-work preservation, and continue through Claude or Codex.\nDo not modify Vult's historical records or enable Shared Project mode. Do not commit, tag, push, or publish.\nStop after the final verification report.\n"
+}

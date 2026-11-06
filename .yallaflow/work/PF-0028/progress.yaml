@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-05T23:45:25.559Z",
+      "completedAt": "2026-11-05T23:45:25.559Z",
+      "summary": "Reliable recorded data available: snapshot items (state, stations, completion, lastActivityAt, createdAt, latestVerification), work show (checkpoints with completedAt and station, revisions, verification runs, criteria with convergence), meta.completionHistory[].completedAt (DONE time), verification ledger runs (success, time). Not recorded by Core: stage-transition times, time spent waiting, agent identity or sessions. Worktrees are readable without mutating git: <git-common-dir>/worktrees/<name>/gitdir and HEAD (pure file reads) plus 'git --no-optional-locks status --porcelain' per worktree for changed files; each worktree has its own committed .yallaflow.",
+      "evidence": [
+        "src/flow/snapshot.js",
+        "src/core/evidence.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-05T23:45:25.835Z",
+      "completedAt": "2026-11-05T23:45:25.835Z",
+      "summary": "Owner direction 2026-11-06, in order: (1) multi-project selection and management, (2) team/worktree visibility from verified runtime data only, never presented as live agent sessions, (3) since-you-were-away summary, (4) actionable notifications, (5) insights strictly from reliable recorded data. UX: distinctive, simple, flow-oriented; no clutter, no repeated buttons or Copy Command actions, no controls just because data or commands exist; prioritize project selection, progress, next valid action, requirements and evidence-backed delivery; developer commands only in one optional area; Core JSON contracts stay the single source of truth. Stop before Phase E."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-05T23:53:03.952Z",
+      "completedAt": "2026-11-05T23:53:03.952Z",
+      "summary": "Phase D: saved project list (yallaflow console add/remove/list, user-level 0600 file, unavailable projects reported) and a Projects page; Worktrees page from Git's own files plus 'git --no-optional-locks status' with same-file overlap warnings, explicitly not presented as agent sessions; since-you-were-away card built from recorded checkpoints, runs, revisions and completions; attention bell listing only items Core marks as waiting for a person or failing, with opt-in browser alerts; Insights only from recorded creation/completion times and verification runs (time per station and waiting time stated as not recorded). UX: removed the new-work dialog, per-item copy buttons and command boxes; one 'For developers' panel per page; a Next-step card from Core's verdict; Delivery tab first (criteria with convergence and verification evidence). Core additive: snapshot verificationRuns and completedAt; project names from config.",
+      "evidence": [
+        "src/console/registry.js",
+        "src/console/worktrees.js",
+        "src/console/server.js",
+        "src/commands/console.js",
+        "resources/console/app.js",
+        "test/console-phase-d.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-05T23:59:27.430Z",
+      "completedAt": "2026-11-05T23:59:27.430Z",
+      "summary": "Fresh proof: syntax (V-001, V-002), text output of 14 read commands identical to v1.1.0 (V-003), schema-valid read-only snapshot/work show on this repository (V-004), full suite 808/808 (V-005), Insights KPIs equal an independent computation from snapshot --json and the digest lists only work changed after the stored last visit (V-006); browser matrix 24/24 clean (ar/en x 1440/390 x 6 pages).",
+      "evidence": [
+        "verification:V-005"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-05T23:59:27.803Z",
+      "completedAt": "2026-11-05T23:59:27.803Z",
+      "summary": "AC-009 and AC-010 satisfied (V-005, V-006)."
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Insights use the recorded creation time, DONE time (meta.completionHistory) and verification runs, not per-checkpoint durations; time per station and waiting time are shown as not recorded",
+      "reason": "The owner required insights strictly from reliable recorded data (2026-11-06); YallaFlow records no stage-transition or waiting times, so durations per station would be estimates",
+      "costIfWrong": "Fewer charts than the Flow v4 prototype showed; adding per-station time needs Core to record stage transitions first",
+      "createdAt": "2026-11-05T23:59:27.292Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-05T23:59:27.803Z"
+}

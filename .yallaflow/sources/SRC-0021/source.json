@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0021",
+  "sourceType": "file",
+  "sourceName": "owner-agent-bridge-feasibility-2026-11-06.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-11-06T15:20:41.239Z",
+  "original": {
+    "path": "sources/SRC-0021/owner-agent-bridge-feasibility-2026-11-06.md",
+    "sha256": "ea2910bccdefc64f0a4603792939ecd719d0d264037f05b91efe13f1fa51d084",
+    "sizeBytes": 2228
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0035"
+  ],
+  "rawText": "# Owner decision: Agent Bridge feasibility phase (2026-11-06, agent session)\n\nAgrees an ACP-first thin Agent Bridge is the preferred direction. Provisionally approves D2, D3, D4, D5, D6\nsubject to constraints. Does NOT approve production implementation. Requires a focused feasibility phase first.\n\nConstraints: ACP preferred with capability detection and a clear fallback when a provider lacks an essential\ncapability; bridge inside the existing local Console unless experiments show a real need for isolation; only ONE\nactive managed agent session per checkout regardless of work item; Core authoritative for workflow state,\napprovals, evidence; agent tool permissions separate from YallaFlow spec/review approvals; never auto-activate\nwork without an explicit user decision; adapters optional, user-installed, version-checked; never store or\nexpose provider credentials, tokens or sensitive raw session data; localhost auth and explicit opt-in; no\nbypass-permissions mode; default-deny unanswered permissions, including on browser disconnect.\n\nAuthentication: Anthropic subscription auth is unresolved for third-party products. Document a compliant\nAPI-key path; separately identify what written clarification is needed for use of the unmodified Claude Code\nbinary. A successful local login does not prove a distributed integration is permitted. Codex: validate the\nuser's own supported local authentication.\n\nPoC: minimal, isolated, real ACP adapters, both providers where authorized: 1 session creation + streaming,\n2 follow-up messages, 3 real tool permission requests with Allow/Deny, 4 cancellation, 5 resume after bridge\nrestart, 6 error recovery and connection loss, 7 an explicit YallaFlow activation and workflow update.\nTemporary disposable repository only. Before consuming paid model usage: report expected credentials, billing\nmethod and estimated upper cost, and request explicit approval for that spending.\n\nDeliverable: side-by-side Claude/Codex capability matrix (verified, failed, uncertain) and a Go/No-Go\nrecommendation. Do not change the v1.2.0 release candidate, implement the production feature, commit, tag,\npush or publish. Stop after the PoC report and request approval for the implementation plan.\n"
+}

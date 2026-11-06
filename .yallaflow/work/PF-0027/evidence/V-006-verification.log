@@ -1,0 +1,34 @@
+TAP version 13
+# Subtest: security: loopback host, token, origin, read-only methods and ID-only paths
+ok 1 - security: loopback host, token, origin, read-only methods and ID-only paths
+  ---
+  duration_ms: 544.429697
+  type: 'test'
+  ...
+# Subtest: serves the snapshot, work detail and preserved sources by ID
+ok 2 - serves the snapshot, work detail and preserved sources by ID
+  ---
+  duration_ms: 969.718555
+  type: 'test'
+  ...
+# Subtest: live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+ok 3 - live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+  ---
+  duration_ms: 1244.662043
+  type: 'test'
+  ...
+# Subtest: the console never writes: browsing every route leaves the workspace byte-identical
+ok 4 - the console never writes: browsing every route leaves the workspace byte-identical
+  ---
+  duration_ms: 883.421835
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 7417.916012

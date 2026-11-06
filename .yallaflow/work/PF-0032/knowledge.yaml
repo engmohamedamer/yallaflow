@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Web console (v1.2.0): 'yallaflow console' is a local web UI inside the yallaflow package (no daemon, no new dependency, no build step). src/console/server.js (node:http on 127.0.0.1; per-run token as Bearer; Host 421, Origin 403; GET/HEAD for reads; UI from a fixed file map; sources served by ID only, previews sandboxed) reads data by spawning this package's own CLI (src/console/runner.js: snapshot --json, work show --json, cached) and refreshes on a debounced recursive watcher of .yallaflow with polling fallback (src/console/watch.js). Its only write is Create Work (src/console/create.js): POST on two routes only (create; attach a file to the item the same request ID created), requiring the console's Origin and exact content type, 64 KB JSON and MAX_EXTRACTION_INPUT_BYTES per file; it runs the CLI's own 'start --keep-active --via console --request-id ID -- <text>', 'route' (when the user chose type and size) and 'intake add --via console' through runner.write/exclusive (argv only, serialized per project). Uploads go to mkdtemp folders removed in finally. '--read-only' disables every POST. The UI (resources/console/, plain JS/CSS) renders Core's stations/states/completion; apart from Create Work every action shows the CLI command.",
+      "evidence": [
+        "src/console/server.js",
+        "src/console/create.js",
+        "src/console/runner.js",
+        "test/console-create.test.js",
+        "verification:V-002"
+      ],
+      "confidence": "confirmed",
+      "provenance": "repository",
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0093"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-06T13:07:31.464Z",
+      "factId": "CTX-0099",
+      "promotedAt": "2026-11-06T13:07:31.794Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-002",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Active work focus (v1.2.0): state/current.yaml activeWork is the checkout's default focus for guide/status/brief; agents can work on any item by ID. Creating work (start, intake, direct commands) and route set it as before; 'start --keep-active -- <request>' (options only as leading tokens closed by '--') leaves an unfinished active item in focus and records the new item as activation {deferred: true, keptActive}; route/advance/checkpoint on a deferred item never move the focus; 'yallaflow activate <id>' is the only explicit switch and clears the deferral. 'start --via console --request-id ID' records attestation {recordedVia: console, verified: false, requestId} and, under the workspace lock, returns the item already created for that request ID (src/behavior/routing.js, src/commands/start.js, src/cli.js parseStartArgs).",
+      "evidence": [
+        "src/behavior/routing.js",
+        "src/commands/start.js",
+        "src/cli.js",
+        "test/console-create.test.js"
+      ],
+      "confidence": "confirmed",
+      "provenance": "repository",
+      "status": "promoted",
+      "createdAt": "2026-11-06T13:07:31.633Z",
+      "factId": "CTX-0100",
+      "promotedAt": "2026-11-06T13:07:32.066Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-003",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Active work focus (v1.2.0): state/current.yaml activeWork is the checkout's default focus for guide/status/brief; agents can work on any item by ID. Creating work (start, intake, direct commands) and route set it as before. 'start --keep-active -- <request>' (options only as leading tokens closed by '--') never makes the new item active, whether or not another item is active (owner decision: creation and activation are separate); it records activation {deferred: true, keptActive: <unfinished active item or null>}. route/advance/checkpoint on a deferred item never move the focus; 'yallaflow activate <id>' is the only explicit switch and clears the deferral; resume on a deferred item prints how to activate it. The console always creates this way. 'start --via console --request-id ID' records attestation {recordedVia: console, verified: false, requestId} and, under the workspace lock, returns the item already created for that request ID (src/behavior/routing.js, src/commands/start.js, src/commands/resume.js, src/cli.js parseStartArgs).",
+      "evidence": [
+        "src/behavior/routing.js",
+        "src/commands/start.js",
+        "src/commands/resume.js",
+        "test/console-create.test.js",
+        "verification:V-004"
+      ],
+      "confidence": "confirmed",
+      "provenance": "repository",
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0100"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-06T14:02:31.157Z",
+      "factId": "CTX-0101",
+      "promotedAt": "2026-11-06T14:02:31.492Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-06T14:02:31.492Z",
+  "reviewedAt": "2026-11-06T14:02:31.492Z"
+}

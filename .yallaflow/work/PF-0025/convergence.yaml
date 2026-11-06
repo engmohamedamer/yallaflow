@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-05T22:27:09.671Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+        "verificationRunIds": [
+          "V-004",
+          "V-006",
+          "V-003",
+          "V-007"
+        ]
+      },
+      "findings": [
+        {
+          "criterion": "PF-0024/AC-001",
+          "status": "satisfied",
+          "reason": "snapshot --json validates against yallaflow.snapshot/1 on every workspace the tests build, on the legacy v0.3.6 fixture, and on this repository (29 items); completion matches the documented formula in unit tests covering bug, investigation, feature, change, refactor and release.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/flow/stations.js",
+              "contentHash": "sha256:4c02a867c57863650902baf84b8ec9d372b30060754d5ffdc9734a3a49a196be",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/flow/snapshot.js",
+              "contentHash": "sha256:b8f6138e6d6b9bae4bd29aa2ad18c20844cd12cc74c38576344cf768a0ea2831",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "resources/schemas/snapshot-1.schema.json",
+              "contentHash": "sha256:b7c864583621738fd1dfeabdfa180eea76175cb66c72f28b953ac467024f7841",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/flow-stations.test.js",
+              "contentHash": "sha256:d01944163c802a7caa987540afce208e1fff251b0f3643df3ce919d2a78933bf",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/snapshot-contract.test.js",
+              "contentHash": "sha256:664e08f8bd47822dc43b8d6288e1e95d517f8bb1b53b0166f2e81626724eb2a4",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/validate-repo.mjs (passed)",
+              "workId": "PF-0025",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "node --test test/flow-stations.test.js test/snapshot-contract.test.js (passed)",
+              "workId": "PF-0025",
+              "verificationRunId": "V-006"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0024/AC-002",
+          "status": "satisfied",
+          "reason": "work show --json validates against yallaflow.work/1 and returns request, sources, checkpoints, history, questions, requirements, criteria with convergence, verification and children; asserted for a feature with a linked source, requirements and a completed checkpoint, and validated for all 29 items here.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/flow/snapshot.js",
+              "contentHash": "sha256:b8f6138e6d6b9bae4bd29aa2ad18c20844cd12cc74c38576344cf768a0ea2831",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "resources/schemas/work-1.schema.json",
+              "contentHash": "sha256:ce4745ca17da80994cd9c9775d0cde1767c8b91070996ac7ca6ac249cad466a3",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/snapshot-contract.test.js",
+              "contentHash": "sha256:664e08f8bd47822dc43b8d6288e1e95d517f8bb1b53b0166f2e81626724eb2a4",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/validate-repo.mjs (passed)",
+              "workId": "PF-0025",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "node --test test/flow-stations.test.js test/snapshot-contract.test.js (passed)",
+              "workId": "PF-0025",
+              "verificationRunId": "V-006"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0024/AC-003",
+          "status": "satisfied",
+          "reason": "A test hashes the whole tree including .git/index before and after snapshot/work show (JSON and text) and finds no change, also on the legacy fixture and this repository; the text output of 14 read commands (brief, status, guide, handoff, resume, doctor, progress, next, decompose status, ready, context status) is byte-identical to v1.1.0 on this repository.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/snapshot-contract.test.js",
+              "contentHash": "sha256:664e08f8bd47822dc43b8d6288e1e95d517f8bb1b53b0166f2e81626724eb2a4",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/text-parity.sh (passed)",
+              "workId": "PF-0025",
+              "verificationRunId": "V-003"
+            },
+            {
+              "type": "runtime",
+              "description": "node /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/validate-repo.mjs (passed)",
+              "workId": "PF-0025",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0025",
+              "verificationRunId": "V-007"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-05T22:27:09.671Z"
+}

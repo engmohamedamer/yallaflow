@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-05T23:59:27.579Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+        "verificationRunIds": [
+          "V-005",
+          "V-006"
+        ]
+      },
+      "findings": [
+        {
+          "criterion": "PF-0024/AC-009",
+          "status": "satisfied",
+          "reason": "With two worktrees on different work items the Worktrees page shows one lane per worktree with its own recorded active work, and a warning when the same path is changed in both (automated test and browser demo); lanes are labelled as checkouts, never as agent sessions.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/worktrees.js",
+              "contentHash": "sha256:600dcb18384447f0a993b8a356461bc9eadb35572b3bb8502206f04c2fccc155",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:36b682149a8208e9e81d3523e335493c17a174200ab76cecf7ee1cbadce330f7",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:b702e7c57914aec52239757edcabe54659b448ad5d60d40a4897c96956ea574e",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-phase-d.test.js",
+              "contentHash": "sha256:1ae8da063f6a544ba02773cf9c5930d285bb8042b622d15899b929fc44e11f8e",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0028",
+              "verificationRunId": "V-005"
+            },
+            {
+              "type": "runtime",
+              "description": "demo shop + shop-vat worktrees, src/orders.js overlap shown"
+            }
+          ]
+        },
+        {
+          "criterion": "PF-0024/AC-010",
+          "status": "satisfied",
+          "reason": "Insights values equal those computed independently from the recorded timestamps and runs in snapshot --json on this repository (done in 30 days, run pass rate and counts, open work); the digest lists only work with recorded events after the stored last-visit time. Per the owner's later direction, insights use recorded creation/DONE times and verification runs (ruling) because per-station durations are not recorded.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:b702e7c57914aec52239757edcabe54659b448ad5d60d40a4897c96956ea574e",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/flow/snapshot.js",
+              "contentHash": "sha256:42c112c3d8343a638000e183337742fbef69466514f33dcd42fd252a5a798be7",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-phase-d.test.js",
+              "contentHash": "sha256:1ae8da063f6a544ba02773cf9c5930d285bb8042b622d15899b929fc44e11f8e",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/insights-check.sh (passed)",
+              "workId": "PF-0028",
+              "verificationRunId": "V-006"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-05T23:59:27.579Z"
+}

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node -e \"const fs=require('fs');for(const f of ['AGENT_WORKSPACE_UX.md','ANTHROPIC_REQUEST_DRAFT.md','evidence/poc-claude/driver-log.jsonl','evidence/poc-claude/channel-log.jsonl'])fs.statSync('research/agent-interaction/'+f);const d=fs.readFileSync('research/agent-interaction/evidence/poc-claude/driver-log.jsonl','utf8');if(!/\"replies\\\\\":5/.test(d)&&!d.includes('replies'))throw new Error('no summary');console.log('PoC evidence and UX architecture present')\"",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "-e",
+        "const fs=require('fs');for(const f of ['AGENT_WORKSPACE_UX.md','ANTHROPIC_REQUEST_DRAFT.md','evidence/poc-claude/driver-log.jsonl','evidence/poc-claude/channel-log.jsonl'])fs.statSync('research/agent-interaction/'+f);const d=fs.readFileSync('research/agent-interaction/evidence/poc-claude/driver-log.jsonl','utf8');if(!/\"replies\\\\\":5/.test(d)&&!d.includes('replies'))throw new Error('no summary');console.log('PoC evidence and UX architecture present')"
+      ],
+      "displayCommand": "node -e \"const fs=require('fs');for(const f of ['AGENT_WORKSPACE_UX.md','ANTHROPIC_REQUEST_DRAFT.md','evidence/poc-claude/driver-log.jsonl','evidence/poc-claude/channel-log.jsonl'])fs.statSync('research/agent-interaction/'+f);const d=fs.readFileSync('research/agent-interaction/evidence/poc-claude/driver-log.jsonl','utf8');if(!/\"replies\\\\\":5/.test(d)&&!d.includes('replies'))throw new Error('no summary');console.log('PoC evidence and UX architecture present')\"",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-06T15:54:04.020Z",
+      "finishedAt": "2026-11-06T15:54:04.046Z",
+      "verifiedAt": "2026-11-06T15:54:04.046Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

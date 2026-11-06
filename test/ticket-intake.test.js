@@ -447,3 +447,32 @@ test('config: requirements.providers is validated, and credentials are refused i
   await writeYaml(configFile, { ...config, requirements: { providers: { jira: { baseUrl: 'https://acme.atlassian.net' } } } });
   assert.equal(run(root, ['doctor']).status, 0);
 });
+
+test('--fetch does not hold the workspace lock during the network request (v1.2.0)', async () => {
+  const issue = (await fixtureJson('github-rest.json'));
+  let release;
+  const gate = new Promise((resolve) => { release = resolve; });
+  const server = createServer(async (req, res) => {
+    if (req.url === '/repos/acme/shop/issues/7') await gate; // a slow tracker
+    const body = req.url === '/repos/acme/shop/issues/7' ? issue.issue : req.url.startsWith('/repos/acme/shop/issues/7/comments') ? issue.comments : null;
+    res.writeHead(body ? 200 : 404, { 'content-type': 'application/json' });
+    res.end(JSON.stringify(body ?? {}));
+  });
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  try {
+    const root = await freshProject();
+    const configFile = path.join(workspacePath(root), 'config.yaml');
+    await writeYaml(configFile, { ...(await readYaml(configFile)), requirements: { providers: { github: { apiUrl: `http://127.0.0.1:${server.address().port}` } } } });
+    const importing = runAsync(root, ['intake', 'ticket', 'github:acme/shop#7', '--fetch'], { GITHUB_TOKEN: '', GH_TOKEN: '' });
+    await new Promise((resolve) => setTimeout(resolve, 700)); // the import is now waiting on the tracker
+    const other = await runAsync(root, ['start', 'Another agent writes meanwhile'], { YALLAFLOW_LOCK_TIMEOUT_MS: '300' });
+    assert.equal(other.status, 0, `a writer was blocked by the fetch: ${other.stderr}`);
+    release();
+    const result = await importing;
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /Ticket imported/);
+  } finally {
+    release?.();
+    await new Promise((resolve) => server.close(resolve));
+  }
+});

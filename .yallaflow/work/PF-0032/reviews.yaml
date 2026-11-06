@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "gates": {
+    "specification": {
+      "status": "approved",
+      "respondedAt": "2026-11-06T11:45:08.862Z",
+      "note": "Approved by the owner in the agent session (2026-11-06): \"I explicitly approve the specification and implementation plan for PF-0032 (Create Work), subject to these implementation requirements: 1. Respect the actual Core intake limits [stated as 20 MB]. 2. Preserve existing CLI behavior; --keep-active and activate backward-compatible with explicit activation semantics and regression tests. 3. Never silently interrupt another active work item. 4. Idempotent creation under the workspace lock, including concurrent requests and retries. 5. Preserve the item and report partial success when an attachment fails; safe attachment retry without duplicating the item. 6. Simple UI, one prominent Create Work action, no repeated command buttons. 7. All other Console actions stay read-only; no agent execution, chat or approvals.\"",
+      "history": [
+        {
+          "status": "awaiting_review",
+          "at": "2026-11-06T11:32:52.651Z"
+        },
+        {
+          "status": "approved",
+          "at": "2026-11-06T11:45:08.862Z",
+          "note": "Approved by the owner in the agent session (2026-11-06): \"I explicitly approve the specification and implementation plan for PF-0032 (Create Work), subject to these implementation requirements: 1. Respect the actual Core intake limits [stated as 20 MB]. 2. Preserve existing CLI behavior; --keep-active and activate backward-compatible with explicit activation semantics and regression tests. 3. Never silently interrupt another active work item. 4. Idempotent creation under the workspace lock, including concurrent requests and retries. 5. Preserve the item and report partial success when an attachment fails; safe attachment retry without duplicating the item. 6. Simple UI, one prominent Create Work action, no repeated command buttons. 7. All other Console actions stay read-only; no agent execution, chat or approvals.\""
+        }
+      ]
+    },
+    "plan": {
+      "status": "approved",
+      "respondedAt": "2026-11-06T11:45:22.222Z",
+      "note": "Approved by the owner in the agent session (2026-11-06), in the same explicit answer that approved the specification: \"I explicitly approve the specification and implementation plan for PF-0032 (Create Work)... Record my explicit approval for the specification and plan, then implement PF-0032 through the existing YallaFlow workflow.\" Conditions recorded on the specification approval.",
+      "history": [
+        {
+          "status": "awaiting_review",
+          "at": "2026-11-06T11:45:17.667Z"
+        },
+        {
+          "status": "approved",
+          "at": "2026-11-06T11:45:22.222Z",
+          "note": "Approved by the owner in the agent session (2026-11-06), in the same explicit answer that approved the specification: \"I explicitly approve the specification and implementation plan for PF-0032 (Create Work)... Record my explicit approval for the specification and plan, then implement PF-0032 through the existing YallaFlow workflow.\" Conditions recorded on the specification approval."
+        }
+      ]
+    }
+  },
+  "updatedAt": "2026-11-06T11:45:22.222Z"
+}

@@ -1,4 +1,7 @@
-import { findProjectRoot, getCurrentState } from '../core/workspace.js';
+import path from 'node:path';
+import { findProjectRoot, getCurrentState, workspacePath } from '../core/workspace.js';
+import { appendRedactedText } from '../security/redact.js';
+import { withWorkspaceLock } from '../utils/lock.js';
 import { prepareFileIntake } from '../intake/file.js';
 import { defaultTitleFromFilename, describeContentAvailability } from '../intake/normalize.js';
 import { findSourceByChecksum, linkSourceToWork, listSources, persistSource, removeSourceDir } from '../core/sources.js';
@@ -66,6 +69,11 @@ export async function intakeAddCommand(requestedWorkId, filePaths, options = {})
     throw error;
   }
   for (const source of sources) await linkSourceToWork(root, source.id, workId);
+  // v1.2.0: a file attached from the console is recorded as such (identity not verified, Q-004).
+  if (options.via === 'console') {
+    const now = new Date().toISOString();
+    await appendRedactedText(path.join(workspacePath(root), 'work', workId, 'progress.md'), `- ${now} Source ${sources.map((source) => source.id).join(', ')} attached from the YallaFlow console (local user, identity not verified)\n`, 'utf8');
+  }
 
   console.log(sources.length === 1 ? `Source captured: ${sources[0].id}` : `Sources captured: ${sources.map((s) => s.id).join(', ')}`);
   console.log(`Attached to: ${work.id}`);
@@ -174,6 +182,20 @@ export async function intakeTicketCommand(input, options = {}) {
   }
   for (const intake of attachmentIntakes) intake.metadata.ticketAttachment = { provider: ticket.provider, key: ticket.key };
 
+  // v1.2.0: with --fetch the network part above ran without the workspace lock (cli.js
+  // does not take it for fetching imports), so other agents were never blocked by a slow
+  // tracker. Everything from here writes: it holds the lock, and the target work item is
+  // re-checked because it may have changed during the fetch.
+  if (options.fetch) {
+    return withWorkspaceLock(root, `yallaflow intake ticket ${input}`, async () => {
+      if (work) assertSourceLinkAllowed(await loadWorkMetaOrThrow(root, work.id), options.reason);
+      return persistTicket();
+    });
+  }
+  return persistTicket();
+
+  async function persistTicket() {
+
   const previous = findPreviousTicketSource(await listSources(root), ticket);
   const created = [];
   try {
@@ -242,6 +264,7 @@ export async function intakeTicketCommand(input, options = {}) {
   console.log(`\nNext:\n  yallaflow source show ${ticketSource.id} --content`);
   console.log(`  Record requirements citing the ticket: {"type":"source","source":"${ticketSource.id}","locator":"ac:1"} (or "comment:<id>", "description").`);
   if (!work) console.log(`  Classify the work: yallaflow route ${target.id} --type TYPE --scope SCOPE --confidence LEVEL --reason "REASON"`);
+  }
 }
 
 // --fetch --attachments: each listed attachment is downloaded (credentials only to the

@@ -212,7 +212,7 @@ function checkRequestHistoryIntegrity(meta) {
 
 // Sources are immutable original inputs: every source a work item references must
 // exist, link back to the work item, and still match the checksum recorded at capture.
-async function checkSourceLinkIntegrity(root, meta) {
+export async function checkSourceLinkIntegrity(root, meta) {
   const issues = [];
   for (const ref of meta.sources ?? []) {
     if (ref.relationship === 'recovered-source' && (ref.workStatusAtLink !== 'DONE' || typeof ref.reason !== 'string' || !ref.reason.trim() || !ref.linkedAt)) {

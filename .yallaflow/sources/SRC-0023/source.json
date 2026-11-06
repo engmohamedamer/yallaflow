@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0023",
+  "sourceType": "file",
+  "sourceName": "owner-claude-channels-poc-decision-2026-11-06.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-11-06T15:38:01.836Z",
+  "original": {
+    "path": "sources/SRC-0023/owner-claude-channels-poc-decision-2026-11-06.md",
+    "sha256": "60db08845e10b9efcccb8da48c737ce8d8f8d2d0e164fc0395c51e2a224c3c3b",
+    "sizeBytes": 1898
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0036"
+  ],
+  "rawText": "# Owner decisions: hybrid direction, Claude Channels PoC, unified Agent Workspace (2026-11-06, agent session)\n\nApproves the revised hybrid direction; subscription-based usage is mandatory.\n- D1: prepare the five Anthropic questions as a concise support/compliance request; do NOT send without review.\n- D2': approved — Codex via ACP; Claude Code via its official Channels mechanism.\n- D7': approved — small controlled Claude PoC on the existing Claude Code subscription; maximum five short turns;\n  no API keys; no paid extra usage; disposable repository only.\n- D8: approved — ACP preferred for Codex; native App Server as fallback when justified.\nBefore the Claude PoC: verify the installed Claude Code supports Channels and that required features and policies\nare enabled. If testing a custom development channel requires an explicit warning or user confirmation, stop and\nlet the owner approve that step interactively. Never bypass tool permissions.\nProduct decisions: (1) one unified Agent Workspace UI with provider-specific capability detection; (2) no separate\nchat interfaces for Claude and Codex; (3) Codex: managed sessions on the existing ChatGPT subscription; (4) Claude:\nconnect only to an explicitly started, unmodified Claude Code session on the user's subscription; (5) never\nrequire, request or silently fall back to API keys; (6) one active managed agent session per checkout; (7) Core\nauthoritative for workflow decisions, memory and evidence; (8) do not expose unsupported controls (Stop/Start)\nwhen the provider cannot perform them; (9) the whole feature is opt-in.\nNext: execute only the isolated Claude Channels feasibility PoC and prepare the unified UX architecture; report\nactual results, limitations and viability. No production implementation, no release-candidate change, no commit,\ntag, push or publish. Stop after the PoC and architecture report for approval.\n"
+}

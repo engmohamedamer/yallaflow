@@ -1158,7 +1158,7 @@
     {
       "id": "CTX-0008",
       "area": "tech-stack",
-      "state": "current",
+      "state": "superseded",
       "confidence": "confirmed",
       "summary": "There is no frontend. YallaFlow is a terminal CLI plus Markdown/YAML files it maintains inside the target repository.",
       "provenance": "repository",
@@ -1191,7 +1191,7 @@
       "verifiedAt": "2026-10-19T20:31:35.598Z",
       "verifiedAtCommit": "9c38eec4a95b29f9b500cf3722707e67667f743e",
       "supersedes": [],
-      "supersededBy": null,
+      "supersededBy": "CTX-0093",
       "history": [
         {
           "action": "introduced",
@@ -1316,10 +1316,17 @@
           ],
           "previousVerifiedAt": "2026-10-19T16:37:32.843Z",
           "previousVerifiedAtCommit": "032f32c4f4ed1709271ffee2e84919e73e7d7b77"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-11-05T23:02:27.912Z",
+          "supersededBy": "CTX-0093",
+          "workId": "PF-0027",
+          "candidateId": "K-001"
         }
       ],
       "createdAt": "2026-10-12T20:06:11.387Z",
-      "updatedAt": "2026-10-19T20:31:35.598Z"
+      "updatedAt": "2026-11-05T23:02:27.912Z"
     },
     {
       "id": "CTX-0009",
@@ -2073,7 +2080,7 @@
     {
       "id": "CTX-0013",
       "area": "architecture",
-      "state": "current",
+      "state": "superseded",
       "confidence": "confirmed",
       "summary": "Rules for reaching DONE (evaluateAdvance):\n- all required checkpoints are complete;\n- non-investigation work has fresh, successful verification evidence newer than the last invalidation;\n- convergence is complete where the contract requires it;\n- code review is complete where pinned;\n- knowledge review is complete.\nReopen (DONE to implementation, verification or review, with a reason) cascades checkpoint invalidation and keeps the evidence.",
       "provenance": "repository",
@@ -2100,7 +2107,7 @@
       "verifiedAt": "2026-10-12T22:03:27.175Z",
       "verifiedAtCommit": "b181dc03230333bc045dd7b97575e6a02321346c",
       "supersedes": [],
-      "supersededBy": null,
+      "supersededBy": "CTX-0089",
       "history": [
         {
           "action": "introduced",
@@ -2129,10 +2136,17 @@
           ],
           "previousVerifiedAt": "2026-10-12T20:06:11.387Z",
           "previousVerifiedAtCommit": "b181dc03230333bc045dd7b97575e6a02321346c"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-10-28T14:14:21.057Z",
+          "supersededBy": "CTX-0089",
+          "workId": "PF-0023",
+          "candidateId": "K-002"
         }
       ],
       "createdAt": "2026-10-12T20:06:11.387Z",
-      "updatedAt": "2026-10-12T22:03:27.175Z"
+      "updatedAt": "2026-10-28T14:14:21.057Z"
     },
     {
       "id": "CTX-0014",
@@ -8963,7 +8977,7 @@
     {
       "id": "CTX-0073",
       "area": "architecture",
-      "state": "current",
+      "state": "superseded",
       "confidence": "confirmed",
       "summary": "Verification evidence: 'yallaflow verify' runs argv commands by default (spawnSync with shell:false); --shell and --script are explicit alternatives. Each run is appended to work/<id>/evidence/verification.json with its full stdout/stderr log file, capturing up to 64 MiB of output (v1.1.0; Node's 1 MiB default had recorded verbose suites as failed). Recognizable secret values are redacted in the log and in the recorded command; the executed command is unchanged. Failed runs are kept. Optional QC and demo records never write this ledger.",
       "provenance": "repository",
@@ -9009,7 +9023,7 @@
       "supersedes": [
         "CTX-0055"
       ],
-      "supersededBy": null,
+      "supersededBy": "CTX-0088",
       "history": [
         {
           "action": "introduced",
@@ -9116,10 +9130,17 @@
           ],
           "previousVerifiedAt": "2026-10-19T20:31:39.674Z",
           "previousVerifiedAtCommit": "9c38eec4a95b29f9b500cf3722707e67667f743e"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-10-28T14:14:20.812Z",
+          "supersededBy": "CTX-0088",
+          "workId": "PF-0023",
+          "candidateId": "K-001"
         }
       ],
       "createdAt": "2026-10-19T16:37:38.721Z",
-      "updatedAt": "2026-10-19T22:48:07.283Z"
+      "updatedAt": "2026-10-28T14:14:20.812Z"
     },
     {
       "id": "CTX-0074",
@@ -10436,7 +10457,933 @@
       ],
       "createdAt": "2026-10-28T12:52:54.424Z",
       "updatedAt": "2026-10-28T13:37:53.289Z"
+    },
+    {
+      "id": "CTX-0088",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Verification evidence: 'yallaflow verify' runs argv commands by default (spawnSync with shell:false); --shell and --script are explicit alternatives. --shell runs through spawnSync shell:true, i.e. /bin/sh -c (dash on Debian/Ubuntu) without pipefail, so a pipeline's recorded exit status is that of its LAST element: 'false | cat' or '<test runner> | tail' is recorded as passed when the last command succeeds. verify sets no timeout and buffers stdout/stderr until the command exits (nothing is streamed). Each run is appended to work/<id>/evidence/verification.json with its full stdout/stderr log file, capturing up to 64 MiB of output (v1.1.0; Node's 1 MiB default had recorded verbose suites as failed); run IDs are allocated when a run finishes, so overlapping runs can be numbered out of start order. Recognizable secret values are redacted in the log and in the recorded command; the executed command is unchanged. Failed runs are kept. Optional QC and demo records never write this ledger.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0023",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/commands/verify.js",
+          "contentHash": "sha256:5b5f99a12e62189b6bd8ed9a706505eb031788eaadc6f85f8b76b0eef16b3df4",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "head"
+        },
+        {
+          "type": "runtime",
+          "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/repro-pipe.sh (passed)",
+          "workId": "PF-0023",
+          "verificationRunId": "V-001"
+        }
+      ],
+      "verifiedAt": "2026-10-28T14:14:20.812Z",
+      "verifiedAtCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+      "supersedes": [
+        "CTX-0073"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-10-28T14:14:20.812Z",
+          "workId": "PF-0023",
+          "candidateId": "K-001",
+          "supersedes": "CTX-0073"
+        }
+      ],
+      "createdAt": "2026-10-28T14:14:20.812Z",
+      "updatedAt": "2026-10-28T14:14:20.812Z"
+    },
+    {
+      "id": "CTX-0089",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Rules for reaching DONE (evaluateAdvance): - all required checkpoints are complete; - non-investigation work has fresh, successful verification evidence newer than the last invalidation; - convergence is complete where the contract requires it; - code review is complete where pinned; - knowledge review is complete. Reopen (DONE to implementation, verification or review, with a reason) cascades checkpoint invalidation and keeps the evidence. Reopening to implementation resets a reviewed knowledge review to pending, and 'knowledge review --none' is refused once any candidate exists (even already-promoted ones), so closing a reopened item again requires proposing and resolving a new candidate. A not-yet-DONE item cannot be reopened; returning from VERIFICATION to IMPLEMENTATION goes through 'checkpoint revise --skill implementation --status in_progress'.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0023",
+        "candidateId": "K-002"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/core/transitions.js",
+          "contentHash": "sha256:7834693e2d1f76b9a1b6c5ebe1d377c87a814f6044351e6a0d01a9b828214dec",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "src/knowledge/store.js",
+          "contentHash": "sha256:cecc3115fd30de48344be60c41ad0fe89f03a3753f9db6d26f6b80c264268b91",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "src/commands/reopen.js",
+          "contentHash": "sha256:9ccca54fa568336b0060d6d01125d65ace04327f03f115d8dca22b5871290346",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "head"
+        }
+      ],
+      "verifiedAt": "2026-10-28T14:14:21.057Z",
+      "verifiedAtCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+      "supersedes": [
+        "CTX-0013"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-10-28T14:14:21.057Z",
+          "workId": "PF-0023",
+          "candidateId": "K-002",
+          "supersedes": "CTX-0013"
+        }
+      ],
+      "createdAt": "2026-10-28T14:14:21.057Z",
+      "updatedAt": "2026-10-28T14:14:21.057Z"
+    },
+    {
+      "id": "CTX-0090",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "CLI startup structure and its cost: src/cli.js statically imports all 33 command modules, and through the intake modules also officeparser, yauzl and @xmldom/xmldom (pdfjs-dist is already imported lazily in src/intake/extractors/pdf.js). A plain '--version' loads 134 files; startup is most of a typical command's ~0.2 s wall time on small workspaces, and stubbing the three intake libraries measured 34-41 ms (about 20%) faster per call (PF-0023, one machine). The test suite invokes the CLI as a child process per command (spawnSync of process.execPath src/cli.js in test-support/shared.js and test-support/optional.js); a 35-test sample spawned 324 CLI processes, so CLI startup cost is multiplied across the suite.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0023",
+        "candidateId": "K-003"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/cli.js",
+          "contentHash": "sha256:51fe73f146ee706410796300b0ec71d10571ea8d7b0fc9cd802318a713f0226f",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "src/intake/adapters/office.js",
+          "contentHash": "sha256:8b6733e5cc71247341d9c4bb28dcb7b62b3e3698d417b42828b43a4319e81f47",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "test-support/shared.js",
+          "contentHash": "sha256:be5385ab58f4924fe9ce60a00d0d4f46b5b41bff34e49e4720718d44ab9f529c",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "head"
+        },
+        {
+          "type": "runtime",
+          "description": "python3 -I /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/bench-summary.py /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/bench.json (passed)",
+          "workId": "PF-0023",
+          "verificationRunId": "V-002"
+        },
+        {
+          "type": "runtime",
+          "description": "python3 -I -c \"\nimport json,collections\nrows=[json.loads(l) for l in open('/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/539e71a5-0fa8-4581-9a26-3349c9e87fe0/scratchpad/audit/probe.jsonl')]\nassert len(rows)>0\nprint('sample: test/work-routing, test/pilot-hardening, test/context-schema (35 tests, 47.2 s wall)')\nprint('CLI child processes:', len(rows), '| sum child wall s:', round(sum(r['ms'] for r in rows)/1000,1), '| median child ms:', sorted(r['ms'] for r in rows)[len(rows)//2])\nprint('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_common(8)))\" (passed)",
+          "workId": "PF-0023",
+          "verificationRunId": "V-004"
+        }
+      ],
+      "verifiedAt": "2026-10-28T14:14:21.297Z",
+      "verifiedAtCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-10-28T14:14:21.297Z",
+          "workId": "PF-0023",
+          "candidateId": "K-003"
+        }
+      ],
+      "createdAt": "2026-10-28T14:14:21.297Z",
+      "updatedAt": "2026-10-28T14:14:21.297Z"
+    },
+    {
+      "id": "CTX-0091",
+      "area": "architecture",
+      "state": "superseded",
+      "confidence": "confirmed",
+      "summary": "Machine-readable read contract (v1.2.0): 'yallaflow snapshot --json' (schema yallaflow.snapshot/1) and 'yallaflow work show <id> --json' (yallaflow.work/1), schemas in resources/schemas/. Collectors in src/flow/snapshot.js use only existing readers with evaluateAdvance mutate:false. The five Flow stations (Understand, Decide, Change, Verify, Remember), item state (new/active/you/fail/paused/done) and completion % (20% per station; the current one counts done steps plus half the step in progress) are computed only in src/flow/stations.js, never in a UI. Schema fields are only added within a major schema version; --json errors are {error:{code,message}} with exit 1.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0025",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/flow/stations.js",
+          "contentHash": "sha256:4c02a867c57863650902baf84b8ec9d372b30060754d5ffdc9734a3a49a196be",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/flow/snapshot.js",
+          "contentHash": "sha256:b8f6138e6d6b9bae4bd29aa2ad18c20844cd12cc74c38576344cf768a0ea2831",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/commands/snapshot.js",
+          "contentHash": "sha256:b6edbbe07f0f189cd5c02478eeac3648a5e6a36ed74fe9b2e428b688e540bbfa",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "resources/schemas/snapshot-1.schema.json",
+          "contentHash": "sha256:b7c864583621738fd1dfeabdfa180eea76175cb66c72f28b953ac467024f7841",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "npm test (passed)",
+          "workId": "PF-0025",
+          "verificationRunId": "V-007"
+        }
+      ],
+      "verifiedAt": "2026-11-05T22:27:21.180Z",
+      "verifiedAtCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+      "supersedes": [],
+      "supersededBy": "CTX-0094",
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-05T22:27:21.180Z",
+          "workId": "PF-0025",
+          "candidateId": "K-001"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-11-05T23:44:48.262Z",
+          "supersededBy": "CTX-0094",
+          "workId": "PF-0030",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-05T22:27:21.180Z",
+      "updatedAt": "2026-11-05T23:44:48.262Z"
+    },
+    {
+      "id": "CTX-0092",
+      "area": "architecture",
+      "state": "superseded",
+      "confidence": "confirmed",
+      "summary": "Concurrency (v1.2.0): every command that can write .yallaflow holds an exclusive-create workspace lock at .yallaflow/local/lock {pid, host, startedAt, command}, taken in src/cli.js (needsWorkspaceLock/dispatch); read-only commands, init and help never take it; verify takes it only around recording its run. It is re-entrant per process, waits up to 10 s (YALLAFLOW_LOCK_TIMEOUT_MS), removes a stale lock (dead pid on this host) by atomic rename-claim, never removes another host's lock, and deletes local/ again when empty so single-user workspaces still have no local/. doctor reports it; doctor --clear-lock removes only a stale one. writeYaml is atomic (unique temp name + rename with retry).",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0026",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/utils/lock.js",
+          "contentHash": "sha256:3ba5685ec0655a702aa6c8a49df9c2fa5f80426c8c439e4290e9afb01537e95c",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/cli.js",
+          "contentHash": "sha256:7aa810f9c990054dc6924a33455ef50088c24ab76301499774bd629838d93219",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/core/yaml.js",
+          "contentHash": "sha256:5369f712da70c81460fae18c4f7eab38469aafcf5d094e0b1247d707175c6c29",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/utils/fs.js",
+          "contentHash": "sha256:2669dc3147b2ce85082070c7848abda8f76c536d63928886ed36ebdb25c47c11",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "runtime",
+          "description": "npm test (passed)",
+          "workId": "PF-0026",
+          "verificationRunId": "V-010"
+        }
+      ],
+      "verifiedAt": "2026-11-05T22:42:24.873Z",
+      "verifiedAtCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+      "supersedes": [],
+      "supersededBy": "CTX-0095",
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-05T22:42:24.873Z",
+          "workId": "PF-0026",
+          "candidateId": "K-001"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-11-05T23:44:48.522Z",
+          "supersededBy": "CTX-0095",
+          "workId": "PF-0030",
+          "candidateId": "K-002"
+        }
+      ],
+      "createdAt": "2026-11-05T22:42:24.873Z",
+      "updatedAt": "2026-11-05T23:44:48.522Z"
+    },
+    {
+      "id": "CTX-0093",
+      "area": "architecture",
+      "state": "superseded",
+      "confidence": "confirmed",
+      "summary": "Web console (v1.2.0): 'yallaflow console' is a read-only local web UI inside the yallaflow package (no daemon, no new dependency, no build step). src/console/server.js (node:http on 127.0.0.1; per-run token as Bearer; Host 421, Origin 403, GET/HEAD only 405; UI from a fixed file map; sources served by ID only, previews sandboxed) reads data by spawning this package's own CLI (src/console/runner.js: snapshot --json, work show --json, cached) and refreshes on a debounced recursive watcher of .yallaflow with polling fallback (src/console/watch.js), streaming change events. The UI is plain JS/CSS in resources/console/ (Flow v4 design); it derives no rules, only renders Core's stations/states/completion, and every action shows the exact CLI command instead of executing it.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0027",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/console/registry.js",
+          "contentHash": "sha256:a3a78aba40ea25a2cb39f9e7430d4d02bcbf4ab3988534369107561601bc7888",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/console/worktrees.js",
+          "contentHash": "sha256:600dcb18384447f0a993b8a356461bc9eadb35572b3bb8502206f04c2fccc155",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "resources/console/app.js",
+          "contentHash": "sha256:b702e7c57914aec52239757edcabe54659b448ad5d60d40a4897c96956ea574e",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "npm test (passed)",
+          "workId": "PF-0028",
+          "verificationRunId": "V-005"
+        }
+      ],
+      "verifiedAt": "2026-11-05T23:59:28.236Z",
+      "verifiedAtCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+      "supersedes": [
+        "CTX-0008"
+      ],
+      "supersededBy": "CTX-0099",
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-05T23:02:27.912Z",
+          "workId": "PF-0027",
+          "candidateId": "K-001",
+          "supersedes": "CTX-0008"
+        },
+        {
+          "action": "reconfirmed",
+          "at": "2026-11-05T23:44:48.769Z",
+          "workId": "PF-0030",
+          "candidateId": "K-003",
+          "previousEvidence": [
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:1869c429617866363b787ad632ffa827158dbf8136390a714d2269dd2e882150",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/runner.js",
+              "contentHash": "sha256:75af1ff4c8e18c3f9f9e9fbd3cf6c92c62c0bfc664576ca3b4f8783e00ea8e13",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/console.js",
+              "contentHash": "sha256:6cf030d68353f3a2ed4c9275d9de85553c6643b8d2e01c1f6efc49155fa56281",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:9dca201fd35f1991e41ac4e4103e21890f46a646af9a7e9d9340098841457b70",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0027",
+              "verificationRunId": "V-005"
+            }
+          ],
+          "previousVerifiedAt": "2026-11-05T23:02:27.912Z",
+          "previousVerifiedAtCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f"
+        },
+        {
+          "action": "reconfirmed",
+          "at": "2026-11-05T23:59:28.236Z",
+          "workId": "PF-0028",
+          "candidateId": "K-001",
+          "previousEvidence": [
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:9186bb8fee4e2db95fb450d1ec1a6451db6c152ceec7e09fc3d7c6cf3abee739",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/core/sources.js",
+              "contentHash": "sha256:6f774da97b03164873f712979d1e90f92c924a648bf1fa7de49dd922fb16f58d",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:f9a24835d0fa5a982b8e0bb4418da03c6f2d8a081f204a2b546d64510f662ad8",
+              "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0030",
+              "verificationRunId": "V-006"
+            }
+          ],
+          "previousVerifiedAt": "2026-11-05T23:44:48.769Z",
+          "previousVerifiedAtCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-11-06T13:07:31.794Z",
+          "supersededBy": "CTX-0099",
+          "workId": "PF-0032",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-05T23:02:27.912Z",
+      "updatedAt": "2026-11-06T13:07:31.794Z"
+    },
+    {
+      "id": "CTX-0094",
+      "area": "architecture",
+      "state": "superseded",
+      "confidence": "confirmed",
+      "summary": "Machine-readable read contract (v1.2.0): 'yallaflow snapshot --json' (schema yallaflow.snapshot/1) and 'yallaflow work show <id> --json' (yallaflow.work/1), schemas in resources/schemas/, collected in src/flow/snapshot.js from existing readers with evaluateAdvance mutate:false. The five Flow stations, item state and completion are computed only in src/flow/stations.js and are evidence-aware: Verify (and so Remember) finishes only with a fresh successful run (not predating lastInvalidationAt) and, where required, a currently converged assessment; a checkpoint reopened behind the stage brings its station back; a decomposed parent's Change station is its required children; nothing but DONE reaches 100% (non-DONE capped at 99). --json errors are {error:{code,message}} with exit 1.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0030",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/flow/stations.js",
+          "contentHash": "sha256:1b3d2badf67d4918d64610e460e76f65a82c2e9d18444bd8b2830c087de7ed60",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/flow/snapshot.js",
+          "contentHash": "sha256:2f6bd728977328659985ba1dcd3ebd24732c8f6f6592bd40f6fa54d15840e8b4",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "test/flow-stations.test.js",
+          "contentHash": "sha256:754243526715a0e14da57bc9033e206a2b2de76d74ee212f9ab1e2b718608d33",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "npm test (passed)",
+          "workId": "PF-0030",
+          "verificationRunId": "V-006"
+        }
+      ],
+      "verifiedAt": "2026-11-05T23:44:48.262Z",
+      "verifiedAtCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+      "supersedes": [
+        "CTX-0091"
+      ],
+      "supersededBy": "CTX-0097",
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-05T23:44:48.262Z",
+          "workId": "PF-0030",
+          "candidateId": "K-001",
+          "supersedes": "CTX-0091"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-11-06T11:29:15.157Z",
+          "supersededBy": "CTX-0097",
+          "workId": "PF-0031",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-05T23:44:48.262Z",
+      "updatedAt": "2026-11-06T11:29:15.157Z"
+    },
+    {
+      "id": "CTX-0095",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Concurrency (v1.2.0): every command that can write .yallaflow holds a workspace lock at .yallaflow/local/lock (src/utils/lock.js), taken in src/cli.js (needsWorkspaceLock/dispatch); read-only commands, dry runs, init and help never take it; verify prints its output first and locks only around recording (waiting up to 5 min). The lock file is created atomically (temp file + link) and records {pid, host, startedAt, command, nonce, boot, start}; it is stale when its holder is gone (dead pid, zombie, different process start time, different boot id, or taken before the last boot) or unreadable for 30 s, and is then removed by atomic rename-claim; release and removal act only on the exact nonce. doctor reports it; doctor --clear-lock removes a stale one or an hour-old one whose holder cannot be identified, never a positively identified live holder. local/ is removed again when empty. writeYaml is atomic and keeps file permissions.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0030",
+        "candidateId": "K-002"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/utils/lock.js",
+          "contentHash": "sha256:814f17c46036182a7c6aed41d39059b7d002f3db8fd14a01c14fe1b35fbe48ab",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/cli.js",
+          "contentHash": "sha256:0d211cf3291fe92ca5df4d37edf0bdba5f4b94a5419a2371d5e078d0db2ce849",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/commands/verify.js",
+          "contentHash": "sha256:6a57b9cd7a006b56b986d2a751d2f1ac733c2e1274f2490963b42616b4a84d35",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/workspace-lock.test.js",
+          "contentHash": "sha256:abc9752a5bb4acd60fde3e6c73fc234638d18b9659ef5fd9cddb2f0af98bd3f8",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "npm test (passed)",
+          "workId": "PF-0030",
+          "verificationRunId": "V-006"
+        }
+      ],
+      "verifiedAt": "2026-11-05T23:44:48.522Z",
+      "verifiedAtCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+      "supersedes": [
+        "CTX-0092"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-05T23:44:48.522Z",
+          "workId": "PF-0030",
+          "candidateId": "K-002",
+          "supersedes": "CTX-0092"
+        }
+      ],
+      "createdAt": "2026-11-05T23:44:48.522Z",
+      "updatedAt": "2026-11-05T23:44:48.522Z"
+    },
+    {
+      "id": "CTX-0096",
+      "area": "convention",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Release preparation for the Console (v1.2.0): the user guide is docs/console.md and upgrade notes docs/upgrading-to-v1.2.0.md; docs/limitations.md records the console's read-only boundary, the lock's known edges and the browser coverage (Chromium, Firefox, WebKit via Playwright on Linux; not desktop Safari, Windows/macOS hosts or screen readers); the release checklist's network scan treats src/console/ as a loopback-only server, never a client.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0029",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "docs/console.md",
+          "contentHash": "sha256:e31ea0e2d75964af2992e0c0874d1f81a38ca091172ccfd9ce533a06950c38a0",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "docs/limitations.md",
+          "contentHash": "sha256:0721d6e488b23abea71298e85dfe3b606025744fe4d65b8c43eb86a421af6fa2",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "docs/releasing.md",
+          "contentHash": "sha256:df89cdb2dcf769757353e53cba8dff02d82dfe4273f3ba53ffd75557bfb33234",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "runtime",
+          "description": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/aae14ddc-a6e8-4acc-9457-2fb09cddf31c/scratchpad/rc-smoke.sh (passed)",
+          "workId": "PF-0029",
+          "verificationRunId": "V-007"
+        }
+      ],
+      "verifiedAt": "2026-11-06T00:36:54.667Z",
+      "verifiedAtCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-06T00:36:54.667Z",
+          "workId": "PF-0029",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-06T00:36:54.667Z",
+      "updatedAt": "2026-11-06T00:36:54.667Z"
+    },
+    {
+      "id": "CTX-0097",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Machine-readable read contract (v1.2.0): 'yallaflow snapshot --json' (schema yallaflow.snapshot/1) and 'yallaflow work show <id> --json' (yallaflow.work/1), schemas in resources/schemas/, collected in src/flow/snapshot.js from existing readers with evaluateAdvance mutate:false. The five Flow stations, item state and completion are computed only in src/flow/stations.js and are evidence-aware: Verify (and so Remember) finishes only with a fresh successful run (not predating lastInvalidationAt) and, where required, a currently converged assessment; a checkpoint reopened behind the stage brings its station back; a decomposed parent's Change station is its required children; nothing but DONE reaches 100% (non-DONE capped at 99). One damaged item never fails the snapshot: an unreadable meta.yaml, a Core validation failure, a delivery-integrity error or a source-link mismatch moves the item to the additive invalid[] ({id,title,code:WORK_ITEM_INVALID,message}), excluded from items, counts and completion; lifecycle-position checks (e.g. a gate not yet requested) stay in doctor only. openCompletion averages open items (null when none). --json errors are {error:{code,message}} with exit 1; work show on an invalid item returns WORK_ITEM_INVALID.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0031",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/flow/snapshot.js",
+          "contentHash": "sha256:4491df709d112a5ead79ccfb9ebe19ae4502b41da9b75b3c1bf437ad02db26b0",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/flow/stations.js",
+          "contentHash": "sha256:1b3d2badf67d4918d64610e460e76f65a82c2e9d18444bd8b2830c087de7ed60",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "test/console-acceptance.test.js",
+          "contentHash": "sha256:b086701e6fa21a1d453ce2474841d69b39f0c4af28111af9dbb1b348a22e8bdf",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "npm test (passed)",
+          "workId": "PF-0031",
+          "verificationRunId": "V-001"
+        }
+      ],
+      "verifiedAt": "2026-11-06T11:29:15.157Z",
+      "verifiedAtCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+      "supersedes": [
+        "CTX-0094"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-06T11:29:15.157Z",
+          "workId": "PF-0031",
+          "candidateId": "K-001",
+          "supersedes": "CTX-0094"
+        }
+      ],
+      "createdAt": "2026-11-06T11:29:15.157Z",
+      "updatedAt": "2026-11-06T11:29:15.157Z"
+    },
+    {
+      "id": "CTX-0098",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Work-ID collisions: outside a Shared Project, work (PF-####) and source (SRC-####) IDs are plain sequence numbers, so two branches can create the same ID and a Git merge can combine two different items in one folder (seen in a real project: ledger registry/skills not matching the pinned contract, ledger entries older than the item, delivery files without delivery-convergence, sources linked to another item). 'yallaflow doctor' names such probable collisions read-only with the commits that added each side (src/core/collisions.js); there is no repair command, and the records must not be edited by hand. Shared Project branch-safe IDs prevent new collisions.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0031",
+        "candidateId": "K-002"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/core/collisions.js",
+          "contentHash": "sha256:0e870c800469135020f54322b8729e71b9b1a033fc42372908c4bc69f46086fa",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/commands/doctor.js",
+          "contentHash": "sha256:b0219fbf3f6e012e8894f3f0a11bf49ff7f026671e9201db22f6b683e1232f50",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/console-acceptance.test.js",
+          "contentHash": "sha256:b086701e6fa21a1d453ce2474841d69b39f0c4af28111af9dbb1b348a22e8bdf",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-06T11:29:15.463Z",
+      "verifiedAtCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-06T11:29:15.463Z",
+          "workId": "PF-0031",
+          "candidateId": "K-002"
+        }
+      ],
+      "createdAt": "2026-11-06T11:29:15.463Z",
+      "updatedAt": "2026-11-06T11:29:15.463Z"
+    },
+    {
+      "id": "CTX-0099",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Web console (v1.2.0): 'yallaflow console' is a local web UI inside the yallaflow package (no daemon, no new dependency, no build step). src/console/server.js (node:http on 127.0.0.1; per-run token as Bearer; Host 421, Origin 403; GET/HEAD for reads; UI from a fixed file map; sources served by ID only, previews sandboxed) reads data by spawning this package's own CLI (src/console/runner.js: snapshot --json, work show --json, cached) and refreshes on a debounced recursive watcher of .yallaflow with polling fallback (src/console/watch.js). Its only write is Create Work (src/console/create.js): POST on two routes only (create; attach a file to the item the same request ID created), requiring the console's Origin and exact content type, 64 KB JSON and MAX_EXTRACTION_INPUT_BYTES per file; it runs the CLI's own 'start --keep-active --via console --request-id ID -- <text>', 'route' (when the user chose type and size) and 'intake add --via console' through runner.write/exclusive (argv only, serialized per project). Uploads go to mkdtemp folders removed in finally. '--read-only' disables every POST. The UI (resources/console/, plain JS/CSS) renders Core's stations/states/completion; apart from Create Work every action shows the CLI command.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0032",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/console/server.js",
+          "contentHash": "sha256:e2db7dfef78ef9c0070c825ab60d6bd407a55590ce72bf4836995b868a1720bc",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/console/create.js",
+          "contentHash": "sha256:82fc20d5c29a9e317ae58a175fe93fc537350aeff845a2f229375e333d5de4b4",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/console/runner.js",
+          "contentHash": "sha256:47956d5eda7fc9e93eb9b8438d94bcd037b3d4cfc8e7e6d6fcda296db73f4256",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "test/console-create.test.js",
+          "contentHash": "sha256:0456a2704141b98403f21f89966b44723ebd5d1b9c91384bd02198a8d11f3b5d",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "npm test (passed)",
+          "workId": "PF-0032",
+          "verificationRunId": "V-002"
+        }
+      ],
+      "verifiedAt": "2026-11-06T13:07:31.794Z",
+      "verifiedAtCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+      "supersedes": [
+        "CTX-0093"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-06T13:07:31.794Z",
+          "workId": "PF-0032",
+          "candidateId": "K-001",
+          "supersedes": "CTX-0093"
+        }
+      ],
+      "createdAt": "2026-11-06T13:07:31.794Z",
+      "updatedAt": "2026-11-06T13:07:31.794Z"
+    },
+    {
+      "id": "CTX-0100",
+      "area": "architecture",
+      "state": "superseded",
+      "confidence": "confirmed",
+      "summary": "Active work focus (v1.2.0): state/current.yaml activeWork is the checkout's default focus for guide/status/brief; agents can work on any item by ID. Creating work (start, intake, direct commands) and route set it as before; 'start --keep-active -- <request>' (options only as leading tokens closed by '--') leaves an unfinished active item in focus and records the new item as activation {deferred: true, keptActive}; route/advance/checkpoint on a deferred item never move the focus; 'yallaflow activate <id>' is the only explicit switch and clears the deferral. 'start --via console --request-id ID' records attestation {recordedVia: console, verified: false, requestId} and, under the workspace lock, returns the item already created for that request ID (src/behavior/routing.js, src/commands/start.js, src/cli.js parseStartArgs).",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0032",
+        "candidateId": "K-002"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/behavior/routing.js",
+          "contentHash": "sha256:9133bcfd326ed72a088cf1d3e071c5c65c773e7244797ced354deca6459cba49",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/commands/start.js",
+          "contentHash": "sha256:eee4da7a6134867a98ef601942aad88de6acedc1a1c05eeb94905a0c6fc8015a",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/cli.js",
+          "contentHash": "sha256:2c30241b0ea69d2bc2f8c6a8b4ef9aa69425f26d8a182002e58692c886706227",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/console-create.test.js",
+          "contentHash": "sha256:0456a2704141b98403f21f89966b44723ebd5d1b9c91384bd02198a8d11f3b5d",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-06T13:07:32.066Z",
+      "verifiedAtCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+      "supersedes": [],
+      "supersededBy": "CTX-0101",
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-06T13:07:32.066Z",
+          "workId": "PF-0032",
+          "candidateId": "K-002"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-11-06T14:02:31.492Z",
+          "supersededBy": "CTX-0101",
+          "workId": "PF-0032",
+          "candidateId": "K-003"
+        }
+      ],
+      "createdAt": "2026-11-06T13:07:32.066Z",
+      "updatedAt": "2026-11-06T14:02:31.492Z"
+    },
+    {
+      "id": "CTX-0101",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Active work focus (v1.2.0): state/current.yaml activeWork is the checkout's default focus for guide/status/brief; agents can work on any item by ID. Creating work (start, intake, direct commands) and route set it as before. 'start --keep-active -- <request>' (options only as leading tokens closed by '--') never makes the new item active, whether or not another item is active (owner decision: creation and activation are separate); it records activation {deferred: true, keptActive: <unfinished active item or null>}. route/advance/checkpoint on a deferred item never move the focus; 'yallaflow activate <id>' is the only explicit switch and clears the deferral; resume on a deferred item prints how to activate it. The console always creates this way. 'start --via console --request-id ID' records attestation {recordedVia: console, verified: false, requestId} and, under the workspace lock, returns the item already created for that request ID (src/behavior/routing.js, src/commands/start.js, src/commands/resume.js, src/cli.js parseStartArgs).",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0032",
+        "candidateId": "K-003"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/behavior/routing.js",
+          "contentHash": "sha256:ef8c703fd30967436f9d274814c4921ba4f6aad0172f14fbb306c650fcea4f83",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/commands/start.js",
+          "contentHash": "sha256:c8fb415510bf8db79dce4594156e03f1aca4d3712be74c8176bf6da8998b934b",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/commands/resume.js",
+          "contentHash": "sha256:5f6c05c7a37322b9abc1d53a7c9d5ce2eff7dec948adcfacc7d2b56c71db858f",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/console-create.test.js",
+          "contentHash": "sha256:5db0e16e027d1f768a5fedd32952f39968abe00c9f53f136d3c87df19b83db98",
+          "gitCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "npm test (passed)",
+          "workId": "PF-0032",
+          "verificationRunId": "V-004"
+        }
+      ],
+      "verifiedAt": "2026-11-06T14:02:31.492Z",
+      "verifiedAtCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
+      "supersedes": [
+        "CTX-0100"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-06T14:02:31.492Z",
+          "workId": "PF-0032",
+          "candidateId": "K-003",
+          "supersedes": "CTX-0100"
+        }
+      ],
+      "createdAt": "2026-11-06T14:02:31.492Z",
+      "updatedAt": "2026-11-06T14:02:31.492Z"
     }
   ],
-  "updatedAt": "2026-10-28T13:37:53.289Z"
+  "updatedAt": "2026-11-06T14:02:31.492Z"
 }

@@ -42,18 +42,4 @@
   - package.json (repository @ 032f32c)
   - src/core/yaml.js (repository @ 032f32c)
 
-<!-- yallaflow-fact:CTX-0008 -->
-### CTX-0008 — There is no frontend. YallaFlow is a terminal CLI plus Markdown/YAML files it maintains inside the target repository.
-
-- **State:** current
-- **Confidence:** confirmed
-- **Provenance:** repository
-- **From baseline:** PF-0002 (BF-008)
-- **Recorded at:** 2026-10-12T20:06:11.387Z
-- **Verified:** 2026-10-19T20:31:35.598Z (commit 9c38eec)
-- **Evidence:**
-  - node src/cli.js context status (passed) (runtime, PF-0016 V-001)
-  - package.json (repository @ 9c38eec)
-  - src/cli.js (repository @ 9c38eec)
-
 <!-- yallaflow-context:end -->

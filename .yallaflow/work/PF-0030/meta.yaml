@@ -1,0 +1,50 @@
+{
+  "id": "PF-0030",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Stabilize Flow Console phases A-C after owner review: independent diff review, lock stress (stale locks, crashes, PID reuse, concurrency, shared projects), station and completion accuracy against workflows and gates, local server security, read-only and CLI-compatibility confirmation; fix findings",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-05T23:14:55.799Z",
+  "updatedAt": "2026-11-05T23:44:49.012Z",
+  "title": "Stabilize Flow Console phases A-C after owner review: independent diff review, lock stress (stale locks, crashes, PID reuse, concurrency, shared projects), station and completion accuracy against workflows and gates, local server security, read-only and CLI-compatibility confirmation; fix findings",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-05T23:14:55.815Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-05T23:44:49.012Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004",
+        "V-005",
+        "V-006"
+      ]
+    }
+  ]
+}
