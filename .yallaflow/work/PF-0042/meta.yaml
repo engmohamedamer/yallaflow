@@ -1,0 +1,57 @@
+{
+  "id": "PF-0042",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Regression test: a closed child work item can never satisfy or prove its parent's requirements",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-06T22:16:26.742Z",
+  "updatedAt": "2026-11-06T22:23:09.246Z",
+  "title": "Regression test: a closed child work item can never satisfy or prove its parent's requirements",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-06T22:16:26.754Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0030",
+      "type": "file",
+      "name": "owner-1.4-continue.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-06T22:16:26.954Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ],
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-06T22:23:09.246Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

@@ -283,3 +283,65 @@ test('the understanding baseline and legacy reconciliation are never held or clo
   assert.match(run(root, ['work', 'close', id, '--outcome', 'cancelled', '--reason', 'x', ...ACCEPT], { ok: false }).stderr, /understanding baseline/);
   assert.equal(await treeHash(yf(root)), all);
 });
+
+test('a closed child can never satisfy or prove its parent\'s requirements (review finding M1)', async () => {
+  const { advanceActiveWork, reopenWork } = await import('../src/core/transitions.js');
+  const { recordVerification } = await import('../src/core/evidence.js');
+  const { reviewKnowledgeNone } = await import('../src/knowledge/store.js');
+  const { executeDecomposition, proposeDecomposition, validateDecomposition } = await import('../src/decomposition/store.js');
+  const { recordRequirements } = await import('../src/delivery/requirements.js');
+  const { evaluateConvergence, recordConvergence } = await import('../src/delivery/convergence.js');
+  const { INTENT, complete, meta: metaOf, routed, satisfied, toVerified, workspace } = await import('../test-support/delivery-fixtures.js');
+  const root = await workspace();
+  const parent = (await routed(root, 'feature', 'architectural', 'Contract hub')).id;
+  for (const skill of ['context-discovery', 'requirement-clarification', 'design-exploration']) {
+    await complete(root, parent, skill);
+    await advanceActiveWork(root, parent);
+  }
+  await recordRequirements(root, parent, structuredClone(INTENT));
+  await complete(root, parent, 'specification');
+  await advanceActiveWork(root, parent);
+  await advanceActiveWork(root, parent);
+  await complete(root, parent, 'implementation-planning');
+  await proposeDecomposition(root, parent, { children: [
+    { key: 'refunds', title: 'Refunds', type: 'feature', scope: 'bounded', requirements: ['REQ-001'], acceptanceCriteria: ['AC-001', 'AC-002'] },
+    { key: 'export', title: 'Export', type: 'feature', scope: 'bounded', requirements: ['REQ-002'], acceptanceCriteria: ['AC-003'] }
+  ] });
+  await validateDecomposition(root, parent);
+  const { ledger } = await executeDecomposition(root, parent);
+  await advanceActiveWork(root, parent);
+  const [refunds, exporter] = ledger.children.map((child) => child.workId);
+  for (const [child, refs] of [[refunds, [`${parent}/AC-001`, `${parent}/AC-002`]], [exporter, [`${parent}/AC-003`]]]) {
+    await complete(root, child, 'context-discovery');
+    await complete(root, child, 'requirement-clarification');
+    for (let index = 0; index < 5; index++) await advanceActiveWork(root, child);
+    await toVerified(root, child);
+    await recordConvergence(root, child, { findings: refs.map((ref) => satisfied(ref)) });
+    await complete(root, child, 'delivery-convergence');
+    await reviewKnowledgeNone(root, child);
+    await advanceActiveWork(root, child);
+  }
+  await advanceActiveWork(root, parent);
+  await recordVerification(root, parent, { command: 'true', success: true, exitCode: 0 });
+  await complete(root, parent, 'verification');
+  const cite = [
+    { criterion: 'AC-001', status: 'satisfied', reason: 'Refunds.', evidence: [`convergence:${refunds}/CV-001`] },
+    { criterion: 'AC-002', status: 'satisfied', reason: 'Refunds.', evidence: [`convergence:${refunds}/CV-001`] },
+    { criterion: 'AC-003', status: 'satisfied', reason: 'Export.', evidence: [`convergence:${exporter}/CV-001`] }
+  ];
+  await recordConvergence(root, parent, { findings: cite });
+  assert.equal((await evaluateConvergence(root, await metaOf(root, parent))).converged, true, 'converged while both children are delivered');
+
+  // The export child is reopened and then closed without delivery.
+  await reopenWork(root, exporter, { toStage: 'implementation', reason: 'Export dropped.' });
+  await closeWork(root, exporter, { outcome: 'cancelled', reason: 'Export dropped by the client.', acceptMinimumVersion: '1.4.0' });
+  assert.equal((await evaluateConvergence(root, await metaOf(root, parent))).converged, false, 'a closed child no longer proves the parent');
+  await assert.rejects(
+    () => recordConvergence(root, parent, { findings: cite }),
+    new RegExp(`${exporter} was closed without delivery \\(cancelled\\); its findings can't prove a parent criterion`)
+  );
+  const snapshot = JSON.parse(run(root, ['snapshot', '--json']).stdout);
+  const parentItem = snapshot.items.find((item) => item.id === parent);
+  assert.notEqual(parentItem.state, 'done');
+  assert.ok(parentItem.stations.find((station) => station.key === 'change')?.steps.some((step) => step.id === exporter && step.status === 'closed'), 'the parent shows the child as closed');
+});

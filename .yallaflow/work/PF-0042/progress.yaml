@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-06T22:16:36.662Z",
+      "completedAt": "2026-11-06T22:16:36.830Z",
+      "summary": "context-discovery: closed-child convergence check exists in childAssessmentProblem (PF-0041 M1) but had no dedicated test; add one end-to-end test"
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T22:16:36.997Z",
+      "completedAt": "2026-11-06T22:16:37.161Z",
+      "summary": "requirement-clarification: closed-child convergence check exists in childAssessmentProblem (PF-0041 M1) but had no dedicated test; add one end-to-end test"
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-06T22:16:37.335Z",
+      "completedAt": "2026-11-06T22:16:37.496Z",
+      "summary": "implementation-planning: closed-child convergence check exists in childAssessmentProblem (PF-0041 M1) but had no dedicated test; add one end-to-end test"
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-06T22:16:40.113Z",
+      "completedAt": "2026-11-06T22:16:40.290Z",
+      "summary": "End-to-end test: both children delivered and cited by the parent; the export child is reopened and closed; the parent is no longer converged, a new citation of the closed child is refused, and the parent shows the child as closed; mutation check confirms it fails without the check"
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T22:23:08.607Z",
+      "completedAt": "2026-11-06T22:23:08.827Z",
+      "summary": "V-001: npm run check passes in full (864 tests)",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [
+    {
+      "decision": "test/work-lifecycle.test.js (closed-child convergence test) was edited before this work item existed, without workflow authorization; adopted for review and verification",
+      "reason": "Owner-requested regression test written ahead of routing in the same session",
+      "costIfWrong": "A test change without its own verification record",
+      "createdAt": "2026-11-06T22:16:27.123Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-06T22:23:08.827Z"
+}
