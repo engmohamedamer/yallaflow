@@ -148,6 +148,52 @@ Each checkout has one **active work item**: the one `guide`, `status` and `brief
 - **Deferred items never take focus on their own.** Routing, advancing or checkpointing such an item leaves the active item unchanged.
 - **Switching is explicit.** `yallaflow activate <id>` makes an item the active one and prints which item it replaced.
 
+## Managing work (1.4.0)
+
+Unless the console was started with `--read-only`, a work item's page has an action bar, and every card on the board has a **⋯** menu. Each action runs YallaFlow's own command, so every rule Core applies to the CLI applies here.
+
+| Action | Same as |
+|---|---|
+| Make it active | `yallaflow activate <id>` |
+| Advance | `yallaflow advance <id>` |
+| Put on hold… / Resume | `yallaflow work hold <id> --reason …` / `yallaflow work resume <id>` |
+| Close without delivery… | `yallaflow work close <id> --outcome … --reason … [--by …]` |
+| Reopen… | `yallaflow reopen <id> [--to …] --reason …` (DONE work to a stage; closed work at its preserved stage) |
+| Edit request… | `yallaflow request revise <id> --text … --reason …` (only before the request is classified) |
+| Answer… | `yallaflow question answer <id> --id Q-### --answer …` |
+
+- **Blocked actions explain themselves.** When Core refuses, for example because a checkpoint is pending, the item is on hold, or a gate is waiting, the console shows Core's own reason and the next valid step. It never decides a move itself.
+- **The first hold or close** in a project shows Core's warning that the project will then require YallaFlow 1.4.0 or newer. It goes ahead only after you tick the confirmation.
+- **Drag and drop on the Flow proposes a move.**
+  - **On the next station:** the card runs **Advance**, one Core step, and Core may refuse with its reason.
+  - **On an earlier station (DONE work only):** Change, Verify or Remember offers **Reopen** to implementation, verification or review.
+  - **Anywhere else:** the drop is not accepted. While you drag, the allowed stations are outlined and the others dimmed.
+
+### Review-gate decisions (local user, identity not verified)
+
+When a gate waits for review (for example the specification or the plan), the item page offers **Review and decide**.
+- **What it shows first:**
+  - the material the gate is about: the specification or plan text, design or discovery notes, and the requirements with their acceptance criteria;
+  - the latest verification;
+  - open questions and other warnings;
+  - the gate's history.
+- **How you decide:** choose **Approve** or **Request changes**, write a **mandatory note**, and **type the gate name exactly**. The button stays disabled until the name matches.
+- **Recording:** YallaFlow's own `approve`/`feedback` command records it, with the provenance **`console, identity not verified`**: the console as the channel, the host, and your Git `user.name` as a *claimed* name.
+- **CLI decisions are unchanged:** they are recorded exactly as before, without provenance. `yallaflow work show` prints the provenance of console decisions.
+- **Refused, with nothing recorded,** when:
+  - the gate was decided or re-requested since you opened the review;
+  - its material changed since then;
+  - you submit the same decision twice.
+- **Not available here:** the project-understanding baseline and legacy reconciliation keep their own commands.
+
+> **Limitation.** This is an explicit local-user decision, not a verified identity.
+> - Anyone holding this console's per-run link on this machine can record a decision.
+> - An agent that can run shell commands could still run `yallaflow approve` itself, as it always could. The Agent Contract forbids that.
+> - The Agent Workspace and agents never reach console decisions.
+> - YallaFlow never records a console decision as verified or authenticated.
+> - **Changes outside the console.** The staleness check runs in the console's own write queue. A command run directly in a terminal at the same instant, or an edit to `work.md`, is not excluded in the moment between the check and the recording.
+> - **What's stored.** A console decision stores the host name and your Git `user.name`. In a Shared Project, `reviews.yaml` is committed, so both reach Git history.
+
 ## Agent Workspace (1.3.0, opt-in)
 
 With `yallaflow console --agents`, a work item gets an **Agent** panel for working with Codex (managed sessions on your ChatGPT login). See [`agents.md`](agents.md).

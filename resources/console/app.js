@@ -50,7 +50,8 @@
   const STATE = {
     new: { ar: 'جديد', en: 'new' }, active: { ar: 'شغّال', en: 'working' }, you: { ar: 'مستنيك', en: 'waiting for you' },
     fail: { ar: 'فيه مشكلة', en: 'failing' }, paused: { ar: 'متوقف', en: 'idle' }, done: { ar: 'خلص', en: 'done' },
-    todo: { ar: 'لسه', en: 'not yet' }, na: { ar: 'مش مطلوبة هنا', en: 'not needed here' }
+    todo: { ar: 'لسه', en: 'not yet' }, na: { ar: 'مش مطلوبة هنا', en: 'not needed here' },
+    held: { ar: 'متوقفة مؤقتًا', en: 'on hold' }, closed: { ar: 'مقفولة من غير تسليم', en: 'closed, not delivered' }
   };
   const TYPE = { feature: { ar: 'ميزة', en: 'feature' }, bug: { ar: 'مشكلة', en: 'bug' }, investigation: { ar: 'بحث', en: 'investigation' }, change: { ar: 'تعديل', en: 'change' }, refactor: { ar: 'إعادة هيكلة', en: 'refactor' }, release: { ar: 'إصدار', en: 'release' } };
   const chip = (s) => `<span class="chip ${s === 'na' ? 'todo' : s === 'paused' ? 'idle' : s}">${s === 'na' ? '' : '<i></i>'}${L(STATE[s] ?? { ar: s, en: s })}</span>`;
@@ -196,7 +197,7 @@
 
   function pchip(it) {
     const old = isOld(it);
-    return `<a class="pchip ${it.state} ${old ? 'old' : ''}" href="#/item/${encodeURIComponent(it.id)}" data-w="${esc(it.id)}"><div class="tt">${esc(it.title)}</div>
+    return `<a class="pchip ${it.state} ${old ? 'old' : ''}" href="#/item/${encodeURIComponent(it.id)}" data-w="${esc(it.id)}" ${readOnly ? '' : 'draggable="true"'}>${readOnly || !itemActions(it).length ? '' : `<button class="pmenu" data-menu="${esc(it.id)}" aria-label="${A('أفعال', 'Actions')} ${esc(it.id)}">⋯</button>`}<div class="tt">${esc(it.title)}</div>
       <div class="meta">${chip(it.state)}<span class="grow"></span><b>${it.completion}%</b></div><div class="mini"><i style="width:${it.completion}%"></i></div>
       <div class="badges"><span class="bdg ltr">${esc(it.id)}</span>${it.lastActivityAt && it.state !== 'done' ? `<span class="bdg ${old ? 'old' : ''}">⏱ ${ago(it.lastActivityAt)}</span>` : ''}${it.sourceCount ? `<span class="bdg">📎 ${it.sourceCount}</span>` : ''}</div></a>`;
   }
@@ -227,7 +228,7 @@
   }
 
   function viewLines() {
-    const order = { you: 0, fail: 1, active: 2, paused: 3, new: 4, done: 5 };
+    const order = { you: 0, fail: 1, active: 2, paused: 3, held: 4, new: 5, done: 6, closed: 7 };
     const list = items().filter(vis).sort((a, b) => order[a.state] - order[b.state] || b.id.localeCompare(a.id));
     if (!items().length) return onboarding() + integrityPanel();
     return hero() + integrityPanel() + filterBar() + `<section class="lines">${list.map((it) => `<a class="line" href="#/item/${encodeURIComponent(it.id)}" data-w="${esc(it.id)}"><div><div class="row tiny muted"><span class="ltr">${esc(it.id)}</span><span>· ${L(TYPE[it.type] ?? { ar: '—', en: '—' })}</span>${it.stage ? `<span class="ltr">· ${esc(it.stage)}</span>` : ''}</div><div class="tt">${esc(it.title)}</div><div class="nx">${iso(nowText(it))}</div></div>${relay(it)}<div class="row">${chip(it.state)}${ring(it.completion, 62, 7)}</div></a>`).join('') || `<p class="muted">${A('مفيش شغل.', 'No work.')}</p>`}</section>`;
@@ -258,6 +259,7 @@
       <section class="ihead">${ring(it.completion, 132, 13)}<div><div class="row tiny muted"><span class="ltr">${esc(it.id)}</span><span>· ${L(TYPE[it.type] ?? { ar: 'لسه متصنفش', en: 'unrouted' })}</span>${it.scope ? `<span class="ltr">· ${esc(it.scope)}</span>` : ''}${it.stage ? `<span class="ltr">· ${esc(it.stage)}</span>` : ''}</div><h1>${esc(it.title)}</h1><p style="font-size:18px;color:var(--ink-2);margin-top:4px">${headline}</p><p class="tiny muted" style="margin-top:4px">${formula()}</p></div>
 </section>
       ${nextCard(it)}
+      ${actionBar(it)}
       ${agentPanel(it)}
       <section class="chain" id="chain"><article class="node start ${it.state === 'new' ? 'active' : 'done'}" data-st="-1" style="--hue:var(--ink-2)"><div class="st-head"><span class="st-ico" aria-hidden="true">＋</span><div class="st-name">${A('الطلب', 'Request')}</div></div><div class="st-out">${it.state === 'new' ? A('جديد', 'new') : A('اتسلّم لـ «افهم»', 'handed to Understand')}</div>
           <p class="small clamp3">${esc(d?.request?.raw ?? it.title)}</p>${(d?.sources ?? []).map((s) => `<button class="flink" data-file="${esc(s.id)}">${fileIcon(s)} <span class="ltr">${esc(s.name)}</span></button>`).join('')}<button class="flink more2" data-dtab="req" data-jump>${A('الطلب كامل ↓', 'Full request ↓')}</button>
@@ -424,6 +426,175 @@
   }
 
   // The one thing to do next, in plain words, from Core's verdict (never computed here).
+  // ---------- work management (1.4.0): every action is Core's own command ----------
+  // The console never decides a move: it asks Core (through the server) and shows Core's answer.
+  const ACTION_LABEL = {
+    activate: { ar: 'خلّيها النشطة', en: 'Make it active' }, advance: { ar: 'كمّل للمرحلة الجاية', en: 'Advance' },
+    hold: { ar: 'وقّفها مؤقتًا…', en: 'Put on hold…' }, resume: { ar: 'كمّل الشغل عليها', en: 'Resume' },
+    close: { ar: 'اقفلها من غير تسليم…', en: 'Close without delivery…' }, reopen: { ar: 'افتحها تاني…', en: 'Reopen…' },
+    revise: { ar: 'عدّل الطلب…', en: 'Edit request…' }, answer: { ar: 'جاوب…', en: 'Answer…' }
+  };
+  function itemActions(it) {
+    if (readOnly) return [];
+    const lifecycle = it.lifecycle?.state;
+    if (lifecycle === 'on_hold') return ['resume', 'close'];
+    if (lifecycle === 'closed') return ['reopen'];
+    if (it.state === 'done') return ['reopen'];
+    const list = [];
+    if (snap?.project?.activeWork !== it.id) list.push('activate');
+    if (it.routing === 'pending') list.push('revise');
+    else list.push('advance');
+    if (it.waitingFor?.kind === 'question') list.push('answer');
+    list.push('hold', 'close');
+    return list;
+  }
+  function actionBar(it) {
+    const acts = itemActions(it);
+    if (!acts.length && !(it.waitingFor?.kind === 'review' && !readOnly)) return '';
+    const blocked = it.blocker && it.state !== 'done' && !it.lifecycle;
+    const gate = it.waitingFor?.kind === 'review' && !readOnly ? `<button class="btn sm go" data-gate="${esc(it.waitingFor.gate)}" data-gate-item="${esc(it.id)}">${A(`راجع وقرّر (${it.waitingFor.gate})`, `Review and decide (${it.waitingFor.gate})`)}</button>` : '';
+    return `<section class="actbar" aria-label="${A('أفعال الشغلانة', 'Work item actions')}">${gate}${acts.map((a) => {
+      const off = a === 'advance' && blocked;
+      return `<button class="btn sm ${a === 'close' ? 'ghost danger' : 'ghost'}" data-act="${a}" data-act-item="${esc(it.id)}" ${off ? `aria-disabled="true" title="${esc(it.blocker)}"` : ''}>${L(ACTION_LABEL[a])}</button>`;
+    }).join('')}${blocked ? `<p class="tiny muted why">${A('ليه مش هتكمّل دلوقتي:', 'Why it can\'t advance yet:')} ${iso(it.blocker)}${it.nextAction ? ` · <span class="ltr">${esc(it.nextAction)}</span>` : ''}</p>` : ''}${it.lifecycle ? `<p class="tiny muted why">${esc(it.blocker ?? '')}</p>` : ''}</section>`;
+  }
+
+  // One dialog for every action; fields follow the action. Core's refusal is shown as-is.
+  function actionFields(kind, it) {
+    const area = (name, label, required = true) => `<label class="fld">${label}<textarea name="${name}" rows="3" maxlength="10000" ${required ? 'required' : ''}></textarea></label>`;
+    if (kind === 'hold') return area('reason', A('السبب', 'Reason'));
+    if (kind === 'resume') return area('note', A('ملاحظة (اختياري)', 'Note (optional)'), false);
+    if (kind === 'revise') return `<label class="fld">${A('الطلب بعد التعديل', 'Revised request')}<textarea name="text" rows="4" maxlength="10000" required>${esc(it.title)}</textarea></label>${area('reason', A('السبب', 'Reason'))}`;
+    if (kind === 'answer') return `<label class="fld">${A('السؤال', 'Question')}<select name="question">${(it.waitingFor?.questions ?? []).map((q) => `<option>${esc(q)}</option>`).join('')}</select></label>${area('answer', A('الإجابة', 'Answer'))}`;
+    if (kind === 'close') return `<label class="fld">${A('النتيجة', 'Outcome')}<select name="outcome"><option value="cancelled">${A('اتلغت', 'Cancelled')}</option><option value="superseded">${A('اتبدّلت بشغلانة تانية', 'Superseded by another item')}</option><option value="duplicate">${A('مكررة', 'Duplicate of another item')}</option></select></label><label class="fld">${A('الشغلانة البديلة (للمستبدلة أو المكررة)', 'The other item (for superseded or duplicate)')}<input name="by" class="ltr" placeholder="PF-0000" pattern="PF-[A-Za-z0-9-]+"></label>${area('reason', A('السبب', 'Reason'))}<p class="tiny muted">${A('الشغل المقفول عمره ما بيتحسب متسلّم ولا متحقق منه.', 'Closed work is never counted as delivered or verified.')}</p>`;
+    if (kind === 'reopen') return `${it.state === 'done' ? `<label class="fld">${A('افتحها على', 'Reopen to')}<select name="to"><option value="implementation">${A('التنفيذ', 'Implementation')}</option><option value="verification">${A('التحقق', 'Verification')}</option><option value="review">${A('المراجعة', 'Review')}</option></select></label>` : ''}${area('reason', A('السبب', 'Reason'))}`;
+    return `<p>${A('YallaFlow هيشغّل الأمر ده دلوقتي.', 'YallaFlow runs this command now.')}</p>`;
+  }
+  function openAction(kind, id, preset = {}) {
+    const it = byId(id);
+    if (!it || readOnly) return;
+    document.querySelector('dialog.act')?.remove();
+    const d = document.createElement('dialog');
+    d.className = 'create act';
+    d.setAttribute('aria-labelledby', 'act-h');
+    d.innerHTML = `<form data-act-form="${esc(kind)}" data-act-item="${esc(id)}" novalidate><div class="row"><h2 id="act-h" class="grow">${L(ACTION_LABEL[kind])}</h2><button type="button" class="btn ghost sm" data-act-cancel>${A('إلغاء', 'Cancel')}</button></div><p class="tiny muted ltr">${esc(id)} — ${esc(it.title)}</p>${actionFields(kind, it)}<div class="confirm" hidden></div><div class="errbar small" role="alert" hidden></div><div class="row"><span class="grow"></span><button class="btn go" type="submit">${L(ACTION_LABEL[kind]).replace('…', '')}</button></div></form>`;
+    document.body.appendChild(d);
+    d.addEventListener('close', () => d.remove());
+    for (const [name, value] of Object.entries(preset)) { const field = d.querySelector(`[name="${name}"]`); if (field) field.value = value; }
+    d.showModal();
+    d.querySelector('textarea, select, button[type="submit"]')?.focus();
+  }
+  async function submitAction(form) {
+    const kind = form.dataset.actForm;
+    const id = form.dataset.actItem;
+    const body = {};
+    for (const field of form.querySelectorAll('[name]')) if (field.value.trim()) body[field.name] = field.value.trim();
+    if (form.querySelector('[name="confirmMinimumVersion"]')?.checked) body.confirmMinimumVersion = true;
+    const err = form.querySelector('.errbar');
+    err.hidden = true;
+    const submit = form.querySelector('button[type="submit"]');
+    submit.disabled = true;
+    try {
+      await post(`/api/p/${pid}/work/${encodeURIComponent(id)}/actions/${kind}`, JSON.stringify(body), { 'Content-Type': 'application/json' });
+      form.closest('dialog').close();
+      toast(`✓ ${esc(L(ACTION_LABEL[kind]).replace('…', ''))} · <span class="ltr">${esc(id)}</span>`);
+      await refresh();
+    } catch (e) {
+      if (e.code === 'CONFIRM_MINIMUM_VERSION') {
+        const box = form.querySelector('.confirm');
+        box.hidden = false;
+        box.innerHTML = `<pre class="warn small">${esc(e.message)}</pre><label class="small"><input type="checkbox" name="confirmMinimumVersion"> ${A('موافق: المشروع هيحتاج YallaFlow 1.4.0 أو أحدث.', 'I confirm: this project will require YallaFlow 1.4.0 or newer.')}</label>`;
+      } else {
+        err.hidden = false;
+        err.innerHTML = `<pre>${esc(why(e))}</pre>`;
+      }
+    } finally {
+      submit.disabled = false;
+    }
+  }
+
+  // ---------- review-gate decisions (Option B): a local-user decision, identity not verified ----------
+  async function openGate(id, gate) {
+    if (readOnly) return;
+    document.querySelector('dialog.act')?.remove();
+    const d = document.createElement('dialog');
+    d.className = 'create act gate';
+    d.setAttribute('aria-labelledby', 'gate-h');
+    d.innerHTML = `<p class="muted">${A('بيحمّل المراجعة…', 'Loading the review…')}</p>`;
+    document.body.appendChild(d);
+    d.addEventListener('close', () => d.remove());
+    d.showModal();
+    let m;
+    try {
+      m = await api(`/api/p/${pid}/work/${encodeURIComponent(id)}/gates/${encodeURIComponent(gate)}`);
+    } catch (e) {
+      d.innerHTML = `<div class="errbar" role="alert">${esc(why(e))}</div><button class="btn" data-act-cancel>${A('اقفل', 'Close')}</button>`;
+      return;
+    }
+    d.innerHTML = `<form data-gate-form data-gate-item="${esc(id)}" data-gate-name="${esc(gate)}" data-requested="${esc(m.requestedAt ?? '')}" data-digest="${esc(m.digest)}" data-request="${esc(newRequestId())}" novalidate>
+      <div class="row"><h2 id="gate-h" class="grow">${A('راجع وقرّر', 'Review and decide')}: <span class="ltr">${esc(gate)}</span></h2><button type="button" class="btn ghost sm" data-act-cancel>${A('إلغاء', 'Cancel')}</button></div>
+      <p class="tiny muted ltr">${esc(id)} — ${esc(m.title)} · ${esc(m.gateStatus ?? '')}</p>
+      ${m.warnings.length ? `<div class="awarn small">${m.warnings.map((w) => `⚠ ${esc(w)}`).join('<br>')}</div>` : ''}
+      ${m.sections.map((s) => `<section class="gsec"><h3>${esc(s.heading)}</h3><pre class="gtext">${esc(s.text)}</pre></section>`).join('') || `<p class="muted small">${A('مفيش نص مكتوب للمرحلة دي في الشغلانة.', 'No written material for this gate in the work item.')}</p>`}
+      ${m.criteria.length ? `<section class="gsec"><h3>${A('معايير القبول', 'Acceptance criteria')}</h3><ul class="small">${m.criteria.map((c) => `<li><b class="ltr">${esc(c.id)}</b> ${esc(c.statement)} <span class="tiny muted">(${esc(c.convergence)})</span></li>`).join('')}</ul></section>` : ''}
+      ${m.verification ? `<p class="small">${A('آخر تحقق', 'Latest verification')}: <span class="ltr">${esc(m.verification.id)}</span> ${m.verification.success ? A('نجح', 'passed') : A('فشل', 'failed')}</p>` : ''}
+      <fieldset class="fld"><legend>${A('القرار', 'Decision')}</legend><label class="small"><input type="radio" name="decision" value="approve" checked> ${A('موافقة', 'Approve')}</label> <label class="small"><input type="radio" name="decision" value="request_changes"> ${A('محتاج تعديلات', 'Request changes')}</label></fieldset>
+      <label class="fld">${A('ملاحظة القرار (مطلوبة)', 'Decision note (required)')}<textarea name="note" rows="3" maxlength="10000" required></textarea></label>
+      <label class="fld">${A(`اكتب اسم المرحلة بالظبط للتأكيد: ${gate}`, `Type the gate name exactly to confirm: ${gate}`)}<input name="confirmGate" class="ltr" autocomplete="off" spellcheck="false"></label>
+      <p class="tiny muted">${A('هيتسجّل كقرار من الكونسول: الهوية مش متحقق منها. ده قرار مستخدم محلي، مش توقيع موثّق.', 'Recorded as a console decision: identity not verified. This is a local-user decision, not a verified signature.')}</p>
+      <div class="errbar small" role="alert" hidden></div>
+      <div class="row"><span class="grow"></span><button class="btn go" type="submit" disabled>${A('سجّل القرار', 'Record decision')}</button></div></form>`;
+    d.querySelector('textarea').focus();
+  }
+  function gateReady(form) {
+    const ok = form.querySelector('[name="confirmGate"]').value === form.dataset.gateName && form.querySelector('[name="note"]').value.trim();
+    form.querySelector('button[type="submit"]').disabled = !ok;
+  }
+  async function submitGate(form) {
+    const err = form.querySelector('.errbar');
+    err.hidden = true;
+    const body = { decision: form.querySelector('[name="decision"]:checked').value, note: form.querySelector('[name="note"]').value, confirmGate: form.querySelector('[name="confirmGate"]').value, requestedAt: form.dataset.requested || null, digest: form.dataset.digest, requestId: form.dataset.request };
+    const submit = form.querySelector('button[type="submit"]');
+    submit.disabled = true;
+    try {
+      await post(`/api/p/${pid}/work/${encodeURIComponent(form.dataset.gateItem)}/gates/${encodeURIComponent(form.dataset.gateName)}/decision`, JSON.stringify(body), { 'Content-Type': 'application/json' });
+      form.closest('dialog').close();
+      toast(`✓ ${A('اتسجّل القرار (من الكونسول، الهوية مش متحقق منها)', 'Decision recorded (console, identity not verified)')}`);
+      await refresh();
+    } catch (e) {
+      err.hidden = false;
+      err.innerHTML = `<pre>${esc(why(e))}</pre>${e.code === 'STALE' ? `<button type="button" class="btn sm" data-gate="${esc(form.dataset.gateName)}" data-gate-item="${esc(form.dataset.gateItem)}">${A('حمّل المراجعة تاني', 'Reload the review')}</button>` : ''}`;
+      gateReady(form);
+    }
+  }
+
+  // ---------- board: drag proposes, Core decides ----------
+  const REOPEN_AT = { 2: 'implementation', 3: 'verification', 4: 'review' };
+  function dropVerdict(it, target) {
+    if (!it || readOnly) return { ok: false };
+    if (it.lifecycle) return { ok: false, why: it.blocker ?? '' };
+    const from = curIndex(it);
+    if (it.state === 'done' && REOPEN_AT[target]) return { ok: true, kind: 'reopen', to: REOPEN_AT[target] };
+    if (it.state !== 'done' && it.routing !== 'pending' && target === from + 1) return { ok: true, kind: 'advance' };
+    return { ok: false, why: it.state === 'done' ? A('الشغل المتسلّم بيتفتح بس على التنفيذ أو التحقق أو المراجعة.', 'Delivered work reopens only to implementation, verification or review.') : A('الشغل بيتحرك محطة واحدة لقدام بس، وYallaFlow هو اللي بيقرّر.', 'Work moves one station forward at a time, and YallaFlow decides.') };
+  }
+  let dragged = null;
+  async function dropOn(target) {
+    const it = byId(dragged);
+    dragged = null;
+    document.querySelectorAll('.station').forEach((s) => s.classList.remove('drop-ok', 'drop-no'));
+    const verdict = dropVerdict(it, target);
+    if (!verdict.ok) { if (it && verdict.why) toast(`⛔ ${esc(verdict.why)}`); return; }
+    if (verdict.kind === 'reopen') return openAction('reopen', it.id, { to: verdict.to });
+    try {
+      await post(`/api/p/${pid}/work/${encodeURIComponent(it.id)}/actions/advance`, '{}', { 'Content-Type': 'application/json' });
+      toast(`✓ ${A('اتحرّكت', 'Moved')} · <span class="ltr">${esc(it.id)}</span>`);
+      await refresh();
+    } catch (e) {
+      toast(`⛔ ${esc(why(e))}`);
+    }
+  }
+
   function nextCard(it) {
     if (it.state === 'done') return `<section class="nextcard done"><b>✓ ${A('خلصت', 'Done')}</b><p>${A('اتحققت واتقفلت في YallaFlow.', 'Verified and closed in YallaFlow.')}${it.latestVerification ? ` <span class="ltr tag">${esc(it.latestVerification.id)}</span>` : ''}</p></section>`;
     const who = it.waitingFor ? A('مستنيك إنت', 'Waiting for you') : it.state === 'fail' ? A('محتاج تصليح', 'Needs a fix') : A('على الوكيل', 'For the agent');
@@ -959,6 +1130,37 @@
     }
     closeDrawer(); bellOpen = false; dtab = 'delivery'; const v = route().v; if (v === 'item') { detail = null; render(); await load(); } else if (v === 'team' || v === 'projects') { render(); await loadForView(); } render(); scrollTo(0, 0); });
   document.addEventListener('click', (e) => {
+    // 1.4.0 work management: actions, gate review, the card menu.
+    const wm = e.target.closest('[data-act],[data-gate],[data-menu],[data-act-cancel]');
+    if (wm) {
+      e.preventDefault();
+      if (wm.hasAttribute('data-act-cancel')) { wm.closest('dialog')?.close(); return; }
+      if (wm.hasAttribute('data-gate')) { openGate(wm.dataset.gateItem, wm.dataset.gate); return; }
+      if (wm.hasAttribute('data-menu')) {
+        const it = byId(wm.dataset.menu);
+        document.querySelector('dialog.act')?.remove();
+        const d = document.createElement('dialog');
+        d.className = 'create act';
+        d.setAttribute('aria-label', `${A('أفعال', 'Actions')} ${wm.dataset.menu}`);
+        d.innerHTML = `<div class="row"><b class="grow ltr">${esc(it.id)}</b><button type="button" class="btn ghost sm" data-act-cancel>${A('اقفل', 'Close')}</button></div><p class="small">${esc(it.title)}</p>${actionBar(it)}`;
+        document.body.appendChild(d);
+        d.addEventListener('close', () => d.remove());
+        d.showModal();
+        return;
+      }
+      const kind = wm.dataset.act;
+      const id = wm.dataset.actItem;
+      wm.closest('dialog')?.close();
+      if (wm.getAttribute('aria-disabled') === 'true') { toast(`⛔ ${esc(byId(id)?.blocker ?? '')}`); return; }
+      if (kind === 'activate' || kind === 'advance') {
+        post(`/api/p/${pid}/work/${encodeURIComponent(id)}/actions/${kind}`, '{}', { 'Content-Type': 'application/json' })
+          .then(async () => { toast(`✓ ${esc(L(ACTION_LABEL[kind]))} · <span class="ltr">${esc(id)}</span>`); await refresh(); })
+          .catch((err) => toast(`⛔ ${esc(why(err))}`));
+        return;
+      }
+      openAction(kind, id);
+      return;
+    }
     const ag = e.target.closest('[data-agent-start],[data-agent-connect],[data-agent-cancel],[data-agent-end],[data-agent-disconnect],[data-agent-perm],[data-agent-activate],[data-agent-resume]');
     if (ag) {
       const workId = route().id;
@@ -1003,9 +1205,25 @@
     else if (x.hasAttribute('data-more')) { const b = x.previousElementSibling; b.classList.toggle('clamp'); x.textContent = b.classList.contains('clamp') ? A('اقرأ الطلب كله ↓', 'Read the whole request ↓') : A('أقل ↑', 'Less ↑'); }
     else if (x.dataset.copy) copy(x.dataset.copy);
   });
+  document.addEventListener('input', (e) => { if (e.target.closest('[data-gate-form]')) gateReady(e.target.closest('[data-gate-form]')); });
+  // Board drag and drop: dragging proposes a move; Core decides (see dropOn).
+  document.addEventListener('dragstart', (e) => {
+    const card = e.target.closest?.('.pchip[data-w]');
+    if (!card || readOnly) return;
+    dragged = card.dataset.w;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', dragged);
+    const it = byId(dragged);
+    document.querySelectorAll('.station[data-st]').forEach((st) => st.classList.add(dropVerdict(it, Number(st.dataset.st)).ok ? 'drop-ok' : 'drop-no'));
+  });
+  document.addEventListener('dragend', () => { document.querySelectorAll('.station').forEach((st) => st.classList.remove('drop-ok', 'drop-no')); });
+  document.addEventListener('dragover', (e) => { const st = e.target.closest?.('.station.drop-ok'); if (st) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; } });
+  document.addEventListener('drop', (e) => { const st = e.target.closest?.('.station[data-st]'); if (st && dragged) { e.preventDefault(); dropOn(Number(st.dataset.st)); } });
   document.addEventListener('input', (e) => { if (e.target.matches('[data-q]')) { flt.q = e.target.value; render(); } else if (e.target.matches('[data-agent-input]')) agentDraft = e.target.value; });
   document.addEventListener('keydown', (e) => { if (e.target.matches?.('[data-agent-input]') && e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); e.target.form.requestSubmit(); } });
   document.addEventListener('submit', (e) => {
+    if (e.target.matches('[data-act-form]')) { e.preventDefault(); submitAction(e.target); return; }
+    if (e.target.matches('[data-gate-form]')) { e.preventDefault(); submitGate(e.target); return; }
     if (e.target.matches('[data-create-form]')) { e.preventDefault(); submitCreate(e.target); }
     else if (e.target.matches('[data-agent-form]')) { e.preventDefault(); const text = agentDraft.trim(); if (!text) return; agentDraft = ''; agentAction('message', { text }); }
   });

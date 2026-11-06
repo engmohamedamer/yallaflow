@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "gates": {
+    "specification": {
+      "status": "approved",
+      "respondedAt": "2026-11-06T22:35:10.671Z",
+      "note": "Approved by the owner in the agent session (2026-11-07): 'Approve spec and plan' for the revised PF-0043 specification (work actions + Option B console gate decisions)",
+      "history": [
+        {
+          "status": "awaiting_review",
+          "at": "2026-11-06T22:25:11.845Z"
+        },
+        {
+          "status": "changes_requested",
+          "at": "2026-11-06T22:31:06.664Z",
+          "note": "Owner (2026-11-07, agent session): choose Option B for console review-gate approvals; include explicit gate decisions in PF-0043 with conditions: exact gate name typed + mandatory note; show the actual specification, acceptance criteria, evidence and warnings first; record every console approval as identity not verified with accurate provenance and audit history; existing Core approval rules, no separate engine; no automatic approval by an AI agent or the Agent Workspace; localhost/token/Origin/read-only restrictions; CLI behaviour and backward compatibility preserved; tests for unauthorized requests, incorrect confirmations, stale gates, duplicate submissions and audit integrity; document the limitation; keep Overview, onboarding, Wizard and Runtime in 1.4.0."
+        },
+        {
+          "status": "approved",
+          "at": "2026-11-06T22:35:10.671Z",
+          "note": "Approved by the owner in the agent session (2026-11-07): 'Approve spec and plan' for the revised PF-0043 specification (work actions + Option B console gate decisions)"
+        }
+      ]
+    },
+    "plan": {
+      "status": "approved",
+      "respondedAt": "2026-11-06T22:35:11.318Z",
+      "note": "Approved by the owner in the agent session (2026-11-07): 'Approve spec and plan' for the 8-step PF-0043 implementation plan",
+      "history": [
+        {
+          "status": "awaiting_review",
+          "at": "2026-11-06T22:35:11.126Z"
+        },
+        {
+          "status": "approved",
+          "at": "2026-11-06T22:35:11.318Z",
+          "note": "Approved by the owner in the agent session (2026-11-07): 'Approve spec and plan' for the 8-step PF-0043 implementation plan"
+        }
+      ]
+    }
+  },
+  "updatedAt": "2026-11-06T22:35:11.318Z"
+}

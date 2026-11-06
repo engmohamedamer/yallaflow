@@ -20,6 +20,11 @@
     "convergence": { "type": ["object", "null"] },
     "knowledge": { "type": "object", "required": ["reviewStatus", "candidates"], "properties": { "reviewStatus": { "type": "string" }, "candidates": { "type": "array", "items": { "type": "object", "required": ["id", "status"] } } } },
     "verification": { "type": "array", "items": { "type": "object", "required": ["id", "success"] } },
-    "children": { "type": "array", "items": { "type": "object", "required": ["key", "title"] } }
+    "children": { "type": "array", "items": { "type": "object", "required": ["key", "title"] } },
+    "gates": {
+      "type": "array",
+      "description": "Review gates and their decisions (added in 1.4.0). provenance is present only for decisions made in the web console: { via: 'console', identity: 'not verified', host, claimedGitName } — a local-user decision, never a verified identity.",
+      "items": { "type": "object", "required": ["gate", "status"] }
+    }
   }
 }

@@ -525,3 +525,28 @@ html[lang="en"] dialog.create .seg span::first-letter { text-transform: uppercas
 .agent .aperm .ptag { color: var(--ink); border-color: var(--dusk); }
 .chip.wait { color: #6f4a00; }
 :root[data-theme="dark"] .chip.wait { color: var(--amber); }
+
+/* 1.4.0 work management (PF-0043) */
+.actbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0 4px; }
+.actbar .why { flex-basis: 100%; margin: 2px 0 0; overflow-wrap: anywhere; }
+.btn.danger { color: var(--clay); border-color: color-mix(in srgb, var(--clay) 45%, transparent); }
+.btn[aria-disabled="true"] { opacity: .55; cursor: not-allowed; }
+.chip.held { background: var(--amber-soft); color: var(--amber); }
+.chip.closed { background: rgba(127,127,127,.14); color: var(--muted); text-decoration: line-through; }
+.pchip { position: relative; }
+.pchip.closed { opacity: .7; }
+.pmenu { position: absolute; inset-inline-end: 6px; top: 6px; border: 0; background: transparent; color: var(--muted); font-size: 16px; line-height: 1; padding: 2px 6px; border-radius: 8px; cursor: pointer; }
+.pmenu:hover, .pmenu:focus-visible { background: var(--bg-2); color: var(--ink); }
+.station.drop-ok { outline: 2px dashed var(--nile); outline-offset: 2px; }
+.station.drop-no { opacity: .5; }
+dialog.act pre, dialog.act .gtext { white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--font); font-size: 14px; margin: 0; }
+dialog.act pre.warn { background: var(--amber-soft); color: var(--ink); border-radius: 12px; padding: 10px 12px; }
+dialog.act .gsec { border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; max-height: 280px; overflow: auto; }
+dialog.act .gsec h3 { font-size: 15px; margin: 0 0 6px; }
+dialog.act fieldset { border: 0; padding: 0; margin: 0; }
+dialog.act .awarn { background: var(--amber-soft); border-radius: 12px; padding: 8px 12px; }
+/* 1.4.0 contrast: text on the soft state colours stays >= 4.5:1 in both themes */
+.btn.danger { color: color-mix(in srgb, var(--clay) 72%, var(--ink)); }
+.chip.held { color: color-mix(in srgb, var(--amber) 70%, var(--ink)); }
+.chip.you { color: color-mix(in srgb, var(--dusk) 78%, var(--ink)); }
+.neckbadge { color: color-mix(in srgb, var(--dusk) 78%, var(--ink)); }

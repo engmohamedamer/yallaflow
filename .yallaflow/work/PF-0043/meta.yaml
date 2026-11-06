@@ -1,0 +1,75 @@
+{
+  "id": "PF-0043",
+  "type": "feature",
+  "scope": "architectural",
+  "routingStatus": "routed",
+  "rawRequest": "Console Work Management: work-item actions through canonical Core commands (activate, advance, reopen, revise, answer, hold, resume, close), blocked explanations, Core-validated drag and drop; 1.4.0 roadmap",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-06T22:24:09.489Z",
+  "updatedAt": "2026-11-06T23:18:23.954Z",
+  "title": "Console Work Management: work-item actions through canonical Core commands (activate, advance, reopen, revise, answer, hold, resume, close), blocked explanations, Core-validated drag and drop; 1.4.0 roadmap",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope architectural`.",
+  "routedAt": "2026-11-06T22:24:09.503Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "brainstorm",
+    "specify",
+    "plan",
+    "implement",
+    "verify",
+    "converge",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "design-exploration",
+      "specification",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "delivery-convergence",
+      "code-review"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0031",
+      "type": "file",
+      "name": "owner-1.4-continue.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-06T22:24:09.738Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0032",
+      "type": "file",
+      "name": "owner-option-b.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-06T22:31:41.179Z",
+      "workStatusAtLink": "SPECIFICATION",
+      "relationship": "work-input"
+    }
+  ],
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-06T23:18:23.954Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

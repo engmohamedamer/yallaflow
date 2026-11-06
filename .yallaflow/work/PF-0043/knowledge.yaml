@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Console writes are always the canonical CLI command run through the console runner (argv, no shell, --opt=value, one write at a time per project); Core keeps every rule and its refusal text is shown as-is. Review-gate decisions in the console are local-user decisions: typed gate name, mandatory note, the gate's material and digest checked inside runner.exclusive, recorded by the unchanged approve/feedback with provenance {via:'console', identity:'not verified', host, claimedGitName} passed only to that child process; CLI decisions carry no provenance; never claim verified identity.",
+      "evidence": [
+        "src/console/actions.js",
+        "src/reviews/store.js",
+        "verification:V-001"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-06T23:18:23.408Z",
+      "factId": "CTX-0106",
+      "promotedAt": "2026-11-06T23:18:23.610Z",
+      "target": "context/conventions.md"
+    }
+  ],
+  "updatedAt": "2026-11-06T23:18:23.610Z",
+  "reviewedAt": "2026-11-06T23:18:23.610Z"
+}

@@ -22,6 +22,15 @@ Nothing yet.
   - Snapshot: Flow states `held` and `closed` and a `lifecycle` field, an additive extension of `yallaflow.snapshot/1`.
   - Commands: `status`, `brief`, `guide` and `work show` label the lifecycle; `doctor` checks it.
 - **One central guard.** Held or closed work refuses every progress command, and names the command that lifts it.
+- **Console work management.**
+  - **Actions:** a work item's page and the board's **⋯** menu run YallaFlow's own commands (activate, advance, hold, resume, close, reopen, edit request, answer).
+  - **Explanations:** blocked actions show Core's reason and the next step.
+  - **Drag and drop:** dropping on the Flow only proposes a move, and Core decides.
+- **Review-gate decisions in the console.**
+  - **Explicit local-user decisions:** you type the gate name and a mandatory note after seeing the gate's material.
+  - **Recorded with provenance `console, identity not verified`** by the unchanged `approve`/`feedback` commands. CLI decisions are recorded as before.
+  - **Protected:** stale and duplicate submissions record nothing.
+  - **Exposure:** the work read contract exposes gates and their provenance additively.
 
 ### Changed
 - **Agent Contract v11:** agents hold, close, resume or reopen work only when the developer explicitly asks, and never progress held or closed work. Refresh with `yallaflow agent refresh`.

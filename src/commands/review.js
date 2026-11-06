@@ -1,3 +1,4 @@
+import { describeProvenance } from '../reviews/store.js';
 import { exists } from '../utils/fs.js';
 import path from 'node:path';
 import { findProjectRoot, workspacePath } from '../core/workspace.js';
@@ -18,6 +19,7 @@ export async function approveCommand(workId, input) {
   const ledger = await setGateStatus(root, workId, input.stage, 'approved', input.note);
   console.log(`${workId} — ${input.stage}: approved`);
   if (ledger.gates[input.stage].note) console.log(`Note: ${ledger.gates[input.stage].note}`);
+  if (describeProvenance(ledger.gates[input.stage])) console.log(`Recorded ${describeProvenance(ledger.gates[input.stage])}.`);
 }
 
 export async function feedbackCommand(workId, input) {
@@ -30,6 +32,7 @@ export async function feedbackCommand(workId, input) {
   const ledger = await setGateStatus(root, workId, input.stage, 'changes_requested', input.note);
   console.log(`${workId} — ${input.stage}: changes requested`);
   if (ledger.gates[input.stage].note) console.log(`Note: ${ledger.gates[input.stage].note}`);
+  if (describeProvenance(ledger.gates[input.stage])) console.log(`Recorded ${describeProvenance(ledger.gates[input.stage])}.`);
 }
 
 function requireGate(stage) {

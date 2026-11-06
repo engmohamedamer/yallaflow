@@ -11608,7 +11608,55 @@
       ],
       "createdAt": "2026-11-06T22:11:27.966Z",
       "updatedAt": "2026-11-06T22:11:27.966Z"
+    },
+    {
+      "id": "CTX-0106",
+      "area": "convention",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Console writes are always the canonical CLI command run through the console runner (argv, no shell, --opt=value, one write at a time per project); Core keeps every rule and its refusal text is shown as-is. Review-gate decisions in the console are local-user decisions: typed gate name, mandatory note, the gate's material and digest checked inside runner.exclusive, recorded by the unchanged approve/feedback with provenance {via:'console', identity:'not verified', host, claimedGitName} passed only to that child process; CLI decisions carry no provenance; never claim verified identity.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0043",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/console/actions.js",
+          "contentHash": "sha256:3468bc2d762cd407a77a12b3df58a32f3e70567c0c8470a8f0b705f925c8fde8",
+          "gitCommit": "3184054c0dee0750421809b73534d0d3cbf1f6b3",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/reviews/store.js",
+          "contentHash": "sha256:a859a3d67c66ee333ab8e765bf054282cb90429a87ac6460c91181ea02b44c60",
+          "gitCommit": "3184054c0dee0750421809b73534d0d3cbf1f6b3",
+          "workingTree": "modified"
+        },
+        {
+          "type": "runtime",
+          "description": "npm run check (passed)",
+          "workId": "PF-0043",
+          "verificationRunId": "V-001"
+        }
+      ],
+      "verifiedAt": "2026-11-06T23:18:23.610Z",
+      "verifiedAtCommit": "3184054c0dee0750421809b73534d0d3cbf1f6b3",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-06T23:18:23.610Z",
+          "workId": "PF-0043",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-06T23:18:23.610Z",
+      "updatedAt": "2026-11-06T23:18:23.610Z"
     }
   ],
-  "updatedAt": "2026-11-06T22:11:27.966Z"
+  "updatedAt": "2026-11-06T23:18:23.610Z"
 }

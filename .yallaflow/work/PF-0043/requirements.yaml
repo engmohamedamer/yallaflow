@@ -1,0 +1,402 @@
+{
+  "schemaVersion": 1,
+  "revision": 2,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "The web console offers work-item actions that run the canonical Core commands unchanged: activate, advance, reopen (DONE with a target, closed at its preserved stage), revise the request, answer a question, hold, resume and close without delivery.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0031",
+          "locator": "Console Work Management"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T22:24:32.940Z",
+      "updatedAt": "2026-11-06T22:24:32.940Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "Blocked actions explain why and show the valid next step, using Core's own blocker and next-action, never a duplicated rule.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0031",
+          "locator": "blocked-action explanations"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T22:24:32.940Z",
+      "updatedAt": "2026-11-06T22:24:32.940Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "Drag and drop on the Flow only proposes a move: dropping on the next station runs advance, on an earlier station offers reopen only where Core allows it; every other drop is refused with the reason; no stage is ever written directly.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0031",
+          "locator": "controlled drag-and-drop"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T22:24:32.940Z",
+      "updatedAt": "2026-11-06T22:24:32.940Z"
+    },
+    {
+      "id": "REQ-004",
+      "statement": "Console actions keep the console's security model (loopback, per-run token, Origin and JSON checks, read-only consoles refuse) and the project-version protections, including the explicit minimum-version confirmation for the first hold or close.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0031",
+          "locator": "Compatibility"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T22:24:32.940Z",
+      "updatedAt": "2026-11-06T22:24:32.940Z"
+    },
+    {
+      "id": "REQ-005",
+      "statement": "Review-gate approval from the console is not implemented in this item; a separate security and provenance decision is presented to the owner first.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0031",
+          "locator": "Important approval boundary"
+        }
+      ],
+      "status": "withdrawn",
+      "reason": "Owner chose Option B (SRC-0032): console review-gate decisions are now in scope (REQ-007).",
+      "recordedAt": "2026-11-06T22:24:32.940Z",
+      "updatedAt": "2026-11-06T22:31:53.333Z"
+    },
+    {
+      "id": "REQ-006",
+      "statement": "docs/roadmap.md describes 1.2.0, 1.3.0 and the 1.4.0 scope including Development Runtime Management and the New Project Wizard as 1.4.0 milestones.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0031",
+          "locator": "Correction"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T22:24:32.940Z",
+      "updatedAt": "2026-11-06T22:24:32.940Z"
+    },
+    {
+      "id": "REQ-007",
+      "statement": "The console supports explicit review-gate decisions (approve, request changes) as a local-user action: the user reviews the gate's actual material and confirms by typing the exact gate name with a mandatory note; Core's existing approve/feedback rules record it, with provenance 'console, identity not verified' and audit history; the CLI is unchanged.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0032",
+          "locator": "Option B conditions 1-8"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T22:31:53.333Z",
+      "updatedAt": "2026-11-06T22:31:53.333Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "POST /api/p/<project>/work/<id>/actions/<action> maps each action to the exact CLI argv (no shell) through the console runner; tests show each action changes the project exactly as the CLI does.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0031",
+          "locator": "Console Work Management"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T22:24:32.940Z",
+      "updatedAt": "2026-11-06T22:24:32.940Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-002",
+      "statement": "A refused action returns Core's refusal text (blocker, lifecycle guard, validation) and the item page and board show it with the next valid action; tests cover a blocked advance and a lifecycle refusal.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0031",
+          "locator": "blocked-action explanations"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T22:24:32.940Z",
+      "updatedAt": "2026-11-06T22:24:32.940Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-003",
+      "statement": "The board allows a drop only on the next station (advance) or, for DONE work, an earlier station (reopen with a reason); other drops are refused in the UI and by the server; browser check covers it.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0031",
+          "locator": "controlled drag-and-drop"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T22:24:32.940Z",
+      "updatedAt": "2026-11-06T22:24:32.940Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-004",
+      "statement": "Action routes require the token, the console Origin and JSON; a read-only console answers 405; the first hold/close returns a confirmation-required response and succeeds only when the user confirms; tests cover each.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0031",
+          "locator": "Compatibility"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T22:24:32.940Z",
+      "updatedAt": "2026-11-06T22:24:32.940Z"
+    },
+    {
+      "id": "AC-005",
+      "requirement": "REQ-005",
+      "statement": "No console route approves or gives feedback on a review gate; the provenance decision is recorded in this work item and presented to the owner.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0031",
+          "locator": "Important approval boundary"
+        }
+      ],
+      "status": "withdrawn",
+      "reason": "Replaced by AC-007 to AC-010 (Option B, SRC-0032).",
+      "recordedAt": "2026-11-06T22:24:32.940Z",
+      "updatedAt": "2026-11-06T22:31:53.333Z"
+    },
+    {
+      "id": "AC-006",
+      "requirement": "REQ-006",
+      "statement": "docs/roadmap.md has 1.2.0, 1.3.0 and 1.4.0 sections; 1.4.0 lists work lifecycle, console work management, project overview, development runtime management and the new project wizard.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0031",
+          "locator": "Correction"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T22:24:32.940Z",
+      "updatedAt": "2026-11-06T22:24:32.940Z"
+    },
+    {
+      "id": "AC-007",
+      "requirement": "REQ-007",
+      "statement": "Before a decision the console shows the gate's material from the work item (the section the gate reviews, the specification for specification gates, requirements and acceptance criteria, latest verification and convergence, open questions, pending impact, integrity warnings, gate history) and a digest of what was shown.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0032",
+          "locator": "condition 2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T22:31:53.333Z",
+      "updatedAt": "2026-11-06T22:31:53.333Z"
+    },
+    {
+      "id": "AC-008",
+      "requirement": "REQ-007",
+      "statement": "A decision is accepted only with the exact gate name typed, a non-empty note, the gate still awaiting review, the same review request and the same material digest as shown; otherwise it is refused and nothing changes. A repeated submission (same request id, or a gate already decided) never records twice.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0032",
+          "locator": "conditions 1, 4, 8"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T22:31:53.333Z",
+      "updatedAt": "2026-11-06T22:31:53.333Z"
+    },
+    {
+      "id": "AC-009",
+      "requirement": "REQ-007",
+      "statement": "The decision is recorded by the unchanged `yallaflow approve|feedback` command through the console runner; the gate entry and its history entry carry provenance {via:'console', identity:'not verified', host, claimedGitName}; CLI decisions are recorded exactly as before (no new field); status, work show and the console show console decisions as 'console, identity not verified'; doctor validates the provenance.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0032",
+          "locator": "conditions 3, 4, 7"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T22:31:53.333Z",
+      "updatedAt": "2026-11-06T22:31:53.333Z"
+    },
+    {
+      "id": "AC-010",
+      "requirement": "REQ-007",
+      "statement": "Gate decision routes require the token, the console Origin and JSON, answer 405 on a read-only console, and are unreachable from the Agent Workspace and agent bridge routes; the provenance channel is set only for the console's own CLI child process. Tests cover unauthorized requests, incorrect confirmations, stale gates, duplicate submissions and audit integrity; docs state it is a local-user approval, not a verified identity.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0032",
+          "locator": "conditions 5, 6, 8"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-06T22:31:53.333Z",
+      "updatedAt": "2026-11-06T22:31:53.333Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-06T22:24:32.940Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-06T22:24:32.940Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-06T22:24:32.940Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-004",
+      "at": "2026-11-06T22:24:32.940Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-005",
+      "at": "2026-11-06T22:24:32.940Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-006",
+      "at": "2026-11-06T22:24:32.940Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-06T22:24:32.940Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-06T22:24:32.940Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-06T22:24:32.940Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-11-06T22:24:32.940Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-005",
+      "at": "2026-11-06T22:24:32.940Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-006",
+      "at": "2026-11-06T22:24:32.940Z",
+      "revision": 1
+    },
+    {
+      "action": "revised",
+      "id": "REQ-005",
+      "at": "2026-11-06T22:31:53.333Z",
+      "revision": 2,
+      "reason": "Owner chose Option B (SRC-0032): console review-gate decisions are now in scope (REQ-007).",
+      "previous": {
+        "id": "REQ-005",
+        "statement": "Review-gate approval from the console is not implemented in this item; a separate security and provenance decision is presented to the owner first.",
+        "provenance": [
+          {
+            "type": "source",
+            "source": "SRC-0031",
+            "locator": "Important approval boundary"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "added",
+      "id": "REQ-007",
+      "at": "2026-11-06T22:31:53.333Z",
+      "revision": 2
+    },
+    {
+      "action": "revised",
+      "id": "AC-005",
+      "at": "2026-11-06T22:31:53.333Z",
+      "revision": 2,
+      "reason": "Replaced by AC-007 to AC-010 (Option B, SRC-0032).",
+      "previous": {
+        "id": "AC-005",
+        "requirement": "REQ-005",
+        "statement": "No console route approves or gives feedback on a review gate; the provenance decision is recorded in this work item and presented to the owner.",
+        "provenance": [
+          {
+            "type": "source",
+            "source": "SRC-0031",
+            "locator": "Important approval boundary"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "added",
+      "id": "AC-007",
+      "at": "2026-11-06T22:31:53.333Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-008",
+      "at": "2026-11-06T22:31:53.333Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-009",
+      "at": "2026-11-06T22:31:53.333Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-010",
+      "at": "2026-11-06T22:31:53.333Z",
+      "revision": 2
+    }
+  ],
+  "updatedAt": "2026-11-06T22:31:53.333Z"
+}

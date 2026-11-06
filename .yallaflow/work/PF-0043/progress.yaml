@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-06T22:25:09.428Z",
+      "completedAt": "2026-11-06T22:25:10.211Z",
+      "summary": "Console writes go through runner.write (argv, per-project queue); existing routes create work, attach sources, agent activate; snapshot carries blocker/nextAction/lifecycle/currentStation; CLI approve/feedback are unauthenticated local commands",
+      "evidence": [
+        "src/console/runner.js",
+        "src/console/server.js",
+        "src/flow/snapshot.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T22:25:09.624Z",
+      "completedAt": "2026-11-06T22:25:10.419Z",
+      "summary": "6 requirements / 6 criteria from SRC-0031; gate approval excluded pending the owner's provenance decision"
+    },
+    "design-exploration": {
+      "status": "completed",
+      "startedAt": "2026-11-06T22:25:09.812Z",
+      "completedAt": "2026-11-06T22:25:10.620Z",
+      "summary": "Console actions as CLI invocations through the runner; drag-and-drop proposes Core commands only; approval provenance options A-D written, recommendation C, pending"
+    },
+    "specification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T22:25:10.007Z",
+      "completedAt": "2026-11-06T22:33:06.099Z",
+      "summary": "Revised for Option B (SRC-0032): console gate decisions with typed gate name, mandatory note, material review with digest, stale and duplicate protection inside the runner's exclusive step, provenance 'console, identity not verified' through the unchanged CLI via a child-only environment channel; CLI records unchanged"
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-06T22:33:06.299Z",
+      "completedAt": "2026-11-06T22:33:06.496Z",
+      "summary": "8-step plan in work.md including gate decisions (gates.js, runner env option, setGateStatus provenance, doctor, tests, browser check, docs, review)"
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-06T23:10:22.398Z",
+      "completedAt": "2026-11-06T23:10:22.859Z",
+      "summary": "src/console/actions.js (action table through the runner, gate material + digest, decisions with typed name, mandatory note, stale/duplicate checks in runner.exclusive), runner per-call env, setGateStatus provenance (console only, refused for baseline/reconciliation), work read contract gates (schema), work show and doctor provenance; UI action bar, dialogs, version confirmation, gate review dialog, board menu and Core-validated drag and drop, contrast fixes; docs (console, roadmap, changelog); 7 console tests; independent review: no high, 1 medium + lows fixed with tests"
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-06T23:18:21.489Z",
+      "completedAt": "2026-11-06T23:18:21.689Z",
+      "summary": "V-001: npm run check 871/871; 3-engine browser check 72/72 clean (layout, a11y, console errors)",
+      "evidence": [
+        "verification:V-001"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-06T23:18:22.579Z",
+      "completedAt": "2026-11-06T23:18:22.983Z",
+      "summary": "9/9 active criteria satisfied"
+    },
+    "code-review": {
+      "status": "completed",
+      "startedAt": "2026-11-06T23:18:22.784Z",
+      "completedAt": "2026-11-06T23:18:23.207Z",
+      "summary": "Independent review on an isolated copy: no high; 1 medium and lows fixed with tests; inherent items documented (ruling)"
+    }
+  },
+  "rulings": [
+    {
+      "decision": "The specification and plan checkpoints were briefly marked complete before the revised text reached work.md (a failed edit script whose following commands still ran); both were revised and re-completed after the text was written",
+      "reason": "Accurate audit trail",
+      "costIfWrong": "A reviewer could think the plan existed earlier than it did",
+      "createdAt": "2026-11-06T22:33:06.706Z"
+    },
+    {
+      "decision": "Review findings fixed: changes_requested gates are decidable again; duplicate cache keyed by project/item/gate/request id after validation; malformed bodies and NUL bytes are 4xx; console provenance refused for baseline/reconciliation; strict doctor provenance; double escaping; resolved questions. Documented, not changed: provenance env can be set by any local process (the label never claims verification); the staleness check is atomic only within the console's write queue; host and Git name are stored and committed in Shared Projects.",
+      "reason": "Owner's Option B: local-user decision, not a trusted identity",
+      "costIfWrong": "A console label on a decision made outside the console, or an approval racing a direct CLI edit",
+      "createdAt": "2026-11-06T23:10:23.313Z"
+    }
+  ],
+  "history": [
+    {
+      "skill": "specification",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Owner chose Option B: add console review-gate decisions with eight conditions",
+      "changedAt": "2026-11-06T22:31:06.860Z"
+    },
+    {
+      "skill": "implementation-planning",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Completed before the revised plan text was written (a failed edit script); redone after the text is in work.md",
+      "changedAt": "2026-11-06T22:33:05.711Z"
+    },
+    {
+      "skill": "specification",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Completed before the revised specification text was written (a failed edit script); redone after the text is in work.md",
+      "changedAt": "2026-11-06T22:33:05.898Z"
+    }
+  ],
+  "updatedAt": "2026-11-06T23:18:23.207Z"
+}

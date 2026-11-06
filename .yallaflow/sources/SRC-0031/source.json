@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0031",
+  "sourceType": "file",
+  "sourceName": "owner-1.4-continue.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-11-06T22:24:09.718Z",
+  "original": {
+    "path": "sources/SRC-0031/owner-1.4-continue.md",
+    "sha256": "4fbea5369e0764aaa47cdad50ef587269944930a0705625d7c9d8b90143d16a6",
+    "sizeBytes": 3028
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0043"
+  ],
+  "rawText": "# Owner instructions (2026-11-07): continue YallaFlow 1.4.0\n\nApproved: continue 1.4.0 development and push the feature branch, subject to: (1) add the missing dedicated regression test proving a CLOSED child cannot satisfy or provide delivery proof for its parent's requirements; (2) run the relevant tests and confirm the tree has no temporary mutation-test changes, credentials, generated secrets, or unrelated modifications; (3) push only feature/workspace-1.4 — no merge to main, tags, releases or deployment.\n\nThen Console Work Management + Project Overview: work-item actions through canonical Core operations (activate, advance, reopen, revise, answer, hold, resume, close); clear blocked-action explanations and next steps; controlled drag-and-drop validated by Core; Project Overview with technology-stack detection, project-understanding status and onboarding/scan for existing projects; accurate confirmed/inferred/unknown distinction.\n\nApproval boundary: do not implement web-based review-gate approval as verified human authorization merely because someone holds the Console token. First produce a separate security and provenance decision (authentication, identity attribution, confirmation, preservation of CLI approval behaviour); if it needs a new owner decision, leave approval pending and continue.\n\nCompatibility: preserve v1.2.0/v1.3.0 release boundaries; Agent Contract v11 upgrades explicit, never silently modifying existing projects; never auto-refresh agent contracts in users' repositories; keep CLI and project-version protections. Small, independently testable stages; targeted tests during development, full suite at significant checkpoints. Implementation of the approved Console management and Project Overview features is authorized without asking about minor technical decisions. No pushes to main, publishing, deployment or production-record changes without approval. Report features, tests, remaining issues and local trial instructions when ready.\n\nCorrection (same day): Development Runtime Management (start/stop the project's local development environment from the Console) is in the approved v1.4.0 scope alongside Work Management, Project Overview and the New Project Wizard, delivered as a separately tested milestone after Work Management and Project Overview. Required: detect local development services; show running/stopped; configure and review explicit Start/Stop commands; start from the Console after approval; stop only services started or explicitly managed by YallaFlow; logs, ports, errors, process status; Laravel, Node.js and Docker via reviewed runtime profiles; non-sensitive shared configuration in .yallaflow/runtime.yaml with git-ignored developer overrides; never infer and execute arbitrary shell commands automatically; explicit trust before first execution and after command changes; safe handling of crashes, stale processes and browser reconnects. Update the roadmap so it ships in 1.4.0, not postponed. No production changes or publishing without approval.\n"
+}

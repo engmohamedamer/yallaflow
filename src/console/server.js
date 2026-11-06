@@ -10,6 +10,7 @@
 // - Reads come from `snapshot --json` / `work show --json` (runner.js) and preserved
 //   source originals read by ID. Create Work runs the CLI's own start/route/intake add
 //   (create.js), never writing .yallaflow itself.
+import { decideGate, gateReview, runAction } from './actions.js';
 import http from 'node:http';
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { readFile, realpath, stat } from 'node:fs/promises';
@@ -37,7 +38,8 @@ const UI_FILES = Object.freeze({
 });
 
 // The only routes that accept POST: create a work item, and attach a file to it.
-const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/work(?:\/[^/]+\/sources)?$/;
+// 1.4.0: work-item actions and review-gate decisions (PF-0043) join Create Work.
+const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/work(?:\/[^/]+\/(?:sources|actions\/[a-z]+|gates\/[a-z]+\/decision))?$/;
 // Agent Interaction (v1.3.0, only with --agents): the Agent Workspace's actions.
 const AGENT_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/agent\/(start|message|permission|cancel|end|resume|connect|disconnect|activate)$/;
 // The Claude channel server and hook forwarder (bridge token, never a browser).
@@ -113,7 +115,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     }
     if (request.method === 'POST') {
       // Writes: only the Create Work routes, only with the token, our own Origin and the exact type.
-      if (readOnly || !WRITE_ROUTE.test(url.pathname)) return send(response, 405, { error: { code: 'READ_ONLY', message: readOnly ? 'This console was started with --read-only.' : 'Only Create Work accepts POST.' } }, { Allow: 'GET, HEAD' });
+      if (readOnly || !WRITE_ROUTE.test(url.pathname)) return send(response, 405, { error: { code: 'READ_ONLY', message: readOnly ? 'This console was started with --read-only.' : 'Only Create Work, work-item actions and gate decisions accept POST.' } }, { Allow: 'GET, HEAD' });
       if (!authorized(request)) return send(response, 401, { error: { code: 'UNAUTHORIZED', message: 'Missing or wrong console token. Open the link printed by `yallaflow console`.' } });
       if (!origin) return send(response, 403, { error: { code: 'FORBIDDEN_ORIGIN', message: 'A write needs the console page as its Origin.' } });
       return handleWrite(request, response, url);
@@ -139,6 +141,10 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     }
     if (rest.length === 2 && rest[0] === 'work' && isWorkId(rest[1])) {
       return send(response, 200, await runner.get(project.root, `work:${rest[1]}`, ['work', 'show', rest[1], '--json']));
+    }
+    // 1.4.0: what a review-gate decision is about, with the digest the decision must match.
+    if (rest.length === 4 && rest[0] === 'work' && isWorkId(rest[1]) && rest[2] === 'gates') {
+      return send(response, 200, await gateReview(project.root, rest[1], rest[3], runner));
     }
     if (rest.length === 1 && rest[0] === 'agent') {
       if (!agentsOn) return send(response, 200, { enabled: false });
@@ -167,6 +173,14 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       const result = await createWork(project.root, input, runner);
       const detail = await runner.get(project.root, `work:${result.id}`, ['work', 'show', result.id, '--json']);
       return send(response, result.created ? 201 : 200, { ...result, item: detail.item });
+    }
+    if (rest.length === 4 && rest[0] === 'work' && isWorkId(rest[1]) && rest[2] === 'actions') {
+      if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+      return send(response, 200, await runAction(project.root, rest[3], rest[1], await readJsonBody(request), runner));
+    }
+    if (rest.length === 5 && rest[0] === 'work' && isWorkId(rest[1]) && rest[2] === 'gates' && rest[4] === 'decision') {
+      if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+      return send(response, 200, await decideGate(project.root, rest[1], rest[3], await readJsonBody(request), runner));
     }
     if (rest.length === 3 && rest[0] === 'work' && isWorkId(rest[1]) && rest[2] === 'sources') {
       if (type !== 'application/octet-stream') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send the file as application/octet-stream.' } });

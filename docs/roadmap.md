@@ -221,6 +221,36 @@ Three optional, independent capabilities; nothing changes for projects that do n
 
 Not in scope: tracker writeback or sync, bundled browsers, a test framework, background services, telemetry, uploads.
 
+## 1.2.0 — Flow Console, read contract & workspace lock
+
+The local web console:
+- **Views:** Flow, projects, work-item pages with delivery evidence and attachments, worktrees, insights.
+- **Its one action:** Create Work.
+- **Read contract:** `snapshot` and `work show`, with JSON schemas.
+- **Workspace write lock** for several agents in one checkout.
+- Compatibility fixes.
+
+## 1.3.0 — Agent Workspace
+
+Opt-in Codex sessions in the console (`--agents`), on the developer's own ChatGPT subscription and never API keys:
+- chat;
+- tool permissions (session-scoped allow, default deny);
+- Stop, End and Resume;
+- explicit activation;
+- one agent console per checkout;
+- verified process cleanup.
+
+A Claude Code connection is not included until Anthropic confirms it may be distributed.
+
+## 1.4.0 — Engineering workspace (in development)
+
+Five milestones, each tested on its own:
+1. **Work lifecycle** (done). Hold, Resume, Close without delivery, and Reopen of closed work. Lifecycle status is kept separate from the stage, and CLOSED is never DONE. The first hold or close confirms the 1.4.0 minimum version.
+2. **Console work management** (done). Work-item actions through Core's commands, blocked-action explanations, Core-validated drag and drop, and review-gate decisions as local-user decisions ("console, identity not verified").
+3. **Project Overview and onboarding.** Technology detection from repository evidence, with confirmed, detected, inferred and unknown values kept apart. Project-understanding status, and existing-project onboarding through the baseline.
+4. **Development runtime management.** Reviewed runtime profiles (`.yallaflow/runtime.yaml`, with git-ignored personal overrides) for Laravel, Node.js and Docker. Start and Stop from the console after explicit trust. Logs, ports, errors and process status. Only services YallaFlow started are ever stopped. Safe handling of crashes, stale processes and reconnects.
+5. **New Project Wizard.** Stack choice, the official framework generators or an agent recommendation, a preview, then auditable creation with `init` and a first setup work item.
+
 ## Future directions (not committed, not scheduled)
 
 Ideas recorded before 1.0. Each would ship as a backward-compatible MINOR release, or as a MAJOR release only if it cannot keep the 1.0 compatibility promise.

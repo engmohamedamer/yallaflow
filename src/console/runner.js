@@ -30,9 +30,11 @@ export function createRunner({ cli = CLI } = {}) {
 
   // A write (Create Work): the CLI's exit status and output, never cached. argv only —
   // user text is one element after `--`, never seen by a shell.
-  function executeRaw(root, args, timeoutMs = WRITE_TIMEOUT_MS) {
+  // extraEnv: variables for this one child process only (1.4.0: the console's decision
+  // provenance). Never set on the console process, so no other child inherits them.
+  function executeRaw(root, args, timeoutMs = WRITE_TIMEOUT_MS, extraEnv = null) {
     return new Promise((resolve, reject) => {
-      const child = spawn(process.execPath, [cli, ...args], { cwd: root, env: { ...process.env, NO_COLOR: '1' }, shell: false });
+      const child = spawn(process.execPath, [cli, ...args], { cwd: root, env: { ...process.env, NO_COLOR: '1', ...(extraEnv ?? {}) }, shell: false });
       let stdout = '';
       let stderr = '';
       const timer = setTimeout(() => child.kill('SIGKILL'), timeoutMs);
@@ -93,14 +95,14 @@ export function createRunner({ cli = CLI } = {}) {
       caches.get(root)?.clear();
     },
     // Writes for one project run one at a time, then every cached read is dropped.
-    write(root, args) {
-      return this.exclusive(root, (exec) => exec(args));
+    write(root, args, { env = null } = {}) {
+      return this.exclusive(root, (exec) => exec(args, { env }));
     },
     // One step of the project's write queue: fn(exec) may read and then run CLI writes
     // with nothing else from this console in between.
     exclusive(root, fn) {
       const previous = writeChains.get(root) ?? Promise.resolve();
-      const next = previous.catch(() => {}).then(() => fn((args) => executeRaw(root, args))).finally(() => caches.get(root)?.clear());
+      const next = previous.catch(() => {}).then(() => fn((args, { env = null } = {}) => executeRaw(root, args, WRITE_TIMEOUT_MS, env))).finally(() => caches.get(root)?.clear());
       writeChains.set(root, next);
       return next;
     }

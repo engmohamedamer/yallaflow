@@ -53,8 +53,34 @@ export function checkLifecycleIntegrity(meta) {
   return issues;
 }
 
+// 1.4.0: console gate decisions carry provenance; it must say exactly what it is.
+async function checkDecisionProvenance(root, meta) {
+  const issues = [];
+  let ledger;
+  try {
+    ledger = (await loadReviews(root, meta.id)).ledger;
+  } catch {
+    return issues;
+  }
+  const allowed = new Set(['via', 'identity', 'host', 'claimedGitName']);
+  for (const [gate, entry] of Object.entries(ledger.gates ?? {})) {
+    for (const record of [entry, ...(entry.history ?? [])]) {
+      const provenance = record?.provenance;
+      if (provenance === undefined) continue;
+      const wellFormed = provenance && typeof provenance === 'object'
+        && Object.keys(provenance).every((field) => allowed.has(field))
+        && provenance.via === 'console' && provenance.identity === 'not verified'
+        && typeof provenance.host === 'string' && provenance.host.length > 0
+        && (provenance.claimedGitName === null || provenance.claimedGitName === undefined || typeof provenance.claimedGitName === 'string')
+        && !['baseline', 'reconciliation'].includes(gate);
+      if (!wellFormed) issues.push(`${meta.id}: ${gate} gate decision provenance must be exactly { via: 'console', identity: 'not verified', host, claimedGitName } and never on the baseline or reconciliation; found ${JSON.stringify(provenance)}.`);
+    }
+  }
+  return issues;
+}
+
 export async function checkWorkIntegrity(root, meta) {
-  const lifecycleIssues = checkLifecycleIntegrity(meta);
+  const lifecycleIssues = [...checkLifecycleIntegrity(meta), ...(await checkDecisionProvenance(root, meta))];
   if (meta.routingStatus === 'pending') return lifecycleIssues;
   const stage = meta.status;
   const progress = await loadWorkProgress(root, meta);

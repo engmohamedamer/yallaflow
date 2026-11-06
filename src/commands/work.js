@@ -1,3 +1,4 @@
+import { describeProvenance, loadReviews } from '../reviews/store.js';
 import { lifecycleLabel } from '../core/lifecycle.js';
 import { findProjectRoot, getConfig } from '../core/workspace.js';
 import { understandingNotice } from '../baseline/understanding.js';
@@ -31,6 +32,9 @@ export async function newWorkCommand(type, title, scope, commandName = type) {
   console.log(`Workflow: ${meta.workflow}`);
   console.log(`Stage: ${meta.status}`);
   if (meta.lifecycle) console.log(`Lifecycle: ${lifecycleLabel(meta)}`);
+  for (const [gate, entry] of Object.entries((await loadReviews(root, meta.id)).ledger.gates ?? {})) {
+    if (describeProvenance(entry)) console.log(`Gate ${gate}: ${entry.status}, recorded ${describeProvenance(entry)}`);
+  }
   console.log(`Behavior contract: registry v${meta.behaviorContract.registryVersion} (pinned) — ${meta.behaviorContract.skills.join(', ')}`);
   if (meta.readOnly) console.log('Safety: read-only; application code changes are not authorized by this workflow.');
   console.log(`Path: .yallaflow/work/${meta.id}/work.md`);

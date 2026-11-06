@@ -4,6 +4,7 @@
 //
 // Fields are only ever added within a schema major version (SemVer for the contract):
 // yallaflow.snapshot/1 and yallaflow.work/1. Schemas: resources/schemas/.
+import { loadReviews } from '../reviews/store.js';
 import { lifecycleLabel } from '../core/lifecycle.js';
 import path from 'node:path';
 import { readdir } from 'node:fs/promises';
@@ -230,7 +231,7 @@ async function workDetail(root, workId, meta, { now = new Date().toISOString() }
   const item = await collectItem(root, meta, state);
   const detail = { schema: WORK_SCHEMA, generatedAt: now, yallaflowVersion: PACKAGE_VERSION, item, request: { raw: meta.rawRequest ?? null, title: meta.title ?? null } };
   detail.sources = await collectSources(root, meta);
-  if (meta.routingStatus === 'pending') return { ...detail, checkpoints: [], history: [], questions: [], requirements: [], criteria: [], verification: [], children: [] };
+  if (meta.routingStatus === 'pending') return { ...detail, checkpoints: [], history: [], questions: [], requirements: [], criteria: [], verification: [], children: [], gates: [] };
 
   const progress = await loadWorkProgress(root, meta);
   detail.checkpoints = progress.contract.skills.map((skillId) => {
@@ -259,6 +260,13 @@ async function workDetail(root, workId, meta, { now = new Date().toISOString() }
     reviewStatus: knowledge?.reviewStatus ?? 'pending',
     candidates: (knowledge?.candidates ?? []).map((entry) => ({ id: entry.id, kind: entry.kind ?? null, status: entry.status, summary: entry.summary ?? null, promotedAs: entry.promotedAs ?? entry.contextId ?? null }))
   };
+  // 1.4.0 (additive): review gates with their decisions; console decisions carry
+  // provenance { via: 'console', identity: 'not verified', ... }.
+  const reviews = (await loadReviews(root, meta.id)).ledger;
+  detail.gates = Object.entries(reviews.gates ?? {}).map(([gate, entry]) => ({
+    gate, status: entry.status, requestedAt: entry.requestedAt ?? null, respondedAt: entry.respondedAt ?? null, note: entry.note ?? null, provenance: entry.provenance ?? null,
+    history: (entry.history ?? []).map((event) => ({ status: event.status, at: event.at ?? null, note: event.note ?? null, reason: event.reason ?? null, provenance: event.provenance ?? null }))
+  }));
   const decomposition = await loadDecomposition(root, meta.id);
   detail.children = decomposition.exists ? decomposition.ledger.children.map((child) => ({ key: child.key, workId: child.workId ?? null, title: child.title, required: child.required !== false })) : [];
   return detail;
