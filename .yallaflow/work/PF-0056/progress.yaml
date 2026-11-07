@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-07T16:13:51.723Z",
+      "completedAt": "2026-11-07T16:13:51.723Z",
+      "summary": "Owner (2026-11-07, agent session) authorized: merge 1.4 into main, prepare a local 1.4 release, clean old logs, return to the original checkout, install 1.4 locally for testing; publishing deferred. Integration procedure in docs/release-1.4-integration.md (preserved lineage, rehearsed twice in PF-0052). main=534cdbb (v1.3.0) with uncommitted PF-0042/43 records and an abandoned duplicate console slice; feature/workspace-1.4=a986619 clean, package 1.4.0, global CLI 1.3.0."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-07T16:13:51.919Z",
+      "completedAt": "2026-11-07T16:13:51.919Z",
+      "summary": "Plan: integration/1.4 branch; history plan/import + commit; plan mergeCommands + app.js restore; history verify-merge; merge commit; memory reconciliation (CTX-0105 main -> new fact superseding CTX-0102, history map x2); stash main checkout's tracked edits and PF-0042/43 (research/ untracked dirs left in place), ff main; doctor + npm run check on main; CHANGELOG local-candidate wording; remove 1.4 worktree and acceptance env after inventory; npm pack + global install of the tarball. No tag, no push, no publish."
+    },
+    "implementation": {
+      "status": "pending"
+    },
+    "verification": {
+      "status": "pending"
+    },
+    "code-review": {
+      "status": "pending"
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-07T16:13:51.919Z"
+}

@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-07T00:45:34.228Z",
+      "completedAt": "2026-11-07T00:45:34.228Z",
+      "summary": "Reviewed release workflow, prior acceptance report, exact candidate commits, package scope and current Git state. main and cached origin/main are 534cdbb; 1.2.0 candidate bc14db0; no remote 1.2.0/1.3.0 tags or releases exist. User explicitly requested release and continuation; manual provider acceptance remains unverified.",
+      "evidence": [
+        "docs/releasing.md",
+        "research/release-review/REPORT.md"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-07T00:45:34.671Z",
+      "completedAt": "2026-11-07T00:45:34.671Z",
+      "summary": "Freeze existing reviewed candidate bytes. Export immutable commits to temporary directories; check versions and package hashes, run fresh tests, doctor, audit and package smoke. Publish annotated 1.2.0 tag/release first, await CI and verify npm integrity/install; only then publish and verify 1.3.0. Stop sequence on failed publication. Record release evidence and finish tracking; web changes use a separate scoped item.",
+      "evidence": [
+        "research/release-review/ACCEPTANCE.md"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-07T00:48:59.555Z",
+      "completedAt": "2026-11-07T01:00:15.375Z",
+      "summary": "Published v1.2.0 from bc14db0; CI matrix/publish succeeded and registry provenance, exact reviewed hash and fresh installation passed V-007/V-008. Pushed annotated v1.3.0 at frozen reviewed commit 534cdbb and published its GitHub Release. Deferred local console/docs changes are excluded. Await 1.3.0 CI and registry verification."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T01:11:33.094Z",
+      "completedAt": "2026-11-07T01:11:33.094Z",
+      "summary": "Verified v1.2.0 and v1.3.0 GitHub releases on reviewed frozen commits. Both GitHub Actions matrices passed on Node 20, 22, 24, including npm publication with provenance. Both versions became visible on npm; exact SHA256/SRI matched reviewed tarballs and fresh isolated installs passed --version, init and doctor (V-008 and latest run). Audit documented two moderate entries, no high/critical.",
+      "evidence": [
+        "verification:V-007",
+        "verification:V-008",
+        "verification:V-009"
+      ]
+    },
+    "code-review": {
+      "status": "completed",
+      "startedAt": "2026-11-07T01:11:38.903Z",
+      "completedAt": "2026-11-07T01:11:38.903Z",
+      "summary": "Verified published tags match the reviewed candidate commits, both CI matrices and provenance publishing succeeded, both npm packages preserve reviewed integrity, and fresh isolated installs passed. Deferred console changes are uncommitted and outside both tags. No blocking release findings.",
+      "evidence": [
+        "verification:V-007",
+        "verification:V-008",
+        "verification:V-009",
+        "verification:V-011"
+      ]
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Release exact reviewed package bytes from existing commits; publish authorization is the current user request. Frozen changelog labels remain historical and are explicitly explained in release notes. No real-provider acceptance pass is inferred.",
+      "reason": "Both candidate SHA256 hashes match the prior review; modifying packaged changelogs would produce different artifacts. User asked to release after status review.",
+      "costIfWrong": "Historical changelog labels may confuse consumers; release notes state actual publication and limitations.",
+      "createdAt": "2026-11-07T00:47:54.094Z"
+    },
+    {
+      "decision": "v1.2.0 CI completed successfully on Node 20/22/24 and npm publish reported accepted with provenance. npm logs explicitly say package processing may take a few minutes; registry currently returns E404. Wait for registry visibility before releasing v1.3.0.",
+      "reason": "The release sequence requires confirming registry availability and package integrity, not only a successful publishing job.",
+      "costIfWrong": "Proceeding before distribution verification could obscure a registry failure.",
+      "createdAt": "2026-11-07T00:58:32.185Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-07T01:11:38.903Z"
+}

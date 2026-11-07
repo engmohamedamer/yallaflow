@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "Continue the saved web-console workspace improvements with the first activation and onboarding slice.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T00:51:36.313Z",
+      "updatedAt": "2026-11-07T00:51:36.313Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "Every valid item page shows active status and permits explicit Make active without enabling agents; Core validates activation and no provider starts or lifecycle stage advances.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T00:51:36.313Z",
+      "updatedAt": "2026-11-07T00:51:36.313Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "Activation retains token, Origin, JSON, size, ID and read-only guards; duplicate clicks and errors have visible states and successful activation refreshes the selected project.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T00:51:36.313Z",
+      "updatedAt": "2026-11-07T00:51:36.313Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-001",
+      "statement": "Flow and Work views show a localized read-only onboarding summary based on Core understanding state, distinguishing required, discovery, awaiting review, established and greenfield intent, without approving or starting a baseline.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T00:51:36.313Z",
+      "updatedAt": "2026-11-07T00:51:36.313Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-07T00:51:36.313Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-07T00:51:36.313Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-07T00:51:36.313Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-07T00:51:36.313Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-07T00:51:36.313Z"
+}

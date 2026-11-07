@@ -1,0 +1,3 @@
+PASS 1.2.0: frozen commit, versions, exact reviewed SHA256, package boundaries, version/init/doctor smoke
+PASS 1.3.0: frozen commit, versions, exact reviewed SHA256, package boundaries, version/init/doctor smoke
+Candidate manifest: /tmp/yallaflow-release-42-candidates.json

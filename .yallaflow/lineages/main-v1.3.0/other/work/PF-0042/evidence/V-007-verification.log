@@ -1,0 +1,2 @@
+PASS 1.2.0: reviewed commit bc14db05fd60668c4da6da3437ecc7fc7b1816b5, release guard, Node 20/22/24 tests and npm publishing job all succeeded.
+https://github.com/engmohamedamer/yallaflow/actions/runs/42320604722

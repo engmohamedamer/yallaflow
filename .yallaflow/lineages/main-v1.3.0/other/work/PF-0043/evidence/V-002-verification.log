@@ -1,0 +1,380 @@
+TAP version 13
+# Subtest: versions, forbidden modes, ACP normalization, and API keys stripped from the adapter env
+ok 1 - versions, forbidden modes, ACP normalization, and API keys stripped from the adapter env
+  ---
+  duration_ms: 4.053051
+  type: 'test'
+  ...
+# Subtest: detection: adapter missing, unsupported version, and ready
+ok 2 - detection: adapter missing, unsupported version, and ready
+  ---
+  duration_ms: 35.442578
+  type: 'test'
+  ...
+# Subtest: codex: start, stream, follow-up, permissions (allow, deny, timeout), one session per checkout, no activation
+ok 3 - codex: start, stream, follow-up, permissions (allow, deny, timeout), one session per checkout, no activation
+  ---
+  duration_ms: 5255.770652
+  type: 'test'
+  ...
+# Subtest: codex: cancel, crash, resume after a console restart, explicit activation through Core
+ok 4 - codex: cancel, crash, resume after a console restart, explicit activation through Core
+  ---
+  duration_ms: 9414.772919
+  type: 'test'
+  ...
+# Subtest: codex: ending a session while a permission is pending denies it and never crashes the console
+ok 5 - codex: ending a session while a permission is pending denies it and never crashes the console
+  ---
+  duration_ms: 4944.690789
+  type: 'test'
+  ...
+# Subtest: codex: a non-subscription login is refused and no session starts
+ok 6 - codex: a non-subscription login is refused and no session starts
+  ---
+  duration_ms: 4314.994713
+  type: 'test'
+  ...
+# Subtest: security: opt-in, token, Origin, content type, read-only, unsupported controls
+ok 7 - security: opt-in, token, Origin, content type, read-only, unsupported controls
+  ---
+  duration_ms: 342.800402
+  type: 'test'
+  ...
+# Subtest: security review regressions: start race, modes, symlinks
+ok 8 - security review regressions: start race, modes, symlinks
+  ---
+  duration_ms: 8516.941688
+  type: 'test'
+  ...
+# Subtest: codex: an adapter that cannot be spawned fails the start promptly and frees the checkout
+ok 9 - codex: an adapter that cannot be spawned fails the start promptly and frees the checkout
+  ---
+  duration_ms: 4244.056918
+  type: 'test'
+  ...
+# Subtest: stabilization: Allow for session is session-scoped only; nothing persists or carries to another session
+ok 10 - stabilization: Allow for session is session-scoped only; nothing persists or carries to another session
+  ---
+  duration_ms: 4555.010706
+  type: 'test'
+  ...
+# Subtest: stabilization: ending a Codex session ends what it started, and an incomplete cleanup is never reported as a clean stop
+ok 11 - stabilization: ending a Codex session ends what it started, and an incomplete cleanup is never reported as a clean stop
+  ---
+  duration_ms: 9996.904333
+  type: 'test'
+  ...
+# Subtest: stabilization: one agent console per checkout across separate console processes
+ok 12 - stabilization: one agent console per checkout across separate console processes
+  ---
+  duration_ms: 4598.208005
+  type: 'test'
+  ...
+# Subtest: stabilization: a directory swapped for a link after the check cannot redirect a local write
+ok 13 - stabilization: a directory swapped for a link after the check cannot redirect a local write
+  ---
+  duration_ms: 4.704566
+  type: 'test'
+  ...
+# Subtest: stabilization review: hard links, End while starting, overlapping lock claims, crash cleanup
+ok 14 - stabilization review: hard links, End while starting, overlapping lock claims, crash cleanup
+  ---
+  duration_ms: 2553.443455
+  type: 'test'
+  ...
+# Subtest: CLI: agents detect is read-only; console flag combinations are validated
+ok 15 - CLI: agents detect is read-only; console flag combinations are validated
+  ---
+  duration_ms: 1402.277361
+  type: 'test'
+  ...
+# YallaFlow foundation CLI
+# Give AI your project, not just your prompt.
+# Usage:
+#   yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]
+#   yallaflow start [request]
+#   yallaflow start --keep-active -- <request>
+#   yallaflow activate <work-id>
+#   yallaflow request --help
+#   yallaflow intake <file> [<file> ...] [--title TITLE]
+#   yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]
+#   yallaflow intake ticket <payload-file|ticket-ref> [--provider github|jira|azure-devops] [--work <work-id>] [--reason TEXT] [--fetch [--attachments]] [--attachment <file>]... [--title TITLE] [--max-comments N]
+#   yallaflow source --help
+#   yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]
+#   yallaflow baseline --help
+#   yallaflow guide [work-id]
+#   yallaflow ready [work-id]
+#   yallaflow skill <skill-id> [--work <work-id>]
+#   yallaflow checkpoint --help
+#   yallaflow question --help
+#   yallaflow knowledge --help
+#   yallaflow requirement --help
+#   yallaflow convergence --help
+#   yallaflow impact --help
+#   yallaflow context --help
+#   yallaflow upgrade status|plan
+#   yallaflow brief
+#   yallaflow inspect
+#   yallaflow limitation --help
+#   yallaflow agent --help
+#   yallaflow decompose --help
+#   yallaflow progress <parent-id>
+#   yallaflow next <parent-id>
+#   yallaflow approve <work-id> --stage GATE [--note TEXT]
+#   yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]
+#   yallaflow handoff [work-id]
+#   yallaflow feature <title> --scope SCOPE
+#   yallaflow bug <title> --scope SCOPE
+#   yallaflow investigate <title> --scope SCOPE
+#   yallaflow change <title> --scope SCOPE
+#   yallaflow refactor <title> --scope SCOPE
+#   yallaflow release <title> --scope SCOPE
+#   yallaflow purpose --help
+#   yallaflow finish [work-id] [--verbose]
+#   yallaflow qc --help
+#   yallaflow demo --help
+#   yallaflow shared --help
+#   yallaflow status
+#   yallaflow snapshot [--json]
+#   yallaflow console [--port N] [--no-open] [--project DIR]... [--read-only] [--agents]
+#   yallaflow agents detect
+#   yallaflow work show <work-id> [--json]
+#   yallaflow resume [work-id]
+#   yallaflow doctor [--clear-lock]
+#   yallaflow advance [work-id]
+#   yallaflow verify [work-id] -- <executable> [args...]
+#   yallaflow verify [work-id] --shell "<command>"
+#   yallaflow verify [work-id] --script <path>
+#   yallaflow verify list [work-id]
+#   yallaflow reopen <work-id> --to implementation|verification|review --reason REASON
+#   yallaflow --version
+# Subtest: start without new options behaves exactly as before (focus moves to the new item)
+ok 16 - start without new options behaves exactly as before (focus moves to the new item)
+  ---
+  duration_ms: 1716.711831
+  type: 'test'
+  ...
+# Subtest: parseStartArgs: new options only as leading tokens; anything else is the legacy request
+ok 17 - parseStartArgs: new options only as leading tokens; anything else is the legacy request
+  ---
+  duration_ms: 1.752012
+  type: 'test'
+  ...
+# Subtest: --keep-active never replaces unfinished active work; routing and checkpoints never move focus; activate does
+ok 18 - --keep-active never replaces unfinished active work; routing and checkpoints never move focus; activate does
+  ---
+  duration_ms: 2118.679768
+  type: 'test'
+  ...
+# Subtest: --keep-active never activates, even when no work item is active (owner decision)
+ok 19 - --keep-active never activates, even when no work item is active (owner decision)
+  ---
+  duration_ms: 1079.929975
+  type: 'test'
+  ...
+# Subtest: console create with nothing active leaves nothing active
+ok 20 - console create with nothing active leaves nothing active
+  ---
+  duration_ms: 982.127975
+  type: 'test'
+  ...
+# Subtest: attachments report what YallaFlow could actually do with each file
+ok 21 - attachments report what YallaFlow could actually do with each file
+  ---
+  duration_ms: 2456.111838
+  type: 'test'
+  ...
+# Subtest: request IDs: a retried or concurrent request creates exactly one item, with an unverified console attestation
+ok 22 - request IDs: a retried or concurrent request creates exactly one item, with an unverified console attestation
+  ---
+  duration_ms: 698.736602
+  type: 'test'
+  ...
+# Subtest: helpers: titles come from the user's words; file names are reduced safely
+ok 23 - helpers: titles come from the user's words; file names are reduced safely
+  ---
+  duration_ms: 0.726379
+  type: 'test'
+  ...
+# Subtest: POST guards: token, Origin, Host, content type, size, read-only, unknown routes
+ok 24 - POST guards: token, Origin, Host, content type, size, read-only, unknown routes
+  ---
+  duration_ms: 76.037133
+  type: 'test'
+  ...
+# Subtest: create: unclassified and classified items through Core; shell text stored verbatim; focus kept
+ok 25 - create: unclassified and classified items through Core; shell text stored verbatim; focus kept
+  ---
+  duration_ms: 3042.78773
+  type: 'test'
+  ...
+# Subtest: create: concurrent requests get distinct IDs; repeated ones never duplicate
+ok 26 - create: concurrent requests get distinct IDs; repeated ones never duplicate
+  ---
+  duration_ms: 3269.946245
+  type: 'test'
+  ...
+# Subtest: brownfield without approved understanding: Core refuses and nothing is created
+ok 27 - brownfield without approved understanding: Core refuses and nothing is created
+  ---
+  duration_ms: 345.544095
+  type: 'test'
+  ...
+# Subtest: attachments: preserved through intake, deduplicated on retry, refused safely, temp files removed, item kept
+ok 28 - attachments: preserved through intake, deduplicated on retry, refused safely, temp files removed, item kept
+  ---
+  duration_ms: 2393.503945
+  type: 'test'
+  ...
+# Subtest: an oversized upload is refused before it is stored
+ok 29 - an oversized upload is refused before it is stored
+  ---
+  duration_ms: 3524.005053
+  type: 'test'
+  ...
+# Subtest: review: requests starting with "-" keep their classification; "--help" is plain text
+ok 30 - review: requests starting with "-" keep their classification; "--help" is plain text
+  ---
+  duration_ms: 2070.325606
+  type: 'test'
+  ...
+# Subtest: review: two identical uploads at once store one copy; a long non-ASCII name is shortened, not leaked
+ok 31 - review: two identical uploads at once store one copy; a long non-ASCII name is shortened, not leaked
+  ---
+  duration_ms: 1174.709877
+  type: 'test'
+  ...
+# Subtest: resume on a deferred item says how to activate it, and changes nothing
+ok 32 - resume on a deferred item says how to activate it, and changes nothing
+  ---
+  duration_ms: 770.314347
+  type: 'test'
+  ...
+# Subtest: security: loopback host, token, origin, read-only methods and ID-only paths
+ok 33 - security: loopback host, token, origin, read-only methods and ID-only paths
+  ---
+  duration_ms: 1057.666055
+  type: 'test'
+  ...
+# Subtest: serves the snapshot, work detail and preserved sources by ID
+ok 34 - serves the snapshot, work detail and preserved sources by ID
+  ---
+  duration_ms: 1876.743793
+  type: 'test'
+  ...
+# Subtest: live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+ok 35 - live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+  ---
+  duration_ms: 2011.301928
+  type: 'test'
+  ...
+# Subtest: the console never writes: browsing every route leaves the workspace byte-identical
+ok 36 - the console never writes: browsing every route leaves the workspace byte-identical
+  ---
+  duration_ms: 1599.823535
+  type: 'test'
+  ...
+# Subtest: extracted text cannot be read outside its source directory; HEAD never opens the event stream
+ok 37 - extracted text cannot be read outside its source directory; HEAD never opens the event stream
+  ---
+  duration_ms: 1502.502622
+  type: 'test'
+  ...
+# Subtest: activation without agents changes only explicit focus, refreshes cached snapshots and keeps history on retry
+not ok 38 - activation without agents changes only explicit focus, refreshes cached snapshots and keeps history on retry
+  ---
+  duration_ms: 2027.533168
+  type: 'test'
+  location: '/home/engamer/Amasi/YallaFlow/test/console-workspace.test.js:39:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    null !== 'INTAKE'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'INTAKE'
+  actual: ~
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/engamer/Amasi/YallaFlow/test/console-workspace.test.js:59:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: activation retains HTTP guards and rejects missing, malformed and delivered work
+ok 39 - activation retains HTTP guards and rejects missing, malformed and delivered work
+  ---
+  duration_ms: 976.094738
+  type: 'test'
+  ...
+# Subtest: snapshot onboarding follows the real baseline lifecycle without writing or approving
+ok 40 - snapshot onboarding follows the real baseline lifecycle without writing or approving
+  ---
+  duration_ms: 114.006742
+  type: 'test'
+  ...
+# Subtest: a greenfield project with new source files keeps its recorded onboarding kind
+ok 41 - a greenfield project with new source files keeps its recorded onboarding kind
+  ---
+  duration_ms: 22.108586
+  type: 'test'
+  ...
+# Subtest: snapshot --json validates and places each item in the flow
+ok 42 - snapshot --json validates and places each item in the flow
+  ---
+  duration_ms: 2341.834769
+  type: 'test'
+  ...
+# Subtest: a requested human review gate is reported as waiting for you
+ok 43 - a requested human review gate is reported as waiting for you
+  ---
+  duration_ms: 1494.218794
+  type: 'test'
+  ...
+# Subtest: an open material question is reported as waiting for you
+ok 44 - an open material question is reported as waiting for you
+  ---
+  duration_ms: 1341.31755
+  type: 'test'
+  ...
+# Subtest: work show --json returns every section and validates
+ok 45 - work show --json returns every section and validates
+  ---
+  duration_ms: 2122.103731
+  type: 'test'
+  ...
+# Subtest: errors are one JSON document with a code and exit status 1
+ok 46 - errors are one JSON document with a code and exit status 1
+  ---
+  duration_ms: 290.357973
+  type: 'test'
+  ...
+# Subtest: read commands never modify .yallaflow, the working tree, or .git/index
+ok 47 - read commands never modify .yallaflow, the working tree, or .git/index
+  ---
+  duration_ms: 3045.117033
+  type: 'test'
+  ...
+# Subtest: snapshot reads a legacy v0.3.6 workspace fixture without writing to it
+ok 48 - snapshot reads a legacy v0.3.6 workspace fixture without writing to it
+  ---
+  duration_ms: 1060.698722
+  type: 'test'
+  ...
+# Subtest: work show reports convergence evidence as stable references (run, path)
+ok 49 - work show reports convergence evidence as stable references (run, path)
+  ---
+  duration_ms: 5792.726522
+  type: 'test'
+  ...
+1..49
+# tests 49
+# suites 0
+# pass 48
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 60369.035698

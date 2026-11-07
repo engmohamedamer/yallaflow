@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "unavailable",
+      "area": "requirement",
+      "summary": "The design and prototype referenced by PF-0040 were absent at recovery; new review artifacts were reconstructed.",
+      "reason": "Preserved owner requirements and work findings were available, but the original design/prototype bytes were not.",
+      "recordedAt": "2026-11-06T23:53:37.107Z"
+    }
+  ],
+  "updatedAt": "2026-11-06T23:53:37.107Z"
+}

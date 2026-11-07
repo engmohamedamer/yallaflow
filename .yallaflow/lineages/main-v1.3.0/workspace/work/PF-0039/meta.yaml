@@ -1,0 +1,49 @@
+{
+  "id": "PF-0039",
+  "type": "release",
+  "scope": "architectural",
+  "routingStatus": "routed",
+  "rawRequest": "Unified v1.2.0 + v1.3.0 release preparation: Claude exclusion from published package, integration rehearsal, artifacts, acceptance environment and report",
+  "status": "VERIFICATION",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-06T19:40:28.931Z",
+  "updatedAt": "2026-11-06T20:53:55.232Z",
+  "title": "Unified v1.2.0 + v1.3.0 release preparation: Claude exclusion from published package, integration rehearsal, artifacts, acceptance environment and report",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow release --scope architectural`.",
+  "routedAt": "2026-11-06T19:40:28.941Z",
+  "workflow": "release",
+  "requiredCapabilities": [
+    "discover",
+    "plan",
+    "implement",
+    "verify",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "code-review"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0026",
+      "type": "file",
+      "name": "owner-unified-release-request.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-06T19:40:29.125Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ]
+}

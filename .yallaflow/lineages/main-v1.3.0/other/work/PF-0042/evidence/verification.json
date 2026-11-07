@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node src/cli.js doctor",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "src/cli.js",
+        "doctor"
+      ],
+      "displayCommand": "node src/cli.js doctor",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:45:41.449Z",
+      "finishedAt": "2026-11-07T00:45:42.055Z",
+      "verifiedAt": "2026-11-07T00:45:42.055Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "node /tmp/yallaflow-release-42.mjs",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "/tmp/yallaflow-release-42.mjs"
+      ],
+      "displayCommand": "node /tmp/yallaflow-release-42.mjs",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:46:46.458Z",
+      "finishedAt": "2026-11-07T00:46:56.007Z",
+      "verifiedAt": "2026-11-07T00:46:56.007Z",
+      "log": "V-002-verification.log"
+    },
+    {
+      "id": "V-003",
+      "command": "npm audit --json",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "audit",
+        "--json"
+      ],
+      "displayCommand": "npm audit --json",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-07T00:46:58.675Z",
+      "finishedAt": "2026-11-07T00:47:00.870Z",
+      "verifiedAt": "2026-11-07T00:47:00.870Z",
+      "log": "V-003-verification.log"
+    },
+    {
+      "id": "V-004",
+      "command": "git diff --check",
+      "executionMode": "argv",
+      "executable": "git",
+      "args": [
+        "diff",
+        "--check"
+      ],
+      "displayCommand": "git diff --check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:47:02.672Z",
+      "finishedAt": "2026-11-07T00:47:02.692Z",
+      "verifiedAt": "2026-11-07T00:47:02.692Z",
+      "log": "V-004-verification.log"
+    },
+    {
+      "id": "V-005",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:46:15.235Z",
+      "finishedAt": "2026-11-07T00:52:34.890Z",
+      "verifiedAt": "2026-11-07T00:52:34.890Z",
+      "log": "V-005-verification.log"
+    },
+    {
+      "id": "V-006",
+      "command": "node /tmp/yallaflow-verify-published-42.mjs 1.2.0",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "/tmp/yallaflow-verify-published-42.mjs",
+        "1.2.0"
+      ],
+      "displayCommand": "node /tmp/yallaflow-verify-published-42.mjs 1.2.0",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-07T00:57:34.369Z",
+      "finishedAt": "2026-11-07T00:57:35.356Z",
+      "verifiedAt": "2026-11-07T00:57:35.356Z",
+      "log": "V-006-verification.log"
+    },
+    {
+      "id": "V-007",
+      "command": "node /tmp/yallaflow-verify-release-ci-42.mjs 1.2.0 42320604722",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "/tmp/yallaflow-verify-release-ci-42.mjs",
+        "1.2.0",
+        "42320604722"
+      ],
+      "displayCommand": "node /tmp/yallaflow-verify-release-ci-42.mjs 1.2.0 42320604722",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:58:23.645Z",
+      "finishedAt": "2026-11-07T00:58:25.328Z",
+      "verifiedAt": "2026-11-07T00:58:25.328Z",
+      "log": "V-007-verification.log"
+    },
+    {
+      "id": "V-008",
+      "command": "node /tmp/yallaflow-verify-published-42.mjs 1.2.0",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "/tmp/yallaflow-verify-published-42.mjs",
+        "1.2.0"
+      ],
+      "displayCommand": "node /tmp/yallaflow-verify-published-42.mjs 1.2.0",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:59:27.762Z",
+      "finishedAt": "2026-11-07T00:59:51.430Z",
+      "verifiedAt": "2026-11-07T00:59:51.430Z",
+      "log": "V-008-verification.log"
+    },
+    {
+      "id": "V-009",
+      "command": "node /tmp/yallaflow-verify-release-ci-42.mjs 1.3.0 42321581922",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "/tmp/yallaflow-verify-release-ci-42.mjs",
+        "1.3.0",
+        "42321581922"
+      ],
+      "displayCommand": "node /tmp/yallaflow-verify-release-ci-42.mjs 1.3.0 42321581922",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T01:08:20.768Z",
+      "finishedAt": "2026-11-07T01:08:22.441Z",
+      "verifiedAt": "2026-11-07T01:08:22.441Z",
+      "log": "V-009-verification.log"
+    },
+    {
+      "id": "V-010",
+      "command": "node /tmp/yallaflow-verify-published-42.mjs 1.3.0",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "/tmp/yallaflow-verify-published-42.mjs",
+        "1.3.0"
+      ],
+      "displayCommand": "node /tmp/yallaflow-verify-published-42.mjs 1.3.0",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-07T01:08:21.933Z",
+      "finishedAt": "2026-11-07T01:08:22.895Z",
+      "verifiedAt": "2026-11-07T01:08:22.895Z",
+      "log": "V-010-verification.log"
+    },
+    {
+      "id": "V-011",
+      "command": "node /tmp/yallaflow-verify-published-42.mjs 1.3.0",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "/tmp/yallaflow-verify-published-42.mjs",
+        "1.3.0"
+      ],
+      "displayCommand": "node /tmp/yallaflow-verify-published-42.mjs 1.3.0",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T01:11:24.856Z",
+      "finishedAt": "2026-11-07T01:11:32.861Z",
+      "verifiedAt": "2026-11-07T01:11:32.861Z",
+      "log": "V-011-verification.log"
+    }
+  ]
+}

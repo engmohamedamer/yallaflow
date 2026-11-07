@@ -1,0 +1,55 @@
+{
+  "id": "PF-0042",
+  "type": "release",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Publish reviewed v1.2.0 and v1.3.0 sequentially, verify GitHub Actions and npm distribution, then continue the requested web-console work separately",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-07T00:45:05.584Z",
+  "updatedAt": "2026-11-07T01:11:44.239Z",
+  "title": "Publish reviewed v1.2.0 and v1.3.0 sequentially, verify GitHub Actions and npm distribution, then continue the requested web-console work separately",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow release --scope bounded`.",
+  "routedAt": "2026-11-07T00:45:05.600Z",
+  "workflow": "release",
+  "requiredCapabilities": [
+    "discover",
+    "plan",
+    "implement",
+    "verify",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "code-review"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-07T01:11:44.239Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004",
+        "V-005",
+        "V-006",
+        "V-007",
+        "V-008",
+        "V-009",
+        "V-010",
+        "V-011"
+      ]
+    }
+  ]
+}

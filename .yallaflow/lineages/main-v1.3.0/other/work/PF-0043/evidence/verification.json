@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --check resources/console/app.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--check",
+        "resources/console/app.js"
+      ],
+      "displayCommand": "node --check resources/console/app.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:55:32.309Z",
+      "finishedAt": "2026-11-07T00:55:32.341Z",
+      "verifiedAt": "2026-11-07T00:55:32.341Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/console-workspace.test.js test/snapshot-contract.test.js test/console-create.test.js test/console-server.test.js test/agent-bridge.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/console-workspace.test.js",
+        "test/snapshot-contract.test.js",
+        "test/console-create.test.js",
+        "test/console-server.test.js",
+        "test/agent-bridge.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/console-workspace.test.js test/snapshot-contract.test.js test/console-create.test.js test/console-server.test.js test/agent-bridge.test.js",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-07T00:55:11.010Z",
+      "finishedAt": "2026-11-07T00:56:11.423Z",
+      "verifiedAt": "2026-11-07T00:56:11.423Z",
+      "log": "V-002-verification.log"
+    },
+    {
+      "id": "V-003",
+      "command": "git diff --check",
+      "executionMode": "argv",
+      "executable": "git",
+      "args": [
+        "diff",
+        "--check"
+      ],
+      "displayCommand": "git diff --check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:56:15.783Z",
+      "finishedAt": "2026-11-07T00:56:15.800Z",
+      "verifiedAt": "2026-11-07T00:56:15.800Z",
+      "log": "V-003-verification.log"
+    }
+  ]
+}

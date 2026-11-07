@@ -1,0 +1,2 @@
+PASS npm yallaflow@1.2.0: registry version, provenance, exact reviewed integrity/SHA256, fresh prefix install, --version, init and doctor
+npm: https://www.npmjs.com/package/yallaflow/v/1.2.0

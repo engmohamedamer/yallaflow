@@ -1,0 +1,389 @@
+{
+  "schema": "yallaflow.lineage/1",
+  "label": "main-v1.3.0",
+  "importedAt": "2026-11-07T16:14:14.571Z",
+  "planHash": "16d7973b3433cd051c9383857709af400dfe93be7d84fd684f72ba673b0e505f",
+  "workspace": {
+    "head": "a986619cdf558b15b22e693657df912baf5ec5c8",
+    "fingerprint": "sha256:73b98ef30de5a1e18f8ac5a1bb016ac0"
+  },
+  "other": {
+    "ref": "main",
+    "commit": "534cdbb217a6604b120f492ba8578088671dd197",
+    "checkout": "sha256:e0f24f596510f08f6352032ed5d4286c"
+  },
+  "mergeBase": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+  "identities": [
+    {
+      "kind": "work",
+      "id": "PF-0039",
+      "classification": "diverged-other",
+      "action": "git-merge-takes-other; preserve-workspace-copy",
+      "uncommitted": false,
+      "workspace": "c659ad6c065144bd1f76493a2f276025fe5470923f0d2856a5e831726c9c42bb",
+      "other": "1683290dad1b7cb55e938147bd918e919dd954e99301e483e81688c7553367e1",
+      "base": "c659ad6c065144bd1f76493a2f276025fe5470923f0d2856a5e831726c9c42bb"
+    },
+    {
+      "kind": "work",
+      "id": "PF-0041",
+      "classification": "colliding",
+      "action": "keep-workspace; preserve-other",
+      "uncommitted": false,
+      "workspace": "c5450a9ed388e46fe22f8a0772b26aa446504e1409b3a517f10c6b2e345a0b88",
+      "other": "b2efb8f253aee6d531e4f9f9fb403e4f2c6123e95a0c63d16d42622c6de82c98",
+      "base": null
+    },
+    {
+      "kind": "work",
+      "id": "PF-0042",
+      "classification": "colliding",
+      "action": "keep-workspace; preserve-other",
+      "uncommitted": true,
+      "workspace": "dd43c67b9a652672270c888b68995333de82a695cd7945e7529c48307da90163",
+      "other": "be6abd4a23d9fe66abe5a93fb52f041a2d94f3841cfd14d09129f55c36046b30",
+      "base": null
+    },
+    {
+      "kind": "work",
+      "id": "PF-0043",
+      "classification": "colliding",
+      "action": "keep-workspace; preserve-other",
+      "uncommitted": true,
+      "workspace": "4c8a383bf58aea35f925c99342e998d3ecfee949950425777ba7fa60b31f26ab",
+      "other": "822b37b70a9f5cb0e941cc53cca07d7177bcf8e6ed77ce922b315bb5964f0f36",
+      "base": null
+    },
+    {
+      "kind": "fact",
+      "id": "CTX-0102",
+      "classification": "diverged-other",
+      "action": "knowledge-decision (verify the meaning; propose through Core; record the mapping) — no relation is assumed",
+      "other": {
+        "state": "superseded",
+        "area": "architecture",
+        "summary": "Agent Workspace (v1.3.0, opt-in via 'yallaflow console --agents'): provider-aware code is confined to src/agents/ (plus commands/agents.js and the console entry points), which makes no network calls of its own. Codex is a managed session through the user-installed ACP adapter codex-acp, refused unless it reports a ChatGPT account login, with API-key variables stripped from its environment. Claude Code is experimental (--experimental-claude): the user starts it and it joins through the bundled Channels MCP server (resources/agents/claude-channel.mjs) and command hooks, authenticated by a per-run bridge token in .yallaflow/local/agent-bridge.json. One managed session per checkout; unanswered permissions are denied after YALLAFLOW_AGENT_PERMISSION_TIMEOUT_MS (default 5 min); full-access/bypass modes are never used; session records live in git-ignored .yallaflow/local/agent-sessions/; activation only through yallaflow activate.",
+        "supersededBy": "CTX-0105",
+        "origin": {
+          "workId": "PF-0037",
+          "candidateId": "K-001"
+        }
+      },
+      "workspace": {
+        "state": "current",
+        "area": "architecture",
+        "summary": "Agent Workspace (v1.3.0, opt-in via 'yallaflow console --agents'): provider-aware code is confined to src/agents/ (plus commands/agents.js and the console entry points), which makes no network calls of its own. Codex is a managed session through the user-installed ACP adapter codex-acp, refused unless it reports a ChatGPT account login, with API-key variables stripped from its environment. Claude Code is experimental (--experimental-claude): the user starts it and it joins through the bundled Channels MCP server (resources/agents/claude-channel.mjs) and command hooks, authenticated by a per-run bridge token in .yallaflow/local/agent-bridge.json. One managed session per checkout; unanswered permissions are denied after YALLAFLOW_AGENT_PERMISSION_TIMEOUT_MS (default 5 min); full-access/bypass modes are never used; session records live in git-ignored .yallaflow/local/agent-sessions/; activation only through yallaflow activate."
+      }
+    },
+    {
+      "kind": "fact",
+      "id": "CTX-0105",
+      "classification": "colliding",
+      "action": "knowledge-decision (verify the meaning; propose through Core; record the mapping) — no relation is assumed",
+      "other": {
+        "state": "current",
+        "area": "architecture",
+        "summary": "The 1.3.0 release checkout supports opt-in managed Codex sessions through the user-installed ACP adapter and requires reported ChatGPT account authentication. Known API-key environment variables are stripped, full-access modes are refused, unanswered tool permissions are denied, and activation is explicit through Core. Experimental Claude runtime files are absent from this release checkout and explicitly excluded by package.json; optional loading returns CLAUDE_NOT_INCLUDED when absent. Ordinary Claude bootstrap instructions remain packaged.",
+        "supersededBy": null,
+        "origin": {
+          "workId": "PF-0039",
+          "candidateId": "K-001"
+        }
+      },
+      "workspace": {
+        "state": "current",
+        "area": "business-rule",
+        "summary": "Work lifecycle (1.4.0): a work item's lifecycle status (open, on hold, closed without delivery) is separate from its workflow stage: meta.lifecycle is absent when open, every change is audited in work/<id>/lifecycle.yaml, holds preserve stage and evidence, CLOSED is never DONE or delivered and is left out of completion; held or closed work refuses every progress command (CLI dispatcher guard under the workspace lock plus core checks); baseline and reconciliation items are never held or closed; the first hold/close requires explicit confirmation to raise the project's minimum YallaFlow version to 1.4.0, written atomically with the change."
+      }
+    }
+  ],
+  "files": [
+    {
+      "side": "other",
+      "path": ".yallaflow/context/index.yaml",
+      "sha256": "sha256:6bd2e6165056c3c41ecf87e3ea3ba1ccc16cb0252241d0451b928d676f7e5506",
+      "size": 512195,
+      "origin": "git:534cdbb217a6604b120f492ba8578088671dd197"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0041/discovery.yaml",
+      "sha256": "sha256:bc7e7064941ff6b522e00f7127fc7f363ba0dda41408a20a02f72f191c23a65d",
+      "size": 496,
+      "origin": "git:534cdbb217a6604b120f492ba8578088671dd197"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0041/evidence/V-001-verification.log",
+      "sha256": "sha256:b53ce91896f46725f326d747510d4374832c0e7856d923780830a3c0dc2199e1",
+      "size": 160,
+      "origin": "git:534cdbb217a6604b120f492ba8578088671dd197"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0041/evidence/V-002-verification.log",
+      "sha256": "sha256:b53ce91896f46725f326d747510d4374832c0e7856d923780830a3c0dc2199e1",
+      "size": 160,
+      "origin": "git:534cdbb217a6604b120f492ba8578088671dd197"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0041/evidence/verification.json",
+      "sha256": "sha256:cc93b3d240b9a142e28846378916d39be7aa22af8bab0e0ed19cd8ba78497bd0",
+      "size": 1063,
+      "origin": "git:534cdbb217a6604b120f492ba8578088671dd197"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0041/knowledge.yaml",
+      "sha256": "sha256:d39b0235b768cce5c91d2082698ac63abd26f456abba487d92539d42079a7462",
+      "size": 156,
+      "origin": "git:534cdbb217a6604b120f492ba8578088671dd197"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0041/meta.yaml",
+      "sha256": "sha256:affc0f8f090b24dc7af758e4ec6ab6bac2bab6cfc68b62efe58d45f549586dba",
+      "size": 1325,
+      "origin": "git:534cdbb217a6604b120f492ba8578088671dd197"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0041/progress.md",
+      "sha256": "sha256:e84db5158ba86db49072974ec24806badb916be97e0973b0a0ca1fd126126ac8",
+      "size": 696,
+      "origin": "git:534cdbb217a6604b120f492ba8578088671dd197"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0041/progress.yaml",
+      "sha256": "sha256:f13d2df1372bd682351d51d6def43093d2f2345ac26d5841abe9e693543798d2",
+      "size": 3114,
+      "origin": "git:534cdbb217a6604b120f492ba8578088671dd197"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0041/work.md",
+      "sha256": "sha256:8abb7c7d81e7a96f7ef2f784e43958b9bbd224b241dc81f82031740881b1a042",
+      "size": 1217,
+      "origin": "git:534cdbb217a6604b120f492ba8578088671dd197"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0042/evidence/V-001-verification.log",
+      "sha256": "sha256:011586e5a9fb001bcd92b0e51c8802974a8c85f581253d89ba3be9dd5c7fdc13",
+      "size": 27128,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0042/evidence/V-002-verification.log",
+      "sha256": "sha256:7171e444434d62c0258b7e0ec5095bb0685f32cf6e86f11a1cf6a841a99c5ddb",
+      "size": 274,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0042/evidence/V-003-verification.log",
+      "sha256": "sha256:e80f741f0482ea32e10a8d0a198f255792ac93c73dfe34e5d6ba09a189b735a1",
+      "size": 1719,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0042/evidence/V-004-verification.log",
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0042/evidence/V-005-verification.log",
+      "sha256": "sha256:cd05072e9206a479d97a7c5123e5a521f8cf259e0b5a6e72f10e29eea590366b",
+      "size": 196998,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0042/evidence/V-006-verification.log",
+      "sha256": "sha256:d4b2f138372321262d1bb74e4df21aae3edef86a17e6b81a9abf4751c971efe3",
+      "size": 3145,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0042/evidence/V-007-verification.log",
+      "sha256": "sha256:11fb0c2fc872414d4cfc9bedfbd9d66f56a7a4c5ecc96ac0b66d3ac079fc3f95",
+      "size": 212,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0042/evidence/V-008-verification.log",
+      "sha256": "sha256:2c7a9bdd97e3c543ea5edcd8235edcb7e79380db366b60ae1434ce254ce7a5fd",
+      "size": 191,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0042/evidence/V-009-verification.log",
+      "sha256": "sha256:bbdbbef5d46b30dfe8cd7f3209edf82cb5d1361a2c91a107a71bd9acce4fb66d",
+      "size": 212,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0042/evidence/V-010-verification.log",
+      "sha256": "sha256:060ec6deac9df6a180b20121c5b0e063b3fb7ef5c1b5b1d47dd6a9d438946cc4",
+      "size": 3145,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0042/evidence/V-011-verification.log",
+      "sha256": "sha256:bc9d9e288b2e77847aa670ce63560f64314cd42063093dab8c32a4dfcce9c083",
+      "size": 191,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0042/evidence/verification.json",
+      "sha256": "sha256:f239f5d23cbb0b987c008b6e7b613968bed1f0d0650fac658a0d25ad7ceaa86c",
+      "size": 6103,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0042/knowledge.yaml",
+      "sha256": "sha256:33869b8ef8d77d9e300956ba18ebbb0f8edfb47e7039755f571b89049ef95f09",
+      "size": 156,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0042/meta.yaml",
+      "sha256": "sha256:9d04a1b6743c41ad62ccd8b3f162744e3c9754ee57b68d95ef0ba2a89a5c45f4",
+      "size": 1440,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0042/progress.md",
+      "sha256": "sha256:19a0e736b418dcc3448d12651728ca713887c4acf6b05ada7b3fdcfa3252a344",
+      "size": 530,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0042/progress.yaml",
+      "sha256": "sha256:2e31e546ba529459e3af8488e612a68b557bf169b729bcfb0ddd27992250832a",
+      "size": 4476,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0042/work.md",
+      "sha256": "sha256:b0a438f68054022a42c26d303e9ab7647878fa62ad62fc276ded86b539dc307d",
+      "size": 1179,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0043/evidence/V-001-verification.log",
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0043/evidence/V-002-verification.log",
+      "sha256": "sha256:dd0763a32d8e95a57d34c397aa3f0f6f6d3bc3146a1811274729dacce60b2aae",
+      "size": 14734,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0043/evidence/V-003-verification.log",
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0043/evidence/verification.json",
+      "sha256": "sha256:6cfa02e52b7d8f8f0d8bf5d56c0ede622e7cdefdd120e46778e58ef359320bc4",
+      "size": 2178,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0043/meta.yaml",
+      "sha256": "sha256:a7f7d91d079fb37a5d1404ff946c78a1c2f3e05f89b80de10bdf506fdaeeee09",
+      "size": 1129,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0043/progress.md",
+      "sha256": "sha256:4567b953a577488f40dab38a4b4eee3d520953a8a10dbb2b4cfde023cc9cc6f7",
+      "size": 457,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0043/progress.yaml",
+      "sha256": "sha256:153e454aa3801440895818955d5c9d91d21a154ecd15627e7d28d7e211153627",
+      "size": 2681,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0043/requirements.yaml",
+      "sha256": "sha256:59ca8d7d35930155a99a449d6f5854e5fdcfd86ef6ab1aef92696127eeaca052",
+      "size": 2448,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "other",
+      "path": ".yallaflow/work/PF-0043/work.md",
+      "sha256": "sha256:012a7d3ff02e19e8f554aeeaf3856c84a3b99e472d14ce21fe87b87f231527ab",
+      "size": 1173,
+      "origin": "checkout:uncommitted"
+    },
+    {
+      "side": "workspace",
+      "path": ".yallaflow/context/index.yaml",
+      "sha256": "sha256:ae3a23b6c4cb6ae2ab8341760d5653ed6ed0616b80a1256b79f03c975233dd21",
+      "size": 529910,
+      "origin": "workspace"
+    },
+    {
+      "side": "workspace",
+      "path": ".yallaflow/work/PF-0039/meta.yaml",
+      "sha256": "sha256:5443d4ecca0a1228f173613cc1ea98fb07e5c1e99013eb7e511e7fc6671023bc",
+      "size": 1474,
+      "origin": "workspace"
+    },
+    {
+      "side": "workspace",
+      "path": ".yallaflow/work/PF-0039/progress.md",
+      "sha256": "sha256:3fcb3e0d4b1e1be0621510361033210c7f3512cb076deed80d92244cbd89409a",
+      "size": 491,
+      "origin": "workspace"
+    },
+    {
+      "side": "workspace",
+      "path": ".yallaflow/work/PF-0039/progress.yaml",
+      "sha256": "sha256:c99e267e4a9fba12c99a1cc7db9f23b9c3f8d05b6c68dc0419a8460ef3cbf62a",
+      "size": 2920,
+      "origin": "workspace"
+    },
+    {
+      "side": "workspace",
+      "path": ".yallaflow/work/PF-0039/work.md",
+      "sha256": "sha256:64341c5c6f42ef2352f11fcb01b01c9a674f250b59c9a1dd13693037146c3094",
+      "size": 1436,
+      "origin": "workspace"
+    }
+  ]
+}
