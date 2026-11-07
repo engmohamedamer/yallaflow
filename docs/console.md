@@ -39,11 +39,11 @@ yallaflow console list
 
 ## New project (1.4.0)
 
-**All projects → New project** creates a new project. You choose the name, parent folder and stack, review the plan with the exact commands, and type the first characters of the plan hash to confirm. Progress, the generator log and failure recovery are shown on the page. See [`new-project.md`](new-project.md).
+**All projects → New project** creates a new project in four steps: idea (name, description, requirements, attachments, location from a home-folder chooser), stack, environment (Docker, local tools or later; Git on by default) and review & create. **Create the project** is bound to the exact plan you reviewed; a plan that installs dependencies also asks for the project name. Progress, the log (collapsed) and failure recovery are shown on the page. When it finishes, the project is added to the console and its Overview opens. **All projects → Add an existing project** registers a folder that already has YallaFlow. The console starts without any saved project, so the first one can be created here. See [`new-project.md`](new-project.md).
 
 ## Setup: development runtime (1.4.0)
 
-The **Setup** tab starts, stops and restarts your project's reviewed local development services and shows their logs. A service runs only after you trust its exact command by typing its id, nothing starts when you open the console, and only processes YallaFlow started and can still identify are ever stopped. See [`runtime.md`](runtime.md).
+The **Setup** tab starts, stops and restarts your project's reviewed local development services and shows their logs. Add a service from a suggestion (with the files it came from) or with **Add a service yourself** (name, id, kind, working folder, command, ports, environment variable names, shared or this machine only); adding runs `yallaflow runtime add` and starts nothing. A service runs only after you trust its exact command by typing its id, nothing starts when you open the console, and only processes YallaFlow started and can still identify are ever stopped. See [`runtime.md`](runtime.md).
 
 ## Project Overview (1.4.0)
 
@@ -54,6 +54,8 @@ The **Overview** tab shows the project itself, read-only:
 - **Stack from repository evidence.** Frameworks, runtimes, package managers, lockfiles, Docker images and source languages. Each row shows the file it came from and its basis: *declared* (a file says so, which is not proof the code uses it), *detected* (a file is present) or *inferred* (counted, not read). `.env` files and compose `environment` values are never read.
 - **Modules** by manifest folder. Several Node.js lockfiles in one module are flagged as a conflict.
 - **Coverage.** How much of the repository the scan read, including whether it stopped at its limit, and which files could not be read.
+
+For a new (Greenfield) project without approved memory, the Overview is a **setup checklist** instead: project created, goal, requirements, stack, development environment, Git, agent, and the first work item with its next step, each with the action that moves it on (open the first work item, configure runtime, initialize Git, enable Codex). Nothing missing there is an error; architecture, modules and memory appear once they are recorded with evidence.
 
 The same data is available as `yallaflow overview --json`.
 
@@ -216,12 +218,12 @@ When a gate waits for review (for example the specification or the plan), the it
 
 ## Agent Workspace (1.3.0, opt-in)
 
-With `yallaflow console --agents`, a work item gets an **Agent** panel for working with Codex (managed sessions on your ChatGPT login). See [`agents.md`](agents.md).
+With `yallaflow console --agents`, a work item gets an **Agent** panel for working with Codex (managed sessions on your ChatGPT login). In a normal console started without the flag, the panel says the Agent Workspace is off and offers **Enable Codex for this session** (with a confirmation): it lasts for this console run only, starts no session and activates no work item. A `--read-only` console never enables it. Activating a work item and starting a session stay two separate, explicit actions. See [`agents.md`](agents.md).
 
 ## Security
 
 - **Listening and requests.** The server listens on `127.0.0.1` only and requires the per-run token (401). It refuses a foreign `Host` (421) and a foreign `Origin` (403). Reads are `GET`/`HEAD`.
-- **The only write: Create Work.** It accepts `POST` on exactly two routes: create a work item, and attach a file to the item that same request created. A write also needs:
+- **Writes.** `POST` is accepted only on fixed routes: Create Work (and attaching a file to the item that request created), work-item actions and gate decisions, runtime trust/start/stop/restart and adding a service, the New Project Wizard (plan, create, attaching a planned file), registering a project, enabling agents for the run, and Git init. A write also needs:
   - the console's own `Origin` (a missing one is refused);
   - the exact content type (415);
   - a size limit: 64 KB of JSON, and 50 MB per file (413).
@@ -229,7 +231,7 @@ With `yallaflow console --agents`, a work item gets an **Agent** panel for worki
 - **No cross-site writes.** The token travels in an `Authorization` header, never a cookie, so another website can't send a request as you.
 - **No shell.** Your text reaches YallaFlow as a single argument, never through a shell.
 - **Uploaded files.** They are written to a private temporary folder (mode 0700), handed to `intake add`, and the folder is removed afterwards, even on failure.
-- Data is addressed by ID only. No request path is resolved into the file system, and a source's preserved original is served only from inside its own source folder.
+- Data is addressed by ID only. No request path is resolved into the file system, and a source's preserved original is served only from inside its own source folder. The one exception is the folder chooser (`GET /api/fs/dirs`, not in `--read-only`): it lists directories inside your home folder only, never files, hidden folders or links that lead outside home.
 - The page loads nothing from other origins. Scripts run under `script-src 'self'`, and previews are served with a sandbox policy and `nosniff`.
 - The console reads through the same `yallaflow snapshot --json` and `work show --json` commands your agent uses, so it sees exactly what YallaFlow reports.
 

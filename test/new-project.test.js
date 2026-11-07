@@ -86,7 +86,7 @@ test('create: hash confirmation, staging, promotion, Core init with provenance â
   assert.equal(meta.routingStatus, 'pending', 'the first work item is left for the developer to route');
   // PF-0058: a short human title; the full request stays separate and invents nothing.
   assert.equal(meta.titleHint, 'Set up storefront');
-  assert.match(meta.rawRequest, /^Set up storefront, Fake fake-ok \(generated with fake-gen@1\.0\.0; the generated code is not reviewed yet\): define the first product requirements/);
+  assert.match(meta.rawRequest, /^Project: storefront, Fake fake-ok \(generated with fake-gen@1\.0\.0; the generated code is not reviewed yet\)\.\nNext: define the first product requirements/);
   const snap = json(run(root, ['snapshot', '--json']));
   assert.equal(snap.items.find((item) => item.id === result.workId).title, 'Set up storefront', 'the board shows the short title');
   assert.equal(JSON.parse(await readFile(path.join(root, '.yallaflow', 'state', 'current.yaml'), 'utf8')).activeWork, null);
@@ -254,4 +254,53 @@ test('review: a parent npm workspace that would capture staging stops the genera
   const error = await createFromPlan(plan.id, plan.hash, { catalog: [...CATALOG_T, npmProbe], hooks: CORE_HOOKS }).catch((e) => e);
   assert.equal(error.code, 'NEW_PROJECT_NPM_ROOT');
   assert.equal((await readdir(parent)).includes('captured'), false);
+});
+
+// PF-0057: intent, environment, Git and attachment descriptors in the hashed plan; Git init
+// without remote or commit; the first work item in the developer's words; empty wording.
+test('plan carries intent, environment, git and attachments; creation initializes Git and words the first work from the goal', { skip: !SUPPORTED }, async () => {
+  const parent = await parentDir();
+  const sha = 'a'.repeat(64);
+  await assert.rejects(createPlan({ name: 'n', parent, stack: 'empty', environment: 'cloud' }), { code: 'NEW_PROJECT_ENVIRONMENT' });
+  await assert.rejects(createPlan({ name: 'n', parent, stack: 'empty', attachments: [{ name: '../x.md', size: 1, sha256: sha }] }), { code: 'NEW_PROJECT_ATTACHMENTS' });
+  await assert.rejects(createPlan({ name: 'n', parent, stack: 'empty', attachments: [{ name: 'a.md', size: 1, sha256: 'xyz' }] }), { code: 'NEW_PROJECT_ATTACHMENTS' });
+  await assert.rejects(createPlan({ name: 'n', parent, stack: 'empty', description: 'x'.repeat(4001) }), { code: 'NEW_PROJECT_INTENT' });
+  const repo = await parentDir();
+  spawnSync('git', ['init', '--quiet'], { cwd: repo });
+  await assert.rejects(createPlan({ name: 'inner', parent: repo, stack: 'empty', allowNested: true, git: true }), { code: 'NEW_PROJECT_GIT_NESTED' });
+
+  const description = 'A shared notebook for small teams to keep meeting notes.\nSecond line of detail.';
+  const requirements = '- Teams can create notebooks\n- Notes support Markdown';
+  const plan = await createPlan({ name: 'notebook', parent, stack: 'empty', description, requirements, environment: 'docker', git: true, attachments: [{ name: 'brief.md', size: 12, sha256: sha }] });
+  assert.deepEqual(plan.body.intent, { description, requirements });
+  assert.equal(plan.body.environment, 'docker');
+  assert.equal(plan.body.git, true);
+  assert.deepEqual(plan.body.steps.map((step) => step.id), ['generate', 'promote', 'init', 'git-init', 'first-work', 'link-files']);
+  const result = await createFromPlan(plan.id, plan.hash, { catalog: CATALOG_T, hooks: CORE_HOOKS });
+  const root = result.destination;
+  assert.equal(spawnSync('git', ['rev-parse', '--is-inside-work-tree'], { cwd: root, encoding: 'utf8' }).stdout.trim(), 'true');
+  assert.notEqual(spawnSync('git', ['rev-parse', 'HEAD'], { cwd: root }).status, 0, 'no commit was made');
+  assert.equal(spawnSync('git', ['remote'], { cwd: root, encoding: 'utf8' }).stdout.trim(), '', 'no remote');
+  const config = JSON.parse(await readFile(path.join(root, '.yallaflow', 'config.yaml'), 'utf8'));
+  assert.equal(config.project.origin.environment, 'docker');
+  assert.equal(config.project.origin.git, true);
+  const meta = JSON.parse(await readFile(path.join(root, '.yallaflow', 'work', result.workId, 'meta.yaml'), 'utf8'));
+  assert.equal(meta.titleHint, 'notebook: A shared notebook for small teams to keep meeting notes.');
+  assert.ok(meta.rawRequest.startsWith(description), 'the description is kept verbatim');
+  assert.ok(meta.rawRequest.includes(`Requirements from the developer:\n${requirements}`));
+  assert.match(meta.rawRequest, /Docker \(planned; no Docker files were created yet\)/);
+  await assert.rejects(readFile(path.join(root, '.yallaflow', 'work', result.workId, 'requirements.yaml')), { code: 'ENOENT' }, 'no criteria are invented');
+  assert.deepEqual((await readdir(root)).filter((name) => !name.startsWith('.')).sort(), ['AGENTS.md', 'CLAUDE.md'], 'no Docker files');
+  const understanding = await assessProjectUnderstanding(root, { kind: 'greenfield' });
+  assert.match(understanding.label, /created empty by the New Project Wizard/);
+  assert.doesNotMatch(understanding.label, /generated code/);
+  // A plan whose Git step was edited cannot run.
+  const other = await createPlan({ name: 'other', parent, stack: 'empty', git: true });
+  const file = path.join(plansDir(), `${other.id}.json`);
+  const stored = JSON.parse(await readFile(file, 'utf8'));
+  stored.body.steps.find((step) => step.id === 'git-init').argv = ['git', 'init', '--template=/tmp/evil'];
+  const { planHash } = await import('../src/newproject/project.js');
+  stored.hash = planHash(stored.body);
+  await writeFile(file, JSON.stringify(stored));
+  await assert.rejects(createFromPlan(other.id, stored.hash, { catalog: CATALOG_T, hooks: CORE_HOOKS }), { code: 'NEW_PROJECT_PLAN_TAMPERED' });
 });

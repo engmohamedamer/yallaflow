@@ -10,7 +10,7 @@ import { shellQuote } from '../security/redact.js';
 export const NEW_USAGE = [
   'yallaflow new catalog [--json]',
   'yallaflow new recommend',
-  'yallaflow new plan --name NAME --parent DIR --stack ID [--install] [--allow-nested] [--rationale TEXT] [--json]',
+  'yallaflow new plan --name NAME --parent DIR --stack ID [--install] [--allow-nested] [--rationale TEXT] [--description TEXT] [--requirements TEXT] [--environment docker|local|later] [--git] [--attachment SHA256:SIZE:NAME]... [--json]',
   'yallaflow new show <plan-id> [--json] | yallaflow new list [--json]',
   'yallaflow new create <plan-id> --confirm <hash-prefix> [--json]',
   'yallaflow new discard <plan-id> [--json]'
@@ -22,6 +22,13 @@ export const CORE_HOOKS = Object.freeze({
   initProject: (root, { name, origin }) => initProject(root, { name, kind: 'greenfield', mode: 'adaptive', origin }),
   firstWork: async (root, request, titleHint) => (await createPendingIntake(root, request, { keepActive: true, ...(titleHint ? { titleHint } : {}) })).id
 });
+
+// --attachment SHA256:SIZE:NAME (the console computes the digest of each file it will upload).
+function parseAttachment(text) {
+  const match = /^([0-9a-f]{64}):(\d{1,12}):(.+)$/.exec(String(text));
+  if (!match) throw Object.assign(new Error('--attachment must be SHA256:SIZE:NAME.'), { code: 'NEW_PROJECT_ATTACHMENTS' });
+  return { sha256: match[1], size: Number(match[2]), name: match[3] };
+}
 
 function usage() {
   return Object.assign(new Error(`Usage: ${NEW_USAGE}`), { code: 'USAGE' });
@@ -42,6 +49,10 @@ export function describePlan(plan) {
     ...b.prerequisites.map((p) => `  Prerequisite ${p.name}: ${p.found ? p.version || 'found' : 'NOT FOUND — install it first'}${p.note ? ` (${p.note})` : ''}`),
     ...(b.nestedIn ? [`  Note: inside ${b.nestedIn} (allowed with --allow-nested)`] : []),
     ...(b.rationale ? [`  Recommendation rationale: ${b.rationale}`] : []),
+    ...(b.intent?.description ? [`  Goal: ${b.intent.description.split(/\r?\n/)[0]}`] : []),
+    ...(b.environment ? [`  Development environment: ${b.environment}`] : []),
+    ...(b.git ? ['  Git: a new local repository (no remote, no commit)'] : []),
+    ...(b.attachments?.length ? [`  Attachments: ${b.attachments.map((a) => a.name).join(', ')}`] : []),
     `  Hash: ${plan.hash}`
   ];
   const status = Object.entries(plan.progress.steps).map(([step, state]) => `${step}:${state.status}`).join(', ');
@@ -75,9 +86,9 @@ async function run(rest, json) {
     return out(json, { request: RECOMMEND_REQUEST }, ['Give your coding agent this request:', '', RECOMMEND_REQUEST]);
   }
   if (action === 'plan') {
-    const { values, positionals } = parseArgs({ args, options: { name: { type: 'string' }, parent: { type: 'string' }, stack: { type: 'string' }, install: { type: 'boolean' }, 'allow-nested': { type: 'boolean' }, rationale: { type: 'string' } }, allowPositionals: true, strict: true });
+    const { values, positionals } = parseArgs({ args, options: { name: { type: 'string' }, parent: { type: 'string' }, stack: { type: 'string' }, install: { type: 'boolean' }, 'allow-nested': { type: 'boolean' }, rationale: { type: 'string' }, description: { type: 'string' }, requirements: { type: 'string' }, environment: { type: 'string' }, git: { type: 'boolean' }, attachment: { type: 'string', multiple: true } }, allowPositionals: true, strict: true });
     if (positionals.length || !values.name || !values.parent || !values.stack) throw usage();
-    const plan = await createPlan({ name: values.name, parent: path.resolve(values.parent), stack: values.stack, install: Boolean(values.install), allowNested: Boolean(values['allow-nested']), rationale: values.rationale ?? null });
+    const plan = await createPlan({ name: values.name, parent: path.resolve(values.parent), stack: values.stack, install: Boolean(values.install), allowNested: Boolean(values['allow-nested']), rationale: values.rationale ?? null, description: values.description ?? null, requirements: values.requirements ?? null, environment: values.environment ?? null, git: Boolean(values.git), attachments: (values.attachment ?? []).map(parseAttachment) });
     return out(json, plan, [...describePlan(plan), '', `Nothing was created. After reviewing: yallaflow new create ${plan.id} --confirm ${plan.hash.slice(0, 8)}`]);
   }
   if (action === 'show') {

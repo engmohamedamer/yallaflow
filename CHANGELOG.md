@@ -37,6 +37,15 @@ Nothing yet.
   - **Preserved lineage.** The other side's colliding records are kept byte-identically under their original IDs in a read-only lineage with a hashed manifest. Knowledge enters the ledger only through the normal commands, with a verified mapping.
   - **Safety.** Dry-run, atomic and idempotent import, a hash-verified doctor check, and a guarded rollback. See [`docs/history.md`](docs/history.md).
 - **New Project Wizard** (`yallaflow new …` and the console's **New project** page). See [`docs/new-project.md`](docs/new-project.md).
+- **New-project journey in the console** (first acceptance round, PF-0057/PF-0058):
+  - A four-step stepper (idea, stack, environment, review & create) instead of a single form. The idea step keeps your description, requirements and attachments; the first work item gets a short title and your words, with nothing invented.
+  - A folder chooser limited to your home folder (directories only), and **Add an existing project**.
+  - **Create the project** is bound to the exact reviewed plan (full hash); typing a hash prefix is no longer needed in the console. A plan that installs dependencies asks for the project name.
+  - Environment choice (Docker recorded as planned, local tools, later) with a tool check, and optional `git init` (no remote, no commit). `yallaflow new plan` gains `--description`, `--requirements`, `--environment`, `--git` and `--attachment`.
+  - The finished project is added to the console (no duplicates; a safe retry if that fails) and its Overview opens with a setup checklist.
+  - **Enable Codex for this session** in a normal console; the Agent panel explains when agents are off or not ready. **Add a service yourself** and **Add this service** on Setup; **Initialize Git** on the Overview and Worktrees.
+  - The console starts with no saved project (except `--read-only`), so the first project can be created from the browser.
+  - Unclassified work opens on its request; the Flow explains empty stations for new work.
   - **Stacks.** Laravel, React/Vue with Vite, Next.js, NestJS or Empty, each an official generator pinned to an exact version, or a recommendation from your own agent.
   - **Plan first.** A plan with the exact commands is reviewed and confirmed by its hash before anything runs.
   - **Safe creation.** Staged generation is moved only into an absent destination; failures keep staging and the log.
@@ -52,6 +61,8 @@ Nothing yet.
   - **Guided onboarding.** The project-understanding state (needed, discovery in progress, awaiting your review, established, or new-project intent) with the request to give your agent. Flow and Work show it until understanding is established. The console never starts, drafts or approves a baseline.
 
 ### Changed
+- Insights counts New work and no longer counts closed work as open; it shows "No verification runs yet" instead of 0%, and explains empty charts.
+- Empty projects no longer mention generated code (plan, completion message and the Greenfield understanding label); paths in displayed commands are shell-quoted.
 - **Agent Contract v11:** agents hold, close, resume or reopen work only when the developer explicitly asks, and never progress held or closed work. Refresh with `yallaflow agent refresh`.
 - **Compatibility.** The first hold or close in a project asks for confirmation (`--accept-minimum-version 1.4.0`). It then records that the project requires YallaFlow >= 1.4.0, atomically with the change.
   - **Older CLIs** (1.1.x–1.3.x, verified) still read such a project and refuse to change it.

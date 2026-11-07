@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-07T17:49:03.011Z",
+      "completedAt": "2026-11-07T17:49:03.011Z",
+      "summary": "Mapped SRC-0045 to 1.4.0 code (work.md Discovery): bugs moved to PF-0058; wiring gaps (runtime add UI, titleHint, Codex behind --agents, Greenfield Overview); Core/API gaps (fixed console project list, no folder API, plan lacks intent/environment/git/attachments, typed hash prefix, no git init, overview lacks origin/git, empty-template understanding label)."
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T17:49:03.902Z",
+      "completedAt": "2026-11-07T17:49:03.902Z",
+      "summary": "Owner answered Q-001..Q-004 (agents enabled in-console with confirmation; agent stack recommendation deferred; home-only folder chooser; Docker recorded, no files). 12 REQ / 12 AC recorded with SRC-0045 and question provenance."
+    },
+    "design-exploration": {
+      "status": "completed",
+      "startedAt": "2026-11-07T17:49:04.590Z",
+      "completedAt": "2026-11-07T17:49:04.590Z",
+      "summary": "Chosen: extend existing wizard/plan/registry/runtime paths rather than new engines. Attachments uploaded after creation to the first work item through the existing Create Work attach route, verified against plan SHA-256 (keeps provenance without staging files in the plan store). Registration done server-side at creation completion so it survives a closed browser; retry registers by plan id only. Agents: lazy AgentBridge construction on confirmed enable. Folder API home-bounded. Rejected: generic filesystem browser, agent-run recommendation (deferred), Docker file generation (deferred)."
+    },
+    "specification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T17:49:24.852Z",
+      "completedAt": "2026-11-07T17:49:24.852Z",
+      "summary": "Specification written in work.md (goal/scope, actors, 12 functional rules, lifecycle, data, validation, security with the list of new endpoints, UI); intent fixed as REQ-001..012 / AC-001..012."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-07T17:53:04.586Z",
+      "completedAt": "2026-11-07T17:53:04.586Z",
+      "summary": "Plan in work.md: 6 slices (Core plan/creation; console server endpoints; overview data; UI; docs; verification incl. installed-package journey, browser matrix, isolated security review). Additive; rollback by revert."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-07T18:29:47.363Z",
+      "completedAt": "2026-11-07T18:29:47.363Z",
+      "summary": "Slices 1-5 done. Core: plan intent/environment/git/attachments (hashed), git-init step, first-work title from goal, origin environment/git, empty-template label. Console server: home-bounded folder API, tools probe, project registration (live, deduplicated, server-side after creation, retry by plan id), planned attachments, git init, runtime services, enable agents for the run, empty console start. UI: 4-step stepper, folder chooser, Greenfield Overview checklist, Flow first-run note, Request-first for unclassified work, agent off/enable panel, Setup forms, Worktrees/Projects empty states, form values preserved across redraws (WebKit found the wipe). Docs and CHANGELOG. Overview data already carried origin and git (no change)."
+    },
+    "verification": {
+      "status": "pending"
+    },
+    "delivery-convergence": {
+      "status": "pending"
+    },
+    "code-review": {
+      "status": "pending"
+    }
+  },
+  "rulings": [
+    {
+      "decision": "The home-folder limit applies to browsing (GET /api/fs/dirs) and to registering an existing project by path; a typed parent folder for a new plan may be outside home, as with yallaflow new plan, and its created project is registered",
+      "reason": "Owner decision Q-003 scoped the limit to the folder chooser; restricting creation would remove a CLI-equivalent capability without an owner decision (security review finding 3, low)",
+      "costIfWrong": "A token holder could create and register a project outside home; it already can through the CLI with the same user rights",
+      "createdAt": "2026-11-07T18:45:59.153Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-07T18:45:59.153Z"
+}

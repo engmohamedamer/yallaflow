@@ -67,7 +67,9 @@ test('security: loopback host, token, origin, read-only methods and ID-only path
     assert.equal((await request(server, '/api/projects', { headers: { Authorization: 'Bearer wrong' }, auth: false })).status, 401);
     assert.equal((await request(server, '/api/projects', { headers: { Host: 'evil.example:80' } })).status, 421);
     assert.equal((await request(server, '/api/projects', { headers: { Origin: 'http://evil.example' } })).status, 403);
-    assert.equal((await request(server, '/api/projects', { method: 'POST' })).status, 405);
+    // 1.4.0 (PF-0057): registering a project is a write — it needs the console page's Origin.
+    assert.equal((await request(server, '/api/projects', { method: 'POST' })).status, 403);
+    assert.equal((await request(server, '/api/snapshot', { method: 'POST' })).status, 405, 'other paths stay read-only');
     assert.equal((await request(server, '/api/projects', { method: 'DELETE' })).status, 405);
     const pid = json(await request(server, '/api/projects')).projects[0].id;
     for (const bad of [`/api/p/${pid}/sources/..%2F..%2Fconfig.yaml/original`, `/api/p/${pid}/work/..%2Fmeta`, '/../package.json', '/app.js/../../package.json', `/api/p/nope/snapshot`]) {

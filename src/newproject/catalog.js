@@ -3,10 +3,15 @@
 // version's --help on 2026-11-07). argv only; the project name is the one variable part
 // and is validated before it reaches here. Nothing outside this table can be executed.
 export const CATALOG_VERSION = 1;
+// Grouping for the console's stack step (PF-0057). Display only: it never changes a command.
+export const CATEGORIES = Object.freeze(['fullstack', 'frontend', 'backend', 'blank']);
 
 export const CATALOG = Object.freeze([
   {
     id: 'laravel',
+    category: 'fullstack',
+    fit: "Full-stack PHP: routing, database (Eloquent), auth scaffolding options, queues and Blade views in one framework.",
+    tradeoffs: "Needs PHP 8.3+ and Composer locally (or Docker later); installs its dependencies during generation, so creation takes longer and needs the network.",
     label: 'Laravel',
     stack: ['PHP', 'Laravel 13', 'Composer'],
     generator: { tool: 'composer create-project', package: 'laravel/laravel', version: '13.11.0' },
@@ -22,6 +27,9 @@ export const CATALOG = Object.freeze([
   },
   {
     id: 'react-vite',
+    category: 'frontend',
+    fit: "Single-page React app with TypeScript and a fast dev server; you choose the backend separately.",
+    tradeoffs: "Frontend only: no server, database or auth; dependencies are installed as a separate, optional step.",
     label: 'React + Vite (TypeScript)',
     stack: ['Node.js', 'React', 'Vite', 'TypeScript'],
     generator: { tool: 'create-vite', package: 'create-vite', version: '9.3.4' },
@@ -37,6 +45,9 @@ export const CATALOG = Object.freeze([
   },
   {
     id: 'vue-vite',
+    category: 'frontend',
+    fit: "Single-page Vue app with TypeScript and a fast dev server; you choose the backend separately.",
+    tradeoffs: "Frontend only: no server, database or auth; dependencies are installed as a separate, optional step.",
     label: 'Vue + Vite (TypeScript)',
     stack: ['Node.js', 'Vue', 'Vite', 'TypeScript'],
     generator: { tool: 'create-vite', package: 'create-vite', version: '9.3.4' },
@@ -52,6 +63,9 @@ export const CATALOG = Object.freeze([
   },
   {
     id: 'nextjs',
+    category: 'fullstack',
+    fit: "React with server rendering, API routes and the App Router in one Node.js project.",
+    tradeoffs: "Full-stack in JavaScript/TypeScript; a database and auth are added later; dependencies are installed as a separate, optional step.",
     label: 'Next.js (App Router, TypeScript)',
     stack: ['Node.js', 'Next.js 16', 'React', 'TypeScript', 'Tailwind CSS'],
     generator: { tool: 'create-next-app', package: 'create-next-app', version: '16.4.5' },
@@ -67,6 +81,9 @@ export const CATALOG = Object.freeze([
   },
   {
     id: 'nestjs',
+    category: 'backend',
+    fit: "Structured Node.js API server with modules, dependency injection and testing set up.",
+    tradeoffs: "Backend only: pair it with a frontend; a database is added later; dependencies are installed as a separate, optional step.",
     label: 'NestJS (TypeScript)',
     stack: ['Node.js', 'NestJS', 'TypeScript'],
     generator: { tool: '@nestjs/cli new', package: '@nestjs/cli', version: '12.0.12' },
@@ -82,6 +99,9 @@ export const CATALOG = Object.freeze([
   },
   {
     id: 'empty',
+    category: 'blank',
+    fit: "An empty folder with YallaFlow initialized: describe the product first and choose a stack with your agent later.",
+    tradeoffs: "No code and no commands run; you add the stack yourself later.",
     label: 'Empty project (no generator)',
     stack: [],
     generator: null,

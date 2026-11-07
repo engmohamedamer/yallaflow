@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "questions": [
+    {
+      "id": "Q-001",
+      "category": "architecture",
+      "question": "How does the console offer to enable managed agents (today only the --agents flag)?",
+      "status": "resolved",
+      "material": true,
+      "createdAt": "2026-11-07T17:42:36.780Z",
+      "updatedAt": "2026-11-07T17:42:45.906Z",
+      "answer": "Owner (2026-11-07, agent session) chose: Enable from the console — an explicit, confirmed 'Enable Codex for this session' action, only in a non-read-only console, for that run only, never starting a session or activating work.",
+      "resolution": "Accepted as the owner's decision; incorporated into the specification.",
+      "resolvedAt": "2026-11-07T17:42:45.906Z"
+    },
+    {
+      "id": "Q-002",
+      "category": "architecture",
+      "question": "How is an agent stack recommendation offered before the project exists?",
+      "status": "resolved",
+      "material": true,
+      "createdAt": "2026-11-07T17:42:37.347Z",
+      "updatedAt": "2026-11-07T17:42:46.098Z",
+      "answer": "Owner chose: defer it honestly — Step 2 is manual, grouped full-stack/frontend/backend with trade-offs; agent recommendation shown as not available yet, planned later.",
+      "resolution": "Accepted as the owner's decision; incorporated into the specification.",
+      "resolvedAt": "2026-11-07T17:42:46.098Z"
+    },
+    {
+      "id": "Q-003",
+      "category": "architecture",
+      "question": "How wide is the console folder chooser?",
+      "status": "resolved",
+      "material": true,
+      "createdAt": "2026-11-07T17:42:37.907Z",
+      "updatedAt": "2026-11-07T17:42:46.295Z",
+      "answer": "Owner chose: home folder only — directories only (never files or contents), inside the user's home, hidden folders excluded, no symlink escape, never writes; marks Git repos, YallaFlow projects and empty folders.",
+      "resolution": "Accepted as the owner's decision; incorporated into the specification.",
+      "resolvedAt": "2026-11-07T17:42:46.295Z"
+    },
+    {
+      "id": "Q-004",
+      "category": "architecture",
+      "question": "What does the Docker environment choice create?",
+      "status": "resolved",
+      "material": true,
+      "createdAt": "2026-11-07T17:42:38.472Z",
+      "updatedAt": "2026-11-07T17:42:46.490Z",
+      "answer": "Owner chose: record the choice now, files later — record it, detect docker without installing, show it as planned in the Overview; no Docker files generated in this phase.",
+      "resolution": "Accepted as the owner's decision; incorporated into the specification.",
+      "resolvedAt": "2026-11-07T17:42:46.490Z"
+    }
+  ],
+  "updatedAt": "2026-11-07T17:42:46.490Z"
+}

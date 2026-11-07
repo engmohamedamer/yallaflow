@@ -55,7 +55,9 @@ function trackedYallaflowPaths(root) {
 // 1.4.0: projects created by the New Project Wizard record their provenance. Only the
 // wizard passes `origin`; it is validated here so nothing else can be recorded.
 export function validateProjectOrigin(origin) {
-  const keys = ['createdBy', 'generator', 'template', 'stack', 'planHash', 'createdAt'];
+  // environment and git (PF-0057) are optional; older CLIs that do not know them treat the
+  // origin as unknown and fall back to the generic Greenfield wording.
+  const keys = ['createdBy', 'generator', 'template', 'stack', 'planHash', 'createdAt', 'environment', 'git'];
   if (!origin || typeof origin !== 'object' || Array.isArray(origin)) throw new Error('project origin must be an object.');
   if (Object.keys(origin).some((key) => !keys.includes(key))) throw new Error(`project origin accepts only: ${keys.join(', ')}.`);
   if (origin.createdBy !== 'yallaflow new') throw new Error('project origin is recorded only by `yallaflow new`.');
@@ -64,6 +66,8 @@ export function validateProjectOrigin(origin) {
   if (!Array.isArray(origin.stack) || origin.stack.some((entry) => typeof entry !== 'string' || entry.length > 60)) throw new Error('project origin stack must list technologies.');
   if (!/^[0-9a-f]{64}$/.test(String(origin.planHash))) throw new Error('project origin planHash must be a SHA-256 hex digest.');
   if (typeof origin.createdAt !== 'string') throw new Error('project origin createdAt is required.');
+  if ('environment' in origin && !['docker', 'local', 'later'].includes(origin.environment)) throw new Error('project origin environment must be docker, local or later.');
+  if ('git' in origin && typeof origin.git !== 'boolean') throw new Error('project origin git must be true or false.');
   return origin;
 }
 

@@ -1,0 +1,535 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "The console offers a four-step new-project stepper: idea, stack, environment, review & create.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§3"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "The plan records intent, requirements, environment, Git choice and attachment descriptors inside its hash; ordinary creation is confirmed by an explicit action bound to the exact plan hash, and install plans keep a stronger confirmation.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§3 Step 4"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "A safe, home-bounded folder chooser replaces typed absolute paths for choosing a parent folder or an existing YallaFlow project.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§4"
+        },
+        {
+          "type": "question",
+          "question": "Q-003"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    },
+    {
+      "id": "REQ-004",
+      "statement": "After creation the project is registered in the console without duplicates, selected, and opened on its Overview; a registration failure is reported as partial success with a non-duplicating retry.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§5"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    },
+    {
+      "id": "REQ-005",
+      "statement": "The first work item has a short human title and keeps the user's description, requirements and attachments, with no invented criteria; it is never activated or handed to an agent automatically.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§6"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    },
+    {
+      "id": "REQ-006",
+      "statement": "Agents show as off, unavailable or on; a non-read-only console can enable Codex for the run after confirmation, and a work item can open directly in the Agent Workspace, without starting a session or activating work.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§7"
+        },
+        {
+          "type": "question",
+          "question": "Q-001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    },
+    {
+      "id": "REQ-007",
+      "statement": "A new project's Overview shows a setup checklist with the goal, requirements, stack, environment, Git, runtime, first work item and next action, and contextual actions; Brownfield Overview is unchanged.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§8"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    },
+    {
+      "id": "REQ-008",
+      "statement": "The Flow and Work item views guide the first run: explanation of empty stations, Request/Next step first for unclassified work, discoverable agent action explaining activation vs. session.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§9"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    },
+    {
+      "id": "REQ-009",
+      "statement": "The Setup page configures runtime services through a guided form (suggestion or manual) that runs Core runtime add without starting anything; existing trust and control guarantees are unchanged.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§10"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    },
+    {
+      "id": "REQ-010",
+      "statement": "Git can be initialized during creation (default on, choice shown) or later for a project without Git; never a remote, commit or push.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§11"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    },
+    {
+      "id": "REQ-011",
+      "statement": "The stack step groups stacks as full-stack, frontend, backend and blank with trade-offs, and states that agent recommendation is not available yet; the environment step records Docker, local or later with a tool check and generates no Docker files.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§3 Step 2-3"
+        },
+        {
+          "type": "question",
+          "question": "Q-002"
+        },
+        {
+          "type": "question",
+          "question": "Q-004"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    },
+    {
+      "id": "REQ-012",
+      "statement": "Empty projects never use generated-code wording, and displayed commands quote paths safely.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§13"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "The New project page shows four labelled steps with back/next, keyboard focus order and validation per step, in Arabic and English, light and dark, desktop and 390 px mobile; browser checks pass in Chromium, Firefox and WebKit with no page errors.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§3"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-002",
+      "statement": "A plan created with description, requirements, environment, git and attachments has them in its hashed body; POST /api/new/create with a hash that differs from the stored plan (edited or different plan) is refused and nothing is created; an install plan without the typed project name is refused.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§3 Step 4"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-003",
+      "statement": "GET /api/fs/dirs returns only directories inside the home folder, hides dot-folders, refuses paths outside home and symlinks resolving outside home, never returns files, and marks git/yallaflow/empty; tests cover traversal, symlink escape, spaces and Unicode.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§4"
+        },
+        {
+          "type": "question",
+          "question": "Q-003"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-004",
+      "statement": "After a console creation the project appears in the registry exactly once and in GET /api/projects without a console restart, the page switches to it and opens Overview; a forced registration failure shows partial success, and Retry registers without a second creation (one folder, one plan).",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§5"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    },
+    {
+      "id": "AC-005",
+      "requirement": "REQ-005",
+      "statement": "The first work item's titleHint is short, its rawRequest contains the user's description and requirements verbatim, attachments are linked as sources with matching SHA-256, it is not active, and requirements.yaml is absent.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§6"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    },
+    {
+      "id": "AC-006",
+      "requirement": "REQ-006",
+      "statement": "Without agents enabled the console states it; POST /api/agents/enable is refused in --read-only and turns on the Agent Workspace otherwise without starting a session or changing the active work; experimental Claude stays unavailable unless started with its flag.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§7"
+        },
+        {
+          "type": "question",
+          "question": "Q-001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    },
+    {
+      "id": "AC-007",
+      "requirement": "REQ-007",
+      "statement": "For a new project the Overview shows the checklist with real states from snapshot/overview/runtime data and contextual actions; a Brownfield project's Overview is unchanged (existing tests pass).",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§8"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    },
+    {
+      "id": "AC-008",
+      "requirement": "REQ-008",
+      "statement": "With only New work the Flow shows an explanation; opening an unclassified item lands on Request/Next step; the agent action text explains activation vs. session; drag-and-drop tests still pass.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§9"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    },
+    {
+      "id": "AC-009",
+      "requirement": "REQ-009",
+      "statement": "The Setup form adds a service (manual and from suggestion) through Core runtime add; the service is defined but not running and not trusted; start before trust is still refused.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§10"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    },
+    {
+      "id": "AC-010",
+      "requirement": "REQ-010",
+      "statement": "Creation with git on produces a .git folder with no commits and no remotes; the Git init action on a project without Git does the same, and is refused inside an existing repository and in --read-only.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§11"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    },
+    {
+      "id": "AC-011",
+      "requirement": "REQ-011",
+      "statement": "The stack step shows grouped stacks with trade-offs and the 'not available yet' agent note; the environment step shows tool availability without installing anything; choosing Docker records environment=docker and creates no Docker files.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§3 Step 2-3"
+        },
+        {
+          "type": "question",
+          "question": "Q-002"
+        },
+        {
+          "type": "question",
+          "question": "Q-004"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    },
+    {
+      "id": "AC-012",
+      "requirement": "REQ-012",
+      "statement": "For an empty project no console page, CLI message or understanding label mentions generated code; displayed commands with spaces, quotes or Unicode are quoted correctly.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0045",
+          "locator": "§13"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T17:48:54.519Z",
+      "updatedAt": "2026-11-07T17:48:54.519Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-004",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-005",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-006",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-007",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-008",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-009",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-010",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-011",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-012",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-005",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-006",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-007",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-008",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-009",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-010",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-011",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-012",
+      "at": "2026-11-07T17:48:54.519Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-07T17:48:54.519Z"
+}

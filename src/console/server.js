@@ -26,6 +26,10 @@ import { HttpError, MAX_JSON_BYTES, attachFile, createWork, validateCreateBody }
 import { isServiceId, runRuntimeAction } from './runtime.js';
 import { wizardCatalog, wizardCreate, wizardPlan, wizardProgress } from './newproject.js';
 import { AgentBridge } from '../agents/bridge.js';
+import { detectProviders } from '../agents/detect.js';
+import { FolderError, listFolders } from './folders.js';
+import { addProject as saveToRegistry } from './registry.js';
+import { addRuntimeService, attachPlannedFile, createdProjectRoot, gitInit, probeTools, workspaceRoot } from './greenfield.js';
 import { loadClaude } from '../agents/experimental.js';
 
 const UI_DIR = fileURLToPath(new URL('../../resources/console/', import.meta.url));
@@ -41,7 +45,9 @@ const UI_FILES = Object.freeze({
 
 // The only routes that accept POST: create a work item, and attach a file to it.
 // 1.4.0: work-item actions and review-gate decisions (PF-0043) join Create Work.
-const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|actions\/[a-z]+|gates\/[a-z]+\/decision))?|runtime\/[a-z][a-z0-9-]{0,31}\/(?:trust|start|stop|restart))$|^\/api\/new\/(?:plan|create)$/;
+// 1.4.0 Greenfield journey (PF-0057): register a project, enable agents for this run, Git init,
+// add a runtime service, attach a planned file to a new project's first work item.
+const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|actions\/[a-z]+|gates\/[a-z]+\/decision))?|runtime\/[a-z][a-z0-9-]{0,31}\/(?:trust|start|stop|restart)|runtime\/services|git\/init)$|^\/api\/new\/(?:plan|create|plans\/NP-\d{14}-[0-9a-f]{6}\/files)$|^\/api\/(?:projects|agents\/enable)$/;
 // Agent Interaction (v1.3.0, only with --agents): the Agent Workspace's actions.
 const AGENT_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/agent\/(start|message|permission|cancel|end|resume|connect|disconnect|activate)$/;
 // The Claude channel server and hook forwarder (bridge token, never a browser).
@@ -79,18 +85,49 @@ export function projectId(root) {
 
 export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', token = randomBytes(24).toString('hex'), poll = false, missing = [], readOnly = false, agents = false, experimentalClaude = false, agentEnv = process.env } = {}) {
   // Agent Interaction needs writes; --read-only keeps the console genuinely read-only.
-  const agentsOn = Boolean(agents) && !readOnly;
+  // Agents start on with --agents, or later for this run only by an explicit, confirmed
+  // action in a non-read-only console (owner decision, PF-0057 Q-001).
+  let agentsOn = Boolean(agents) && !readOnly;
+  let bridge = null;
   const runner = createRunner();
   const projects = await Promise.all(roots.map(async (root) => ({ id: projectId(root), root, name: (await projectName(root)) ?? path.basename(root) })));
   const byId = new Map(projects.map((entry) => [entry.id, entry]));
   const clients = new Set();
   const tokenBuffer = Buffer.from(token);
 
-  const watchers = projects.map((project) => watchWorkspace(project.root, () => {
+  const watch = (project) => watchWorkspace(project.root, () => {
     runner.invalidate(project.root);
     const message = `data: ${JSON.stringify({ type: 'change', project: project.id, at: new Date().toISOString() })}\n\n`;
     for (const client of clients) client.write(message);
-  }, { poll }));
+  }, { poll });
+  const watchers = projects.map(watch);
+
+  // Adds a workspace to this running console and to the saved list (no duplicates).
+  // Registrations run one at a time (security review, PF-0057): parallel requests for the
+  // same folder must not add it twice, and the saved list is rewritten by one writer.
+  let registering = Promise.resolve();
+  function registerRoot(root) {
+    const next = registering.then(() => registerNow(root));
+    registering = next.catch(() => {});
+    return next;
+  }
+  async function registerNow(root) {
+    const real = await workspaceRoot(root);
+    const known = [];
+    for (const entry of projects) known.push([entry, await realpath(entry.root).catch(() => entry.root)]);
+    const already = known.find(([, existing]) => existing === real)?.[0];
+    const saved = await saveToRegistry(real);
+    if (already) return { id: already.id, name: already.name, root: already.root, added: false, saved: saved.added };
+    if (byId.has(projectId(real))) { const same = byId.get(projectId(real)); return { id: same.id, name: same.name, root: same.root, added: false, saved: saved.added }; }
+    const entry = { id: projectId(real), root: real, name: (await projectName(real)) ?? path.basename(real) };
+    projects.push(entry);
+    byId.set(entry.id, entry);
+    watchers.push(watch(entry));
+    await bridge?.addProject(entry);
+    const message = `data: ${JSON.stringify({ type: 'projects', project: entry.id, at: new Date().toISOString() })}\n\n`;
+    for (const client of clients) client.write(message);
+    return { id: entry.id, name: entry.name, root: entry.root, added: true, saved: saved.added };
+  }
   const heartbeat = setInterval(() => { for (const client of clients) client.write(': ping\n\n'); }, 25_000);
   heartbeat.unref();
 
@@ -117,7 +154,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     }
     if (request.method === 'POST') {
       // Writes: only the Create Work routes, only with the token, our own Origin and the exact type.
-      if (readOnly || !WRITE_ROUTE.test(url.pathname)) return send(response, 405, { error: { code: 'READ_ONLY', message: readOnly ? 'This console was started with --read-only.' : 'Only Create Work, work-item actions, gate decisions, runtime actions and the New Project Wizard accept POST.' } }, { Allow: 'GET, HEAD' });
+      if (readOnly || !WRITE_ROUTE.test(url.pathname)) return send(response, 405, { error: { code: 'READ_ONLY', message: readOnly ? 'This console was started with --read-only.' : 'Only Create Work, work-item actions, gate decisions, runtime actions, project registration, agent enablement, Git init and the New Project Wizard accept POST.' } }, { Allow: 'GET, HEAD' });
       if (!authorized(request)) return send(response, 401, { error: { code: 'UNAUTHORIZED', message: 'Missing or wrong console token. Open the link printed by `yallaflow console`.' } });
       if (!origin) return send(response, 403, { error: { code: 'FORBIDDEN_ORIGIN', message: 'A write needs the console page as its Origin.' } });
       return handleWrite(request, response, url);
@@ -129,7 +166,24 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
 
     const parts = url.pathname.split('/').filter(Boolean); // ['api', ...]
     if (parts.length === 2 && parts[1] === 'projects') {
-      return send(response, 200, { projects: projects.map(({ id, name, root }) => ({ id, name, root })), unavailable: missing, readOnly, agents: { enabled: agentsOn, claude: agentsOn && Boolean(experimentalClaude) } });
+      return send(response, 200, { projects: projects.map(({ id, name, root }) => ({ id, name, root })), unavailable: missing, readOnly, agents: { enabled: agentsOn, claude: agentsOn && Boolean(experimentalClaude), canEnable: !readOnly && !agentsOn } });
+    }
+    // 1.4.0 (PF-0057) reads: folders inside home, tool availability, agent readiness.
+    if (parts.length === 3 && parts[1] === 'fs' && parts[2] === 'dirs') {
+      if (readOnly) return send(response, 405, { error: { code: 'READ_ONLY', message: 'This console was started with --read-only; it does not choose folders.' } });
+      try {
+        return send(response, 200, await listFolders(url.searchParams.get('path') ?? ''));
+      } catch (error) {
+        if (error instanceof FolderError) return send(response, error.status, { error: { code: error.code, message: error.message } });
+        throw error;
+      }
+    }
+    // Probes run programs (--version only): never in a read-only console (security review).
+    if (parts.length === 3 && parts[1] === 'new' && parts[2] === 'tools') return readOnly ? send(response, 405, { error: { code: 'READ_ONLY', message: 'This console was started with --read-only.' } }) : send(response, 200, await probeTools());
+    if (parts.length === 2 && parts[1] === 'agents') {
+      if (readOnly) return send(response, 200, { enabled: false, canEnable: false, readOnly: true, claude: false, codex: null });
+      const found = await detectProviders({ env: agentEnv });
+      return send(response, 200, { enabled: agentsOn, canEnable: !readOnly && !agentsOn, readOnly, claude: agentsOn && Boolean(experimentalClaude), codex: { ready: Boolean(found.codex?.ready), problems: found.codex?.problems ?? [] } });
     }
     if (parts.length === 2 && parts[1] === 'events') {
       if (request.method !== 'GET') return send(response, 405, { error: { code: 'METHOD', message: 'The event stream is GET only.' } }, { Allow: 'GET' });
@@ -180,13 +234,43 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
   // POST /api/p/<project>/work/<id>/sources    — attach one file to the item it created
   async function handleWrite(request, response, url) {
     const parts = url.pathname.split('/').filter(Boolean);
+    // 1.4.0 (PF-0057): register a project — a plan's finished project, or an existing
+    // YallaFlow project inside the home folder chosen in the folder chooser.
+    if (parts.length === 2 && parts[1] === 'projects') {
+      const type = String(request.headers['content-type'] ?? '').split(';')[0].trim().toLowerCase();
+      if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+      const body = await readJsonBody(request);
+      const keys = body && typeof body === 'object' && !Array.isArray(body) ? Object.keys(body) : [];
+      if (keys.length !== 1 || !['planId', 'root'].includes(keys[0]) || typeof body[keys[0]] !== 'string' || !body[keys[0]]) return send(response, 400, { error: { code: 'BAD_REQUEST', message: 'Send { planId } or { root }.' } });
+      if (body.planId) return send(response, 200, await registerRoot((await createdProjectRoot(body.planId)).root));
+      try {
+        const listed = await listFolders(body.root); // home-bounded, real folder
+        return send(response, 200, await registerRoot(listed.path));
+      } catch (error) {
+        if (error instanceof FolderError) return send(response, error.status, { error: { code: error.code, message: error.message } });
+        throw error;
+      }
+    }
+    if (parts.length === 3 && parts[1] === 'agents' && parts[2] === 'enable') {
+      const type = String(request.headers['content-type'] ?? '').split(';')[0].trim().toLowerCase();
+      if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+      const body = await readJsonBody(request);
+      if (!body || body.confirm !== true || Object.keys(body).length !== 1) return send(response, 400, { error: { code: 'CONFIRMATION_REQUIRED', message: 'Confirm enabling Codex for this console session.' } });
+      return send(response, 200, await enableAgents());
+    }
+    if (parts.length === 5 && parts[1] === 'new' && parts[2] === 'plans' && parts[4] === 'files') {
+      const type = String(request.headers['content-type'] ?? '').split(';')[0].trim().toLowerCase();
+      if (type !== 'application/octet-stream') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send the file as application/octet-stream.' } });
+      const result = await attachPlannedFile(parts[3], request, runner);
+      return send(response, result.duplicate ? 200 : 201, result);
+    }
     // 1.4.0 New Project Wizard: POST /api/new/plan, /api/new/create (JSON only).
     if (parts[1] === 'new') {
       const type = String(request.headers['content-type'] ?? '').split(';')[0].trim().toLowerCase();
       if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
       const body = await readJsonBody(request);
       const cwd = projects[0]?.root ?? process.cwd();
-      return send(response, 200, parts[2] === 'plan' ? await wizardPlan(cwd, body, runner) : await wizardCreate(cwd, body, runner));
+      return send(response, 200, parts[2] === 'plan' ? await wizardPlan(cwd, body, runner) : await wizardCreate(cwd, body, runner, { register: async (planId) => registerRoot((await createdProjectRoot(planId)).root) }));
     }
     const project = parts[1] === 'p' ? byId.get(parts[2]) : null;
     if (!project) return send(response, 404, { error: { code: 'NOT_FOUND', message: 'Unknown project.' } });
@@ -206,6 +290,18 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     if (rest.length === 5 && rest[0] === 'work' && isWorkId(rest[1]) && rest[2] === 'gates' && rest[4] === 'decision') {
       if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
       return send(response, 200, await decideGate(project.root, rest[1], rest[3], await readJsonBody(request), runner));
+    }
+    // 1.4.0 (PF-0057): add a runtime service (Core runtime add; nothing starts), Git init.
+    if (rest.length === 2 && rest[0] === 'runtime' && rest[1] === 'services') {
+      if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+      return send(response, 201, await addRuntimeService(project.root, await readJsonBody(request), runner));
+    }
+    if (rest.length === 2 && rest[0] === 'git' && rest[1] === 'init') {
+      if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+      const body = await readJsonBody(request);
+      if (!body || body.confirm !== true || Object.keys(body).length !== 1) return send(response, 400, { error: { code: 'CONFIRMATION_REQUIRED', message: 'Confirm initializing a Git repository.' } });
+      teamCache.delete(project.id);
+      return send(response, 200, await gitInit(project.root));
     }
     // 1.4.0 runtime: POST /api/p/<project>/runtime/<service>/(trust|start|stop|restart)
     if (rest.length === 3 && rest[0] === 'runtime' && isServiceId(rest[1])) {
@@ -346,10 +442,10 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     server.listen(port, host, () => resolve(server.address()));
   });
 
-  const bridge = agentsOn ? new AgentBridge({
+  const makeBridge = ({ claude = Boolean(experimentalClaude) } = {}) => new AgentBridge({
     projects,
     port: listening.port,
-    claude: Boolean(experimentalClaude),
+    claude,
     env: agentEnv,
     broadcast: (projectId, event) => {
       const message = `data: ${JSON.stringify({ type: 'agent', project: projectId, event })}\n\n`;
@@ -361,7 +457,29 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       if (result.status !== 0) throw Object.assign(new Error((result.stderr || result.stdout).trim().split('\n')[0] || 'Activation failed.'), { status: 422, code: 'ACTIVATE_REFUSED' });
       return { ok: true, workId };
     }
-  }) : null;
+  });
+  bridge = agentsOn ? makeBridge() : null;
+  // Enabling agents for this run: builds the bridge the --agents flag would have built. It
+  // starts no session, claims no checkout and activates nothing.
+  let enabling = null;
+  async function enableAgents() {
+    if (readOnly) throw Object.assign(new Error('This console was started with --read-only.'), { status: 405, code: 'READ_ONLY' });
+    if (agentsOn) return { enabled: true, already: true };
+    enabling ??= (async () => {
+      // Enabling here never turns on the experimental Claude connection (security review).
+      const next = makeBridge({ claude: false });
+      await next.open();
+      bridge = next;
+      // A project registered while the bridge was being built is added now.
+      for (const project of projects) await next.addProject(project);
+      agentsOn = true;
+      api.agents = { enabled: true, claude: false };
+      const message = `data: ${JSON.stringify({ type: 'agents', enabled: true, at: new Date().toISOString() })}\n\n`;
+      for (const client of clients) client.write(message);
+    })().finally(() => { enabling = null; });
+    await enabling;
+    return { enabled: true, already: false };
+  }
   const api = {
     url: `http://127.0.0.1:${listening.port}/`,
     port: listening.port,

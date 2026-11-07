@@ -27,6 +27,11 @@ const STAGING_PREFIX = '.yallaflow-new-';
 const GENERATOR_TIMEOUT_MS = 15 * 60 * 1000;
 const PREREQ_TIMEOUT_MS = 5000;
 const RATIONALE_MAX = 2000;
+const DESCRIPTION_MAX = 4000;
+const REQUIREMENTS_MAX = 16000;
+const ATTACHMENTS_MAX = 10;
+export const ENVIRONMENTS = Object.freeze(['docker', 'local', 'later']);
+export const GIT_INIT_ARGV = Object.freeze(['git', 'init', '--quiet']);
 const SAFE_ENV = Object.freeze(['PATH', 'HOME', 'LANG', 'LC_ALL', 'TERM', 'USER', 'LOGNAME', 'SHELL', 'TMPDIR', 'TZ', 'npm_config_cache', 'npm_config_registry', 'COMPOSER_HOME', 'COMPOSER_CACHE_DIR', 'HTTPS_PROXY', 'HTTP_PROXY', 'NO_PROXY', 'https_proxy', 'http_proxy', 'no_proxy']);
 
 export class NewProjectError extends Error {
@@ -80,13 +85,17 @@ function scrubbedEnv(source = process.env) {
 // Validates the request and writes an immutable plan. Nothing is created or executed
 // except prerequisite `--version` probes.
 export async function createPlan(input, { catalog = CATALOG, env = process.env, now = new Date().toISOString() } = {}) {
-  const { name, parent, stack, install = false, allowNested = false, rationale = null } = input ?? {};
+  const { name, parent, stack, install = false, allowNested = false, rationale = null, description = null, requirements = null, environment = null, git = false, attachments = [] } = input ?? {};
   if (typeof name !== 'string' || !PROJECT_NAME.test(name) || name === '.' || name === '..') throw new NewProjectError('NEW_PROJECT_NAME', 'The project name must be 1-64 characters: letters, digits, dot, dash or underscore, starting with a letter or digit.');
   const entry = catalogEntry(stack, catalog);
   if (!entry) throw new NewProjectError('NEW_PROJECT_STACK', `Unknown stack ${JSON.stringify(stack)}. See \`yallaflow new catalog\`.`);
   if (typeof parent !== 'string' || !parent.trim() || !path.isAbsolute(parent)) throw new NewProjectError('NEW_PROJECT_PARENT', 'The parent folder must be an absolute path.');
   if (install && !entry.install) throw new NewProjectError('NEW_PROJECT_INSTALL', `${entry.label} has no separate dependency install step${entry.installsDependencies ? ' (its generator installs dependencies itself)' : ''}.`);
   if (rationale !== null && (typeof rationale !== 'string' || rationale.length > RATIONALE_MAX)) throw new NewProjectError('NEW_PROJECT_RATIONALE', `The rationale must be text up to ${RATIONALE_MAX} characters.`);
+  const intent = validateIntent(description, requirements);
+  if (environment !== null && !ENVIRONMENTS.includes(environment)) throw new NewProjectError('NEW_PROJECT_ENVIRONMENT', `The environment must be one of: ${ENVIRONMENTS.join(', ')}.`);
+  if (typeof git !== 'boolean') throw new NewProjectError('NEW_PROJECT_GIT', 'git must be true or false.');
+  const planned = validateAttachments(attachments);
   let realParent;
   try {
     realParent = await realpath(parent);
@@ -103,6 +112,7 @@ export async function createPlan(input, { catalog = CATALOG, env = process.env, 
   if (await exists(destination)) throw new NewProjectError('NEW_PROJECT_EXISTS', `${destination} already exists. The wizard only creates a new folder; it never overwrites or re-labels an existing project.`);
   const nested = await enclosingRepository(realParent);
   if (nested && !allowNested) throw new NewProjectError('NEW_PROJECT_NESTED', `${realParent} is inside a ${nested.kind} (${nested.at}). Choose another parent folder, or pass --allow-nested if a nested project is intended.`);
+  if (git && nested) throw new NewProjectError('NEW_PROJECT_GIT_NESTED', `${realParent} is inside a ${nested.kind} (${nested.at}); a new Git repository is not created inside another one. Leave Git off, or choose another parent folder.`);
 
   const steps = [];
   if (entry.argv) steps.push({ id: 'generate', argv: entry.argv(name), cwd: '<staging>', network: entry.network, installsDependencies: entry.installsDependencies, runsPackageScripts: entry.runsPackageScripts });
@@ -110,7 +120,9 @@ export async function createPlan(input, { catalog = CATALOG, env = process.env, 
   steps.push({ id: 'promote', argv: null, note: entry.argv ? `move the generated project into ${destination} only if it is still absent` : `create the project folder ${destination} only if it is still absent` });
   if (install && entry.install) steps.push({ id: 'install', argv: entry.install, cwd: destination, network: true, installsDependencies: true, runsPackageScripts: true });
   steps.push({ id: 'init', argv: null, note: `YallaFlow Core init (--type greenfield) with wizard provenance` });
-  steps.push({ id: 'first-work', argv: null, note: 'YallaFlow Core start --keep-active: a first setup work item for your agent' });
+  if (git) steps.push({ id: 'git-init', argv: [...GIT_INIT_ARGV], cwd: destination, network: false, installsDependencies: false, runsPackageScripts: false, note: 'a new local Git repository: no remote, no commit' });
+  steps.push({ id: 'first-work', argv: null, note: 'YallaFlow Core start --keep-active: a first work item with your description (not activated)' });
+  if (planned.length) steps.push({ id: 'link-files', argv: null, note: `link ${planned.length} attached file(s) to the first work item; each must match its SHA-256 below` });
 
   const body = {
     schema: PLAN_SCHEMA,
@@ -132,7 +144,12 @@ export async function createPlan(input, { catalog = CATALOG, env = process.env, 
     executesExternalCommands: steps.some((step) => Array.isArray(step.argv)),
     steps,
     rationale: rationale ? String(rationale).trim() : null,
-    docs: entry.docs
+    docs: entry.docs,
+    // PF-0057 (all optional; older plans simply lack them).
+    intent,
+    environment,
+    git,
+    attachments: planned
   };
   const hash = planHash(body);
   const id = `NP-${now.replace(/[-:TZ.]/g, '').slice(0, 14)}-${randomBytes(3).toString('hex')}`;
@@ -186,6 +203,8 @@ function verifyAgainstCatalog(plan, catalog) {
   const generate = plan.body.steps.find((step) => step.id === 'generate');
   const expected = entry.argv ? entry.argv(plan.body.name) : null;
   if (JSON.stringify(generate?.argv ?? null) !== JSON.stringify(expected)) throw new NewProjectError('NEW_PROJECT_PLAN_TAMPERED', `Plan ${plan.id}'s command does not match the catalog; create a new plan.`);
+  const gitInit = plan.body.steps.find((step) => step.id === 'git-init');
+  if (gitInit && (JSON.stringify(gitInit.argv) !== JSON.stringify(GIT_INIT_ARGV) || plan.body.git !== true)) throw new NewProjectError('NEW_PROJECT_PLAN_TAMPERED', `Plan ${plan.id}'s Git step does not match this version.`);
   const install = plan.body.steps.find((step) => step.id === 'install');
   if (install && JSON.stringify(install.argv) !== JSON.stringify(entry.install)) throw new NewProjectError('NEW_PROJECT_PLAN_TAMPERED', `Plan ${plan.id}'s install command does not match the catalog.`);
   if (!PROJECT_NAME.test(plan.body.name) || path.join(plan.body.parent, plan.body.name) !== plan.body.destination) throw new NewProjectError('NEW_PROJECT_PLAN_TAMPERED', `Plan ${plan.id}'s destination is inconsistent.`);
@@ -306,13 +325,27 @@ export async function createFromPlan(id, confirm, { catalog = CATALOG, env = pro
     if (await exists(path.join(root, '.yallaflow'))) throw new NewProjectError('NEW_PROJECT_DESTINATION_CHANGED', `${root} already has a YallaFlow workspace; the wizard never re-labels an existing project.`);
     await hooks.initProject(root, {
       name: body.name,
-      origin: { createdBy: 'yallaflow new', generator: body.generator ? `${body.generator.package}@${body.generator.version}` : null, template: body.stack, stack: body.technologies, planHash: plan.hash, createdAt: new Date().toISOString() }
+      origin: { createdBy: 'yallaflow new', generator: body.generator ? `${body.generator.package}@${body.generator.version}` : null, template: body.stack, stack: body.technologies, planHash: plan.hash, createdAt: new Date().toISOString(), ...(body.environment ? { environment: body.environment } : {}), ...(body.git ? { git: true } : {}) }
     });
     await mark('init', 'done');
   }
+  if (body.git && !done('git-init')) {
+    if (await exists(path.join(root, '.git'))) {
+      await mark('git-init', 'done', { note: 'already a Git repository' });
+    } else {
+      await mark('git-init', 'running');
+      const gitLog = await safeLocalDir(root, '.yallaflow', 'local').then((dir) => path.join(dir, 'git-init.log'));
+      const result = await runLogged([...GIT_INIT_ARGV], root, gitLog, PREREQ_TIMEOUT_MS * 6);
+      if (result.code !== 0) {
+        await mark('git-init', 'failed', { exitCode: result.code ?? null });
+        throw new NewProjectError('NEW_PROJECT_GIT_FAILED', `The project exists at ${root} with YallaFlow initialized, but \`git init\` failed (${result.error ?? `exit ${result.code}`}). Retry creation (it skips finished steps), or initialize Git later from the project's Overview.`);
+      }
+      await mark('git-init', 'done');
+    }
+  }
   let workId = progress.steps['first-work']?.workId ?? null;
   if (!done('first-work')) {
-    workId = await hooks.firstWork(root, firstWorkRequest(body), `Set up ${body.name}`);
+    workId = await hooks.firstWork(root, firstWorkRequest(body), firstWorkTitle(body));
     await mark('first-work', 'done', { workId });
   }
   if (progress.staging && !progress.stagingRemoved) {
@@ -332,9 +365,51 @@ export async function createFromPlan(id, confirm, { catalog = CATALOG, env = pro
 
 // The first work item: a short title, and the request in the developer's terms. Nothing is
 // invented: no criteria, no architecture, only what the plan records.
+export function firstWorkTitle(body) {
+  const goal = body.intent?.description?.split(/\r?\n/).map((line) => line.trim()).find(Boolean);
+  if (!goal) return `Set up ${body.name}`;
+  const short = goal.length > 72 ? `${goal.slice(0, 71).replace(/\s+\S*$/, '')}…` : goal;
+  return `${body.name}: ${short}`;
+}
+
 export function firstWorkRequest(body) {
   const stack = body.generator ? `${body.stackLabel} (generated with ${body.generator.package}@${body.generator.version}; the generated code is not reviewed yet)` : 'an empty project (no code yet)';
-  return `Set up ${body.name}, ${stack}: define the first product requirements, then confirm the local setup and the runtime profile.`;
+  const environment = { docker: 'Docker (planned; no Docker files were created yet)', local: 'local tools', later: 'to be decided' }[body.environment] ?? null;
+  const lines = [];
+  if (body.intent?.description) lines.push(body.intent.description.trim(), '');
+  if (body.intent?.requirements) lines.push('Requirements from the developer:', body.intent.requirements.trim(), '');
+  lines.push(`Project: ${body.name}, ${stack}.${environment ? ` Development environment: ${environment}.` : ''}`);
+  lines.push(body.intent?.requirements
+    ? 'Next: review these requirements with the developer, then confirm the local setup and the runtime profile.'
+    : 'Next: define the first product requirements with the developer, then confirm the local setup and the runtime profile.');
+  return lines.join('\n');
+}
+
+function validateIntent(description, requirements) {
+  const text = (value, max, label) => {
+    if (value === null || value === undefined) return null;
+    if (typeof value !== 'string' || value.length > max || value.includes('\0')) throw new NewProjectError('NEW_PROJECT_INTENT', `${label} must be text up to ${max} characters.`);
+    return value.trim() || null;
+  };
+  const d = text(description, DESCRIPTION_MAX, 'The description');
+  const r = text(requirements, REQUIREMENTS_MAX, 'The requirements');
+  return d || r ? { description: d, requirements: r } : null;
+}
+
+// Attachments are described in the plan (name, size, SHA-256) and linked to the first work
+// item after creation; a file whose bytes do not match its descriptor is refused then.
+function validateAttachments(list) {
+  if (!Array.isArray(list) || list.length > ATTACHMENTS_MAX) throw new NewProjectError('NEW_PROJECT_ATTACHMENTS', `Attach at most ${ATTACHMENTS_MAX} files.`);
+  const seen = new Set();
+  return list.map((entry) => {
+    const { name, size, sha256 } = entry ?? {};
+    if (typeof name !== 'string' || !name.trim() || name.length > 200 || /[\\/\u0000-\u001f\u007f]/.test(name) || name.startsWith('.')) throw new NewProjectError('NEW_PROJECT_ATTACHMENTS', 'Each attachment needs a plain file name.');
+    if (!Number.isSafeInteger(size) || size <= 0) throw new NewProjectError('NEW_PROJECT_ATTACHMENTS', `${name}: the size must be a positive number of bytes.`);
+    if (typeof sha256 !== 'string' || !/^[0-9a-f]{64}$/.test(sha256)) throw new NewProjectError('NEW_PROJECT_ATTACHMENTS', `${name}: a SHA-256 hex digest is required.`);
+    if (seen.has(sha256)) throw new NewProjectError('NEW_PROJECT_ATTACHMENTS', `${name} is attached twice.`);
+    seen.add(sha256);
+    return { name: name.trim(), size, sha256 };
+  });
 }
 
 async function removeStaging(plan) {

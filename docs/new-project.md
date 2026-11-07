@@ -1,6 +1,17 @@
 # New Project Wizard (1.4.0)
 
-`yallaflow new` and the console's **New project** page (from **All projects**) create a genuinely new project: you choose the name, location and stack and review a plan with the exact commands, then confirm. YallaFlow then runs the official generator, initializes YallaFlow and opens a first work item for your agent. Linux and macOS.
+`yallaflow new` and the console's **New project** page (from **All projects**) create a genuinely new project: you describe it, choose the location, stack and environment, review a plan with the exact commands, then confirm. YallaFlow then runs the official generator, initializes YallaFlow and opens a first work item for your agent. Linux and macOS.
+
+## In the console: four steps
+
+1. **Idea.** The project name, what you want to build, optional requirements and context, and optional attachments (BRD, Word, PDF, Markdown, screenshots). Choose the location with **Choose folder**: it lists folders inside your home folder only (directories, never files; hidden folders are not shown; a link that leads outside home is not listed) and marks Git repositories, YallaFlow projects and empty folders. Typing a path is an advanced option; like `yallaflow new plan`, it can name any folder you can write to, and the project created there is added to the console too.
+2. **Stack.** The stacks below, grouped as full-stack, frontend, backend and blank, each with what it gives you and its trade-offs. A recommendation from your agent is not available in this step yet.
+3. **Environment.** Docker, local tools or decide later, with the tools found on this machine (checked with their version flag only; nothing is installed). Docker is recorded as planned: no Docker files are created yet. **Initialize a local Git repository** is on by default: it runs `git init` only, with no remote, commit or push.
+4. **Review & create.** A summary (project, purpose, location, stack, environment, Git, requirements, attachments), what will and will not happen, and the commands under **Technical details**. **Create the project** carries out exactly this plan: the page sends the plan's full hash, and a changed or different plan is refused. A plan that installs dependencies (runs package scripts) also asks you to type the project name.
+
+When it finishes, the console adds the project to its list (once, even if you retry) and opens its **Overview**: a setup checklist with the goal, requirements, stack, environment, Git, runtime, agent and the first work item with its next step. Attached files are linked to the first work item; only files whose size and SHA-256 match the plan are accepted. If adding the project to the console fails, the page says the project exists and offers **Add it to the console**, which never creates a second project.
+
+The console also starts with no saved project at all (not with `--read-only`), so the first project can be created from the browser.
 
 ## Stacks
 
@@ -23,7 +34,8 @@ Each stack runs one official generator, pinned to an exact version:
 
 ```bash
 yallaflow new catalog
-yallaflow new plan --name shop --parent ~/code --stack laravel
+yallaflow new plan --name shop --parent ~/code --stack laravel \
+  [--description TEXT] [--requirements TEXT] [--environment docker|local|later] [--git]
 yallaflow new show NP-…                 # review it again
 yallaflow new create NP-… --confirm <first 8+ characters of the plan hash>
 yallaflow new discard NP-…              # remove the staging folder of a failed attempt
@@ -38,17 +50,17 @@ yallaflow new discard NP-…              # remove the staging folder of a faile
 - **The destination is claimed exclusively** (it must not exist even as an empty folder). Later steps run only in the folder this plan created: if it was replaced, nothing is installed, initialized or labelled there.
 - **Confirming is a human decision.** `new create` runs from a terminal or from the console's confirmed page. A script or an agent's tool call is refused. This guards against automation confirming its own plan; it is not a security boundary against a process that controls your user account.
 - **Failure.** Nothing is promoted. Staging and the full generator log are kept for diagnosis, and retry skips the steps that already finished.
-- **After creation.** YallaFlow's Core `init` runs as a new (Greenfield) project and records the provenance (`project.origin`: generator, version, stack, plan hash). It also creates a first, unrouted work item that is not made active. Open Claude Code or Codex in the folder and describe what you are building. Add it to the console with `yallaflow console add <folder>`.
+- **After creation.** YallaFlow's Core `init` runs as a new (Greenfield) project and records the provenance (`project.origin`: generator, version, stack, plan hash, and the environment and Git choice when given). With `--git`, `git init` runs (no remote, no commit). A first, unrouted work item is created and not made active: its title is short (`<name>: <your goal>`, or `Set up <name>`), and its request keeps your description and requirements word for word. No acceptance criteria or architecture are invented. From the command line, add the project to the console with `yallaflow console add <folder>`; the console's New project page does this itself.
 
 ## What "Greenfield" means here
 
 A project created this way is Greenfield even though it already contains generated code, so it does not need an existing-project baseline. The generated code is **not** treated as understood or approved:
 - no project-memory facts are created from it;
-- `brief` and the Overview say "generated code not reviewed";
+- `brief` and the Overview say "generated code not reviewed" (an empty project says "created empty");
 - understanding grows from your intent, requirements and decisions.
 
 Only a project created by `yallaflow new` gets this provenance. Existing repositories keep the normal discovery and baseline rules.
 
 ## Recommend for me
 
-YallaFlow calls no model. `yallaflow new recommend` (or **Recommend for me** in the console) gives you a request for your own coding agent. The agent asks what you are building and runs `yallaflow new plan … --rationale "<why>"`. You then review that plan, including the rationale, and confirm it yourself.
+YallaFlow calls no model. `yallaflow new recommend` gives you a request for your own coding agent. The agent asks what you are building and runs `yallaflow new plan … --rationale "<why>"`. You then review that plan, including the rationale, and confirm it yourself.

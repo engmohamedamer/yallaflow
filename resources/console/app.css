@@ -601,3 +601,41 @@ table.stack th { font-size: 12px; color: var(--muted); font-weight: 600; }
 [data-wiz-create] input { font: inherit; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
 .wizform > label.small { display: flex; gap: 8px; align-items: flex-start; font-weight: 400; }
 .wizform > label.small input { margin-top: 3px; }
+/* 1.4.0 (PF-0057): new-project stepper, folder chooser, setup checklist */
+.stepper { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 0 0 14px; counter-reset: none; }
+.stepper li { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); font-size: 14px; color: var(--muted); }
+.stepper li .sn { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--bg-2); font-size: 12px; font-weight: 600; }
+.stepper li.now { color: var(--ink); border-color: var(--nile); box-shadow: 0 0 0 2px var(--nile-soft); font-weight: 600; }
+.stepper li.now .sn { background: var(--nile); color: #fff; }
+.stepper li.done { color: var(--ink-2); }
+.stepper li.done .sn { background: var(--palm, #0fae9d); color: #fff; }
+.stackcard:focus-within { outline: 2px solid var(--nile); outline-offset: 2px; }
+.stackgroup { margin-top: 6px !important; }
+.wizform textarea, .wizform select, .wizform details input { font: inherit; font-weight: 400; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); width: 100%; box-sizing: border-box; }
+.wizform details > summary { cursor: pointer; }
+.wiznav { margin-top: 6px; }
+.wizpath { overflow-wrap: anywhere; font-size: 13px; padding: 6px 10px; background: var(--bg-2); border-radius: 8px; }
+.wizfiles { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 4px; }
+.twocol { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.twocol > label { display: grid; gap: 6px; font-weight: 600; font-size: 14px; }
+.folderdlg { width: min(640px, calc(100vw - 32px)); max-height: min(80vh, 720px); overflow: auto; color: var(--ink); }
+.folderdlg::backdrop { background: rgb(0 0 0 / .35); }
+.folders { list-style: none; padding: 0; margin: 0; display: grid; gap: 2px; max-height: 46vh; overflow: auto; }
+.folders li { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 2px 4px; border-radius: 8px; }
+.folders li:hover { background: var(--bg-2); }
+.folders .flink { text-align: start; }
+.checklist { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 10px; }
+.checklist .ck { display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap; }
+.checklist .ckmark { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--line); flex: none; font-size: 13px; }
+.checklist .ck.done .ckmark { background: var(--palm, #0fae9d); color: #fff; border-color: transparent; }
+.checklist .ck.now .ckmark { color: var(--nile); border-color: var(--nile); }
+.firstrun p { margin: 6px 0 8px; }
+.kpi-empty { color: var(--muted); }
+@media (max-width: 560px) { .stepper li { font-size: 12px; padding: 4px 8px; } .checklist .ck > .btn, .checklist .ck > a.btn { margin-inline-start: 34px; } }
+.brief p { white-space: pre-wrap; }
+@media (max-width: 1440px) { .tabs a { padding: 6px 12px; } .top { gap: 10px; } }
+@media (max-width: 1180px) { .tabs a { padding: 6px 9px; font-size: 15px; } }
+.projsel { max-width: 220px; text-overflow: ellipsis; }
+.stackcard .row { flex-wrap: wrap; }
+.stackcard .chip, .wizform .chip { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+@media (max-width: 560px) { .checklist .ck > .grow { flex-basis: calc(100% - 40px); } }

@@ -60,7 +60,7 @@ export async function assessProjectUnderstanding(root, { kind = null, inventoryK
   if (origin) {
     return {
       state: UNDERSTANDING.GREENFIELD,
-      label: `Greenfield — created from ${origin.generator ?? 'an empty template'} by the New Project Wizard; generated code not reviewed. Understanding comes from product intent, supplied requirements, and approved decisions`,
+      label: `Greenfield — ${origin.generator ? `created from ${origin.generator} by the New Project Wizard; generated code not reviewed` : 'created empty by the New Project Wizard'}. Understanding comes from product intent, supplied requirements, and approved decisions`,
       facts,
       origin
     };

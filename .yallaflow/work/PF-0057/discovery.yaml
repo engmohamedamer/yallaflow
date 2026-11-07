@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "uncaptured-artifact",
+      "area": "requirement",
+      "summary": "The owner's request was pasted into chat; the captured source restates it section by section, lightly condensed, not byte-identical",
+      "reason": "Pasted chat text has no original file",
+      "recordedAt": "2026-11-07T17:37:59.387Z"
+    }
+  ],
+  "updatedAt": "2026-11-07T17:37:59.387Z"
+}

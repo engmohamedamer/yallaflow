@@ -33,13 +33,16 @@ export async function consoleCommand({ port, open = true, projects = [], poll = 
     if (await exists(path.join(entry.root, '.yallaflow'))) roots.push(entry.root);
     else missing.push(entry.root);
   }
-  if (!roots.length) throw new Error('No YallaFlow project to show. Run it inside a project, pass --project DIR, or save one with `yallaflow console add DIR`.');
+  // 1.4.0 (PF-0057): with no project yet, a normal console starts on New project, so the
+  // first project can be created from the browser. A read-only console has nothing to show.
+  if (!roots.length && readOnly) throw new Error('No YallaFlow project to show. Run it inside a project, pass --project DIR, or save one with `yallaflow console add DIR`.');
   const server = await listen(roots, port, poll, missing, readOnly, { agents, experimentalClaude });
   const link = `${server.url}#token=${server.token}`;
-  console.log(readOnly ? 'YallaFlow console is running (read-only).' : 'YallaFlow console is running. It can create work items; everything else is read-only (--read-only turns creation off).');
+  console.log(readOnly ? 'YallaFlow console is running (read-only).' : 'YallaFlow console is running. It changes things only when you confirm an action on the page (--read-only turns every change off).');
   if (server.agents?.enabled) console.log(`Agent Workspace: on (Codex${server.agents.claude ? ', Claude Code experimental' : ''}). Agents use your own subscriptions; YallaFlow never uses API keys.`);
   console.log(`\nOpen: ${link}\n`);
   for (const project of server.projects) console.log(`Project: ${project.name} (${project.root})`);
+  if (!server.projects.length) console.log('No projects yet: open the link to create one, or add an existing project from the page.');
   for (const root of missing) console.log(`Unavailable (folder or workspace missing): ${root}`);
   console.log(`Live updates: ${server.watchModes.includes('poll') ? 'polling every 2 s' : 'file watcher'}`);
   console.log('The link carries a private token for this run only. Press Ctrl-C to stop.');

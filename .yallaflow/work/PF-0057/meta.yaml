@@ -1,0 +1,57 @@
+{
+  "id": "PF-0057",
+  "type": "feature",
+  "scope": "architectural",
+  "routingStatus": "routed",
+  "rawRequest": "Greenfield UX journey in the console: smart new-project stepper (idea, stack, environment, review), safe folder chooser, auto-register and open the new project, agent workspace discovery, guided runtime setup, git init, new-project overview",
+  "status": "VERIFICATION",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-07T17:37:18.541Z",
+  "updatedAt": "2026-11-07T18:29:47.594Z",
+  "title": "Greenfield UX journey in the console: smart new-project stepper (idea, stack, environment, review), safe folder chooser, auto-register and open the new project, agent workspace discovery, guided runtime setup, git init, new-project overview",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope architectural`.",
+  "routedAt": "2026-11-07T17:37:18.559Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "brainstorm",
+    "specify",
+    "plan",
+    "implement",
+    "verify",
+    "converge",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "design-exploration",
+      "specification",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "delivery-convergence",
+      "code-review"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0045",
+      "type": "file",
+      "name": "greenfield-ux-acceptance-round1.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-07T17:37:59.164Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ]
+}

@@ -105,7 +105,15 @@
         unavailable = listed.unavailable ?? [];
         readOnly = listed.readOnly !== false;
         agentsOn = Boolean(listed.agents?.enabled);
+        agentsCanEnable = Boolean(listed.agents?.canEnable);
         if (!projects.some((p) => p.id === pid)) pid = projects[0]?.id ?? null;
+      }
+      // No project yet (1.4.0): an empty console starts on project creation.
+      if (!projects.length) {
+        error = null;
+        snap = { project: { name: '' }, items: [], invalid: [], counts: { new: 0, active: 0, you: 0, fail: 0, paused: 0, done: 0, held: 0, closed: 0 } };
+        detail = null;
+        return snap;
       }
       const next = await api(`/api/p/${pid}/snapshot`);
       const r = route();
@@ -216,7 +224,8 @@
     const empty = `<p class="tiny muted" style="text-align:center;margin-top:20px">—</p>`;
     const capped = (list, i) => `${(openSt.has(i) ? list : list.slice(0, CAP)).map(pchip).join('') || empty}${list.length > CAP ? `<button class="more" data-more-st="${i}">${openSt.has(i) ? A('أقل ↑', 'Less ↑') : A(`+${list.length - CAP} كمان`, `+${list.length - CAP} more`)}</button>` : ''}`;
     if (!items().length) return onboarding() + integrityPanel();
-    return digestCard() + hero() + integrityPanel() + filterBar() + `<section class="map" id="map" aria-label="${A('التدفق', 'Flow')}">
+    const firstRun = items().every((it) => it.state === 'new') ? `<section class="panel firstrun" style="margin-bottom:14px"><b>${A('شغلك لسه في البوابة', 'Your work is at the gate')}</b><p class="small">${A('كل شغلانة جديدة بتستنى قبل المحطات. لما وكيلك يصنّفها (نوعها وحجمها)، بتدخل «افهم» وتعدّي على «قرّر» و«نفّذ» و«اتحقّق» و«افتكر» حسب اللي محتاجاه. المحطات الفاضية دي مش مشكلة.', 'Each new work item waits before the stations. Once your agent classifies it (type and size), it enters Understand and passes Decide, Change, Verify and Remember as needed. Empty stations are not a problem.')}</p>${items().slice(0, 3).map((it) => `<a class="btn sm" href="#/item/${encodeURIComponent(it.id)}">${esc(it.title)} →</a>`).join(' ')}</section>` : '';
+    return digestCard() + hero() + firstRun + integrityPanel() + filterBar() + `<section class="map" id="map" aria-label="${A('التدفق', 'Flow')}">
       <div class="station gate start" data-st="-1" style="--hue:var(--ink-2)"><div class="st-head"><span class="st-ico" aria-hidden="true">＋</span><div class="st-name">${A('جديد', 'New')}</div><span class="st-n">${entries.length}</span></div><div class="st-out">${A('الطلبات بتدخل من هنا', 'Requests enter here')}</div>
         ${capped(entries, -1)}</div>
       ${ST.map((st, i) => `<div class="station ${i === neck ? 'neck' : ''}" data-st="${i}" style="--hue:${st.hue}"><div class="st-head"><span class="st-ico">${icon(st.k)}</span><div class="st-name">${L(st.name)}</div><span class="st-n">${at(i).length}</span></div><div class="st-out">${A('بيسلّم', 'hands off')} <b>${L(st.gives)}</b></div>
@@ -245,7 +254,7 @@
   }
 
   // ---------- item ----------
-  let dtab = 'delivery';
+  let dtab = null; // null: Request for unclassified work, Delivery otherwise
   function viewItem(id) {
     const it = byId(id);
     const broken = (snap?.invalid ?? []).find((b) => b.id === id);
@@ -389,7 +398,7 @@
       ${open ? `<div class="row">${p.decisions.map((d) => `<button class="btn sm ${d === 'deny' ? 'ghost' : 'go'}" data-agent-perm="${esc(p.requestId)}" data-decision="${d}">${{ allow: A('اسمح مرة', 'Allow once'), allow_session: A('اسمح للجلسة', 'Allow for session'), deny: A('ارفض', 'Deny') }[d]}</button>`).join('')}<span class="tiny muted">${A('لو محدش ردّ هيترفض تلقائي.', 'Unanswered requests are denied automatically.')}</span></div>` : `<div class="tiny ${p.overridden ? 'warn' : 'muted'}">${label} ${by}</div>${sentNote}`}</div>`;
   }
   function agentPanel(it) {
-    if (!agentsOn) return '';
+    if (!agentsOn) return agentOffPanel(it);
     if (!agent || agent.pid !== pid) return `<section class="panel agent" id="agent"><p class="muted">${A('بيحمّل مساحة الوكيل…', 'Loading the agent workspace…')}</p></section>`;
     const s = agent.session;
     const provider = (id) => agent.providers.find((p) => p.id === id);
@@ -648,7 +657,11 @@
       files: d.sources.length ? `<div class="files">${d.sources.map((s) => `<button class="fcard" data-file="${esc(s.id)}"><span class="fic">${fileIcon(s)}</span><span class="grow"><b class="ltr fname">${esc(s.name)}</b><span class="tiny muted"><span class="ltr">${size(s.sizeBytes)}</span> · <span class="ltr">${esc(s.id)}</span>${s.capturedAt ? ` · ${ago(s.capturedAt)}` : ''}</span>${availChip(s.contentAvailability, s.availabilityNote)}${s.availabilityNote && s.contentAvailability === 'original-only' ? `<span class="tiny muted">${esc(s.availabilityNote)}</span>` : ''}</span><span class="tiny open">${A('افتح ↗', 'Open ↗')}</span></button>`).join('')}</div><p class="tiny muted" style="margin-top:10px">${A('الأصل محفوظ في المشروع ومايتعدّلش.', 'Originals are preserved and never edited.')}</p>` : `<p class="muted">${A('مفيش مرفقات.', 'No attachments.')}</p>`,
       q: d.questions.length ? `<ul class="qlist">${d.questions.map((q) => `<li><div class="row"><span class="ltr tag">${esc(q.id)}</span><b class="grow">${esc(q.question)}</b>${q.answer ? `<span class="chip done"><i></i>${A('اتجاوب', 'answered')}</span>` : `<span class="chip you"><i></i>${L(STATE.you)}</span>`}</div>${q.answer ? `<p class="small" style="margin-top:4px">↳ ${esc(q.answer)}</p>` : ''}</li>`).join('')}</ul>` : `<p class="muted">${A('مفيش أسئلة.', 'No questions.')}</p>`
     };
-    return `<section class="panel details" id="details"><div class="dtabs" role="tablist">${tabs.map(([k, l]) => `<button role="tab" aria-selected="${dtab === k}" data-dtab="${k}">${l}</button>`).join('')}</div><div class="dpanel">${panel[dtab] ?? panel.delivery}</div></section>`;
+    // 1.4.0 (PF-0057): unclassified work opens on its request, with the Request tab first.
+    const unrouted = it.routing === 'pending';
+    const tab = dtab ?? (unrouted ? 'req' : 'delivery');
+    const ordered = unrouted ? [...tabs.filter(([k]) => k === 'req'), ...tabs.filter(([k]) => k !== 'req')] : tabs;
+    return `<section class="panel details" id="details"><div class="dtabs" role="tablist">${ordered.map(([k, l]) => `<button role="tab" aria-selected="${tab === k}" data-dtab="${k}">${l}</button>`).join('')}</div><div class="dpanel">${panel[tab] ?? panel.delivery}${unrouted && tab === 'delivery' && !d.criteria.length ? `<p class="small muted">${A('لسه مفيش معايير قبول: بتتسجّل لما وكيلك يصنّف الشغلانة ويتفق معاك على المطلوب.', 'No acceptance criteria yet: they are recorded once your agent classifies this work and agrees the scope with you.')}</p>` : ''}</div></section>`;
   }
 
   // ---------- drawer: attachment previews and handoffs ----------
@@ -812,6 +825,7 @@
     if (!projectOverview || projectOverview.pid !== pid) return `<p class="muted" style="margin-top:30px">${A('بيقرا المشروع…', 'Reading the project…')}</p>`;
     if (projectOverview.error) return `<section class="errbar data" role="alert"><b>${A('مقدرناش نقرا نظرة المشروع', 'The project overview could not be read')}</b><p class="small">${esc(projectOverview.error)}</p></section>`;
     const o = projectOverview.data;
+    if (o.project.kind === 'greenfield' && !(o.memory?.current > 0)) return greenfieldOverview(o);
     const m = o.memory;
     const facts = (area) => (o.areas[area]?.facts ?? []);
     const factList = (area, empty) => {
@@ -851,6 +865,46 @@
       </div>
       <p class="tiny muted" style="margin-top:12px">${coverage}</p>
       ${devPanel(A('أوامر نظرة المشروع', 'Overview commands'), cmds)}`;
+  }
+
+  // ---------- new-project Overview (1.4.0, PF-0057): a setup checklist from canonical data ----------
+  // Every line is read from records (snapshot, overview, runtime, agent state); nothing is
+  // computed as done that YallaFlow did not record. A project with approved memory gets the
+  // evidence-based Overview instead.
+  function greenfieldOverview(o) {
+    const origin = o.project.origin ?? {};
+    const all = items();
+    const first = [...all].sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt)))[0] ?? null;
+    const goalSet = first && !/^Set up \S+$/.test(first.title);
+    const services = runtime?.pid === pid && runtime.data ? runtime.data.services ?? [] : null;
+    const gitOn = Boolean(o.coverage?.git);
+    const envName = { docker: 'Docker', local: A('أدوات محلية', 'local tools'), later: null }[origin.environment] ?? null;
+    const row = (state, title, body, action = '') => `<li class="ck ${state}"><span class="ckmark" aria-hidden="true">${state === 'done' ? '✓' : state === 'now' ? '●' : '○'}</span><div class="grow"><b>${title}</b>${body ? `<p class="small muted">${body}</p>` : ''}</div>${action}</li>`;
+    const firstLink = first ? `<a class="btn sm" href="#/item/${encodeURIComponent(first.id)}">${A('افتح أول شغلانة', 'Open the first work item')}</a>` : '';
+    const checklist = [
+      row('done', A('المشروع اتعمل', 'Project created'), origin.createdAt ? A(`بمعالج المشروع الجديد ${ago(origin.createdAt)}.`, `By the New Project Wizard ${ago(origin.createdAt)}.`) : A('مشروع جديد (Greenfield).', 'A new (Greenfield) project.')),
+      row(goalSet ? 'done' : 'now', A('الهدف', 'Goal'), goalSet ? esc(first.title.replace(/^[^:]+:\s*/, '')) : A('لسه مااتوصفش. اوصف اللي هتبنيه في أول شغلانة.', 'Not described yet. Describe what you are building in the first work item.'), goalSet ? '' : firstLink),
+      row(first && first.state !== 'new' ? 'done' : 'now', A('المتطلبات', 'Requirements'), first && first.state !== 'new' ? A('وكيلك صنّف الشغلانة وبدأ يشتغل عليها.', 'Your agent classified the work and started on it.') : A('اتفق مع وكيلك على أول متطلبات. المتطلبات والمرفقات اللي كتبتها محفوظة في أول شغلانة.', 'Agree the first requirements with your agent. The requirements and attachments you gave are kept on the first work item.'), firstLink),
+      row(origin.stack?.length ? 'done' : 'todo', A('التقنية', 'Stack'), origin.stack?.length ? esc(origin.stack.join(' · ')) : A('مفيش تقنية لسه (مشروع فاضي). اختارها مع وكيلك.', 'No stack yet (an empty project). Choose it with your agent.')),
+      row(services?.length ? 'done' : envName ? 'now' : 'todo', A('بيئة التطوير', 'Development environment'), services?.length ? A(`${services.length} خدمة معرّفة.`, `${services.length} service(s) defined.`) : envName ? A(`${envName} — مخطّطة، لسه مفيش خدمات معرّفة.`, `${envName} — planned; no services defined yet.`) : A('لسه متحددتش.', 'Not decided yet.'), readOnly ? '' : `<a class="btn sm" href="#/setup">${A('اضبط التشغيل', 'Configure runtime')}</a>`),
+      row(gitOn ? 'done' : 'todo', 'Git', gitOn ? A('فيه Git repository.', 'A Git repository exists.') : A('مفيش Git repository لسه.', 'No Git repository yet.'), gitOn || readOnly ? '' : `<button class="btn sm" data-git-init>${A('اعمل Git repository', 'Initialize Git')}</button>`),
+      row(agentsOn ? 'done' : 'todo', A('الوكيل', 'Agent'), agentsOn ? A('مساحة الوكيل مفعّلة: افتح أي شغلانة وابدأ جلسة Codex.', 'The Agent Workspace is on: open a work item and start a Codex session.') : agentInfo?.codex && !agentInfo.codex.ready ? A('Codex مش جاهز على الجهاز ده.', 'Codex is not ready on this machine.') : A('مساحة الوكيل مقفولة. تقدر تشتغل من الوكيل في الترمينال كمان.', 'The Agent Workspace is off. You can also work from your agent in a terminal.'), !agentsOn && agentsCanEnable ? `<button class="btn sm" data-agents-enable>${A('فعّل Codex للجلسة دي', 'Enable Codex for this session')}</button>` : '')
+    ].join('');
+    const firstCard = first ? `<section class="panel"><h2>${A('أول شغلانة', 'First work item')}</h2><p><a href="#/item/${encodeURIComponent(first.id)}"><span class="ltr tag">${esc(first.id)}</span> ${esc(first.title)}</a></p><p class="small">${chip(first.state === 'new' ? 'todo' : first.state)} ${iso(nowText(first))}</p></section>` : '';
+    const main = o.stack.entries.filter((e) => !['language', 'lockfile', 'ecosystem', 'ci'].includes(e.kind));
+    const stack = main.length ? `<section class="panel wide"><h2>${A('اللي في الكود دلوقتي', 'What the code declares now')}</h2><p class="small">${main.map((e) => `<span class="tag">${esc(e.component)}${e.declared ? ` <span class="ltr">${esc(e.declared)}</span>` : ''}</span>`).join(' ')}</p><p class="tiny muted">${A('من ملفات المشروع؛ الكود المتولّد لسه ماتراجعش.', 'From the project files; generated code is not reviewed yet.')}</p></section>` : '';
+    return `<section class="pagehead"><h1 style="font-size:26px">${esc(o.project.name)}</h1><p class="muted">${A('مشروع جديد. ده اللي اتعمل وده اللي فاضل — مفيش حاجة ناقصة هنا تعتبر خطأ.', 'A new project. This is what was created and what remains — nothing missing here is an error.')}</p></section>
+      <section class="panel"><h2>${A('تجهيز المشروع', 'Project setup')}</h2><ol class="checklist">${checklist}</ol></section>
+      <div class="ovgrid" style="margin-top:16px">${firstCard}${stack}</div>
+      <p class="tiny muted" style="margin-top:12px">${A('المعمارية والوحدات وذاكرة المشروع بتظهر هنا لما تتسجّل بأدلة.', 'Architecture, modules and project memory appear here once they are recorded with evidence.')}</p>`;
+  }
+  async function gitInitAction() {
+    if (readOnly || !confirm(A('تعمل Git repository محلي في المشروع ده؟ من غير remote ولا commit.', 'Initialize a local Git repository in this project? No remote and no commit.'))) return;
+    try {
+      await post(`/api/p/${pid}/git/init`, JSON.stringify({ confirm: true }), { 'Content-Type': 'application/json' });
+      toast(A('اتعمل Git repository.', 'Git repository initialized.'));
+    } catch (e) { toast(esc(e.message)); }
+    team = null; await loadProjectOverview(); await loadForView(); render();
   }
 
   // ---------- setup (1.4.0): reviewed, trusted local development services ----------
@@ -906,9 +960,46 @@
     const head = `<section class="pagehead"><h1 style="font-size:26px">${A('تشغيل بيئة التطوير', 'Development runtime')}</h1><p class="muted">${A('خدمات محددة ومراجَعة في .yallaflow/runtime.yaml. مفيش حاجة بتشتغل لوحدها: بتوثّق الأمر مرة، وتشغّل وتوقف بنفسك. YallaFlow بيوقف بس البرامج اللي هو شغّلها وقادر يتعرّف عليها.', 'Reviewed services from .yallaflow/runtime.yaml. Nothing runs on its own: you trust a command once, then start and stop it yourself. YallaFlow stops only processes it started and can positively identify.')}</p></section>`;
     if (!r.supported) return head + `<section class="panel"><p>${A('مدير التشغيل مدعوم على Linux وmacOS بس.', 'The runtime manager supports Linux and macOS only.')}</p></section>`;
     const profileErr = r.profile.error ? `<section class="errbar data" role="alert"><b>${A('ملف التشغيل فيه مشكلة', 'The runtime profile is invalid')}</b><p class="small">${esc(r.profile.error)}</p></section>` : '';
-    const services = r.services.length ? `<section class="svcs">${r.services.map(serviceCard).join('')}</section>` : `<section class="panel"><p class="small muted">${A('لسه مفيش خدمات معرّفة.', 'No services are defined yet.')}</p></section>`;
-    const sugg = r.suggestions.length ? `<section class="panel" style="margin-top:16px"><h2 style="font-size:17px">${A('اقتراحات من ملفات المشروع', 'Suggestions from repository files')}</h2><p class="tiny muted">${A('الاقتراحات مابتشتغلش. ضيفها من سطر الأوامر، راجعها، ووثّقها.', 'Suggestions never run. Add one from the command line, review it, then trust it.')}</p><ul class="modules">${r.suggestions.map((x) => `<li><b>${esc(x.name)}</b> <span class="ltr mono small">${esc(x.command.join(' '))}</span> <span class="tiny muted">${A('من', 'from')} <span class="ltr">${esc(x.evidence.join(', '))}</span></span>${x.note ? `<p class="tiny muted">${esc(x.note)}</p>` : ''}<div class="cli" dir="ltr">yallaflow runtime add --from-suggestion ${esc(x.id)}</div></li>`).join('')}</ul></section>` : '';
-    return head + profileErr + services + sugg + devPanel(A('أوامر التشغيل', 'Runtime commands'), ['yallaflow runtime status', 'yallaflow runtime suggest', 'yallaflow runtime add <id> --cwd DIR --port N -- <executable> [args...]', 'yallaflow runtime trust <id>', 'yallaflow runtime start|stop|restart <id>', 'yallaflow runtime logs <id>', 'yallaflow runtime stop --all']);
+    const services = r.services.length ? `<section class="svcs">${r.services.map(serviceCard).join('')}</section>` : `<section class="panel"><p class="small">${A('لسه مفيش خدمات معرّفة. ضيف خدمة من الاقتراحات تحت أو بنفسك، وبعدين وثّقها وشغّلها لما تكون جاهز.', 'No services are defined yet. Add one from the suggestions below or yourself, then trust and start it when you are ready.')}</p></section>`;
+    const configure = readOnly ? '' : `<details class="panel" style="margin-top:16px" ${r.services.length || r.suggestions.length ? '' : 'open'}><summary><b>${A('ضيف خدمة بنفسك', 'Add a service yourself')}</b></summary>
+      <form class="wizform" data-rt-form data-keep="rt-${esc(pid)}" style="margin-top:10px">
+        <div class="twocol"><label>${A('الاسم', 'Name')}<input name="name" required maxlength="60" placeholder="Web"></label><label>${A('المعرّف', 'Id')} <span class="tiny muted">(a-z 0-9 -)</span><input class="ltr" name="id" required pattern="[a-z][a-z0-9-]{0,31}" placeholder="web"></label></div>
+        <div class="twocol"><label>${A('النوع', 'Kind')}<select name="kind"><option value="process">${A('أمر (process)', 'Command (process)')}</option><option value="docker-compose">Docker Compose</option></select></label><label>${A('فولدر التشغيل (جوه المشروع)', 'Working folder (inside the project)')}<input class="ltr" name="cwd" value="."></label></div>
+        <label>${A('الأمر', 'Command')} <span class="tiny muted">${A('(البرنامج والوسائط، من غير shell)', '(program and arguments, no shell)')}</span><input class="ltr mono" name="command" required placeholder="npm run dev"></label>
+        <div class="twocol"><label>${A('المنافذ', 'Ports')} <span class="tiny muted">${A('(مفصولة بفاصلة)', '(comma separated)')}</span><input class="ltr" name="ports" placeholder="5173"></label><label>${A('أسماء متغيرات البيئة', 'Environment variable names')} <span class="tiny muted">${A('(أسماء بس، القيم بتفضل عندك)', '(names only; values stay with you)')}</span><input class="ltr" name="env" placeholder="API_URL"></label></div>
+        <label class="small"><input type="checkbox" name="local"> ${A('على الجهاز ده بس (مش متشاركة في المستودع)', 'This machine only (not shared in the repository)')}</label>
+        <div class="row"><button class="btn go sm" type="submit">${A('ضيف الخدمة', 'Add the service')}</button><span class="tiny muted">${A('الإضافة مابتشغّلش حاجة.', 'Adding runs nothing.')}</span></div>
+        ${runtimeErr.__add ? `<p class="small" role="alert" style="color:var(--clay);white-space:pre-wrap">${esc(runtimeErr.__add)}</p>` : ''}</form></details>`;
+    const sugg = r.suggestions.length ? `<section class="panel" style="margin-top:16px"><h2 style="font-size:17px">${A('اقتراحات من ملفات المشروع', 'Suggestions from repository files')}</h2><p class="tiny muted">${A('الاقتراحات مابتشتغلش. ضيفها، راجعها، ووثّقها — التشغيل خطوة منفصلة.', 'Suggestions never run. Add one, review it, then trust it — starting is a separate step.')}</p><ul class="modules">${r.suggestions.map((x) => `<li><b>${esc(x.name)}</b> <span class="ltr mono small">${esc(x.command.join(' '))}</span> <span class="tiny muted">${A('من', 'from')} <span class="ltr">${esc(x.evidence.join(', '))}</span></span>${x.note ? `<p class="tiny muted">${esc(x.note)}</p>` : ''}${readOnly ? '' : `<div class="row" style="margin-top:6px"><button class="btn sm" data-rt-suggest="${esc(x.id)}">${A('ضيف الخدمة دي', 'Add this service')}</button></div>`}</li>`).join('')}</ul></section>` : '';
+    return head + profileErr + services + sugg + configure + devPanel(A('أوامر التشغيل', 'Runtime commands'), ['yallaflow runtime status', 'yallaflow runtime suggest', 'yallaflow runtime add <id> --cwd DIR --port N -- <executable> [args...]', 'yallaflow runtime trust <id>', 'yallaflow runtime start|stop|restart <id>', 'yallaflow runtime logs <id>', 'yallaflow runtime stop --all']);
+  }
+  // The add-service form is never redrawn while the developer is using it (PF-0057).
+  const rtFormBusy = () => { const form = document.querySelector('[data-rt-form]'); return Boolean(form && (form.contains(document.activeElement) || [...form.querySelectorAll('input:not([type=checkbox])')].some((x) => x.value !== x.defaultValue))); };
+  // Splits a typed command into argv (quotes group words; no shell features).
+  function argvOf(text) {
+    const out = []; let cur = ''; let quote = null; let any = false;
+    for (const ch of String(text)) {
+      if (quote) { if (ch === quote) quote = null; else cur += ch; }
+      else if (ch === '"' || ch === "'") { quote = ch; any = true; }
+      else if (/\s/.test(ch)) { if (cur || any) out.push(cur); cur = ''; any = false; }
+      else cur += ch;
+    }
+    if (cur || any) out.push(cur);
+    return out;
+  }
+  async function addService(body) {
+    runtimeErr.__add = null;
+    try {
+      await post(`/api/p/${pid}/runtime/services`, JSON.stringify(body), { 'Content-Type': 'application/json' });
+      document.querySelector('[data-rt-form]')?.reset();
+      toast(A('الخدمة اتضافت. راجعها ووثّقها قبل التشغيل.', 'Service added. Review and trust it before starting.'));
+    } catch (e) { runtimeErr.__add = e.message; toast(esc(e.message)); }
+    await loadRuntime(); render();
+  }
+  function submitService(form) {
+    const d = new FormData(form);
+    const list = (v) => String(v ?? '').split(',').map((x) => x.trim()).filter(Boolean);
+    addService({ id: String(d.get('id') ?? '').trim(), name: String(d.get('name') ?? '').trim(), kind: String(d.get('kind')), cwd: String(d.get('cwd') ?? '.').trim() || '.', ports: list(d.get('ports')).map(Number), env: list(d.get('env')), local: d.get('local') === 'on', argv: argvOf(d.get('command')) });
   }
   async function runtimeAction(action, id) {
     if (readOnly || runtimeBusy[id]) return;
@@ -936,88 +1027,326 @@
   // While Setup is open, state is re-read every few seconds (a service can crash at any time).
   function syncRuntimePolling() {
     const want = route().v === 'setup';
-    if (want && !runtimeTimer) runtimeTimer = setInterval(async () => { if (Object.values(runtimeBusy).some(Boolean)) return; await loadRuntime(); if (route().v === 'setup' && !document.activeElement?.matches?.('[data-trust-input]')) render(); }, 3000);
+    if (want && !runtimeTimer) runtimeTimer = setInterval(async () => { if (Object.values(runtimeBusy).some(Boolean)) return; await loadRuntime(); if (route().v === 'setup' && !document.activeElement?.matches?.('[data-trust-input]') && !rtFormBusy()) render(); }, 3000);
     if (!want && runtimeTimer) { clearInterval(runtimeTimer); runtimeTimer = null; }
   }
 
-  // ---------- new project (1.4.0): reviewed plan → confirmed, staged creation ----------
-  // Data: GET /api/new/catalog; POST /api/new/plan and /api/new/create; GET
-  // /api/new/plans/<id> for progress. Nothing is created until the plan was reviewed and
-  // its hash prefix typed; only catalog generators run, with the exact command shown.
-  let wiz = { step: 'form', catalog: null, form: null, plan: null, error: null, busy: false, progress: null };
+  // ---------- new project (1.4.0, PF-0057): a four-step stepper ----------
+  // 1 Idea → 2 Stack → 3 Environment → 4 Review & create. The plan is created when step 4
+  // opens and is immutable; Create sends its full hash (a changed plan is refused). A plan
+  // that installs dependencies also needs the project name typed. Attachments are listed in
+  // the plan by size and SHA-256 and uploaded to the first work item after creation. The
+  // server registers the new project in the console; the page then switches to it.
+  let wiz = { step: 1, catalog: null, tools: null, form: null, files: [], plan: null, error: null, busy: false, progress: null, confirmName: '', attach: null, registration: null };
   let wizTimer = null;
   async function loadWizard() {
-    if (wiz.catalog) return;
-    try { wiz.catalog = await api('/api/new/catalog'); } catch (e) { wiz.error = e.message; }
+    if (!wiz.catalog) { try { wiz.catalog = await api('/api/new/catalog'); } catch (e) { wiz.error = e.message; } }
+  }
+  async function loadTools() {
+    if (wiz.tools) return;
+    try { wiz.tools = await api('/api/new/tools'); } catch { wiz.tools = { tools: [] }; }
+    if (route().v === 'new') render();
   }
   const parentGuess = () => { const root = projects.find((p) => p.id === pid)?.root ?? projects[0]?.root ?? ''; return root.replace(/[\\/][^\\/]+[\\/]?$/, '') || root; };
+  const CAT = { fullstack: { ar: 'Full-stack: واجهة وخادم في مشروع واحد', en: 'Full-stack: frontend and server in one project' }, frontend: { ar: 'واجهة بس (Frontend)', en: 'Frontend only' }, backend: { ar: 'خادم بس (Backend / API)', en: 'Backend only (API)' }, blank: { ar: 'فاضي', en: 'Blank' } };
+  const ENV = {
+    docker: { t: { ar: 'Docker', en: 'Docker' }, d: { ar: 'هنسجّل إنك عايز تشتغل بـDocker. مفيش ملفات Docker بتتعمل دلوقتي، وهتضبطها بعدين من «التشغيل».', en: 'Records that you want to develop with Docker. No Docker files are created now; you set them up later in Setup.' }, tools: ['docker', 'docker-compose'] },
+    local: { t: { ar: 'أدوات على جهازك', en: 'Local tools' }, d: { ar: 'هتشغّل المشروع بالأدوات المتسطّبة عندك. بعد الإنشاء، «التشغيل» بيقترح أوامر من ملفات المشروع وانت بتراجعها.', en: 'Run the project with tools installed on this machine. After creation, Setup suggests commands from the project files for you to review.' }, tools: ['node', 'npm', 'php', 'composer'] },
+    later: { t: { ar: 'أقرر بعدين', en: 'Decide later' }, d: { ar: 'مفيش حاجة بتتسجّل للبيئة دلوقتي. تقدر تضبطها في أي وقت.', en: 'Nothing about the environment is recorded now. You can configure it at any time.' }, tools: [] }
+  };
+  const wizForm = () => (wiz.form ??= { name: '', description: '', requirements: '', parent: parentGuess(), stack: 'empty', environment: 'later', git: true, install: false, allowNested: false });
+  // Same rule as the server: installing dependencies or running package scripts needs the name typed.
+  const typedName = (b) => Boolean(b.install) || b.steps.some((st) => st.installsDependencies || st.runsPackageScripts);
+  const stackOf = (id) => wiz.catalog?.catalog.find((c) => c.id === id);
+  function stepper() {
+    const names = [A('الفكرة', 'Idea'), A('التقنية', 'Stack'), A('البيئة', 'Environment'), A('راجع وأنشئ', 'Review & create')];
+    const at = typeof wiz.step === 'number' ? wiz.step : 5;
+    return `<ol class="stepper">${names.map((n, i) => `<li class="${i + 1 < at ? 'done' : i + 1 === at ? 'now' : ''}" ${i + 1 === at ? 'aria-current="step"' : ''}><span class="sn">${i + 1 < at ? '✓' : i + 1}</span>${n}</li>`).join('')}</ol>`;
+  }
+  const navRow = (next, { back = true, nextLabel = A('التالي', 'Next') } = {}) => `<div class="row wiznav">${back ? `<button class="btn ghost" type="button" data-wiz-prev>${A('رجوع', 'Back')}</button>` : ''}<span class="grow"></span>${next ? `<button class="btn go" type="submit" ${wiz.busy ? 'disabled' : ''}>${nextLabel}</button>` : ''}</div>`;
   function viewNew() {
-    const head = `<section class="pagehead"><h1 style="font-size:26px">${A('مشروع جديد', 'New project')}</h1><p class="muted">${A('اختار الاسم والمكان والتقنية، راجع الخطة بالأوامر اللي هتتنفذ، وبعدين أكّد. YallaFlow بيعمل فولدر جديد بس، عمره ما بيكتب فوق مشروع موجود.', 'Choose a name, a location and a stack, review the plan with the exact commands, then confirm. YallaFlow only creates a new folder; it never overwrites an existing project.')}</p></section>`;
+    const head = `<section class="pagehead"><h1 style="font-size:26px">${A('مشروع جديد', 'New project')}</h1><p class="muted">${A('اوصف اللي هتبنيه، اختار التقنية والبيئة، راجع، وبعدين أنشئ. YallaFlow بيعمل فولدر جديد بس، عمره ما بيكتب فوق حاجة موجودة.', 'Describe what you are building, choose the stack and environment, review, then create. YallaFlow only creates a new folder; it never overwrites anything.')}</p></section>`;
     if (readOnly) return head + `<section class="panel"><p>${A('الكونسول ده للقراءة بس.', 'This console is read-only.')}</p></section>`;
     if (!wiz.catalog) return head + (wiz.error ? `<section class="errbar" role="alert"><p>${esc(wiz.error)}</p></section>` : `<p class="muted">${A('بيحمّل…', 'Loading…')}</p>`);
     const err = wiz.error ? `<section class="errbar" role="alert" style="margin-bottom:12px"><p class="small" style="white-space:pre-wrap">${esc(wiz.error)}</p></section>` : '';
-    if (wiz.step === 'form') {
-      const f = wiz.form ?? { name: '', parent: parentGuess(), stack: 'react-vite', install: false, allowNested: false };
-      wiz.form = f;
-      const stacks = wiz.catalog.catalog.map((c) => `<label class="stackcard ${f.stack === c.id ? 'on' : ''}"><input type="radio" name="wiz-stack" value="${esc(c.id)}" ${f.stack === c.id ? 'checked' : ''}><b>${esc(c.label)}</b><span class="tiny muted">${esc(c.stack.join(' · ') || A('من غير مولّد', 'no generator'))}</span><span class="row tiny">${c.network ? `<span class="chip wait">${A('بيحتاج إنترنت', 'network')}</span>` : ''}${c.installsDependencies ? `<span class="chip wait">${A('بيسطّب مكتبات', 'installs dependencies')}</span>` : ''}${c.generator ? `<span class="tag ltr">${esc(c.generator.package)}@${esc(c.generator.version)}</span>` : ''}</span></label>`).join('');
-      return head + err + `<form class="panel wizform" data-wiz-form>
-        <label>${A('اسم المشروع', 'Project name')}<input class="ltr" name="name" required pattern="[A-Za-z0-9][A-Za-z0-9._-]{0,63}" value="${esc(f.name)}" autocomplete="off"></label>
-        <label>${A('الفولدر الأب (مسار كامل)', 'Parent folder (absolute path)')}<input class="ltr" name="parent" required value="${esc(f.parent)}" autocomplete="off"></label>
-        <fieldset><legend>${A('التقنية', 'Stack')}</legend><div class="stackgrid">${stacks}</div></fieldset>
-        <label class="small"><input type="checkbox" name="install" ${f.install ? 'checked' : ''}> ${A('سطّب المكتبات بعد الإنشاء (خطوة منفصلة، بتحتاج إنترنت وبتشغّل سكريبتات الحزم)', 'Install dependencies after creation (a separate step; needs the network and runs package scripts)')}</label>
-        <label class="small"><input type="checkbox" name="allowNested" ${f.allowNested ? 'checked' : ''}> ${A('اسمح بمشروع جوه مستودع موجود', 'Allow a project inside an existing repository')}</label>
-        <div class="row"><button class="btn go" type="submit" ${wiz.busy ? 'disabled' : ''}>${wiz.busy ? A('بيجهّز الخطة…', 'Preparing the plan…') : A('راجع الخطة', 'Review the plan')}</button></div>
-        <details class="small" style="margin-top:10px"><summary>${A('اقتراح من وكيلك', 'Recommend for me')}</summary><p class="tiny muted">${A('YallaFlow مش بيكلّم أي نموذج. ادّي الطلب ده لوكيلك (Claude Code أو Codex)، وهو هيعمل خطة تراجعها هنا.', 'YallaFlow calls no model. Give this request to your agent (Claude Code or Codex); it prepares a plan that you review with yallaflow new show.')}</p><div class="cli" dir="ltr">${esc(wiz.catalog.recommendRequest)}</div><button class="btn ghost sm" type="button" data-copy="${esc(wiz.catalog.recommendRequest)}">${A('انسخ الطلب', 'Copy the request')}</button></details>
-      </form>`;
+    const f = wizForm();
+    if (wiz.step === 1) {
+      const files = wiz.files.map((x, i) => `<li><span class="ltr">${esc(x.name)}</span> <span class="tiny muted">${size(x.size)}</span> <button type="button" class="btn ghost sm" data-wiz-unfile="${i}" aria-label="${A('شيل', 'Remove')} ${esc(x.name)}">✕</button></li>`).join('');
+      return head + stepper() + err + `<form class="panel wizform" data-wiz-step="1" data-keep="wiz-1" novalidate>
+        <label>${A('اسم المشروع', 'Project name')} <span class="tiny muted">${A('(حروف إنجليزي وأرقام و . _ -)', '(letters, digits, . _ -)')}</span><input class="ltr" name="name" required pattern="[A-Za-z0-9][A-Za-z0-9._-]{0,63}" value="${esc(f.name)}" autocomplete="off"></label>
+        <label>${A('عايز تبني إيه؟', 'What do you want to build?')}<textarea name="description" rows="3" maxlength="4000" placeholder="${A('مثلاً: نوت بوك مشترك للفرق الصغيرة يحفظ محاضر الاجتماعات.', 'For example: a shared notebook for small teams to keep meeting notes.')}">${esc(f.description)}</textarea></label>
+        <details ${f.requirements ? 'open' : ''}><summary class="small">${A('متطلبات وسياق (اختياري)', 'Requirements and context (optional)')}</summary><textarea name="requirements" rows="5" maxlength="16000" placeholder="${A('المزايا المطلوبة، المستخدمين، القيود…', 'Features, users, constraints…')}">${esc(f.requirements)}</textarea></details>
+        <fieldset><legend>${A('مرفقات (اختياري)', 'Attachments (optional)')}</legend><p class="tiny muted">${A('BRD أو Word أو PDF أو صور. بتترفق بأول شغلانة بعد الإنشاء، وبتتطابق مع اللي راجعته.', 'A BRD, Word, PDF or screenshots. They are attached to the first work item after creation, matched to what you reviewed.')}</p>
+          <input type="file" multiple accept="${ACCEPT}" data-wiz-files>${files ? `<ul class="wizfiles">${files}</ul>` : ''}</fieldset>
+        <fieldset><legend>${A('المكان', 'Location')}</legend><div class="row"><span class="ltr mono grow wizpath">${esc(f.parent || A('لسه مااخترتش', 'not chosen yet'))}</span><button class="btn sm" type="button" data-folder-open="parent">${A('اختار فولدر', 'Choose folder')}</button></div>
+          <p class="tiny muted">${A('المشروع هيتعمل في:', 'The project will be created at:')} <span class="ltr mono">${esc(f.parent && f.name ? `${f.parent.replace(/[\\/]$/, '')}/${f.name}` : '—')}</span></p>
+          <details class="small"><summary>${A('اكتب المسار بنفسك (متقدم)', 'Type the path yourself (advanced)')}</summary><input class="ltr" name="parent" value="${esc(f.parent)}" autocomplete="off" aria-label="${A('الفولدر الأب', 'Parent folder')}"></details></fieldset>
+        ${navRow(true, { back: false })}</form>`;
+    }
+    if (wiz.step === 2) {
+      const groups = ['fullstack', 'frontend', 'backend', 'blank'].map((cat) => {
+        const list = wiz.catalog.catalog.filter((c) => (c.category ?? 'blank') === cat);
+        if (!list.length) return '';
+        return `<fieldset class="stackgroup"><legend>${L(CAT[cat])}</legend><div class="stackgrid">${list.map((c) => `<label class="stackcard ${f.stack === c.id ? 'on' : ''}"><input type="radio" name="wiz-stack" value="${esc(c.id)}" ${f.stack === c.id ? 'checked' : ''}><b>${esc(c.label)}</b><span class="tiny muted">${esc(c.stack.join(' · ') || A('من غير كود', 'no code'))}</span>${c.fit ? `<span class="small">${esc(c.fit)}</span>` : ''}${c.tradeoffs ? `<span class="tiny muted">⚖ ${esc(c.tradeoffs)}</span>` : ''}<span class="row tiny">${c.network ? `<span class="chip wait">${A('محتاج إنترنت', 'needs network')}</span>` : ''}</span></label>`).join('')}</div></fieldset>`;
+      }).join('');
+      return head + stepper() + err + `<form class="panel wizform" data-wiz-step="2" data-keep="wiz-2">
+        <p class="small">${A('اختار التقنية بنفسك. تقدر تغيّرها لحد ما تأكد الإنشاء.', 'Choose the stack yourself. You can change it until you confirm creation.')}</p>${groups}
+        <p class="tiny muted" style="margin-top:8px">ⓘ ${A('اقتراح التقنية من وكيلك لسه مش متاح هنا. لو مش متأكد، اختار «مشروع فاضي» واسأل وكيلك بعد الإنشاء.', 'A stack recommendation from your agent is not available here yet. If you are unsure, choose the empty project and ask your agent after creation.')}</p>
+        ${navRow(true)}</form>`;
+    }
+    if (wiz.step === 3) {
+      loadTools();
+      const st = stackOf(f.stack);
+      const tool = (id) => wiz.tools?.tools.find((t) => t.id === id);
+      const toolChips = (ids) => ids.map((id) => { const t = tool(id); return !wiz.tools ? `<span class="tag">${esc(id)} …</span>` : `<span class="chip ${t?.found ? 'done' : 'wait'}" title="${esc(t?.version ?? '')}"><i></i>${esc(id)} ${t?.found ? `<span class="ltr tiny">${esc((/\d+(?:\.\d+){1,2}/.exec(t.version) ?? [A('موجود', 'found')])[0])}</span>` : A('مش موجود', 'not found')}</span>`; }).join(' ');
+      const envs = ['docker', 'local', 'later'].map((k) => `<label class="stackcard ${f.environment === k ? 'on' : ''}"><input type="radio" name="wiz-env" value="${k}" ${f.environment === k ? 'checked' : ''}><b>${L(ENV[k].t)}</b><span class="small">${L(ENV[k].d)}</span>${ENV[k].tools.length ? `<span class="row tiny">${toolChips(ENV[k].tools)}</span>` : ''}</label>`).join('');
+      return head + stepper() + err + `<form class="panel wizform" data-wiz-step="3" data-keep="wiz-3">
+        <fieldset><legend>${A('بيئة التطوير', 'Development environment')}</legend><div class="stackgrid">${envs}</div><p class="tiny muted">${A('YallaFlow بيفحص الأدوات بس، مابيسطّبش ولا بيشغّل حاجة.', 'YallaFlow only checks for tools; it installs and runs nothing.')}</p></fieldset>
+        <fieldset><legend>Git</legend><label class="small"><input type="checkbox" name="git" ${f.git ? 'checked' : ''}> ${A('اعمل Git repository محلي', 'Initialize a local Git repository')} ${toolChips(['git'])}</label>
+          <p class="tiny muted">${A('بيعمل git init بس: من غير remote ولا commit ولا push. ربطه بـGitHub أو غيره خطوة منفصلة بتعملها انت.', 'Runs git init only: no remote, no commit, no push. Connecting it to GitHub or another remote is a separate step you take yourself.')}</p></fieldset>
+        ${st?.install ? `<fieldset><legend>${A('المكتبات', 'Dependencies')}</legend><label class="small"><input type="checkbox" name="install" ${f.install ? 'checked' : ''}> ${A('سطّب المكتبات بعد الإنشاء', 'Install dependencies after creation')} <span class="ltr tiny mono">${esc(st.install.join(' '))}</span></label><p class="tiny muted">${A('بيحتاج إنترنت وبيشغّل سكريبتات الحزم، فهتكتب اسم المشروع علشان تأكد.', 'Needs the network and runs package scripts, so you will type the project name to confirm.')}</p></fieldset>` : ''}
+        <details class="small"><summary>${A('متقدم', 'Advanced')}</summary><label><input type="checkbox" name="allowNested" ${f.allowNested ? 'checked' : ''}> ${A('اسمح بمشروع جوه مستودع موجود', 'Allow a project inside an existing repository')}</label></details>
+        ${navRow(true, { nextLabel: wiz.busy ? A('بيجهّز الخطة…', 'Preparing the plan…') : A('راجع', 'Review') })}</form>`;
     }
     const plan = wiz.plan;
+    if (!plan) return head + stepper() + err + `<section class="panel"><p class="muted">${A('بيجهّز الخطة…', 'Preparing the plan…')}</p>${navRow(false)}</section>`;
     const b = plan.body;
-    const steps = b.steps.map((st) => st.argv ? `<li><span class="ltr mono">${esc(JSON.stringify(st.argv))}</span> ${st.network ? `<span class="chip wait">${A('إنترنت', 'network')}</span>` : ''}${st.installsDependencies ? `<span class="chip wait">${A('بيسطّب مكتبات', 'installs dependencies')}</span>` : ''}${st.runsPackageScripts ? `<span class="chip wait">${A('بيشغّل سكريبتات', 'runs package scripts')}</span>` : ''}</li>` : `<li class="small muted">${esc(st.note)}</li>`).join('');
-    const prereq = b.prerequisites.map((p) => `<li>${esc(p.name)}: ${p.found ? `<span class="ltr">${esc(p.version || 'found')}</span>` : `<b style="color:var(--clay)">${A('مش موجود — سطّبه الأول', 'not found — install it first')}</b>`}${p.note ? ` <span class="tiny muted">(${esc(p.note)})</span>` : ''}</li>`).join('');
-    const review = `<section class="panel"><h2 style="font-size:18px">${A('راجع الخطة', 'Review the plan')} · ${esc(b.stackLabel)}</h2>
-      <dl class="svcdef"><dt>${A('هيتعمل في', 'Will be created at')}</dt><dd class="ltr mono">${esc(b.destination)}</dd><dt>${A('التقنيات', 'Stack')}</dt><dd>${esc(b.technologies.join(', ') || '—')}</dd><dt>${A('المولّد', 'Generator')}</dt><dd class="ltr">${b.generator ? `${esc(b.generator.package)}@${esc(b.generator.version)}${b.docs ? ` · <span class="tiny muted">${A('التوثيق:', 'docs:')} ${esc(b.docs)}</span>` : ''}` : A('مفيش', 'none')}</dd><dt>${A('الهيكل المتوقع', 'Expected structure')}</dt><dd class="ltr mono small">${esc(b.expectedStructure.join('  '))}</dd>${b.nestedIn ? `<dt>${A('ملاحظة', 'Note')}</dt><dd>${A('جوه', 'inside')} <span class="ltr">${esc(b.nestedIn)}</span></dd>` : ''}</dl>
-      <details style="margin-top:12px"><summary class="small">${A('تفاصيل تقنية: الأوامر اللي هتتنفذ بالترتيب', 'Technical details: what runs, in order')}</summary><ol class="wizsteps">${steps}</ol></details>
-      ${prereq ? `<h3 style="font-size:15px;margin-top:12px">${A('المتطلبات', 'Prerequisites')}</h3><ul class="small">${prereq}</ul>` : ''}
-      ${b.rationale ? `<p class="small" style="margin-top:8px"><b>${A('سبب الاقتراح:', 'Why this stack:')}</b> ${esc(b.rationale)}</p>` : ''}
-      <p class="tiny muted" style="margin-top:8px">${b.generator ? A('المشروع الجديد بيتسجّل كمشروع جديد (Greenfield)، والكود المتولّد مش بيعتبر متراجع أو معتمد.', 'The project is recorded as new (Greenfield); the generated code is not treated as reviewed or approved.') : A('المشروع بيتسجّل كمشروع جديد (Greenfield) وفاضي: مفيش كود ولا أوامر بتتنفذ.', 'The project is recorded as new (Greenfield) and empty: no code is generated and no command runs.')}</p></section>`;
-    if (wiz.step === 'review') {
-      return head + err + review + `<form class="panel" data-wiz-create style="margin-top:12px"><label class="small">${A('اكتب أول 8 حروف من بصمة الخطة علشان تأكد:', 'Type the first 8 characters of the plan hash to confirm:')} <b class="ltr mono">${esc(plan.hash.slice(0, 8))}</b> <input class="ltr" name="confirm" size="10" autocomplete="off" required></label>
-        <div class="row" style="margin-top:8px"><button class="btn go" type="submit" ${wiz.busy ? 'disabled' : ''}>${A('أنشئ المشروع', 'Create the project')}</button><button class="btn ghost" type="button" data-wiz-back>${A('رجوع', 'Back')}</button></div></form>`;
+    const envText = b.environment ? L(ENV[b.environment].t) : L(ENV.later.t);
+    const will = [
+      A(`فولدر جديد: ${b.destination}`, `A new folder: ${b.destination}`),
+      b.generator ? A(`كود مبدئي من ${b.generator.package}@${b.generator.version}`, `Starter code from ${b.generator.package}@${b.generator.version}`) : A('من غير كود (مشروع فاضي)', 'No code (an empty project)'),
+      ...(b.install ? [A('تسطيب المكتبات', 'Dependency install')] : []),
+      A('سجلات YallaFlow للمشروع كمشروع جديد', 'YallaFlow records for the project, as a new project'),
+      ...(b.git ? [A('Git repository محلي (من غير commit)', 'A local Git repository (no commit)')] : []),
+      A('أول شغلانة بوصفك، مش متفعّلة', 'A first work item with your description, not activated'),
+      ...(b.attachments?.length ? [A(`${b.attachments.length} مرفق على أول شغلانة`, `${b.attachments.length} attachment(s) on the first work item`)] : [])
+    ];
+    const wont = [A('مفيش حاجة موجودة بتتكتب فوقها', 'Nothing existing is overwritten'), A('مفيش remote ولا commit ولا push', 'No remote, commit or push'), A('مفيش خدمات بتشتغل ولا وكيل بيبدأ', 'No services run and no agent starts'), ...(b.environment === 'docker' ? [A('مفيش ملفات Docker لسه', 'No Docker files yet')] : [])];
+    const steps = b.steps.map((st) => st.argv ? `<li><span class="ltr mono">${esc(JSON.stringify(st.argv))}</span> ${st.network ? `<span class="chip wait">${A('إنترنت', 'network')}</span>` : ''}${st.installsDependencies ? `<span class="chip wait">${A('بيسطّب مكتبات', 'installs dependencies')}</span>` : ''}${st.runsPackageScripts ? `<span class="chip wait">${A('بيشغّل سكريبتات', 'runs scripts')}</span>` : ''}</li>` : `<li class="muted">${esc(st.note ?? st.id)}</li>`).join('');
+    const prereq = b.prerequisites.map((p) => `<li>${esc(p.name)}: ${p.found ? `<span class="ltr">${esc(p.version || 'found')}</span>` : `<b style="color:var(--clay)">${A('مش موجود — سطّبه الأول', 'not found — install it first')}</b>`}</li>`).join('');
+    const summary = `<section class="panel"><h2 style="font-size:18px">${A('ملخص', 'Summary')}</h2>
+      <dl class="svcdef"><dt>${A('المشروع', 'Project')}</dt><dd class="ltr">${esc(b.name)}</dd>
+      <dt>${A('الهدف', 'Purpose')}</dt><dd>${b.intent?.description ? esc(b.intent.description) : `<span class="muted">${A('لسه مااتوصفش — هتحدده مع وكيلك', 'not described yet — you will define it with your agent')}</span>`}</dd>
+      <dt>${A('المكان', 'Location')}</dt><dd class="ltr mono">${esc(b.destination)}</dd>
+      <dt>${A('التقنية', 'Stack')}</dt><dd>${esc(b.stackLabel)}</dd>
+      <dt>${A('البيئة', 'Environment')}</dt><dd>${envText}${b.environment === 'docker' ? ` <span class="tiny muted">(${A('مخططة', 'planned')})</span>` : ''}</dd>
+      <dt>Git</dt><dd>${b.git ? A('repository محلي جديد', 'a new local repository') : A('لأ', 'no')}</dd>
+      ${b.intent?.requirements ? `<dt>${A('المتطلبات', 'Requirements')}</dt><dd><div class="brief clamp3"><p>${esc(b.intent.requirements)}</p></div></dd>` : ''}
+      ${b.attachments?.length ? `<dt>${A('المرفقات', 'Attachments')}</dt><dd>${b.attachments.map((a) => `<span class="ltr tag">${esc(a.name)}</span>`).join(' ')}</dd>` : ''}</dl>
+      <div class="twocol" style="margin-top:12px"><div><h3 style="font-size:15px">${A('هيتعمل', 'Will be created')}</h3><ul class="small">${will.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div><div><h3 style="font-size:15px">${A('مش هيحصل', 'Will not happen')}</h3><ul class="small">${wont.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div></div>
+      ${prereq && b.prerequisites.some((p) => !p.found) ? `<p class="small" style="margin-top:8px;color:var(--clay)">${A('في أدوات ناقصة، الإنشاء هيفشل غالباً:', 'Some tools are missing; creation will likely fail:')}</p><ul class="small">${prereq}</ul>` : ''}
+      <details style="margin-top:12px"><summary class="small">${A('تفاصيل تقنية', 'Technical details')}</summary><ol class="wizsteps">${steps}</ol>${prereq ? `<ul class="small">${prereq}</ul>` : ''}<p class="tiny muted ltr">plan ${esc(plan.id)} · sha256 ${esc(plan.hash)}</p></details></section>`;
+    if (wiz.step === 4) {
+      return head + stepper() + err + summary + `<form class="panel" data-wiz-create data-keep="wiz-4" style="margin-top:12px">
+        ${typedName(b) ? `<label class="small">${A('الخطة دي بتسطّب مكتبات أو بتشغّل سكريبتات. اكتب اسم المشروع علشان تأكد:', 'This plan installs dependencies or runs scripts. Type the project name to confirm:')} <b class="ltr">${esc(b.name)}</b> <input class="ltr" name="confirmName" size="16" autocomplete="off" required value="${esc(wiz.confirmName)}"></label>` : `<p class="small">${A('لما تدوس «أنشئ المشروع»، YallaFlow بينفّذ الخطة اللي فوق دي بالظبط. لو اتغيّرت، الإنشاء بيترفض.', 'When you press Create the project, YallaFlow carries out exactly the plan above. If it changed, creation is refused.')}</p>`}
+        <div class="row wiznav"><button class="btn ghost" type="button" data-wiz-prev>${A('رجوع', 'Back')}</button><span class="grow"></span><button class="btn go" type="submit" ${wiz.busy ? 'disabled' : ''}>${A('أنشئ المشروع', 'Create the project')}</button></div></form>`;
     }
+    // Progress and outcome.
     const pr = wiz.progress;
     const stepState = (id) => pr?.plan?.progress?.steps?.[id]?.status ?? 'pending';
-    const list = ['generate', 'promote', ...(b.install ? ['install'] : []), 'init', 'first-work'].map((id) => `<li data-wiz-step="${id}" data-state="${esc(stepState(id))}">${esc({ generate: A('توليد المشروع', 'Generate the project'), promote: A('نقله للمكان النهائي', 'Move it into place'), install: A('تسطيب المكتبات', 'Install dependencies'), init: A('تهيئة YallaFlow', 'Initialize YallaFlow'), 'first-work': A('أول شغلانة', 'First work item') }[id])} — <span class="small">${esc(L({ done: { ar: 'خلص', en: 'done' }, running: { ar: 'شغّال', en: 'running' }, failed: { ar: 'فشل', en: 'failed' }, pending: { ar: 'مستني', en: 'pending' } }[stepState(id)] ?? { ar: stepState(id), en: stepState(id) }))}</span></li>`).join('');
+    const LABEL = { generate: b.generator ? A('توليد المشروع', 'Generate the project') : A('تجهيز الفولدر', 'Prepare the folder'), promote: b.generator ? A('نقله للمكان النهائي', 'Move it into place') : A('إنشاء فولدر المشروع', 'Create the project folder'), install: A('تسطيب المكتبات', 'Install dependencies'), init: A('تهيئة YallaFlow', 'Initialize YallaFlow'), 'git-init': A('إنشاء Git repository', 'Initialize Git'), 'first-work': A('أول شغلانة', 'First work item') };
+    const list = b.steps.filter((st) => LABEL[st.id]).map((st) => `<li data-wiz-step="${st.id}" data-state="${esc(stepState(st.id))}">${esc(LABEL[st.id])}</li>`).join('');
     const outcome = pr?.outcome;
-    const result = outcome?.ok
-      ? `<section class="panel" data-wiz-done style="margin-top:12px"><h2 style="font-size:18px">${A('المشروع اتعمل', 'The project was created')}</h2><p class="small">${A('افتح Claude Code أو Codex في الفولدر ده واوصف اللي بتبنيه. أول شغلانة مستنياك.', 'Open Claude Code or Codex in this folder and describe what you are building. The first work item is waiting for you.')}</p><div class="cli" dir="ltr">cd ${esc(outcome.destination)}\nyallaflow console add ${esc(shq(outcome.destination))}</div></section>`
-      : outcome?.error ? `<section class="errbar" role="alert" data-wiz-failed style="margin-top:12px"><b>${A('الإنشاء فشل — ماتكتبش فوق أي حاجة', 'Creation failed — nothing was overwritten')}</b><p class="small" style="white-space:pre-wrap">${esc(outcome.error.message)}</p><div class="row"><button class="btn sm" data-wiz-retry>${A('حاول تاني', 'Retry')}</button></div><p class="tiny muted">${A('فولدر التجهيز والسجل محفوظين للتشخيص. امسحهم بـ', 'The staging folder and its log are kept for diagnosis. Remove them with')} <span class="ltr mono">yallaflow new discard ${esc(plan.id)}</span></p></section>` : '';
-    return head + review + `<section class="panel" style="margin-top:12px"><h2 style="font-size:18px">${A('التقدّم', 'Progress')}</h2><ol class="wizsteps">${list}</ol>${pr?.log ? `<pre class="svclog ltr" tabindex="0">${esc(pr.log)}</pre>` : ''}</section>` + result;
+    let result = '';
+    if (outcome?.ok) {
+      const attachLine = wiz.attach ? `<ul class="small">${wiz.attach.map((x) => `<li>${x.ok ? '✓' : '⚠'} <span class="ltr">${esc(x.name)}</span>${x.ok ? '' : ` — ${esc(x.error)}`}</li>`).join('')}</ul>${wiz.attach.some((x) => !x.ok) ? `<button class="btn sm" data-wiz-reattach>${A('ارفع المرفقات تاني', 'Retry attachments')}</button> <span class="tiny muted">${A('أو اختارهم تاني:', 'or pick them again:')}</span> <input type="file" multiple accept="${ACCEPT}" data-wiz-refiles>` : ''}` : '';
+      const reg = wiz.registration ?? outcome.registration;
+      result = `<section class="panel" data-wiz-done style="margin-top:12px"><h2 style="font-size:18px">${A('المشروع اتعمل ✓', 'The project was created ✓')}</h2><p class="small ltr mono">${esc(outcome.destination)}</p>${attachLine}
+        ${reg?.ok ? `<p class="small">${A('اتضاف للكونسول.', 'Added to the console.')}</p><a class="btn go" href="#/overview" data-open-project="${esc(reg.id)}" data-open-view="overview">${A('افتح المشروع', 'Open the project')}</a>`
+          : `<div class="errbar data" role="alert"><b>${A('المشروع اتعمل، بس مااتضافش للكونسول', 'The project exists, but it was not added to the console')}</b><p class="small">${esc(reg?.message ?? '')}</p><button class="btn sm" data-wiz-register>${A('ضيفه للكونسول', 'Add it to the console')}</button><p class="tiny muted">${A('ده بيسجّله بس، عمره ما بيعمل مشروع تاني.', 'This only registers it; it never creates a second project.')}</p></div>`}</section>`;
+    } else if (outcome?.error) {
+      result = `<section class="errbar" role="alert" data-wiz-failed style="margin-top:12px"><b>${A('الإنشاء وقف — مفيش حاجة اتكتب فوقها', 'Creation stopped — nothing was overwritten')}</b><p class="small" style="white-space:pre-wrap">${esc(outcome.error.message)}</p><div class="row"><button class="btn sm" data-wiz-retry>${A('حاول تاني', 'Retry')}</button><span class="tiny muted">${A('المحاولة بتكمّل من آخر خطوة خلصت، ومابتعملش مشروع تاني.', 'Retrying continues from the last finished step and never creates a second project.')}</span></div>
+        <details class="small"><summary>${A('تفاصيل تقنية', 'Technical details')}</summary><code class="ltr">yallaflow new discard ${esc(plan.id)}</code></details></section>`;
+    }
+    return head + stepper() + summary + `<section class="panel" style="margin-top:12px"><h2 style="font-size:18px">${A('التقدّم', 'Progress')}</h2><ol class="wizsteps">${list}</ol>${pr?.log ? `<details><summary class="small">${A('السجل', 'Log')}</summary><pre class="svclog ltr" tabindex="0">${esc(pr.log)}</pre></details>` : ''}</section>` + result;
+  }
+  function readStep(form) {
+    const f = wizForm();
+    const data = new FormData(form);
+    if (form.dataset.wizStep === '1') {
+      f.name = String(data.get('name') ?? '').trim();
+      f.description = String(data.get('description') ?? '');
+      f.requirements = String(data.get('requirements') ?? '');
+      f.parent = String(data.get('parent') ?? f.parent).trim();
+    } else if (form.dataset.wizStep === '2') {
+      f.stack = String(data.get('wiz-stack') ?? f.stack);
+      if (!stackOf(f.stack)?.install) f.install = false;
+    } else if (form.dataset.wizStep === '3') {
+      f.environment = String(data.get('wiz-env') ?? f.environment);
+      f.git = data.get('git') === 'on';
+      f.install = data.get('install') === 'on';
+      f.allowNested = data.get('allowNested') === 'on';
+    }
+  }
+  async function wizardNext(form) {
+    readStep(form);
+    const f = wizForm();
+    wiz.error = null;
+    if (wiz.step === 1) {
+      if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/.test(f.name)) { wiz.error = A('اسم المشروع لازم يبدأ بحرف أو رقم، ومن غير مسافات (حروف إنجليزي وأرقام و . _ -).', 'The project name must start with a letter or digit, without spaces (letters, digits, . _ -).'); return render(); }
+      if (!f.parent.startsWith('/') && !/^[A-Za-z]:[\\/]/.test(f.parent)) { wiz.error = A('اختار الفولدر اللي هيتعمل جواه المشروع.', 'Choose the folder the project will be created in.'); return render(); }
+      wiz.step = 2; return render();
+    }
+    if (wiz.step === 2) { wiz.step = 3; return render(); }
+    if (wiz.step === 3) {
+      wiz.busy = true; wiz.plan = null; render();
+      try {
+        wiz.plan = await post('/api/new/plan', JSON.stringify({ name: f.name, parent: f.parent, stack: f.stack, install: f.install, allowNested: f.allowNested, description: f.description.trim() || null, requirements: f.requirements.trim() || null, environment: f.environment, git: f.git, files: wiz.files.map(({ name, size: s, sha256 }) => ({ name, size: s, sha256 })) }), { 'Content-Type': 'application/json' });
+        wiz.step = 4;
+      } catch (e) {
+        wiz.error = e.message;
+        if (e.code === 'NEW_PROJECT_NESTED' || e.code === 'NEW_PROJECT_EXISTS' || e.code === 'NEW_PROJECT_PARENT') wiz.step = e.code === 'NEW_PROJECT_NESTED' ? 3 : 1;
+      }
+      wiz.busy = false; render();
+    }
+  }
+  async function hashFile(file) {
+    const digest = await crypto.subtle.digest('SHA-256', await file.arrayBuffer());
+    return Array.from(new Uint8Array(digest), (x) => x.toString(16).padStart(2, '0')).join('');
+  }
+  async function addWizardFiles(list) {
+    for (const file of list) {
+      if (wiz.files.length >= 10) { wiz.error = A('أقصى حد 10 مرفقات.', 'At most 10 attachments.'); break; }
+      const sha256 = await hashFile(file);
+      if (wiz.files.some((x) => x.sha256 === sha256)) continue;
+      wiz.files.push({ file, name: file.name, size: file.size, sha256 });
+    }
+    render();
   }
   async function pollWizard() {
     if (!wiz.plan) return;
     try { wiz.progress = await api(`/api/new/plans/${wiz.plan.id}`); } catch (e) { wiz.error = e.message; }
-    if (wiz.progress?.outcome && wizTimer) { clearInterval(wizTimer); wizTimer = null; }
+    if (wiz.progress?.outcome && wizTimer) {
+      clearInterval(wizTimer); wizTimer = null;
+      if (wiz.progress.outcome.ok) await afterCreate(wiz.progress.outcome);
+    }
     if (route().v === 'new') render();
   }
-  async function wizardSubmit(form) {
-    const data = new FormData(form);
-    wiz.form = { name: String(data.get('name') ?? '').trim(), parent: String(data.get('parent') ?? '').trim(), stack: String(data.get('wiz-stack') ?? ''), install: data.get('install') === 'on', allowNested: data.get('allowNested') === 'on' };
+  async function wizardCreate(form) {
+    const confirmName = form ? String(new FormData(form).get('confirmName') ?? '').trim() : wiz.confirmName;
+    wiz.confirmName = confirmName;
     wiz.busy = true; wiz.error = null; render();
     try {
-      wiz.plan = await post('/api/new/plan', JSON.stringify(wiz.form), { 'Content-Type': 'application/json' });
-      wiz.step = 'review';
-    } catch (e) { wiz.error = e.message; }
-    wiz.busy = false; render();
-  }
-  async function wizardCreate(confirm) {
-    wiz.busy = true; wiz.error = null; render();
-    try {
-      await post('/api/new/create', JSON.stringify({ planId: wiz.plan.id, confirm }), { 'Content-Type': 'application/json' });
-      wiz.step = 'progress'; wiz.progress = null;
-      if (!wizTimer) wizTimer = setInterval(pollWizard, 1500);
+      await post('/api/new/create', JSON.stringify({ planId: wiz.plan.id, confirm: wiz.plan.hash, ...(typedName(wiz.plan.body) ? { confirmName } : {}) }), { 'Content-Type': 'application/json' });
+      wiz.step = 'progress'; wiz.progress = null; wiz.attach = null; wiz.registration = null;
+      if (!wizTimer) wizTimer = setInterval(pollWizard, 1200);
       await pollWizard();
     } catch (e) { wiz.error = e.message; }
     wiz.busy = false; render();
+  }
+  async function uploadPlanned() {
+    if (!wiz.plan.body.attachments?.length) return;
+    const results = [];
+    for (const planned of wiz.plan.body.attachments) {
+      const picked = wiz.files.find((x) => x.sha256 === planned.sha256);
+      if (!picked) { results.push({ name: planned.name, ok: false, error: A('الملف مش متاح في الصفحة دي — اختاره تاني.', 'The file is not available in this page — pick it again.') }); continue; }
+      try {
+        await post(`/api/new/plans/${wiz.plan.id}/files`, picked.file, { 'Content-Type': 'application/octet-stream', 'X-File-Name': encodeURIComponent(picked.name) });
+        results.push({ name: planned.name, ok: true });
+      } catch (e) { results.push({ name: planned.name, ok: false, error: e.message }); }
+    }
+    wiz.attach = results;
+  }
+  async function reloadProjects() {
+    const listed = await api('/api/projects');
+    projects = listed.projects;
+    unavailable = listed.unavailable ?? [];
+    agentsOn = Boolean(listed.agents?.enabled);
+    agentsCanEnable = Boolean(listed.agents?.canEnable);
+  }
+  async function afterCreate(outcome) {
+    await uploadPlanned();
+    try { await reloadProjects(); } catch { /* shown on the next load */ }
+    const reg = outcome.registration;
+    // Everything worked: open the new project's Overview.
+    if (reg?.ok && !(wiz.attach ?? []).some((x) => !x.ok)) {
+      const id = reg.id;
+      resetWizard();
+      await switchProject(id, 'overview');
+    }
+  }
+  function resetWizard() { wiz = { ...wiz, step: 1, form: null, files: [], plan: null, error: null, busy: false, progress: null, confirmName: '', attach: null, registration: null }; }
+  async function wizardRegister() {
+    try {
+      const reg = await post('/api/projects', JSON.stringify({ planId: wiz.plan.id }), { 'Content-Type': 'application/json' });
+      wiz.registration = { ok: true, ...reg };
+      await reloadProjects();
+    } catch (e) { wiz.registration = { ok: false, message: e.message }; }
+    render();
+  }
+
+  // ---------- folder chooser (1.4.0, PF-0057): folders inside the home folder only ----------
+  let folder = null; // { mode: 'parent'|'existing', data, error, busy }
+  async function openFolder(mode, at) {
+    folder = { mode, data: folder?.data ?? null, error: null, busy: true };
+    let d = document.getElementById('folderdlg');
+    if (!d) { d = document.createElement('dialog'); d.id = 'folderdlg'; d.className = 'panel folderdlg'; document.body.appendChild(d); }
+    renderFolder();
+    if (!d.open) d.showModal();
+    try { folder.data = await api(`/api/fs/dirs?path=${encodeURIComponent(at ?? (mode === 'parent' ? wizForm().parent : '') ?? '')}`); } catch (e) {
+      try { folder.data = await api('/api/fs/dirs'); folder.error = e.message; } catch (e2) { folder.error = e2.message; }
+    }
+    folder.busy = false; renderFolder();
+    d.querySelector('[data-folder-go]')?.focus();
+  }
+  function renderFolder() {
+    const d = document.getElementById('folderdlg');
+    if (!d || !folder) return;
+    const x = folder.data;
+    const mark = (f) => `${f.yallaflow ? `<span class="chip done"><i></i>YallaFlow</span>` : ''}${f.git ? '<span class="chip todo">Git</span>' : ''}${f.empty ? `<span class="tag">${A('فاضي', 'empty')}</span>` : ''}`;
+    const here = x ? x.here : null;
+    const chooseLabel = folder.mode === 'parent' ? A('أنشئ المشروع جوه الفولدر ده', 'Create the project in this folder') : A('ضيف المشروع ده', 'Add this project');
+    const canChoose = x && (folder.mode === 'parent' || here?.yallaflow);
+    d.setAttribute('aria-label', folder.mode === 'parent' ? A('اختار فولدر', 'Choose a folder') : A('ضيف مشروع موجود', 'Add an existing project'));
+    d.innerHTML = `<div class="row"><b class="grow">${folder.mode === 'parent' ? A('اختار الفولدر اللي هيتعمل جواه المشروع', 'Choose where to create the project') : A('اختار فولدر مشروع YallaFlow موجود', 'Choose an existing YallaFlow project folder')}</b><button type="button" class="btn ghost sm" data-folder-close>${A('اقفل', 'Close')}</button></div>
+      ${x ? `<div class="row small" style="margin:8px 0">${x.parent ? `<button type="button" class="btn ghost sm" data-folder-go="${esc(x.parent)}" aria-label="${A('الفولدر الأعلى', 'Parent folder')}">↑</button>` : ''}<span class="ltr mono grow wizpath">${esc(x.path)}</span>${here ? mark(here) : ''}</div>` : ''}
+      ${folder.error ? `<p class="small" role="alert" style="color:var(--clay)">${esc(folder.error)}</p>` : ''}
+      ${folder.busy ? `<p class="muted small">${A('بيقرا…', 'Reading…')}</p>` : x ? `<ul class="folders" role="list">${x.folders.map((f) => `<li><button type="button" class="flink" data-folder-go="${esc(f.path)}"><span aria-hidden="true">📁</span> <span class="ltr">${esc(f.name)}</span></button>${mark(f)}</li>`).join('') || `<li class="muted small">${A('مفيش فولدرات هنا.', 'No folders here.')}</li>`}</ul>${x.truncated ? `<p class="tiny muted">${A('أول 500 فولدر بس.', 'First 500 folders only.')}</p>` : ''}` : ''}
+      ${folder.mode === 'existing' && x && !here?.yallaflow ? `<p class="tiny muted">${A('الفولدر ده مفيهوش YallaFlow. المشروع الموجود من غير YallaFlow بيتجهز بفهم المشروع (Brownfield) كخطوة منفصلة.', 'This folder has no YallaFlow workspace. An existing repository without YallaFlow is set up through project onboarding (Brownfield), a separate step.')}</p>` : ''}
+      <p class="tiny muted">${A('الفولدرات اللي جوه فولدر البيت بس، والمخفية مابتظهرش. مفيش ملفات بتتقري.', 'Only folders inside your home folder; hidden ones are not shown. No file is read.')}</p>
+      <div class="row" style="margin-top:8px"><span class="grow"></span><button type="button" class="btn go" data-folder-choose ${canChoose ? '' : 'disabled'}>${chooseLabel}</button></div>`;
+  }
+  async function chooseFolder() {
+    const x = folder?.data;
+    if (!x) return;
+    if (folder.mode === 'parent') {
+      wizForm().parent = x.path;
+      document.getElementById('folderdlg')?.close();
+      folder = null; render(); return;
+    }
+    folder.busy = true; renderFolder();
+    try {
+      const reg = await post('/api/projects', JSON.stringify({ root: x.path }), { 'Content-Type': 'application/json' });
+      document.getElementById('folderdlg')?.close();
+      folder = null;
+      await reloadProjects();
+      await switchProject(reg.id, 'overview');
+    } catch (e) { folder.busy = false; folder.error = e.message; renderFolder(); }
+  }
+
+  // ---------- agents (1.4.0, PF-0057): off / unavailable / on, enabled for this run ----------
+  let agentsCanEnable = false;
+  let agentInfo = null;
+  async function loadAgentInfo() { try { agentInfo = await api('/api/agents'); agentsCanEnable = agentInfo.canEnable; } catch { agentInfo = null; } }
+  async function enableAgents() {
+    if (!confirm(A('تفعيل Codex للجلسة دي بس من الكونسول؟ مفيش جلسة بتبدأ ومفيش شغلانة بتتفعّل لوحدها. Codex بيستخدم اشتراك ChatGPT بتاعك، ومن غير مفاتيح API.', 'Enable Codex for this console session only? No session starts and no work item is activated on its own. Codex uses your ChatGPT subscription, never API keys.'))) return;
+    try {
+      await post('/api/agents/enable', JSON.stringify({ confirm: true }), { 'Content-Type': 'application/json' });
+      agentsOn = true; agentsCanEnable = false;
+      await loadAgentInfo();
+      if (route().v === 'item') await loadAgent();
+    } catch (e) { toast(esc(e.message)); }
+    render();
+  }
+  // The work item page while agents are off: say so plainly, and how to turn them on.
+  function agentOffPanel(it) {
+    const explain = `<p class="tiny muted">${A('«فعّل الشغلانة» بيخليها الشغلانة النشطة في YallaFlow. «ابدأ جلسة» بيفتح Codex عليها. ولا واحدة فيهم بتحصل لوحدها.', 'Activating makes this the active work item in YallaFlow. Starting a session opens Codex on it. Neither happens on its own.')}</p>`;
+    if (readOnly) return `<section class="panel agent" id="agent"><h2>${A('الوكيل', 'Agent')}</h2><p class="small">${A('الكونسول ده للقراءة بس، فمساحة الوكيل مقفولة.', 'This console is read-only, so the Agent Workspace is off.')}</p></section>`;
+    const codex = agentInfo?.codex;
+    const status = codex && !codex.ready ? `<p class="small">${A('Codex مش جاهز على الجهاز ده:', 'Codex is not ready on this machine:')}</p><ul class="aprob">${codex.problems.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>` : '';
+    return `<section class="panel agent" id="agent"><div class="ahead"><h2>${A('الوكيل', 'Agent')}</h2><span class="grow"></span><span class="chip todo">${A('مقفول', 'off')}</span></div>
+      <p class="small">${A(`اشتغل على ${it.id} مع Codex من هنا. مساحة الوكيل مقفولة في الكونسول ده لحد ما تفعّلها.`, `Work on ${it.id} with Codex from here. The Agent Workspace is off in this console until you enable it.`)}</p>${status}
+      ${agentsCanEnable ? `<button class="btn go sm" data-agents-enable>${A('فعّل Codex للجلسة دي', 'Enable Codex for this session')}</button>` : ''}${explain}</section>`;
   }
 
   // ---------- projects ----------
@@ -1041,8 +1370,8 @@
         <div class="pflow">${dist.map((n, i) => `<span style="--hue:${ST[i].hue}" data-tip="${esc(L(ST[i].name))}: ${n}"><i style="height:${6 + n * 10}px"></i><b>${n}</b></span>`).join('')}</div>
         <div class="tiny muted">${last ? A(`آخر نشاط مسجّل ${ago(last)}`, `last recorded activity ${ago(last)}`) : ''}</div></div></a>`;
     }).join('');
-    return `<section class="pagehead"><div class="row"><h1 style="font-size:26px">${A('المشاريع', 'Projects')}</h1>${readOnly ? '' : `<a class="btn sm go" href="#/new" style="margin-inline-start:auto">＋ ${A('مشروع جديد', 'New project')}</a>`}</div><p class="muted">${A('كل مشروع ليه مجلد .yallaflow خاص بيه، والكونسول بيقرا كل واحد لوحده.', 'Each project has its own .yallaflow; the console reads each one separately.')}</p></section>
-      <section class="projects">${cards}</section>
+    return `<section class="pagehead"><div class="row"><h1 style="font-size:26px">${A('المشاريع', 'Projects')}</h1>${readOnly ? '' : `<button class="btn sm" data-folder-open="existing" style="margin-inline-start:auto">${A('ضيف مشروع موجود', 'Add an existing project')}</button><a class="btn sm go" href="#/new">＋ ${A('مشروع جديد', 'New project')}</a>`}</div><p class="muted">${A('كل مشروع ليه مجلد .yallaflow خاص بيه، والكونسول بيقرا كل واحد لوحده.', 'Each project has its own .yallaflow; the console reads each one separately.')}</p></section>
+      ${overview.length ? `<section class="projects">${cards}</section>` : `<section class="panel"><h2 style="font-size:20px">${A('أهلاً في YallaFlow', 'Welcome to YallaFlow')}</h2><p class="small">${A('لسه مفيش مشاريع في الكونسول. ابدأ مشروع جديد، أو ضيف مشروع YallaFlow موجود.', 'There are no projects in the console yet. Start a new project, or add an existing YallaFlow project.')}</p>${readOnly ? '' : `<div class="row" style="margin-top:8px"><a class="btn go" href="#/new">＋ ${A('مشروع جديد', 'New project')}</a><button class="btn" data-folder-open="existing">${A('ضيف مشروع موجود', 'Add an existing project')}</button></div>`}</section>`}
       ${unavailable.length ? `<p class="small" style="margin-top:14px">${A('مش متاحة (الفولدر اتنقل أو اتمسح):', 'Unavailable (folder moved or deleted):')} ${unavailable.map((u) => `<span class="ltr tag">${esc(u)}</span>`).join(' ')}</p>` : ''}
       ${devPanel(A('إدارة قائمة المشاريع', 'Manage the project list'), ['yallaflow console add <folder>', 'yallaflow console remove <folder>', 'yallaflow console list'])}`;
   }
@@ -1056,7 +1385,7 @@
   function viewTeam() {
     if (!team) return `<p class="muted" style="margin-top:30px">${A('بيحمّل…', 'Loading…')}</p>`;
     if (team.error) return `<section class="errbar">${esc(team.error)}</section>`;
-    if (!team.git) return `<section class="pagehead"><h1 style="font-size:26px">${A('نسخ الشغل', 'Worktrees')}</h1><p class="muted">${A('المشروع ده مش جوه git repository.', 'This project is not inside a Git repository.')}</p></section>`;
+    if (!team.git) return `<section class="pagehead"><h1 style="font-size:26px">${A('نسخ الشغل', 'Worktrees')}</h1><p class="muted">${A('المشروع ده مش جوه Git repository لسه.', 'This project is not in a Git repository yet.')}</p></section><section class="panel"><p class="small">${A('نسخ الشغل (git worktrees) بتخليك تشغّل أكتر من وكيل على شغلانات مختلفة في نفس الوقت من غير ما يتداخلوا. محتاجة Git الأول.', 'Worktrees (git worktrees) let you run several agents on different work items at the same time without collisions. They need Git first.')}</p>${readOnly ? '' : `<button class="btn sm go" data-git-init style="margin-top:8px">${A('اعمل Git repository', 'Initialize Git')}</button><p class="tiny muted">${A('git init بس: من غير remote ولا commit ولا push.', 'git init only: no remote, commit or push.')}</p>`}</section>`;
     const lane = (w) => {
       const a = w.activeWork;
       const at = a ? (a.state === 'done' ? 5 : a.state === 'new' ? -1 : stIndex(a.currentStation)) : null;
@@ -1238,9 +1567,23 @@
     const hadQ = document.activeElement?.matches?.('[data-q]');
     const hadAgent = document.activeElement?.matches?.('[data-agent-input]');
     document.title = (snap?.counts?.you ? `(${snap.counts.you}) ` : '') + 'YallaFlow' + (snap?.project?.name ? ` · ${snap.project.name}` : '');
+    if (!projects.length && snap && !['new', 'projects'].includes(r.v)) { location.hash = '#/projects'; return; }
     const views = { new: viewNew, setup: viewSetup, overview: viewOverview, item: () => viewItem(r.id), lines: viewLines, team: viewTeam, insights: viewInsights, projects: viewProjects, map: viewMap };
     const body = !snap ? `<p class="muted" style="margin-top:40px;text-align:center">${error ? '' : A('بيحمّل…', 'Loading…')}</p>` : (views[r.v] ?? viewMap)();
+    // Forms marked data-keep survive a redraw: typed values and focus are carried over (PF-0057).
+    const kept = [...document.querySelectorAll('form[data-keep]')].map((form) => ({ key: form.dataset.keep, values: [...form.elements].filter((el) => el.name && el.type !== 'file').map((el) => [el.name, el.type === 'checkbox' || el.type === 'radio' ? (el.type === 'radio' ? (el.checked ? el.value : null) : el.checked) : el.value, el.type]), focus: form.contains(document.activeElement) ? document.activeElement.name : null, caret: document.activeElement?.selectionStart ?? null }));
     document.getElementById('app').innerHTML = topbar(r) + `<main>${banner()}${snap && ['map', 'lines'].includes(r.v) ? understandingStrip() : ''}${body}</main>`;
+    for (const k of kept) {
+      const form = document.querySelector(`form[data-keep="${CSS.escape(k.key)}"]`);
+      if (!form) continue;
+      for (const [name, value, type] of k.values) {
+        const els = [...form.elements].filter((el) => el.name === name);
+        if (type === 'radio') { if (value !== null) els.forEach((el) => { el.checked = el.value === value; }); }
+        else if (type === 'checkbox') els.forEach((el) => { el.checked = value; });
+        else els.forEach((el) => { el.value = value; });
+      }
+      if (k.focus) { const el = form.elements.namedItem(k.focus); if (el?.focus) { el.focus(); if (k.caret !== null && el.setSelectionRange) try { el.setSelectionRange(k.caret, k.caret); } catch { /* not a text field */ } } }
+    }
     requestAnimationFrame(placeConnectors);
     if (hadQ) { const q = document.querySelector('[data-q]'); if (q) { q.focus(); q.setSelectionRange(q.value.length, q.value.length); } }
     if (hadAgent) { const box = document.querySelector('[data-agent-input]'); if (box) { box.focus(); box.setSelectionRange(box.value.length, box.value.length); } }
@@ -1306,10 +1649,10 @@
 
   async function loadForView() {
     const v = route().v;
-    if (v === 'item') await loadAgent();
+    if (v === 'item') { if (agentsOn) await loadAgent(); else await loadAgentInfo(); }
     if (v === 'team') await loadTeam();
     else if (v === 'projects') await loadOverview();
-    else if (v === 'overview' || ((v === 'map' || v === 'lines') && projectOverview?.pid !== pid)) await loadProjectOverview();
+    else if (v === 'overview' || ((v === 'map' || v === 'lines') && projectOverview?.pid !== pid)) { await loadProjectOverview(); if (v === 'overview' && projectOverview?.data?.project?.kind === 'greenfield') { await loadRuntime(); if (!agentsOn) await loadAgentInfo(); } }
     else if (v === 'setup') await loadRuntime();
     else if (v === 'new') await loadWizard();
     syncRuntimePolling();
@@ -1379,6 +1722,9 @@
             const event = JSON.parse(line.slice(6));
             if (event.type === 'change' && event.project === pid) await refresh();
             else if (event.type === 'agent') onAgentEvent(event.project, event.event);
+            // 1.4.0 (PF-0057): a project was added, or agents were enabled, in this console.
+            else if (event.type === 'projects') { await reloadProjects().catch(() => {}); if (route().v === 'projects') await loadOverview(); render(); }
+            else if (event.type === 'agents') { agentsOn = true; agentsCanEnable = false; render(); }
           }
         }
       } catch { /* retry below */ }
@@ -1400,19 +1746,35 @@
       render(); await load(); await buildDigest(); render(); listen();
       return;
     }
-    closeDrawer(); bellOpen = false; dtab = 'delivery'; const v = route().v; if (v === 'item') { detail = null; render(); await load(); await loadForView(); } else if (['team', 'projects', 'overview', 'map', 'lines', 'setup', 'new'].includes(v)) { render(); await loadForView(); } else syncRuntimePolling(); render(); scrollTo(0, 0); });
+    closeDrawer(); bellOpen = false; dtab = null; const v = route().v; if (v === 'item') { detail = null; render(); await load(); await loadForView(); } else if (['team', 'projects', 'overview', 'map', 'lines', 'setup', 'new'].includes(v)) { render(); await loadForView(); } else syncRuntimePolling(); render(); scrollTo(0, 0); });
   document.addEventListener('submit', (e) => {
-    const plan = e.target.closest('[data-wiz-form]');
-    if (plan) { e.preventDefault(); wizardSubmit(plan); return; }
+    const step = e.target.closest('[data-wiz-step]');
+    if (step) { e.preventDefault(); wizardNext(step); return; }
     const create = e.target.closest('[data-wiz-create]');
-    if (create) { e.preventDefault(); wizardCreate(String(new FormData(create).get('confirm') ?? '').trim()); }
+    if (create) { e.preventDefault(); wizardCreate(create); }
   });
   document.addEventListener('change', (e) => {
-    if (e.target.matches?.('input[name="wiz-stack"]') && wiz.form) { wiz.form.stack = e.target.value; for (const card of document.querySelectorAll('.stackcard')) card.classList.toggle('on', card.contains(e.target)); }
+    if (e.target.matches?.('input[name="wiz-stack"], input[name="wiz-env"]') && wiz.form) { if (e.target.name === 'wiz-stack') wiz.form.stack = e.target.value; else wiz.form.environment = e.target.value; for (const card of e.target.closest('fieldset, form').querySelectorAll('.stackcard')) card.classList.toggle('on', card.contains(e.target)); }
+    if (e.target.matches?.('[data-wiz-files]')) { const form = e.target.closest('form'); if (form) readStep(form); addWizardFiles([...e.target.files]); }
+    if (e.target.matches?.('[data-wiz-refiles]')) { (async () => { for (const file of e.target.files) { const sha256 = await hashFile(file); if (!wiz.files.some((x) => x.sha256 === sha256)) wiz.files.push({ file, name: file.name, size: file.size, sha256 }); } await uploadPlanned(); render(); })(); }
   });
   document.addEventListener('click', (e) => {
-    if (e.target.closest('[data-wiz-back]')) { wiz.step = 'form'; wiz.error = null; render(); return; }
-    if (e.target.closest('[data-wiz-retry]')) { wizardCreate(wiz.plan.hash.slice(0, 8)); return; }
+    if (e.target.closest('[data-wiz-prev]')) { const form = e.target.closest('form'); if (form?.dataset.wizStep) readStep(form); if (wiz.step === 4) wiz.plan = null; wiz.step = Math.max(1, (typeof wiz.step === 'number' ? wiz.step : 4) - 1); wiz.error = null; render(); return; }
+    if (e.target.closest('[data-wiz-retry]')) { wizardCreate(null); return; }
+    if (e.target.closest('[data-wiz-register]')) { wizardRegister(); return; }
+    if (e.target.closest('[data-wiz-reattach]')) { uploadPlanned().then(render); return; }
+    const unfile = e.target.closest('[data-wiz-unfile]');
+    if (unfile) { const form = unfile.closest('form'); if (form) readStep(form); wiz.files.splice(Number(unfile.dataset.wizUnfile), 1); render(); return; }
+    const fo = e.target.closest('[data-folder-open]');
+    if (fo) { const form = fo.closest('form'); if (form?.dataset.wizStep) readStep(form); openFolder(fo.dataset.folderOpen); return; }
+    const fg = e.target.closest('[data-folder-go]');
+    if (fg && folder) { openFolder(folder.mode, fg.dataset.folderGo); return; }
+    if (e.target.closest('[data-folder-choose]')) { chooseFolder(); return; }
+    if (e.target.closest('[data-folder-close]')) { document.getElementById('folderdlg')?.close(); folder = null; return; }
+    if (e.target.closest('[data-agents-enable]')) { enableAgents(); return; }
+    if (e.target.closest('[data-git-init]')) { gitInitAction(); return; }
+    const sg = e.target.closest('[data-rt-suggest]');
+    if (sg) { addService({ fromSuggestion: sg.dataset.rtSuggest }); return; }
     const rt = e.target.closest('[data-rt]');
     if (rt) { runtimeAction(rt.dataset.rt, rt.dataset.id); return; }
     const rtl = e.target.closest('[data-rt-logs]');
@@ -1482,7 +1844,7 @@
     else if (x.hasAttribute('data-theme-toggle')) { const dark = theme ? theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; theme = dark ? 'light' : 'dark'; store.set('theme', theme); render(); }
     else if (x.hasAttribute('data-bell')) { bellOpen = !bellOpen; render(); }
     else if (x.hasAttribute('data-digest')) { store.set(seenKey(), new Date().toISOString()); digest = null; render(); }
-    else if (x.dataset.openProject) { e.preventDefault(); switchProject(x.dataset.openProject); }
+    else if (x.dataset.openProject) { e.preventDefault(); switchProject(x.dataset.openProject, x.dataset.openView ?? 'map'); }
     else if (x.hasAttribute('data-dev')) { const dev = document.getElementById('dev'); if (dev) { dev.open = true; dev.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' }); } }
     else if (x.dataset.f) { flt.st = flt.st === x.dataset.f ? 'all' : x.dataset.f; render(); }
     else if (x.dataset.moreSt) { const i = +x.dataset.moreSt; if (openSt.has(i)) openSt.delete(i); else openSt.add(i); render(); }
@@ -1511,6 +1873,7 @@
   document.addEventListener('submit', (e) => {
     if (e.target.matches('[data-act-form]')) { e.preventDefault(); submitAction(e.target); return; }
     if (e.target.matches('[data-gate-form]')) { e.preventDefault(); submitGate(e.target); return; }
+    if (e.target.matches('[data-rt-form]')) { e.preventDefault(); submitService(e.target); return; }
     if (e.target.matches('[data-create-form]')) { e.preventDefault(); submitCreate(e.target); }
     else if (e.target.matches('[data-agent-form]')) { e.preventDefault(); const text = agentDraft.trim(); if (!text) return; agentDraft = ''; agentAction('message', { text }); }
   });
@@ -1533,11 +1896,11 @@
     }
   });
 
-  async function switchProject(next) {
+  async function switchProject(next, view = 'map') {
     pid = next;
     store.set('project', pid);
-    snap = null; detail = null; team = null; digest = null;
-    location.hash = '#/map';
+    snap = null; detail = null; team = null; digest = null; projectOverview = null; runtime = null;
+    location.hash = `#/${view}`;
     render();
     await load();
     await buildDigest();

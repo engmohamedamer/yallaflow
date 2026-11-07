@@ -53,16 +53,32 @@ export class AgentBridge {
     this.runActivate = runActivate;
     this.port = port;
     this.timeoutMs = permissionTimeoutMs ?? (Number(env.YALLAFLOW_AGENT_PERMISSION_TIMEOUT_MS) || DEFAULT_PERMISSION_TIMEOUT_MS);
-    this.projects = new Map(projects.map((project) => [project.id, {
+    this.projects = new Map(projects.map((project) => [project.id, this.entry(project)]));
+  }
+
+  entry(project) {
+    return {
       ...project,
       session: null, // { provider, record, impl }
       pending: new Map(),
       events: [],
       claude: null,
-      bridgeToken: claude ? randomBytes(24).toString('hex') : null,
+      bridgeToken: this.claudeEnabled ? randomBytes(24).toString('hex') : null,
       owner: null, // the checkout lock while this console holds it
       holder: null // who holds it when another console does
-    }]));
+    };
+  }
+
+  // A project added to the running console (PF-0057). Like open(), it writes nothing into
+  // the project unless the experimental Claude bridge is on.
+  async addProject(project) {
+    if (this.projects.has(project.id)) return;
+    const entry = this.entry(project);
+    this.projects.set(project.id, entry);
+    if (!this.claudeEnabled) return;
+    await ensureLocalIgnored(entry.root);
+    entry.claude = this.newClaudeLink(entry);
+    await this.claimCheckout(entry);
   }
 
   // ----- lifecycle -----

@@ -83,7 +83,7 @@ export function validateCreateBody(body) {
   return { requestId, request: request.trim(), type, scope };
 }
 
-async function readMeta(root, workId) {
+export async function readMeta(root, workId) {
   return readYaml(path.join(workspacePath(root), 'work', workId, 'meta.yaml'));
 }
 
@@ -137,7 +137,7 @@ export function safeFileName(raw) {
 }
 
 // Streams the request body into a private temp folder, enforcing the size limit.
-async function receiveFile(request, name) {
+export async function receiveFile(request, name) {
   const dir = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-upload-')); // 0700
   const file = path.join(dir, name);
   const hash = createHash('sha256');
@@ -165,7 +165,7 @@ async function receiveFile(request, name) {
   return { dir, file, size, sha256: hash.digest('hex') };
 }
 
-async function linkedSourceWithHash(root, meta, sha256) {
+export async function linkedSourceWithHash(root, meta, sha256) {
   for (const ref of meta.sources ?? []) {
     try {
       const record = await loadSource(root, ref.id);
@@ -179,7 +179,7 @@ async function linkedSourceWithHash(root, meta, sha256) {
 }
 
 // What YallaFlow could actually do with the file, from its stored source record.
-async function availabilityOf(root, sourceId) {
+export async function availabilityOf(root, sourceId) {
   try {
     const record = await loadSource(root, sourceId);
     return { contentAvailability: record.contentAvailability ?? null, availabilityNote: availabilityNote(record) };
