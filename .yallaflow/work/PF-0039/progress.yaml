@@ -18,15 +18,26 @@
     },
     "implementation": {
       "status": "completed",
-      "startedAt": "2026-11-06T20:53:54.553Z",
-      "completedAt": "2026-11-06T20:53:54.872Z",
-      "summary": "Claude integration separated (experimental set, dynamic loading, clear refusal, files negations, docs split, tests split); lazy checkout claim and read-only status/listing; run-wide test user-config isolation with guard tests; Node 20 fixture fix; cleared auth wait timer; reproducible build script, test matrix, browser harness, release procedure, acceptance environment; RC checksum corrected; leaked test files cleaned up with owner approval"
+      "startedAt": "2026-11-07T00:08:21.543Z",
+      "completedAt": "2026-11-07T00:08:21.543Z",
+      "summary": "Release UI fixes and changelog complete. Node24 matrix exposed a test-only race: the live lock fixture auto-exited after 1500ms. The fixture now waits for explicit IPC release after timeout/no-write assertions and is killed on test teardown; production locking is unchanged. Test-only additions do not change npm package bytes.",
+      "evidence": [
+        "test/workspace-lock.test.js",
+        "resources/console/app.js",
+        "CHANGELOG.md"
+      ]
     },
     "verification": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-07T00:16:55.845Z",
+      "completedAt": "2026-11-07T00:16:55.845Z",
+      "summary": "Release preparation verified: Node22 V-002 and Node20 V-029 each 853/853; Node24 V-028 852/853 exposed test-holder expiry, corrected full lock file passes V-035 and targeted Node20/22 V-033/V-032. Final package/integration V-034, install/upgrade V-027, acceptance self-check V-030, browsers V-019/V-021/V-026 and diff V-036 pass. Audit retains two documented moderate entries. REPORT.md preserves failures and limits: no all-green final-commit matrix, real provider acceptance or publication claim. Prepared manual acceptance is the authorized endpoint."
     },
     "code-review": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-07T00:16:56.051Z",
+      "completedAt": "2026-11-07T00:16:56.051Z",
+      "summary": "Separate inspection of final console/test/changelog diff and distribution boundaries found no remaining blocker to preparation. Explicit view loading resolves reproduced existing-item failure; message deltas retain controls and activation awaits refresh. Lock test uses deterministic IPC and teardown without changing production locking. Reviewed patch allowlist and package checksums agree. Known dependency findings, final-tag CI and real-provider/owner acceptance remain explicit publication prerequisites in REPORT.md and ACCEPTANCE.md."
     }
   },
   "rulings": [
@@ -35,8 +46,55 @@
       "reason": "Owner approved a narrowly scoped cleanup; tests must never touch saved real projects",
       "costIfWrong": "Future test runs could write runtime files into real registered projects",
       "createdAt": "2026-11-06T20:37:20.709Z"
+    },
+    {
+      "decision": "The Node 20.16.0 full-suite attempt ended with signal 15 (tool exit 143) before the verification ledger recorded a result. No pass is claimed. Node 22 full suite passed 853 tests. Retry Node 20 with bounded file concurrency and record fresh evidence.",
+      "reason": "Interrupted runtime matrix execution is not completed proof",
+      "costIfWrong": "Unsupported Node compatibility claim",
+      "createdAt": "2026-11-06T23:50:21.300Z"
+    },
+    {
+      "decision": "WebKit browser acceptance remains unresolved: first run could not click Stop during rapid streaming; subsequent run stayed on Loading the agent workspace after Create Work. Chromium and Firefox completed the same paths. Preserve both failures and investigate before a publication recommendation.",
+      "reason": "Cross-browser failures cannot be represented as acceptance passes",
+      "costIfWrong": "Shipping an agent panel that fails to load or respond in a supported browser",
+      "createdAt": "2026-11-06T23:56:47.738Z"
+    },
+    {
+      "decision": "Resolved browser findings: V-016 deterministically reproduced missing Agent Workspace loading on old package. Fixed explicit item loading and preserved controls during message chunks; activation awaits refresh. Corrected packed UI passed Chromium V-019, Firefox V-021 and WebKit V-026, including normal Stop clicks. WebKit used a longer disposable fake turn to avoid the three-second fixture ending before action under load. Final package/changelog rebuilt V-024 and installed/upgraded V-027.",
+      "reason": "Replace prior unresolved-browser assessment with fresh reproducible findings and proof",
+      "costIfWrong": "False cross-browser release readiness",
+      "createdAt": "2026-11-07T00:07:39.649Z"
     }
   ],
-  "history": [],
-  "updatedAt": "2026-11-06T20:53:54.872Z"
+  "history": [
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Fresh release diff verification V-004 found a trailing blank line in test-support/agent-fixtures.js; remove only that whitespace before rechecking.",
+      "changedAt": "2026-11-06T23:47:08.536Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Browser acceptance uncovered deterministic missing loadForView/loadAgent when navigating to an existing item. Fix explicit item loading, then rebuild and verify the 1.3.0 candidate with recorded overlay; preserve 1.2.0 baseline.",
+      "changedAt": "2026-11-06T23:57:47.205Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Document the verified console navigation and streaming fixes in the 1.3.0 changelog before final packaging.",
+      "changedAt": "2026-11-07T00:03:50.690Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Node 24 full matrix V-028: 852 pass, one live-lock test fails because its holder exits after 1500ms before a slow child enters the lock. Replace wall-clock expiry with explicit parent release; production locking unchanged.",
+      "changedAt": "2026-11-07T00:08:19.084Z"
+    }
+  ],
+  "updatedAt": "2026-11-07T00:16:56.051Z"
 }

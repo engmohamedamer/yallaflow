@@ -1,0 +1,122 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 51f15ee..c72c8f4 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -32,6 +32,8 @@ Opt-in. Uses only the developer's existing Codex (ChatGPT) subscription: no API
+ 
+ ### Fixed
+ - The console's bell badge and warning chip now meet WCAG AA contrast in light and dark themes.
++- Opening an existing or newly created work item loads its Agent Workspace immediately, without waiting for a workspace-change event.
++- Streamed replies keep Stop, End and the message composer in place so incoming chunks do not interrupt interaction. Explicit activation waits for the refreshed work state before rendering the panel.
+ 
+ ## [1.2.0] - unreleased (prepared 2026-11-06) — Flow Console, read contract & workspace lock
+ 
+diff --git a/resources/console/app.js b/resources/console/app.js
+index fb8f9ab..06ff7c2 100644
+--- a/resources/console/app.js
++++ b/resources/console/app.js
+@@ -319,18 +319,27 @@
+       loadAgent().then(renderAgent);
+       return;
+     }
+-    renderAgent();
++    renderAgent(event.type === 'message.delta');
+   }
+   // Re-render only the panel, keeping the composer text and focus.
+-  function renderAgent() {
++  function renderAgent(streamOnly = false) {
+     const host = document.getElementById('agent');
+     const it = byId(route().id);
+     if (!host || !it) return;
+     const focused = document.activeElement?.matches?.('[data-agent-input]');
+-    host.outerHTML = agentPanel(it);
++    const streamHost = streamOnly && host.querySelector('.astream');
++    if (streamHost) {
++      // Keep Stop/End and the composer in the DOM while message chunks arrive.
++      // Replacing them every chunk can discard a pointer or keyboard interaction.
++      const template = document.createElement('template');
++      template.innerHTML = agentPanel(it);
++      const nextStream = template.content.querySelector('.astream');
++      if (nextStream) streamHost.innerHTML = nextStream.innerHTML;
++      else host.outerHTML = agentPanel(it);
++    } else host.outerHTML = agentPanel(it);
+     const stream = document.querySelector('#agent .astream');
+     if (stream) stream.scrollTop = stream.scrollHeight;
+-    if (focused) { const box = document.querySelector('[data-agent-input]'); if (box) { box.focus(); box.setSelectionRange(box.value.length, box.value.length); } }
++    if (focused && !streamHost) { const box = document.querySelector('[data-agent-input]'); if (box) { box.focus(); box.setSelectionRange(box.value.length, box.value.length); } }
+   }
+   // Turn the event list into readable entries: message deltas join into one bubble.
+   function agentEntries(events) {
+@@ -417,7 +426,7 @@
+   }
+   async function agentAction(action, body, after) {
+     agentBusy = true; agentError = null; renderAgent();
+-    try { const result = await agentPost(action, body); after?.(result); } catch (e) { agentError = e.message; }
++    try { const result = await agentPost(action, body); await after?.(result); } catch (e) { agentError = e.message; }
+     agentBusy = false;
+     await loadAgent();
+     renderAgent();
+@@ -782,6 +791,7 @@
+     toast(`＋ ${A(`«${esc(it.item.title)}» اتسجّلت`, `"${esc(it.item.title)}" was created`)} <span class="ltr">${esc(it.id)}</span><br><span class="tiny">${it.keptActive ? A(`${esc(it.keptActive)} لسه الشغلانة النشطة.`, `${esc(it.keptActive)} stays the active work item.`) : A('مش هتبقى النشطة إلا لما تتفعّل.', 'Not made active; activation stays explicit.')}</span>`);
+     location.hash = `#/item/${encodeURIComponent(it.id)}`;
+     await load();
++    await loadForView();
+     render();
+   }
+ 
+@@ -957,7 +967,7 @@
+       render(); await load(); await buildDigest(); render(); listen();
+       return;
+     }
+-    closeDrawer(); bellOpen = false; dtab = 'delivery'; const v = route().v; if (v === 'item') { detail = null; render(); await load(); } else if (v === 'team' || v === 'projects') { render(); await loadForView(); } render(); scrollTo(0, 0); });
++    closeDrawer(); bellOpen = false; dtab = 'delivery'; const v = route().v; if (v === 'item') { detail = null; render(); await load(); await loadForView(); } else if (v === 'team' || v === 'projects') { render(); await loadForView(); } render(); scrollTo(0, 0); });
+   document.addEventListener('click', (e) => {
+     const ag = e.target.closest('[data-agent-start],[data-agent-connect],[data-agent-cancel],[data-agent-end],[data-agent-disconnect],[data-agent-perm],[data-agent-activate],[data-agent-resume]');
+     if (ag) {
+diff --git a/test-support/agent-fixtures.js b/test-support/agent-fixtures.js
+index d662168..58a9c89 100644
+--- a/test-support/agent-fixtures.js
++++ b/test-support/agent-fixtures.js
+@@ -82,4 +82,3 @@ export async function consoleWith(root, options = {}) {
+ }
+ export const activeWork = async (root) => JSON.parse(await readFile(path.join(root, '.yallaflow', 'state', 'current.yaml'), 'utf8')).activeWork;
+ export const stateLines = async (file) => (await readFile(file, 'utf8')).trim().split('\n').map((line) => JSON.parse(line));
+-
+diff --git a/test/workspace-lock.test.js b/test/workspace-lock.test.js
+index 3c3e232..e714c93 100644
+--- a/test/workspace-lock.test.js
++++ b/test/workspace-lock.test.js
+@@ -113,14 +113,16 @@ test('doctor --clear-lock removes a stale lock and refuses a live one', async ()
+   assert.equal(await exists(lockFilePath(root)), false);
+ });
+ 
+-test('a live holder is waited for; past the timeout the command fails and changes nothing', async () => {
++test('a live holder rejects timed-out writes without changes, then permits writes after release', async (t) => {
+   const root = await project();
+   const holder = spawn(process.execPath, ['--input-type=module', '-e', `
+     import { acquireWorkspaceLock } from ${JSON.stringify(new URL('../src/utils/lock.js', import.meta.url).href)};
+-    await acquireWorkspaceLock(${JSON.stringify(root)}, { command: 'yallaflow test-holder' });
++    const release = await acquireWorkspaceLock(${JSON.stringify(root)}, { command: 'yallaflow test-holder' });
++    process.once('message', async () => { await release(); process.exit(0); });
+     process.stdout.write('held\\n');
+-    setTimeout(() => process.exit(0), 1500);
+-  `]);
++  `], { stdio: ['ignore', 'pipe', 'pipe', 'ipc'] });
++  t.after(() => holder.kill());
++  const exited = new Promise((resolve) => holder.once('close', resolve));
+   await new Promise((resolve) => holder.stdout.once('data', resolve));
+ 
+   const workDir = path.join(workspacePath(root), 'work');
+@@ -130,7 +132,11 @@ test('a live holder is waited for; past the timeout the command fails and change
+   assert.match(busy.stderr, /The workspace is busy: `yallaflow test-holder`/);
+   assert.deepEqual(await exists(workDir) ? await readdir(workDir) : [], before, 'nothing was written');
+ 
+-  const waited = await runAsync(root, ['start', 'Waits its turn']);
++  // Keep the holder alive through the assertion even when CLI startup is slow.
++  // Releasing it is a test action, not a race against a fixed 1.5-second timer.
++  holder.send('release');
++  await exited;
++  const waited = await runAsync(root, ['start', 'After release']);
+   assert.equal(waited.status, 0, waited.stderr);
+   assert.match(waited.stdout, /Created PF-0001/);
+ });

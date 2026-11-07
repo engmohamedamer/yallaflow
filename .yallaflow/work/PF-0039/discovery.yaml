@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "insufficient-evidence",
+      "area": "testing",
+      "summary": "Real ChatGPT subscription interaction and owner manual acceptance are not established by simulated-provider browser and unit tests.",
+      "reason": "Requires the consolidated manual acceptance session in research/release-review/ACCEPTANCE.md; no provider login or security policy is changed.",
+      "recordedAt": "2026-11-06T23:52:52.874Z"
+    }
+  ],
+  "updatedAt": "2026-11-06T23:52:52.874Z"
+}

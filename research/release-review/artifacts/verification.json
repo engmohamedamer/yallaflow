@@ -1,0 +1,52 @@
+{
+  "checkedAt": "2026-11-07T00:08:43.221Z",
+  "node": "v22.23.4",
+  "releaseCandidates": [
+    {
+      "version": "1.2.0",
+      "commit": "bc14db05fd60668c4da6da3437ecc7fc7b1816b5",
+      "overlaySha256": null,
+      "filename": "yallaflow-1.2.0.tgz",
+      "sha256": "bbad23be5806aa46d1556638ca08f92591cc16f26561d1f25536b5d89e4f4ab5",
+      "fileCount": 219,
+      "reproducible": true,
+      "smoke": [
+        "version",
+        "greenfield init",
+        "brownfield init",
+        "bootstraps",
+        "doctor",
+        "snapshot",
+        "brownfield gate"
+      ],
+      "dependencies": "reused local node_modules, not a fresh install"
+    },
+    {
+      "version": "1.3.0",
+      "commit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+      "overlaySha256": "21e5e20819fad06d549799ab8f797db16adb4528c850e07e7736260d0ccd9e2c",
+      "filename": "yallaflow-1.3.0.tgz",
+      "sha256": "3dca4f4d283a5de9e093ba3fe3688346cba7418e283be7929af93b61255d153d",
+      "fileCount": 229,
+      "reproducible": true,
+      "smoke": [
+        "version",
+        "greenfield init",
+        "brownfield init",
+        "bootstraps",
+        "doctor",
+        "snapshot",
+        "brownfield gate"
+      ],
+      "dependencies": "reused local node_modules, not a fresh install"
+    }
+  ],
+  "integration": "exact exported trees match after patch application",
+  "limitations": [
+    "No npm registry install or publication",
+    "Filename/high-signal secret scan is not exhaustive",
+    "No real provider interaction",
+    "Browser acceptance recorded separately"
+  ],
+  "scratch": "/tmp/yallaflow-release-review-61u6fd"
+}
