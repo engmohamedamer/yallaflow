@@ -1,4 +1,23 @@
 {
   "schema": "yallaflow.lineage-mappings/1",
-  "mappings": []
+  "mappings": [
+    {
+      "from": "CTX-0105",
+      "kind": "fact",
+      "to": "CTX-0115",
+      "relation": "canonical-continuation",
+      "work": "PF-0056",
+      "reason": "Main's v1.3.0 Codex/Claude-exclusion fact was verified against the 1.4 tree (src/agents/codex.js, bridge.js, experimental.js, package.json exclusions) and promoted unchanged as CTX-0115.",
+      "recordedAt": "2026-11-07T16:23:49.466Z"
+    },
+    {
+      "from": "CTX-0102",
+      "kind": "fact",
+      "to": "CTX-0115",
+      "relation": "supersedes",
+      "work": "PF-0056",
+      "reason": "CTX-0102's bundled Claude channel claim no longer describes the code; CTX-0115 supersedes it on both lines.",
+      "recordedAt": "2026-11-07T16:23:49.683Z"
+    }
+  ]
 }

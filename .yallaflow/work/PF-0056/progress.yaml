@@ -17,16 +17,25 @@
       "summary": "Plan: integration/1.4 branch; history plan/import + commit; plan mergeCommands + app.js restore; history verify-merge; merge commit; memory reconciliation (CTX-0105 main -> new fact superseding CTX-0102, history map x2); stash main checkout's tracked edits and PF-0042/43 (research/ untracked dirs left in place), ff main; doctor + npm run check on main; CHANGELOG local-candidate wording; remove 1.4 worktree and acceptance env after inventory; npm pack + global install of the tarball. No tag, no push, no publish."
     },
     "implementation": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-07T16:16:02.288Z",
+      "completedAt": "2026-11-07T16:16:02.288Z",
+      "summary": "Lineage main-v1.3.0 imported (41 files, hash-verified, ea28173); main 534cdbb merged with plan restore commands, verify-merge passed 5 record sets (476b917); product code byte-identical to a986619. Deviation fixed before merge commit: current.yaml first included in the import commit, verify-merge refused, merge aborted and import commit amended (local, unpushed). CHANGELOG 1.4.0 heading marked local candidate. Main's CTX-0105 verified against src/agents and package.json, proposed as K-001 superseding CTX-0102."
     },
     "verification": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-07T16:23:56.619Z",
+      "completedAt": "2026-11-07T16:23:56.619Z",
+      "summary": "V-001 npm run check 925/925 (Node 22.23.4) on the merged tree; V-002 doctor failed as expected before the lineage mappings and render; V-003 npm pack --dry-run 261 files; V-004 doctor healthy after K-001 promoted as CTX-0115 and mappings main-v1.3.0:CTX-0105 -> CTX-0115 (canonical-continuation), CTX-0102 -> CTX-0115 (supersedes)."
     },
     "code-review": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-07T16:24:01.811Z",
+      "completedAt": "2026-11-07T16:24:01.811Z",
+      "summary": "Reviewed the integration diff against a986619: outside .yallaflow and research/ only CHANGELOG.md's 1.4.0 heading changed; research/ gains main's release-review and workspace-evolution artifacts from 534cdbb; .yallaflow gains lineage main-v1.3.0, main's DONE PF-0039, PF-0056 and CTX-0115. git diff --check clean. No product-code change, so no new code risk."
     }
   },
   "rulings": [],
   "history": [],
-  "updatedAt": "2026-11-07T16:13:51.919Z"
+  "updatedAt": "2026-11-07T16:24:01.811Z"
 }

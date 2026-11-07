@@ -562,25 +562,6 @@ print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_commo
   - test/console-create.test.js (repository @ bdb5e90)
   - npm test (passed) (runtime, PF-0032 V-004)
 
-<!-- yallaflow-fact:CTX-0105 -->
-### CTX-0105 — The 1.3.0 release checkout supports opt-in managed Codex sessions through the user-installed ACP adapter and requires reported ChatGPT account authentication. Known API-key environment variables are stripped, full-access modes are refused, unanswered tool permissions are denied, and activation is explicit through Core. Experimental Claude runtime files are absent from this release checkout and explicitly excluded by package.json; optional loading returns CLAUDE_NOT_INCLUDED when absent. Ordinary Claude bootstrap instructions remain packaged.
-
-- **State:** current
-- **Confidence:** confirmed
-- **Provenance:** repository
-- **Source work:** PF-0039
-- **Knowledge ID:** K-001
-- **Promoted at:** 2026-11-06T23:56:39.400Z
-- **Supersedes:** CTX-0102
-- **Verified:** 2026-11-06T23:56:39.400Z (commit b700b2c)
-- **Evidence:**
-  - package.json (repository @ b700b2c)
-  - src/agents/experimental.js (repository @ b700b2c)
-  - src/agents/codex.js (repository @ b700b2c)
-  - src/agents/bridge.js (repository @ b700b2c)
-  - docs/agents.md (repository @ b700b2c)
-  - node research/release-review/verify-artifacts.mjs (passed) (runtime, PF-0039 V-003)
-
 <!-- yallaflow-fact:CTX-0108 -->
 ### CTX-0108 — yallaflow overview --json (schema yallaflow.overview/1, src/overview/collect.js) is the read-only project overview: understanding state, memory facts with freshness, and an evidence-based stack from src/inventory/stack.js where every entry has a basis (declared = a file states it, detected = a file is present, inferred = counted). It reads manifests, compose image: lines and Dockerfile FROM lines only, never .env files or environment values. The console serves it uncached via runner.readFresh because it reads repository files the .yallaflow watcher does not follow.
 
@@ -626,5 +607,24 @@ print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_commo
   - src/runtime/supervisor.js (repository @ 2f86ec7)
   - docs/runtime.md (repository @ 2f86ec7)
   - test/runtime.test.js (repository @ 2f86ec7)
+
+<!-- yallaflow-fact:CTX-0115 -->
+### CTX-0115 — The 1.3.0 release checkout supports opt-in managed Codex sessions through the user-installed ACP adapter and requires reported ChatGPT account authentication. Known API-key environment variables are stripped, full-access modes are refused, unanswered tool permissions are denied, and activation is explicit through Core. Experimental Claude runtime files are absent from this release checkout and explicitly excluded by package.json; optional loading returns CLAUDE_NOT_INCLUDED when absent. Ordinary Claude bootstrap instructions remain packaged.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0056
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-07T16:23:41.856Z
+- **Supersedes:** CTX-0102
+- **Verified:** 2026-11-07T16:23:41.856Z (commit 476b917)
+- **Evidence:**
+  - .yallaflow/lineages/main-v1.3.0/other/context/index.yaml#CTX-0105 (repository @ 476b917)
+  - package.json (repository @ 476b917)
+  - src/agents/experimental.js (repository @ 476b917)
+  - src/agents/codex.js (repository @ 476b917)
+  - src/agents/bridge.js (repository @ 476b917)
+  - docs/agents.md (repository @ 476b917)
 
 <!-- yallaflow-context:end -->

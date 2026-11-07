@@ -4,14 +4,14 @@
   "scope": "bounded",
   "routingStatus": "routed",
   "rawRequest": "Integrate 1.4 into main (preserved-lineage history import, memory reconciliation) and prepare a local 1.4.0 candidate install for owner testing; no tag, push or publish",
-  "status": "EXECUTION",
+  "status": "DONE",
   "readOnly": false,
   "knowledgePolicy": {
     "version": 1,
     "reviewRequired": true
   },
   "createdAt": "2026-11-07T16:13:40.658Z",
-  "updatedAt": "2026-11-07T16:13:54.883Z",
+  "updatedAt": "2026-11-07T16:24:02.004Z",
   "title": "Integrate 1.4 into main (preserved-lineage history import, memory reconciliation) and prepare a local 1.4.0 candidate install for owner testing; no tag, push or publish",
   "routingConfidence": "high",
   "routingReason": "Explicitly classified by the user: `yallaflow release --scope bounded`.",
@@ -33,5 +33,16 @@
       "verification",
       "code-review"
     ]
-  }
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-07T16:24:02.004Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004"
+      ]
+    }
+  ]
 }

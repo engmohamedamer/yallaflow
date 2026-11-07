@@ -8,7 +8,7 @@ All notable changes to YallaFlow are documented here. The format loosely follows
 
 Nothing yet.
 
-## [1.4.0] - unreleased (in development) — Engineering workspace
+## [1.4.0] - local candidate (not yet published) — Engineering workspace
 
 - Runtime trust now includes package/composer script definitions, directly executed shell scripts and selected Compose files; application code remains outside the fingerprint.
 
