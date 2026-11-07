@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Diverged YallaFlow histories are reconciled through history plan/import into immutable lineages under original IDs, followed by exact per-record Git restores and history verify-merge (index modes/objects and disk bytes). Imported knowledge enters canonical memory only through explicit knowledge promotion and justified history mappings after semantic review. Whole-identity deletion, dirty restore targets and checkout-masked committed conflicts are refused. Actual integration into main remains an owner-authorized action.",
+      "evidence": [
+        "src/history/plan.js",
+        "src/history/lineage.js",
+        "docs/history.md",
+        "docs/release-1.4-integration.md"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0107"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-07T12:35:50.008Z",
+      "factId": "CTX-0113",
+      "promotedAt": "2026-11-07T12:36:02.578Z",
+      "target": "context/conventions.md"
+    }
+  ],
+  "updatedAt": "2026-11-07T12:36:02.578Z",
+  "reviewedAt": "2026-11-07T12:36:02.578Z"
+}

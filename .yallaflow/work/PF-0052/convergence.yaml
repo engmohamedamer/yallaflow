@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-07T12:43:10.762Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "95571b7559e504731b50f2fb6d3b56d2d234a9a8",
+        "verificationRunIds": [
+          "V-011",
+          "V-010"
+        ]
+      },
+      "summary": "Assessed the approved history contract after independent review fixes and 16 passing targeted regressions (V-011); the real-main read-only plan is V-010. Full verification is recorded separately before finish.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "Plan inventory classifies every PF/SRC/CTX/ADR identity against both sides and the merge base, including unchanged identities, with hashes; no source is written. Deleted identities and masked committed conflicts fail closed.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/history/plan.js",
+              "contentHash": "sha256:3e3ab4061815ad1e5e6a36cce61f7f211a81a538d734ed4077980290e2b0343a",
+              "gitCommit": "95571b7559e504731b50f2fb6d3b56d2d234a9a8",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/history/source.js",
+              "contentHash": "sha256:666c755d225eb180f36698afd074f9d6281f32340dd9a1a53c1667b47385bfab",
+              "gitCommit": "95571b7559e504731b50f2fb6d3b56d2d234a9a8",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/history.test.js",
+              "contentHash": "sha256:6571805ca44318bb5aa81530249806f00bf137e3200df76e3b66a2d243769a57",
+              "gitCommit": "95571b7559e504731b50f2fb6d3b56d2d234a9a8",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/history.test.js (passed)",
+              "workId": "PF-0052",
+              "verificationRunId": "V-011"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Import rebuilds reviewed decisions, validates bytes and references before atomic publication, preserves both sides where necessary, is idempotent and never overwrites canonical records. Failure injection and malformed inputs are tested.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/history/lineage.js",
+              "contentHash": "sha256:0b97cfff41a53fb310d4909ff9c820fee9931fc1718b2758256a07411c3571db",
+              "gitCommit": "95571b7559e504731b50f2fb6d3b56d2d234a9a8",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/history.test.js",
+              "contentHash": "sha256:6571805ca44318bb5aa81530249806f00bf137e3200df76e3b66a2d243769a57",
+              "gitCommit": "95571b7559e504731b50f2fb6d3b56d2d234a9a8",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/history.test.js (passed)",
+              "workId": "PF-0052",
+              "verificationRunId": "V-011"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "Original identities remain in an immutable manifest with append-only justified mappings; every target kind is checked and preserved work resolves fact references against its side ledger. Canonical taken work exposes explicit lineage mapping without rewriting its history.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/history/lineage.js",
+              "contentHash": "sha256:0b97cfff41a53fb310d4909ff9c820fee9931fc1718b2758256a07411c3571db",
+              "gitCommit": "95571b7559e504731b50f2fb6d3b56d2d234a9a8",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/doctor.js",
+              "contentHash": "sha256:a01eb13605d1eac2f125c74f161823b8ac5abedc178a2f9324bda6009c82e01a",
+              "gitCommit": "95571b7559e504731b50f2fb6d3b56d2d234a9a8",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/flow/snapshot.js",
+              "contentHash": "sha256:5a274d84b1224cb2fd0ec7461e522da118ba123dd869e5c3bc170d56667966a6",
+              "gitCommit": "95571b7559e504731b50f2fb6d3b56d2d234a9a8",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/history.test.js",
+              "contentHash": "sha256:6571805ca44318bb5aa81530249806f00bf137e3200df76e3b66a2d243769a57",
+              "gitCommit": "95571b7559e504731b50f2fb6d3b56d2d234a9a8",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/history.test.js (passed)",
+              "workId": "PF-0052",
+              "verificationRunId": "V-011"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "Show LABEL:ID returns preserved bytes or fact objects read-only. Rollback requires intact unreferenced history and separately refuses unique unrecoverable copies unless explicitly forced.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/history.js",
+              "contentHash": "sha256:c78637fa82ecfdbecf032b44d781b2a034f2f9189d335c5a15d5ea33fe21b524",
+              "gitCommit": "95571b7559e504731b50f2fb6d3b56d2d234a9a8",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/history/lineage.js",
+              "contentHash": "sha256:0b97cfff41a53fb310d4909ff9c820fee9931fc1718b2758256a07411c3571db",
+              "gitCommit": "95571b7559e504731b50f2fb6d3b56d2d234a9a8",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/history.test.js",
+              "contentHash": "sha256:6571805ca44318bb5aa81530249806f00bf137e3200df76e3b66a2d243769a57",
+              "gitCommit": "95571b7559e504731b50f2fb6d3b56d2d234a9a8",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/history.test.js (passed)",
+              "workId": "PF-0052",
+              "verificationRunId": "V-011"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "Directory sources use read-only regular-file handles, reject links, and the fixture hashes both checkouts before and after. V-010 records a new real-main dry run only: 41 preserved files proposed, with no import or real-main mutation.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/history/source.js",
+              "contentHash": "sha256:666c755d225eb180f36698afd074f9d6281f32340dd9a1a53c1667b47385bfab",
+              "gitCommit": "95571b7559e504731b50f2fb6d3b56d2d234a9a8",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/history.test.js",
+              "contentHash": "sha256:6571805ca44318bb5aa81530249806f00bf137e3200df76e3b66a2d243769a57",
+              "gitCommit": "95571b7559e504731b50f2fb6d3b56d2d234a9a8",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node src/cli.js history plan --label main-v1.3.0 --from-ref main --from-dir /home/engamer/Amasi/YallaFlow (passed)",
+              "workId": "PF-0052",
+              "verificationRunId": "V-010"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/history.test.js (passed)",
+              "workId": "PF-0052",
+              "verificationRunId": "V-011"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "The documented disposable-clone rehearsals exercised import, semantic memory reconciliation, doctor, full tests, fast-forward and rollback without changing real main. Fresh fixture tests additionally exercise exact restore commands and reject mixed index/disk state; docs use the candidate CLI and retain the owner authorization boundary.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "docs/release-1.4-integration.md",
+              "contentHash": "sha256:a4e828a2a5ec00638f6c87c2b293ef6b960db5c0058cea6ee072f2bb6e1fdc50",
+              "gitCommit": "95571b7559e504731b50f2fb6d3b56d2d234a9a8",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/history.test.js",
+              "contentHash": "sha256:6571805ca44318bb5aa81530249806f00bf137e3200df76e3b66a2d243769a57",
+              "gitCommit": "95571b7559e504731b50f2fb6d3b56d2d234a9a8",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/history.test.js (passed)",
+              "workId": "PF-0052",
+              "verificationRunId": "V-011"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-07T12:43:10.762Z"
+}

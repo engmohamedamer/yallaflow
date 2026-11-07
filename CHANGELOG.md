@@ -31,6 +31,9 @@ Nothing yet.
   - **Recorded with provenance `console, identity not verified`** by the unchanged `approve`/`feedback` commands. CLI decisions are recorded as before.
   - **Protected:** stale and duplicate submissions record nothing.
   - **Exposure:** the work read contract exposes gates and their provenance additively.
+- **Work-history reconciliation** (`yallaflow history …`). Diverged branches that allocated the same work or memory IDs are reconciled without renumbering or rewriting.
+  - **Preserved lineage.** The other side's colliding records are kept byte-identically under their original IDs in a read-only lineage with a hashed manifest. Knowledge enters the ledger only through the normal commands, with a verified mapping.
+  - **Safety.** Dry-run, atomic and idempotent import, a hash-verified doctor check, and a guarded rollback. See [`docs/history.md`](docs/history.md).
 - **New Project Wizard** (`yallaflow new …` and the console's **New project** page). See [`docs/new-project.md`](docs/new-project.md).
   - **Stacks.** Laravel, React/Vue with Vite, Next.js, NestJS or Empty, each an official generator pinned to an exact version, or a recommendation from your own agent.
   - **Plan first.** A plan with the exact commands is reviewed and confirmed by its hash before anything runs.

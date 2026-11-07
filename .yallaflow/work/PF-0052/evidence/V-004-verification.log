@@ -1,0 +1,92 @@
+TAP version 13
+# Subtest: plan is read-only and classifies collisions, uncommitted records, diverged records and memory
+not ok 1 - plan is read-only and classifies collisions, uncommitted records, diverged records and memory
+  ---
+  duration_ms: 5080.642324
+  type: 'test'
+  location: '/home/engamer/Amasi/YallaFlow-1.4/test/history.test.js:75:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(plan.body.inventory.some((entry) => entry.classification === 'identical'))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/engamer/Amasi/YallaFlow-1.4/test/history.test.js:82:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: import is byte-identical, read-only, idempotent, never overwrites, and survives an injected failure
+ok 2 - import is byte-identical, read-only, idempotent, never overwrites, and survives an injected failure
+  ---
+  duration_ms: 9269.825476
+  type: 'test'
+  ...
+# Subtest: a tampered plan, a changed source and a symlink in the other checkout are refused or not followed
+ok 3 - a tampered plan, a changed source and a symlink in the other checkout are refused or not followed
+  ---
+  duration_ms: 5473.854622
+  type: 'test'
+  ...
+# Subtest: mappings need a cited canonical record and a reason; rollback refuses referenced history; doctor detects tampering
+ok 4 - mappings need a cited canonical record and a reason; rollback refuses referenced history; doctor detects tampering
+  ---
+  duration_ms: 7128.088827
+  type: 'test'
+  ...
+# Subtest: rollback removes an intact, unreferenced lineage only
+ok 5 - rollback removes an intact, unreferenced lineage only
+  ---
+  duration_ms: 7656.619326
+  type: 'test'
+  ...
+# Subtest: a record taken from the other side keeps its fact references; doctor requires a mapping, work show resolves it
+ok 6 - a record taken from the other side keeps its fact references; doctor requires a mapping, work show resolves it
+  ---
+  duration_ms: 7297.647956
+  type: 'test'
+  ...
+# Subtest: review: hard links in the other checkout are not read; secret-looking files stop the import
+ok 7 - review: hard links in the other checkout are not read; secret-looking files stop the import
+  ---
+  duration_ms: 7148.082737
+  type: 'test'
+  ...
+# Subtest: review: a plan with a recomputed hash but forged identities or commits is refused
+ok 8 - review: a plan with a recomputed hash but forged identities or commits is refused
+  ---
+  duration_ms: 8309.0894
+  type: 'test'
+  ...
+# Subtest: review: verify-merge catches a file that only exists on the other side; the plan's restore commands fix it
+ok 9 - review: verify-merge catches a file that only exists on the other side; the plan's restore commands fix it
+  ---
+  duration_ms: 7561.939487
+  type: 'test'
+  ...
+# Subtest: review: mapping targets are checked by kind and must cite the lineage; symlinked lineage folders and --out tricks are refused
+ok 10 - review: mapping targets are checked by kind and must cite the lineage; symlinked lineage folders and --out tricks are refused
+  ---
+  duration_ms: 6933.01773
+  type: 'test'
+  ...
+# Subtest: review: merge verification checks staged blobs, modes, links and bound plans
+ok 11 - review: merge verification checks staged blobs, modes, links and bound plans
+  ---
+  duration_ms: 7198.511756
+  type: 'test'
+  ...
+1..11
+# tests 11
+# suites 0
+# pass 10
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 79305.944399

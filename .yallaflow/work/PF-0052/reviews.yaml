@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "gates": {
+    "specification": {
+      "status": "approved",
+      "respondedAt": "2026-11-07T11:35:03.917Z",
+      "note": "Re-approval after the audited impact revision (IM-001). The revision implements the owner's own written decisions verbatim (SRC-0043, 2026-11-07): Decision 1 'Specification: APPROVED … The lineage must not become a second canonical work ledger … Do not automatically assert supersession or equivalence without verifying the semantics' and Decision 3 'Keep the older v1.4 branch state in the preserved lineage for historical traceability. Do not reopen or downgrade the completed work item'.",
+      "history": [
+        {
+          "status": "awaiting_review",
+          "at": "2026-11-07T10:57:58.299Z"
+        },
+        {
+          "status": "approved",
+          "at": "2026-11-07T11:33:31.488Z",
+          "note": "Approved by the owner in the agent session (2026-11-07) by answering 'Approve spec' to the specification-review question for the preserved-lineage design (byte-identical lineage under original IDs with hashed manifest, memory reconciled through knowledge commands, explicit mapping). PF-0039 decision: main's DONE version stays canonical ('Main's DONE (Recommended)')."
+        },
+        {
+          "status": "awaiting_review",
+          "at": "2026-11-07T11:34:43.049Z",
+          "reason": "Impact IM-001: Decision 3 requires preserving the workspace's own pre-merge PF-0039 state in the lineage (the specification called that unnecessary), and Decision 1 forbids asserting supersession or equivalence of imported knowledge without verifying semantics; the specification text must say both."
+        },
+        {
+          "status": "approved",
+          "at": "2026-11-07T11:35:03.917Z",
+          "note": "Re-approval after the audited impact revision (IM-001). The revision implements the owner's own written decisions verbatim (SRC-0043, 2026-11-07): Decision 1 'Specification: APPROVED … The lineage must not become a second canonical work ledger … Do not automatically assert supersession or equivalence without verifying the semantics' and Decision 3 'Keep the older v1.4 branch state in the preserved lineage for historical traceability. Do not reopen or downgrade the completed work item'."
+        }
+      ]
+    },
+    "plan": {
+      "status": "approved",
+      "respondedAt": "2026-11-07T11:35:11.747Z",
+      "note": "Re-approval after the audited impact revision (IM-001): the plan changes are the owner's written Decision 2 safeguards and Decisions 1 and 3 constraints (SRC-0043, 2026-11-07, 'Implementation Plan: APPROVED … Required safeguards …').",
+      "history": [
+        {
+          "status": "awaiting_review",
+          "at": "2026-11-07T11:33:32.255Z"
+        },
+        {
+          "status": "approved",
+          "at": "2026-11-07T11:33:32.435Z",
+          "note": "Approved by the owner in the agent session (2026-11-07) by answering 'Approve plan' to the plan-review question summarizing the Implementation Plan in work.md."
+        },
+        {
+          "status": "approved",
+          "at": "2026-11-07T11:35:11.747Z",
+          "note": "Re-approval after the audited impact revision (IM-001): the plan changes are the owner's written Decision 2 safeguards and Decisions 1 and 3 constraints (SRC-0043, 2026-11-07, 'Implementation Plan: APPROVED … Required safeguards …')."
+        }
+      ]
+    }
+  },
+  "updatedAt": "2026-11-07T11:35:11.747Z"
+}

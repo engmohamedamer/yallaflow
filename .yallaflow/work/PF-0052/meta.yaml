@@ -1,0 +1,79 @@
+{
+  "id": "PF-0052",
+  "type": "feature",
+  "scope": "architectural",
+  "routingStatus": "routed",
+  "rawRequest": "Work-history reconciliation for diverged branches: detect work, source, project-memory and ADR ID collisions between this workspace and another Git ref or checkout, dry-run, and import the other side's records byte-identically as an auditable lineage with an ID mapping, hash validation, idempotent apply and rollback, without rewriting or overwriting any record",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-07T10:56:31.750Z",
+  "updatedAt": "2026-11-07T12:43:26.832Z",
+  "title": "Work-history reconciliation for diverged branches: detect work, source, project-memory and ADR ID collisions between this workspace and another Git ref or checkout, dry-run, and import the other side's records byte-identically as an auditable lineage with an ID mapping, hash validation, idempotent apply and rollback, without rewriting or overwriting any record",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope architectural`.",
+  "routedAt": "2026-11-07T10:56:31.762Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "brainstorm",
+    "specify",
+    "plan",
+    "implement",
+    "verify",
+    "converge",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "design-exploration",
+      "specification",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "delivery-convergence",
+      "code-review"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0042",
+      "type": "file",
+      "name": "owner-1.4-final-integration.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-07T10:56:31.971Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0043",
+      "type": "file",
+      "name": "owner-pf0052-decisions.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-07T11:34:28.289Z",
+      "workStatusAtLink": "IMPLEMENTATION",
+      "relationship": "work-input"
+    }
+  ],
+  "lastInvalidationAt": "2026-11-07T12:32:55.465Z",
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-07T12:43:26.832Z",
+      "verificationRunIds": [
+        "V-009",
+        "V-010",
+        "V-011",
+        "V-012"
+      ]
+    }
+  ]
+}

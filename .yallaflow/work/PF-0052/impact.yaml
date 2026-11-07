@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "impacts": [
+    {
+      "id": "IM-001",
+      "status": "assessed",
+      "raisedAt": "2026-11-07T11:34:28.289Z",
+      "stageAtRaise": "IMPLEMENTATION",
+      "triggers": [
+        {
+          "type": "source",
+          "source": "SRC-0043",
+          "at": "2026-11-07T11:34:28.289Z"
+        }
+      ],
+      "assessment": {
+        "assessedAt": "2026-11-07T11:34:43.049Z",
+        "stages": {
+          "context-discovery": {
+            "verdict": "unaffected",
+            "reason": "The repository findings (collisions, PF-0039 divergence) are unchanged by the owner's decisions."
+          },
+          "requirement-clarification": {
+            "verdict": "unaffected",
+            "reason": "The decisions restate and tighten the recorded requirements; no requirement changes."
+          },
+          "design-exploration": {
+            "verdict": "unaffected",
+            "reason": "The owner confirmed the preserved-lineage option chosen in design."
+          },
+          "specification": {
+            "verdict": "affected",
+            "reason": "Decision 3 requires preserving the workspace's own pre-merge PF-0039 state in the lineage (the specification called that unnecessary), and Decision 1 forbids asserting supersession or equivalence of imported knowledge without verifying semantics; the specification text must say both."
+          },
+          "implementation-planning": {
+            "verdict": "affected",
+            "reason": "The plan must include preserving workspace-side records of diverged items and a semantic verification step before any knowledge relation is recorded."
+          }
+        },
+        "applied": {
+          "revised": [
+            "specification",
+            "implementation-planning"
+          ],
+          "stage": {
+            "from": "IMPLEMENTATION",
+            "to": "SPECIFICATION"
+          },
+          "convergenceInvalidated": false
+        }
+      }
+    }
+  ],
+  "updatedAt": "2026-11-07T11:34:43.049Z"
+}

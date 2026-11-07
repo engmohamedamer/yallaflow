@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-07T10:57:37.418Z",
+      "completedAt": "2026-11-07T10:57:37.418Z",
+      "summary": "Compared main (534cdbb, v1.3.0) and feature/workspace-1.4 against merge base b700b2c with git diff/merge-tree and the context ledgers: work-ID collisions PF-0041 (committed on main), PF-0042/PF-0043 (uncommitted in the main checkout only); memory collision CTX-0105 (main: PF-0039 K-001 superseding CTX-0102; 1.4: lifecycle fact); PF-0039 diverged (DONE on main, unchanged on 1.4); no SRC or ADR collisions; app.js textual conflict although the v1.3.0 fix is on 1.4. Existing Core has no import/alias/lineage support; context reconcile and knowledge commands exist for memory transitions."
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T10:57:38.173Z",
+      "completedAt": "2026-11-07T10:57:38.173Z",
+      "summary": "Owner requirements (SRC-0042) recorded as REQ-001..003 / AC-001..006: preservation without rewriting, collision detection, dry-run, validation, rollback, idempotent and partial-failure-safe apply, auditable mapping, referential integrity, untouched main checkout, no real reconciliation before owner review."
+    },
+    "design-exploration": {
+      "status": "completed",
+      "startedAt": "2026-11-07T10:57:38.936Z",
+      "completedAt": "2026-11-07T10:57:38.936Z",
+      "summary": "Evaluated (1) work adopt with new IDs — breaks records' self-references or needs alias resolution in every reader; (2) preserved byte-identical lineage under original IDs with a manifest and explicit mappings, memory reconciled through existing knowledge commands — no rewriting, no renumbering, references intact; (3) Git-history-only — loses main's uncommitted records and silently breaks PF-0039's fact reference. Recommended (2)."
+    },
+    "specification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T11:35:03.561Z",
+      "completedAt": "2026-11-07T11:35:03.561Z",
+      "summary": "Specification revised for the owner's decisions (SRC-0043): workspace-side pre-merge copies of diverged records (PF-0039) are preserved in the lineage; main's DONE PF-0039 stays canonical and is never reopened; the lineage is never a second canonical ledger; no supersession or equivalence is asserted without semantic verification."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-07T11:35:11.341Z",
+      "completedAt": "2026-11-07T11:35:11.341Z",
+      "summary": "Plan revised for SRC-0043: workspace-side copies of diverged records in the plan output, justified relations only in history map, and a recorded semantic verification of CTX-0105/CTX-0102 before mapping in the rehearsal."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-07T12:36:00.753Z",
+      "completedAt": "2026-11-07T12:36:00.753Z",
+      "summary": "Completed independent-review fixes including commit-vs-checkout fail-closed guards and absent-on-both-commits handling. The final independent re-review reports no remaining scoped blockers. Fresh targeted and full tests are running; completion claims await those results."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T12:43:09.752Z",
+      "completedAt": "2026-11-07T12:43:09.752Z",
+      "summary": "npm run check passed 917/917 (V-012). Final history regression run passed 16/16 (V-011), including the last absent-on-both-commits case. Real-main read-only dry-run passed (V-010); doctor healthy (V-008). Node 20 minimum-version suite is running as additional release verification."
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-07T12:43:12.702Z",
+      "completedAt": "2026-11-07T12:43:12.702Z",
+      "summary": "AC-001 through AC-006 assessed as satisfied with repository and verification evidence; full inventory and identity inspection gaps corrected. No unrequested behavior remains."
+    },
+    "code-review": {
+      "status": "completed",
+      "startedAt": "2026-11-07T12:43:13.530Z",
+      "completedAt": "2026-11-07T12:43:13.530Z",
+      "summary": "Independent history_review reviewed the implementation and re-reviewed all fixes. Final scoped outcome: no remaining blocking findings. Findings covered original index/plan safety defects plus preservation, mapping, references, links and requirement surfaces; fresh targeted and full verification passed."
+    }
+  },
+  "rulings": [
+    {
+      "decision": "PF-0039 stays canonical as main's DONE (v1.3.0) version after integration; its reference to main's CTX-0105 is resolved through the lineage mapping.",
+      "reason": "Owner decision in the agent session (2026-11-07): 'Main's DONE (Recommended)'.",
+      "costIfWrong": "A released work item would be represented as open, or a memory reference would resolve to the wrong fact.",
+      "createdAt": "2026-11-07T11:33:31.668Z"
+    },
+    {
+      "decision": "Owner constraints (SRC-0043): the lineage is immutable, read-only and never a second canonical ledger; the workspace's own pre-merge PF-0039 state is also preserved in the lineage; knowledge enters the active ledger only through existing Core rules with new identities and a source mapping, and no supersession or equivalence is asserted without verifying the semantics.",
+      "reason": "Owner's written decisions on the specification, plan and PF-0039 gates (2026-11-07).",
+      "costIfWrong": "Historical records could be treated as current work, or memory could record a false supersession.",
+      "createdAt": "2026-11-07T11:34:28.469Z"
+    },
+    {
+      "decision": "The unreleased Agent Contract v11 text names lineages/ among CLI-owned state (no version bump), and this repository's AGENT.md was refreshed; the specification said the contract would not change.",
+      "reason": "Every CLI-owned path must be named in the contract (state-ownership test 54); v11 ships first in 1.4.0, so no released contract changes and no agent obligation is added beyond 'do not edit CLI-owned state'.",
+      "costIfWrong": "Workspaces that adopted the unreleased v11 during development would show a contract body difference until refreshed.",
+      "createdAt": "2026-11-07T11:37:52.904Z"
+    },
+    {
+      "decision": "Handoff to Codex (owner request). Open re-review findings to fix before PF-0052 can be finished: (1) history verify-merge compares the working tree, not the index: it must compare git ls-files -s / write-tree for each record set against git ls-tree <commit> (mode + object id), require git diff --quiet for those paths, and count symlinks, hard links and other non-regular entries as extra; (2) the import rebuild comparison must also cover gitResolution, mergeCommands and label, and verify-merge must require plan.hash === the imported lineage manifest planHash and re-derive gitResolution itself rather than trusting the plan file. Already fixed and tested (10/10 history tests): hard links not read, secret-looking files refused, strict plan ids and full commits, rebuild-and-compare of identities/preserve, rollback refuses cited or unrecoverable lineages, mapping targets by kind with citation, symlinked lineages folder refused, exact restore commands in the plan. Docs (release-1.4-integration.md, history.md) were updated after the reviewer's copy was taken; recheck them against the final behaviour.",
+      "reason": "The owner asked to continue the work with Codex; the findings are recorded so the next agent does not depend on this conversation.",
+      "costIfWrong": "A merge could be reported as verified while its commit still mixes main's and 1.4's PF-0041 records.",
+      "createdAt": "2026-11-07T12:13:41.318Z"
+    },
+    {
+      "decision": "Requirement audit found history show LABEL:ID missing (AC-004), while the plan omits identical and workspace-only identities from its report (AC-001). Complete these read-only surfaces before convergence; retain focused merge-resolution and reference-mapping semantics.",
+      "reason": "The approved acceptance criteria require these behaviors; passing the focused security tests is not sufficient.",
+      "costIfWrong": "A DONE claim would not match the approved requirement contract.",
+      "createdAt": "2026-11-07T12:22:40.670Z"
+    },
+    {
+      "decision": "Independent review found additional preservation and integrity gaps: uncommitted diverged-other copies, whole-record deletions, source/ADR mapping validation, lineage-scoped knowledge references, and metadata hard links. Fix and regress these before finish. The planned standalone schema artifact is replaced by runtime validation plus rebuilt-plan comparison; no published schema contract exists.",
+      "reason": "Read-only independent review of the approved preservation and AC-003 contract.",
+      "costIfWrong": "Historical bytes or references could be lost while doctor or merge verification reports success.",
+      "createdAt": "2026-11-07T12:30:32.316Z"
+    }
+  ],
+  "history": [
+    {
+      "skill": "specification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-001: Decision 3 requires preserving the workspace's own pre-merge PF-0039 state in the lineage (the specification called that unnecessary), and Decision 1 forbids asserting supersession or equivalence of imported knowledge without verifying semantics; the specification text must say both.",
+      "changedAt": "2026-11-07T11:34:43.049Z"
+    },
+    {
+      "skill": "implementation-planning",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-001: The plan must include preserving workspace-side records of diverged items and a semantic verification step before any knowledge relation is recorded.",
+      "changedAt": "2026-11-07T11:34:43.049Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Independent re-review found checkout classification can mask committed conflicts and dirty workspace restore targets can lose local history. Fail closed on both before completion.",
+      "changedAt": "2026-11-07T12:32:55.452Z"
+    }
+  ],
+  "updatedAt": "2026-11-07T12:43:13.530Z"
+}

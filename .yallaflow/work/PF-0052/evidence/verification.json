@@ -1,0 +1,247 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T11:53:55.748Z",
+      "finishedAt": "2026-11-07T12:00:18.978Z",
+      "verifiedAt": "2026-11-07T12:00:18.978Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/history.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/history.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/history.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T12:19:08.384Z",
+      "finishedAt": "2026-11-07T12:19:28.510Z",
+      "verifiedAt": "2026-11-07T12:19:28.510Z",
+      "log": "V-002-verification.log"
+    },
+    {
+      "id": "V-003",
+      "command": "node src/cli.js history plan --label main-v1.3.0 --from-ref main --from-dir /home/engamer/Amasi/YallaFlow",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "src/cli.js",
+        "history",
+        "plan",
+        "--label",
+        "main-v1.3.0",
+        "--from-ref",
+        "main",
+        "--from-dir",
+        "/home/engamer/Amasi/YallaFlow"
+      ],
+      "displayCommand": "node src/cli.js history plan --label main-v1.3.0 --from-ref main --from-dir /home/engamer/Amasi/YallaFlow",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T12:20:40.238Z",
+      "finishedAt": "2026-11-07T12:20:56.558Z",
+      "verifiedAt": "2026-11-07T12:20:56.558Z",
+      "log": "V-003-verification.log"
+    },
+    {
+      "id": "V-004",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/history.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/history.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/history.test.js",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-07T12:24:32.836Z",
+      "finishedAt": "2026-11-07T12:25:52.264Z",
+      "verifiedAt": "2026-11-07T12:25:52.264Z",
+      "log": "V-004-verification.log"
+    },
+    {
+      "id": "V-005",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T12:19:45.599Z",
+      "finishedAt": "2026-11-07T12:26:33.212Z",
+      "verifiedAt": "2026-11-07T12:26:33.212Z",
+      "log": "V-005-verification.log"
+    },
+    {
+      "id": "V-006",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/history.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/history.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/history.test.js",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-07T12:31:39.298Z",
+      "finishedAt": "2026-11-07T12:32:05.726Z",
+      "verifiedAt": "2026-11-07T12:32:05.726Z",
+      "log": "V-006-verification.log"
+    },
+    {
+      "id": "V-007",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/history.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/history.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/history.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T12:31:55.408Z",
+      "finishedAt": "2026-11-07T12:32:23.492Z",
+      "verifiedAt": "2026-11-07T12:32:23.492Z",
+      "log": "V-007-verification.log"
+    },
+    {
+      "id": "V-008",
+      "command": "node src/cli.js doctor",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "src/cli.js",
+        "doctor"
+      ],
+      "displayCommand": "node src/cli.js doctor",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T12:32:27.358Z",
+      "finishedAt": "2026-11-07T12:32:28.003Z",
+      "verifiedAt": "2026-11-07T12:32:28.003Z",
+      "log": "V-008-verification.log"
+    },
+    {
+      "id": "V-009",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/history.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/history.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/history.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T12:33:46.718Z",
+      "finishedAt": "2026-11-07T12:35:41.946Z",
+      "verifiedAt": "2026-11-07T12:35:41.946Z",
+      "log": "V-009-verification.log"
+    },
+    {
+      "id": "V-010",
+      "command": "node src/cli.js history plan --label main-v1.3.0 --from-ref main --from-dir /home/engamer/Amasi/YallaFlow",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "src/cli.js",
+        "history",
+        "plan",
+        "--label",
+        "main-v1.3.0",
+        "--from-ref",
+        "main",
+        "--from-dir",
+        "/home/engamer/Amasi/YallaFlow"
+      ],
+      "displayCommand": "node src/cli.js history plan --label main-v1.3.0 --from-ref main --from-dir /home/engamer/Amasi/YallaFlow",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T12:35:48.493Z",
+      "finishedAt": "2026-11-07T12:36:26.633Z",
+      "verifiedAt": "2026-11-07T12:36:26.633Z",
+      "log": "V-010-verification.log"
+    },
+    {
+      "id": "V-011",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/history.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/history.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/history.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T12:34:43.678Z",
+      "finishedAt": "2026-11-07T12:36:49.463Z",
+      "verifiedAt": "2026-11-07T12:36:49.463Z",
+      "log": "V-011-verification.log"
+    },
+    {
+      "id": "V-012",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T12:32:35.847Z",
+      "finishedAt": "2026-11-07T12:42:41.495Z",
+      "verifiedAt": "2026-11-07T12:42:41.495Z",
+      "log": "V-012-verification.log"
+    }
+  ]
+}

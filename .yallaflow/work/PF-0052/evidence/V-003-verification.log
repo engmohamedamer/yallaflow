@@ -1,0 +1,27 @@
+History plan main-v1.3.0 (dry-run; nothing was written to the workspace)
+  this workspace: 95571b7559e5 · other: main 534cdbb217a6 + its checkout (uncommitted records included) · merge base b700b2cb9d0f
+  work  PF-0039    diverged-other      → git-merge-takes-other; preserve-workspace-copy
+  work  PF-0041    colliding           → keep-workspace; preserve-other
+  work  PF-0042    colliding           → keep-workspace; preserve-other
+  work  PF-0043    colliding           → keep-workspace; preserve-other
+  fact  CTX-0102   diverged-other      → knowledge-decision (verify the meaning; propose through Core; record the mapping) — no relation is assumed
+        other: [superseded] Agent Workspace (v1.3.0, opt-in via 'yallaflow console --agents'): provider-aware code is confined to src/agen
+        here:  [current] Agent Workspace (v1.3.0, opt-in via 'yallaflow console --agents'): provider-aware code is confined to src/agen
+  fact  CTX-0105   colliding           → knowledge-decision (verify the meaning; propose through Core; record the mapping) — no relation is assumed
+        other: [current] The 1.3.0 release checkout supports opt-in managed Codex sessions through the user-installed ACP adapter and r
+        here:  [current] Work lifecycle (1.4.0): a work item's lifecycle status (open, on hold, closed without delivery) is separate fr
+  files to preserve: 41 (36 other, 5 workspace; 26 uncommitted)
+  merge resolution: .yallaflow/work/PF-0039 → theirs
+  merge resolution: .yallaflow/work/PF-0041 → ours
+  merge resolution: .yallaflow/work/PF-0042 → ours
+  merge resolution: .yallaflow/work/PF-0043 → ours
+  merge commands (after import):
+    git merge --no-ff --no-commit 534cdbb217a6604b120f492ba8578088671dd197
+    git restore --source=534cdbb217a6604b120f492ba8578088671dd197 --staged --worktree -- .yallaflow/work/PF-0039
+    git restore --source=HEAD --staged --worktree -- .yallaflow/work/PF-0041
+    git restore --source=HEAD --staged --worktree -- .yallaflow/work/PF-0042
+    git restore --source=HEAD --staged --worktree -- .yallaflow/work/PF-0043
+    git restore --source=HEAD --staged --worktree -- .yallaflow/context/index.yaml .yallaflow/state/current.yaml
+    yallaflow history verify-merge --plan <plan file>
+  plan hash: 475eaf808f9127943a4423f2713a68771c6f3905a5b457266d45a85c12b45cb1
+  (pass --out FILE to keep it for import)

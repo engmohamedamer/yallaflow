@@ -18,6 +18,7 @@ import { checkDeliveryIntegrity } from '../delivery/integrity.js';
 import { checkQualityIntegrity } from '../quality/integrity.js';
 import { checkWorkRecordOwnership } from '../core/ownership.js';
 import { loadRuntimeProfiles } from '../runtime/profile.js';
+import { listLineages, verifyLineage } from '../history/lineage.js';
 
 import { clearStaleLock, readLock } from '../utils/lock.js';
 import { diagnoseCollisions } from '../core/collisions.js';
@@ -133,6 +134,18 @@ export async function collectDoctorReport(root, { verifyMedia = false } = {}) {
     checks.push([`sources (${sources.length} present)`, true]);
   } catch (error) {
     checks.push([`sources: ${error instanceof Error ? error.message : String(error)}`, false]);
+  }
+
+  // 1.4.0: preserved lineages (PF-0052): every file matches its recorded hash, nothing
+  // extra was added, and recorded mappings point to existing canonical records.
+  try {
+    for (const lineage of await listLineages(root)) {
+      if (lineage.invalid) { checks.push([`lineage ${lineage.label}: manifest unreadable`, false]); continue; }
+      const result = await verifyLineage(root, lineage.label);
+      checks.push([`lineage ${lineage.label} (${result.files} preserved file(s), ${result.mappings} mapping(s))`, true]);
+    }
+  } catch (error) {
+    checks.push([`lineage: ${error instanceof Error ? error.message : String(error)}`, false]);
   }
 
   // 1.4.0: the runtime profile, only when one exists (validation never runs anything).

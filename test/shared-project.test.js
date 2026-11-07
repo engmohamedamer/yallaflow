@@ -701,7 +701,8 @@ test('47/48/49/50/51. shared check is read-only, provider-neutral, passes a safe
 test('51/no-network: YallaFlow source never invokes mutating or network Git subcommands and calls no LLM provider', async () => {
   const srcDir = fileURLToPath(new URL('../src/', import.meta.url));
   const offenders = [];
-  const allowed = new Set(['status', 'rev-parse', 'diff', 'ls-files', 'ls-tree', 'check-ignore', 'symbolic-ref', 'config']);
+  // 1.4.0 history (PF-0052) reads another branch with read-only plumbing: cat-file and merge-base.
+  const allowed = new Set(['status', 'rev-parse', 'diff', 'ls-files', 'ls-tree', 'check-ignore', 'symbolic-ref', 'config', 'cat-file', 'merge-base']);
   async function walk(dir) {
     for (const entry of await readdir(dir, { withFileTypes: true })) {
       const full = path.join(dir, entry.name);

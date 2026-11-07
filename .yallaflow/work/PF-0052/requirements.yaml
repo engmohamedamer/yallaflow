@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "Reconcile diverged work histories (main and feature/workspace-1.4) so both sides' records, decisions, timestamps, sources and evidence are preserved and nothing is silently rewritten or overwritten.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0042",
+          "locator": "1. Resolve work-ID collisions safely"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T10:57:36.645Z",
+      "updatedAt": "2026-11-07T10:57:36.645Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "Detect collisions (work items, sources, project-memory facts, ADRs) and support dry-run, validation, rollback, idempotent and partial-failure-safe apply, with an auditable identity mapping and preserved referential integrity.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0042",
+          "locator": "The solution must"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T10:57:36.645Z",
+      "updatedAt": "2026-11-07T10:57:36.645Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "Never touch the main checkout's uncommitted changes and never execute the actual reconciliation against main before the owner reviews the dry-run.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0042",
+          "locator": "Preserve all uncommitted changes; Do not execute an actual reconciliation"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T10:57:36.645Z",
+      "updatedAt": "2026-11-07T10:57:36.645Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-002",
+      "statement": "`yallaflow history plan --label L --from-ref REF [--from-dir DIR]` is read-only and reports, per ID (PF, SRC, CTX, ADR): identical, only-on-other-side, diverged-shared (same record changed on one side), or colliding (same ID, different records), with file hashes, writing nothing to the workspace or the other checkout.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T10:57:36.645Z",
+      "updatedAt": "2026-11-07T10:57:36.645Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "`yallaflow history import --plan FILE --confirm HASH` stores every other-side record that cannot live at its ID byte-identically under .yallaflow/lineages/L/ with a CLI-owned manifest (source ref and commit or directory fingerprint, per-file SHA-256, import time) and never writes into work/, sources/ or context/; an existing lineage with different content is refused, the same plan applied twice is a no-op, and a failed apply leaves no partial lineage (staged then renamed).",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T10:57:36.645Z",
+      "updatedAt": "2026-11-07T10:57:36.645Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-002",
+      "statement": "The manifest records an auditable mapping for each preserved identity (L:PF-0041, L:CTX-0105, …) and, once a reconciliation decision is taken through existing Core commands, its relation to the canonical record (e.g. L:CTX-0105 → CTX-0113 via a knowledge promotion citing the lineage); doctor validates lineage hashes and mappings and resolves references made by lineage records within their lineage.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T10:57:36.645Z",
+      "updatedAt": "2026-11-07T10:57:36.645Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-002",
+      "statement": "`yallaflow history show L[:ID]` reads preserved records read-only; `yallaflow history remove L --confirm HASH` (rollback) removes a lineage only while no canonical record references it and only if its files still match the manifest.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T10:57:36.645Z",
+      "updatedAt": "2026-11-07T10:57:36.645Z"
+    },
+    {
+      "id": "AC-005",
+      "requirement": "REQ-003",
+      "statement": "Reading another checkout (--from-dir) opens files read-only without following symbolic links out of it, never modifies it, and tests prove its uncommitted files are byte-identical before and after; a dry-run against the real main checkout is produced for the owner without applying anything.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T10:57:36.645Z",
+      "updatedAt": "2026-11-07T10:57:36.645Z"
+    },
+    {
+      "id": "AC-006",
+      "requirement": "REQ-001",
+      "statement": "A documented, tested merge procedure (on a disposable clone) reproduces the integration: lineage import, memory reconciliation via knowledge commands, conflict resolution rules per path, doctor clean, full suite green, with exact commands and a rollback strategy, without touching the real main.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T10:57:36.645Z",
+      "updatedAt": "2026-11-07T10:57:36.645Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-07T10:57:36.645Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-07T10:57:36.645Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-07T10:57:36.645Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-07T10:57:36.645Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-07T10:57:36.645Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-07T10:57:36.645Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-11-07T10:57:36.645Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-005",
+      "at": "2026-11-07T10:57:36.645Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-006",
+      "at": "2026-11-07T10:57:36.645Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-07T10:57:36.645Z"
+}

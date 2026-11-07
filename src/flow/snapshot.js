@@ -27,6 +27,7 @@ import { convergenceRequired } from '../delivery/policy.js';
 import { loadDecomposition } from '../decomposition/store.js';
 import { PACKAGE_VERSION } from '../version.js';
 import { buildStations, itemState, stationForSkill } from './stations.js';
+import { lineageReferenceResolver } from '../history/lineage.js';
 
 export const SNAPSHOT_SCHEMA = 'yallaflow.snapshot/1';
 export const WORK_SCHEMA = 'yallaflow.work/1';
@@ -256,9 +257,16 @@ async function workDetail(root, workId, meta, { now = new Date().toISOString() }
   detail.convergence = assessed ? { converged: Boolean(assessed.converged) } : null;
   detail.verification = (await listVerificationRuns(root, meta.id)).map((run) => ({ id: run.id, success: Boolean(run.success), command: run.command ?? null, at: run.verifiedAt ?? run.finishedAt ?? null, summary: run.summary ?? null }));
   const knowledge = (await loadWorkKnowledge(root, meta)).ledger;
+  const resolveLineageRef = await lineageReferenceResolver(root).catch(() => null);
   detail.knowledge = {
     reviewStatus: knowledge?.reviewStatus ?? 'pending',
-    candidates: (knowledge?.candidates ?? []).map((entry) => ({ id: entry.id, kind: entry.kind ?? null, status: entry.status, summary: entry.summary ?? null, promotedAs: entry.promotedAs ?? entry.contextId ?? null }))
+    candidates: (knowledge?.candidates ?? []).map((entry) => {
+      const promotedAs = entry.promotedAs ?? entry.contextId ?? entry.factId ?? null;
+      // 1.4.0: a record taken from another branch keeps that branch's fact IDs; show how
+      // they resolve here through the preserved lineage (PF-0052).
+      const lineage = promotedAs ? resolveLineageRef?.(meta.id, promotedAs) : null;
+      return { id: entry.id, kind: entry.kind ?? null, status: entry.status, summary: entry.summary ?? null, promotedAs, ...(lineage ? { lineage } : {}) };
+    })
   };
   // 1.4.0 (additive): review gates with their decisions; console decisions carry
   // provenance { via: 'console', identity: 'not verified', ... }.

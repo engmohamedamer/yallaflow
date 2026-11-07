@@ -187,17 +187,21 @@
   - src/reviews/store.js (repository @ 3184054)
   - npm run check (passed) (runtime, PF-0043 V-001)
 
-<!-- yallaflow-fact:CTX-0107 -->
-### CTX-0107 — This repository's main and feature/workspace-1.4 branches allocated YallaFlow work IDs independently, so PF-0041..PF-0043 exist on both with different content. Never merge .yallaflow/work between them with Git: carry code fixes narrowly and keep the merge into main blocked until a verified adopt/alias mechanism exists (docs/release-1.4-integration.md).
+<!-- yallaflow-fact:CTX-0113 -->
+### CTX-0113 — Diverged YallaFlow histories are reconciled through history plan/import into immutable lineages under original IDs, followed by exact per-record Git restores and history verify-merge (index modes/objects and disk bytes). Imported knowledge enters canonical memory only through explicit knowledge promotion and justified history mappings after semantic review. Whole-identity deletion, dirty restore targets and checkout-masked committed conflicts are refused. Actual integration into main remains an owner-authorized action.
 
 - **State:** current
 - **Confidence:** confirmed
 - **Provenance:** repository
-- **Source work:** PF-0045
+- **Source work:** PF-0052
 - **Knowledge ID:** K-001
-- **Promoted at:** 2026-11-07T02:12:02.332Z
-- **Verified:** 2026-11-07T02:12:02.332Z (commit 17e3e34)
+- **Promoted at:** 2026-11-07T12:36:02.578Z
+- **Supersedes:** CTX-0107
+- **Verified:** 2026-11-07T12:36:02.578Z (commit 95571b7)
 - **Evidence:**
-  - docs/release-1.4-integration.md (repository @ 17e3e34)
+  - src/history/plan.js (repository @ 95571b7)
+  - src/history/lineage.js (repository @ 95571b7)
+  - docs/history.md (repository @ 95571b7)
+  - docs/release-1.4-integration.md (repository @ 95571b7)
 
 <!-- yallaflow-context:end -->

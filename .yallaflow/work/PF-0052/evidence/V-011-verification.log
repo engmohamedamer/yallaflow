@@ -1,0 +1,106 @@
+TAP version 13
+# Subtest: plan is read-only and classifies collisions, uncommitted records, diverged records and memory
+ok 1 - plan is read-only and classifies collisions, uncommitted records, diverged records and memory
+  ---
+  duration_ms: 9094.546168
+  type: 'test'
+  ...
+# Subtest: import is byte-identical, read-only, idempotent, never overwrites, and survives an injected failure
+ok 2 - import is byte-identical, read-only, idempotent, never overwrites, and survives an injected failure
+  ---
+  duration_ms: 11924.26559
+  type: 'test'
+  ...
+# Subtest: a tampered plan, a changed source and a symlink in the other checkout are refused or not followed
+ok 3 - a tampered plan, a changed source and a symlink in the other checkout are refused or not followed
+  ---
+  duration_ms: 6446.587122
+  type: 'test'
+  ...
+# Subtest: mappings need a cited canonical record and a reason; rollback refuses referenced history; doctor detects tampering
+ok 4 - mappings need a cited canonical record and a reason; rollback refuses referenced history; doctor detects tampering
+  ---
+  duration_ms: 8998.645046
+  type: 'test'
+  ...
+# Subtest: rollback removes an intact, unreferenced lineage only
+ok 5 - rollback removes an intact, unreferenced lineage only
+  ---
+  duration_ms: 9231.013475
+  type: 'test'
+  ...
+# Subtest: a record taken from the other side keeps its fact references; doctor requires a mapping, work show resolves it
+ok 6 - a record taken from the other side keeps its fact references; doctor requires a mapping, work show resolves it
+  ---
+  duration_ms: 8610.107254
+  type: 'test'
+  ...
+# Subtest: review: hard links in the other checkout are not read; secret-looking files stop the import
+ok 7 - review: hard links in the other checkout are not read; secret-looking files stop the import
+  ---
+  duration_ms: 6481.52147
+  type: 'test'
+  ...
+# Subtest: review: a plan with a recomputed hash but forged identities or commits is refused
+ok 8 - review: a plan with a recomputed hash but forged identities or commits is refused
+  ---
+  duration_ms: 6138.93445
+  type: 'test'
+  ...
+# Subtest: review: verify-merge catches a file that only exists on the other side; the plan's restore commands fix it
+ok 9 - review: verify-merge catches a file that only exists on the other side; the plan's restore commands fix it
+  ---
+  duration_ms: 7985.042367
+  type: 'test'
+  ...
+# Subtest: review: mapping targets are checked by kind and must cite the lineage; symlinked lineage folders and --out tricks are refused
+ok 10 - review: mapping targets are checked by kind and must cite the lineage; symlinked lineage folders and --out tricks are refused
+  ---
+  duration_ms: 9359.569216
+  type: 'test'
+  ...
+# Subtest: review: merge verification checks staged blobs, modes, links and bound plans
+ok 11 - review: merge verification checks staged blobs, modes, links and bound plans
+  ---
+  duration_ms: 9038.903405
+  type: 'test'
+  ...
+# Subtest: review: uncommitted shared history is preserved on both sides and deleted identities fail closed
+ok 12 - review: uncommitted shared history is preserved on both sides and deleted identities fail closed
+  ---
+  duration_ms: 6895.167213
+  type: 'test'
+  ...
+# Subtest: review: metadata hard links and dangling preserved fact references are refused atomically
+ok 13 - review: metadata hard links and dangling preserved fact references are refused atomically
+  ---
+  duration_ms: 7676.543324
+  type: 'test'
+  ...
+# Subtest: review: doctor validates source and ADR mapping targets after creation
+ok 14 - review: doctor validates source and ADR mapping targets after creation
+  ---
+  duration_ms: 5916.603327
+  type: 'test'
+  ...
+# Subtest: review: checkout overlays cannot mask committed conflicts or discard dirty workspace targets
+ok 15 - review: checkout overlays cannot mask committed conflicts or discard dirty workspace targets
+  ---
+  duration_ms: 5618.19842
+  type: 'test'
+  ...
+# Subtest: review: new uncommitted identities absent from both commits remain supported
+ok 16 - review: new uncommitted identities absent from both commits remain supported
+  ---
+  duration_ms: 5926.026022
+  type: 'test'
+  ...
+1..16
+# tests 16
+# suites 0
+# pass 16
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 125622.989102
