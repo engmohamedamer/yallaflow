@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-07T02:34:01.818Z",
+      "completedAt": "2026-11-07T02:34:01.818Z",
+      "summary": "Reviewed src/agents/acp.js (process-group spawn, /proc start-time identity, descendant tracking, verified-stop reporting), src/security/redact.js (redactSecrets, isSecretKey), src/console/server.js and runner.js (fixed POST routes, guards, argv-only CLI runner), src/core/ownership.js (state ownership), src/inventory/stack.js (stack evidence for suggestions) and the no-network guard in test/shared-project.test.js. No runtime/service code exists today. .yallaflow/local is already git-ignored personal state (agent sessions)."
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T02:34:02.555Z",
+      "completedAt": "2026-11-07T02:34:02.555Z",
+      "summary": "Requirements from SRC-0036/SRC-0037 recorded as REQ-001..004 / AC-001..006. Four security/compatibility choices (loopback port probe exception, service lifetime vs console, trust storage, environment pass-through base) are listed in the specification for owner approval at the specification gate."
+    },
+    "design-exploration": {
+      "status": "completed",
+      "startedAt": "2026-11-07T02:34:03.295Z",
+      "completedAt": "2026-11-07T02:34:03.295Z",
+      "summary": "Options considered: (a) in-console supervisor owning child pipes (services die with the console, logs lost on restart); (b) CLI-launched detached process groups with run records and log files under .yallaflow/local/runtime (services independent of the console, CLI and Console share one state, identity re-verified on every read). Chose (b): one Core path for CLI and Console, survives console restarts and browser reconnects, and stop safety rests on pid+start-time identity reused from the Agent Workspace."
+    },
+    "specification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T02:34:10.622Z",
+      "completedAt": "2026-11-07T02:34:10.622Z",
+      "summary": "Specification written in work.md (profiles, suggestions, trust, supervisor, ports, Console, CLI, compatibility, non-goals) with four security/compatibility decisions for the owner: loopback-only port probe exception, services outliving the Console, personal trust bound to definition+checkout, fixed environment pass-through base."
+    },
+    "implementation-planning": {
+      "status": "pending"
+    },
+    "implementation": {
+      "status": "pending"
+    },
+    "verification": {
+      "status": "pending"
+    },
+    "delivery-convergence": {
+      "status": "pending"
+    },
+    "code-review": {
+      "status": "pending"
+    }
+  },
+  "rulings": [
+    {
+      "decision": "The specification checkpoint was completed seconds before its text was written into work.md (a heading mismatch made the first insertion fail); the Specification section was filled immediately afterwards, before any review was requested or given.",
+      "reason": "Keeps the review record honest: the reviewed text is the current work.md Specification section.",
+      "costIfWrong": "A reviewer could believe the checkpoint summary was backed by text that did not yet exist at that moment.",
+      "createdAt": "2026-11-07T02:34:27.317Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-07T02:34:27.317Z"
+}

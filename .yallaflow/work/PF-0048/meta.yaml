@@ -1,0 +1,67 @@
+{
+  "id": "PF-0048",
+  "type": "feature",
+  "scope": "architectural",
+  "routingStatus": "routed",
+  "rawRequest": "New Project Wizard: project name, location and stack selection using pinned official generators or an agent-recommended setup, a reviewable plan before anything is created, staged and auditable creation, YallaFlow init and a first setup work item, from the CLI and the Console",
+  "status": "SPECIFICATION",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-07T02:34:32.662Z",
+  "updatedAt": "2026-11-07T02:34:53.315Z",
+  "title": "New Project Wizard: project name, location and stack selection using pinned official generators or an agent-recommended setup, a reviewable plan before anything is created, staged and auditable creation, YallaFlow init and a first setup work item, from the CLI and the Console",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope architectural`.",
+  "routedAt": "2026-11-07T02:34:32.673Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "brainstorm",
+    "specify",
+    "plan",
+    "implement",
+    "verify",
+    "converge",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "design-exploration",
+      "specification",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "delivery-convergence",
+      "code-review"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0038",
+      "type": "file",
+      "name": "owner-1.4-complete-scope.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-07T02:34:32.881Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0039",
+      "type": "file",
+      "name": "owner-1.4-continue.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-07T02:34:32.883Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ]
+}

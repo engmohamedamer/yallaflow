@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "A New Project Wizard collects project name, location and stack, and supports templates or supported official generators and an optional agent-recommended setup.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0038",
+          "locator": "New Project Wizard"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0039",
+          "locator": "New Project Wizard"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:34:50.723Z",
+      "updatedAt": "2026-11-07T02:34:50.723Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "Nothing is scaffolded before the user has reviewed the plan; existing paths are never overwritten; interrupted creation is recoverable.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0038",
+          "locator": "Do not scaffold arbitrary code before the user has reviewed the plan"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:34:50.723Z",
+      "updatedAt": "2026-11-07T02:34:50.723Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "After creation the project is initialized with YallaFlow and gets a first setup work item.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0038",
+          "locator": "project creation, and YallaFlow initialization"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:34:50.723Z",
+      "updatedAt": "2026-11-07T02:34:50.723Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "yallaflow new plan validates name and parent (canonical path, destination absent, parent writable, nested workspace refused unless allowed) and selects only a catalog generator with a pinned version and enumerated options; prerequisites are checked with --version only and missing tools are reported, never installed.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:34:50.723Z",
+      "updatedAt": "2026-11-07T02:34:50.723Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "Agent recommendation never calls a model from YallaFlow: the wizard offers a copyable request; an agent answers by running yallaflow new plan with --rationale, and the rationale is shown in the plan review.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:34:50.723Z",
+      "updatedAt": "2026-11-07T02:34:50.723Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-002",
+      "statement": "A plan is an immutable user-level record with destination, generator, version, exact argv, network notice, post-steps and content hash; yallaflow new create runs only with a matching hash confirmation, generates in a fresh staging directory without a shell, and promotes to the destination only if it is still absent.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:34:50.723Z",
+      "updatedAt": "2026-11-07T02:34:50.723Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-002",
+      "statement": "A failed or interrupted creation keeps staging and its log, promotes nothing and touches no existing path; retry never repeats completed post-steps; discard removes only that plan's staging directory.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:34:50.723Z",
+      "updatedAt": "2026-11-07T02:34:50.723Z"
+    },
+    {
+      "id": "AC-005",
+      "requirement": "REQ-003",
+      "statement": "After promotion, yallaflow init runs in the new project and a first setup work item is created with --keep-active (not routed on the developer's behalf); the project can be added to the console list.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:34:50.723Z",
+      "updatedAt": "2026-11-07T02:34:50.723Z"
+    },
+    {
+      "id": "AC-006",
+      "requirement": "REQ-001",
+      "statement": "The Console wizard (ar/en, light/dark, mobile) shows every plan field and the network notice, requires the hash confirmation, shows progress, log and recovery states, and uses fixed POST routes with token, Origin, JSON, size and read-only guards and no free-form command.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:34:50.723Z",
+      "updatedAt": "2026-11-07T02:34:50.723Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-07T02:34:50.723Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-07T02:34:50.723Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-07T02:34:50.723Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-07T02:34:50.723Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-07T02:34:50.723Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-07T02:34:50.723Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-11-07T02:34:50.723Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-005",
+      "at": "2026-11-07T02:34:50.723Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-006",
+      "at": "2026-11-07T02:34:50.723Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-07T02:34:50.723Z"
+}

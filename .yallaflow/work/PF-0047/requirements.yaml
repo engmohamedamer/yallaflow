@@ -1,0 +1,215 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "Reviewed runtime profiles: non-sensitive shared configuration in .yallaflow/runtime.yaml with git-ignored developer overrides, covering Laravel, Node.js and Docker services.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0037",
+          "locator": "Correction: reviewed runtime profiles"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0036",
+          "locator": "Runtime Manager"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:34:01.071Z",
+      "updatedAt": "2026-11-07T02:34:01.071Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "Explicit trust before first execution and after any command change; detected services are suggestions only and inferred commands are never executed automatically.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0037",
+          "locator": "explicit trust before first execution and after command changes"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:34:01.071Z",
+      "updatedAt": "2026-11-07T02:34:01.071Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "Start, Stop, Restart and Logs from the CLI and the Console, with running/stopped status, ports, errors and process status; stop only services started or explicitly managed by YallaFlow; safe handling of crashes, stale processes and browser reconnects.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0037",
+          "locator": "start/stop, logs, ports, errors, process status"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0036",
+          "locator": "Start / Stop / Restart / Logs"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:34:01.071Z",
+      "updatedAt": "2026-11-07T02:34:01.071Z"
+    },
+    {
+      "id": "REQ-004",
+      "statement": "Never expose secrets: no secret values in profiles, YallaFlow records or displayed logs beyond best-effort redaction that is disclosed as imperfect.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0036",
+          "locator": "Do not ... expose secrets"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:34:01.071Z",
+      "updatedAt": "2026-11-07T02:34:01.071Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "runtime add/remove validate and write .yallaflow/runtime.yaml (shared) or .yallaflow/local/runtime.yaml (override, git-ignored); unknown fields, unsafe cwd (escape via .. or symlink), invalid ids/ports and secret-like keys or values are refused without echoing values; the effective service merges shared and override and marks overridden fields; doctor validates the profile.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:34:01.071Z",
+      "updatedAt": "2026-11-07T02:34:01.071Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-002",
+      "statement": "runtime suggest lists Laravel (artisan serve), Node (package scripts with the detected package manager) and Docker Compose candidates labelled with their evidence file and never runs them; start refuses an untrusted service or one whose definition or checkout changed since trust (RUNTIME_UNTRUSTED) and shows the exact argv, cwd, env names and ports to review.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:34:01.071Z",
+      "updatedAt": "2026-11-07T02:34:01.071Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-003",
+      "statement": "start spawns argv without a shell in its own process group with a filtered environment and a size-capped log file, refuses when a declared port is already listening or the service is running, and records pid, process start time and definition hash; status reports stopped/starting/running/exited/unknown computed from the live process identity.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:34:01.071Z",
+      "updatedAt": "2026-11-07T02:34:01.071Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-003",
+      "statement": "stop and restart signal only a process group whose pid and start time match the run record (configured signal, timeout, then SIGKILL), never by port or name; a reused PID is reported as unknown and never signalled; survivors are reported; stop --all stops every owned service.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:34:01.071Z",
+      "updatedAt": "2026-11-07T02:34:01.071Z"
+    },
+    {
+      "id": "AC-005",
+      "requirement": "REQ-003",
+      "statement": "The Console Setup view shows services, suggestions, status, ports, readiness and logs, and offers Trust (typed id confirmation), Start, Stop and Restart through fixed POST routes with token, Origin, JSON, size and read-only guards; state survives console restarts and browser reconnects.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:34:01.071Z",
+      "updatedAt": "2026-11-07T02:34:01.071Z"
+    },
+    {
+      "id": "AC-006",
+      "requirement": "REQ-004",
+      "statement": "Profiles store environment variable names only; logs are redacted on read with the existing redaction rules and the UI states that redaction is best effort; tests prove a secret printed by a service and an .env value never reach YallaFlow records or API responses unredacted.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:34:01.071Z",
+      "updatedAt": "2026-11-07T02:34:01.071Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-07T02:34:01.071Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-07T02:34:01.071Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-07T02:34:01.071Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-004",
+      "at": "2026-11-07T02:34:01.071Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-07T02:34:01.071Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-07T02:34:01.071Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-07T02:34:01.071Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-11-07T02:34:01.071Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-005",
+      "at": "2026-11-07T02:34:01.071Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-006",
+      "at": "2026-11-07T02:34:01.071Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-07T02:34:01.071Z"
+}
