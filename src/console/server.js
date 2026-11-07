@@ -24,6 +24,7 @@ import { loadSource, loadSourceText, sourceOriginalPath } from '../core/sources.
 import { isSourceId, isWorkId } from '../core/ids.js';
 import { HttpError, MAX_JSON_BYTES, attachFile, createWork, validateCreateBody } from './create.js';
 import { isServiceId, runRuntimeAction } from './runtime.js';
+import { wizardCatalog, wizardCreate, wizardPlan, wizardProgress } from './newproject.js';
 import { AgentBridge } from '../agents/bridge.js';
 import { loadClaude } from '../agents/experimental.js';
 
@@ -40,7 +41,7 @@ const UI_FILES = Object.freeze({
 
 // The only routes that accept POST: create a work item, and attach a file to it.
 // 1.4.0: work-item actions and review-gate decisions (PF-0043) join Create Work.
-const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|actions\/[a-z]+|gates\/[a-z]+\/decision))?|runtime\/[a-z][a-z0-9-]{0,31}\/(?:trust|start|stop|restart))$/;
+const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|actions\/[a-z]+|gates\/[a-z]+\/decision))?|runtime\/[a-z][a-z0-9-]{0,31}\/(?:trust|start|stop|restart))$|^\/api\/new\/(?:plan|create)$/;
 // Agent Interaction (v1.3.0, only with --agents): the Agent Workspace's actions.
 const AGENT_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/agent\/(start|message|permission|cancel|end|resume|connect|disconnect|activate)$/;
 // The Claude channel server and hook forwarder (bridge token, never a browser).
@@ -116,7 +117,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     }
     if (request.method === 'POST') {
       // Writes: only the Create Work routes, only with the token, our own Origin and the exact type.
-      if (readOnly || !WRITE_ROUTE.test(url.pathname)) return send(response, 405, { error: { code: 'READ_ONLY', message: readOnly ? 'This console was started with --read-only.' : 'Only Create Work, work-item actions, gate decisions and runtime actions accept POST.' } }, { Allow: 'GET, HEAD' });
+      if (readOnly || !WRITE_ROUTE.test(url.pathname)) return send(response, 405, { error: { code: 'READ_ONLY', message: readOnly ? 'This console was started with --read-only.' : 'Only Create Work, work-item actions, gate decisions, runtime actions and the New Project Wizard accept POST.' } }, { Allow: 'GET, HEAD' });
       if (!authorized(request)) return send(response, 401, { error: { code: 'UNAUTHORIZED', message: 'Missing or wrong console token. Open the link printed by `yallaflow console`.' } });
       if (!origin) return send(response, 403, { error: { code: 'FORBIDDEN_ORIGIN', message: 'A write needs the console page as its Origin.' } });
       return handleWrite(request, response, url);
@@ -134,6 +135,9 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       if (request.method !== 'GET') return send(response, 405, { error: { code: 'METHOD', message: 'The event stream is GET only.' } }, { Allow: 'GET' });
       return openEvents(request, response);
     }
+    // 1.4.0 New Project Wizard reads (not tied to an existing project).
+    if (parts.length === 3 && parts[1] === 'new' && parts[2] === 'catalog') return send(response, 200, await wizardCatalog(projects[0]?.root ?? process.cwd(), runner));
+    if (parts.length === 4 && parts[1] === 'new' && parts[2] === 'plans' && /^NP-\d{14}-[0-9a-f]{6}$/.test(parts[3])) return send(response, 200, await wizardProgress(parts[3]));
     if (parts[1] !== 'p' || !byId.has(parts[2])) return send(response, 404, { error: { code: 'NOT_FOUND', message: 'Unknown project.' } });
     const project = byId.get(parts[2]);
     const rest = parts.slice(3);
@@ -176,6 +180,14 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
   // POST /api/p/<project>/work/<id>/sources    — attach one file to the item it created
   async function handleWrite(request, response, url) {
     const parts = url.pathname.split('/').filter(Boolean);
+    // 1.4.0 New Project Wizard: POST /api/new/plan, /api/new/create (JSON only).
+    if (parts[1] === 'new') {
+      const type = String(request.headers['content-type'] ?? '').split(';')[0].trim().toLowerCase();
+      if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+      const body = await readJsonBody(request);
+      const cwd = projects[0]?.root ?? process.cwd();
+      return send(response, 200, parts[2] === 'plan' ? await wizardPlan(cwd, body, runner) : await wizardCreate(cwd, body, runner));
+    }
     const project = parts[1] === 'p' ? byId.get(parts[2]) : null;
     if (!project) return send(response, 404, { error: { code: 'NOT_FOUND', message: 'Unknown project.' } });
     const rest = parts.slice(3);

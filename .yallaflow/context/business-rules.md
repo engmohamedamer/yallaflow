@@ -95,4 +95,19 @@
   - src/core/integrity.js (repository @ 212579b)
   - test/doctor-integrity.test.js (repository @ 212579b)
 
+<!-- yallaflow-fact:CTX-0112 -->
+### CTX-0112 — Projects created by `yallaflow new` (New Project Wizard, 1.4.0) record config project.origin {createdBy: 'yallaflow new', generator, template, stack, planHash, createdAt} through Core initProject and are Greenfield: no baseline is required for generator boilerplate, but generated code is never treated as understood or approved (no context facts, label 'generated code not reviewed'). Projects without valid wizard provenance, or with a recorded brownfield kind, keep the normal discovery and baseline rules.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0048
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-07T10:32:14.366Z
+- **Verified:** 2026-11-07T10:32:14.366Z (commit d5fa5f3)
+- **Evidence:**
+  - src/baseline/understanding.js (repository @ d5fa5f3)
+  - src/core/workspace.js (repository @ d5fa5f3)
+  - docs/new-project.md (repository @ d5fa5f3)
+
 <!-- yallaflow-context:end -->

@@ -31,6 +31,11 @@ Nothing yet.
   - **Recorded with provenance `console, identity not verified`** by the unchanged `approve`/`feedback` commands. CLI decisions are recorded as before.
   - **Protected:** stale and duplicate submissions record nothing.
   - **Exposure:** the work read contract exposes gates and their provenance additively.
+- **New Project Wizard** (`yallaflow new …` and the console's **New project** page). See [`docs/new-project.md`](docs/new-project.md).
+  - **Stacks.** Laravel, React/Vue with Vite, Next.js, NestJS or Empty, each an official generator pinned to an exact version, or a recommendation from your own agent.
+  - **Plan first.** A plan with the exact commands is reviewed and confirmed by its hash before anything runs.
+  - **Safe creation.** Staged generation is moved only into an absent destination; failures keep staging and the log.
+  - **After creation.** Core `init` records the wizard provenance, so the project is Greenfield with its generated code not reviewed. A first work item is created for Claude Code or Codex.
 - **Development runtime manager** (`yallaflow runtime …` and the console's **Setup** tab). See [`docs/runtime.md`](docs/runtime.md).
   - **Profiles.** Reviewed services in `.yallaflow/runtime.yaml`, with personal overrides in the git-ignored `.yallaflow/local/runtime.yaml`. Suggestions come from Laravel, Node.js and Docker Compose evidence and never run.
   - **Trust.** Personal and git-ignored, bound to the effective command, folder, environment names, ports and checkout, and renewed after any change.

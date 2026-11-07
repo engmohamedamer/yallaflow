@@ -35,16 +35,28 @@
       "summary": "Implementation plan written in work.md (modules, Core integration, Console routes and UI, tests incl. security/crash-recovery/concurrency, browser, docs, independent security review); awaiting the owner's plan review."
     },
     "implementation": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-07T10:32:12.699Z",
+      "completedAt": "2026-11-07T10:32:12.699Z",
+      "summary": "src/newproject/{catalog,project}.js (pinned official generators, immutable hashed plans in the user config folder, staged generation with npm-root isolation, exclusive destination claim, identity-checked later steps), src/commands/new.js, Core initProject + initWorkspace origin + understanding gate (wizard provenance → Greenfield), console routes src/console/newproject.js and the New project page, overview project.origin, docs/new-project.md and docs updates. Independent security review on an isolated copy found 1 medium (npx inherits parent .npmrc/node_modules) and lows (retry relabels a replaced destination, progress log link-following, unredacted failure log, rename race, plan store checks, non-interactive create); all fixed, re-reviewed, and the remaining npm-workspaces and symlinked-folder residuals fixed afterwards with tests."
     },
     "verification": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-07T10:32:13.090Z",
+      "completedAt": "2026-11-07T10:32:13.090Z",
+      "summary": "V-003 npm run check 902/902 (10 wizard tests incl. tamper, races, npm root capture, destination replacement, redaction). Real end-to-end creation with Laravel 13.11.0, create-vite 9.3.4 (React; Vue with install), create-next-app 16.4.5 and @nestjs/cli 12.0.12. Browser regression (Overview, Setup, Wizard) passes on Chromium, Firefox, WebKit with no page errors. V-001 failed on the provider-name and no-network guards (fixed by wording); V-002 passed before the last two review fixes."
     },
     "delivery-convergence": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-07T10:32:13.759Z",
+      "completedAt": "2026-11-07T10:32:13.759Z",
+      "summary": "CV-001: AC-001..AC-009 satisfied."
     },
     "code-review": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-07T10:32:13.954Z",
+      "completedAt": "2026-11-07T10:32:13.954Z",
+      "summary": "Independent security review (separate reviewer, isolated copy, no real repositories touched) plus two re-reviews. Fixed: npm parent config/node_modules shadowing (staging package.json + npm prefix check against workspaces capture), retry relabelling a replaced destination (dev/ino identity, refuse existing .yallaflow), progress log link-following (derived path, anchored folders, O_NOFOLLOW, nlink 1), unredacted failure log, rename-onto-empty-folder race (exclusive mkdir), plan store checks, per-run install log, non-interactive create (terminal or console only, documented as an automation guard). Residual, reported to the owner: project.origin can be hand-added to a config and changes the advisory understanding label (the enforced gate already trusts the recorded kind, a pre-existing property)."
     }
   },
   "rulings": [],
@@ -57,5 +69,5 @@
       "changedAt": "2026-11-07T02:36:29.178Z"
     }
   ],
-  "updatedAt": "2026-11-07T02:45:04.727Z"
+  "updatedAt": "2026-11-07T10:32:13.954Z"
 }

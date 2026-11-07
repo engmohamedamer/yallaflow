@@ -52,7 +52,26 @@ function trackedYallaflowPaths(root) {
   return [...seen];
 }
 
-export async function initWorkspace(root, name, kind, mode = 'adaptive') {
+// 1.4.0: projects created by the New Project Wizard record their provenance. Only the
+// wizard passes `origin`; it is validated here so nothing else can be recorded.
+export function validateProjectOrigin(origin) {
+  const keys = ['createdBy', 'generator', 'template', 'stack', 'planHash', 'createdAt'];
+  if (!origin || typeof origin !== 'object' || Array.isArray(origin)) throw new Error('project origin must be an object.');
+  if (Object.keys(origin).some((key) => !keys.includes(key))) throw new Error(`project origin accepts only: ${keys.join(', ')}.`);
+  if (origin.createdBy !== 'yallaflow new') throw new Error('project origin is recorded only by `yallaflow new`.');
+  if (origin.generator !== null && (typeof origin.generator !== 'string' || !/^[@a-z0-9/._-]+@[0-9][0-9A-Za-z.+-]*$/.test(origin.generator))) throw new Error('project origin generator must be <package>@<version> or null.');
+  if (typeof origin.template !== 'string' || !/^[a-z0-9-]{1,40}$/.test(origin.template)) throw new Error('project origin template is invalid.');
+  if (!Array.isArray(origin.stack) || origin.stack.some((entry) => typeof entry !== 'string' || entry.length > 60)) throw new Error('project origin stack must list technologies.');
+  if (!/^[0-9a-f]{64}$/.test(String(origin.planHash))) throw new Error('project origin planHash must be a SHA-256 hex digest.');
+  if (typeof origin.createdAt !== 'string') throw new Error('project origin createdAt is required.');
+  return origin;
+}
+
+export async function initWorkspace(root, name, kind, mode = 'adaptive', { origin = null } = {}) {
+  if (origin) {
+    validateProjectOrigin(origin);
+    if (kind !== 'greenfield') throw new Error('A wizard-created project is initialized as greenfield.');
+  }
   const base = workspacePath(root);
   if (await exists(base)) throw new Error(`Workspace already exists at ${base}`);
   if (await exists(path.join(root, LEGACY_WORKSPACE_DIR))) {
@@ -74,7 +93,7 @@ export async function initWorkspace(root, name, kind, mode = 'adaptive') {
 
   const config = {
     schemaVersion: 1,
-    project: { name, kind, root: '.' },
+    project: { name, kind, root: '.', ...(origin ? { origin } : {}) },
     workflow: {
       discoverBeforeAsk: true,
       verifyBeforeDone: true,

@@ -581,3 +581,23 @@ table.stack th { font-size: 12px; color: var(--muted); font-weight: 600; }
 @media (max-width: 560px) { .svcdef { grid-template-columns: 1fr; } .svcdef dt { margin-top: 6px; } }
 .svc .btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
 [dir="rtl"] .svcdef dd { text-align: right; }
+
+/* 1.4.0 New project wizard */
+.wizform { display: grid; gap: 14px; }
+.wizform > label { display: grid; gap: 6px; font-weight: 600; font-size: 14px; }
+.wizform input[type="text"], .wizform input:not([type]), .wizform input[name] { font: inherit; font-weight: 400; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.wizform input[type="checkbox"], .wizform input[type="radio"] { width: auto; padding: 0; }
+.wizform fieldset { border: 0; padding: 0; margin: 0; }
+.wizform legend { font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+.stackgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.stackcard { display: grid; gap: 4px; padding: 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); cursor: pointer; }
+.stackcard.on { border-color: var(--nile); box-shadow: 0 0 0 2px var(--nile-soft); }
+.stackcard input { position: absolute; opacity: 0; pointer-events: none; }
+.stackcard:focus-within { outline: 2px solid var(--nile); outline-offset: 2px; }
+.wizsteps { margin: 6px 0 0; padding-inline-start: 22px; display: grid; gap: 6px; }
+.wizsteps li[data-state="done"] { color: var(--palm-ink, var(--palm)); }
+.wizsteps li[data-state="failed"] { color: var(--clay); }
+.wizsteps li[data-state="running"] { color: var(--nile-2); }
+[data-wiz-create] input { font: inherit; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.wizform > label.small { display: flex; gap: 8px; align-items: flex-start; font-weight: 400; }
+.wizform > label.small input { margin-top: 3px; }

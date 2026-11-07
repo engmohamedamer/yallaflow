@@ -94,6 +94,8 @@ export async function collectOverview(root, { now = new Date().toISOString() } =
       name: config.project?.name ?? path.basename(root),
       kind,
       shared: Boolean(config.shared?.enabled),
+      // 1.4.0: provenance of a project created by the New Project Wizard (generated code not reviewed).
+      origin: config.project?.origin ?? null,
       classification: classification ? { kind: classification.kind, reasons: classification.reasons } : null
     },
     understanding,

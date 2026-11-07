@@ -1,0 +1,296 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-07T10:32:13.275Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 2,
+        "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+        "verificationRunIds": [
+          "V-003"
+        ]
+      },
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "createPlan validates the name, an absolute existing writable parent (realpath), an absent destination and nesting (.git/.yallaflow ancestors, --allow-nested); only catalog stacks with pinned versions and fixed options; prerequisites probed with --version only and reported, never installed.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/newproject/project.js",
+              "contentHash": "sha256:90aa327480e2c6ba9142983cdd973d33d5fcb1fd350e4bc91d3f6825ca60ae79",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/newproject/catalog.js",
+              "contentHash": "sha256:abb971039a9b1b14b8d94d499439931d09c7c31a3f06d651b97497c114dc53c5",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/new-project.test.js",
+              "contentHash": "sha256:acf34161798754ecd1d8c555d526c60f907578ee20e0948c8f7777cea3aeb251",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0048",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "No model is called: `new recommend` and the console's Recommend for me give a copyable request for the developer's own agent, which answers with `new plan --rationale`; the rationale is part of the hashed plan and shown in review.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/new.js",
+              "contentHash": "sha256:ddc311444f97f8e73849aee5b81e7a1d35b69101fd2a63ffb6c569d6b87f6720",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:d0cb293f373dcf50eac9ba98670c9737a6e597ce5cff36b66184b046302440a9",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/new-project.test.js",
+              "contentHash": "sha256:acf34161798754ecd1d8c555d526c60f907578ee20e0948c8f7777cea3aeb251",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "untracked"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "Plans are immutable records in the user config folder with destination, generator, version, exact argv, network/install/package-script flags, steps and SHA-256 hash; create needs an 8+ character hash prefix, re-derives the command from the catalog (an edited plan cannot run anything else), runs argv-only in staging and claims the destination exclusively.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/newproject/project.js",
+              "contentHash": "sha256:90aa327480e2c6ba9142983cdd973d33d5fcb1fd350e4bc91d3f6825ca60ae79",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/new-project.test.js",
+              "contentHash": "sha256:acf34161798754ecd1d8c555d526c60f907578ee20e0948c8f7777cea3aeb251",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0048",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "Generator failure, missing marker, destination appearing, npm root capture and destination replacement all promote nothing and touch no existing path; staging and the redacted log are kept; retries skip done steps and verify the created folder identity; discard removes only that plan's staging folder.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/newproject/project.js",
+              "contentHash": "sha256:90aa327480e2c6ba9142983cdd973d33d5fcb1fd350e4bc91d3f6825ca60ae79",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/new-project.test.js",
+              "contentHash": "sha256:acf34161798754ecd1d8c555d526c60f907578ee20e0948c8f7777cea3aeb251",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "untracked"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "After promotion Core initProject (shared with `yallaflow init`) records project.origin and a first work item is created with keepActive (pending, not active); the result names `yallaflow console add`. Verified end to end with the real Laravel 13.11.0, create-vite 9.3.4 (React and Vue, with install), create-next-app 16.4.5 and @nestjs/cli 12.0.12 generators.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/init.js",
+              "contentHash": "sha256:5ef6d7e2f4b6ee60bade7e421e4e3ff3fd01a8f82b3c8c2979f6e3847f97c8ae",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/new.js",
+              "contentHash": "sha256:ddc311444f97f8e73849aee5b81e7a1d35b69101fd2a63ffb6c569d6b87f6720",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/new-project.test.js",
+              "contentHash": "sha256:acf34161798754ecd1d8c555d526c60f907578ee20e0948c8f7777cea3aeb251",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "real generators Laravel, React/Vue+Vite, Next.js, NestJS created and initialized as Greenfield in a scratch folder"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "The console New project page (ar/en, light/dark, mobile) shows every plan field, network/install badges and the hash to type, then progress, log and recovery; routes /api/new/plan|create with token, Origin, JSON, size and read-only guards and exact-key bodies; verified in three browsers.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:d0cb293f373dcf50eac9ba98670c9737a6e597ce5cff36b66184b046302440a9",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/newproject.js",
+              "contentHash": "sha256:2e8e779b7b554bb6089e12167267b18361a7b534635361d0375a33581181e277",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:18398bb7d40995c8a1ce6fa36c2cc505857ab52e1fe98f9eebda5ed7d031c0a8",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "research/release-1.4/browser-check.mjs",
+              "contentHash": "sha256:de33f7aea2bb10297f347c8650d3fb75507b9fd6703ed63260082ac5fb364fa0",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/new-project.test.js",
+              "contentHash": "sha256:acf34161798754ecd1d8c555d526c60f907578ee20e0948c8f7777cea3aeb251",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "untracked"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "project.origin is validated and recorded only through initWorkspace's wizard path; assessProjectUnderstanding treats a greenfield project with valid wizard origin as Greenfield; a recorded brownfield kind or a project without provenance keeps the existing rules (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/core/workspace.js",
+              "contentHash": "sha256:caf6ab3d92318d9ca1a4d92757c1f81eb6127de9d2a630548bb6dae0f1dfe714",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/baseline/understanding.js",
+              "contentHash": "sha256:31d01d8fff921f4e89d638091cbc6a539a96f59c32c6891f6021f6754daed94a",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/new-project.test.js",
+              "contentHash": "sha256:acf34161798754ecd1d8c555d526c60f907578ee20e0948c8f7777cea3aeb251",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "untracked"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-008",
+          "status": "satisfied",
+          "reason": "No context facts are created from generated code; brief and overview label the project 'generated code not reviewed'; the first work item lets the developer continue with their coding agent in the normal workflow.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/baseline/understanding.js",
+              "contentHash": "sha256:31d01d8fff921f4e89d638091cbc6a539a96f59c32c6891f6021f6754daed94a",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/overview/collect.js",
+              "contentHash": "sha256:ab6cda38327c458e1d3a53b3fdacb736096d9149759c1744aabbbba2f33a733c",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/new-project.test.js",
+              "contentHash": "sha256:acf34161798754ecd1d8c555d526c60f907578ee20e0948c8f7777cea3aeb251",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "untracked"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-009",
+          "status": "satisfied",
+          "reason": "The plan review lists stack, expected structure and every command with network/install/package-script effects; creation requires the typed hash prefix and a human caller (terminal or console page); failures keep staging with generator log, exit code and step reached.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:d0cb293f373dcf50eac9ba98670c9737a6e597ce5cff36b66184b046302440a9",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/new.js",
+              "contentHash": "sha256:ddc311444f97f8e73849aee5b81e7a1d35b69101fd2a63ffb6c569d6b87f6720",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/newproject/project.js",
+              "contentHash": "sha256:90aa327480e2c6ba9142983cdd973d33d5fcb1fd350e4bc91d3f6825ca60ae79",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/new-project.test.js",
+              "contentHash": "sha256:acf34161798754ecd1d8c555d526c60f907578ee20e0948c8f7777cea3aeb251",
+              "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+              "workingTree": "untracked"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-07T10:32:13.275Z"
+}

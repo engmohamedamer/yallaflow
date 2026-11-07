@@ -94,9 +94,9 @@ export function createRunner({ cli = CLI } = {}) {
     // 1.4.0 runtime actions: run outside the project's write queue (a start may wait a
     // minute for readiness and must not block Create Work); the runtime CLI serializes
     // per service itself. Cached reads are dropped afterwards.
-    async runAside(root, args, { env = null } = {}) {
+    async runAside(root, args, { env = null, timeoutMs = WRITE_TIMEOUT_MS } = {}) {
       try {
-        return await executeRaw(root, args, WRITE_TIMEOUT_MS, env);
+        return await executeRaw(root, args, timeoutMs, env);
       } finally {
         caches.get(root)?.clear();
       }

@@ -3,7 +3,7 @@
 // Uses already-installed browsers; never downloads anything. Screenshots go to
 // research/release-1.4/screenshots/<engine>-<name>.png.
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import net from 'node:net';
 import os from 'node:os';
@@ -122,6 +122,51 @@ checks.setup = async (page, server) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.locator('[data-service="web"] [data-rt="stop"]').click();
   await page.locator('[data-service="web"] [data-svc-state="stopped"]').waitFor({ timeout: 30000 });
+};
+
+checks.wizard = async (page, server) => {
+  const parent = mkdtempSync(path.join(temp, 'new-parent-'));
+  mkdirSync(path.join(parent, 'taken'));
+  await page.goto(`${server.url}#token=${server.token}`);
+  await setLang(page, 'en');
+  await setTheme(page, 'light');
+  await page.goto(`${server.url}#/projects`);
+  await page.locator('a[href="#/new"]').click();
+  const form = page.locator('[data-wiz-form]');
+  await form.waitFor();
+  await form.locator('input[name="name"]').fill('taken');
+  await form.locator('input[name="parent"]').fill(parent);
+  await form.locator('.stackcard', { hasText: 'Empty project' }).click();
+  await page.screenshot({ path: path.join(output, `${engine}-wizard-form.png`), fullPage: true });
+  await form.locator('button[type="submit"]').click();
+  await page.locator('.errbar[role="alert"]').waitFor();
+  assert.match(await page.locator('.errbar[role="alert"]').innerText(), /already exists/);
+  await page.locator('[data-wiz-form] input[name="name"]').fill('demo-app');
+  await page.locator('[data-wiz-form] button[type="submit"]').click();
+  const confirm = page.locator('[data-wiz-create]');
+  await confirm.waitFor();
+  assert.ok(await page.getByText('What runs, in order').isVisible());
+  await page.screenshot({ path: path.join(output, `${engine}-wizard-review.png`), fullPage: true });
+  await confirm.locator('input[name="confirm"]').fill('00000000');
+  await confirm.locator('button[type="submit"]').click();
+  await page.locator('.errbar[role="alert"]').waitFor();
+  const hash = (await page.locator('[data-wiz-create] b.mono').innerText()).trim();
+  await page.locator('[data-wiz-create] input[name="confirm"]').fill(hash);
+  await page.locator('[data-wiz-create] button[type="submit"]').click();
+  await page.locator('[data-wiz-done]').waitFor({ timeout: 60000 });
+  await page.screenshot({ path: path.join(output, `${engine}-wizard-done.png`), fullPage: true });
+  await setLang(page, 'ar');
+  await setTheme(page, 'dark');
+  await page.locator('[data-wiz-done]').waitFor();
+  await page.screenshot({ path: path.join(output, `${engine}-wizard-done-ar-dark.png`), fullPage: true });
+  await setLang(page, 'en');
+  await setTheme(page, 'light');
+  await page.setViewportSize({ width: 390, height: 844 });
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  assert.ok(overflow <= 1, `no horizontal page scroll on mobile (overflow ${overflow}px)`);
+  await page.screenshot({ path: path.join(output, `${engine}-wizard-mobile.png`), fullPage: true });
+  const config = JSON.parse(readFileSync(path.join(parent, 'demo-app', '.yallaflow', 'config.yaml'), 'utf8'));
+  assert.equal(config.project.origin.createdBy, 'yallaflow new');
 };
 
 const browser = await playwright[engine].launch({ headless: true });

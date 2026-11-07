@@ -13,13 +13,14 @@ import { classifyProject, inventoryRepository } from '../inventory/inventory.js'
 import { deterministicDiscovery, writeDiscovery } from '../core/discovery.js';
 import { INTERACTION_MODES } from '../behavior/interaction.js';
 
-export async function initCommand(options = {}) {
-  const root = process.cwd();
+// The canonical Core init, shared by `yallaflow init` and the New Project Wizard (1.4.0,
+// which passes the wizard provenance as `origin`). Returns what was set up.
+export async function initProject(root, { name: requestedName, kind: requestedKind, mode: requestedMode, origin = null } = {}) {
   const inventory = await inventoryRepository(root);
   const classification = classifyProject(inventory);
-  const kind = options.type ?? classification.kind;
-  const name = options.name ?? path.basename(root);
-  const mode = options.mode ?? 'adaptive';
+  const kind = requestedKind ?? classification.kind;
+  const name = requestedName ?? path.basename(root);
+  const mode = requestedMode ?? 'adaptive';
   if (!INTERACTION_MODES.includes(mode)) throw new Error(`--mode must be one of: ${INTERACTION_MODES.join(', ')}`);
   // v0.3.10-internal.3: init also installs the thin repository bootstrap for every
   // first-party agent (src/agent/bootstrap.js) so a fresh agent session finds YallaFlow
@@ -28,7 +29,7 @@ export async function initCommand(options = {}) {
   // nothing changed.
   await assertAllBootstrapsInstallable(root);
   const snapshot = await snapshotBootstrapFiles(root);
-  await initWorkspace(root, name, kind, mode);
+  await initWorkspace(root, name, kind, mode, { origin });
   let bootstraps;
   try {
     if (kind === 'brownfield') await writeDiscovery(root, await deterministicDiscovery(root, inventory));
@@ -40,6 +41,12 @@ export async function initCommand(options = {}) {
     await restoreBootstrapFiles(snapshot);
     throw new Error(`YallaFlow init failed and was rolled back (no .yallaflow workspace, agent files unchanged): ${error instanceof Error ? error.message : String(error)}`);
   }
+  return { name, kind, mode, bootstraps, classification };
+}
+
+export async function initCommand(options = {}) {
+  const root = process.cwd();
+  const { name, kind, mode, bootstraps, classification } = await initProject(root, { name: options.name, kind: options.type, mode: options.mode });
   console.log(`Initialized YallaFlow workspace for ${name}`);
   console.log(`Project kind: ${kind}${options.type ? ' (explicit --type)' : ` (${classification.reasons[0]})`}`);
   console.log(`Interaction mode: ${mode}`);

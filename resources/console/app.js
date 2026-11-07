@@ -938,6 +938,86 @@
     if (!want && runtimeTimer) { clearInterval(runtimeTimer); runtimeTimer = null; }
   }
 
+  // ---------- new project (1.4.0): reviewed plan → confirmed, staged creation ----------
+  // Data: GET /api/new/catalog; POST /api/new/plan and /api/new/create; GET
+  // /api/new/plans/<id> for progress. Nothing is created until the plan was reviewed and
+  // its hash prefix typed; only catalog generators run, with the exact command shown.
+  let wiz = { step: 'form', catalog: null, form: null, plan: null, error: null, busy: false, progress: null };
+  let wizTimer = null;
+  async function loadWizard() {
+    if (wiz.catalog) return;
+    try { wiz.catalog = await api('/api/new/catalog'); } catch (e) { wiz.error = e.message; }
+  }
+  const parentGuess = () => { const root = projects.find((p) => p.id === pid)?.root ?? projects[0]?.root ?? ''; return root.replace(/[\\/][^\\/]+[\\/]?$/, '') || root; };
+  function viewNew() {
+    const head = `<section class="pagehead"><h1 style="font-size:26px">${A('مشروع جديد', 'New project')}</h1><p class="muted">${A('اختار الاسم والمكان والتقنية، راجع الخطة بالأوامر اللي هتتنفذ، وبعدين أكّد. YallaFlow بيعمل فولدر جديد بس، عمره ما بيكتب فوق مشروع موجود.', 'Choose a name, a location and a stack, review the plan with the exact commands, then confirm. YallaFlow only creates a new folder; it never overwrites an existing project.')}</p></section>`;
+    if (readOnly) return head + `<section class="panel"><p>${A('الكونسول ده للقراءة بس.', 'This console is read-only.')}</p></section>`;
+    if (!wiz.catalog) return head + (wiz.error ? `<section class="errbar" role="alert"><p>${esc(wiz.error)}</p></section>` : `<p class="muted">${A('بيحمّل…', 'Loading…')}</p>`);
+    const err = wiz.error ? `<section class="errbar" role="alert" style="margin-bottom:12px"><p class="small" style="white-space:pre-wrap">${esc(wiz.error)}</p></section>` : '';
+    if (wiz.step === 'form') {
+      const f = wiz.form ?? { name: '', parent: parentGuess(), stack: 'react-vite', install: false, allowNested: false };
+      wiz.form = f;
+      const stacks = wiz.catalog.catalog.map((c) => `<label class="stackcard ${f.stack === c.id ? 'on' : ''}"><input type="radio" name="wiz-stack" value="${esc(c.id)}" ${f.stack === c.id ? 'checked' : ''}><b>${esc(c.label)}</b><span class="tiny muted">${esc(c.stack.join(' · ') || A('من غير مولّد', 'no generator'))}</span><span class="row tiny">${c.network ? `<span class="chip wait">${A('بيحتاج إنترنت', 'network')}</span>` : ''}${c.installsDependencies ? `<span class="chip wait">${A('بيسطّب مكتبات', 'installs dependencies')}</span>` : ''}${c.generator ? `<span class="tag ltr">${esc(c.generator.package)}@${esc(c.generator.version)}</span>` : ''}</span></label>`).join('');
+      return head + err + `<form class="panel wizform" data-wiz-form>
+        <label>${A('اسم المشروع', 'Project name')}<input class="ltr" name="name" required pattern="[A-Za-z0-9][A-Za-z0-9._-]{0,63}" value="${esc(f.name)}" autocomplete="off"></label>
+        <label>${A('الفولدر الأب (مسار كامل)', 'Parent folder (absolute path)')}<input class="ltr" name="parent" required value="${esc(f.parent)}" autocomplete="off"></label>
+        <fieldset><legend>${A('التقنية', 'Stack')}</legend><div class="stackgrid">${stacks}</div></fieldset>
+        <label class="small"><input type="checkbox" name="install" ${f.install ? 'checked' : ''}> ${A('سطّب المكتبات بعد الإنشاء (خطوة منفصلة، بتحتاج إنترنت وبتشغّل سكريبتات الحزم)', 'Install dependencies after creation (a separate step; needs the network and runs package scripts)')}</label>
+        <label class="small"><input type="checkbox" name="allowNested" ${f.allowNested ? 'checked' : ''}> ${A('اسمح بمشروع جوه مستودع موجود', 'Allow a project inside an existing repository')}</label>
+        <div class="row"><button class="btn go" type="submit" ${wiz.busy ? 'disabled' : ''}>${wiz.busy ? A('بيجهّز الخطة…', 'Preparing the plan…') : A('راجع الخطة', 'Review the plan')}</button></div>
+        <details class="small" style="margin-top:10px"><summary>${A('اقتراح من وكيلك', 'Recommend for me')}</summary><p class="tiny muted">${A('YallaFlow مش بيكلّم أي نموذج. ادّي الطلب ده لوكيلك (Claude Code أو Codex)، وهو هيعمل خطة تراجعها هنا.', 'YallaFlow calls no model. Give this request to your agent (Claude Code or Codex); it prepares a plan that you review with yallaflow new show.')}</p><div class="cli" dir="ltr">${esc(wiz.catalog.recommendRequest)}</div><button class="btn ghost sm" type="button" data-copy="${esc(wiz.catalog.recommendRequest)}">${A('انسخ الطلب', 'Copy the request')}</button></details>
+      </form>`;
+    }
+    const plan = wiz.plan;
+    const b = plan.body;
+    const steps = b.steps.map((st) => st.argv ? `<li><span class="ltr mono">${esc(JSON.stringify(st.argv))}</span> ${st.network ? `<span class="chip wait">${A('إنترنت', 'network')}</span>` : ''}${st.installsDependencies ? `<span class="chip wait">${A('بيسطّب مكتبات', 'installs dependencies')}</span>` : ''}${st.runsPackageScripts ? `<span class="chip wait">${A('بيشغّل سكريبتات', 'runs package scripts')}</span>` : ''}</li>` : `<li class="small muted">${esc(st.note)}</li>`).join('');
+    const prereq = b.prerequisites.map((p) => `<li>${esc(p.name)}: ${p.found ? `<span class="ltr">${esc(p.version || 'found')}</span>` : `<b style="color:var(--clay)">${A('مش موجود — سطّبه الأول', 'not found — install it first')}</b>`}${p.note ? ` <span class="tiny muted">(${esc(p.note)})</span>` : ''}</li>`).join('');
+    const review = `<section class="panel"><h2 style="font-size:18px">${A('راجع الخطة', 'Review the plan')} · ${esc(b.stackLabel)}</h2>
+      <dl class="svcdef"><dt>${A('هيتعمل في', 'Will be created at')}</dt><dd class="ltr mono">${esc(b.destination)}</dd><dt>${A('التقنيات', 'Stack')}</dt><dd>${esc(b.technologies.join(', ') || '—')}</dd><dt>${A('المولّد', 'Generator')}</dt><dd class="ltr">${b.generator ? `${esc(b.generator.package)}@${esc(b.generator.version)}${b.docs ? ` · <span class="tiny muted">${A('التوثيق:', 'docs:')} ${esc(b.docs)}</span>` : ''}` : A('مفيش', 'none')}</dd><dt>${A('الهيكل المتوقع', 'Expected structure')}</dt><dd class="ltr mono small">${esc(b.expectedStructure.join('  '))}</dd>${b.nestedIn ? `<dt>${A('ملاحظة', 'Note')}</dt><dd>${A('جوه', 'inside')} <span class="ltr">${esc(b.nestedIn)}</span></dd>` : ''}</dl>
+      <h3 style="font-size:15px;margin-top:12px">${A('الأوامر اللي هتتنفذ بالترتيب', 'What runs, in order')}</h3><ol class="wizsteps">${steps}</ol>
+      ${prereq ? `<h3 style="font-size:15px;margin-top:12px">${A('المتطلبات', 'Prerequisites')}</h3><ul class="small">${prereq}</ul>` : ''}
+      ${b.rationale ? `<p class="small" style="margin-top:8px"><b>${A('سبب الاقتراح:', 'Why this stack:')}</b> ${esc(b.rationale)}</p>` : ''}
+      <p class="tiny muted" style="margin-top:8px">${A('المشروع الجديد بيتسجّل كمشروع جديد (Greenfield)، والكود المتولّد مش بيعتبر متراجع أو معتمد.', 'The project is recorded as new (Greenfield); the generated code is not treated as reviewed or approved.')}</p></section>`;
+    if (wiz.step === 'review') {
+      return head + err + review + `<form class="panel" data-wiz-create style="margin-top:12px"><label class="small">${A('اكتب أول 8 حروف من بصمة الخطة علشان تأكد:', 'Type the first 8 characters of the plan hash to confirm:')} <b class="ltr mono">${esc(plan.hash.slice(0, 8))}</b> <input class="ltr" name="confirm" size="10" autocomplete="off" required></label>
+        <div class="row" style="margin-top:8px"><button class="btn go" type="submit" ${wiz.busy ? 'disabled' : ''}>${A('أنشئ المشروع', 'Create the project')}</button><button class="btn ghost" type="button" data-wiz-back>${A('رجوع', 'Back')}</button></div></form>`;
+    }
+    const pr = wiz.progress;
+    const stepState = (id) => pr?.plan?.progress?.steps?.[id]?.status ?? 'pending';
+    const list = ['generate', 'promote', ...(b.install ? ['install'] : []), 'init', 'first-work'].map((id) => `<li data-wiz-step="${id}" data-state="${esc(stepState(id))}">${esc({ generate: A('توليد المشروع', 'Generate the project'), promote: A('نقله للمكان النهائي', 'Move it into place'), install: A('تسطيب المكتبات', 'Install dependencies'), init: A('تهيئة YallaFlow', 'Initialize YallaFlow'), 'first-work': A('أول شغلانة', 'First work item') }[id])} — <span class="small">${esc(L({ done: { ar: 'خلص', en: 'done' }, running: { ar: 'شغّال', en: 'running' }, failed: { ar: 'فشل', en: 'failed' }, pending: { ar: 'مستني', en: 'pending' } }[stepState(id)] ?? { ar: stepState(id), en: stepState(id) }))}</span></li>`).join('');
+    const outcome = pr?.outcome;
+    const result = outcome?.ok
+      ? `<section class="panel" data-wiz-done style="margin-top:12px"><h2 style="font-size:18px">${A('المشروع اتعمل', 'The project was created')}</h2><p class="small">${A('افتح Claude Code أو Codex في الفولدر ده واوصف اللي بتبنيه. أول شغلانة مستنياك.', 'Open Claude Code or Codex in this folder and describe what you are building. The first work item is waiting for you.')}</p><div class="cli" dir="ltr">cd ${esc(outcome.destination)}\nyallaflow console add ${esc(outcome.destination)}</div></section>`
+      : outcome?.error ? `<section class="errbar" role="alert" data-wiz-failed style="margin-top:12px"><b>${A('الإنشاء فشل — ماتكتبش فوق أي حاجة', 'Creation failed — nothing was overwritten')}</b><p class="small" style="white-space:pre-wrap">${esc(outcome.error.message)}</p><div class="row"><button class="btn sm" data-wiz-retry>${A('حاول تاني', 'Retry')}</button></div><p class="tiny muted">${A('فولدر التجهيز والسجل محفوظين للتشخيص. امسحهم بـ', 'The staging folder and its log are kept for diagnosis. Remove them with')} <span class="ltr mono">yallaflow new discard ${esc(plan.id)}</span></p></section>` : '';
+    return head + review + `<section class="panel" style="margin-top:12px"><h2 style="font-size:18px">${A('التقدّم', 'Progress')}</h2><ol class="wizsteps">${list}</ol>${pr?.log ? `<pre class="svclog ltr" tabindex="0">${esc(pr.log)}</pre>` : ''}</section>` + result;
+  }
+  async function pollWizard() {
+    if (!wiz.plan) return;
+    try { wiz.progress = await api(`/api/new/plans/${wiz.plan.id}`); } catch (e) { wiz.error = e.message; }
+    if (wiz.progress?.outcome && wizTimer) { clearInterval(wizTimer); wizTimer = null; }
+    if (route().v === 'new') render();
+  }
+  async function wizardSubmit(form) {
+    const data = new FormData(form);
+    wiz.form = { name: String(data.get('name') ?? '').trim(), parent: String(data.get('parent') ?? '').trim(), stack: String(data.get('wiz-stack') ?? ''), install: data.get('install') === 'on', allowNested: data.get('allowNested') === 'on' };
+    wiz.busy = true; wiz.error = null; render();
+    try {
+      wiz.plan = await post('/api/new/plan', JSON.stringify(wiz.form), { 'Content-Type': 'application/json' });
+      wiz.step = 'review';
+    } catch (e) { wiz.error = e.message; }
+    wiz.busy = false; render();
+  }
+  async function wizardCreate(confirm) {
+    wiz.busy = true; wiz.error = null; render();
+    try {
+      await post('/api/new/create', JSON.stringify({ planId: wiz.plan.id, confirm }), { 'Content-Type': 'application/json' });
+      wiz.step = 'progress'; wiz.progress = null;
+      if (!wizTimer) wizTimer = setInterval(pollWizard, 1500);
+      await pollWizard();
+    } catch (e) { wiz.error = e.message; }
+    wiz.busy = false; render();
+  }
+
   // ---------- projects ----------
   let overview = null; // [{ project, snap | error }]
   async function loadOverview() {
@@ -959,7 +1039,7 @@
         <div class="pflow">${dist.map((n, i) => `<span style="--hue:${ST[i].hue}" data-tip="${esc(L(ST[i].name))}: ${n}"><i style="height:${6 + n * 10}px"></i><b>${n}</b></span>`).join('')}</div>
         <div class="tiny muted">${last ? A(`آخر نشاط مسجّل ${ago(last)}`, `last recorded activity ${ago(last)}`) : ''}</div></div></a>`;
     }).join('');
-    return `<section class="pagehead"><h1 style="font-size:26px">${A('المشاريع', 'Projects')}</h1><p class="muted">${A('كل مشروع ليه مجلد .yallaflow خاص بيه، والكونسول بيقرا كل واحد لوحده.', 'Each project has its own .yallaflow; the console reads each one separately.')}</p></section>
+    return `<section class="pagehead"><div class="row"><h1 style="font-size:26px">${A('المشاريع', 'Projects')}</h1>${readOnly ? '' : `<a class="btn sm go" href="#/new" style="margin-inline-start:auto">＋ ${A('مشروع جديد', 'New project')}</a>`}</div><p class="muted">${A('كل مشروع ليه مجلد .yallaflow خاص بيه، والكونسول بيقرا كل واحد لوحده.', 'Each project has its own .yallaflow; the console reads each one separately.')}</p></section>
       <section class="projects">${cards}</section>
       ${unavailable.length ? `<p class="small" style="margin-top:14px">${A('مش متاحة (الفولدر اتنقل أو اتمسح):', 'Unavailable (folder moved or deleted):')} ${unavailable.map((u) => `<span class="ltr tag">${esc(u)}</span>`).join(' ')}</p>` : ''}
       ${devPanel(A('إدارة قائمة المشاريع', 'Manage the project list'), ['yallaflow console add <folder>', 'yallaflow console remove <folder>', 'yallaflow console list'])}`;
@@ -1154,7 +1234,7 @@
     const hadQ = document.activeElement?.matches?.('[data-q]');
     const hadAgent = document.activeElement?.matches?.('[data-agent-input]');
     document.title = (snap?.counts?.you ? `(${snap.counts.you}) ` : '') + 'YallaFlow' + (snap?.project?.name ? ` · ${snap.project.name}` : '');
-    const views = { setup: viewSetup, overview: viewOverview, item: () => viewItem(r.id), lines: viewLines, team: viewTeam, insights: viewInsights, projects: viewProjects, map: viewMap };
+    const views = { new: viewNew, setup: viewSetup, overview: viewOverview, item: () => viewItem(r.id), lines: viewLines, team: viewTeam, insights: viewInsights, projects: viewProjects, map: viewMap };
     const body = !snap ? `<p class="muted" style="margin-top:40px;text-align:center">${error ? '' : A('بيحمّل…', 'Loading…')}</p>` : (views[r.v] ?? viewMap)();
     document.getElementById('app').innerHTML = topbar(r) + `<main>${banner()}${snap && ['map', 'lines'].includes(r.v) ? understandingStrip() : ''}${body}</main>`;
     requestAnimationFrame(placeConnectors);
@@ -1227,6 +1307,7 @@
     else if (v === 'projects') await loadOverview();
     else if (v === 'overview' || ((v === 'map' || v === 'lines') && projectOverview?.pid !== pid)) await loadProjectOverview();
     else if (v === 'setup') await loadRuntime();
+    else if (v === 'new') await loadWizard();
     syncRuntimePolling();
   }
 
@@ -1315,8 +1396,19 @@
       render(); await load(); await buildDigest(); render(); listen();
       return;
     }
-    closeDrawer(); bellOpen = false; dtab = 'delivery'; const v = route().v; if (v === 'item') { detail = null; render(); await load(); await loadForView(); } else if (['team', 'projects', 'overview', 'map', 'lines', 'setup'].includes(v)) { render(); await loadForView(); } else syncRuntimePolling(); render(); scrollTo(0, 0); });
+    closeDrawer(); bellOpen = false; dtab = 'delivery'; const v = route().v; if (v === 'item') { detail = null; render(); await load(); await loadForView(); } else if (['team', 'projects', 'overview', 'map', 'lines', 'setup', 'new'].includes(v)) { render(); await loadForView(); } else syncRuntimePolling(); render(); scrollTo(0, 0); });
+  document.addEventListener('submit', (e) => {
+    const plan = e.target.closest('[data-wiz-form]');
+    if (plan) { e.preventDefault(); wizardSubmit(plan); return; }
+    const create = e.target.closest('[data-wiz-create]');
+    if (create) { e.preventDefault(); wizardCreate(String(new FormData(create).get('confirm') ?? '').trim()); }
+  });
+  document.addEventListener('change', (e) => {
+    if (e.target.matches?.('input[name="wiz-stack"]') && wiz.form) { wiz.form.stack = e.target.value; for (const card of document.querySelectorAll('.stackcard')) card.classList.toggle('on', card.contains(e.target)); }
+  });
   document.addEventListener('click', (e) => {
+    if (e.target.closest('[data-wiz-back]')) { wiz.step = 'form'; wiz.error = null; render(); return; }
+    if (e.target.closest('[data-wiz-retry]')) { wizardCreate(wiz.plan.hash.slice(0, 8)); return; }
     const rt = e.target.closest('[data-rt]');
     if (rt) { runtimeAction(rt.dataset.rt, rt.dataset.id); return; }
     const rtl = e.target.closest('[data-rt-logs]');

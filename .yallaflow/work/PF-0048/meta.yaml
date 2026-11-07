@@ -4,14 +4,14 @@
   "scope": "architectural",
   "routingStatus": "routed",
   "rawRequest": "New Project Wizard: project name, location and stack selection using pinned official generators or an agent-recommended setup, a reviewable plan before anything is created, staged and auditable creation, YallaFlow init and a first setup work item, from the CLI and the Console",
-  "status": "IMPLEMENTATION",
+  "status": "DONE",
   "readOnly": false,
   "knowledgePolicy": {
     "version": 1,
     "reviewRequired": true
   },
   "createdAt": "2026-11-07T02:34:32.662Z",
-  "updatedAt": "2026-11-07T09:28:16.189Z",
+  "updatedAt": "2026-11-07T10:32:14.675Z",
   "title": "New Project Wizard: project name, location and stack selection using pinned official generators or an agent-recommended setup, a reviewable plan before anything is created, staged and auditable creation, YallaFlow init and a first setup work item, from the CLI and the Console",
   "routingConfidence": "high",
   "routingReason": "Explicitly classified by the user: `yallaflow feature --scope architectural`.",
@@ -72,6 +72,16 @@
       "linkedAt": "2026-11-07T02:42:05.373Z",
       "workStatusAtLink": "SPECIFICATION",
       "relationship": "work-input"
+    }
+  ],
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-07T10:32:14.675Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002",
+        "V-003"
+      ]
     }
   ]
 }

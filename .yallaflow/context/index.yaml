@@ -11859,7 +11859,56 @@
       ],
       "createdAt": "2026-11-07T10:01:59.488Z",
       "updatedAt": "2026-11-07T10:01:59.488Z"
+    },
+    {
+      "id": "CTX-0112",
+      "area": "business-rule",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Projects created by `yallaflow new` (New Project Wizard, 1.4.0) record config project.origin {createdBy: 'yallaflow new', generator, template, stack, planHash, createdAt} through Core initProject and are Greenfield: no baseline is required for generator boilerplate, but generated code is never treated as understood or approved (no context facts, label 'generated code not reviewed'). Projects without valid wizard provenance, or with a recorded brownfield kind, keep the normal discovery and baseline rules.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0048",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/baseline/understanding.js",
+          "contentHash": "sha256:31d01d8fff921f4e89d638091cbc6a539a96f59c32c6891f6021f6754daed94a",
+          "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/core/workspace.js",
+          "contentHash": "sha256:caf6ab3d92318d9ca1a4d92757c1f81eb6127de9d2a630548bb6dae0f1dfe714",
+          "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "docs/new-project.md",
+          "contentHash": "sha256:bea5e594dfba491243a9e53dd90777adcc75e71fff430e87f5e9eaaba9d7eaed",
+          "gitCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-07T10:32:14.366Z",
+      "verifiedAtCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-07T10:32:14.366Z",
+          "workId": "PF-0048",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-07T10:32:14.366Z",
+      "updatedAt": "2026-11-07T10:32:14.366Z"
     }
   ],
-  "updatedAt": "2026-11-07T10:01:59.488Z"
+  "updatedAt": "2026-11-07T10:32:14.366Z"
 }

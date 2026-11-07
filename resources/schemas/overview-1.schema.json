@@ -16,6 +16,11 @@
         "name": { "type": "string" },
         "kind": { "type": ["string", "null"] },
         "shared": { "type": "boolean" },
+        "origin": {
+          "type": ["object", "null"],
+          "description": "1.4.0: set only for projects created by the New Project Wizard. The generated code is not reviewed or approved project knowledge.",
+          "properties": { "createdBy": { "const": "yallaflow new" }, "generator": { "type": ["string", "null"] }, "template": { "type": "string" }, "stack": { "type": "array", "items": { "type": "string" } }, "planHash": { "type": "string" }, "createdAt": { "type": "string" } }
+        },
         "classification": {
           "type": ["object", "null"],
           "required": ["kind", "reasons"],

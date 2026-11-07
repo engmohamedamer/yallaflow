@@ -8,6 +8,10 @@
     {
       "name": "setup",
       "ok": true
+    },
+    {
+      "name": "wizard",
+      "ok": true
     }
   ],
   "pageErrors": []

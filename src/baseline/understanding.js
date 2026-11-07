@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { readYaml } from '../core/yaml.js';
-import { workspacePath } from '../core/workspace.js';
+import { validateProjectOrigin, workspacePath } from '../core/workspace.js';
 import { loadContextLedger } from '../context/ledger.js';
 import { classifyProject, inventoryRepository } from '../inventory/inventory.js';
 import { baselineNextStep, findBaselineWork } from './store.js';
@@ -52,6 +52,19 @@ export async function assessProjectUnderstanding(root, { kind = null, inventoryK
       baselineId: baseline.id
     };
   }
+  // 1.4.0 (owner decision, PF-0048): a project created by the New Project Wizard from an
+  // explicitly selected catalog generator is Greenfield. Its generated code is not
+  // understood or approved; nothing else (an existing repository, a recorded brownfield
+  // kind, a folder without wizard provenance) changes.
+  const origin = kind !== 'brownfield' ? await wizardOrigin(root) : null;
+  if (origin) {
+    return {
+      state: UNDERSTANDING.GREENFIELD,
+      label: `Greenfield — created from ${origin.generator ?? 'an empty template'} by the New Project Wizard; generated code not reviewed. Understanding comes from product intent, supplied requirements, and approved decisions`,
+      facts,
+      origin
+    };
+  }
   let classified = inventoryKind;
   if (classified === undefined && kind !== 'brownfield') {
     try {
@@ -74,6 +87,18 @@ export async function assessProjectUnderstanding(root, { kind = null, inventoryK
     label: 'Greenfield — understanding comes from product intent, supplied requirements, and approved decisions (no repository scan)',
     facts
   };
+}
+
+async function wizardOrigin(root) {
+  try {
+    const config = await readYaml(path.join(workspacePath(root), 'config.yaml'));
+    const origin = config?.project?.origin;
+    if (!origin || config.project.kind !== 'greenfield') return null;
+    validateProjectOrigin(origin);
+    return origin;
+  } catch {
+    return null;
+  }
 }
 
 export function understandingRequired(assessment) {
