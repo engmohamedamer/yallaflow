@@ -1,0 +1,10 @@
+{
+  "engine": "firefox",
+  "results": [
+    {
+      "name": "overview",
+      "ok": true
+    }
+  ],
+  "pageErrors": []
+}

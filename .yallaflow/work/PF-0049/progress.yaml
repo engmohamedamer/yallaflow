@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-07T02:35:55.040Z",
+      "completedAt": "2026-11-07T02:35:55.040Z",
+      "summary": "research/release-1.4/browser-check.mjs runs disposable projects only; Firefox and WebKit need the locally installed playwright-core 1.64.0-alpha that matches firefox-1553/webkit-2368; the 1.64.1 core expects newer browsers."
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T02:35:55.497Z",
+      "completedAt": "2026-11-07T02:35:55.497Z",
+      "summary": "Owner requires browser regression evidence and screenshots for the 1.4.0 candidate; this records the Overview results for all three engines."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-07T02:35:56.042Z",
+      "completedAt": "2026-11-07T02:35:56.042Z",
+      "summary": "Add the generated firefox/webkit screenshots and results JSON produced by the existing script; no code changes."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-07T02:35:57.614Z",
+      "completedAt": "2026-11-07T02:35:57.614Z",
+      "summary": "Added Firefox and WebKit Overview screenshots and results (all checks ok, no page errors) next to the Chromium ones."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T02:35:58.063Z",
+      "completedAt": "2026-11-07T02:35:58.063Z",
+      "summary": "V-001: chromium, firefox and webkit results all ok with zero page errors."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-07T02:35:58.063Z"
+}

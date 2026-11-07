@@ -37,4 +37,17 @@
   - npm pack --dry-run --json 2>/dev/null | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const p=JSON.parse(s)[0];const f=p.files.map(x=>x.path);const bad=f.filter(x=>/^(site|\.github|\.yallaflow)\//.test(x)||/\.(mp4|webm|mov|jpe?g|png)$/i.test(x));console.log(p.name+"@"+p.version, f.length+" files,", (p.size/1024).toFixed(0)+" KB packed; site/media/images leaked:", bad.length, bad.join(" "));process.exit(bad.length||p.version!=="1.1.0"?1:0)})' (passed) (runtime, PF-0022 V-019)
   - python3 -I -c "import yaml; d=yaml.safe_load(open('.github/workflows/pages.yml')); on=d[True]; assert sorted(on)==['push','workflow_dispatch'] and on['push']['branches']==['main'] and on['push']['paths']==['site/**','.github/workflows/pages.yml']; steps=d['jobs']['deploy']['steps']; uses=[s.get('uses','').split('@')[0] for s in steps]; assert uses==['actions/checkout','actions/configure-pages','actions/upload-pages-artifact','actions/deploy-pages'] and not any('run' in s for s in steps); assert d['permissions']=={'contents':'read'} and d['jobs']['deploy']['permissions']=={'contents':'read','pages':'write','id-token':'<redacted>'}; assert all(len(s['uses'].split('@')[1])==40 for s in steps); print('pages.yml isolated, least-privilege, SHA-pinned')" && git diff --quiet HEAD -- .github/workflows/release.yml && echo release.yml-unchanged (passed) (runtime, PF-0022 V-025)
 
+<!-- yallaflow-fact:CTX-0109 -->
+### CTX-0109 — Browser regression for the console (research/release-1.4/browser-check.mjs) runs on this machine with the locally cached playwright-core 1.64.0-alpha (~/.npm/_npx/9833c18b2d85bc59), which matches the installed firefox-1553 and webkit-2368; playwright-core 1.64.1 expects newer browser builds and fails to launch Firefox. Nothing is downloaded.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0049
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-07T02:35:58.537Z
+- **Verified:** 2026-11-07T02:35:58.537Z (commit 7fecae2)
+- **Evidence:**
+  - research/release-1.4/browser-check.mjs (repository @ 7fecae2)
+
 <!-- yallaflow-context:end -->

@@ -23,9 +23,8 @@
       "summary": "Options: (a) run generators directly into the destination (rejected: a failure leaves a half-written folder at the user's path); (b) staging directory under the chosen parent plus same-filesystem rename only if the destination is still absent (chosen); for recommendations, (c) YallaFlow calling a model (rejected: no-provider rule and subscription-only policy) versus (d) the developer's own agent proposing a plan through the CLI (chosen)."
     },
     "specification": {
-      "status": "completed",
+      "status": "in_progress",
       "startedAt": "2026-11-07T02:35:01.793Z",
-      "completedAt": "2026-11-07T02:35:01.793Z",
       "summary": "Specification in work.md: identity, pinned catalog of official generators (Laravel, React+Vite, Vue+Vite, Next.js, NestJS, empty), agent recommendation through the developer's own agent, immutable hash-bound plans, staged creation with promotion only to an absent destination, init + first work item, Console routes and security; one Core-semantics decision for the owner (generator-created projects and the understanding gate, recommended: wizard provenance treated as Greenfield intent)."
     },
     "implementation-planning": {
@@ -45,6 +44,14 @@
     }
   },
   "rulings": [],
-  "history": [],
-  "updatedAt": "2026-11-07T02:35:01.793Z"
+  "history": [
+    {
+      "skill": "specification",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "The specification checkpoint was completed before its owner review; it stays in progress until the owner approves or requests changes at the specification gate (doctor integrity).",
+      "changedAt": "2026-11-07T02:36:29.178Z"
+    }
+  ],
+  "updatedAt": "2026-11-07T02:36:29.178Z"
 }

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "for e in chromium firefox webkit; do python3 -c \"import json,sys;d=json.load(open('research/release-1.4/screenshots/'+sys.argv[1]+'-results.json'));assert all(r['ok'] for r in d['results']) and not d['pageErrors'], sys.argv[1];print(sys.argv[1],'ok')\" $e || exit 1; done",
+      "executionMode": "shell",
+      "executable": "for e in chromium firefox webkit; do python3 -c \"import json,sys;d=json.load(open('research/release-1.4/screenshots/'+sys.argv[1]+'-results.json'));assert all(r['ok'] for r in d['results']) and not d['pageErrors'], sys.argv[1];print(sys.argv[1],'ok')\" $e || exit 1; done",
+      "args": [],
+      "displayCommand": "for e in chromium firefox webkit; do python3 -c \"import json,sys;d=json.load(open('research/release-1.4/screenshots/'+sys.argv[1]+'-results.json'));assert all(r['ok'] for r in d['results']) and not d['pageErrors'], sys.argv[1];print(sys.argv[1],'ok')\" $e || exit 1; done",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T02:35:57.350Z",
+      "finishedAt": "2026-11-07T02:35:57.412Z",
+      "verifiedAt": "2026-11-07T02:35:57.412Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

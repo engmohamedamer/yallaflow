@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "environment",
+      "source": "implementation-runtime",
+      "summary": "Browser regression for the console (research/release-1.4/browser-check.mjs) runs on this machine with the locally cached playwright-core 1.64.0-alpha (~/.npm/_npx/9833c18b2d85bc59), which matches the installed firefox-1553 and webkit-2368; playwright-core 1.64.1 expects newer browser builds and fails to launch Firefox. Nothing is downloaded.",
+      "evidence": [
+        "research/release-1.4/browser-check.mjs"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-07T02:35:58.278Z",
+      "factId": "CTX-0109",
+      "promotedAt": "2026-11-07T02:35:58.537Z",
+      "target": "context/environments.md"
+    }
+  ],
+  "updatedAt": "2026-11-07T02:35:58.537Z",
+  "reviewedAt": "2026-11-07T02:35:58.537Z"
+}
