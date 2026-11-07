@@ -23,13 +23,13 @@ const OUTCOMES = ['cancelled', 'superseded', 'duplicate'];
 // Gates decided in the console. Baseline and reconciliation keep their own commands.
 export const CONSOLE_GATES = Object.freeze(['discovery', 'clarification', 'design', 'specification', 'plan', 'decomposition', 'implementation', 'verification']);
 
-function text(value, name, { required = true } = {}) {
+function text(value, name, { required = true, maxLength = MAX_TEXT } = {}) {
   if (value === undefined || value === null || value === '') {
     if (required) throw new HttpError(422, 'MISSING', `${name} is required.`);
     return null;
   }
   if (typeof value !== 'string' || !value.trim()) throw new HttpError(422, 'MISSING', `${name} is required.`);
-  if (value.length > MAX_TEXT) throw new HttpError(422, 'TOO_LONG', `${name} is limited to ${MAX_TEXT} characters.`);
+  if (value.length > maxLength) throw new HttpError(422, 'TOO_LONG', `${name} is limited to ${maxLength} characters.`);
   if (value.includes('\0')) throw new HttpError(422, 'INVALID', `${name} contains a NUL character.`);
   return value.trim();
 }
@@ -55,7 +55,7 @@ export function actionArgs(action, workId, input = {}) {
       return ['reopen', workId, opt('to', oneOf(body.to, REOPEN_TARGETS, 'The reopen target')), opt('reason', reason)];
     }
     case 'revise':
-      return ['request', 'revise', workId, opt('text', text(body.text, 'The revised request')), opt('reason', text(body.reason, 'A reason'))];
+      return ['request', 'revise', workId, opt('text', text(body.text, 'The revised request', { maxLength: 20_000 })), opt('reason', text(body.reason, 'A reason'))];
     case 'answer': {
       const question = String(body.question ?? '');
       if (!/^Q-\d{3,}$/.test(question)) throw new HttpError(422, 'INVALID', 'Name the question (Q-###).');

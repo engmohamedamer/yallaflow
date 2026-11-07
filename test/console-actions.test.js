@@ -63,10 +63,10 @@ test('work-item actions run the canonical commands: same records as the CLI, Cor
     const refusal = await blocked.json();
     assert.equal(refusal.error.code, 'REFUSED');
     assert.match(refusal.error.message, /checkpoint|blocker|Cannot/i);
-    // Revising applies to requests not yet routed (Core's rule); a routed item gets Core's refusal.
+    // A stale edit is refused once work has left INTAKE.
     const routedRevise = await c.post(`work/${id}/actions/revise`, { text: 'Add CSV and Excel export of orders', reason: 'The client also needs Excel.' });
     assert.equal(routedRevise.status, 409);
-    assert.match((await routedRevise.json()).error.message, /already routed/);
+    assert.match((await routedRevise.json()).error.message, /already started/);
     const pending = createdWork(run(root, ['start', 'Dark mode for the storefront']).stdout);
     assert.equal((await c.post(`work/${pending}/actions/revise`, { text: 'Dark mode for the storefront and the admin', reason: 'Admin too.' })).status, 200);
     assert.match(JSON.stringify(await meta(root, pending)), /admin/);
@@ -93,6 +93,34 @@ test('work-item actions run the canonical commands: same records as the CLI, Cor
   } finally {
     await c.close();
   }
+});
+
+test('request edits use full text before work starts and refuse stale or invalid saves', async () => {
+  const root = await freshProject('yf-edit-request-');
+  const original = 'Full request\n' + 'Detailed requirement. '.repeat(600);
+  const id = routedBoundedChange(root, original);
+  const c = await consoleOn(root);
+  try {
+    const before = await meta(root, id);
+    const shown = await (await c.get(`work/${id}`)).json();
+    assert.equal(shown.item.requestEditable, true);
+    assert.equal(shown.request.raw, original);
+    assert.notEqual(shown.item.title, original);
+    const snapshot = await (await c.get('snapshot')).json();
+    assert.equal(snapshot.items.find((item) => item.id === id).requestEditable, true);
+    for (const text of ['', '   ', 'x'.repeat(20001)]) {
+      assert.equal((await c.post(`work/${id}/actions/revise`, { text, reason: 'Correction.' })).status, 422);
+      assert.deepEqual(await meta(root, id), before);
+    }
+    const revised = original + '\nAnother detail.';
+    assert.equal((await c.post(`work/${id}/actions/revise`, { text: revised, reason: 'Added detail.' })).status, 200);
+    assert.equal((await meta(root, id)).requestHistory[0].previousRequest, original);
+    assert.equal((await (await c.get(`work/${id}`)).json()).request.raw, revised);
+    assert.equal((await c.post(`work/${id}/actions/advance`)).status, 200);
+    assert.equal((await (await c.get(`work/${id}`)).json()).item.requestEditable, false);
+    assert.equal((await c.post(`work/${id}/actions/revise`, { text: 'Stale edit', reason: 'Opened before advance.' })).status, 409);
+    assert.equal((await meta(root, id)).rawRequest, revised);
+  } finally { await c.close(); }
 });
 
 test('action input is validated and values never become options', async () => {

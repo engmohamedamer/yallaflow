@@ -208,9 +208,10 @@
 
   function pchip(it) {
     const old = isOld(it);
-    return `<a class="pchip ${it.state} ${old ? 'old' : ''}" href="#/item/${encodeURIComponent(it.id)}" data-w="${esc(it.id)}" ${readOnly ? '' : 'draggable="true"'}>${readOnly || !itemActions(it).length ? '' : `<button class="pmenu" data-menu="${esc(it.id)}" aria-label="${A('أفعال', 'Actions')} ${esc(it.id)}">⋯</button>`}<button class="pchat" data-chat-item="${esc(it.id)}" aria-label="${A('اسأل الوكيل عن', 'Ask the agent about')} ${esc(it.id)}" title="${A('اسأل الوكيل عن الشغلانة دي', 'Ask the agent about this item')}">💬</button><div class="tt">${esc(it.title)}</div>
+    return `<article class="pchip ${it.state} ${old ? 'old' : ''}" data-w="${esc(it.id)}" ${readOnly ? '' : 'draggable="true"'}><a class="pbody" href="#/item/${encodeURIComponent(it.id)}" draggable="false"><span class="pid ltr">${esc(it.id)}</span><div class="tt">${esc(it.title)}</div>
       <div class="meta">${chip(it.state)}<span class="grow"></span><b>${it.completion}%</b></div><div class="mini"><i style="width:${it.completion}%"></i></div>
-      <div class="badges"><span class="bdg ltr">${esc(it.id)}</span>${it.lastActivityAt && it.state !== 'done' ? `<span class="bdg ${old ? 'old' : ''}">⏱ ${ago(it.lastActivityAt)}</span>` : ''}${it.sourceCount ? `<span class="bdg">📎 ${it.sourceCount}</span>` : ''}</div></a>`;
+      <div class="badges">${it.lastActivityAt && it.state !== 'done' ? `<span class="bdg ${old ? 'old' : ''}">⏱ ${ago(it.lastActivityAt)}</span>` : ''}${it.sourceCount ? `<span class="bdg">📎 ${it.sourceCount}</span>` : ''}</div></a>
+      <div class="pactions"><button type="button" class="pchat" data-chat-item="${esc(it.id)}" aria-label="${A('افتح الشات للطلب', 'Open chat for')} ${esc(it.id)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-6 4V6a2 2 0 0 1 2-2Z"/><path d="M7 9h10M7 13h6"/></svg><span>${A('الشات', 'Chat')}</span></button>${readOnly || !itemActions(it).length ? '' : `<button type="button" class="pmenu" data-menu="${esc(it.id)}" aria-label="${A('أفعال', 'Actions')} ${esc(it.id)}" title="${A('أفعال الطلب', 'Work item actions')}">⋯</button>`}</div></article>`;
   }
 
   function viewMap() {
@@ -489,7 +490,9 @@
     const cap = provider(s.provider)?.capabilities ?? {};
     const modeChip = s.mode ? `<span class="chip ${autoApproves(s.mode) ? 'wait' : 'todo'}" title="${esc(L(MODE_LABEL[s.mode] ?? { ar: s.mode, en: s.mode }))}">${esc(s.mode)}</span>` : '';
     const warn = isForbidden(s.mode) ? `<div class="awarn" role="alert">⛔ ${esc(L(MODE_LABEL.bypassPermissions))}. ${A('غيّر الوضع من Claude Code.', 'Change the mode in Claude Code.')}</div>` : autoApproves(s.mode) ? `<div class="awarn">⚠ ${esc(L(MODE_LABEL[s.mode]))}. ${A('مش كل فعل هيظهر هنا كطلب إذن.', 'Not every action will appear here as a permission request.')}</div>` : '';
-    const state = s.provider === 'claude' && !s.connected ? A('مستني Claude Code', 'Waiting for Claude Code') : s.status === 'working' ? A('شغّال…', 'Working…') : s.status === 'starting' ? A('بيبدأ…', 'Starting…') : A('جاهز', 'Ready');
+    // Claude Code takes messages only once a hook has reported its permission mode (PF-0065).
+    const modePending = s.provider === 'claude' && s.connected && !s.mode;
+    const state = s.provider === 'claude' && !s.connected ? A('مستني Claude Code', 'Waiting for Claude Code') : modePending ? A('مستني وضع الأذونات', 'Waiting for the permission mode') : s.status === 'working' ? A('شغّال…', 'Working…') : s.status === 'starting' ? A('بيبدأ…', 'Starting…') : A('جاهز', 'Ready');
     const controls = [
       cap.stop && s.status === 'working' ? `<button class="btn sm ghost" data-agent-cancel>${A('وقّف', 'Stop')}</button>` : '',
       cap.end ? `<button class="btn sm ghost" data-agent-end>${A('اقفل الجلسة', 'End session')}</button>` : '',
@@ -497,20 +500,26 @@
     ].join('');
     const launch = s.provider === 'claude' && !s.connected && agentLaunch ? `<div class="alaunch"><p class="small">${A('شغّل Claude Code بنفسك في فولدر المشروع بالأمر ده. Claude Code هيعرض تحذير القناة التجريبية والقرار ليك.', 'Start Claude Code yourself in the project folder with this command. Claude Code shows its own development-channel warning; the decision is yours.')}</p><pre class="cli" dir="ltr">${esc(agentLaunch)}</pre><button class="btn sm ghost" data-copy="${esc(agentLaunch)}">${A('انسخ', 'Copy')}</button></div>` : '';
     const entries = agentEntries(agent.events).map((e) => e.kind === 'user' ? `<div class="amsg me"><p>${esc(e.text)}</p></div>` : e.kind === 'agent' ? `<div class="amsg"><p>${esc(e.text)}</p></div>` : e.kind === 'tool' ? `<div class="atool ${e.status === 'failed' ? 'fail' : e.status === 'completed' ? 'done' : ''}"><span>${e.status === 'completed' ? '✓' : e.status === 'failed' ? '✕' : '●'}</span> ${esc(e.title)}</div>` : e.kind === 'perm' ? permCard(e) : `<div class="anote ${e.warn ? 'warn' : ''}">${esc(e.text)}</div>`).join('');
-    const canSend = cap.send && (s.provider === 'codex' ? s.status === 'idle' : s.connected);
+    const canSend = cap.send && (s.provider === 'codex' ? s.status === 'idle' : s.connected && !modePending);
+    const modeHint = modePending ? `<div class="awarn" role="status">${A('Claude Code متوصّل، بس لسه ما بلّغش بوضع الأذونات بتاعه، فالرسايل مش هتتبعت لحد ما يبلّغ. بيبلّغ لما تكتب حاجة في Claude Code أو لما يستخدم أداة.', 'Claude Code is connected but has not reported its permission mode yet, so messages cannot be sent until it does. It reports it when you type in Claude Code or when it uses a tool.')}</div>` : '';
     return `<section class="panel agent" id="agent">${head}${err}
       <div class="abar"><b>${PROVIDER[s.provider]}</b>${s.provider === 'claude' ? ` <i class="exp">${A('تجريبي', 'experimental')}</i>` : ''}<span class="chip active"><i></i>${esc(state)}</span>${s.auth ? `<span class="chip todo">${esc(s.auth)}</span>` : ''}${modeChip}<span class="grow"></span>${controls}</div>
-      ${warn}${launch}
+      ${warn}${modeHint}${launch}
       <div class="astream" aria-live="polite">${entries || `<p class="tiny muted">${A(`اكتب للوكيل، مثلاً: «كمّل ${it.id}».`, `Message the agent, for example: "Continue ${it.id}".`)}</p>`}</div>
       ${suggestionChips(it)}<form class="acompose" data-agent-form><textarea data-agent-input rows="2" maxlength="20000" placeholder="${A(`اكتب لـ ${PROVIDER[s.provider]}…`, `Message ${PROVIDER[s.provider]}…`)}" ${canSend ? '' : 'disabled'}>${esc(agentDraft)}</textarea><button class="btn go" type="submit" ${canSend && !agentBusy ? '' : 'disabled'}>${A('ابعت', 'Send')}</button></form>
       ${s.provider === 'claude' ? `<p class="tiny muted">${A('الإيقاف والإنهاء بيتعملوا من Claude Code نفسه (Esc). الردود بتوصل كرسايل كاملة.', 'Stop and end happen in Claude Code itself (Esc). Replies arrive as whole messages.')}</p>` : ''}</section>`;
   }
+  // Returns false when the action failed. Its error survives the state reload that follows
+  // (loadAgent clears agentError on success), so a refused send is never silent (PF-0065).
   async function agentAction(action, body, after) {
     agentBusy = true; agentError = null; renderAgent();
-    try { const result = await agentPost(action, body); await after?.(result); } catch (e) { agentError = e.message; }
+    let failed = null;
+    try { const result = await agentPost(action, body); await after?.(result); } catch (e) { failed = e.message; }
     agentBusy = false;
     await loadAgent();
+    if (failed) agentError = failed;
     renderAgent();
+    return !failed;
   }
 
   // The one thing to do next, in plain words, from Core's verdict (never computed here).
@@ -530,8 +539,8 @@
     if (it.state === 'done') return ['reopen'];
     const list = [];
     if (snap?.project?.activeWork !== it.id) list.push('activate');
-    if (it.routing === 'pending') list.push('revise');
-    else list.push('advance');
+    if (it.requestEditable) list.push('revise');
+    if (it.routing !== 'pending') list.push('advance');
     if (it.waitingFor?.kind === 'question') list.push('answer');
     list.push('hold', 'close');
     return list;
@@ -548,11 +557,11 @@
   }
 
   // One dialog for every action; fields follow the action. Core's refusal is shown as-is.
-  function actionFields(kind, it) {
+  function actionFields(kind, it, request = '') {
     const area = (name, label, required = true) => `<label class="fld">${label}<textarea name="${name}" rows="3" maxlength="10000" ${required ? 'required' : ''}></textarea></label>`;
     if (kind === 'hold') return area('reason', A('السبب', 'Reason'));
     if (kind === 'resume') return area('note', A('ملاحظة (اختياري)', 'Note (optional)'), false);
-    if (kind === 'revise') return `<label class="fld">${A('الطلب بعد التعديل', 'Revised request')}<textarea name="text" rows="4" maxlength="10000" required>${esc(it.title)}</textarea></label>${area('reason', A('السبب', 'Reason'))}`;
+    if (kind === 'revise') return `<p class="small muted">${A('تقدر تعدّل الطلب طالما الشغل لسه ما بدأش. النسخة القديمة والمرفقات هيفضلوا محفوظين.', 'You can edit the request until work starts. Previous versions and attachments are kept.')}</p><label class="fld">${A('الطلب بعد التعديل', 'Revised request')}<textarea name="text" rows="6" maxlength="20000" required>${esc(request)}</textarea></label>${area('reason', A('السبب', 'Reason'))}`;
     if (kind === 'answer') return `<label class="fld">${A('السؤال', 'Question')}<select name="question">${(it.waitingFor?.questions ?? []).map((q) => `<option>${esc(q)}</option>`).join('')}</select></label>${area('answer', A('الإجابة', 'Answer'))}`;
     if (kind === 'close') return `<label class="fld">${A('النتيجة', 'Outcome')}<select name="outcome"><option value="cancelled">${A('اتلغت', 'Cancelled')}</option><option value="superseded">${A('اتبدّلت بشغلانة تانية', 'Superseded by another item')}</option><option value="duplicate">${A('مكررة', 'Duplicate of another item')}</option></select></label><label class="fld">${A('الشغلانة البديلة (للمستبدلة أو المكررة)', 'The other item (for superseded or duplicate)')}<input name="by" class="ltr" placeholder="PF-0000" pattern="PF-[A-Za-z0-9-]+"></label>${area('reason', A('السبب', 'Reason'))}<p class="tiny muted">${A('الشغل المقفول عمره ما بيتحسب متسلّم ولا متحقق منه.', 'Closed work is never counted as delivered or verified.')}</p>`;
     if (kind === 'reopen') return `${it.state === 'done' ? `<label class="fld">${A('افتحها على', 'Reopen to')}<select name="to"><option value="implementation">${A('التنفيذ', 'Implementation')}</option><option value="verification">${A('التحقق', 'Verification')}</option><option value="review">${A('المراجعة', 'Review')}</option></select></label>` : ''}${area('reason', A('السبب', 'Reason'))}`;
@@ -568,6 +577,29 @@
     d.innerHTML = `<form data-act-form="${esc(kind)}" data-act-item="${esc(id)}" novalidate><div class="row"><h2 id="act-h" class="grow">${L(ACTION_LABEL[kind])}</h2><button type="button" class="btn ghost sm" data-act-cancel>${A('إلغاء', 'Cancel')}</button></div><p class="tiny muted ltr">${esc(id)} — ${esc(it.title)}</p>${actionFields(kind, it)}<div class="confirm" hidden></div><div class="errbar small" role="alert" hidden></div><div class="row"><span class="grow"></span><button class="btn go" type="submit">${L(ACTION_LABEL[kind]).replace('…', '')}</button></div></form>`;
     document.body.appendChild(d);
     d.addEventListener('close', () => d.remove());
+    if (kind === 'revise') {
+      const field = d.querySelector('[name="text"]');
+      const submit = d.querySelector('button[type="submit"]');
+      field.disabled = true;
+      submit.disabled = true;
+      field.placeholder = A('بيحمّل الطلب كامل…', 'Loading the full request…');
+      const projectId = pid;
+      api(`/api/p/${projectId}/work/${encodeURIComponent(id)}`).then((current) => {
+        if (!d.isConnected) return;
+        if (pid !== projectId) { d.close(); return; }
+        if (!current.item.requestEditable) throw new Error(A('الشغل بدأ أو الطلب مش متاح للتعديل دلوقتي. حدّث الصفحة.', 'Work has started or this request is no longer editable. Refresh the page.'));
+        field.value = current.request.raw ?? '';
+        field.placeholder = '';
+        field.disabled = false;
+        submit.disabled = false;
+        field.focus();
+      }).catch((e) => {
+        if (!d.isConnected) return;
+        const err = d.querySelector('.errbar');
+        err.hidden = false;
+        err.textContent = why(e);
+      });
+    }
     for (const [name, value] of Object.entries(preset)) { const field = d.querySelector(`[name="${name}"]`); if (field) field.value = value; }
     d.showModal();
     d.querySelector('textarea, select, button[type="submit"]')?.focus();
@@ -1980,7 +2012,7 @@
     if (e.target.matches('[data-rt-form]')) { e.preventDefault(); submitService(e.target); return; }
     if (e.target.matches('[data-agents-form]')) { e.preventDefault(); confirmAgents(e.target); return; }
     if (e.target.matches('[data-create-form]')) { e.preventDefault(); submitCreate(e.target); }
-    else if (e.target.matches('[data-agent-form]')) { e.preventDefault(); const text = agentDraft.trim(); if (!text) return; agentDraft = ''; agentAction('message', { text }); }
+    else if (e.target.matches('[data-agent-form]')) { e.preventDefault(); const text = agentDraft.trim(); if (!text) return; agentDraft = ''; agentAction('message', { text }).then((sent) => { if (!sent && !agentDraft) { agentDraft = text; renderAgent(); } }); }
   });
   document.addEventListener('change', async (e) => {
     if (e.target.matches('[data-agent-mode]')) { agentMode = e.target.value; return; }

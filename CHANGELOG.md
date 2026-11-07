@@ -70,6 +70,10 @@ Nothing yet.
   - **Older CLIs** (1.1.x–1.3.x, verified) still read such a project and refuse to change it.
   - **Untouched:** projects that never hold or close work.
 
+### Fixed
+- **Agent chat errors are shown.** A refused message or agent action used to disappear when the panel reloaded the session state, so a send could fail silently. The error now stays visible and the typed message is put back.
+- **Claude Code (experimental) waits for its permission mode.** Until Claude Code reports its permission mode, the panel says so and offers no Send, instead of looking ready while messages are refused.
+
 ## [1.3.0] - unreleased (in development) — Agent Workspace
 
 Opt-in. Uses only the developer's existing Codex (ChatGPT) subscription: no API keys, no API billing, no credential handling. Codex is the supported provider. A Claude Code connection is not included, pending Anthropic's confirmation. Guide: [`docs/agents.md`](docs/agents.md).

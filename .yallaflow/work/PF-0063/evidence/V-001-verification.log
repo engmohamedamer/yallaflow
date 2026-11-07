@@ -1,0 +1,118 @@
+TAP version 13
+# Subtest: work-item actions run the canonical commands: same records as the CLI, Core refusals passed through
+ok 1 - work-item actions run the canonical commands: same records as the CLI, Core refusals passed through
+  ---
+  duration_ms: 1990.903035
+  type: 'test'
+  ...
+# Subtest: request edits use full text before work starts and refuse stale or invalid saves
+ok 2 - request edits use full text before work starts and refuse stale or invalid saves
+  ---
+  duration_ms: 952.628765
+  type: 'test'
+  ...
+# Subtest: action input is validated and values never become options
+ok 3 - action input is validated and values never become options
+  ---
+  duration_ms: 357.553622
+  type: 'test'
+  ...
+# Subtest: security: token, Origin, content type and read-only consoles guard every action and decision
+ok 4 - security: token, Origin, content type and read-only consoles guard every action and decision
+  ---
+  duration_ms: 293.174605
+  type: 'test'
+  ...
+# Subtest: gate decisions: material shown first, exact confirmation, stale and duplicate protection, console provenance
+ok 5 - gate decisions: material shown first, exact confirmation, stale and duplicate protection, console provenance
+  ---
+  duration_ms: 2105.633332
+  type: 'test'
+  ...
+# Subtest: CLI decisions are recorded exactly as before (no provenance), and a bad provenance channel records nothing
+ok 6 - CLI decisions are recorded exactly as before (no provenance), and a bad provenance channel records nothing
+  ---
+  duration_ms: 1468.233817
+  type: 'test'
+  ...
+# Subtest: the Agent Workspace never reaches gate decisions, and agents never inherit the provenance channel
+ok 7 - the Agent Workspace never reaches gate decisions, and agents never inherit the provenance channel
+  ---
+  duration_ms: 2.236844
+  type: 'test'
+  ...
+# Subtest: review findings: re-deciding after "request changes", request ids per gate, malformed bodies, provenance limits, strict doctor
+ok 8 - review findings: re-deciding after "request changes", request ids per gate, malformed bodies, provenance limits, strict doctor
+  ---
+  duration_ms: 2319.877764
+  type: 'test'
+  ...
+# Subtest: a pending raw request can be revised through a supported operation
+ok 9 - a pending raw request can be revised through a supported operation
+  ---
+  duration_ms: 29.21102
+  type: 'test'
+  ...
+# Subtest: revision requires a non-empty reason
+ok 10 - revision requires a non-empty reason
+  ---
+  duration_ms: 17.119004
+  type: 'test'
+  ...
+# Subtest: revision requires non-empty replacement text
+ok 11 - revision requires non-empty replacement text
+  ---
+  duration_ms: 14.586246
+  type: 'test'
+  ...
+# Subtest: revision history is preserved and auditable
+ok 12 - revision history is preserved and auditable
+  ---
+  duration_ms: 16.498542
+  type: 'test'
+  ...
+# Subtest: classified INTAKE can be revised without changing its title, classification or focus
+ok 13 - classified INTAKE can be revised without changing its title, classification or focus
+  ---
+  duration_ms: 21.439849
+  type: 'test'
+  ...
+# Subtest: started checkpoints, including reset checkpoints, prevent revision while still in INTAKE
+ok 14 - started checkpoints, including reset checkpoints, prevent revision while still in INTAKE
+  ---
+  duration_ms: 41.831607
+  type: 'test'
+  ...
+# Subtest: leaving INTAKE prevents revision even before any checkpoint is recorded
+ok 15 - leaving INTAKE prevents revision even before any checkpoint is recorded
+  ---
+  duration_ms: 222.963958
+  type: 'test'
+  ...
+# Subtest: held and closed pending requests reject direct Core revisions without writes
+ok 16 - held and closed pending requests reject direct Core revisions without writes
+  ---
+  duration_ms: 184.936013
+  type: 'test'
+  ...
+# Subtest: a file-backed source remains byte-identical after a request correction
+ok 17 - a file-backed source remains byte-identical after a request correction
+  ---
+  duration_ms: 175.944494
+  type: 'test'
+  ...
+# Subtest: CLI: request revise corrects an accidental --help intake end to end
+ok 18 - CLI: request revise corrects an accidental --help intake end to end
+  ---
+  duration_ms: 360.017511
+  type: 'test'
+  ...
+1..18
+# tests 18
+# suites 0
+# pass 18
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9651.161839

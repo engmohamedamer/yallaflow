@@ -1,0 +1,70 @@
+TAP version 13
+# Subtest: a merge-collided work item is listed as invalid and never hides the project
+ok 1 - a merge-collided work item is listed as invalid and never hides the project
+  ---
+  duration_ms: 1202.743242
+  type: 'test'
+  ...
+# Subtest: the exact Vult message: a ledger pinned to another registry version
+ok 2 - the exact Vult message: a ledger pinned to another registry version
+  ---
+  duration_ms: 382.116018
+  type: 'test'
+  ...
+# Subtest: an unreadable meta.yaml is reported, not fatal
+ok 3 - an unreadable meta.yaml is reported, not fatal
+  ---
+  duration_ms: 437.503906
+  type: 'test'
+  ...
+# Subtest: zero work items: no completion is claimed
+ok 4 - zero work items: no completion is claimed
+  ---
+  duration_ms: 285.593146
+  type: 'test'
+  ...
+# Subtest: console: an invalid item is a data warning in a 200 snapshot, not a failed project
+ok 5 - console: an invalid item is a data warning in a 200 snapshot, not a failed project
+  ---
+  duration_ms: 881.590384
+  type: 'test'
+  ...
+# Subtest: console UI: the theme button is matched by its own attribute, never by <html data-theme>
+ok 6 - console UI: the theme button is matched by its own attribute, never by <html data-theme>
+  ---
+  duration_ms: 6.140693
+  type: 'test'
+  ...
+# Subtest: edit is offered alongside Advance in INTAKE and suppressed for ineligible or read-only work
+ok 7 - edit is offered alongside Advance in INTAKE and suppressed for ineligible or read-only work
+  ---
+  duration_ms: 2.914318
+  type: 'test'
+  ...
+# Subtest: editor waits for full raw text, preserves long multiline content and supports Arabic
+ok 8 - editor waits for full raw text, preserves long multiline content and supports Arabic
+  ---
+  duration_ms: 5.623083
+  type: 'test'
+  ...
+# Subtest: a started request or failed load leaves saving disabled and shows the error
+ok 9 - a started request or failed load leaves saving disabled and shows the error
+  ---
+  duration_ms: 3.299549
+  type: 'test'
+  ...
+# Subtest: cancelling before loading completes discards the load without writing
+ok 10 - cancelling before loading completes discards the load without writing
+  ---
+  duration_ms: 1.478102
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3392.897178

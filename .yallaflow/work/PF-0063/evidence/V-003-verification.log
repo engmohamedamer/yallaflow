@@ -1,0 +1,114 @@
+TAP version 13
+# Subtest: a merge-collided work item is listed as invalid and never hides the project
+ok 1 - a merge-collided work item is listed as invalid and never hides the project
+  ---
+  duration_ms: 1326.847387
+  type: 'test'
+  ...
+# Subtest: the exact Vult message: a ledger pinned to another registry version
+ok 2 - the exact Vult message: a ledger pinned to another registry version
+  ---
+  duration_ms: 550.259833
+  type: 'test'
+  ...
+# Subtest: an unreadable meta.yaml is reported, not fatal
+ok 3 - an unreadable meta.yaml is reported, not fatal
+  ---
+  duration_ms: 538.311987
+  type: 'test'
+  ...
+# Subtest: zero work items: no completion is claimed
+ok 4 - zero work items: no completion is claimed
+  ---
+  duration_ms: 393.15921
+  type: 'test'
+  ...
+# Subtest: console: an invalid item is a data warning in a 200 snapshot, not a failed project
+ok 5 - console: an invalid item is a data warning in a 200 snapshot, not a failed project
+  ---
+  duration_ms: 1497.843123
+  type: 'test'
+  ...
+# Subtest: console UI: the theme button is matched by its own attribute, never by <html data-theme>
+ok 6 - console UI: the theme button is matched by its own attribute, never by <html data-theme>
+  ---
+  duration_ms: 8.923294
+  type: 'test'
+  ...
+# Subtest: security: loopback host, token, origin, read-only methods and ID-only paths
+ok 7 - security: loopback host, token, origin, read-only methods and ID-only paths
+  ---
+  duration_ms: 432.390169
+  type: 'test'
+  ...
+# Subtest: serves the snapshot, work detail and preserved sources by ID
+ok 8 - serves the snapshot, work detail and preserved sources by ID
+  ---
+  duration_ms: 701.253121
+  type: 'test'
+  ...
+# Subtest: live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+ok 9 - live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+  ---
+  duration_ms: 1080.757659
+  type: 'test'
+  ...
+# Subtest: the console never writes: browsing every route leaves the workspace byte-identical
+ok 10 - the console never writes: browsing every route leaves the workspace byte-identical
+  ---
+  duration_ms: 854.813402
+  type: 'test'
+  ...
+# Subtest: extracted text cannot be read outside its source directory; HEAD never opens the event stream
+ok 11 - extracted text cannot be read outside its source directory; HEAD never opens the event stream
+  ---
+  duration_ms: 887.220005
+  type: 'test'
+  ...
+# Subtest: edit is offered alongside Advance in INTAKE and suppressed for ineligible or read-only work
+ok 12 - edit is offered alongside Advance in INTAKE and suppressed for ineligible or read-only work
+  ---
+  duration_ms: 3.828093
+  type: 'test'
+  ...
+# Subtest: editor waits for full raw text, preserves long multiline content and supports Arabic
+ok 13 - editor waits for full raw text, preserves long multiline content and supports Arabic
+  ---
+  duration_ms: 6.645411
+  type: 'test'
+  ...
+# Subtest: a started request or failed load leaves saving disabled and shows the error
+not ok 14 - a started request or failed load leaves saving disabled and shows the error
+  ---
+  duration_ms: 3.00993
+  type: 'test'
+  location: '/home/engamer/Amasi/YallaFlow/test/request-revision-ui.test.js:71:1'
+  failureType: 'unhandledRejection'
+  error: 'Offline'
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    TestContext.<anonymous> (file:///home/engamer/Amasi/YallaFlow/test/request-revision-ui.test.js:72:97)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# (node:1038732) PromiseRejectionHandledWarning: Promise rejection was handled asynchronously (rejection id: 1)
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: cancelling before loading completes discards the load without writing
+ok 15 - cancelling before loading completes discards the load without writing
+  ---
+  duration_ms: 6.003362
+  type: 'test'
+  ...
+1..15
+# tests 15
+# suites 0
+# pass 14
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6978.48388

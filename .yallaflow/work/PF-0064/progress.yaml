@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-07T20:53:20.930Z",
+      "completedAt": "2026-11-07T20:53:20.930Z",
+      "summary": "Flow pchip puts chat and menu absolutely over the title, while ID sits in bottom badges. Existing delegated data-chat-item/data-menu handlers and pchip[data-w] drag hooks can be retained. Use ID above title, full-width linked content, and labeled chat plus menu in a separate footer.",
+      "evidence": [
+        "resources/console/app.js",
+        "resources/console/app.css"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T20:53:21.318Z",
+      "completedAt": "2026-11-07T20:53:21.318Z",
+      "summary": "User delegates layout choice: improve card chat placement. Put ID before title and a labeled chat action in footer alongside menu; retain chat behavior, progress, age, attachments, read-only behavior and Arabic/English layout."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-07T20:53:21.925Z",
+      "completedAt": "2026-11-07T20:53:21.925Z",
+      "summary": "Update only pchip markup and its CSS: article wrapper keeps drag identity; link contains ID/title/status/progress/badges; sibling footer contains chat and menu buttons. Use flex layout, logical spacing, theme variables and inline SVG. Verify syntax and existing console/request controller regression tests; no new tests for this presentation-only change."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-07T20:55:18.634Z",
+      "completedAt": "2026-11-07T20:55:18.634Z",
+      "summary": "Flow cards now show ID above the full-width title and content; a separated footer places labeled SVG chat and menu actions in normal document flow. Article wrapper separates buttons from the navigation link, retains pchip/data-w drag hooks and delegated chat/menu actions. Uses logical layout and theme variables for Arabic/English and light/dark.",
+      "evidence": [
+        "resources/console/app.js",
+        "resources/console/app.css"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T20:55:19.026Z",
+      "completedAt": "2026-11-07T20:55:19.026Z",
+      "summary": "V-001 passed JavaScript syntax; V-002 passed 10 existing console and action-controller tests. git diff --check is clean. Reviewed render markup, non-overlapping normal-flow footer CSS, retained delegation and draggable wrapper selectors. No live-browser visual test was run.",
+      "evidence": [
+        "verification:V-001",
+        "verification:V-002",
+        "resources/console/app.css"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-07T20:55:19.026Z"
+}

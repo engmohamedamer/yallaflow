@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-07T20:50:48.133Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+        "verificationRunIds": [
+          "V-004"
+        ]
+      },
+      "summary": "Reviewed request editing against both criteria after V-004 passed all 34 relevant tests.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "Core and snapshot share eligibility for pending and untouched INTAKE work. UI exposes Edit alongside Advance and loads full raw text with Save disabled until loaded. CLI/API tests prove long text, audit history, unchanged classification and preserved attachments.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/behavior/routing.js",
+              "contentHash": "sha256:92baeff59b71c2916893c7e0a13af470064f3de7ba6bd2d18809725c017c3d8a",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/flow/snapshot.js",
+              "contentHash": "sha256:d1f6b58968aa7ffdc09af516658deebd3de80ab5470692bcdb44bd417edf44d0",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:96ef16297bc6176d5443a7d470db14a4a5c1377b07bba9b4626b8a14e00a42cd",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/request-revision.test.js",
+              "contentHash": "sha256:d3d5a901c0686766cc63b68827fc3b38909cab7940571a7fc6d57f74124ff3f3",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/request-revision-ui.test.js",
+              "contentHash": "sha256:4c317c93e022b5c9a6b55e0ec80691f119fa49384b6a3912c9c3a116f94d3089",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-actions.test.js",
+              "contentHash": "sha256:65b607ec0c103904ebe7825de009c9a69c4686171732b09687350948f4fcac66",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/request-revision.test.js test/request-revision-ui.test.js test/console-actions.test.js test/console-acceptance.test.js test/console-server.test.js (passed)",
+              "workId": "PF-0063",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Core rejects later stages, started or reset checkpoints and held/closed/DONE work. UI hides unavailable actions; API rechecks state on every save and invalid input changes nothing. Tests cover stale saves, cancellation and loading errors.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/behavior/routing.js",
+              "contentHash": "sha256:92baeff59b71c2916893c7e0a13af470064f3de7ba6bd2d18809725c017c3d8a",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:96ef16297bc6176d5443a7d470db14a4a5c1377b07bba9b4626b8a14e00a42cd",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/request-revision.test.js",
+              "contentHash": "sha256:d3d5a901c0686766cc63b68827fc3b38909cab7940571a7fc6d57f74124ff3f3",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/request-revision-ui.test.js",
+              "contentHash": "sha256:4c317c93e022b5c9a6b55e0ec80691f119fa49384b6a3912c9c3a116f94d3089",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-actions.test.js",
+              "contentHash": "sha256:65b607ec0c103904ebe7825de009c9a69c4686171732b09687350948f4fcac66",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/request-revision.test.js test/request-revision-ui.test.js test/console-actions.test.js test/console-acceptance.test.js test/console-server.test.js (passed)",
+              "workId": "PF-0063",
+              "verificationRunId": "V-004"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-07T20:50:48.133Z"
+}

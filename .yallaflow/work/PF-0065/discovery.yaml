@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "testing",
+      "summary": "The fix was verified by a vm harness over the shipped console code and the full suite, not in a browser against a live Claude Code session.",
+      "reason": "The running console predates the fix; a browser re-check needs the console restarted by the owner.",
+      "recordedAt": "2026-11-07T21:49:31.655Z"
+    }
+  ],
+  "updatedAt": "2026-11-07T21:49:31.655Z"
+}

@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "Allow the user to edit a request in the console while work has not started.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T20:41:36.537Z",
+      "updatedAt": "2026-11-07T20:41:36.537Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "Pending and classified INTAKE requests with no started checkpoints expose Edit request, prefilled with the full request, and save revisions with history while preserving attachments.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T20:41:36.537Z",
+      "updatedAt": "2026-11-07T20:41:36.537Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "Editing is unavailable and rejected once work starts, and on held, closed or completed work; invalid input changes nothing.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T20:41:36.537Z",
+      "updatedAt": "2026-11-07T20:41:36.537Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-07T20:41:36.537Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-07T20:41:36.537Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-07T20:41:36.537Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-07T20:41:36.537Z"
+}

@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --check resources/console/app.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--check",
+        "resources/console/app.js"
+      ],
+      "displayCommand": "node --check resources/console/app.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T20:54:58.246Z",
+      "finishedAt": "2026-11-07T20:54:58.277Z",
+      "verifiedAt": "2026-11-07T20:54:58.277Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/console-acceptance.test.js test/request-revision-ui.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/console-acceptance.test.js",
+        "test/request-revision-ui.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/console-acceptance.test.js test/request-revision-ui.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T20:54:58.400Z",
+      "finishedAt": "2026-11-07T20:55:01.833Z",
+      "verifiedAt": "2026-11-07T20:55:01.833Z",
+      "log": "V-002-verification.log"
+    }
+  ]
+}

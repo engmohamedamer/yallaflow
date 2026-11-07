@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-07T21:43:59.185Z",
+      "completedAt": "2026-11-07T21:44:18.881Z",
+      "summary": "Send path: agentAction (resources/console/app.js:509) posts, catches the error into agentError, then awaits loadAgent (:323), which sets agentError = null on a successful reload, before renderAgent. Server refuses Claude messages with MODE_UNKNOWN until a hook reports permission_mode (src/agents/bridge.js:488-490). Panel state (app.js ~489) shows Ready for a connected Claude session even when s.mode is null. Code dates from v1.3.0 (b700b2c/17e3e34)."
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-07T21:44:28.472Z",
+      "completedAt": "2026-11-07T21:44:28.472Z",
+      "summary": "Symptom (owner, real session 2026-11-07): after a console restart, sending to a connected Claude Code did nothing and showed no error. Reproduced in isolation (vm harness over the shipped agentAction+loadAgent with agentPost rejecting MODE_UNKNOWN): agentError is null after the failed send. Root cause: loadAgent clears agentError on success, erasing the send error before render. Contributing UX cause: the panel reports Ready while Claude's permission mode is unknown, so the send box looks usable. Consistent with the session: once the first hook reported auto mode, sends worked.",
+      "evidence": [
+        "resources/console/app.js:509-515",
+        "resources/console/app.js:323-326",
+        "src/agents/bridge.js:488-490",
+        "runtime:vm harness over shipped app.js — agentError null after a rejected send"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-07T21:45:56.440Z",
+      "completedAt": "2026-11-07T21:45:56.440Z",
+      "summary": "resources/console/app.js: agentAction keeps a failed action's error across the loadAgent reload and returns success; the send handler puts the typed message back on failure; a connected Claude session with no reported permission mode shows 'Waiting for the permission mode' with an explanation and disables Send. test/console-agent-errors.test.js (6 tests, vm harness over the shipped code). CHANGELOG 1.4.0 Fixed."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T21:49:31.738Z",
+      "completedAt": "2026-11-07T21:49:31.738Z",
+      "summary": "V-001 npm run check passed 960/960 (6 new tests in test/console-agent-errors.test.js). Reproduction harness on the pre-fix code showed agentError null after a refused send; the new tests assert it survives, Send is disabled with an explanation while Claude's mode is unknown (EN/AR), and the message is restored on failure.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-07T21:49:31.738Z"
+}

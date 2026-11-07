@@ -4,14 +4,14 @@
   "scope": "bounded",
   "routingStatus": "routed",
   "rawRequest": "Allow editing a console work request while it has not started",
-  "status": "DISCOVERY",
+  "status": "DONE",
   "readOnly": false,
   "knowledgePolicy": {
     "version": 1,
     "reviewRequired": true
   },
   "createdAt": "2026-11-07T20:39:48.304Z",
-  "updatedAt": "2026-11-07T20:40:17.756Z",
+  "updatedAt": "2026-11-07T20:50:54.122Z",
   "title": "Allow editing a console work request while it has not started",
   "routingConfidence": "high",
   "routingReason": "Explicitly classified by the user: `yallaflow feature --scope bounded`.",
@@ -44,6 +44,17 @@
       "linkedAt": "2026-11-07T20:40:17.013Z",
       "workStatusAtLink": "INTAKE",
       "relationship": "work-input"
+    }
+  ],
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-07T20:50:54.122Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004"
+      ]
     }
   ]
 }

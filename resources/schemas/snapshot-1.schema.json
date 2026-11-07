@@ -57,6 +57,7 @@
         "scope": { "type": ["string", "null"] },
         "title": { "type": "string" },
         "routing": { "enum": ["pending", "routed"] },
+        "requestEditable": { "type": "boolean", "description": "Whether Core permits request revision before work starts." },
         "stage": { "type": ["string", "null"] },
         "parent": { "type": ["string", "null"] },
         "state": { "enum": ["new", "active", "you", "fail", "paused", "done", "held", "closed"], "description": "held and closed (lifecycle status, separate from the stage) were added in 1.4.0." },

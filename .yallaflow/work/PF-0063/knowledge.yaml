@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "business-rule",
+      "source": "implementation-runtime",
+      "summary": "Request revisions are allowed only before work starts: pending routing or INTAKE with no checkpoint activity or revision history in the progress ledger. Core preserves request history, sources, classified title and workflow; held, closed and DONE work cannot be edited. Snapshot and work detail expose requestEditable from the same Core policy; console editing loads full raw text and saves through request revise.",
+      "evidence": [
+        "src/behavior/routing.js",
+        "src/flow/snapshot.js",
+        "resources/console/app.js",
+        "verification:V-004"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-07T20:50:48.528Z",
+      "factId": "CTX-0120",
+      "promotedAt": "2026-11-07T20:50:53.879Z",
+      "target": "context/business-rules.md"
+    }
+  ],
+  "updatedAt": "2026-11-07T20:50:53.879Z",
+  "reviewedAt": "2026-11-07T20:50:53.879Z"
+}

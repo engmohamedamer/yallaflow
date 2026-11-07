@@ -5,9 +5,11 @@ import { mkdtemp, readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
 import path from 'node:path';
-import { createPendingIntake, reviseRequest, routeWorkItem } from '../src/behavior/routing.js';
+import { canReviseRequest, createPendingIntake, reviseRequest, routeWorkItem } from '../src/behavior/routing.js';
 import { initWorkspace, listWork, workspacePath } from '../src/core/workspace.js';
 import { readYaml } from '../src/core/yaml.js';
+import { checkpointWork, reviseCheckpoint } from '../src/core/progress.js';
+import { run, workspaceHash } from '../test-support/optional.js';
 
 const cli = fileURLToPath(new URL('../src/cli.js', import.meta.url));
 
@@ -16,6 +18,10 @@ async function freshRoot() {
   await initWorkspace(root, 'demo', 'greenfield');
   return root;
 }
+
+test('completed work is never editable, even with an empty progress ledger', () => {
+  assert.equal(canReviseRequest({ status: 'DONE', routingStatus: 'routed' }, { ledger: { skills: {}, history: [] } }), false);
+});
 
 test('a pending raw request can be revised through a supported operation', async () => {
   const root = await freshRoot();
@@ -60,16 +66,55 @@ test('revision history is preserved and auditable', async () => {
   assert.match(work, /Second correction/);
 });
 
-test('routed work cannot have its original request rewritten through this operation', async () => {
+test('classified INTAKE can be revised without changing its title, classification or focus', async () => {
   const root = await freshRoot();
   const intake = await createPendingIntake(root, 'Add refund summary to revenue dashboard');
   const meta = await routeWorkItem(root, intake.id, {
     work_type: 'feature', scope: 'bounded', confidence: 'high', reason: 'Clear scope.'
   });
-  await assert.rejects(
-    () => reviseRequest(root, meta.id, { text: 'Different text', reason: 'Trying to rewrite routed work.' }),
-    /already routed/
-  );
+  const stateFile = path.join(workspacePath(root), 'state', 'current.yaml');
+  const before = await readFile(stateFile, 'utf8');
+  const revised = await reviseRequest(root, meta.id, { text: 'Different text', reason: 'Clarify before starting.' });
+  assert.equal(revised.rawRequest, 'Different text');
+  for (const key of ['title', 'type', 'scope', 'status', 'routingStatus', 'routedAt']) assert.equal(revised[key], meta[key]);
+  assert.equal(revised.requestHistory[0].previousRequest, meta.rawRequest);
+  assert.equal(await readFile(stateFile, 'utf8'), before);
+});
+
+test('started checkpoints, including reset checkpoints, prevent revision while still in INTAKE', async () => {
+  const root = await freshRoot();
+  const intake = await createPendingIntake(root, 'Original');
+  const meta = await routeWorkItem(root, intake.id, { work_type: 'feature', scope: 'bounded', confidence: 'high', reason: 'Clear scope.' });
+  await checkpointWork(root, meta.id, { skillId: 'context-discovery', status: 'in_progress' });
+  for (const reset of [false, true]) {
+    if (reset) await reviseCheckpoint(root, meta.id, { skillId: 'context-discovery', status: 'pending', reason: 'Restart discovery.' });
+    const before = await workspaceHash(root);
+    await assert.rejects(() => reviseRequest(root, meta.id, { text: 'Changed', reason: 'Too late.' }), /already started/);
+    assert.equal(await workspaceHash(root), before);
+  }
+});
+
+test('leaving INTAKE prevents revision even before any checkpoint is recorded', async () => {
+  const root = await freshRoot();
+  const intake = await createPendingIntake(root, 'Original');
+  await routeWorkItem(root, intake.id, { work_type: 'feature', scope: 'bounded', confidence: 'high', reason: 'Clear scope.' });
+  run(root, ['advance', intake.id]);
+  const before = await workspaceHash(root);
+  const result = run(root, ['request', 'revise', intake.id, '--text', 'Changed', '--reason', 'Too late.'], { ok: false });
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /already started/);
+  assert.equal(await workspaceHash(root), before);
+});
+
+test('held and closed pending requests reject direct Core revisions without writes', async () => {
+  const root = await freshRoot();
+  const intake = await createPendingIntake(root, 'Original');
+  for (const action of ['hold', 'close']) {
+    run(root, ['work', action, intake.id, '--reason', 'Waiting.', '--accept-minimum-version', '1.4.0', ...(action === 'close' ? ['--outcome', 'cancelled'] : [])]);
+    const before = await workspaceHash(root);
+    await assert.rejects(() => reviseRequest(root, intake.id, { text: 'Changed', reason: 'Too late.' }), /not allowed/);
+    assert.equal(await workspaceHash(root), before);
+  }
 });
 
 test('a file-backed source remains byte-identical after a request correction', async () => {
@@ -84,6 +129,8 @@ test('a file-backed source remains byte-identical after a request correction', a
   const before = await readFile(sourceFile, 'utf8');
 
   await reviseRequest(root, item.id, { text: 'Corrected title/summary', reason: 'Title was wrong.' });
+  await routeWorkItem(root, item.id, { work_type: 'feature', scope: 'bounded', confidence: 'high', reason: 'Clear scope.' });
+  await reviseRequest(root, item.id, { text: 'Clarified after classification', reason: 'Not started yet.' });
 
   const after = await readFile(sourceFile, 'utf8');
   assert.equal(after, before);

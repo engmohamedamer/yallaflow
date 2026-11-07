@@ -284,20 +284,32 @@ export async function addSourceToWork(root, workId, source, now = new Date().toI
   return meta;
 }
 
-// GAP-CLI-002: the only supported way to correct a pending/unrouted work item's raw
-// request — never hand-editing meta.yaml. Only valid before routing; once routed, the
-// original intake is durable history, not a mutable field. History is preserved, and
-// file-backed sources (if any) are never touched — only the raw request text changes.
+// Shared by revision and the read model. Classification alone does not start work;
+// leaving INTAKE or recording checkpoint activity does. History also prevents a
+// checkpoint reset from making previously started work editable again.
+export function canReviseRequest(meta, progress = null) {
+  if (['on_hold', 'closed'].includes(meta.lifecycle?.state) || meta.status === 'DONE') return false;
+  if (meta.routingStatus === 'pending') return true;
+  if (meta.status !== 'INTAKE' || !progress) return false;
+  return !progress.ledger.history?.length && Object.values(progress.ledger.skills).every(
+    (checkpoint) => checkpoint.status === 'pending' && !checkpoint.startedAt && !checkpoint.completedAt
+  );
+}
+
+// The canonical, audited correction path before work starts. Sources, the classified
+// title and workflow stay intact; earlier request versions remain durable history.
 export async function reviseRequest(root, workId, input, now = new Date().toISOString()) {
   const workDir = path.join(workspacePath(root), 'work', workId);
   const metaFile = path.join(workDir, 'meta.yaml');
   if (!await exists(metaFile)) throw new Error(`Work item ${workId} was not found.`);
   const meta = await readYaml(metaFile);
-  if (meta.routingStatus !== 'pending') {
-    throw new Error(`${workId} is already routed; its original request cannot be rewritten through this operation.`);
+  assertProgressAllowed(meta, 'revising its request');
+  const progress = meta.routingStatus === 'pending' ? null : await loadWorkProgress(root, meta);
+  if (!canReviseRequest(meta, progress)) {
+    throw new Error(`${workId} has already started; its request can only be edited before work starts (pending or untouched INTAKE).`);
   }
   if (!isNonEmptyString(input.text)) throw new Error('--text must be a non-empty replacement request.');
-  if (!isNonEmptyString(input.reason)) throw new Error('Revising a pending request requires a non-empty --reason.');
+  if (!isNonEmptyString(input.reason)) throw new Error('Revising a request requires a non-empty --reason.');
 
   const previousRequest = meta.rawRequest;
   const nextRequest = input.text.trim();

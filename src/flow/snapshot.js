@@ -5,6 +5,7 @@
 // Fields are only ever added within a schema major version (SemVer for the contract):
 // yallaflow.snapshot/1 and yallaflow.work/1. Schemas: resources/schemas/.
 import { loadReviews } from '../reviews/store.js';
+import { canReviseRequest } from '../behavior/routing.js';
 import { lifecycleLabel } from '../core/lifecycle.js';
 import path from 'node:path';
 import { readdir } from 'node:fs/promises';
@@ -124,6 +125,7 @@ async function collectItem(root, meta, state, metas = null) {
     scope: meta.scope ?? meta.complexity ?? null,
     title: meta.title ?? meta.titleHint ?? meta.rawRequest ?? meta.id,
     routing: meta.routingStatus ?? 'routed',
+    requestEditable: canReviseRequest(meta),
     stage,
     parent: meta.parent ?? null,
     sourceCount: meta.sources?.length ?? 0,
@@ -144,6 +146,7 @@ async function collectItem(root, meta, state, metas = null) {
   }
 
   const progress = await loadWorkProgress(root, meta);
+  base.requestEditable = canReviseRequest(meta, progress);
   const runs = await listVerificationRuns(root, meta.id);
   const latest = runs.at(-1) ?? null;
   const questions = await loadWorkQuestions(root, meta);

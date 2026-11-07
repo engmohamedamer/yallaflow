@@ -181,10 +181,11 @@ Unless the console was started with `--read-only`, a work item's page has an act
 | Put on hold… / Resume | `yallaflow work hold <id> --reason …` / `yallaflow work resume <id>` |
 | Close without delivery… | `yallaflow work close <id> --outcome … --reason … [--by …]` |
 | Reopen… | `yallaflow reopen <id> [--to …] --reason …` (DONE work to a stage; closed work at its preserved stage) |
-| Edit request… | `yallaflow request revise <id> --text … --reason …` (only before the request is classified) |
+| Edit request… | `yallaflow request revise <id> --text … --reason …` (before work starts: unclassified or still in INTAKE with no checkpoint activity) |
 | Answer… | `yallaflow question answer <id> --id Q-### --answer …` |
 
 - **Blocked actions explain themselves.** When Core refuses, for example because a checkpoint is pending, the item is on hold, or a gate is waiting, the console shows Core's own reason and the next valid step. It never decides a move itself.
+- **Edit request loads the full text.** Save the revised text with a reason, or cancel to leave it unchanged. Earlier versions and attachments are preserved; the classified title and workflow stay the same. If work starts while the editor is open, saving is refused.
 - **The first hold or close** in a project shows Core's warning that the project will then require YallaFlow 1.4.0 or newer. It goes ahead only after you tick the confirmation.
 - **Drag and drop on the Flow proposes a move.**
   - **On the next station:** the card runs **Advance**, one Core step, and Core may refuse with its reason.

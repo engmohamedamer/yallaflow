@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-07T20:41:05.299Z",
+      "completedAt": "2026-11-07T20:41:05.299Z",
+      "summary": "Console itemActions and reviseRequest only allow pending routing; classified INTAKE requests lack editing despite no work started. Existing canonical revise action preserves request history and sources. Will extend eligibility to INTAKE with no started checkpoints, preserve lifecycle guard, and prefill from full raw request.",
+      "evidence": [
+        "src/behavior/routing.js",
+        "resources/console/app.js",
+        "test/request-revision.test.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T20:41:36.666Z",
+      "completedAt": "2026-11-07T20:41:36.666Z",
+      "summary": "Not started means pending intake or INTAKE without checkpoint activity. Reuse the existing audited revision dialog; preserve classification and sources, load full request instead of display title, and reject edits once work starts."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-07T20:50:06.166Z",
+      "completedAt": "2026-11-07T20:50:06.166Z",
+      "summary": "Added shared request-edit eligibility for pending and untouched INTAKE work to Core and snapshot; console Edit action loads full request up to create limit, keeps audit history and attachments, and refuses saves after work starts. Added CLI/API/UI regression coverage and updated CLI/console docs.",
+      "evidence": [
+        "src/behavior/routing.js",
+        "resources/console/app.js",
+        "test/request-revision.test.js",
+        "test/console-actions.test.js",
+        "test/request-revision-ui.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T20:50:24.602Z",
+      "completedAt": "2026-11-07T20:50:24.602Z",
+      "summary": "V-004 passed 34 Core, CLI, API, action-controller and console regression tests. V-002 passed browser bundle syntax check; git diff --check clean. UI controller tested with a DOM harness, not a live browser.",
+      "evidence": [
+        "verification:V-004",
+        "verification:V-002"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-07T20:50:48.395Z",
+      "completedAt": "2026-11-07T20:50:48.395Z",
+      "summary": "Both acceptance criteria satisfied in CV-001 with V-004 and implementation evidence; no unrequested behavior."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-07T20:50:48.395Z"
+}

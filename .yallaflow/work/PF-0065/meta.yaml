@@ -1,0 +1,43 @@
+{
+  "id": "PF-0065",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console agent chat hides send errors (agentAction clears the error on reload) and gives no sign that Claude Code has not reported its permission mode yet",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-07T21:43:49.662Z",
+  "updatedAt": "2026-11-07T21:49:35.569Z",
+  "title": "Console agent chat hides send errors (agentAction clears the error on reload) and gives no sign that Claude Code has not reported its permission mode yet",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-11-07T21:43:49.682Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-07T21:49:35.569Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}
