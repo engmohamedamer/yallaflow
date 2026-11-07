@@ -1,0 +1,46 @@
+{
+  "id": "PF-0051",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "1.4.0 acceptance candidate: final integration and stabilization — manual acceptance guide with install and test instructions, release blockers and residual risks, roadmap/CHANGELOG integration status, final full and browser regression",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-07T10:36:34.604Z",
+  "updatedAt": "2026-11-07T10:44:46.662Z",
+  "title": "1.4.0 acceptance candidate: final integration and stabilization — manual acceptance guide with install and test instructions, release blockers and residual risks, roadmap/CHANGELOG integration status, final full and browser regression",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-07T10:36:34.616Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-07T10:44:46.662Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002"
+      ]
+    }
+  ]
+}
