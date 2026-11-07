@@ -1311,6 +1311,8 @@
     if (!x) return;
     if (folder.mode === 'parent') {
       wizForm().parent = x.path;
+      const typed = document.querySelector('[data-wiz-step="1"] input[name="parent"]');
+      if (typed) { typed.value = x.path; typed.defaultValue = x.path; }
       document.getElementById('folderdlg')?.close();
       folder = null; render(); return;
     }
@@ -1571,7 +1573,7 @@
     const views = { new: viewNew, setup: viewSetup, overview: viewOverview, item: () => viewItem(r.id), lines: viewLines, team: viewTeam, insights: viewInsights, projects: viewProjects, map: viewMap };
     const body = !snap ? `<p class="muted" style="margin-top:40px;text-align:center">${error ? '' : A('بيحمّل…', 'Loading…')}</p>` : (views[r.v] ?? viewMap)();
     // Forms marked data-keep survive a redraw: typed values and focus are carried over (PF-0057).
-    const kept = [...document.querySelectorAll('form[data-keep]')].map((form) => ({ key: form.dataset.keep, values: [...form.elements].filter((el) => el.name && el.type !== 'file').map((el) => [el.name, el.type === 'checkbox' || el.type === 'radio' ? (el.type === 'radio' ? (el.checked ? el.value : null) : el.checked) : el.value, el.type]), focus: form.contains(document.activeElement) ? document.activeElement.name : null, caret: document.activeElement?.selectionStart ?? null }));
+    const kept = [...document.querySelectorAll('form[data-keep]')].map((form) => ({ key: form.dataset.keep, values: [...form.elements].filter((el) => el.name && el.type !== 'file' && (el.type === 'checkbox' || el.type === 'radio' ? el.checked !== el.defaultChecked : el.value !== el.defaultValue)).map((el) => [el.name, el.type === 'checkbox' || el.type === 'radio' ? (el.type === 'radio' ? (el.checked ? el.value : null) : el.checked) : el.value, el.type]), focus: form.contains(document.activeElement) ? document.activeElement.name : null, caret: document.activeElement?.selectionStart ?? null }));
     document.getElementById('app').innerHTML = topbar(r) + `<main>${banner()}${snap && ['map', 'lines'].includes(r.v) ? understandingStrip() : ''}${body}</main>`;
     for (const k of kept) {
       const form = document.querySelector(`form[data-keep="${CSS.escape(k.key)}"]`);
@@ -1649,10 +1651,11 @@
 
   async function loadForView() {
     const v = route().v;
+    if (!pid && !['new', 'projects'].includes(v)) return;
     if (v === 'item') { if (agentsOn) await loadAgent(); else await loadAgentInfo(); }
     if (v === 'team') await loadTeam();
     else if (v === 'projects') await loadOverview();
-    else if (v === 'overview' || ((v === 'map' || v === 'lines') && projectOverview?.pid !== pid)) { await loadProjectOverview(); if (v === 'overview' && projectOverview?.data?.project?.kind === 'greenfield') { await loadRuntime(); if (!agentsOn) await loadAgentInfo(); } }
+    else if (pid && (v === 'overview' || ((v === 'map' || v === 'lines') && projectOverview?.pid !== pid))) { await loadProjectOverview(); if (v === 'overview' && projectOverview?.data?.project?.kind === 'greenfield') { await loadRuntime(); if (!agentsOn) await loadAgentInfo(); } }
     else if (v === 'setup') await loadRuntime();
     else if (v === 'new') await loadWizard();
     syncRuntimePolling();
