@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "test -f docs/release-1.4-integration.md && grep -q 'release-1.4-integration.md' docs/roadmap.md && grep -c 'Restart' docs/roadmap.md && git diff --quiet HEAD -- .yallaflow/work/PF-0041 .yallaflow/work/PF-0042 .yallaflow/work/PF-0043 && git -C /home/engamer/Amasi/YallaFlow diff --quiet HEAD -- .yallaflow/work/PF-0041 && echo 'no collided records touched on either branch'",
+      "executionMode": "shell",
+      "executable": "test -f docs/release-1.4-integration.md && grep -q 'release-1.4-integration.md' docs/roadmap.md && grep -c 'Restart' docs/roadmap.md && git diff --quiet HEAD -- .yallaflow/work/PF-0041 .yallaflow/work/PF-0042 .yallaflow/work/PF-0043 && git -C /home/engamer/Amasi/YallaFlow diff --quiet HEAD -- .yallaflow/work/PF-0041 && echo 'no collided records touched on either branch'",
+      "args": [],
+      "displayCommand": "test -f docs/release-1.4-integration.md && grep -q 'release-1.4-integration.md' docs/roadmap.md && grep -c 'Restart' docs/roadmap.md && git diff --quiet HEAD -- .yallaflow/work/PF-0041 .yallaflow/work/PF-0042 .yallaflow/work/PF-0043 && git -C /home/engamer/Amasi/YallaFlow diff --quiet HEAD -- .yallaflow/work/PF-0041 && echo 'no collided records touched on either branch'",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T02:11:40.405Z",
+      "finishedAt": "2026-11-07T02:11:40.414Z",
+      "verifiedAt": "2026-11-07T02:11:40.414Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

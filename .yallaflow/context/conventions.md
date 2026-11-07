@@ -187,4 +187,17 @@
   - src/reviews/store.js (repository @ 3184054)
   - npm run check (passed) (runtime, PF-0043 V-001)
 
+<!-- yallaflow-fact:CTX-0107 -->
+### CTX-0107 — This repository's main and feature/workspace-1.4 branches allocated YallaFlow work IDs independently, so PF-0041..PF-0043 exist on both with different content. Never merge .yallaflow/work between them with Git: carry code fixes narrowly and keep the merge into main blocked until a verified adopt/alias mechanism exists (docs/release-1.4-integration.md).
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0045
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-07T02:12:02.332Z
+- **Verified:** 2026-11-07T02:12:02.332Z (commit 17e3e34)
+- **Evidence:**
+  - docs/release-1.4-integration.md (repository @ 17e3e34)
+
 <!-- yallaflow-context:end -->

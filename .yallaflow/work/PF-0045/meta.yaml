@@ -1,0 +1,57 @@
+{
+  "id": "PF-0045",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Document the main/1.4 code-integration and work-ID reconciliation strategy (PF-0041..PF-0043 collisions) and update the roadmap and delivery plan so Overview, Runtime Manager (start/stop/restart/logs) and New Project Wizard all ship in 1.4.0",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-07T02:10:35.580Z",
+  "updatedAt": "2026-11-07T02:12:02.636Z",
+  "title": "Document the main/1.4 code-integration and work-ID reconciliation strategy (PF-0041..PF-0043 collisions) and update the roadmap and delivery plan so Overview, Runtime Manager (start/stop/restart/logs) and New Project Wizard all ship in 1.4.0",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-07T02:10:35.594Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0033",
+      "type": "file",
+      "name": "owner-1.4-complete-scope.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-07T02:10:48.773Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ],
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-07T02:12:02.636Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}
