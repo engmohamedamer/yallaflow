@@ -1,0 +1,142 @@
+TAP version 13
+# Subtest: runtime inputs: package/composer scripts revoke trust; metadata and application code do not
+ok 1 - runtime inputs: package/composer scripts revoke trust; metadata and application code do not
+  ---
+  duration_ms: 32.258594
+  type: 'test'
+  ...
+# Subtest: runtime inputs: direct shell, interpreter flags and extensionless shebang scripts are bound
+ok 2 - runtime inputs: direct shell, interpreter flags and extensionless shebang scripts are bound
+  ---
+  duration_ms: 15.620682
+  type: 'test'
+  ...
+# Subtest: runtime inputs: default and explicitly selected Compose files and project directories are bound
+ok 3 - runtime inputs: default and explicitly selected Compose files and project directories are bound
+  ---
+  duration_ms: 16.000065
+  type: 'test'
+  ...
+# Subtest: runtime inputs: selected package directories and ancestors are included
+ok 4 - runtime inputs: selected package directories and ancestors are included
+  ---
+  duration_ms: 18.798118
+  type: 'test'
+  ...
+# Subtest: runtime inputs: file removal changes fingerprints; unsafe and malformed files fail closed
+ok 5 - runtime inputs: file removal changes fingerprints; unsafe and malformed files fail closed
+  ---
+  duration_ms: 5.462673
+  type: 'test'
+  ...
+# Subtest: profiles: argv only, repository-relative cwd, names not values; secrets and unknown fields refused without echo
+ok 6 - profiles: argv only, repository-relative cwd, names not values; secrets and unknown fields refused without echo
+  ---
+  duration_ms: 1491.359517
+  type: 'test'
+  ...
+# Subtest: trust: required before start, personal, and renewed after any material change (shared or override)
+ok 7 - trust: required before start, personal, and renewed after any material change (shared or override)
+  ---
+  duration_ms: 1897.056013
+  type: 'test'
+  ...
+# Subtest: start/stop/logs: readiness, minimal environment, redacted logs, graceful stop; nothing auto-starts
+ok 8 - start/stop/logs: readiness, minimal environment, redacted logs, graceful stop; nothing auto-starts
+  ---
+  duration_ms: 3312.94685
+  type: 'test'
+  ...
+# Subtest: a port held by someone else refuses start and that process is never touched
+ok 9 - a port held by someone else refuses start and that process is never touched
+  ---
+  duration_ms: 1154.494679
+  type: 'test'
+  ...
+# Subtest: crash recovery: a service killed outside YallaFlow reads failed; a reused PID is unmanaged and never signalled
+ok 10 - crash recovery: a service killed outside YallaFlow reads failed; a reused PID is unmanaged and never signalled
+  ---
+  duration_ms: 3243.344498
+  type: 'test'
+  ...
+# Subtest: concurrency: five simultaneous starts start one process; restart replaces it; stop --all stops owned services only
+ok 11 - concurrency: five simultaneous starts start one process; restart replaces it; stop --all stops owned services only
+  ---
+  duration_ms: 3929.165454
+  type: 'test'
+  ...
+# Subtest: start failures are reported with the log tail; a cwd escaping through a symlink is refused
+ok 12 - start failures are reported with the log tail; a cwd escaping through a symlink is refused
+  ---
+  duration_ms: 2594.593231
+  type: 'test'
+  ...
+# Subtest: suggestions come from repository evidence and never run
+ok 13 - suggestions come from repository evidence and never run
+  ---
+  duration_ms: 759.388483
+  type: 'test'
+  ...
+# Subtest: console: runtime routes are token/Origin/JSON guarded, trust needs the typed id, read-only refuses
+ok 14 - console: runtime routes are token/Origin/JSON guarded, trust needs the typed id, read-only refuses
+  ---
+  duration_ms: 2944.325232
+  type: 'test'
+  ...
+# Subtest: review: trust and run records planted inside the repository are ignored; trust needs the reviewed definition
+ok 15 - review: trust and run records planted inside the repository are ignored; trust needs the reviewed definition
+  ---
+  duration_ms: 1357.529914
+  type: 'test'
+  ...
+# Subtest: review: a run record whose process no longer leads its own group is unmanaged and never signalled
+ok 16 - review: a run record whose process no longer leads its own group is unmanaged and never signalled
+  ---
+  duration_ms: 1146.105505
+  type: 'test'
+  ...
+# Subtest: review: log symlinks and hard links are refused; reading logs never writes, truncates or rotates
+ok 17 - review: log symlinks and hard links are refused; reading logs never writes, truncates or rotates
+  ---
+  duration_ms: 1361.596023
+  type: 'test'
+  ...
+# Subtest: review: an untrusted dependency starts nothing; control and bidi characters are refused
+ok 18 - review: an untrusted dependency starts nothing; control and bidi characters are refused
+  ---
+  duration_ms: 1636.64605
+  type: 'test'
+  ...
+# Subtest: review: CLI trust is a human decision — refused when not interactive
+ok 19 - review: CLI trust is a human decision — refused when not interactive
+  ---
+  duration_ms: 788.287897
+  type: 'test'
+  ...
+# Subtest: review: a FIFO planted as the log never hangs reads
+ok 20 - review: a FIFO planted as the log never hangs reads
+  ---
+  duration_ms: 565.604996
+  type: 'test'
+  ...
+# Subtest: trust: script edits reject stale confirmation and start, while application edits retain trust
+ok 21 - trust: script edits reject stale confirmation and start, while application edits retain trust
+  ---
+  duration_ms: 2144.366768
+  type: 'test'
+  ...
+# Subtest: trust: a service changing its inputs during startup stays recorded and stoppable
+ok 22 - trust: a service changing its inputs during startup stays recorded and stoppable
+  ---
+  duration_ms: 2386.573241
+  type: 'test'
+  ...
+1..22
+# tests 22
+# suites 0
+# pass 22
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 32847.649155

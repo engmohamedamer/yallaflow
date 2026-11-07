@@ -16,6 +16,7 @@ import { workspacePath } from '../core/workspace.js';
 import { containsSecret, isSecretKey } from '../security/redact.js';
 import { safeWriteFile } from '../agents/local-files.js';
 import { localRuntimeDir } from './local.js';
+import { executionInputs } from './inputs.js';
 
 export const RUNTIME_PROFILE_SCHEMA = 1;
 export const SERVICE_ID = /^[a-z][a-z0-9-]{0,31}$/;
@@ -189,10 +190,11 @@ function withDefaults(service) {
 
 // The material definition: everything that changes what runs, where, with which
 // environment names, ports, readiness and stop behaviour. Trust binds to its hash.
-export function definitionHash(service) {
+export async function definitionHash(root, service) {
   const material = {
     kind: service.kind, command: service.command, cwd: service.cwd, env: [...service.env].sort(), ports: [...service.ports].sort((a, b) => a - b),
-    ready: service.ready, stopSignal: service.stopSignal, stopTimeoutSeconds: service.stopTimeoutSeconds
+    ready: service.ready, stopSignal: service.stopSignal, stopTimeoutSeconds: service.stopTimeoutSeconds,
+    readyTimeoutSeconds: service.readyTimeoutSeconds, dependsOn: [...service.dependsOn].sort(), inputs: await executionInputs(root, service)
   };
   return `sha256:${createHash('sha256').update(JSON.stringify(material)).digest('hex')}`;
 }

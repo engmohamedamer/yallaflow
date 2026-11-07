@@ -10,6 +10,8 @@ Nothing yet.
 
 ## [1.4.0] - unreleased (in development) — Engineering workspace
 
+- Runtime trust now includes package/composer script definitions, directly executed shell scripts and selected Compose files; application code remains outside the fingerprint.
+
 ### Added
 - **Hold and resume work** (`yallaflow work hold|resume`).
   - A temporary hold keeps the stage, checkpoints, requirements and evidence.

@@ -236,9 +236,11 @@ test('start failures are reported with the log tail; a cwd escaping through a sy
   const outside = await mkdtemp(path.join(os.tmpdir(), 'yf-outside-'));
   await symlink(outside, path.join(root, 'escape'));
   assert.equal(run(root, ['runtime', 'add', 'esc', '--cwd', 'escape', '--', process.execPath, '-e', '1']).status, 0);
-  trust(root, 'esc');
+  assert.equal(service(root, 'esc').trust.trusted, false);
+  const unsafeTrust = run(root, ['runtime', 'trust', 'esc', '--expect', 'unsafe', '--json'], { YALLAFLOW_RUNTIME_VIA: 'console' });
+  assert.equal(json(unsafeTrust).error.code, 'RUNTIME_TRUST_INPUT');
   const escaped = run(root, ['runtime', 'start', 'esc', '--json']);
-  assert.match(json(escaped).error.message, /resolves outside the repository/);
+  assert.equal(json(escaped).error.code, 'RUNTIME_TRUST_INPUT');
 
   assert.equal(run(root, ['runtime', 'add', 'ghost', '--', 'definitely-not-a-real-executable-yf']).status, 0);
   trust(root, 'ghost');
@@ -428,4 +430,43 @@ test('review: a FIFO planted as the log never hangs reads', { skip: !SUPPORTED }
   assert.equal(result.signal, null, 'did not hang');
   assert.deepEqual(json(result).lines, []);
   assert.equal(service(root).state, 'stopped');
+});
+
+
+test('trust: script edits reject stale confirmation and start, while application edits retain trust', { skip: !SUPPORTED }, async () => {
+  const root = await project();
+  await writeFile(path.join(root, 'web/package.json'), '{"scripts":{"dev":"node server.js"}}');
+  assert.equal(run(root, ['runtime', 'add', 'web', '--cwd', 'web', '--', 'npm', 'run', 'dev']).status, 0);
+  trust(root, 'web');
+  const reviewedHash = service(root).definitionHash;
+  await writeFile(path.join(root, 'web/server.js'), '// application changed');
+  assert.equal(service(root).trust.trusted, true);
+  await writeFile(path.join(root, 'web/package.json'), '{"scripts":{"dev":"node changed.js"}}');
+  assert.equal(service(root).trust.trusted, false);
+  const stale = run(root, ['runtime', 'trust', 'web', '--expect', reviewedHash, '--json'], { YALLAFLOW_RUNTIME_VIA: 'console' });
+  assert.equal(json(stale).error.code, 'RUNTIME_TRUST_STALE');
+  assert.equal(json(run(root, ['runtime', 'start', 'web', '--json'])).error.code, 'RUNTIME_UNTRUSTED');
+  trust(root, 'web');
+  assert.equal(service(root).trust.trusted, true);
+});
+
+
+test('trust: a service changing its inputs during startup stays recorded and stoppable', { skip: !SUPPORTED }, async () => {
+  const root = await project();
+  await writeFile(path.join(root, 'web/package.json'), '{"scripts":{"dev":"node server.js"}}');
+  await writeFile(path.join(root, 'web/server.js'), "require('fs').writeFileSync('package.json','{invalid');setInterval(()=>{},1000);");
+  assert.equal(run(root, ['runtime', 'add', 'web', '--cwd', 'web', '--', process.execPath, 'server.js']).status, 0);
+  trust(root, 'web');
+  const started = run(root, ['runtime', 'start', 'web', '--json']);
+  assert.equal(started.status, 0, started.stdout + started.stderr);
+  const pid = json(started).pid;
+  try {
+    const current = service(root);
+    assert.equal(current.pid, pid);
+    assert.equal(current.trust.trusted, false);
+    assert.equal(current.stale, true);
+    const stopped = run(root, ['runtime', 'stop', 'web', '--json']);
+    assert.equal(stopped.status, 0, stopped.stdout + stopped.stderr);
+    assert.equal(alive(pid), false);
+  } finally { if (alive(pid)) process.kill(pid, 'SIGKILL'); }
 });

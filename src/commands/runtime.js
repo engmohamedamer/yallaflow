@@ -79,6 +79,7 @@ async function run(rest, json) {
     // terminal. A non-interactive caller (a script, or an agent's tool call) is refused.
     // This prevents accidental trust by automation; it is not a boundary against a process
     // that controls the whole user account.
+    const reviewedHash = values.expect ?? await definitionHash(root, service);
     const viaConsole = process.env.YALLAFLOW_RUNTIME_VIA === 'console' && values.expect;
     if (!viaConsole) {
       if (!process.stdin.isTTY) throw new RuntimeError('RUNTIME_TRUST_INTERACTIVE', `Trusting a command is a human decision: run \`yallaflow runtime trust ${service.id}\` in a terminal and type the service id, or use Trust in the console. It cannot be scripted.`);
@@ -86,12 +87,12 @@ async function run(rest, json) {
       const typed = await ask(`Type ${service.id} to trust it (anything else cancels): `);
       if (typed.trim() !== service.id) throw new RuntimeError('RUNTIME_TRUST_CANCELLED', 'Not trusted.');
     }
-    const record = await trustService(root, service, { expect: values.expect ?? null });
+    const record = await trustService(root, service, { expect: reviewedHash });
     return out(json, { ok: true, id: service.id, trustedAt: record.trustedAt }, [
       `Trusted ${service.id} for this checkout (personal, not shared):`,
       `  command: ${JSON.stringify(service.command)}`, `  cwd: ${service.cwd}`, `  env names: ${service.env.join(', ') || '(none)'}`, `  ports: ${service.ports.join(', ') || '(none)'}`,
-      `  definition: ${definitionHash(service)}`,
-      'Trust is personal (kept in your user config folder, not in the repository). Any change to these requires trusting it again. Trust covers this definition, not what the program or its scripts do: review package scripts and local scripts too. Nothing was started.'
+      `  definition: ${record.hash}`,
+      'Trust is personal (kept in your user config folder, not in the repository). Changes to the definition, package/composer script definitions, directly executed shell scripts or selected Compose files require trusting it again. Application code and indirect dependencies remain outside this fingerprint. Nothing was started.'
     ]);
   }
   if (action === 'start' || action === 'restart') {

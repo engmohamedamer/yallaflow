@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/runtime-inputs.test.js test/runtime.test.js test/network-guard.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/runtime-inputs.test.js",
+        "test/runtime.test.js",
+        "test/network-guard.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/runtime-inputs.test.js test/runtime.test.js test/network-guard.test.js",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-07T12:49:37.057Z",
+      "finishedAt": "2026-11-07T12:50:08.510Z",
+      "verifiedAt": "2026-11-07T12:50:08.510Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/runtime-inputs.test.js test/runtime.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/runtime-inputs.test.js",
+        "test/runtime.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/runtime-inputs.test.js test/runtime.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T15:44:48.863Z",
+      "finishedAt": "2026-11-07T15:45:21.748Z",
+      "verifiedAt": "2026-11-07T15:45:21.748Z",
+      "log": "V-002-verification.log"
+    },
+    {
+      "id": "V-003",
+      "command": "npm run check:syntax",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check:syntax"
+      ],
+      "displayCommand": "npm run check:syntax",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T15:45:38.557Z",
+      "finishedAt": "2026-11-07T15:45:45.536Z",
+      "verifiedAt": "2026-11-07T15:45:45.536Z",
+      "log": "V-003-verification.log"
+    }
+  ]
+}

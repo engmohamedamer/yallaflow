@@ -168,7 +168,8 @@ async function computeState(root, service, run) {
   }
   if (who === 'other') return { state: 'unknown', reason: `pid ${run.pid} is no longer the process YallaFlow started (its identity or process group changed); it is unmanaged and is never signalled.` };
   const state = await readiness(root, service, run);
-  return run.definitionHash !== definitionHash(service) ? { state, stale: true } : { state };
+  try { return run.definitionHash !== await definitionHash(root, service) ? { state, stale: true } : { state }; }
+  catch { return { state, stale: true }; } // input trust never blocks stopping an owned process
 }
 
 async function readiness(root, service, run) {
@@ -184,7 +185,10 @@ export async function runtimeStatus(root) {
   for (const service of profiles.services) {
     const run = await readRun(root, service.id);
     const state = await computeState(root, service, run);
-    const trust = await trustState(root, service);
+    let trust;
+    let hash = null;
+    try { hash = await definitionHash(root, service); trust = await trustState(root, service); }
+    catch (error) { trust = { trusted: false, reason: 'changed', error: error.message }; }
     const ports = [];
     for (const port of service.ports) ports.push({ port, listening: await portListening(port) });
     const ours = ['running', 'starting'].includes(state.state);
@@ -192,7 +196,7 @@ export async function runtimeStatus(root) {
       id: service.id, name: service.name, kind: service.kind, source: service.source, overridden: service.overridden,
       command: service.command, cwd: service.cwd, env: service.env, ports, ready: service.ready, dependsOn: service.dependsOn,
       stopSignal: service.stopSignal, stopTimeoutSeconds: service.stopTimeoutSeconds, readyTimeoutSeconds: service.readyTimeoutSeconds,
-      definitionHash: definitionHash(service),
+      definitionHash: hash,
       trust,
       ...state,
       pid: ours ? run.pid : null,
@@ -238,7 +242,7 @@ export async function startService(root, id, { startedBy = 'cli' } = {}) {
     const trust = await trustState(root, service);
     if (!trust.trusted) {
       const why = trust.reason === 'changed' ? 'its definition changed since you trusted it' : 'it has not been trusted in this checkout';
-      throw new RuntimeError('RUNTIME_UNTRUSTED', `Service ${service.id}${service.id === id ? '' : ` (a dependency of ${id})`} is not started: ${why}. Nothing was started. Review it, then run \`yallaflow runtime trust ${service.id}\`. ${reviewText(service)}`, { review: { id: service.id, definitionHash: definitionHash(service), command: service.command, cwd: service.cwd, env: service.env, ports: service.ports } });
+      throw new RuntimeError('RUNTIME_UNTRUSTED', `Service ${service.id}${service.id === id ? '' : ` (a dependency of ${id})`} is not started: ${why}. Nothing was started. Review it, then run \`yallaflow runtime trust ${service.id}\`. ${reviewText(service)}`, { review: { id: service.id, definitionHash: await definitionHash(root, service), command: service.command, cwd: service.cwd, env: service.env, ports: service.ports } });
     }
   }
   let result;
@@ -257,6 +261,9 @@ async function startOne(root, service, startedBy) {
       if (await portListening(port)) throw new RuntimeError('PORT_IN_USE', `Port ${port} on 127.0.0.1 is already in use by a process YallaFlow did not start; ${id} was not started and that process was not touched.`);
     }
     const cwd = await resolveServiceCwd(root, service);
+    const trusted = await trustState(root, service);
+    if (!trusted.trusted) throw new RuntimeError('RUNTIME_UNTRUSTED', `Service ${id} changed before start; review and trust it again.`);
+    const trustedHash = trusted.definitionHash;
     const log = await openServiceLog(root, id);
     const offset = (await log.stat()).size;
     const startedAt = new Date().toISOString();
@@ -270,11 +277,15 @@ async function startOne(root, service, startedBy) {
       throw new RuntimeError('RUNTIME_START_FAILED', `Service ${id} could not be started: ${error.code === 'ENOENT' ? `executable ${service.command[0]} was not found on PATH` : error.message}.`);
     }
     await log.close();
-    const record = { schemaVersion: 1, id, pid: child.pid, pgid: child.pid, startTime: processStartTime(child.pid), definitionHash: definitionHash(service), startedAt, startedBy, logOffset: offset };
+    const record = { schemaVersion: 1, id, pid: child.pid, pgid: child.pid, startTime: processStartTime(child.pid), definitionHash: trustedHash, startedAt, startedBy, logOffset: offset };
     let exited = null;
     child.once('exit', (code, signal) => { exited = { code, signal }; });
     child.unref();
-    await writeRun(root, record);
+    try { await writeRun(root, record); }
+    catch (error) {
+      if (ownership(record) === 'ours') signalGroup(record.pgid, 'SIGKILL');
+      throw error;
+    }
 
     // Always watch a short settle window for an immediate crash (a service without a
     // readiness check would otherwise read "running" before it fails), then readiness.

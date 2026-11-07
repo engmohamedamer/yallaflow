@@ -11974,7 +11974,70 @@
       ],
       "createdAt": "2026-11-07T12:36:02.578Z",
       "updatedAt": "2026-11-07T12:36:02.578Z"
+    },
+    {
+      "id": "CTX-0114",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Runtime trust includes hashes of package/composer script definitions, directly invoked local shell scripts and selected Compose files; the reviewed hash is rechecked inside the service lock before spawn and stored without post-spawn input reads. Unsafe inputs revoke trust but do not prevent stopping an owned process. Application code such as node server.js and indirect dependencies remain outside the fingerprint.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0053",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/runtime/inputs.js",
+          "contentHash": "sha256:c81b284bc80b2503f8669bc2da0e42201df7876ae3f9f70c97c19b5e8543885c",
+          "gitCommit": "2f86ec728498fc135fb5dc539d9864a2ba442595",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/runtime/trust.js",
+          "contentHash": "sha256:3a7171bc1193f369543ac57c6ebc9b9d86f2b7b4af7a859bad67ffce08bd03db",
+          "gitCommit": "2f86ec728498fc135fb5dc539d9864a2ba442595",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/runtime/supervisor.js",
+          "contentHash": "sha256:34325d5c89abc53ee6c9d2f21991bd7a9a20baf27fe46031cf1cca238291cb81",
+          "gitCommit": "2f86ec728498fc135fb5dc539d9864a2ba442595",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "docs/runtime.md",
+          "contentHash": "sha256:d6ceb64999534af83394de000a314986e2218c7e9aee56172317f60588ad24e7",
+          "gitCommit": "2f86ec728498fc135fb5dc539d9864a2ba442595",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/runtime.test.js",
+          "contentHash": "sha256:f8c438b5a00509bff02d568c3692f9af05dc97e5e4a8a6d3b7db05cb2531dcb7",
+          "gitCommit": "2f86ec728498fc135fb5dc539d9864a2ba442595",
+          "workingTree": "modified"
+        }
+      ],
+      "verifiedAt": "2026-11-07T15:45:40.420Z",
+      "verifiedAtCommit": "2f86ec728498fc135fb5dc539d9864a2ba442595",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-07T15:45:40.420Z",
+          "workId": "PF-0053",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-07T15:45:40.420Z",
+      "updatedAt": "2026-11-07T15:45:40.420Z"
     }
   ],
-  "updatedAt": "2026-11-07T12:36:02.578Z"
+  "updatedAt": "2026-11-07T15:45:40.420Z"
 }

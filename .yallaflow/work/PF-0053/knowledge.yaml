@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Runtime trust includes hashes of package/composer script definitions, directly invoked local shell scripts and selected Compose files; the reviewed hash is rechecked inside the service lock before spawn and stored without post-spawn input reads. Unsafe inputs revoke trust but do not prevent stopping an owned process. Application code such as node server.js and indirect dependencies remain outside the fingerprint.",
+      "evidence": [
+        "src/runtime/inputs.js",
+        "src/runtime/trust.js",
+        "src/runtime/supervisor.js",
+        "docs/runtime.md",
+        "test/runtime.test.js"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-07T15:45:40.201Z",
+      "factId": "CTX-0114",
+      "promotedAt": "2026-11-07T15:45:40.420Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-07T15:45:40.420Z",
+  "reviewedAt": "2026-11-07T15:45:40.420Z"
+}

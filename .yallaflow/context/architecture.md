@@ -609,4 +609,21 @@ print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_commo
   - src/runtime/supervisor.js (repository @ 24c8adc)
   - docs/runtime.md (repository @ 24c8adc)
 
+<!-- yallaflow-fact:CTX-0114 -->
+### CTX-0114 — Runtime trust includes hashes of package/composer script definitions, directly invoked local shell scripts and selected Compose files; the reviewed hash is rechecked inside the service lock before spawn and stored without post-spawn input reads. Unsafe inputs revoke trust but do not prevent stopping an owned process. Application code such as node server.js and indirect dependencies remain outside the fingerprint.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0053
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-07T15:45:40.420Z
+- **Verified:** 2026-11-07T15:45:40.420Z (commit 2f86ec7)
+- **Evidence:**
+  - src/runtime/inputs.js (repository @ 2f86ec7)
+  - src/runtime/trust.js (repository @ 2f86ec7)
+  - src/runtime/supervisor.js (repository @ 2f86ec7)
+  - docs/runtime.md (repository @ 2f86ec7)
+  - test/runtime.test.js (repository @ 2f86ec7)
+
 <!-- yallaflow-context:end -->

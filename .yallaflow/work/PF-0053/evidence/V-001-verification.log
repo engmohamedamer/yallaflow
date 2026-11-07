@@ -1,0 +1,172 @@
+TAP version 13
+# Subtest: runtime inputs: package/composer scripts revoke trust; metadata and application code do not
+ok 1 - runtime inputs: package/composer scripts revoke trust; metadata and application code do not
+  ---
+  duration_ms: 25.232812
+  type: 'test'
+  ...
+# Subtest: runtime inputs: direct shell, interpreter flags and extensionless shebang scripts are bound
+ok 2 - runtime inputs: direct shell, interpreter flags and extensionless shebang scripts are bound
+  ---
+  duration_ms: 15.484294
+  type: 'test'
+  ...
+# Subtest: runtime inputs: default and explicitly selected Compose files and project directories are bound
+ok 3 - runtime inputs: default and explicitly selected Compose files and project directories are bound
+  ---
+  duration_ms: 17.019855
+  type: 'test'
+  ...
+# Subtest: runtime inputs: selected package directories and ancestors are included
+ok 4 - runtime inputs: selected package directories and ancestors are included
+  ---
+  duration_ms: 18.577108
+  type: 'test'
+  ...
+# Subtest: runtime inputs: file removal changes fingerprints; unsafe and malformed files fail closed
+ok 5 - runtime inputs: file removal changes fingerprints; unsafe and malformed files fail closed
+  ---
+  duration_ms: 5.778487
+  type: 'test'
+  ...
+# Subtest: profiles: argv only, repository-relative cwd, names not values; secrets and unknown fields refused without echo
+ok 6 - profiles: argv only, repository-relative cwd, names not values; secrets and unknown fields refused without echo
+  ---
+  duration_ms: 1548.465063
+  type: 'test'
+  ...
+# Subtest: trust: required before start, personal, and renewed after any material change (shared or override)
+ok 7 - trust: required before start, personal, and renewed after any material change (shared or override)
+  ---
+  duration_ms: 2088.055128
+  type: 'test'
+  ...
+# Subtest: start/stop/logs: readiness, minimal environment, redacted logs, graceful stop; nothing auto-starts
+ok 8 - start/stop/logs: readiness, minimal environment, redacted logs, graceful stop; nothing auto-starts
+  ---
+  duration_ms: 3508.360113
+  type: 'test'
+  ...
+# Subtest: a port held by someone else refuses start and that process is never touched
+ok 9 - a port held by someone else refuses start and that process is never touched
+  ---
+  duration_ms: 1315.22535
+  type: 'test'
+  ...
+# Subtest: crash recovery: a service killed outside YallaFlow reads failed; a reused PID is unmanaged and never signalled
+ok 10 - crash recovery: a service killed outside YallaFlow reads failed; a reused PID is unmanaged and never signalled
+  ---
+  duration_ms: 3434.734197
+  type: 'test'
+  ...
+# Subtest: concurrency: five simultaneous starts start one process; restart replaces it; stop --all stops owned services only
+ok 11 - concurrency: five simultaneous starts start one process; restart replaces it; stop --all stops owned services only
+  ---
+  duration_ms: 3938.25522
+  type: 'test'
+  ...
+# Subtest: start failures are reported with the log tail; a cwd escaping through a symlink is refused
+not ok 12 - start failures are reported with the log tail; a cwd escaping through a symlink is refused
+  ---
+  duration_ms: 1548.342777
+  type: 'test'
+  location: '/home/engamer/Amasi/YallaFlow-1.4/test/runtime.test.js:227:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+    + [
+    +   '$: missing schema',
+    +   '$: missing generatedAt',
+    +   '$: missing yallaflowVersion',
+    +   '$: missing supported',
+    +   '$: missing profile',
+    +   '$: missing services',
+    +   '$: missing suggestions'
+    + ]
+    - []
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+    0: '$: missing schema'
+    1: '$: missing generatedAt'
+    2: '$: missing yallaflowVersion'
+    3: '$: missing supported'
+    4: '$: missing profile'
+    5: '$: missing services'
+    6: '$: missing suggestions'
+  operator: 'deepStrictEqual'
+  stack: |-
+    status (file:///home/engamer/Amasi/YallaFlow-1.4/test/runtime.test.js:74:97)
+    service (file:///home/engamer/Amasi/YallaFlow-1.4/test/runtime.test.js:75:39)
+    trust (file:///home/engamer/Amasi/YallaFlow-1.4/test/runtime.test.js:69:16)
+    TestContext.<anonymous> (file:///home/engamer/Amasi/YallaFlow-1.4/test/runtime.test.js:239:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: suggestions come from repository evidence and never run
+ok 13 - suggestions come from repository evidence and never run
+  ---
+  duration_ms: 818.214877
+  type: 'test'
+  ...
+# Subtest: console: runtime routes are token/Origin/JSON guarded, trust needs the typed id, read-only refuses
+ok 14 - console: runtime routes are token/Origin/JSON guarded, trust needs the typed id, read-only refuses
+  ---
+  duration_ms: 3156.423465
+  type: 'test'
+  ...
+# Subtest: review: trust and run records planted inside the repository are ignored; trust needs the reviewed definition
+ok 15 - review: trust and run records planted inside the repository are ignored; trust needs the reviewed definition
+  ---
+  duration_ms: 1511.773004
+  type: 'test'
+  ...
+# Subtest: review: a run record whose process no longer leads its own group is unmanaged and never signalled
+ok 16 - review: a run record whose process no longer leads its own group is unmanaged and never signalled
+  ---
+  duration_ms: 1308.171833
+  type: 'test'
+  ...
+# Subtest: review: log symlinks and hard links are refused; reading logs never writes, truncates or rotates
+ok 17 - review: log symlinks and hard links are refused; reading logs never writes, truncates or rotates
+  ---
+  duration_ms: 1535.048292
+  type: 'test'
+  ...
+# Subtest: review: an untrusted dependency starts nothing; control and bidi characters are refused
+ok 18 - review: an untrusted dependency starts nothing; control and bidi characters are refused
+  ---
+  duration_ms: 1707.397868
+  type: 'test'
+  ...
+# Subtest: review: CLI trust is a human decision — refused when not interactive
+ok 19 - review: CLI trust is a human decision — refused when not interactive
+  ---
+  duration_ms: 854.254027
+  type: 'test'
+  ...
+# Subtest: review: a FIFO planted as the log never hangs reads
+ok 20 - review: a FIFO planted as the log never hangs reads
+  ---
+  duration_ms: 645.953109
+  type: 'test'
+  ...
+# Subtest: trust: script edits reject stale confirmation and start, while application edits retain trust
+ok 21 - trust: script edits reject stale confirmation and start, while application edits retain trust
+  ---
+  duration_ms: 2360.721538
+  type: 'test'
+  ...
+1..21
+# tests 21
+# suites 0
+# pass 20
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 31418.212626
