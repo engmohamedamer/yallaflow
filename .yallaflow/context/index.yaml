@@ -11194,7 +11194,7 @@
     {
       "id": "CTX-0099",
       "area": "architecture",
-      "state": "current",
+      "state": "superseded",
       "confidence": "confirmed",
       "summary": "Web console (v1.2.0): 'yallaflow console' is a local web UI inside the yallaflow package (no daemon, no new dependency, no build step). src/console/server.js (node:http on 127.0.0.1; per-run token as Bearer; Host 421, Origin 403; GET/HEAD for reads; UI from a fixed file map; sources served by ID only, previews sandboxed) reads data by spawning this package's own CLI (src/console/runner.js: snapshot --json, work show --json, cached) and refreshes on a debounced recursive watcher of .yallaflow with polling fallback (src/console/watch.js). Its only write is Create Work (src/console/create.js): POST on two routes only (create; attach a file to the item the same request ID created), requiring the console's Origin and exact content type, 64 KB JSON and MAX_EXTRACTION_INPUT_BYTES per file; it runs the CLI's own 'start --keep-active --via console --request-id ID -- <text>', 'route' (when the user chose type and size) and 'intake add --via console' through runner.write/exclusive (argv only, serialized per project). Uploads go to mkdtemp folders removed in finally. '--read-only' disables every POST. The UI (resources/console/, plain JS/CSS) renders Core's stations/states/completion; apart from Create Work every action shows the CLI command.",
       "provenance": "repository",
@@ -11243,7 +11243,7 @@
       "supersedes": [
         "CTX-0093"
       ],
-      "supersededBy": null,
+      "supersededBy": "CTX-0116",
       "history": [
         {
           "action": "introduced",
@@ -11251,10 +11251,17 @@
           "workId": "PF-0032",
           "candidateId": "K-001",
           "supersedes": "CTX-0093"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-11-07T19:18:46.674Z",
+          "supersededBy": "CTX-0116",
+          "workId": "PF-0057",
+          "candidateId": "K-001"
         }
       ],
       "createdAt": "2026-11-06T13:07:31.794Z",
-      "updatedAt": "2026-11-06T13:07:31.794Z"
+      "updatedAt": "2026-11-07T19:18:46.674Z"
     },
     {
       "id": "CTX-0100",
@@ -11619,7 +11626,7 @@
     {
       "id": "CTX-0106",
       "area": "convention",
-      "state": "current",
+      "state": "superseded",
       "confidence": "confirmed",
       "summary": "Console writes are always the canonical CLI command run through the console runner (argv, no shell, --opt=value, one write at a time per project); Core keeps every rule and its refusal text is shown as-is. Review-gate decisions in the console are local-user decisions: typed gate name, mandatory note, the gate's material and digest checked inside runner.exclusive, recorded by the unchanged approve/feedback with provenance {via:'console', identity:'not verified', host, claimedGitName} passed only to that child process; CLI decisions carry no provenance; never claim verified identity.",
       "provenance": "repository",
@@ -11652,17 +11659,24 @@
       "verifiedAt": "2026-11-06T23:18:23.610Z",
       "verifiedAtCommit": "3184054c0dee0750421809b73534d0d3cbf1f6b3",
       "supersedes": [],
-      "supersededBy": null,
+      "supersededBy": "CTX-0117",
       "history": [
         {
           "action": "introduced",
           "at": "2026-11-06T23:18:23.610Z",
           "workId": "PF-0043",
           "candidateId": "K-001"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-11-07T19:18:47.030Z",
+          "supersededBy": "CTX-0117",
+          "workId": "PF-0057",
+          "candidateId": "K-002"
         }
       ],
       "createdAt": "2026-11-06T23:18:23.610Z",
-      "updatedAt": "2026-11-06T23:18:23.610Z"
+      "updatedAt": "2026-11-07T19:18:47.030Z"
     },
     {
       "id": "CTX-0107",
@@ -11877,7 +11891,7 @@
     {
       "id": "CTX-0112",
       "area": "business-rule",
-      "state": "current",
+      "state": "superseded",
       "confidence": "confirmed",
       "summary": "Projects created by `yallaflow new` (New Project Wizard, 1.4.0) record config project.origin {createdBy: 'yallaflow new', generator, template, stack, planHash, createdAt} through Core initProject and are Greenfield: no baseline is required for generator boilerplate, but generated code is never treated as understood or approved (no context facts, label 'generated code not reviewed'). Projects without valid wizard provenance, or with a recorded brownfield kind, keep the normal discovery and baseline rules.",
       "provenance": "repository",
@@ -11911,17 +11925,24 @@
       "verifiedAt": "2026-11-07T10:32:14.366Z",
       "verifiedAtCommit": "d5fa5f3aee0c596920b77797871f9194aa009c9b",
       "supersedes": [],
-      "supersededBy": null,
+      "supersededBy": "CTX-0118",
       "history": [
         {
           "action": "introduced",
           "at": "2026-11-07T10:32:14.366Z",
           "workId": "PF-0048",
           "candidateId": "K-001"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-11-07T19:18:47.384Z",
+          "supersededBy": "CTX-0118",
+          "workId": "PF-0057",
+          "candidateId": "K-003"
         }
       ],
       "createdAt": "2026-11-07T10:32:14.366Z",
-      "updatedAt": "2026-11-07T10:32:14.366Z"
+      "updatedAt": "2026-11-07T19:18:47.384Z"
     },
     {
       "id": "CTX-0113",
@@ -12118,7 +12139,209 @@
       ],
       "createdAt": "2026-11-07T16:23:41.856Z",
       "updatedAt": "2026-11-07T16:23:41.856Z"
+    },
+    {
+      "id": "CTX-0116",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Web console (v1.2.0, extended in 1.4.0): 'yallaflow console' is a local web UI inside the yallaflow package (no daemon, no new dependency, no build step). src/console/server.js (node:http on 127.0.0.1; per-run Bearer token; Host 421, Origin 403; GET/HEAD for reads; UI from a fixed file map; sources served by ID only, previews sandboxed) reads by spawning this package's CLI (snapshot/work show/overview/runtime status --json) and refreshes on a debounced .yallaflow watcher with polling fallback. POST is accepted only on WRITE_ROUTE: Create Work and its attach route, work-item actions and gate decisions, runtime trust/start/stop/restart and adding a service, the New Project Wizard (plan, create with the full plan hash, planned files), project registration, enabling agents for the run, and Git init; each needs the console Origin and exact content type, and '--read-only' refuses every POST. The project list can grow at runtime (registration serialized and deduplicated), and the console starts with no saved project unless read-only. GET /api/fs/dirs is the only filesystem listing: directories inside the real home folder, no hidden folders, no files, not in read-only.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0057",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/console/server.js",
+          "contentHash": "sha256:3565d8bdf9caa0ef0b9f35a4a9cdb3c8da503da824845b91279903276d8c12bd",
+          "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "src/console/folders.js",
+          "contentHash": "sha256:87d8a8306d8e66eb97e5e57a023350f053337761d2475d18a4a0b0a84a14416b",
+          "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "src/console/greenfield.js",
+          "contentHash": "sha256:42a0f7f98cc902c712069c826631d6cdfc059e118571a5b55447dbd5b30f2565",
+          "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "src/commands/console.js",
+          "contentHash": "sha256:68d70f713d19a0a508df32f90ca733c80908a69b8d5b9c74e551b2b037b4c60e",
+          "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+          "workingTree": "head"
+        },
+        {
+          "type": "runtime",
+          "description": "npm run check (passed)",
+          "workId": "PF-0057",
+          "verificationRunId": "V-004"
+        },
+        {
+          "type": "repository",
+          "path": "test/console-greenfield.test.js",
+          "contentHash": "sha256:2d7e2c4a8ee24117f9ec57ef0bee18a5129e4722a5ead3e6251190a460ecfafc",
+          "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+          "workingTree": "modified"
+        }
+      ],
+      "verifiedAt": "2026-11-07T19:18:46.674Z",
+      "verifiedAtCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+      "supersedes": [
+        "CTX-0099"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-07T19:18:46.674Z",
+          "workId": "PF-0057",
+          "candidateId": "K-001",
+          "supersedes": "CTX-0099"
+        }
+      ],
+      "createdAt": "2026-11-07T19:18:46.674Z",
+      "updatedAt": "2026-11-07T19:18:46.674Z"
+    },
+    {
+      "id": "CTX-0117",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Every console write to .yallaflow state is the canonical CLI command run through the console runner (argv, no shell, --opt=value, one write at a time per project); Core keeps every rule and its refusal text is shown as-is. Outside .yallaflow the console writes only the user-level console project list (the same registry addProject as 'yallaflow console add', serialized in-process) and runs 'git init --quiet' (fixed argv, refused inside an existing work tree) for an explicit Git init. Review-gate decisions in the console are local-user decisions: typed gate name, mandatory note, material and digest checked inside runner.exclusive, recorded by the unchanged approve/feedback with provenance {via:'console', identity:'not verified', host, claimedGitName}; never claim verified identity.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0057",
+        "candidateId": "K-002"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/console/actions.js",
+          "contentHash": "sha256:3468bc2d762cd407a77a12b3df58a32f3e70567c0c8470a8f0b705f925c8fde8",
+          "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "src/console/greenfield.js",
+          "contentHash": "sha256:42a0f7f98cc902c712069c826631d6cdfc059e118571a5b55447dbd5b30f2565",
+          "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "src/console/server.js",
+          "contentHash": "sha256:3565d8bdf9caa0ef0b9f35a4a9cdb3c8da503da824845b91279903276d8c12bd",
+          "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "src/console/registry.js",
+          "contentHash": "sha256:ef12d09cfc4e09b4e4b14276b17acfb4ef046220c17e2a10225b7aefabd3db70",
+          "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+          "workingTree": "head"
+        },
+        {
+          "type": "runtime",
+          "description": "npm run check (passed)",
+          "workId": "PF-0057",
+          "verificationRunId": "V-004"
+        }
+      ],
+      "verifiedAt": "2026-11-07T19:18:47.030Z",
+      "verifiedAtCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+      "supersedes": [
+        "CTX-0106"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-07T19:18:47.030Z",
+          "workId": "PF-0057",
+          "candidateId": "K-002",
+          "supersedes": "CTX-0106"
+        }
+      ],
+      "createdAt": "2026-11-07T19:18:47.030Z",
+      "updatedAt": "2026-11-07T19:18:47.030Z"
+    },
+    {
+      "id": "CTX-0118",
+      "area": "business-rule",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Projects created by 'yallaflow new' (New Project Wizard, 1.4.0) record config project.origin {createdBy: 'yallaflow new', generator, template, stack, planHash, createdAt, optional environment docker|local|later and git: true} through Core initProject and are Greenfield: no baseline is required for generator boilerplate, but generated code is never treated as understood or approved (no context facts; label 'generated code not reviewed', or 'created empty' for the empty stack). The first work item is unrouted and not activated, titled '<name>: <goal>' or 'Set up <name>', with the developer's description and requirements kept verbatim and no invented criteria. Projects without valid wizard provenance, or with a recorded brownfield kind, keep the normal discovery and baseline rules.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0057",
+        "candidateId": "K-003"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/newproject/project.js",
+          "contentHash": "sha256:683c6acfacab36f09793f938b79c42820e176c85429e74d2647b5bd6ca75d91b",
+          "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "src/core/workspace.js",
+          "contentHash": "sha256:65ce13fcb35877ec8c62145e9156f66b4433b74ae7143e80fe7fdbe79cbb6106",
+          "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "src/baseline/understanding.js",
+          "contentHash": "sha256:1cda9834152104a888fdda39c5aa1a86c48eb26499e338970a98fe8c1cfa0924",
+          "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "test/new-project.test.js",
+          "contentHash": "sha256:2505d41747a642053ae7b83af3d92f46d31e3e630e09c8b8cf26a384700d237b",
+          "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+          "workingTree": "head"
+        },
+        {
+          "type": "runtime",
+          "description": "npm run check (passed)",
+          "workId": "PF-0057",
+          "verificationRunId": "V-004"
+        }
+      ],
+      "verifiedAt": "2026-11-07T19:18:47.384Z",
+      "verifiedAtCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+      "supersedes": [
+        "CTX-0112"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-07T19:18:47.384Z",
+          "workId": "PF-0057",
+          "candidateId": "K-003",
+          "supersedes": "CTX-0112"
+        }
+      ],
+      "createdAt": "2026-11-07T19:18:47.384Z",
+      "updatedAt": "2026-11-07T19:18:47.384Z"
     }
   ],
-  "updatedAt": "2026-11-07T16:23:41.856Z"
+  "updatedAt": "2026-11-07T19:18:47.384Z"
 }

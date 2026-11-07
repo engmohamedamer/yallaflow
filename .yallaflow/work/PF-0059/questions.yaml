@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "questions": [
+    {
+      "id": "Q-001",
+      "category": "business",
+      "question": "How should the agent chat appear on the work item page?",
+      "status": "resolved",
+      "material": true,
+      "createdAt": "2026-11-07T19:12:04.821Z",
+      "updatedAt": "2026-11-07T19:12:07.789Z",
+      "answer": "Owner (2026-11-07, agent session) chose 'Floating button': a corner button opens the chat as a window over the page, like a support chat.",
+      "resolution": "Owner decision, accepted.",
+      "resolvedAt": "2026-11-07T19:12:07.789Z"
+    }
+  ],
+  "updatedAt": "2026-11-07T19:12:07.789Z"
+}

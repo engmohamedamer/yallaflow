@@ -172,21 +172,6 @@
   - src/agents/checkout-lock.js (repository @ bdb5e90)
   - npm test (passed) (runtime, PF-0038 V-002)
 
-<!-- yallaflow-fact:CTX-0106 -->
-### CTX-0106 — Console writes are always the canonical CLI command run through the console runner (argv, no shell, --opt=value, one write at a time per project); Core keeps every rule and its refusal text is shown as-is. Review-gate decisions in the console are local-user decisions: typed gate name, mandatory note, the gate's material and digest checked inside runner.exclusive, recorded by the unchanged approve/feedback with provenance {via:'console', identity:'not verified', host, claimedGitName} passed only to that child process; CLI decisions carry no provenance; never claim verified identity.
-
-- **State:** current
-- **Confidence:** confirmed
-- **Provenance:** repository
-- **Source work:** PF-0043
-- **Knowledge ID:** K-001
-- **Promoted at:** 2026-11-06T23:18:23.610Z
-- **Verified:** 2026-11-06T23:18:23.610Z (commit 3184054)
-- **Evidence:**
-  - src/console/actions.js (repository @ 3184054)
-  - src/reviews/store.js (repository @ 3184054)
-  - npm run check (passed) (runtime, PF-0043 V-001)
-
 <!-- yallaflow-fact:CTX-0113 -->
 ### CTX-0113 — Diverged YallaFlow histories are reconciled through history plan/import into immutable lineages under original IDs, followed by exact per-record Git restores and history verify-merge (index modes/objects and disk bytes). Imported knowledge enters canonical memory only through explicit knowledge promotion and justified history mappings after semantic review. Whole-identity deletion, dirty restore targets and checkout-masked committed conflicts are refused. Actual integration into main remains an owner-authorized action.
 

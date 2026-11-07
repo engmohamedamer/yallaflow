@@ -526,24 +526,6 @@ print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_commo
   - src/commands/doctor.js (repository @ bdb5e90)
   - test/console-acceptance.test.js (repository @ bdb5e90)
 
-<!-- yallaflow-fact:CTX-0099 -->
-### CTX-0099 — Web console (v1.2.0): 'yallaflow console' is a local web UI inside the yallaflow package (no daemon, no new dependency, no build step). src/console/server.js (node:http on 127.0.0.1; per-run token as Bearer; Host 421, Origin 403; GET/HEAD for reads; UI from a fixed file map; sources served by ID only, previews sandboxed) reads data by spawning this package's own CLI (src/console/runner.js: snapshot --json, work show --json, cached) and refreshes on a debounced recursive watcher of .yallaflow with polling fallback (src/console/watch.js). Its only write is Create Work (src/console/create.js): POST on two routes only (create; attach a file to the item the same request ID created), requiring the console's Origin and exact content type, 64 KB JSON and MAX_EXTRACTION_INPUT_BYTES per file; it runs the CLI's own 'start --keep-active --via console --request-id ID -- <text>', 'route' (when the user chose type and size) and 'intake add --via console' through runner.write/exclusive (argv only, serialized per project). Uploads go to mkdtemp folders removed in finally. '--read-only' disables every POST. The UI (resources/console/, plain JS/CSS) renders Core's stations/states/completion; apart from Create Work every action shows the CLI command.
-
-- **State:** current
-- **Confidence:** confirmed
-- **Provenance:** repository
-- **Source work:** PF-0032
-- **Knowledge ID:** K-001
-- **Promoted at:** 2026-11-06T13:07:31.794Z
-- **Supersedes:** CTX-0093
-- **Verified:** 2026-11-06T13:07:31.794Z (commit bdb5e90)
-- **Evidence:**
-  - src/console/server.js (repository @ bdb5e90)
-  - src/console/create.js (repository @ bdb5e90)
-  - src/console/runner.js (repository @ bdb5e90)
-  - test/console-create.test.js (repository @ bdb5e90)
-  - npm test (passed) (runtime, PF-0032 V-002)
-
 <!-- yallaflow-fact:CTX-0101 -->
 ### CTX-0101 — Active work focus (v1.2.0): state/current.yaml activeWork is the checkout's default focus for guide/status/brief; agents can work on any item by ID. Creating work (start, intake, direct commands) and route set it as before. 'start --keep-active -- <request>' (options only as leading tokens closed by '--') never makes the new item active, whether or not another item is active (owner decision: creation and activation are separate); it records activation {deferred: true, keptActive: <unfinished active item or null>}. route/advance/checkpoint on a deferred item never move the focus; 'yallaflow activate <id>' is the only explicit switch and clears the deferral; resume on a deferred item prints how to activate it. The console always creates this way. 'start --via console --request-id ID' records attestation {recordedVia: console, verified: false, requestId} and, under the workspace lock, returns the item already created for that request ID (src/behavior/routing.js, src/commands/start.js, src/commands/resume.js, src/cli.js parseStartArgs).
 
@@ -626,5 +608,42 @@ print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_commo
   - src/agents/codex.js (repository @ 476b917)
   - src/agents/bridge.js (repository @ 476b917)
   - docs/agents.md (repository @ 476b917)
+
+<!-- yallaflow-fact:CTX-0116 -->
+### CTX-0116 — Web console (v1.2.0, extended in 1.4.0): 'yallaflow console' is a local web UI inside the yallaflow package (no daemon, no new dependency, no build step). src/console/server.js (node:http on 127.0.0.1; per-run Bearer token; Host 421, Origin 403; GET/HEAD for reads; UI from a fixed file map; sources served by ID only, previews sandboxed) reads by spawning this package's CLI (snapshot/work show/overview/runtime status --json) and refreshes on a debounced .yallaflow watcher with polling fallback. POST is accepted only on WRITE_ROUTE: Create Work and its attach route, work-item actions and gate decisions, runtime trust/start/stop/restart and adding a service, the New Project Wizard (plan, create with the full plan hash, planned files), project registration, enabling agents for the run, and Git init; each needs the console Origin and exact content type, and '--read-only' refuses every POST. The project list can grow at runtime (registration serialized and deduplicated), and the console starts with no saved project unless read-only. GET /api/fs/dirs is the only filesystem listing: directories inside the real home folder, no hidden folders, no files, not in read-only.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0057
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-07T19:18:46.674Z
+- **Supersedes:** CTX-0099
+- **Verified:** 2026-11-07T19:18:46.674Z (commit 9437b4c)
+- **Evidence:**
+  - src/console/server.js (repository @ 9437b4c)
+  - src/console/folders.js (repository @ 9437b4c)
+  - src/console/greenfield.js (repository @ 9437b4c)
+  - src/commands/console.js (repository @ 9437b4c)
+  - npm run check (passed) (runtime, PF-0057 V-004)
+  - test/console-greenfield.test.js (repository @ 9437b4c)
+
+<!-- yallaflow-fact:CTX-0117 -->
+### CTX-0117 — Every console write to .yallaflow state is the canonical CLI command run through the console runner (argv, no shell, --opt=value, one write at a time per project); Core keeps every rule and its refusal text is shown as-is. Outside .yallaflow the console writes only the user-level console project list (the same registry addProject as 'yallaflow console add', serialized in-process) and runs 'git init --quiet' (fixed argv, refused inside an existing work tree) for an explicit Git init. Review-gate decisions in the console are local-user decisions: typed gate name, mandatory note, material and digest checked inside runner.exclusive, recorded by the unchanged approve/feedback with provenance {via:'console', identity:'not verified', host, claimedGitName}; never claim verified identity.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0057
+- **Knowledge ID:** K-002
+- **Promoted at:** 2026-11-07T19:18:47.030Z
+- **Supersedes:** CTX-0106
+- **Verified:** 2026-11-07T19:18:47.030Z (commit 9437b4c)
+- **Evidence:**
+  - src/console/actions.js (repository @ 9437b4c)
+  - src/console/greenfield.js (repository @ 9437b4c)
+  - src/console/server.js (repository @ 9437b4c)
+  - src/console/registry.js (repository @ 9437b4c)
+  - npm run check (passed) (runtime, PF-0057 V-004)
 
 <!-- yallaflow-context:end -->

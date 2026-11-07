@@ -1,0 +1,524 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-07T19:18:03.284Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+        "verificationRunIds": [
+          "V-006",
+          "V-007",
+          "V-004",
+          "V-008",
+          "V-005"
+        ]
+      },
+      "summary": "PF-0057 delivered against REQ-001..012 on 9437b4c, assessed after V-004..V-008.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "Four labelled steps with back/next and per-step validation; completed keyboard-only (Enter submits, Space selects, visible focus outline) and in Chromium, Firefox and WebKit, EN/AR, light/dark, 1280/390 px with no page errors or horizontal overflow, on the installed package.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:1f074a197af64570214c2b7112861338d1c89229607c2c4c4072ac0159c2126d",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.css",
+              "contentHash": "sha256:c40389f8249d92a03b38bb48210e74a2b1c657dd518ab2a2e62d9aef80ca24a6",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "bash '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad/matrix.sh' '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad' (passed)",
+              "workId": "PF-0057",
+              "verificationRunId": "V-006"
+            },
+            {
+              "type": "runtime",
+              "description": "cd '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad' && timeout 240 node extra-check.mjs '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad/extra-AjgD' (passed)",
+              "workId": "PF-0057",
+              "verificationRunId": "V-007"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Plan body hashes description, requirements, environment, git and file descriptors; a different/changed hash is refused with nothing created; plans that install dependencies or run package scripts (also Laravel's generator) refuse creation without the typed name.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/newproject/project.js",
+              "contentHash": "sha256:683c6acfacab36f09793f938b79c42820e176c85429e74d2647b5bd6ca75d91b",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/newproject.js",
+              "contentHash": "sha256:0e2e5ba1b1018532a6406cae008a3c7368b894f66d5b118f1c8bde708ed75c2e",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/new-project.test.js",
+              "contentHash": "sha256:2505d41747a642053ae7b83af3d92f46d31e3e630e09c8b8cf26a384700d237b",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-greenfield.test.js",
+              "contentHash": "sha256:2d7e2c4a8ee24117f9ec57ef0bee18a5129e4722a5ead3e6251190a460ecfafc",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0057",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/console-greenfield.test.js test/new-project.test.js test/console-server.test.js (passed)",
+              "workId": "PF-0057",
+              "verificationRunId": "V-008"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "GET /api/fs/dirs lists only real directories inside home, no files, no hidden folders (also refused when requested by path), refuses outside paths and links leading outside home, marks git/yallaflow/empty, handles spaces and Arabic; refused in --read-only.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/folders.js",
+              "contentHash": "sha256:87d8a8306d8e66eb97e5e57a023350f053337761d2475d18a4a0b0a84a14416b",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-greenfield.test.js",
+              "contentHash": "sha256:2d7e2c4a8ee24117f9ec57ef0bee18a5129e4722a5ead3e6251190a460ecfafc",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0057",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "Registration is server-side at creation end, serialized and deduplicated (parallel test), visible without restart, the page switches to the project's Overview; a registration failure is reported as partial success (server test) and the page's Retry registers once without a second project (browser test).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:3565d8bdf9caa0ef0b9f35a4a9cdb3c8da503da824845b91279903276d8c12bd",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/newproject.js",
+              "contentHash": "sha256:0e2e5ba1b1018532a6406cae008a3c7368b894f66d5b118f1c8bde708ed75c2e",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-greenfield.test.js",
+              "contentHash": "sha256:2d7e2c4a8ee24117f9ec57ef0bee18a5129e4722a5ead3e6251190a460ecfafc",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "cd '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad' && node installed-check.mjs '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad/installed2-h9ci' (passed)",
+              "workId": "PF-0057",
+              "verificationRunId": "V-005"
+            },
+            {
+              "type": "runtime",
+              "description": "cd '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad' && timeout 240 node extra-check.mjs '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad/extra-AjgD' (passed)",
+              "workId": "PF-0057",
+              "verificationRunId": "V-007"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/console-greenfield.test.js test/new-project.test.js test/console-server.test.js (passed)",
+              "workId": "PF-0057",
+              "verificationRunId": "V-008"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "First work titleHint '<name>: <goal>' (or 'Set up <name>'), rawRequest keeps description and requirements verbatim, planned files linked as sources by SHA-256 once, item not activated, no requirements.yaml.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/newproject/project.js",
+              "contentHash": "sha256:683c6acfacab36f09793f938b79c42820e176c85429e74d2647b5bd6ca75d91b",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/greenfield.js",
+              "contentHash": "sha256:42a0f7f98cc902c712069c826631d6cdfc059e118571a5b55447dbd5b30f2565",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/new-project.test.js",
+              "contentHash": "sha256:2505d41747a642053ae7b83af3d92f46d31e3e630e09c8b8cf26a384700d237b",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-greenfield.test.js",
+              "contentHash": "sha256:2d7e2c4a8ee24117f9ec57ef0bee18a5129e4722a5ead3e6251190a460ecfafc",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0057",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "Agents shown off/unavailable/on; POST /api/agents/enable needs confirmation, is refused read-only, starts no session and activates nothing; enabling never turns on experimental Claude.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:3565d8bdf9caa0ef0b9f35a4a9cdb3c8da503da824845b91279903276d8c12bd",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/agents/bridge.js",
+              "contentHash": "sha256:7044c2e9f2aff95879bd29885b063670282e29d98b4a964accb7b2665dfc6631",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:1f074a197af64570214c2b7112861338d1c89229607c2c4c4072ac0159c2126d",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-greenfield.test.js",
+              "contentHash": "sha256:2d7e2c4a8ee24117f9ec57ef0bee18a5129e4722a5ead3e6251190a460ecfafc",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "cd '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad' && node installed-check.mjs '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad/installed2-h9ci' (passed)",
+              "workId": "PF-0057",
+              "verificationRunId": "V-005"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "Greenfield projects without approved memory show the setup checklist from snapshot/overview/runtime/agent data with contextual actions; projects with memory and Brownfield projects keep the evidence-based Overview (existing overview tests pass).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:1f074a197af64570214c2b7112861338d1c89229607c2c4c4072ac0159c2126d",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0057",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "bash '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad/matrix.sh' '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad' (passed)",
+              "workId": "PF-0057",
+              "verificationRunId": "V-006"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-008",
+          "status": "satisfied",
+          "reason": "Flow shows an explanation when all work is New; unclassified items open on Request with the tab first and a note in an empty Delivery tab; the agent panel explains activation vs session; drag-and-drop tests unchanged and passing.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:1f074a197af64570214c2b7112861338d1c89229607c2c4c4072ac0159c2126d",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0057",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "bash '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad/matrix.sh' '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad' (passed)",
+              "workId": "PF-0057",
+              "verificationRunId": "V-006"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-009",
+          "status": "satisfied",
+          "reason": "Setup adds services from a suggestion or a manual form through Core runtime add with option-safe arguments; the service is defined, untrusted and stopped; start before trust is refused; form input survives live redraws.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/greenfield.js",
+              "contentHash": "sha256:42a0f7f98cc902c712069c826631d6cdfc059e118571a5b55447dbd5b30f2565",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:1f074a197af64570214c2b7112861338d1c89229607c2c4c4072ac0159c2126d",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-greenfield.test.js",
+              "contentHash": "sha256:2d7e2c4a8ee24117f9ec57ef0bee18a5129e4722a5ead3e6251190a460ecfafc",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0057",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "bash '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad/matrix.sh' '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad' (passed)",
+              "workId": "PF-0057",
+              "verificationRunId": "V-006"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-010",
+          "status": "satisfied",
+          "reason": "Creation with git and the console Git init action produce a repository with no commit and no remote; refused inside another repository, when .git exists and in --read-only.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/newproject/project.js",
+              "contentHash": "sha256:683c6acfacab36f09793f938b79c42820e176c85429e74d2647b5bd6ca75d91b",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/greenfield.js",
+              "contentHash": "sha256:42a0f7f98cc902c712069c826631d6cdfc059e118571a5b55447dbd5b30f2565",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/new-project.test.js",
+              "contentHash": "sha256:2505d41747a642053ae7b83af3d92f46d31e3e630e09c8b8cf26a384700d237b",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-greenfield.test.js",
+              "contentHash": "sha256:2d7e2c4a8ee24117f9ec57ef0bee18a5129e4722a5ead3e6251190a460ecfafc",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "cd '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad' && node installed-check.mjs '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad/installed2-h9ci' (passed)",
+              "workId": "PF-0057",
+              "verificationRunId": "V-005"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-011",
+          "status": "satisfied",
+          "reason": "Stacks grouped full-stack/frontend/backend/blank with fit and trade-offs plus the 'agent recommendation not available yet' note; environment step probes tools with version flags only; Docker records environment=docker and creates no Docker files.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/newproject/catalog.js",
+              "contentHash": "sha256:975be6ac3521e37a50b7c58b914dfc8eb4ceebe5ca662c0374da53358b1348d9",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/greenfield.js",
+              "contentHash": "sha256:42a0f7f98cc902c712069c826631d6cdfc059e118571a5b55447dbd5b30f2565",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:1f074a197af64570214c2b7112861338d1c89229607c2c4c4072ac0159c2126d",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "cd '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad' && node installed-check.mjs '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad/installed2-h9ci' (passed)",
+              "workId": "PF-0057",
+              "verificationRunId": "V-005"
+            },
+            {
+              "type": "runtime",
+              "description": "bash '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad/matrix.sh' '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad' (passed)",
+              "workId": "PF-0057",
+              "verificationRunId": "V-006"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-012",
+          "status": "satisfied",
+          "reason": "Empty projects: plan note, review text, CLI completion message, brief and the understanding label never mention generated code; displayed paths are POSIX-quoted (spaces, quotes, Arabic).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/newproject/project.js",
+              "contentHash": "sha256:683c6acfacab36f09793f938b79c42820e176c85429e74d2647b5bd6ca75d91b",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/new.js",
+              "contentHash": "sha256:5400a9ba7236f80e3c099bf5967e5b7803316a0f1a58731da9c0b880a0006514",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/baseline/understanding.js",
+              "contentHash": "sha256:1cda9834152104a888fdda39c5aa1a86c48eb26499e338970a98fe8c1cfa0924",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:1f074a197af64570214c2b7112861338d1c89229607c2c4c4072ac0159c2126d",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "cd '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad' && timeout 240 node extra-check.mjs '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad/extra-AjgD' (passed)",
+              "workId": "PF-0057",
+              "verificationRunId": "V-007"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0057",
+              "verificationRunId": "V-004"
+            }
+          ]
+        }
+      ],
+      "unrequested": [
+        {
+          "id": "UR-001",
+          "disposition": "accepted",
+          "summary": "The console starts with no saved project (not in --read-only) and shows a welcome with New project / Add an existing project.",
+          "reason": "Without it a new user could not reach the New project page at all; it serves REQ-001/REQ-004 and was reported in the session.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/console.js",
+              "contentHash": "sha256:68d70f713d19a0a508df32f90ca733c80908a69b8d5b9c74e551b2b037b4c60e",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "cd '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad' && node installed-check.mjs '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad/installed2-h9ci' (passed)",
+              "workId": "PF-0057",
+              "verificationRunId": "V-005"
+            }
+          ]
+        },
+        {
+          "id": "UR-002",
+          "disposition": "accepted",
+          "summary": "Form values and focus survive live redraws (data-keep forms).",
+          "reason": "WebKit showed live updates wiping typed input in Setup and the stepper; needed for AC-001/AC-009.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:1f074a197af64570214c2b7112861338d1c89229607c2c4c4072ac0159c2126d",
+              "gitCommit": "9437b4cbadf42347e638e178b251e09dd5a7f42b",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "bash '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad/matrix.sh' '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad' (passed)",
+              "workId": "PF-0057",
+              "verificationRunId": "V-006"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "updatedAt": "2026-11-07T19:18:03.284Z"
+}

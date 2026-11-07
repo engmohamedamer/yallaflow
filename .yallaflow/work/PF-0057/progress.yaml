@@ -41,13 +41,22 @@
       "summary": "Slices 1-5 done. Core: plan intent/environment/git/attachments (hashed), git-init step, first-work title from goal, origin environment/git, empty-template label. Console server: home-bounded folder API, tools probe, project registration (live, deduplicated, server-side after creation, retry by plan id), planned attachments, git init, runtime services, enable agents for the run, empty console start. UI: 4-step stepper, folder chooser, Greenfield Overview checklist, Flow first-run note, Request-first for unclassified work, agent off/enable panel, Setup forms, Worktrees/Projects empty states, form values preserved across redraws (WebKit found the wipe). Docs and CHANGELOG. Overview data already carried origin and git (no change)."
     },
     "verification": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-07T19:16:12.969Z",
+      "completedAt": "2026-11-07T19:16:12.969Z",
+      "summary": "V-004 npm run check 937/937 on 9437b4c (V-001 failed on an architecture guard, fixed by renaming literals; V-002 937/937 before the chooser fix). V-003/V-005 installed-package checks (13/13): empty start, empty + create-vite projects, git without commit, no Docker files, refused-then-retried creation without duplicates, registration, agents off->enabled, restart persistence. V-006 installed browser journey Chromium/Firefox/WebKit x EN-light-1280/AR-dark-390, no page errors, no overflow, 6/6 projects in the chosen folder. Independent security review on an isolated copy: 1 medium + 5 low + 6 info, all fixed with regression tests except finding 3 (ruling). Owner's real projects hash-identical after a read-only installed console read every view."
     },
     "delivery-convergence": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-07T19:18:27.914Z",
+      "completedAt": "2026-11-07T19:18:27.914Z",
+      "summary": "CV recorded: AC-001..012 satisfied with repository and verification evidence (V-004..V-008); 2 unrequested behaviors accepted (empty-console start; form values preserved across redraws)."
     },
     "code-review": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-07T19:18:28.363Z",
+      "completedAt": "2026-11-07T19:18:28.363Z",
+      "summary": "Independent security/code review on an isolated copy (real repo read-only, restored and verified identical): no high; medium concurrent registration duplicates fixed (serialized registerRoot + recheck); low lost registry entries fixed (single writer); low hidden-path browsing fixed; low typed-name rule extended to generators that run package scripts; low control characters in file names refused; info NUL/length, read-only tool probes, bridge enable race, experimental Claude off on enable, runtime add type/option/override, empty planId fixed; finding 3 (typed parent outside home) kept as a ruling. Regression tests added for each fix. Own review: diff --check clean, no secrets, argv only."
     }
   },
   "rulings": [
@@ -59,5 +68,5 @@
     }
   ],
   "history": [],
-  "updatedAt": "2026-11-07T18:45:59.153Z"
+  "updatedAt": "2026-11-07T19:18:28.363Z"
 }

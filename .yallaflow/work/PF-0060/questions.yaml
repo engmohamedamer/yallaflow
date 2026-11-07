@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "questions": [
+    {
+      "id": "Q-001",
+      "category": "architecture",
+      "question": "Should the console let the developer change the agent, and to what?",
+      "status": "resolved",
+      "material": true,
+      "createdAt": "2026-11-07T19:12:00.864Z",
+      "updatedAt": "2026-11-07T19:12:03.783Z",
+      "answer": "Owner (2026-11-07, agent session) chose 'Add Claude Code': an agent picker with Codex or Claude Code, each on the developer's own subscription, never API keys; restored from YallaFlow-agent-1.3 as separate work with its own security review. This reverses the 1.3.0 exclusion of Claude Code.",
+      "resolution": "Owner decision, accepted.",
+      "resolvedAt": "2026-11-07T19:12:03.783Z"
+    }
+  ],
+  "updatedAt": "2026-11-07T19:12:03.783Z"
+}

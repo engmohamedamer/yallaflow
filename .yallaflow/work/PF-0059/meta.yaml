@@ -1,0 +1,49 @@
+{
+  "id": "PF-0059",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Agent Workspace chat as a floating window on the work item page (owner choice: floating button), and clear provider status: a usage limit or ended session is shown in plain words, never 'Internal error' with a stale Working chip",
+  "status": "INTAKE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-07T19:11:45.365Z",
+  "updatedAt": "2026-11-07T19:11:59.823Z",
+  "title": "Agent Workspace chat as a floating window on the work item page (owner choice: floating button), and clear provider status: a usage limit or ended session is shown in plain words, never 'Internal error' with a stale Working chip",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-07T19:11:45.507Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0046",
+      "type": "file",
+      "name": "Screenshot from 2026-11-07 21-02-53.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-07T19:11:59.823Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ]
+}

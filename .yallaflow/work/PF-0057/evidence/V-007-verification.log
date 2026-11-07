@@ -1,0 +1,12 @@
+PASS CLI: empty project created — Created /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad/extra-AjgD/home/Work/cli-empty with YallaFlow initialized (new empty project). | First work item: PF-0001 (not routed, not active). | Next: open your coding agent in /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad/extra-AjgD/home/Work/cli-empty and describe what you are building. Add it to the console with `yallaflow console add '/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/da6879fe-c54d-4749-9900-40c0e7d85a1d/scratchpad/extra-AjgD/home/Work/cli-empty'`. | 
+PASS CLI: no generated-code wording for an empty project
+PASS brief: no generated-code wording for an empty project
+PASS keyboard: Enter submits step 1
+PASS keyboard: a stack is chosen with Space — empty
+PASS keyboard: the focused stack card shows a focus outline — solid
+PASS keyboard: the stepper reaches creation
+PASS partial success: the page says the project exists but was not added
+PASS retry registers the project once (saved list) — entries: 1
+PASS retry creates no second project — cli-empty,kbd-app
+PASS no page errors
+all checks passed

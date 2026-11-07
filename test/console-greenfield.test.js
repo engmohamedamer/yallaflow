@@ -352,3 +352,14 @@ test('review: runtime add refuses option-like commands and typed suggestions; a 
     await server.close();
   }
 });
+
+test('a registration failure after creation is reported as partial success, never as a failed creation', { skip: !SUPPORTED }, () => withHome(async (home) => {
+  const { wizardPlan, wizardCreate, wizardProgress } = await import('../src/console/newproject.js');
+  const { createRunner } = await import('../src/console/runner.js');
+  const runner = createRunner();
+  const plan = await wizardPlan(home, { name: 'partial', parent: home, stack: 'empty' }, runner);
+  await wizardCreate(home, { planId: plan.id, confirm: plan.hash }, runner, { register: async () => { throw Object.assign(new Error('the saved project list could not be written'), { code: 'EACCES' }); } });
+  const progress = await waitFor(async () => { const p = await wizardProgress(plan.id); return p.outcome ? p : null; });
+  assert.equal(progress.outcome.ok, true, 'the project was created');
+  assert.deepEqual(progress.outcome.registration, { ok: false, code: 'EACCES', message: 'the saved project list could not be written' });
+}));

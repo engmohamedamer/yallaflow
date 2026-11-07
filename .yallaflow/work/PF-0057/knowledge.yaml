@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Web console (v1.2.0, extended in 1.4.0): 'yallaflow console' is a local web UI inside the yallaflow package (no daemon, no new dependency, no build step). src/console/server.js (node:http on 127.0.0.1; per-run Bearer token; Host 421, Origin 403; GET/HEAD for reads; UI from a fixed file map; sources served by ID only, previews sandboxed) reads by spawning this package's CLI (snapshot/work show/overview/runtime status --json) and refreshes on a debounced .yallaflow watcher with polling fallback. POST is accepted only on WRITE_ROUTE: Create Work and its attach route, work-item actions and gate decisions, runtime trust/start/stop/restart and adding a service, the New Project Wizard (plan, create with the full plan hash, planned files), project registration, enabling agents for the run, and Git init; each needs the console Origin and exact content type, and '--read-only' refuses every POST. The project list can grow at runtime (registration serialized and deduplicated), and the console starts with no saved project unless read-only. GET /api/fs/dirs is the only filesystem listing: directories inside the real home folder, no hidden folders, no files, not in read-only.",
+      "evidence": [
+        "src/console/server.js",
+        "src/console/folders.js",
+        "src/console/greenfield.js",
+        "src/commands/console.js",
+        "verification:V-004",
+        "test/console-greenfield.test.js"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0099"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-07T19:18:40.557Z",
+      "factId": "CTX-0116",
+      "promotedAt": "2026-11-07T19:18:46.674Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-002",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Every console write to .yallaflow state is the canonical CLI command run through the console runner (argv, no shell, --opt=value, one write at a time per project); Core keeps every rule and its refusal text is shown as-is. Outside .yallaflow the console writes only the user-level console project list (the same registry addProject as 'yallaflow console add', serialized in-process) and runs 'git init --quiet' (fixed argv, refused inside an existing work tree) for an explicit Git init. Review-gate decisions in the console are local-user decisions: typed gate name, mandatory note, material and digest checked inside runner.exclusive, recorded by the unchanged approve/feedback with provenance {via:'console', identity:'not verified', host, claimedGitName}; never claim verified identity.",
+      "evidence": [
+        "src/console/actions.js",
+        "src/console/greenfield.js",
+        "src/console/server.js",
+        "src/console/registry.js",
+        "verification:V-004"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0106"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-07T19:18:40.795Z",
+      "factId": "CTX-0117",
+      "promotedAt": "2026-11-07T19:18:47.030Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-003",
+      "kind": "business-rule",
+      "source": "implementation-runtime",
+      "summary": "Projects created by 'yallaflow new' (New Project Wizard, 1.4.0) record config project.origin {createdBy: 'yallaflow new', generator, template, stack, planHash, createdAt, optional environment docker|local|later and git: true} through Core initProject and are Greenfield: no baseline is required for generator boilerplate, but generated code is never treated as understood or approved (no context facts; label 'generated code not reviewed', or 'created empty' for the empty stack). The first work item is unrouted and not activated, titled '<name>: <goal>' or 'Set up <name>', with the developer's description and requirements kept verbatim and no invented criteria. Projects without valid wizard provenance, or with a recorded brownfield kind, keep the normal discovery and baseline rules.",
+      "evidence": [
+        "src/newproject/project.js",
+        "src/core/workspace.js",
+        "src/baseline/understanding.js",
+        "test/new-project.test.js",
+        "verification:V-004"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0112"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-07T19:18:41.027Z",
+      "factId": "CTX-0118",
+      "promotedAt": "2026-11-07T19:18:47.384Z",
+      "target": "context/business-rules.md"
+    }
+  ],
+  "updatedAt": "2026-11-07T19:18:47.384Z",
+  "reviewedAt": "2026-11-07T19:18:47.384Z"
+}

@@ -1,0 +1,14 @@
+PASS installed CLI version — 1.4.0 at /home/engamer/.nvm/versions/node/v22.23.4/bin/yallaflow
+PASS console starts with no saved project
+PASS agents off by default, can be enabled — codex ready: true
+PASS empty project created and registered — ""
+PASS git initialized without commit
+PASS no Docker files created
+PASS generated project (create-vite) created and registered — ""
+PASS generated project overview: greenfield, stack declared
+PASS creation refused while the destination exists; nothing overwritten — NEW_PROJECT_EXISTS
+PASS retry creates it once
+PASS no duplicate registration — 3 projects
+PASS agents enabled for the run, no session started
+PASS after restart: projects persist, agents off again — 3 projects
+all checks passed
