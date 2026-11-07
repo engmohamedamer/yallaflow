@@ -2,15 +2,21 @@
   "schemaVersion": 1,
   "gates": {
     "specification": {
-      "status": "awaiting_review",
-      "requestedAt": "2026-11-07T02:36:15.558Z",
+      "status": "approved",
+      "respondedAt": "2026-11-07T02:43:09.416Z",
+      "note": "Approved by the owner in the agent session (2026-11-07), recorded as SRC-0040: 'I explicitly approve the proposed directions for PF-0047 (Development Runtime Manager) ... subject to the following requirements' — loopback port checks approved (127.0.0.1, configured ports, strict timeouts); services surviving Console shutdown approved with positive ownership identification, unmanaged otherwise; personal git-ignored trust bound to effective command, cwd and runtime configuration; minimal base environment plus explicitly configured variables. The specification was updated with these constraints before this approval was recorded. The plan has not been reviewed.",
       "history": [
         {
           "status": "awaiting_review",
           "at": "2026-11-07T02:36:15.558Z"
+        },
+        {
+          "status": "approved",
+          "at": "2026-11-07T02:43:09.416Z",
+          "note": "Approved by the owner in the agent session (2026-11-07), recorded as SRC-0040: 'I explicitly approve the proposed directions for PF-0047 (Development Runtime Manager) ... subject to the following requirements' — loopback port checks approved (127.0.0.1, configured ports, strict timeouts); services surviving Console shutdown approved with positive ownership identification, unmanaged otherwise; personal git-ignored trust bound to effective command, cwd and runtime configuration; minimal base environment plus explicitly configured variables. The specification was updated with these constraints before this approval was recorded. The plan has not been reviewed."
         }
       ]
     }
   },
-  "updatedAt": "2026-11-07T02:36:15.558Z"
+  "updatedAt": "2026-11-07T02:43:09.416Z"
 }

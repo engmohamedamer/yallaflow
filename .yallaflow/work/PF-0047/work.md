@@ -88,11 +88,11 @@ Each suggestion is labelled "suggested from <file>". Adding one is an explicit `
   - Refused if any declared port is already listening (`PORT_IN_USE`, naming the port; the process using it is never touched) or if the service is already running.
 - **Run record.** Stored in `.yallaflow/local/runtime/runs/<id>.json` with pid, pgid, Linux start time (from `/proc/<pid>/stat`) or a ps-derived start time on macOS, definition hash, startedAt, startedBy (cli|console) and log path.
 - **States** (computed on read, never trusted from the file):
-  - `stopped` (no record)
+  - `stopped` (no record, or stopped by YallaFlow)
   - `starting` (alive, readiness not yet met)
   - `running` (alive and ready, or no readiness defined)
-  - `exited` (record present, process gone; exit code when known)
-  - `unknown` (the pid is alive but its identity does not match, for example after PID reuse). Reported as "needs attention" and never signalled.
+  - `failed` (the process ended without a YallaFlow stop; exit code when known)
+  - `unknown` / unmanaged (the pid is alive but its identity does not match, for example after PID reuse). Reported as unmanaged and never signalled.
 - **Stop.**
   - Only for a process whose pid and start time still match the run record.
   - Sends `stopSignal` to the process group, waits `stopTimeoutSeconds`, then SIGKILLs the group if the identity still matches.
@@ -126,7 +126,18 @@ Port checks connect to `127.0.0.1:<port>` only, with a 300 ms timeout, and nothi
 - No automatic install, migrations, restart loops, privileged ports, remote hosts, Windows support, or stopping containers or processes YallaFlow did not start.
 - Detected services are suggestions only.
 
+### Owner decisions (SRC-0040, 2026-11-07) — binding constraints
+1. **Loopback checks.** Port and readiness checks connect only to 127.0.0.1, only for ports explicitly configured on a service, with a 300 ms timeout. The no-network guard keeps prohibiting everything else, and no external probing is ever added.
+2. **Services outlive the Console.** Ownership is tracked across restarts: pid + process start time + process group + the definition hash in the run record, plus the project's checkout fingerprint. Only a process positively identified this way is ever signalled. Anything else is reported as **unmanaged** and never terminated.
+3. **Personal trust.** It lives in `.yallaflow/local/runtime-trust.yaml` (git-ignored) and is bound to the hash of the effective command, cwd, kind, env names, ports, readiness and stop settings, plus the checkout fingerprint. Any material change requires renewed confirmation. Suggestions inferred from repository files are never executed without being added and trusted explicitly.
+4. **Controlled environment.** Services get a fixed minimal base (PATH, HOME, LANG, LC_ALL, TERM, USER, LOGNAME, SHELL, TMPDIR, TZ) plus the variables the profile names explicitly. No other variable is inherited: credentials, tokens and API keys reach a service only when the profile names them. Values are never stored.
+5. **States.** `stopped` (never started, or exited 0 after a stop), `starting`, `running`, `failed` (exited on its own, or non-zero), and `unknown`/unmanaged (identity cannot be established). There is no `exited` state.
+6. **No auto-start.** Opening a project, the Console or the Setup view never starts anything.
+7. **Restarts and concurrency.** Trust, run records, logs and errors persist across Console restarts. A per-service lock makes concurrent start/stop/restart requests serialize: the second sees the first's result and never double-starts.
+8. **Tests.** Security (no shell, cwd escape, secret refusal, env filtering, untrusted refusal, read-only console), crash recovery (killed service → failed; reused PID → unmanaged; console restart → state recovered) and concurrency (parallel starts start once).
+
 ### Unresolved Items — decisions needing owner approval (security / compatibility)
+All four were decided by the owner on 2026-11-07 (see Owner decisions above).
 1. **Loopback exception.** Allow `src/runtime/` a loopback-only TCP connect (127.0.0.1) for port and readiness checks, as a narrow, tested exception to the no-network rule.
 2. **Lifetime.** Services outlive the Console (stopped explicitly with `runtime stop`/`--all`), rather than stopping when the Console exits.
 3. **Trust storage.** Trust is personal (git-ignored), bound to the definition hash and checkout. A teammate's profile change always needs local re-trust.
@@ -137,6 +148,59 @@ Port checks connect to `127.0.0.1:<port>` only, with a 300 ms timeout, and nothi
 AC-001..AC-006 in requirements.yaml (`yallaflow requirement` / `work show PF-0047`).
 
 ## Implementation Plan
+
+**Modules (new):**
+- `src/runtime/profile.js`: load, validate and merge `.yallaflow/runtime.yaml` and `.yallaflow/local/runtime.yaml`. Covers the schema, id, port and cwd checks (`realpath` inside the root), secret-key and secret-value refusal using `isSecretKey`/`containsSecret` without echoing values, and the canonical effective definition and its SHA-256.
+- `src/runtime/trust.js`: `.yallaflow/local/runtime-trust.yaml`, holding `{ id: { hash, checkout, trustedAt } }`. Uses the checkout fingerprint from the existing shared-identity helper (or a sha256 of realpath).
+- `src/runtime/suggest.js`: Laravel, Node script and compose suggestions from `inventoryRepository` + `detectStack` + `package.json` scripts. Pure data.
+- `src/runtime/process.js`:
+  - process identity: Linux `/proc/<pid>/stat` start time; macOS `ps -o lstart= -p` (argv)
+  - group signalling and descendant tracking (reusing the pattern from `src/agents/acp.js`)
+  - environment builder: fixed base + named variables
+- `src/runtime/probe.js`: the only network code, a `127.0.0.1`-only TCP connect with a 300 ms timeout and an integer port.
+- `src/runtime/supervisor.js`:
+  - start, stop, restart, status and logs over run records in `.yallaflow/local/runtime/runs/<id>.json`
+  - logs in `.yallaflow/local/runtime/logs/<id>.log`: 5 MB cap, one rotation, opened as the child's stdout/stderr fd, so they survive Console exit
+  - a per-service lock file (O_EXCL, with stale detection by pid + start time)
+  - the readiness poller during start (up to `readyTimeoutSeconds`, default 60, then `starting` is reported as is)
+  - `failed` vs `stopped` from a stop marker that YallaFlow writes before signalling
+- `src/commands/runtime.js` + `cli.js`: `yallaflow runtime list|status [--json]|suggest [--json]|add|remove|trust|start|stop [--all]|restart|logs`. `--json` returns `yallaflow.runtime/1` (new `resources/schemas/runtime-1.schema.json`). Start, stop and trust print outcome lines and a single JSON line with `--json`.
+
+**Core integration:**
+- `STATE_OWNERSHIP`: `runtime.yaml` (cli: `runtime add|remove`), with `local/` already personal.
+- `doctor` validates `runtime.yaml` when present.
+- `.yallaflow/local` stays ignored through the existing `ensureLocalIgnored`.
+- The CLI lock is not taken for runtime operations, which never touch work state; the per-service lock is used instead.
+
+**Console:**
+- GET `/api/p/<p>/runtime`: `runtime status --json` through `runner.readFresh`.
+- GET `/api/p/<p>/runtime/<id>/logs?lines=N` (N ≤ 1000).
+- POST `/api/p/<p>/runtime/<id>/(trust|start|stop|restart)` with a fixed argv and the existing guards. Trust needs the body `{ confirm: "<id>" }`, and the others take `{}`.
+- Read-only consoles return 405.
+- **UI:** a new **Setup** tab with service cards (state chip, ports, readiness, trust state and the exact argv/cwd/env names, overridden marks), Trust/Start/Stop/Restart buttons with busy/error states, a log viewer (escaped and redacted, refresh button, best-effort redaction notice), a suggestions list with the "add" command shown under For developers (no browser-side profile editing in 1.4.0), and an unmanaged/needs-attention explanation. Arabic/English, light/dark, mobile.
+
+**Tests** (`test/runtime.test.js`, using node fixture services so no network is needed):
+- profile validation: escape, symlink, secrets, unknown fields, override merge
+- trust invalidation on any material change
+- untrusted refusal
+- start/stop/restart of a real child, with port readiness through a tiny node HTTP server on a free port
+- `PORT_IN_USE`
+- environment filtering: a parent `SECRET_TOKEN` is absent and a named variable is present
+- log redaction
+- killed-outside → `failed`
+- PID reuse simulated by a forged start time → `unmanaged`, with no signal sent
+- run-record recovery in a new CLI process
+- concurrent `start` ×5 → one process
+- `stop --all`
+- console routes (401/403/415/405 read-only, trust confirm mismatch, fixed argv)
+- the no-network guard updated to allow `src/runtime/probe.js` only, and asserting that it contains `127.0.0.1` and no other host
+- Laravel and Docker smoke tests where the tools exist: `php artisan serve` on a minimal artisan stub is not shipped, so Docker/compose is covered by profile/suggestion tests plus argv construction; real-process tests use node
+
+**Browser:** a Setup-tab scenario added to `research/release-1.4/browser-check.mjs` (start a trusted node service, see `running`, read logs, stop), on three engines.
+
+**Docs:** `docs/runtime.md` (new), console.md, cli.md, security.md and CHANGELOG.
+
+**Review:** an independent security review on an isolated copy (the real repo read-only), with findings fixed or recorded.
 
 ## Verification Evidence
 
@@ -161,3 +225,11 @@ Raw source preserved in: `.yallaflow/sources/SRC-0036/owner-1.4-complete-scope.m
 **Name:** owner-1.4-continue.md
 
 Raw source preserved in: `.yallaflow/sources/SRC-0037/owner-1.4-continue.md`. Read it directly; it is not duplicated here.
+
+## Source Added
+
+**Source ID:** SRC-0040
+**Type:** file
+**Name:** owner-1.4-spec-decisions.md
+
+Raw source preserved in: `.yallaflow/sources/SRC-0040/owner-1.4-spec-decisions.md`. Read it directly; it is not duplicated here.

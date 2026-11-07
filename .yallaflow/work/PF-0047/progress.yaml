@@ -23,9 +23,10 @@
       "summary": "Options considered: (a) in-console supervisor owning child pipes (services die with the console, logs lost on restart); (b) CLI-launched detached process groups with run records and log files under .yallaflow/local/runtime (services independent of the console, CLI and Console share one state, identity re-verified on every read). Chose (b): one Core path for CLI and Console, survives console restarts and browser reconnects, and stop safety rests on pid+start-time identity reused from the Agent Workspace."
     },
     "specification": {
-      "status": "in_progress",
+      "status": "completed",
       "startedAt": "2026-11-07T02:34:10.622Z",
-      "summary": "Specification written in work.md (profiles, suggestions, trust, supervisor, ports, Console, CLI, compatibility, non-goals) with four security/compatibility decisions for the owner: loopback-only port probe exception, services outliving the Console, personal trust bound to definition+checkout, fixed environment pass-through base."
+      "completedAt": "2026-11-07T02:43:15.703Z",
+      "summary": "Specification approved by the owner (SRC-0040/SRC-0041 decisions incorporated before approval); constraints recorded in work.md Owner decisions and AC-007..AC-009."
     },
     "implementation-planning": {
       "status": "pending"
@@ -60,5 +61,5 @@
       "changedAt": "2026-11-07T02:36:28.773Z"
     }
   ],
-  "updatedAt": "2026-11-07T02:36:28.773Z"
+  "updatedAt": "2026-11-07T02:43:15.703Z"
 }

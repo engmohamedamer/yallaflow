@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "revision": 1,
+  "revision": 2,
   "requirements": [
     {
       "id": "REQ-001",
@@ -147,6 +147,51 @@
       "status": "active",
       "recordedAt": "2026-11-07T02:34:01.071Z",
       "updatedAt": "2026-11-07T02:34:01.071Z"
+    },
+    {
+      "id": "AC-007",
+      "requirement": "REQ-003",
+      "statement": "Opening a project, the Console or the Setup view never starts a service; trust, run records, logs and errors survive Console restarts; concurrent start/stop/restart of one service serialize through a per-service lock and never start it twice.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0040",
+          "locator": "Additional requirements"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:42:49.434Z",
+      "updatedAt": "2026-11-07T02:42:49.434Z"
+    },
+    {
+      "id": "AC-008",
+      "requirement": "REQ-003",
+      "statement": "States are stopped, starting, running, failed and unknown/unmanaged; a service killed outside YallaFlow is failed; a process whose identity (pid, start time, group, project) cannot be established is reported unmanaged and never signalled; tests cover crash recovery and PID reuse.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0040",
+          "locator": "Decision 2 and additional requirements"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:42:49.434Z",
+      "updatedAt": "2026-11-07T02:42:49.434Z"
+    },
+    {
+      "id": "AC-009",
+      "requirement": "REQ-004",
+      "statement": "A service receives only the fixed minimal base environment plus variables its profile names; no other credential, token or secret variable is inherited; port checks connect only to 127.0.0.1 on configured ports with a strict timeout, and the no-network guard still forbids everything else.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0040",
+          "locator": "Decisions 1 and 4"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:42:49.434Z",
+      "updatedAt": "2026-11-07T02:42:49.434Z"
     }
   ],
   "history": [
@@ -209,7 +254,25 @@
       "id": "AC-006",
       "at": "2026-11-07T02:34:01.071Z",
       "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-007",
+      "at": "2026-11-07T02:42:49.434Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-008",
+      "at": "2026-11-07T02:42:49.434Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-009",
+      "at": "2026-11-07T02:42:49.434Z",
+      "revision": 2
     }
   ],
-  "updatedAt": "2026-11-07T02:34:01.071Z"
+  "updatedAt": "2026-11-07T02:42:49.434Z"
 }

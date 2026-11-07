@@ -2,15 +2,21 @@
   "schemaVersion": 1,
   "gates": {
     "specification": {
-      "status": "awaiting_review",
-      "requestedAt": "2026-11-07T02:36:15.767Z",
+      "status": "approved",
+      "respondedAt": "2026-11-07T02:43:09.603Z",
+      "note": "Approved by the owner in the agent session (2026-11-07), recorded as SRC-0041: 'I approve treating projects created from an explicitly selected, trusted generator through YallaFlow's Wizard as Greenfield projects' with ten requirements (validated new location, never overwrite or re-label an existing repository, provenance and stack recorded, generated code not treated as understood or approved, existing discovery/baseline rules intact, stack/structure/commands shown first, confirmation for external commands and installs, safe failure with diagnostics, canonical Core init, continue with Claude Code or Codex). The specification was updated with these constraints before this approval was recorded. The plan has not been reviewed.",
       "history": [
         {
           "status": "awaiting_review",
           "at": "2026-11-07T02:36:15.767Z"
+        },
+        {
+          "status": "approved",
+          "at": "2026-11-07T02:43:09.603Z",
+          "note": "Approved by the owner in the agent session (2026-11-07), recorded as SRC-0041: 'I approve treating projects created from an explicitly selected, trusted generator through YallaFlow's Wizard as Greenfield projects' with ten requirements (validated new location, never overwrite or re-label an existing repository, provenance and stack recorded, generated code not treated as understood or approved, existing discovery/baseline rules intact, stack/structure/commands shown first, confirmation for external commands and installs, safe failure with diagnostics, canonical Core init, continue with Claude Code or Codex). The specification was updated with these constraints before this approval was recorded. The plan has not been reviewed."
         }
       ]
     }
   },
-  "updatedAt": "2026-11-07T02:36:15.767Z"
+  "updatedAt": "2026-11-07T02:43:09.603Z"
 }

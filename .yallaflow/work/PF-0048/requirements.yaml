@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "revision": 1,
+  "revision": 2,
   "requirements": [
     {
       "id": "REQ-001",
@@ -128,6 +128,51 @@
       "status": "active",
       "recordedAt": "2026-11-07T02:34:50.723Z",
       "updatedAt": "2026-11-07T02:34:50.723Z"
+    },
+    {
+      "id": "AC-007",
+      "requirement": "REQ-003",
+      "statement": "A project created by yallaflow new create records project.origin (createdBy, generator, version, template, stack, planHash, createdAt) through Core init and is treated as Greenfield by the understanding gate; a project without that provenance (including any existing repository) keeps today's discovery and baseline rules.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0041",
+          "locator": "PF-0048 approval and items 2, 3, 5"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:42:49.605Z",
+      "updatedAt": "2026-11-07T02:42:49.605Z"
+    },
+    {
+      "id": "AC-008",
+      "requirement": "REQ-003",
+      "statement": "Generated code is never treated as understood or approved: no project-memory facts are created from it and brief/overview state that the generated code is not reviewed; the first work item lets the developer continue with Claude Code or Codex in the normal workflow.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0041",
+          "locator": "items 4 and 10"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:42:49.605Z",
+      "updatedAt": "2026-11-07T02:42:49.605Z"
+    },
+    {
+      "id": "AC-009",
+      "requirement": "REQ-002",
+      "statement": "The plan review shows the selected stack, the expected generated structure and every command with its network and dependency-install effects, and create requires explicit confirmation for any external command; failures keep staging with the generator log, exit code and step reached.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0041",
+          "locator": "items 6, 7, 8"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:42:49.605Z",
+      "updatedAt": "2026-11-07T02:42:49.605Z"
     }
   ],
   "history": [
@@ -184,7 +229,25 @@
       "id": "AC-006",
       "at": "2026-11-07T02:34:50.723Z",
       "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-007",
+      "at": "2026-11-07T02:42:49.605Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-008",
+      "at": "2026-11-07T02:42:49.605Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-009",
+      "at": "2026-11-07T02:42:49.605Z",
+      "revision": 2
     }
   ],
-  "updatedAt": "2026-11-07T02:34:50.723Z"
+  "updatedAt": "2026-11-07T02:42:49.605Z"
 }
