@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-07T23:38:10.317Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+        "verificationRunIds": [
+          "V-002"
+        ]
+      },
+      "summary": "Assessed after V-002 (npm run check 980/980) and a browser check with a simulated Codex usage limit.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "A usage-limit turn (reply text then a generic error), a crash and a dropped Claude channel each emit session.stopped with the reason (and retry time for the limit) and save lastStop in the session record; the limit survives End and a console restart; the item chat shows the reason card.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/bridge.js",
+              "contentHash": "sha256:7f252d60d5017ab91a4d7b31eb41082d4af06f8385e9d9614a4a03cfbb34156b",
+              "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-continue.test.js",
+              "contentHash": "sha256:3b23a7b47576979ba930d5a9191e5b3a9c369d73dfdc0abde0d53fccc7dec49e",
+              "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-claude-experimental.test.js",
+              "contentHash": "sha256:9bd75f67e54f3c59fc6aaeebb4207eff86a2e341bc0307d48ae0489805867566",
+              "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0066",
+              "verificationRunId": "V-002"
+            },
+            {
+              "type": "runtime",
+              "description": "playwright-cli 2026-11-08, simulated Codex limit — card 'Codex وصل لحد الاستخدام في الاشتراك… بعد 10:35 PM', 0 console errors"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "The card offers Continue with each ready provider (not the one that just hit its limit) and Copy the continue message; switchAgent ends Codex or unlinks Claude first and stops if that fails, then starts or connects the chosen agent; nothing runs without a click.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:c43c419dc354d0f2549cd8a573015db38d378da5e5e37c89a3fc8d5323417444",
+              "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-continue.test.js",
+              "contentHash": "sha256:3b23a7b47576979ba930d5a9191e5b3a9c369d73dfdc0abde0d53fccc7dec49e",
+              "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0066",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "After a successful switch the message box holds 'Continue <id>. The previous agent (…) <reason>. Start with yallaflow handoff <id>…'; no message action is called.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:c43c419dc354d0f2549cd8a573015db38d378da5e5e37c89a3fc8d5323417444",
+              "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-continue.test.js",
+              "contentHash": "sha256:3b23a7b47576979ba930d5a9191e5b3a9c369d73dfdc0abde0d53fccc7dec49e",
+              "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0066",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "The item chat lists that item's sessions (agent, start, end, how it stopped) from status().history, read from .yallaflow/local/agent-sessions; nothing else is written.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/bridge.js",
+              "contentHash": "sha256:7f252d60d5017ab91a4d7b31eb41082d4af06f8385e9d9614a4a03cfbb34156b",
+              "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:c43c419dc354d0f2549cd8a573015db38d378da5e5e37c89a3fc8d5323417444",
+              "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-continue.test.js",
+              "contentHash": "sha256:3b23a7b47576979ba930d5a9191e5b3a9c369d73dfdc0abde0d53fccc7dec49e",
+              "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0066",
+              "verificationRunId": "V-002"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-07T23:38:10.317Z"
+}

@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "The console's floating agent chat follows the page (chatCtx in resources/console/app.js): a work item page is that item's chat; Overview, Flow, Work, Setup, Worktrees and Insights share a project chat whose session has no workId. One agent session per checkout still applies: an item's session appears on project pages as a link, and a project session on an item page is labelled as the project chat.",
+      "evidence": [
+        "resources/console/app.js",
+        "test/console-project-chat.test.js",
+        "verification:V-001"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-07T23:45:18.155Z",
+      "factId": "CTX-0124",
+      "promotedAt": "2026-11-07T23:45:18.289Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-07T23:45:18.289Z",
+  "reviewedAt": "2026-11-07T23:45:18.289Z"
+}

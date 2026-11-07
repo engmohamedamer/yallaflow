@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T23:52:13.837Z",
+      "finishedAt": "2026-11-07T23:56:28.199Z",
+      "verifiedAt": "2026-11-07T23:56:28.199Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "npm pack --dry-run 2>&1 | grep -q 'total files: 273' && node src/cli.js --version | grep -qx 1.4.0 && git diff --check",
+      "executionMode": "shell",
+      "executable": "npm pack --dry-run 2>&1 | grep -q 'total files: 273' && node src/cli.js --version | grep -qx 1.4.0 && git diff --check",
+      "args": [],
+      "displayCommand": "npm pack --dry-run 2>&1 | grep -q 'total files: 273' && node src/cli.js --version | grep -qx 1.4.0 && git diff --check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T23:56:42.871Z",
+      "finishedAt": "2026-11-07T23:56:43.957Z",
+      "verifiedAt": "2026-11-07T23:56:43.957Z",
+      "log": "V-002-verification.log"
+    }
+  ]
+}

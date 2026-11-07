@@ -113,20 +113,21 @@
   - test/new-project.test.js (repository @ 9437b4c)
   - npm run check (passed) (runtime, PF-0057 V-004)
 
-<!-- yallaflow-fact:CTX-0120 -->
-### CTX-0120 — Request revisions are allowed only before work starts: pending routing or INTAKE with no checkpoint activity or revision history in the progress ledger. Core preserves request history, sources, classified title and workflow; held, closed and DONE work cannot be edited. Snapshot and work detail expose requestEditable from the same Core policy; console editing loads full raw text and saves through request revise.
+<!-- yallaflow-fact:CTX-0122 -->
+### CTX-0122 — Request revisions are allowed only before work starts: pending routing or INTAKE with no checkpoint activity or revision history in the progress ledger. Core preserves request history, sources, classified title and workflow; held, closed and DONE work cannot be edited. Snapshot and work detail expose requestEditable from the same Core policy; console editing loads full raw text and saves through request revise. Files pasted or picked while editing are attached through 'intake add --before-start', which re-checks the same policy under the workspace lock before any source is persisted (console route work/<id>/revision-sources).
 
 - **State:** current
 - **Confidence:** confirmed
 - **Provenance:** repository
-- **Source work:** PF-0063
+- **Source work:** PF-0061
 - **Knowledge ID:** K-001
-- **Promoted at:** 2026-11-07T20:50:53.879Z
-- **Verified:** 2026-11-07T20:50:53.879Z (commit ad9fe0d)
+- **Promoted at:** 2026-11-07T23:19:11.308Z
+- **Supersedes:** CTX-0120
+- **Verified:** 2026-11-07T23:19:11.308Z (commit 9cfe4b5)
 - **Evidence:**
-  - src/behavior/routing.js (repository @ ad9fe0d)
-  - src/flow/snapshot.js (repository @ ad9fe0d)
-  - resources/console/app.js (repository @ ad9fe0d)
-  - node --import ./test-support/isolate-user-config.js --test test/request-revision.test.js test/request-revision-ui.test.js test/console-actions.test.js test/console-acceptance.test.js test/console-server.test.js (passed) (runtime, PF-0063 V-004)
+  - src/behavior/routing.js (repository @ 9cfe4b5)
+  - src/commands/intake.js (repository @ 9cfe4b5)
+  - src/console/server.js (repository @ 9cfe4b5)
+  - npm run check (passed) (runtime, PF-0061 V-005)
 
 <!-- yallaflow-context:end -->

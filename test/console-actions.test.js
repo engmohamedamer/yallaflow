@@ -296,3 +296,63 @@ test('review findings: re-deciding after "request changes", request ids per gate
   await writeFile(file, `${JSON.stringify(ledger, null, 2)}\n`);
   assert.match(run(root, ['doctor'], { ok: false }).stdout, /provenance must be exactly/);
 });
+
+// PF-0061: pasted screenshots use the same intake pipeline when editing a request.
+test('revision attachments preserve bytes, deduplicate retries and respect request-edit and HTTP guards', async () => {
+  const root = await freshProject('yf-revision-files-');
+  const id = routedBoundedChange(root, 'Screenshot request');
+  const c = await consoleOn(root);
+  const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+j3ioAAAAASUVORK5CYII=', 'base64');
+  const upload = (target = id, extra = {}, body = png, suffix = 'revision-sources') => fetch(`${c.server.url}api/p/${c.pid}/work/${target}/${suffix}`, {
+    method: 'POST', headers: { Authorization: `Bearer ${c.server.token}`, Origin: c.origin, 'Content-Type': 'application/octet-stream', 'X-Request-Id': 'revision-12345', 'X-File-Name': 'screenshot.png', ...extra }, body
+  });
+  try {
+    assert.equal((await upload(id, { Origin: 'http://evil.example' })).status, 403);
+    assert.equal((await upload(id, { Authorization: 'Bearer invalid' })).status, 401);
+    assert.equal((await upload(id, { 'Content-Type': 'text/plain' })).status, 415);
+    assert.equal((await upload(id, { 'X-File-Name': 'bad.svg' })).status, 415);
+    assert.equal((await upload(id, {}, Buffer.alloc(0))).status, 400);
+    assert.equal((await upload(id, {}, png, 'sources')).status, 403, 'creation request binding remains enforced');
+    assert.equal((await c.post(`work/${id}/actions/revise`, { text: 'Updated with screenshot', reason: 'Visual reference' })).status, 200);
+    const response = await upload(); assert.equal(response.status, 201, await response.clone().text());
+    const first = await response.json(); assert.ok(first.source);
+    const stored = await readFile(path.join(root, '.yallaflow', 'sources', first.source, 'screenshot.png'));
+    assert.deepEqual(stored, png);
+    const duplicate = await upload(); assert.equal(duplicate.status, 200);
+    assert.equal((await duplicate.json()).source, first.source);
+    assert.equal((await meta(root, id)).sources.length, 1);
+    assert.equal((await meta(root, id)).requestHistory.length, 1);
+    assert.equal((await (await c.get(`work/${id}`)).json()).item.requestEditable, true);
+    run(root, ['advance', id]);
+    assert.equal((await upload()).status, 409);
+    assert.equal((await meta(root, id)).sources.length, 1);
+    const untouched = routedBoundedChange(root, 'Held request');
+    run(root, ['work', 'hold', untouched, '--reason', 'Waiting', '--accept-minimum-version', '1.4.0']);
+    assert.equal((await upload(untouched)).status, 409);
+    run(root, ['work', 'resume', untouched]);
+    run(root, ['work', 'close', untouched, '--outcome', 'cancelled', '--reason', 'Cancelled']);
+    assert.equal((await upload(untouched)).status, 409);
+    const pending = createdWork(run(root, ['start', 'Pending request']).stdout);
+    assert.equal((await upload(pending)).status, 201, 'unclassified requests can also receive screenshots');
+    const ro = await consoleOn(root, { readOnly: true });
+    try {
+      const denied = await fetch(`${ro.server.url}api/p/${ro.pid}/work/${pending}/revision-sources`, { method: 'POST', headers: { Authorization: `Bearer ${ro.server.token}`, Origin: ro.origin, 'Content-Type': 'application/octet-stream' }, body: png });
+      assert.equal(denied.status, 405);
+    } finally { await ro.close(); }
+  } finally { await c.close(); }
+});
+
+test('revision upload rechecks eligibility in the CLI if work starts after its queued check', async () => {
+  const { attachFile } = await import('../src/console/create.js');
+  const { Readable } = await import('node:stream');
+  const root = await freshProject('yf-revision-race-');
+  const id = routedBoundedChange(root, 'Request before race');
+  const request = Readable.from([Buffer.from('reference text')]);
+  request.headers = { 'x-request-id': 'revision-race-123', 'x-file-name': 'notes.txt' };
+  const runner = { exclusive: async (cwd, callback) => callback(async (argv) => {
+    run(root, ['advance', id]); // external CLI wins after the console eligibility check
+    return run(cwd, argv, { ok: false });
+  }) };
+  await assert.rejects(attachFile(root, id, request, runner, { revision: true }), /already started/);
+  assert.equal((await meta(root, id)).sources?.length ?? 0, 0);
+});

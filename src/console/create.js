@@ -17,6 +17,8 @@ import { workspacePath } from '../core/workspace.js';
 import { loadSource } from '../core/sources.js';
 import { isWorkId } from '../core/ids.js';
 import { availabilityNote } from '../flow/snapshot.js';
+import { canReviseRequest } from '../behavior/routing.js';
+import { loadWorkProgress } from '../core/progress.js';
 import { resolveWorkflowPolicy } from '../behavior/policy.js';
 import { MAX_EXTRACTION_INPUT_BYTES } from '../intake/constants.js';
 
@@ -188,7 +190,7 @@ export async function availabilityOf(root, sourceId) {
   }
 }
 
-export async function attachFile(root, workId, request, runner) {
+export async function attachFile(root, workId, request, runner, { revision = false } = {}) {
   const requestId = request.headers['x-request-id'];
   if (typeof requestId !== 'string' || !REQUEST_ID.test(requestId)) throw new HttpError(400, 'BAD_REQUEST', 'X-Request-Id is required.');
   let meta;
@@ -197,8 +199,14 @@ export async function attachFile(root, workId, request, runner) {
   } catch {
     throw new HttpError(404, 'NOT_FOUND', `Work item ${workId} was not found.`);
   }
-  // Attachments belong to the Create Work action that made this item, nothing else.
-  if (meta.attestation?.recordedVia !== 'console' || meta.attestation.requestId !== requestId) {
+  const assertEditable = async (current) => {
+    const progress = current.routingStatus === 'pending' ? null : await loadWorkProgress(root, current);
+    if (!canReviseRequest(current, progress)) throw new HttpError(409, 'REQUEST_STARTED', 'Request attachments can only be added before work starts.');
+  };
+  // Creation retains its request binding. Revisions use the existing edit policy,
+  // including for work originally created by the CLI.
+  if (revision) await assertEditable(meta);
+  else if (meta.attestation?.recordedVia !== 'console' || meta.attestation.requestId !== requestId) {
     throw new HttpError(403, 'NOT_THIS_REQUEST', 'Files can be attached here only to the work item this console request created.');
   }
   const name = safeFileName(request.headers['x-file-name']);
@@ -215,9 +223,10 @@ export async function attachFile(root, workId, request, runner) {
     // two identical uploads at once (a double click, a retry) still store one copy.
     const outcome = await runner.exclusive(root, async (exec) => {
       const current = await readMeta(root, workId);
+      if (revision) await assertEditable(current);
       const existing = await linkedSourceWithHash(root, current, received.sha256);
       if (existing) return { existing };
-      return { result: await exec(['intake', 'add', workId, received.file, '--via', 'console']) };
+      return { result: await exec(['intake', 'add', workId, received.file, '--via', 'console', ...(revision ? ['--before-start'] : [])]) };
     });
     if (outcome.existing) return { source: outcome.existing, name, duplicate: true, ...(await availabilityOf(root, outcome.existing)) };
     const result = outcome.result;

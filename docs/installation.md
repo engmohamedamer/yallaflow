@@ -56,11 +56,11 @@ git add .yallaflow CLAUDE.md AGENTS.md && git commit -m "Initialize YallaFlow"
 
 Then open Claude Code or Codex in the repository and describe the work. `yallaflow agent setup claude|codex` remains available to re-create a pointer file manually.
 
-To follow the work in a browser, run `yallaflow console` in the project (local; its one action is Create Work; see [`console.md`](console.md)). Keep other projects in view with `yallaflow console add <folder>`.
+To follow the work in a browser, run `yallaflow console` in the project (local; it changes things only when you confirm an action on the page, and `--read-only` turns every change off; see [`console.md`](console.md)). Keep other projects in view with `yallaflow console add <folder>`.
 
 `.yallaflow/` is durable project state and is meant to be committed; `doctor` warns when it is neither tracked nor deliberately ignored. Review [`security.md`](security.md) before capturing files that might contain sensitive data.
 
-Upgrading an existing workspace: run `yallaflow upgrade status`, then see [`upgrading-to-v1.2.0.md`](upgrading-to-v1.2.0.md), [`upgrading-to-v1.1.0.md`](upgrading-to-v1.1.0.md), [`upgrading-to-v1.0.1.md`](upgrading-to-v1.0.1.md) and [`upgrading-to-v1.0.md`](upgrading-to-v1.0.md) (and [`upgrading-to-v0.3.10.md`](upgrading-to-v0.3.10.md), [`upgrading-to-v0.3.9.md`](upgrading-to-v0.3.9.md), [`upgrading-to-v0.3.8.md`](upgrading-to-v0.3.8.md), [`upgrading-to-v0.3.7.md`](upgrading-to-v0.3.7.md), [`upgrading-to-v0.3.6.md`](upgrading-to-v0.3.6.md) for earlier changes).
+Upgrading an existing workspace: run `yallaflow upgrade status`, then see [`upgrading-to-v1.4.0.md`](upgrading-to-v1.4.0.md), [`upgrading-to-v1.2.0.md`](upgrading-to-v1.2.0.md), [`upgrading-to-v1.1.0.md`](upgrading-to-v1.1.0.md), [`upgrading-to-v1.0.1.md`](upgrading-to-v1.0.1.md) and [`upgrading-to-v1.0.md`](upgrading-to-v1.0.md) (and [`upgrading-to-v0.3.10.md`](upgrading-to-v0.3.10.md), [`upgrading-to-v0.3.9.md`](upgrading-to-v0.3.9.md), [`upgrading-to-v0.3.8.md`](upgrading-to-v0.3.8.md), [`upgrading-to-v0.3.7.md`](upgrading-to-v0.3.7.md), [`upgrading-to-v0.3.6.md`](upgrading-to-v0.3.6.md) for earlier changes).
 
 ## Updating YallaFlow
 

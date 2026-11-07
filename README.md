@@ -82,6 +82,15 @@ flowchart TB
 
 The depth adapts to the work. A bounded bug fix goes from root-cause analysis straight to the fix, while architectural work gets a reviewed design, specification, or plan. Nothing is called done without fresh verification evidence, and work that carries acceptance criteria is checked against them before it closes. What was learned becomes reviewed project knowledge. [Workflows in detail →](docs/workflows.md)
 
+## What's new in 1.4.0
+
+- **Work lifecycle.** Put work on hold, resume it, or close it without delivery (`yallaflow work hold|resume|close`). Closed work is never counted as done.
+- **Manage work from the console.** Run YallaFlow's own actions on a work item, make review-gate decisions with a note, and edit a request before work starts. [Console →](docs/console.md)
+- **Project Overview.** Stack from repository evidence, understanding from project memory, and guided onboarding. Run `yallaflow overview` or open the console's **Overview** tab.
+- **Development runtime.** Start, stop and watch your app's services from the console's **Setup** tab, after you review and trust them. [Runtime →](docs/runtime.md)
+- **New Project Wizard.** Plan a new project with an official generator, review the exact commands, then create it. [New project →](docs/new-project.md)
+- **An agent chat that keeps work moving.** The chat is on every console page: a work item page is that item's chat, and the other pages share a project chat. If an agent stops (for example, at a usage limit), the item offers to continue with another agent. Codex is supported, and Claude Code is available as an opt-in experiment. [Agents →](docs/agents.md)
+
 ## What's new in 1.3.0
 
 - **Agent Workspace** (opt-in, `yallaflow console --agents`): work with Codex from the console using your own ChatGPT subscription. You get chat, live activity, and tool-permission requests next to the Flow. No API keys, ever. [Agent Workspace →](docs/agents.md)
@@ -154,11 +163,12 @@ A maintainer runs `yallaflow init`, approves the project understanding, runs `ya
 ## Upgrading
 
 ```bash
-npm install -g yallaflow@1.2.0
+npm install -g yallaflow@1.4.0
 yallaflow doctor
+yallaflow agent refresh
 ```
 
-Existing work items, project memory and sources are unchanged, and 1.2.0 needs no `agent refresh`. [Upgrading to 1.2.0 →](docs/upgrading-to-v1.2.0.md) · [from 1.0.x: 1.1.0 →](docs/upgrading-to-v1.1.0.md)
+Existing work items, project memory and sources are unchanged. 1.4.0 brings Agent Contract v11, so run `agent refresh` once per project. [Upgrading to 1.4.0 →](docs/upgrading-to-v1.4.0.md) · [1.2.0 →](docs/upgrading-to-v1.2.0.md) · [from 1.0.x: 1.1.0 →](docs/upgrading-to-v1.1.0.md)
 
 ## Commands you might run yourself
 

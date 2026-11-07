@@ -1,0 +1,841 @@
+TAP version 13
+# Subtest: start --help creates no work and prints help
+ok 1 - start --help creates no work and prints help
+  ---
+  duration_ms: 156.869855
+  type: 'test'
+  ...
+# Subtest: start -h creates no work
+ok 2 - start -h creates no work
+  ---
+  duration_ms: 113.486708
+  type: 'test'
+  ...
+# Subtest: verify --help never attempts to run a verification command
+ok 3 - verify --help never attempts to run a verification command
+  ---
+  duration_ms: 160.46374
+  type: 'test'
+  ...
+# Subtest: help is non-mutating across every command namespace
+ok 4 - help is non-mutating across every command namespace
+  ---
+  duration_ms: 3838.774795
+  type: 'test'
+  ...
+# Subtest: an unknown option returns an actionable error without mutating state
+ok 5 - an unknown option returns an actionable error without mutating state
+  ---
+  duration_ms: 138.771619
+  type: 'test'
+  ...
+# Subtest: a merge-collided work item is listed as invalid and never hides the project
+ok 6 - a merge-collided work item is listed as invalid and never hides the project
+  ---
+  duration_ms: 2225.163604
+  type: 'test'
+  ...
+# Subtest: the exact Vult message: a ledger pinned to another registry version
+ok 7 - the exact Vult message: a ledger pinned to another registry version
+  ---
+  duration_ms: 732.804168
+  type: 'test'
+  ...
+# Subtest: an unreadable meta.yaml is reported, not fatal
+ok 8 - an unreadable meta.yaml is reported, not fatal
+  ---
+  duration_ms: 699.948494
+  type: 'test'
+  ...
+# Subtest: zero work items: no completion is claimed
+ok 9 - zero work items: no completion is claimed
+  ---
+  duration_ms: 553.17236
+  type: 'test'
+  ...
+# Subtest: console: an invalid item is a data warning in a 200 snapshot, not a failed project
+ok 10 - console: an invalid item is a data warning in a 200 snapshot, not a failed project
+  ---
+  duration_ms: 1694.902886
+  type: 'test'
+  ...
+# Subtest: console UI: the theme button is matched by its own attribute, never by <html data-theme>
+ok 11 - console UI: the theme button is matched by its own attribute, never by <html data-theme>
+  ---
+  duration_ms: 8.468896
+  type: 'test'
+  ...
+# Subtest: work-item actions run the canonical commands: same records as the CLI, Core refusals passed through
+ok 12 - work-item actions run the canonical commands: same records as the CLI, Core refusals passed through
+  ---
+  duration_ms: 3519.892783
+  type: 'test'
+  ...
+# Subtest: request edits use full text before work starts and refuse stale or invalid saves
+ok 13 - request edits use full text before work starts and refuse stale or invalid saves
+  ---
+  duration_ms: 1724.570454
+  type: 'test'
+  ...
+# Subtest: action input is validated and values never become options
+ok 14 - action input is validated and values never become options
+  ---
+  duration_ms: 654.035799
+  type: 'test'
+  ...
+# Subtest: security: token, Origin, content type and read-only consoles guard every action and decision
+ok 15 - security: token, Origin, content type and read-only consoles guard every action and decision
+  ---
+  duration_ms: 367.104163
+  type: 'test'
+  ...
+# Subtest: gate decisions: material shown first, exact confirmation, stale and duplicate protection, console provenance
+ok 16 - gate decisions: material shown first, exact confirmation, stale and duplicate protection, console provenance
+  ---
+  duration_ms: 2512.100769
+  type: 'test'
+  ...
+# Subtest: CLI decisions are recorded exactly as before (no provenance), and a bad provenance channel records nothing
+ok 17 - CLI decisions are recorded exactly as before (no provenance), and a bad provenance channel records nothing
+  ---
+  duration_ms: 2100.30119
+  type: 'test'
+  ...
+# Subtest: the Agent Workspace never reaches gate decisions, and agents never inherit the provenance channel
+ok 18 - the Agent Workspace never reaches gate decisions, and agents never inherit the provenance channel
+  ---
+  duration_ms: 2.345081
+  type: 'test'
+  ...
+# Subtest: review findings: re-deciding after "request changes", request ids per gate, malformed bodies, provenance limits, strict doctor
+ok 19 - review findings: re-deciding after "request changes", request ids per gate, malformed bodies, provenance limits, strict doctor
+  ---
+  duration_ms: 2626.440732
+  type: 'test'
+  ...
+# Subtest: revision attachments preserve bytes, deduplicate retries and respect request-edit and HTTP guards
+ok 20 - revision attachments preserve bytes, deduplicate retries and respect request-edit and HTTP guards
+  ---
+  duration_ms: 1862.091277
+  type: 'test'
+  ...
+# Subtest: revision upload rechecks eligibility in the CLI if work starts after its queued check
+not ok 21 - revision upload rechecks eligibility in the CLI if work starts after its queued check
+  ---
+  duration_ms: 589.147541
+  type: 'test'
+  location: '/home/engamer/Amasi/YallaFlow/test/console-actions.test.js:345:1'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of undefined (reading 'length')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///home/engamer/Amasi/YallaFlow/test/console-actions.test.js:357:47)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a refused send keeps its error after the agent state reloads
+ok 22 - a refused send keeps its error after the agent state reloads
+  ---
+  duration_ms: 4.710861
+  type: 'test'
+  ...
+# Subtest: a successful send reports success and leaves no error
+ok 23 - a successful send reports success and leaves no error
+  ---
+  duration_ms: 13.547199
+  type: 'test'
+  ...
+# Subtest: a connected Claude Code whose mode is unknown cannot be sent to and says why
+ok 24 - a connected Claude Code whose mode is unknown cannot be sent to and says why
+  ---
+  duration_ms: 3.9124
+  type: 'test'
+  ...
+# Subtest: once the mode is reported the panel offers Send
+ok 25 - once the mode is reported the panel offers Send
+  ---
+  duration_ms: 1.729383
+  type: 'test'
+  ...
+# Subtest: the Arabic panel explains the wait too
+ok 26 - the Arabic panel explains the wait too
+  ---
+  duration_ms: 3.250435
+  type: 'test'
+  ...
+# Subtest: a failed send puts the typed message back
+ok 27 - a failed send puts the typed message back
+  ---
+  duration_ms: 0.458201
+  type: 'test'
+  ...
+# YallaFlow foundation CLI
+# Give AI your project, not just your prompt.
+# Usage:
+#   yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]
+#   yallaflow start [request]
+#   yallaflow start --keep-active -- <request>
+#   yallaflow activate <work-id>
+#   yallaflow request --help
+#   yallaflow intake <file> [<file> ...] [--title TITLE]
+#   yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT] [--before-start]
+#   yallaflow intake ticket <payload-file|ticket-ref> [--provider github|jira|azure-devops] [--work <work-id>] [--reason TEXT] [--fetch [--attachments]] [--attachment <file>]... [--title TITLE] [--max-comments N]
+#   yallaflow source --help
+#   yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]
+#   yallaflow baseline --help
+#   yallaflow guide [work-id]
+#   yallaflow ready [work-id]
+#   yallaflow skill <skill-id> [--work <work-id>]
+#   yallaflow checkpoint --help
+#   yallaflow question --help
+#   yallaflow knowledge --help
+#   yallaflow requirement --help
+#   yallaflow convergence --help
+#   yallaflow impact --help
+#   yallaflow context --help
+#   yallaflow upgrade status|plan
+#   yallaflow brief
+#   yallaflow inspect
+#   yallaflow limitation --help
+#   yallaflow agent --help
+#   yallaflow decompose --help
+#   yallaflow progress <parent-id>
+#   yallaflow next <parent-id>
+#   yallaflow approve <work-id> --stage GATE [--note TEXT]
+#   yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]
+#   yallaflow handoff [work-id]
+#   yallaflow feature <title> --scope SCOPE
+#   yallaflow bug <title> --scope SCOPE
+#   yallaflow investigate <title> --scope SCOPE
+#   yallaflow change <title> --scope SCOPE
+#   yallaflow refactor <title> --scope SCOPE
+#   yallaflow release <title> --scope SCOPE
+#   yallaflow purpose --help
+#   yallaflow finish [work-id] [--verbose]
+#   yallaflow qc --help
+#   yallaflow demo --help
+#   yallaflow shared --help
+#   yallaflow status
+#   yallaflow snapshot [--json]
+#   yallaflow overview [--json]
+#   yallaflow runtime --help
+#   yallaflow new --help
+#   yallaflow history --help
+#   yallaflow console [--port N] [--no-open] [--project DIR]... [--read-only] [--agents]
+#   yallaflow agents detect
+#   yallaflow work show <work-id> [--json]
+#   yallaflow work hold|resume|close <work-id> ...  (lifecycle: on hold, closed without delivery)
+#   yallaflow resume [work-id]
+#   yallaflow doctor [--clear-lock]
+#   yallaflow advance [work-id]
+#   yallaflow verify [work-id] -- <executable> [args...]
+#   yallaflow verify [work-id] --shell "<command>"
+#   yallaflow verify [work-id] --script <path>
+#   yallaflow verify list [work-id]
+#   yallaflow reopen <work-id> --to implementation|verification|review --reason REASON
+#   yallaflow reopen <work-id> --reason REASON   (closed work)
+#   yallaflow --version
+# Subtest: start without new options behaves exactly as before (focus moves to the new item)
+ok 28 - start without new options behaves exactly as before (focus moves to the new item)
+  ---
+  duration_ms: 1095.778229
+  type: 'test'
+  ...
+# Subtest: parseStartArgs: new options only as leading tokens; anything else is the legacy request
+ok 29 - parseStartArgs: new options only as leading tokens; anything else is the legacy request
+  ---
+  duration_ms: 2.724981
+  type: 'test'
+  ...
+# Subtest: --keep-active never replaces unfinished active work; routing and checkpoints never move focus; activate does
+ok 30 - --keep-active never replaces unfinished active work; routing and checkpoints never move focus; activate does
+  ---
+  duration_ms: 1172.858723
+  type: 'test'
+  ...
+# Subtest: --keep-active never activates, even when no work item is active (owner decision)
+ok 31 - --keep-active never activates, even when no work item is active (owner decision)
+  ---
+  duration_ms: 687.843278
+  type: 'test'
+  ...
+# Subtest: console create with nothing active leaves nothing active
+ok 32 - console create with nothing active leaves nothing active
+  ---
+  duration_ms: 622.786976
+  type: 'test'
+  ...
+# Subtest: attachments report what YallaFlow could actually do with each file
+ok 33 - attachments report what YallaFlow could actually do with each file
+  ---
+  duration_ms: 1885.384659
+  type: 'test'
+  ...
+# Subtest: request IDs: a retried or concurrent request creates exactly one item, with an unverified console attestation
+ok 34 - request IDs: a retried or concurrent request creates exactly one item, with an unverified console attestation
+  ---
+  duration_ms: 603.166713
+  type: 'test'
+  ...
+# Subtest: helpers: titles come from the user's words; file names are reduced safely
+ok 35 - helpers: titles come from the user's words; file names are reduced safely
+  ---
+  duration_ms: 0.388489
+  type: 'test'
+  ...
+# Subtest: POST guards: token, Origin, Host, content type, size, read-only, unknown routes
+ok 36 - POST guards: token, Origin, Host, content type, size, read-only, unknown routes
+  ---
+  duration_ms: 63.474923
+  type: 'test'
+  ...
+# Subtest: create: unclassified and classified items through Core; shell text stored verbatim; focus kept
+ok 37 - create: unclassified and classified items through Core; shell text stored verbatim; focus kept
+  ---
+  duration_ms: 1136.421513
+  type: 'test'
+  ...
+# Subtest: create: concurrent requests get distinct IDs; repeated ones never duplicate
+ok 38 - create: concurrent requests get distinct IDs; repeated ones never duplicate
+  ---
+  duration_ms: 1105.660824
+  type: 'test'
+  ...
+# Subtest: brownfield without approved understanding: Core refuses and nothing is created
+ok 39 - brownfield without approved understanding: Core refuses and nothing is created
+  ---
+  duration_ms: 118.725767
+  type: 'test'
+  ...
+# Subtest: attachments: preserved through intake, deduplicated on retry, refused safely, temp files removed, item kept
+ok 40 - attachments: preserved through intake, deduplicated on retry, refused safely, temp files removed, item kept
+  ---
+  duration_ms: 1427.38833
+  type: 'test'
+  ...
+# Subtest: an oversized upload is refused before it is stored
+ok 41 - an oversized upload is refused before it is stored
+  ---
+  duration_ms: 3323.742171
+  type: 'test'
+  ...
+# Subtest: review: requests starting with "-" keep their classification; "--help" is plain text
+ok 42 - review: requests starting with "-" keep their classification; "--help" is plain text
+  ---
+  duration_ms: 1209.441649
+  type: 'test'
+  ...
+# Subtest: review: two identical uploads at once store one copy; a long non-ASCII name is shortened, not leaked
+ok 43 - review: two identical uploads at once store one copy; a long non-ASCII name is shortened, not leaked
+  ---
+  duration_ms: 606.881501
+  type: 'test'
+  ...
+# Subtest: resume on a deferred item says how to activate it, and changes nothing
+ok 44 - resume on a deferred item says how to activate it, and changes nothing
+  ---
+  duration_ms: 378.932126
+  type: 'test'
+  ...
+# Subtest: console add/list/remove keep a user-level project list and never touch the project
+ok 45 - console add/list/remove keep a user-level project list and never touch the project
+  ---
+  duration_ms: 1431.557342
+  type: 'test'
+  ...
+# Subtest: snapshot items carry recorded completion time and verification counts
+ok 46 - snapshot items carry recorded completion time and verification counts
+  ---
+  duration_ms: 858.986084
+  type: 'test'
+  ...
+# Subtest: worktrees: listed from Git files, changed files and overlaps reported, Git never written
+ok 47 - worktrees: listed from Git files, changed files and overlaps reported, Git never written
+  ---
+  duration_ms: 683.563313
+  type: 'test'
+  ...
+# Subtest: a planted worktree gitdir is ignored: nothing is read or run outside real worktrees
+ok 48 - a planted worktree gitdir is ignored: nothing is read or run outside real worktrees
+  ---
+  duration_ms: 275.900239
+  type: 'test'
+  ...
+# Subtest: verify never records a run on work that became DONE while it ran
+ok 49 - verify never records a run on work that became DONE while it ran
+  ---
+  duration_ms: 411.706921
+  type: 'test'
+  ...
+# Subtest: agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+ok 50 - agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+  ---
+  duration_ms: 6.436416
+  type: 'test'
+  ...
+# Subtest: paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+ok 51 - paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+  ---
+  duration_ms: 3.708459
+  type: 'test'
+  ...
+# Subtest: file selection and paste combine; unsupported, empty and oversized files are explained
+ok 52 - file selection and paste combine; unsupported, empty and oversized files are explained
+  ---
+  duration_ms: 2.127626
+  type: 'test'
+  ...
+# Subtest: revision partial failure keeps pending files and retries without duplicating text or successful uploads
+ok 53 - revision partial failure keeps pending files and retries without duplicating text or successful uploads
+  ---
+  duration_ms: 5.103557
+  type: 'test'
+  ...
+# Subtest: create uploads pasted files through the existing bound request endpoint
+ok 54 - create uploads pasted files through the existing bound request endpoint
+  ---
+  duration_ms: 2.779644
+  type: 'test'
+  ...
+# Subtest: security: loopback host, token, origin, read-only methods and ID-only paths
+ok 55 - security: loopback host, token, origin, read-only methods and ID-only paths
+  ---
+  duration_ms: 788.858033
+  type: 'test'
+  ...
+# Subtest: serves the snapshot, work detail and preserved sources by ID
+ok 56 - serves the snapshot, work detail and preserved sources by ID
+  ---
+  duration_ms: 1202.993404
+  type: 'test'
+  ...
+# Subtest: live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+ok 57 - live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+  ---
+  duration_ms: 1423.672707
+  type: 'test'
+  ...
+# Subtest: the console never writes: browsing every route leaves the workspace byte-identical
+ok 58 - the console never writes: browsing every route leaves the workspace byte-identical
+  ---
+  duration_ms: 1213.474213
+  type: 'test'
+  ...
+# Subtest: extracted text cannot be read outside its source directory; HEAD never opens the event stream
+ok 59 - extracted text cannot be read outside its source directory; HEAD never opens the event stream
+  ---
+  duration_ms: 924.578798
+  type: 'test'
+  ...
+# Subtest: native text intake: sample.txt
+ok 60 - native text intake: sample.txt
+  ---
+  duration_ms: 393.967144
+  type: 'test'
+  ...
+# Subtest: native text intake: sample.md
+ok 61 - native text intake: sample.md
+  ---
+  duration_ms: 302.726086
+  type: 'test'
+  ...
+# Subtest: native text intake: sample.json
+ok 62 - native text intake: sample.json
+  ---
+  duration_ms: 308.557533
+  type: 'test'
+  ...
+# Subtest: native text intake: sample.jsonl
+ok 63 - native text intake: sample.jsonl
+  ---
+  duration_ms: 298.260879
+  type: 'test'
+  ...
+# Subtest: native text intake: sample.yaml
+ok 64 - native text intake: sample.yaml
+  ---
+  duration_ms: 286.984009
+  type: 'test'
+  ...
+# Subtest: native text intake: sample.xml
+ok 65 - native text intake: sample.xml
+  ---
+  duration_ms: 306.146168
+  type: 'test'
+  ...
+# Subtest: native text intake: sample.html
+ok 66 - native text intake: sample.html
+  ---
+  duration_ms: 263.940755
+  type: 'test'
+  ...
+# Subtest: native text intake: sample.csv
+ok 67 - native text intake: sample.csv
+  ---
+  duration_ms: 251.314468
+  type: 'test'
+  ...
+# Subtest: native text intake: sample.tsv
+ok 68 - native text intake: sample.tsv
+  ---
+  duration_ms: 254.559223
+  type: 'test'
+  ...
+# Subtest: native text intake: sample.toml
+ok 69 - native text intake: sample.toml
+  ---
+  duration_ms: 258.25331
+  type: 'test'
+  ...
+# Subtest: office intake: docx
+ok 70 - office intake: docx
+  ---
+  duration_ms: 300.652617
+  type: 'test'
+  ...
+# Subtest: office intake: pptx produces per-slide sections
+ok 71 - office intake: pptx produces per-slide sections
+  ---
+  duration_ms: 268.689444
+  type: 'test'
+  ...
+# Subtest: office intake: xlsx produces a sheet table with the real sheet name
+ok 72 - office intake: xlsx produces a sheet table with the real sheet name
+  ---
+  duration_ms: 349.615989
+  type: 'test'
+  ...
+# Subtest: office intake: rtf
+ok 73 - office intake: rtf
+  ---
+  duration_ms: 307.826911
+  type: 'test'
+  ...
+# Subtest: office intake: odt
+ok 74 - office intake: odt
+  ---
+  duration_ms: 295.37262
+  type: 'test'
+  ...
+# Subtest: office intake: ods
+ok 75 - office intake: ods
+  ---
+  duration_ms: 306.652622
+  type: 'test'
+  ...
+# Subtest: office intake: odp
+ok 76 - office intake: odp
+  ---
+  duration_ms: 314.826877
+  type: 'test'
+  ...
+# Subtest: PDF intake produces per-page sections
+ok 77 - PDF intake produces per-page sections
+  ---
+  duration_ms: 847.435921
+  type: 'test'
+  ...
+# Subtest: image intake preserves original without claiming extraction: sample.png
+ok 78 - image intake preserves original without claiming extraction: sample.png
+  ---
+  duration_ms: 168.015703
+  type: 'test'
+  ...
+# Subtest: image intake preserves original without claiming extraction: sample.jpg
+ok 79 - image intake preserves original without claiming extraction: sample.jpg
+  ---
+  duration_ms: 175.310817
+  type: 'test'
+  ...
+# Subtest: image intake preserves original without claiming extraction: sample.svg
+ok 80 - image intake preserves original without claiming extraction: sample.svg
+  ---
+  duration_ms: 161.440907
+  type: 'test'
+  ...
+# Subtest: PNG dimensions are read from the header
+ok 81 - PNG dimensions are read from the header
+  ---
+  duration_ms: 150.235648
+  type: 'test'
+  ...
+# Subtest: unsupported binary is accepted as original-only, not rejected
+ok 82 - unsupported binary is accepted as original-only, not rejected
+  ---
+  duration_ms: 148.232361
+  type: 'test'
+  ...
+# Subtest: a dangerous archive extension is preserved, never auto-unpacked
+ok 83 - a dangerous archive extension is preserved, never auto-unpacked
+  ---
+  duration_ms: 157.427257
+  type: 'test'
+  ...
+# Subtest: corrupt DOCX degrades to original-only instead of failing intake
+ok 84 - corrupt DOCX degrades to original-only instead of failing intake
+  ---
+  duration_ms: 167.931501
+  type: 'test'
+  ...
+# Subtest: corrupt PDF degrades to original-only instead of failing intake
+ok 85 - corrupt PDF degrades to original-only instead of failing intake
+  ---
+  duration_ms: 434.639177
+  type: 'test'
+  ...
+# Subtest: fake extension (non-zip content named .docx) is detected and preserved as binary
+ok 86 - fake extension (non-zip content named .docx) is detected and preserved as binary
+  ---
+  duration_ms: 182.970657
+  type: 'test'
+  ...
+# Subtest: path traversal attempts are rejected at the validation boundary
+ok 87 - path traversal attempts are rejected at the validation boundary
+  ---
+  duration_ms: 15.336286
+  type: 'test'
+  ...
+# Subtest: malicious filename with embedded traversal sequences is sanitized to its basename
+ok 88 - malicious filename with embedded traversal sequences is sanitized to its basename
+  ---
+  duration_ms: 170.673335
+  type: 'test'
+  ...
+# Subtest: zero-byte file is rejected
+ok 89 - zero-byte file is rejected
+  ---
+  duration_ms: 170.47949
+  type: 'test'
+  ...
+# Subtest: oversize source file is rejected with a clear error, never silently truncated
+ok 90 - oversize source file is rejected with a clear error, never silently truncated
+  ---
+  duration_ms: 159.892439
+  type: 'test'
+  ...
+# Subtest: a file exceeding the extraction limit is preserved as original-only rather than parsed
+ok 91 - a file exceeding the extraction limit is preserved as original-only rather than parsed
+  ---
+  duration_ms: 321.915996
+  type: 'test'
+  ...
+# Subtest: rollback: a persisted source can be removed if the owning work item fails to be created
+ok 92 - rollback: a persisted source can be removed if the owning work item fails to be created
+  ---
+  duration_ms: 14.91642
+  type: 'test'
+  ...
+# Subtest: duplicate intake does not overwrite; checksum match is reported
+ok 93 - duplicate intake does not overwrite; checksum match is reported
+  ---
+  duration_ms: 318.319093
+  type: 'test'
+  ...
+# Subtest: restart preserves source relationship and checksum
+ok 94 - restart preserves source relationship and checksum
+  ---
+  duration_ms: 207.483052
+  type: 'test'
+  ...
+# Subtest: intake accepts multiple files at once, creating one work item with several sources
+ok 95 - intake accepts multiple files at once, creating one work item with several sources
+  ---
+  duration_ms: 216.943856
+  type: 'test'
+  ...
+# Subtest: intake add attaches an additional source to an existing work item
+ok 96 - intake add attaches an additional source to an existing work item
+  ---
+  duration_ms: 453.449875
+  type: 'test'
+  ...
+# Subtest: intake add works after the work item has been routed
+ok 97 - intake add works after the work item has been routed
+  ---
+  duration_ms: 719.168854
+  type: 'test'
+  ...
+# Subtest: source list shows format and content availability
+ok 98 - source list shows format and content availability
+  ---
+  duration_ms: 300.011768
+  type: 'test'
+  ...
+# Subtest: source show --content explains when no text representation exists
+ok 99 - source show --content explains when no text representation exists
+  ---
+  duration_ms: 264.547858
+  type: 'test'
+  ...
+# Subtest: source show --content prints extracted text for office documents
+ok 100 - source show --content prints extracted text for office documents
+  ---
+  duration_ms: 271.780933
+  type: 'test'
+  ...
+# Subtest: guide and resume expose format and content availability
+ok 101 - guide and resume expose format and content availability
+  ---
+  duration_ms: 427.853732
+  type: 'test'
+  ...
+# Subtest: legacy (schemaVersion 1) sources remain readable without migration
+ok 102 - legacy (schemaVersion 1) sources remain readable without migration
+  ---
+  duration_ms: 166.300155
+  type: 'test'
+  ...
+# Subtest: new sources are always written as the current schema version
+ok 103 - new sources are always written as the current schema version
+  ---
+  duration_ms: 182.077302
+  type: 'test'
+  ...
+# Subtest: existing text start still works, unaffected by universal file intake
+ok 104 - existing text start still works, unaffected by universal file intake
+  ---
+  duration_ms: 137.696403
+  type: 'test'
+  ...
+# Subtest: old workspace without sources/ loads, and read-only commands never create it
+ok 105 - old workspace without sources/ loads, and read-only commands never create it
+  ---
+  duration_ms: 353.432837
+  type: 'test'
+  ...
+# Subtest: optional title and no routing inference
+ok 106 - optional title and no routing inference
+  ---
+  duration_ms: 203.928152
+  type: 'test'
+  ...
+# Subtest: overview: evidence-based stack with declared / detected / inferred kept apart; no secret is read
+ok 107 - overview: evidence-based stack with declared / detected / inferred kept apart; no secret is read
+  ---
+  duration_ms: 313.873177
+  type: 'test'
+  ...
+# Subtest: overview: greenfield intent, a legacy workspace and a damaged ledger all yield a valid document
+ok 108 - overview: greenfield intent, a legacy workspace and a damaged ledger all yield a valid document
+  ---
+  duration_ms: 724.107616
+  type: 'test'
+  ...
+# Subtest: overview: memory facts come with confidence and mechanical freshness
+ok 109 - overview: memory facts come with confidence and mechanical freshness
+  ---
+  duration_ms: 156.847835
+  type: 'test'
+  ...
+# Subtest: composeImages: tags, digests, quotes and variables
+ok 110 - composeImages: tags, digests, quotes and variables
+  ---
+  duration_ms: 0.94873
+  type: 'test'
+  ...
+# Subtest: console: GET overview is token-protected, read-only and returns the contract
+ok 111 - console: GET overview is token-protected, read-only and returns the contract
+  ---
+  duration_ms: 300.667306
+  type: 'test'
+  ...
+# Subtest: edit is offered alongside Advance in INTAKE and suppressed for ineligible or read-only work
+ok 112 - edit is offered alongside Advance in INTAKE and suppressed for ineligible or read-only work
+  ---
+  duration_ms: 4.739887
+  type: 'test'
+  ...
+# Subtest: editor waits for full raw text, preserves long multiline content and supports Arabic
+ok 113 - editor waits for full raw text, preserves long multiline content and supports Arabic
+  ---
+  duration_ms: 8.805497
+  type: 'test'
+  ...
+# Subtest: a started request or failed load leaves saving disabled and shows the error
+ok 114 - a started request or failed load leaves saving disabled and shows the error
+  ---
+  duration_ms: 5.600089
+  type: 'test'
+  ...
+# Subtest: cancelling before loading completes discards the load without writing
+ok 115 - cancelling before loading completes discards the load without writing
+  ---
+  duration_ms: 2.854177
+  type: 'test'
+  ...
+# Subtest: completed work is never editable, even with an empty progress ledger
+ok 116 - completed work is never editable, even with an empty progress ledger
+  ---
+  duration_ms: 1.977521
+  type: 'test'
+  ...
+# Subtest: a pending raw request can be revised through a supported operation
+ok 117 - a pending raw request can be revised through a supported operation
+  ---
+  duration_ms: 59.427658
+  type: 'test'
+  ...
+# Subtest: revision requires a non-empty reason
+ok 118 - revision requires a non-empty reason
+  ---
+  duration_ms: 38.964575
+  type: 'test'
+  ...
+# Subtest: revision requires non-empty replacement text
+ok 119 - revision requires non-empty replacement text
+  ---
+  duration_ms: 30.228528
+  type: 'test'
+  ...
+# Subtest: revision history is preserved and auditable
+ok 120 - revision history is preserved and auditable
+  ---
+  duration_ms: 45.347807
+  type: 'test'
+  ...
+# Subtest: classified INTAKE can be revised without changing its title, classification or focus
+ok 121 - classified INTAKE can be revised without changing its title, classification or focus
+  ---
+  duration_ms: 56.281028
+  type: 'test'
+  ...
+# Subtest: started checkpoints, including reset checkpoints, prevent revision while still in INTAKE
+ok 122 - started checkpoints, including reset checkpoints, prevent revision while still in INTAKE
+  ---
+  duration_ms: 110.727715
+  type: 'test'
+  ...
+# Subtest: leaving INTAKE prevents revision even before any checkpoint is recorded
+ok 123 - leaving INTAKE prevents revision even before any checkpoint is recorded
+  ---
+  duration_ms: 441.94772
+  type: 'test'
+  ...
+# Subtest: held and closed pending requests reject direct Core revisions without writes
+ok 124 - held and closed pending requests reject direct Core revisions without writes
+  ---
+  duration_ms: 408.020086
+  type: 'test'
+  ...
+# Subtest: a file-backed source remains byte-identical after a request correction
+ok 125 - a file-backed source remains byte-identical after a request correction
+  ---
+  duration_ms: 242.629629
+  type: 'test'
+  ...
+# Subtest: CLI: request revise corrects an accidental --help intake end to end
+ok 126 - CLI: request revise corrects an accidental --help intake end to end
+  ---
+  duration_ms: 417.940914
+  type: 'test'
+  ...
+1..126
+# tests 126
+# suites 0
+# pass 125
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 16229.054764

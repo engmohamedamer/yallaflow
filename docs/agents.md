@@ -63,9 +63,19 @@ YallaFlow never selects Codex's full-access mode.
   - the checkout frees up when the first console stops, or when its process is gone.
 - **Gates stay human decisions, by command.** An agent that may run shell commands could also run `yallaflow approve`. The Agent Contract forbids that, but the Agent Workspace does not add a technical lock against it, just as the terminal doesn't. Check the approval notes and the progress ledger.
 
+## When an agent stops in the middle of a work item
+The work lives in the work item, not in the chat, so another agent can pick it up.
+- **The chat says why the agent stopped:** it reached its subscription usage limit (with the time to try again when the provider gives one), stopped on an error, stopped unexpectedly, had its session ended, or Claude Code disconnected.
+- **You choose how to continue:**
+  - **Continue with Codex / Continue with Claude Code** ends or unlinks the old session first, then starts or connects the one you chose on the same work item. Only agents that are ready are offered, and the one that just hit its limit is not.
+  - **Copy the continue message** to use in a terminal agent in the project folder.
+  - Or wait and keep using the same agent once its limit resets.
+- **Nothing happens on its own.** Switching needs your click, and the continue message (`Continue PF-…`, with the previous agent and why it stopped) is only prepared in the message box; you send it.
+- **The item lists its agent sessions:** which agent worked on it, when, and how each session stopped. The stop reason is kept in the git-ignored session record, so it survives a console restart.
+
 ## What is stored
 - **Kept locally:**
-  - session link records and your permission decisions, in `.yallaflow/local/agent-sessions/` (git-ignored);
+  - session link records (including how each session stopped) and your permission decisions, in `.yallaflow/local/agent-sessions/` (git-ignored);
   - the checkout lock `.yallaflow/local/agent-console.lock` (process identity only), present only while the console runs.
 - **Never kept by YallaFlow:**
   - messages and transcripts, which stay with each provider's own history;

@@ -1,11 +1,12 @@
 import path from 'node:path';
+import { loadWorkProgress } from '../core/progress.js';
 import { findProjectRoot, getCurrentState, workspacePath } from '../core/workspace.js';
 import { appendRedactedText } from '../security/redact.js';
 import { withWorkspaceLock } from '../utils/lock.js';
 import { prepareFileIntake } from '../intake/file.js';
 import { defaultTitleFromFilename, describeContentAvailability } from '../intake/normalize.js';
 import { findSourceByChecksum, linkSourceToWork, listSources, persistSource, removeSourceDir } from '../core/sources.js';
-import { addSourceToWork, assertSourceLinkAllowed, createPendingIntake } from '../behavior/routing.js';
+import { addSourceToWork, assertSourceLinkAllowed, canReviseRequest, createPendingIntake } from '../behavior/routing.js';
 import { loadWorkMetaOrThrow } from '../core/workspace.js';
 import { describeTrigger, loadWorkImpacts, pendingImpact } from '../delivery/impact.js';
 import { assertEngineeringWorkAllowed } from '../baseline/understanding.js';
@@ -58,7 +59,13 @@ export async function intakeAddCommand(requestedWorkId, filePaths, options = {})
   if (!workId) throw new Error('No active work item. Provide a work ID: `yallaflow intake add PF-0001 <file>`.');
   if (!filePaths?.length) throw new Error('Usage: yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]');
   // Checked before any source is persisted, so a refused link leaves no orphan source.
-  assertSourceLinkAllowed(await loadWorkMetaOrThrow(root, workId), options.reason);
+  const meta = await loadWorkMetaOrThrow(root, workId);
+  assertSourceLinkAllowed(meta, options.reason);
+  // Checked under the CLI workspace lock, before any source is persisted.
+  if (options.beforeStart) {
+    const progress = meta.routingStatus === 'pending' ? null : await loadWorkProgress(root, meta);
+    if (!canReviseRequest(meta, progress)) throw new Error(`${workId} has already started; request attachments can only be added before work starts.`);
+  }
 
   const sources = await captureSources(root, filePaths);
   let work;

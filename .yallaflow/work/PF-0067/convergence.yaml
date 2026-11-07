@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-07T23:45:17.684Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "Assessed after V-001 (npm run check 986/986) and a browser check with the simulated agent.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "The chat button is on Overview, Flow, Work, Setup, Worktrees and Insights in EN and AR at 1440 and 390 px with no horizontal scroll, not on the new-project page; 0 browser console errors.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:87995c9c1513459989518dcd59b23aa829b3cd113faede921665026f8a241659",
+              "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-project-chat.test.js",
+              "contentHash": "sha256:d63ae2ff338a94a734470e32df5e57a2a08a0c46c8a2bac763f94dc020a3c91b",
+              "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0067",
+              "verificationRunId": "V-001"
+            },
+            {
+              "type": "runtime",
+              "description": "playwright-cli 2026-11-08 — 24/24 page views with the chat button, none on #/new, 0 console errors"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Header 'Agent · Project' (AR 'الوكيل · المشروع'); no activation; start/connect send no workId; three project suggestions without item ids; agents-off text names no item. In the browser a Codex session started from the Flow page and replied.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:87995c9c1513459989518dcd59b23aa829b3cd113faede921665026f8a241659",
+              "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-project-chat.test.js",
+              "contentHash": "sha256:d63ae2ff338a94a734470e32df5e57a2a08a0c46c8a2bac763f94dc020a3c91b",
+              "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0067",
+              "verificationRunId": "V-001"
+            },
+            {
+              "type": "runtime",
+              "description": "playwright-cli 2026-11-08 — project chat started from #/map, reply received"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "An item session (Codex or Claude) shows on project pages as a link to the item with no composer; a project session on an item page is labelled as the project chat; the item chat is unchanged and the existing agent and console tests pass.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:87995c9c1513459989518dcd59b23aa829b3cd113faede921665026f8a241659",
+              "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-project-chat.test.js",
+              "contentHash": "sha256:d63ae2ff338a94a734470e32df5e57a2a08a0c46c8a2bac763f94dc020a3c91b",
+              "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-bridge.test.js",
+              "contentHash": "sha256:b87c5001c97bf229b767adf7fb95430abf759aa1c0e5f672abccc9a6aee2886e",
+              "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0067",
+              "verificationRunId": "V-001"
+            },
+            {
+              "type": "runtime",
+              "description": "playwright-cli 2026-11-08 — item page labelled the project session"
+            }
+          ]
+        }
+      ],
+      "unrequested": [
+        {
+          "id": "UR-001",
+          "disposition": "accepted",
+          "summary": "Project pages load the agent state only while the chat is open, to keep page loads light.",
+          "reason": "Needed to avoid an agent status request on every page view; no behaviour the owner sees changes.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:87995c9c1513459989518dcd59b23aa829b3cd113faede921665026f8a241659",
+              "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+              "workingTree": "modified"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "updatedAt": "2026-11-07T23:45:17.684Z"
+}

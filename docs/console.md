@@ -57,6 +57,8 @@ The **Overview** tab shows the project itself, read-only:
 
 For a new (Greenfield) project without approved memory, the Overview is a **setup checklist** instead: project created, goal, requirements, stack, development environment, Git, agent, and the first work item with its next step, each with the action that moves it on (open the first work item, configure runtime, initialize Git, enable Codex). Nothing missing there is an error; architecture, modules and memory appear once they are recorded with evidence.
 
+Overview cards show three facts initially; **View more** expands the remaining facts returned for that area. Long facts have their own expandable preview. Paragraphs, lists and code are formatted, while confidence and freshness remain visible.
+
 The same data is available as `yallaflow overview --json`.
 
 ## What you see
@@ -142,6 +144,12 @@ YallaFlow does not record time per station or waiting time, so the console does 
 - **What kind of work?** *Let my agent decide* (the default) or feature, bug, change, investigation. When you pick a type, choose its size: *Small* (bounded), *Large* (architectural) or *Exploratory* (spike). Nothing is preselected, and YallaFlow itself says which combinations exist.
 - **Files (optional).** A BRD or other requirement document: PDF, Word, Excel, PowerPoint, OpenDocument, RTF, Markdown or text, CSV/JSON/YAML, or an image (PNG, JPEG, GIF, WebP). Each file can be up to 50 MB, YallaFlow's own limit for a file it can still read as text.
 
+You can also paste a screenshot with **Ctrl+V** inside the request form (or your platform's paste shortcut). Images appear as removable previews alongside selected files. Nothing uploads until you submit.
+
+**Edit request** offers the same file picker and screenshot paste while the work is still editable: pending classification or untouched INTAKE. Existing sources and request history are preserved. If text saves but an attachment fails, the dialog says so and keeps the failed file for retry; a retry does not resave unchanged text or upload successful files again. Work that has started, is on hold, closed or done cannot receive attachments through this edit form. The server checks that condition again when it saves the file (`intake add --before-start`, under the workspace lock).
+
+Agent replies support headings, lists, bold text, inline and fenced code, tables and HTTP(S) links. Raw HTML is shown as text, and embedded images are not loaded.
+
 **What happens.**
 
 - **Same commands as the CLI.** The console runs YallaFlow's own commands, exactly as an agent would: `start`, then `route` when you chose a type, then `intake add` for each file. The same validation, workspace lock and audit apply, and nothing else writes.
@@ -220,6 +228,8 @@ When a gate waits for review (for example the specification or the plan), the it
 ## Agent Workspace (1.3.0, opt-in)
 
 With `yallaflow console --agents`, a work item gets an **Agent** panel for working with Codex (managed sessions on your ChatGPT login). The chat opens as a floating window from the corner button (its dot shows working, ready or waiting for your approval); each board card has a chat icon that opens the item with a "where is it" question in the box, and suggestions that fit the item's stage only fill the box. In a normal console started without the flag, the chat says the Agent Workspace is off and offers **Enable agents for this session** (with a confirmation): it lasts for this console run only, starts no session and activates no work item. The same dialog offers a separate, unchecked **Also allow Claude Code (experimental)**; see [`agents-claude-experimental.md`](agents-claude-experimental.md). A `--read-only` console never enables it. Activating a work item and starting a session stay two separate, explicit actions. See [`agents.md`](agents.md).
+
+The corner chat button is on every project page (Overview, Flow, Work, Setup, Worktrees, Insights), and the page decides what the chat is about. On a work item page it is that item's chat. On the other pages it is the **project chat** ("Agent · Project"): its session is not tied to a work item, its suggestions are project questions (where the project stands, what is waiting for you, what is stuck), and the agent routes any change you ask for there to a work item first. There is still one agent session per checkout: a session running on a work item shows on project pages as a link to that item, and a project session shows on an item page labelled as the project chat. When an agent stops in the middle of a work item, the item's chat offers to continue with another agent (see [`agents.md`](agents.md#when-an-agent-stops-in-the-middle-of-a-work-item)).
 
 ## Security
 

@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Agent session records (.yallaflow/local/agent-sessions/<id>.json, git-ignored) keep lastStop {reason: usage_limit|error|crashed|ended|disconnected|unlinked, detail, retryAt, at}; the bridge emits session.stopped after saving it and returns the records as status().history. A Codex usage limit arrives as reply text followed by a generic error, so the bridge reads the turn's recent reply text with the error. The console offers to continue a stopped work item with another ready agent: the old session is ended or unlinked first, nothing switches automatically, and the 'Continue <id>' message is prepared, never sent for the developer.",
+      "evidence": [
+        "src/agents/bridge.js",
+        "resources/console/app.js",
+        "test/agent-continue.test.js",
+        "verification:V-002"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-07T23:38:10.647Z",
+      "factId": "CTX-0123",
+      "promotedAt": "2026-11-07T23:38:10.732Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-07T23:38:10.732Z",
+  "reviewedAt": "2026-11-07T23:38:10.732Z"
+}

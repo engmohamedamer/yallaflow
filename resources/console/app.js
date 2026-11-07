@@ -20,6 +20,60 @@
   const iso = (s) => esc(s).replace(/\b([A-Z][A-Za-z]*)-(\d+)\b/g, '⁦$1‑$2⁩');
   const A = (ar, en) => (lang === 'ar' ? ar : en);
 
+  // Small, escaped Markdown subset. Never interpret raw HTML or image embeds.
+  function richInline(value) {
+    const pattern = /`([^`\n]+)`|\*\*([^*\n]+)\*\*|\[([^\]\n]+)\]\(([^\s)]+)\)/g;
+    let html = '', at = 0;
+    for (const m of String(value).matchAll(pattern)) {
+      html += esc(value.slice(at, m.index));
+      if (m[1] !== undefined) html += `<code dir="auto">${esc(m[1])}</code>`;
+      else if (m[2] !== undefined) html += `<strong>${esc(m[2])}</strong>`;
+      else if (/^https?:\/\//i.test(m[4])) html += `<a href="${esc(m[4])}" target="_blank" rel="noopener noreferrer">${esc(m[3])}</a>`;
+      else html += esc(m[0]);
+      at = m.index + m[0].length;
+    }
+    return html + esc(value.slice(at));
+  }
+  function richText(value) {
+    const lines = String(value ?? '').replace(/\r\n?/g, '\n').split('\n');
+    const out = [], paragraph = [];
+    const flush = () => { if (paragraph.length) out.push(`<p dir="auto">${paragraph.splice(0).map(richInline).join('<br>')}</p>`); };
+    const cells = (line) => line.trim().replace(/^\||\|$/g, '').split('|').map((cell) => cell.trim());
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (/^\s*```/.test(line)) {
+        flush(); const code = [];
+        while (++i < lines.length && !/^\s*```/.test(lines[i])) code.push(lines[i]);
+        out.push(`<pre dir="ltr"><code>${esc(code.join('\n'))}</code></pre>`); continue;
+      }
+      const heading = /^(#{1,6})\s+(.+)$/.exec(line);
+      if (heading) { flush(); out.push(`<h${Math.min(heading[1].length + 2, 6)} dir="auto">${richInline(heading[2])}</h${Math.min(heading[1].length + 2, 6)}>`); continue; }
+      if (line.includes('|') && i + 1 < lines.length && cells(lines[i + 1]).every((c) => /^:?-{3,}:?$/.test(c))) {
+        flush(); const headers = cells(line); i++;
+        const rows = [];
+        while (i + 1 < lines.length && lines[i + 1].includes('|') && lines[i + 1].trim()) rows.push(cells(lines[++i]));
+        out.push(`<div class="tablewrap"><table><thead><tr>${headers.map((c) => `<th dir="auto">${richInline(c)}</th>`).join('')}</tr></thead><tbody>${rows.map((row) => `<tr>${row.map((c) => `<td dir="auto">${richInline(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`); continue;
+      }
+      const list = /^\s*(?:([-*+])|\d+[.)])\s+(.+)$/.exec(line);
+      if (list) {
+        flush(); const tag = list[1] ? 'ul' : 'ol', items = [list[2]];
+        while (i + 1 < lines.length) {
+          const next = /^\s*(?:([-*+])|\d+[.)])\s+(.+)$/.exec(lines[i + 1]);
+          if (!next || Boolean(next[1]) !== Boolean(list[1])) break;
+          items.push(next[2]); i++;
+        }
+        out.push(`<${tag}>${items.map((item) => `<li dir="auto">${richInline(item)}</li>`).join('')}</${tag}>`); continue;
+      }
+      if (/^>\s?/.test(line)) { flush(); out.push(`<blockquote dir="auto">${richInline(line.replace(/^>\s?/, ''))}</blockquote>`); continue; }
+      if (!line.trim()) flush(); else paragraph.push(line);
+    }
+    flush(); return out.join('');
+  }
+  const overviewExpanded = new Set();
+  function disclosure(key, summary, body, className = '') {
+    return `<details class="disclosure ${className}" data-overview="${esc(key)}" ${overviewExpanded.has(key) ? 'open' : ''}><summary>${summary}<span class="more-label">${A('عرض المزيد', 'View more')}</span><span class="less-label">${A('عرض أقل', 'View less')}</span></summary>${body}</details>`;
+  }
+
   // ---------- token: from the link printed by `yallaflow console` ----------
   let token = null;
   try { token = sessionStorage.getItem('yfc.token'); } catch { /* unavailable */ }
@@ -134,6 +188,15 @@
   const route = () => { const h = location.hash.replace(/^#\/?/, '').split('/'); return { v: h[0] || 'map', id: h[1] ? decodeURIComponent(h[1]) : null }; };
   const items = () => (snap?.items ?? []);
   const byId = (id) => items().find((it) => it.id === id);
+  // The floating agent chat follows the page (PF-0067): a work item page is that item's chat;
+  // the other project pages share one project chat, which is not tied to a work item.
+  const PROJECT_CHAT_VIEWS = ['overview', 'map', 'lines', 'setup', 'team', 'insights'];
+  const PROJECT_CHAT = Object.freeze({ id: null, project: true });
+  function chatCtx(r = route()) {
+    if (!snap) return null;
+    if (r.v === 'item') return byId(r.id) ?? null;
+    return PROJECT_CHAT_VIEWS.includes(r.v) ? PROJECT_CHAT : null;
+  }
   const curIndex = (it) => (it.state === 'done' ? 5 : it.state === 'new' ? -1 : stIndex(it.currentStation));
 
   function topbar(r) {
@@ -178,8 +241,8 @@
     if (!open) return `<section class="hero calm"><span class="hico done" aria-hidden="true">✓</span><div><h1>${A(`كل الشغل المسجّل خلص (${c.done})`, `All ${c.done} recorded work item${c.done === 1 ? ' is' : 's are'} done`)}</h1>
       <p>${A('ده الشغل المسجّل في YallaFlow، مش المشروع كله. الشغل الجديد بيدخل من بوابة «جديد».', 'This is the work recorded in YallaFlow, not the whole software project. New work enters through the New gate.')}</p>${createButton()}</div>${stats}</section>`;
     const pct = snap.openCompletion ?? 0;
-    return `<section class="hero">${ring(pct, 128, 13)}<div><h1>${greet}</h1>
-      <p>${A(`${open} ${open === 1 ? 'شغلانة مفتوحة' : 'شغلانات مفتوحة'} واصلة في المتوسط ${pct}%، و${you} ${you === 1 ? 'شغلانة مستنية' : 'شغلانات مستنية'} قرارك.`, `${open} open work item${open === 1 ? ' is' : 's are'} on average ${pct}% along, and ${you} item${you === 1 ? '' : 's'} wait${you === 1 ? 's' : ''} for your decision.`)}</p><p class="tiny muted" style="margin-top:6px">${A('النسبة للشغل المفتوح المسجّل بس.', 'The percentage covers open recorded work only.')} ${formula()}</p></div>
+    return `<section class="hero compact">${ring(pct, 80, 8)}<div><h1>${greet}</h1>
+      <p>${A(`${open} ${open === 1 ? 'شغلانة مفتوحة' : 'شغلانات مفتوحة'} واصلة في المتوسط ${pct}%، و${you} ${you === 1 ? 'شغلانة مستنية' : 'شغلانات مستنية'} قرارك.`, `${open} open work item${open === 1 ? ' is' : 's are'} on average ${pct}% along, and ${you} item${you === 1 ? '' : 's'} wait${you === 1 ? 's' : ''} for your decision.`)}</p><details class="progress-help tiny muted"><summary>${A('النسبة بتتحسب إزاي؟', 'How is progress calculated?')}</summary><p>${A('النسبة للشغل المفتوح المسجّل بس.', 'The percentage covers open recorded work only.')} ${formula()}</p></details></div>
       ${stats}</section>`;
   }
   const createButton = () => (readOnly ? '' : `<button class="btn go" data-create style="margin-top:12px">＋ ${A('ابدأ أول شغلانة', 'Create work')}</button>`);
@@ -321,7 +384,7 @@
     return post(`/api/p/${pid}/agent/${action}`, JSON.stringify(body ?? {}), { 'Content-Type': 'application/json' });
   }
   async function loadAgent() {
-    if (!agentsOn || route().v !== 'item') return;
+    if (!agentsOn || !chatCtx()) return;
     try { agent = { pid, ...(await api(`/api/p/${pid}/agent`)) }; agentError = null; } catch (e) { agentError = e.message; }
   }
   function onAgentEvent(projectId, event) {
@@ -330,7 +393,7 @@
     if (agent.events.length > 400) agent.events.splice(0, agent.events.length - 400);
     if (event.type === 'permission.requested') agent.pending.push(event);
     if (event.type === 'permission.resolved') agent.pending = agent.pending.filter((p) => p.requestId !== event.requestId);
-    if (['session.started', 'session.ended', 'session.connected', 'session.disconnected', 'turn.started', 'turn.ended', 'mode.changed', 'work.activated', 'error'].includes(event.type)) {
+    if (['session.started', 'session.ended', 'session.stopped', 'session.connected', 'session.disconnected', 'turn.started', 'turn.ended', 'mode.changed', 'work.activated', 'error'].includes(event.type)) {
       loadAgent().then(renderAgent);
       return;
     }
@@ -339,7 +402,7 @@
   // Re-render only the panel, keeping the composer text and focus.
   function renderAgent(streamOnly = false) {
     const host = document.getElementById('agent');
-    const it = byId(route().id);
+    const it = chatCtx();
     if (!host || !it) return;
     const focused = document.activeElement?.matches?.('[data-agent-input]');
     const streamHost = streamOnly && host.querySelector('.astream');
@@ -426,7 +489,7 @@
     const st = agentState(it);
     return `<div class="chatdock ${chatOpen ? 'open' : ''}">
       <section class="chatwin" id="chatwin" role="dialog" aria-modal="false" aria-label="${A('الوكيل', 'Agent')}" ${chatOpen ? '' : 'hidden'}>
-        <div class="chathead"><b class="grow">${A('الوكيل', 'Agent')} · <span class="ltr">${esc(it.id)}</span></b><span class="tiny muted">${esc(st.label)}</span><button type="button" class="ibtn sm" data-chat-toggle aria-label="${A('صغّر', 'Minimize')}">—</button></div>
+        <div class="chathead"><b class="grow">${A('الوكيل', 'Agent')} · ${it.project ? A('المشروع', 'Project') : `<span class="ltr">${esc(it.id)}</span>`}</b><span class="tiny muted">${esc(st.label)}</span><button type="button" class="ibtn sm" data-chat-toggle aria-label="${A('صغّر', 'Minimize')}">—</button></div>
         <div class="chatbody">${chatOpen ? agentPanel(it) : ''}</div>
       </section>
       <button type="button" class="chatfab ${st.tone}" data-chat-toggle aria-controls="chatwin" aria-expanded="${chatOpen}" aria-label="${esc(st.label)}" title="${esc(st.label)}"><span aria-hidden="true">${chatOpen ? '✕' : '💬'}</span><i class="dot"></i>${st.badge ? `<b class="badge">${st.badge}</b>` : ''}</button>
@@ -435,6 +498,11 @@
   // Suggested requests for the item's current place in the flow (PF-0059). A suggestion only
   // fills the message box: the developer reads it and sends it, nothing runs on a click.
   function suggestions(it) {
+    if (it.project) return [
+      A('المشروع وصل لفين، وإيه الخطوة الجاية؟', 'Where does the project stand, and what is next?'),
+      A('إيه اللي مستنيني أقرر فيه دلوقتي؟', 'What is waiting for a decision from me right now?'),
+      A('أنهي شغلانات واقفة أو متأخرة، وليه؟', 'Which work items are stuck or slow, and why?')
+    ];
     const id = it.id;
     const list = [A(`${id} وصلت لفين، وإيه الخطوة الجاية؟`, `Where is ${id} now, and what is the next step?`)];
     const st = it.currentStation;
@@ -463,20 +531,83 @@
     chatOpen = force ?? !chatOpen;
     store.set('chatOpen', chatOpen);
     render();
-    if (chatOpen) { if (agentsOn && (!agent || agent.pid !== pid)) loadAgent().then(render); document.querySelector('#chatwin [data-agent-input], #chatwin button')?.focus(); }
+    if (chatOpen) { if (agentsOn && (!agent || agent.pid !== pid)) loadAgent().then(render); else if (!agentsOn && !agentInfo) loadAgentInfo().then(render); document.querySelector('#chatwin [data-agent-input], #chatwin button')?.focus(); }
     else document.querySelector('.chatfab')?.focus();
   }
+  // ---------- continuing a stopped work item with another agent (PF-0066) ----------
+  // The stop comes from Core's session records and this run's events; the console never
+  // switches on its own, and the continue message is prepared, never sent for the developer.
+  const STOP_LABEL = {
+    usage_limit: { ar: 'وصل لحد الاستخدام في الاشتراك', en: 'reached its subscription usage limit' },
+    error: { ar: 'وقف بسبب خطأ', en: 'stopped on an error' },
+    crashed: { ar: 'وقف فجأة', en: 'stopped unexpectedly' },
+    ended: { ar: 'جلسته اتقفلت', en: 'had its session ended' },
+    disconnected: { ar: 'اتفصل', en: 'disconnected' },
+    unlinked: { ar: 'اتفصل من YallaFlow', en: 'was unlinked from YallaFlow' }
+  };
+  const stopText = (reason) => L(STOP_LABEL[reason] ?? STOP_LABEL.error);
+  function itemStop(it) {
+    const s = agent?.session;
+    if (s && s.workId === it.id) {
+      // The latest stop of this run counts only if nothing was sent or started after it.
+      const last = [...(agent.events ?? [])].reverse().find((e) => ['session.stopped', 'session.started', 'message.sent', 'turn.started', 'session.connected'].includes(e.type));
+      if (last?.type === 'session.stopped' && last.stop && (s.provider === 'codex' ? s.status !== 'working' : !s.connected || ['usage_limit', 'error'].includes(last.stop.reason))) return { provider: last.provider ?? s.provider, ...last.stop, live: true };
+      return null;
+    }
+    if (s) return null; // another item's session owns the checkout
+    const rec = (agent?.history ?? []).find((h) => h.workId === it.id);
+    return rec?.lastStop ? { provider: rec.provider, ...rec.lastStop, live: false } : null;
+  }
+  function continueText(it, stop) {
+    const who = PROVIDER[stop.provider] ?? stop.provider;
+    return A(`كمّل ${it.id}. الوكيل اللي قبلك (${who}) ${stopText(stop.reason)}. ابدأ بـ yallaflow handoff ${it.id} وكمّل من حالة الشغلانة المسجّلة.`,
+      `Continue ${it.id}. The previous agent (${who}) ${stopText(stop.reason)}. Start with yallaflow handoff ${it.id} and continue from the recorded state of the work item.`);
+  }
+  function stopCard(it) {
+    if (it.project) return '';
+    const stop = itemStop(it);
+    if (!stop || readOnly) return '';
+    const who = PROVIDER[stop.provider] ?? esc(stop.provider);
+    const others = (agent?.providers ?? []).filter((p) => p.ready && !(p.id === stop.provider && stop.live && stop.reason === 'usage_limit'));
+    const retry = stop.reason === 'usage_limit' ? (stop.retryAt ? A(` تقدر تكمّل معاه تاني بعد ${esc(stop.retryAt)}.`, ` You can continue with it again after ${esc(stop.retryAt)}.`) : A(' تقدر تكمّل معاه تاني لما الحد يرجع.', ' You can continue with it again once the limit resets.')) : '';
+    const text = continueText(it, stop);
+    return `<div class="astop" role="status"><p class="small"><b>${who} ${esc(stopText(stop.reason))}.</b>${retry} ${A('الشغل محفوظ في الشغلانة، فأي وكيل يقدر يكمّله.', 'The work is saved in the work item, so any agent can continue it.')}</p>
+      ${stop.detail && stop.reason !== 'ended' ? `<p class="tiny muted" dir="auto">${esc(stop.detail)}</p>` : ''}
+      <div class="row">${others.map((p) => `<button class="btn sm go" data-agent-switch="${esc(p.id)}" ${agentBusy ? 'disabled' : ''}>${A(`كمّل بـ ${PROVIDER[p.id]}`, `Continue with ${PROVIDER[p.id]}`)}</button>`).join('')}<button class="btn sm ghost" data-copy="${esc(text)}">${A('انسخ رسالة التكملة للترمينال', 'Copy the continue message for a terminal')}</button></div>
+      <p class="tiny muted">${A('الرسالة بتتجهّز في خانة الكتابة ومش بتتبعت غير لما تدوس ابعت.', 'The message is prepared in the message box and is sent only when you press Send.')}</p></div>`;
+  }
+  function sessionHistory(it) {
+    if (it.project) return '';
+    const rows = (agent?.history ?? []).filter((h) => h.workId === it.id).slice(0, 6);
+    if (!rows.length) return '';
+    const state = (h) => h.lastStop ? stopText(h.lastStop.reason) : h.status === 'running' ? A('شغّالة', 'running') : A('خلصت', 'ended');
+    return `<details class="ahist"><summary class="tiny muted">${A('الجلسات على الشغلانة دي', 'Agent sessions on this item')} (${rows.length})</summary><ul class="tiny">${rows.map((h) => `<li><b>${esc(PROVIDER[h.provider] ?? h.provider)}</b> · ${ago(h.startedAt)}${h.endedAt ? ` → ${ago(h.endedAt)}` : ''} · ${esc(state(h))}</li>`).join('')}</ul></details>`;
+  }
+  async function switchAgent(to, it) {
+    const stop = itemStop(it);
+    if (!stop) return;
+    const s = agent?.session;
+    // The old session is ended (Codex) or unlinked (Claude) first: one session per checkout.
+    if (s?.provider === 'codex' && !(await agentAction('end', {}))) return;
+    if (s?.provider === 'claude' && !(await agentAction('disconnect', {}, () => { agentLaunch = null; }))) return;
+    agentProvider = to;
+    const ok = to === 'codex'
+      ? await agentAction('start', { provider: 'codex', workId: it.id, mode: agentMode })
+      : await agentAction('connect', { provider: 'claude', workId: it.id }, (r) => { agentLaunch = r.launch?.command ?? null; });
+    if (ok) { agentDraft = continueText(it, stop); renderAgent(); }
+  }
+
   function agentPanel(it) {
     if (!agentsOn) return agentOffPanel(it);
     if (!agent || agent.pid !== pid) return `<section class="panel agent" id="agent"><p class="muted">${A('بيحمّل مساحة الوكيل…', 'Loading the agent workspace…')}</p></section>`;
     const s = agent.session;
     const provider = (id) => agent.providers.find((p) => p.id === id);
-    const isActive = snap?.project?.activeWork === it.id;
-    const activation = isActive ? `<span class="chip done"><i></i>${A('الشغلانة النشطة', 'Active work item')}</span>` : `<span class="tiny muted">${A('مش الشغلانة النشطة.', 'Not the active work item.')}</span> <button class="btn sm ghost" data-agent-activate="${esc(it.id)}">${A('خلّيها النشطة', 'Make it active')}</button>`;
+    const isActive = !it.project && snap?.project?.activeWork === it.id;
+    const activation = it.project ? `<span class="tiny muted">${A('شات المشروع: مش مربوط بشغلانة. أي تعديل الوكيل هيفتحله شغلانة الأول.', 'Project chat: not tied to a work item. The agent routes any change to a work item first.')}</span>` : isActive ? `<span class="chip done"><i></i>${A('الشغلانة النشطة', 'Active work item')}</span>` : `<span class="tiny muted">${A('مش الشغلانة النشطة.', 'Not the active work item.')}</span> <button class="btn sm ghost" data-agent-activate="${esc(it.id)}">${A('خلّيها النشطة', 'Make it active')}</button>`;
     const head = `<div class="ahead"><h2>${A('الوكيل', 'Agent')}</h2><span class="grow"></span>${activation}</div>`;
     const err = agentError ? `<div class="errbar data small">${esc(agentError)}</div>` : '';
     if (!s && agent.lockedBy) return `<section class="panel agent" id="agent">${head}${err}<div class="awarn" role="status">${A('جلسات الوكيل في النسخة دي من المشروع تبع كونسول YallaFlow تاني شغّال. استخدمه، أو اقفله الأول.', 'Agent sessions in this checkout belong to another running YallaFlow console. Use that console, or stop it first.')}</div><p class="tiny muted" dir="ltr">${esc(agent.lockedBy.message)}</p></section>`;
-    if (!s || (s.workId && s.workId !== it.id && s.provider === 'codex')) {
+    if (!s || (s.workId && s.workId !== it.id && (s.provider === 'codex' || it.project))) {
       if (s) return `<section class="panel agent" id="agent">${head}${err}<p class="small">${A(`فيه جلسة ${PROVIDER[s.provider]} شغّالة على`, `A ${PROVIDER[s.provider]} session is active for`)} <a href="#/item/${encodeURIComponent(s.workId)}" class="ltr">${esc(s.workId)}</a>. ${A('جلسة واحدة بس في كل نسخة من المشروع.', 'Only one agent session runs per checkout.')}</p></section>`;
       const choice = agentProvider ?? agent.providers.find((p) => p.ready)?.id ?? 'codex';
       const p = provider(choice);
@@ -485,7 +616,7 @@
       let action = '';
       if (p?.ready && p.capabilities.start) action = `<div class="row"><label class="small">${A('الصلاحيات', 'Permissions')} <select data-agent-mode>${p.capabilities.modes.map((m) => `<option value="${m}" ${m === agentMode ? 'selected' : ''}>${L(MODE_LABEL[m])}</option>`).join('')}</select></label><span class="grow"></span><button class="btn go" data-agent-start ${agentBusy ? 'disabled' : ''}>${A('ابدأ جلسة Codex', 'Start Codex session')}</button></div>${agent.resumable.length ? `<div class="tiny muted">${A('جلسات سابقة:', 'Earlier sessions:')} ${agent.resumable.map((r) => `<button class="linkbtn" data-agent-resume="${esc(r.id)}">${esc(r.workId ?? '—')} · ${ago(r.startedAt)}</button>`).join(' ')}</div>` : ''}`;
       else if (p?.ready && p.id === 'claude') action = `<div class="row"><span class="small grow">${A('Claude Code بيشتغل في الترمينال بتاعك باشتراكك. YallaFlow بيتوصّل بيه بس، مش بيشغّله.', 'Claude Code runs in your terminal with your subscription. YallaFlow connects to it; it never runs it.')}</span><button class="btn go" data-agent-connect ${agentBusy ? 'disabled' : ''}>${A('وصّل Claude Code', 'Connect Claude Code')}</button></div>`;
-      return `<section class="panel agent" id="agent">${head}${err}<div class="apicks">${picks}</div>${problems}${action}<p class="tiny muted">${A('الوكيل بيستخدم اشتراكك الموجود بس، من غير مفاتيح API. أذونات الأدوات مش موافقات YallaFlow.', 'Agents use only your existing subscription, never API keys. Tool permissions are not YallaFlow approvals.')}</p></section>`;
+      return `<section class="panel agent" id="agent">${head}${err}${stopCard(it)}<div class="apicks">${picks}</div>${problems}${action}<p class="tiny muted">${A('الوكيل بيستخدم اشتراكك الموجود بس، من غير مفاتيح API. أذونات الأدوات مش موافقات YallaFlow.', 'Agents use only your existing subscription, never API keys. Tool permissions are not YallaFlow approvals.')}</p></section>`;
     }
     const cap = provider(s.provider)?.capabilities ?? {};
     const modeChip = s.mode ? `<span class="chip ${autoApproves(s.mode) ? 'wait' : 'todo'}" title="${esc(L(MODE_LABEL[s.mode] ?? { ar: s.mode, en: s.mode }))}">${esc(s.mode)}</span>` : '';
@@ -499,14 +630,14 @@
       s.provider === 'claude' ? `<button class="btn sm ghost" data-agent-disconnect>${A('افصل من YallaFlow', 'Unlink')}</button>` : ''
     ].join('');
     const launch = s.provider === 'claude' && !s.connected && agentLaunch ? `<div class="alaunch"><p class="small">${A('شغّل Claude Code بنفسك في فولدر المشروع بالأمر ده. Claude Code هيعرض تحذير القناة التجريبية والقرار ليك.', 'Start Claude Code yourself in the project folder with this command. Claude Code shows its own development-channel warning; the decision is yours.')}</p><pre class="cli" dir="ltr">${esc(agentLaunch)}</pre><button class="btn sm ghost" data-copy="${esc(agentLaunch)}">${A('انسخ', 'Copy')}</button></div>` : '';
-    const entries = agentEntries(agent.events).map((e) => e.kind === 'user' ? `<div class="amsg me"><p>${esc(e.text)}</p></div>` : e.kind === 'agent' ? `<div class="amsg"><p>${esc(e.text)}</p></div>` : e.kind === 'tool' ? `<div class="atool ${e.status === 'failed' ? 'fail' : e.status === 'completed' ? 'done' : ''}"><span>${e.status === 'completed' ? '✓' : e.status === 'failed' ? '✕' : '●'}</span> ${esc(e.title)}</div>` : e.kind === 'perm' ? permCard(e) : `<div class="anote ${e.warn ? 'warn' : ''}">${esc(e.text)}</div>`).join('');
+    const entries = agentEntries(agent.events).map((e) => e.kind === 'user' ? `<div class="amsg me"><p>${esc(e.text)}</p></div>` : e.kind === 'agent' ? `<div class="amsg richtext">${richText(e.text)}</div>` : e.kind === 'tool' ? `<div class="atool ${e.status === 'failed' ? 'fail' : e.status === 'completed' ? 'done' : ''}"><span>${e.status === 'completed' ? '✓' : e.status === 'failed' ? '✕' : '●'}</span> ${esc(e.title)}</div>` : e.kind === 'perm' ? permCard(e) : `<div class="anote ${e.warn ? 'warn' : ''}">${esc(e.text)}</div>`).join('');
     const canSend = cap.send && (s.provider === 'codex' ? s.status === 'idle' : s.connected && !modePending);
     const modeHint = modePending ? `<div class="awarn" role="status">${A('Claude Code متوصّل، بس لسه ما بلّغش بوضع الأذونات بتاعه، فالرسايل مش هتتبعت لحد ما يبلّغ. بيبلّغ لما تكتب حاجة في Claude Code أو لما يستخدم أداة.', 'Claude Code is connected but has not reported its permission mode yet, so messages cannot be sent until it does. It reports it when you type in Claude Code or when it uses a tool.')}</div>` : '';
     return `<section class="panel agent" id="agent">${head}${err}
       <div class="abar"><b>${PROVIDER[s.provider]}</b>${s.provider === 'claude' ? ` <i class="exp">${A('تجريبي', 'experimental')}</i>` : ''}<span class="chip active"><i></i>${esc(state)}</span>${s.auth ? `<span class="chip todo">${esc(s.auth)}</span>` : ''}${modeChip}<span class="grow"></span>${controls}</div>
-      ${warn}${modeHint}${launch}
-      <div class="astream" aria-live="polite">${entries || `<p class="tiny muted">${A(`اكتب للوكيل، مثلاً: «كمّل ${it.id}».`, `Message the agent, for example: "Continue ${it.id}".`)}</p>`}</div>
-      ${suggestionChips(it)}<form class="acompose" data-agent-form><textarea data-agent-input rows="2" maxlength="20000" placeholder="${A(`اكتب لـ ${PROVIDER[s.provider]}…`, `Message ${PROVIDER[s.provider]}…`)}" ${canSend ? '' : 'disabled'}>${esc(agentDraft)}</textarea><button class="btn go" type="submit" ${canSend && !agentBusy ? '' : 'disabled'}>${A('ابعت', 'Send')}</button></form>
+      ${!it.project && !s.workId ? `<p class="tiny muted">${A('دي جلسة شات المشروع، مش مربوطة بالشغلانة دي.', 'This is the project chat session; it is not tied to this work item.')}</p>` : ''}${warn}${modeHint}${stopCard(it)}${launch}
+      <div class="astream" aria-live="polite">${entries || `<p class="tiny muted">${it.project ? A('اسأل الوكيل عن المشروع، مثلاً: «إيه اللي مستنيني؟».', 'Ask the agent about the project, for example: "What is waiting for me?".') : A(`اكتب للوكيل، مثلاً: «كمّل ${it.id}».`, `Message the agent, for example: "Continue ${it.id}".`)}</p>`}</div>
+      ${sessionHistory(it)}${suggestionChips(it)}<form class="acompose" data-agent-form><textarea data-agent-input rows="2" maxlength="20000" placeholder="${A(`اكتب لـ ${PROVIDER[s.provider]}…`, `Message ${PROVIDER[s.provider]}…`)}" ${canSend ? '' : 'disabled'}>${esc(agentDraft)}</textarea><button class="btn go" type="submit" ${canSend && !agentBusy ? '' : 'disabled'}>${A('ابعت', 'Send')}</button></form>
       ${s.provider === 'claude' ? `<p class="tiny muted">${A('الإيقاف والإنهاء بيتعملوا من Claude Code نفسه (Esc). الردود بتوصل كرسايل كاملة.', 'Stop and end happen in Claude Code itself (Esc). Replies arrive as whole messages.')}</p>` : ''}</section>`;
   }
   // Returns false when the action failed. Its error survives the state reload that follows
@@ -561,7 +692,7 @@
     const area = (name, label, required = true) => `<label class="fld">${label}<textarea name="${name}" rows="3" maxlength="10000" ${required ? 'required' : ''}></textarea></label>`;
     if (kind === 'hold') return area('reason', A('السبب', 'Reason'));
     if (kind === 'resume') return area('note', A('ملاحظة (اختياري)', 'Note (optional)'), false);
-    if (kind === 'revise') return `<p class="small muted">${A('تقدر تعدّل الطلب طالما الشغل لسه ما بدأش. النسخة القديمة والمرفقات هيفضلوا محفوظين.', 'You can edit the request until work starts. Previous versions and attachments are kept.')}</p><label class="fld">${A('الطلب بعد التعديل', 'Revised request')}<textarea name="text" rows="6" maxlength="20000" required>${esc(request)}</textarea></label>${area('reason', A('السبب', 'Reason'))}`;
+    if (kind === 'revise') return `<p class="small muted">${A('تقدر تعدّل الطلب طالما الشغل لسه ما بدأش. النسخة القديمة والمرفقات هيفضلوا محفوظين.', 'You can edit the request until work starts. Previous versions and attachments are kept.')}</p><label class="fld">${A('الطلب بعد التعديل', 'Revised request')}<textarea name="text" rows="6" maxlength="20000" required>${esc(request)}</textarea></label>${area('reason', A('السبب', 'Reason'))}${attachmentFields()}`;
     if (kind === 'answer') return `<label class="fld">${A('السؤال', 'Question')}<select name="question">${(it.waitingFor?.questions ?? []).map((q) => `<option>${esc(q)}</option>`).join('')}</select></label>${area('answer', A('الإجابة', 'Answer'))}`;
     if (kind === 'close') return `<label class="fld">${A('النتيجة', 'Outcome')}<select name="outcome"><option value="cancelled">${A('اتلغت', 'Cancelled')}</option><option value="superseded">${A('اتبدّلت بشغلانة تانية', 'Superseded by another item')}</option><option value="duplicate">${A('مكررة', 'Duplicate of another item')}</option></select></label><label class="fld">${A('الشغلانة البديلة (للمستبدلة أو المكررة)', 'The other item (for superseded or duplicate)')}<input name="by" class="ltr" placeholder="PF-0000" pattern="PF-[A-Za-z0-9-]+"></label>${area('reason', A('السبب', 'Reason'))}<p class="tiny muted">${A('الشغل المقفول عمره ما بيتحسب متسلّم ولا متحقق منه.', 'Closed work is never counted as delivered or verified.')}</p>`;
     if (kind === 'reopen') return `${it.state === 'done' ? `<label class="fld">${A('افتحها على', 'Reopen to')}<select name="to"><option value="implementation">${A('التنفيذ', 'Implementation')}</option><option value="verification">${A('التحقق', 'Verification')}</option><option value="review">${A('المراجعة', 'Review')}</option></select></label>` : ''}${area('reason', A('السبب', 'Reason'))}`;
@@ -578,6 +709,7 @@
     document.body.appendChild(d);
     d.addEventListener('close', () => d.remove());
     if (kind === 'revise') {
+      initRequestFiles(d.querySelector('form'));
       const field = d.querySelector('[name="text"]');
       const submit = d.querySelector('button[type="submit"]');
       field.disabled = true;
@@ -605,6 +737,8 @@
     d.querySelector('textarea, select, button[type="submit"]')?.focus();
   }
   async function submitAction(form) {
+    if (form.dataset.busy) return;
+    const projectId = pid;
     const kind = form.dataset.actForm;
     const id = form.dataset.actItem;
     const body = {};
@@ -612,10 +746,18 @@
     if (form.querySelector('[name="confirmMinimumVersion"]')?.checked) body.confirmMinimumVersion = true;
     const err = form.querySelector('.errbar');
     err.hidden = true;
-    const submit = form.querySelector('button[type="submit"]');
-    submit.disabled = true;
+    requestBusy(form, true);
     try {
-      await post(`/api/p/${pid}/work/${encodeURIComponent(id)}/actions/${kind}`, JSON.stringify(body), { 'Content-Type': 'application/json' });
+      const serialized = JSON.stringify(body);
+      if (kind !== 'revise' || form._savedRevision !== serialized) {
+        await post(`/api/p/${projectId}/work/${encodeURIComponent(id)}/actions/${kind}`, serialized, { 'Content-Type': 'application/json' });
+        if (kind === 'revise') form._savedRevision = serialized;
+      }
+      if (kind === 'revise' && !await uploadRevisionFiles(form, projectId, id)) {
+        err.hidden = false;
+        err.textContent = A('نص الطلب اتحفظ، لكن بعض المرفقات ماترفعتش. جرّب الحفظ تاني لإعادة رفعها، أو احذفها.', 'The request text was saved, but some attachments failed. Save again to retry them, or remove them.');
+        return;
+      }
       form.closest('dialog').close();
       toast(`✓ ${esc(L(ACTION_LABEL[kind]).replace('…', ''))} · <span class="ltr">${esc(id)}</span>`);
       await refresh();
@@ -629,7 +771,8 @@
         err.innerHTML = `<pre>${esc(why(e))}</pre>`;
       }
     } finally {
-      submit.disabled = false;
+      requestBusy(form, false);
+      if (kind === 'revise' && fileQueues.has(form)) renderPendingFiles(form);
     }
   }
 
@@ -932,7 +1075,13 @@
       const list = facts(area);
       if (!list.length) return `<p class="small muted">${empty}</p>`;
       const more = (o.areas[area].total ?? 0) - list.length;
-      return `<ul class="facts">${list.map((f) => `<li><p class="small">${esc(f.summary)}</p><span class="tiny muted"><span class="ltr">${esc(f.id)}</span> · ${esc(f.confidence ?? '')} · <span class="fresh-${esc(f.freshness)}">${L(FRESH_TEXT[f.freshness] ?? FRESH_TEXT.unknown)}</span>${f.state === 'disputed' ? ` · <b>${A('عليه خلاف', 'disputed')}</b>` : ''}</span></li>`).join('')}</ul>${more > 0 ? `<p class="tiny muted">${A(`و ${more} كمان في ذاكرة المشروع.`, `+${more} more in project memory.`)}</p>` : ''}`;
+      const item = (f) => {
+        const summary = String(f.summary ?? '');
+        const preview = summary.replace(/\s+/g, ' ').slice(0, 180);
+        const text = `<div class="richtext small">${richText(summary)}</div>`;
+        return `<li>${summary.length > 220 ? disclosure(`${pid}:${f.id}`, `<span class="fact-preview" dir="auto">${esc(preview)}…</span>`, text, 'fact-detail') : text}<div class="fact-meta tiny muted"><span class="ltr">${esc(f.id)}</span> · ${esc(f.confidence ?? '')} · <span class="fresh-${esc(f.freshness)}">${L(FRESH_TEXT[f.freshness] ?? FRESH_TEXT.unknown)}</span>${f.state === 'disputed' ? ` · <b>${A('عليه خلاف', 'disputed')}</b>` : ''}</div></li>`;
+      };
+      return `<ul class="facts">${list.slice(0, 3).map(item).join('')}</ul>${list.length > 3 ? disclosure(`${pid}:${area}`, `<span>${A(`${list.length - 3} حقائق إضافية`, `${list.length - 3} more facts`)}</span>`, `<ul class="facts">${list.slice(3).map(item).join('')}</ul>`, 'area-more') : ''}${more > 0 ? `<p class="tiny muted">${A(`و ${more} كمان في ذاكرة المشروع.`, `+${more} more in project memory.`)}</p>` : ''}`;
     };
     const main = o.stack.entries.filter((e) => e.kind !== 'language' && e.kind !== 'lockfile' && e.kind !== 'ecosystem' && e.kind !== 'ci');
     const langs = o.stack.entries.filter((e) => e.kind === 'language');
@@ -1454,7 +1603,7 @@
       if (claude && !result?.claude) toast(esc(A('الوكلاء اتفعّلوا، بس Claude Code مااتفعّلش في الجلسة دي (اتفعّلت قبل كده من غيره). أعد تشغيل الكونسول علشان تختاره.', 'Agents are on, but Claude Code was not turned on for this session (it was enabled earlier without it). Restart the console to choose it.')));
       agentsOn = true; agentsCanEnable = false;
       await loadAgentInfo();
-      if (route().v === 'item') await loadAgent();
+      if (chatCtx()) await loadAgent();
     } catch (e) { toast(esc(e.message)); }
     render();
   }
@@ -1465,7 +1614,7 @@
     const codex = agentInfo?.codex;
     const status = codex && !codex.ready ? `<p class="small">${A('Codex مش جاهز على الجهاز ده:', 'Codex is not ready on this machine:')}</p><ul class="aprob">${codex.problems.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>` : '';
     return `<section class="panel agent" id="agent"><div class="ahead"><h2>${A('الوكيل', 'Agent')}</h2><span class="grow"></span><span class="chip todo">${A('مقفول', 'off')}</span></div>
-      <p class="small">${A(`اشتغل على ${it.id} مع Codex من هنا. مساحة الوكيل مقفولة في الكونسول ده لحد ما تفعّلها.`, `Work on ${it.id} with Codex from here. The Agent Workspace is off in this console until you enable it.`)}</p>${status}
+      <p class="small">${it.project ? A('اسأل الوكيل عن المشروع من هنا. مساحة الوكيل مقفولة في الكونسول ده لحد ما تفعّلها.', 'Ask the agent about the project from here. The Agent Workspace is off in this console until you enable it.') : A(`اشتغل على ${it.id} مع Codex من هنا. مساحة الوكيل مقفولة في الكونسول ده لحد ما تفعّلها.`, `Work on ${it.id} with Codex from here. The Agent Workspace is off in this console until you enable it.`)}</p>${status}
       ${agentsCanEnable ? `<button class="btn go sm" data-agents-enable>${A('فعّل الوكلاء للجلسة دي', 'Enable agents for this session')}</button>` : ''}${explain}</section>`;
   }
 
@@ -1575,6 +1724,83 @@
     return known[e.code] ?? e.message;
   }
   const retryable = (e) => !e.status || e.status === 503;
+  const fileQueues = new WeakMap();
+  function attachmentFields() {
+    return `<section class="request-files"><label class="fld"><span>${A('مرفقات (اختياري)', 'Attachments (optional)')}</span><input type="file" data-request-files multiple accept="${ACCEPT}"></label><p class="tiny muted">${A('اختار ملفات أو الصق صورة بـ Ctrl+V داخل الطلب · لحد 50 MB للملف.', 'Choose files or paste a screenshot with Ctrl+V inside the request · up to 50 MB each.')}</p><ul class="pending-files" data-pending-files></ul><p class="tiny" data-file-note role="status" aria-live="polite"></p></section>`;
+  }
+  function renderPendingFiles(form) {
+    const state = fileQueues.get(form);
+    form.querySelector('[data-pending-files]').innerHTML = state.entries.map((entry, i) => `<li>${entry.url ? `<img src="${esc(entry.url)}" alt="" width="56" height="44">` : '<span aria-hidden="true">📎</span>'}<span class="grow"><b dir="auto">${esc(entry.file.name)}</b><small class="muted">${size(entry.file.size)}${entry.uploaded ? ` · ✓ ${A('اتضاف', 'Attached')}` : ''}</small>${entry.error ? `<small class="file-error">${esc(entry.error)}</small>` : ''}</span>${entry.uploaded ? '' : `<button type="button" class="ibtn" data-remove-file="${i}" aria-label="${esc(A(`احذف ${entry.file.name}`, `Remove ${entry.file.name}`))}" ${form.dataset.busy ? 'disabled' : ''}>✕</button>`}</li>`).join('');
+  }
+  function addRequestFiles(form, files, pasted = false) {
+    const state = fileQueues.get(form);
+    if (!state || form.dataset.busy) return;
+    const problems = [];
+    for (let file of files) {
+      if (pasted) {
+        const ext = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/gif': 'gif', 'image/webp': 'webp' }[file.type];
+        if (!ext) { problems.push(A('نوع الصورة مش مدعوم. اختار PNG أو JPG أو GIF أو WebP.', 'Use a PNG, JPG, GIF or WebP image.')); continue; }
+        file = new File([file], `screenshot-${Date.now()}-${++state.sequence}.${ext}`, { type: file.type });
+      }
+      const ext = '.' + file.name.split('.').pop().toLowerCase();
+      const code = !ACCEPT.split(',').includes(ext) ? 'UNSUPPORTED_FILE' : !file.size ? 'EMPTY_FILE' : file.size > 50 * 1024 * 1024 ? 'TOO_LARGE' : null;
+      if (code) { problems.push(why({ status: 422, code }, file)); continue; }
+      state.entries.push({ file, url: /^image\/(png|jpeg|gif|webp)$/.test(file.type) ? URL.createObjectURL(file) : null, uploaded: false, error: null });
+    }
+    renderPendingFiles(form);
+    form.querySelector('[data-file-note]').textContent = problems.join(' ') || A(`${state.entries.length} مرفق جاهز.`, `${state.entries.length} attachment(s) ready.`);
+  }
+  function initRequestFiles(form) {
+    fileQueues.set(form, { entries: [], sequence: 0, requestId: newRequestId() });
+    form.addEventListener('paste', (event) => {
+      if (form.dataset.busy) return;
+      const files = [...(event.clipboardData?.items ?? [])].filter((item) => item.kind === 'file').map((item) => item.getAsFile()).filter(Boolean);
+      if (!files.length) files.push(...(event.clipboardData?.files ?? []));
+      if (!files.length) return; // ordinary text paste remains native
+      event.preventDefault(); addRequestFiles(form, files, true);
+    });
+    form.querySelector('[data-request-files]').addEventListener('change', (event) => {
+      addRequestFiles(form, [...event.target.files]); event.target.value = '';
+    });
+    form.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-remove-file]');
+      if (!button || form.dataset.busy) return;
+      const state = fileQueues.get(form), index = Number(button.dataset.removeFile);
+      const entry = state.entries[index];
+      if (!entry || entry.uploaded) return;
+      if (entry.url) URL.revokeObjectURL(entry.url);
+      state.entries.splice(index, 1); renderPendingFiles(form);
+      form.querySelector('[data-file-note]').textContent = A('المرفق اتشال من الطلب.', 'Attachment removed from the request.');
+      form.querySelector('[data-request-files]').focus();
+    });
+    const dialog = form.closest('dialog');
+    dialog.addEventListener('cancel', (event) => { if (form.dataset.busy) event.preventDefault(); });
+    dialog.addEventListener('close', () => { for (const entry of fileQueues.get(form)?.entries ?? []) if (entry.url) URL.revokeObjectURL(entry.url); fileQueues.delete(form); });
+  }
+  function requestBusy(form, busy) {
+    if (busy) {
+      form.dataset.busy = 'true';
+      form._enabledControls = [...form.querySelectorAll('input,textarea,select,button')].filter((el) => !el.disabled);
+      for (const el of form._enabledControls) el.disabled = true;
+    } else {
+      delete form.dataset.busy;
+      for (const el of form._enabledControls ?? []) el.disabled = false;
+      delete form._enabledControls;
+    }
+  }
+  async function uploadRevisionFiles(form, projectId, id) {
+    const state = fileQueues.get(form);
+    for (const entry of state.entries.filter((entry) => !entry.uploaded)) {
+      entry.error = null;
+      try {
+        await post(`/api/p/${projectId}/work/${encodeURIComponent(id)}/revision-sources`, entry.file, { 'Content-Type': 'application/octet-stream', 'X-File-Name': encodeURIComponent(entry.file.name), 'X-Request-Id': state.requestId });
+        entry.uploaded = true;
+      } catch (error) { entry.error = why(error, entry.file); }
+    }
+    renderPendingFiles(form);
+    return state.entries.every((entry) => entry.uploaded);
+  }
+
   function openCreate() {
     if (readOnly) return;
     cw = { requestId: newRequestId(), pid, created: null, files: [], failed: [], attached: [] };
@@ -1584,6 +1810,7 @@
     d.setAttribute('aria-labelledby', 'cw-h');
     d.innerHTML = createForm();
     document.body.appendChild(d);
+    initRequestFiles(d.querySelector('form'));
     d.addEventListener('close', () => { d.remove(); });
     d.showModal();
     d.querySelector('textarea').focus();
@@ -1595,7 +1822,7 @@
       <label class="fld"><span>${A('محتاج إيه؟', 'What do you need?')}</span><textarea name="request" rows="5" maxlength="20000" required placeholder="${A('مثلاً: العملاء يقدروا يصدّروا طلباتهم CSV من صفحة الطلبات…', 'For example: customers can export their orders to CSV from the orders page…')}"></textarea></label>
       <fieldset class="seg"><legend>${A('نوع الشغل', 'What kind of work?')}</legend>${KINDS.map(([v, l], i) => `<label><input type="radio" name="type" value="${v}" ${i === 0 ? 'checked' : ''}><span>${L(l)}</span></label>`).join('')}</fieldset>
       <fieldset class="seg" data-size hidden><legend>${A('الحجم', 'Size')}</legend>${SIZES.map(([v, l, tech]) => `<label><input type="radio" name="scope" value="${v}"><span>${L(l)} <i class="ltr">${tech}</i></span></label>`).join('')}</fieldset>
-      <label class="fld"><span>${A('ملفات (اختياري)', 'Files (optional)')}</span><input type="file" name="files" multiple accept="${ACCEPT}"><small class="muted">${A('BRD أو PDF أو Word أو Excel أو صور · لحد 50 MB للملف', 'BRD, PDF, Word, Excel or images · up to 50 MB each')}</small></label>
+      ${attachmentFields()}
       <p class="tiny muted">${A('YallaFlow بيسجّل الشغلانة بس، ومفيش وكيل بيشتغل لوحده. بعدها كمّل من Claude Code أو Codex.', 'YallaFlow records the work item; no agent starts on its own. Then continue in Claude Code or Codex.')}</p>
       <div class="formerr" role="alert" aria-live="assertive"></div>
       <div class="row end"><button type="button" class="btn ghost" data-cw-cancel>${A('إلغاء', 'Cancel')}</button><button type="submit" class="btn go" data-cw-submit>${A('إنشاء', 'Create')}</button></div></form>`;
@@ -1635,6 +1862,7 @@
     return failed;
   }
   async function submitCreate(form) {
+    if (form.dataset.busy) return;
     const d = form.closest('dialog');
     const err = form.querySelector('.formerr');
     const request = form.request.value.trim();
@@ -1643,9 +1871,8 @@
     if (!request) { err.textContent = A('اكتب المطلوب في سطر أو اتنين.', 'Describe what you need in a line or two.'); form.request.focus(); return; }
     if (type && !scope) { err.textContent = A('اختار الحجم للنوع ده.', 'Choose a size for this kind of work.'); form.querySelector('input[name="scope"]').focus(); return; }
     cw.pid = form.project?.value ?? pid;
-    const files = [...(form.files.files ?? [])];
-    const button = form.querySelector('[data-cw-submit]');
-    button.disabled = true;
+    const files = fileQueues.get(form).entries.map((entry) => entry.file);
+    requestBusy(form, true);
     err.textContent = A('بيسجّل…', 'Creating…');
     try {
       const result = await post(`/api/p/${cw.pid}/work`, JSON.stringify({ requestId: cw.requestId, request, type, scope }), { 'Content-Type': 'application/json' });
@@ -1654,10 +1881,11 @@
     } catch (e) {
       // Nothing was created (or a retry will return it: the same request ID is reused).
       err.textContent = why(e);
-      button.disabled = false;
+      requestBusy(form, false);
       return;
     }
     cw.failed = await uploadAll(d, files);
+    requestBusy(form, false);
     // With files, always show what happened to each one; otherwise go straight to the item.
     if (files.length || cw.classifyError) return partialView(d);
     finishCreate(d);
@@ -1692,7 +1920,7 @@
     const body = !snap ? `<p class="muted" style="margin-top:40px;text-align:center">${error ? '' : A('بيحمّل…', 'Loading…')}</p>` : (views[r.v] ?? viewMap)();
     // Forms marked data-keep survive a redraw: typed values and focus are carried over (PF-0057).
     const kept = [...document.querySelectorAll('form[data-keep]')].map((form) => ({ key: form.dataset.keep, values: [...form.elements].filter((el) => el.name && el.type !== 'file' && (el.type === 'checkbox' || el.type === 'radio' ? el.checked !== el.defaultChecked : el.value !== el.defaultValue)).map((el) => [el.name, el.type === 'checkbox' || el.type === 'radio' ? (el.type === 'radio' ? (el.checked ? el.value : null) : el.checked) : el.value, el.type]), focus: form.contains(document.activeElement) ? document.activeElement.name : null, caret: document.activeElement?.selectionStart ?? null }));
-    document.getElementById('app').innerHTML = topbar(r) + `<main>${banner()}${snap && ['map', 'lines'].includes(r.v) ? understandingStrip() : ''}${body}</main>` + (snap && r.v === 'item' && byId(r.id) ? agentDock(byId(r.id)) : '');
+    document.getElementById('app').innerHTML = topbar(r) + `<main>${banner()}${snap && ['map', 'lines'].includes(r.v) ? understandingStrip() : ''}${body}</main>` + (chatCtx(r) ? agentDock(chatCtx(r)) : '');
     for (const k of kept) {
       const form = document.querySelector(`form[data-keep="${CSS.escape(k.key)}"]`);
       if (!form) continue;
@@ -1770,7 +1998,8 @@
   async function loadForView() {
     const v = route().v;
     if (!pid && !['new', 'projects'].includes(v)) return;
-    if (v === 'item') { if (agentsOn) await loadAgent(); else await loadAgentInfo(); }
+    // Project pages load the agent state only while the chat is open (PF-0067).
+    if (v === 'item' || (chatOpen && PROJECT_CHAT_VIEWS.includes(v))) { if (agentsOn) await loadAgent(); else await loadAgentInfo(); }
     if (v === 'team') await loadTeam();
     else if (v === 'projects') await loadOverview();
     else if (pid && (v === 'overview' || ((v === 'map' || v === 'lines') && projectOverview?.pid !== pid))) { await loadProjectOverview(); if (v === 'overview' && projectOverview?.data?.project?.kind === 'greenfield') { await loadRuntime(); if (!agentsOn) await loadAgentInfo(); } }
@@ -1945,6 +2174,8 @@
       openAction(kind, id);
       return;
     }
+    const sw = e.target.closest('[data-agent-switch]');
+    if (sw) { const it = byId(route().id); if (it) switchAgent(sw.dataset.agentSwitch, it); return; }
     const ag = e.target.closest('[data-agent-start],[data-agent-connect],[data-agent-cancel],[data-agent-end],[data-agent-disconnect],[data-agent-perm],[data-agent-activate],[data-agent-resume]');
     if (ag) {
       const workId = route().id;
@@ -1989,6 +2220,7 @@
     else if (x.hasAttribute('data-more')) { const b = x.previousElementSibling; b.classList.toggle('clamp'); x.textContent = b.classList.contains('clamp') ? A('اقرأ الطلب كله ↓', 'Read the whole request ↓') : A('أقل ↑', 'Less ↑'); }
     else if (x.dataset.copy) copy(x.dataset.copy);
   });
+  document.addEventListener('toggle', (e) => { const key = e.target.dataset?.overview; if (key && e.target.isConnected) { if (e.target.open) overviewExpanded.add(key); else overviewExpanded.delete(key); } }, true);
   document.addEventListener('input', (e) => { if (e.target.closest('[data-gate-form]')) gateReady(e.target.closest('[data-gate-form]')); });
   // Board drag and drop: dragging proposes a move; Core decides (see dropOn).
   document.addEventListener('dragstart', (e) => {

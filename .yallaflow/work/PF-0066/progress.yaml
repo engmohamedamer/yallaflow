@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-07T23:19:34.599Z",
+      "completedAt": "2026-11-07T23:20:29.352Z",
+      "summary": "Codex turn failures (incl. usage limit) emit an 'error' event then turn.ended and leave the session idle (src/agents/codex.js:180-196); crashes emit session.ended reason crashed; Claude channel drop emits session.disconnected. Events live only in memory per console run (bridge project.events); session records in .yallaflow/local/agent-sessions/<id>.json carry provider, workId, start/end, status but no stop reason; status() returns only resumable Codex records. The UI already recognises usage-limit text (agentEntries) but offers no continuation; switching today means End, then Start or Connect by hand. Start/resume/connect/disconnect/end routes exist, so a switch can be composed from them."
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T23:20:29.638Z",
+      "completedAt": "2026-11-07T23:20:29.638Z",
+      "summary": "Owner approved the design in the session (2026-11-08): card shows why the agent stopped; continue with another agent, resume later, or terminal; old session ends first; never automatic; record who worked when. 4 REQ / 4 AC recorded; continue message prepared, not auto-sent (ruling)."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-07T23:27:47.768Z",
+      "completedAt": "2026-11-07T23:27:47.768Z",
+      "summary": "src/agents/bridge.js: stopFrom() classifies a stop (usage_limit with retry time from the reply text or error, error, crashed, ended, disconnected, unlinked); noteStop() saves lastStop in the git-ignored session record and emits session.stopped; status() returns history (provider, workId, start/end, status, lastStop). resources/console/app.js: stopped card in the item chat (reason, retry time, Continue with each ready agent except the one that just hit its limit, copy continue message), switchAgent() ends/unlinks the old session then starts/connects the chosen one and prepares 'Continue <id>…' unsent; session history list per item. app.css styles; docs/agents.md section; CHANGELOG. Tests: test/agent-continue.test.js (10), Claude disconnect assertion, panel harness updated. Browser check with a simulated Codex limit (AR, 1440 px): card shown, 0 console errors."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T23:38:10.132Z",
+      "completedAt": "2026-11-07T23:38:10.132Z",
+      "summary": "V-002 npm run check 980/980 after fixing the stop-ordering race found by V-001 (1 failure); agent suites re-run 3x clean; browser check of the card with a simulated limit.",
+      "evidence": [
+        "verification:V-002"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-07T23:38:10.553Z",
+      "completedAt": "2026-11-07T23:38:10.553Z",
+      "summary": "4/4 criteria satisfied."
+    }
+  },
+  "rulings": [
+    {
+      "decision": "The continue message is prepared in the message box, not sent automatically, even after an explicit switch.",
+      "reason": "Sending uses the developer's subscription; the owner's rule is no subscription use beyond what they ask for, and they may want to add context.",
+      "costIfWrong": "One extra click per switch.",
+      "createdAt": "2026-11-07T23:20:29.543Z"
+    },
+    {
+      "decision": "V-001 failed one test: a crash's stop reason was saved after session.ended was announced, so an immediate read missed it. Fixed in the bridge (session.stopped is emitted after the record is saved) and the switch card now clears when the new session starts; re-verifying.",
+      "reason": "Fresh verification found a real ordering race that the UI could also hit.",
+      "costIfWrong": "The stopped card could miss a crash until the next reload.",
+      "createdAt": "2026-11-07T23:34:34.740Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-07T23:38:10.553Z"
+}

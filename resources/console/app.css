@@ -503,6 +503,10 @@ html[lang="en"] dialog.create .seg span::first-letter { text-transform: uppercas
 :root[data-theme="dark"] .agent .linkbtn { color: var(--nile); }
 .agent .abar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .agent .awarn { background: var(--amber-soft); color: var(--ink); border-radius: 12px; padding: 8px 12px; font-size: 14px; }
+.agent .astop { border: 1px solid var(--amber); background: var(--amber-soft); border-radius: 14px; padding: 10px 12px; display: grid; gap: 8px; color: var(--ink); }
+.agent .astop p { margin: 0; }
+.agent .ahist { margin: 2px 0; }
+.agent .ahist ul { margin: 6px 0 0; padding-inline-start: 18px; display: grid; gap: 2px; }
 .agent .alaunch { border: 1px dashed var(--line); border-radius: 14px; padding: 10px 12px; display: grid; gap: 8px; }
 .agent .alaunch .cli { white-space: pre-wrap; word-break: break-all; }
 .agent .astream { max-height: 460px; overflow-y: auto; display: grid; gap: 8px; padding: 4px 2px; }
@@ -559,7 +563,7 @@ dialog.act .awarn { background: var(--amber-soft); border-radius: 12px; padding:
 .ovgrid .panel h2 { font-size: 17px; margin-bottom: 8px; }
 .ovgrid .wide { grid-column: 1 / -1; }
 .ovgrid ul.facts, .ovgrid ul.modules { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-.ovgrid ul.facts li { border-inline-start: 3px solid var(--line, rgba(127,127,127,.25)); padding-inline-start: 10px; }
+.ovgrid ul.facts > li { border-inline-start: 3px solid var(--line, rgba(127,127,127,.25)); padding-inline-start: 10px; }
 .tablewrap { overflow-x: auto; margin-top: 8px; }
 table.stack { width: 100%; border-collapse: collapse; font-size: 14px; }
 table.stack th, table.stack td { text-align: start; padding: 6px 8px; border-bottom: 1px solid rgba(127,127,127,.18); vertical-align: top; }
@@ -667,4 +671,71 @@ table.stack th { font-size: 12px; color: var(--muted); font-weight: 600; }
 @media (max-width: 560px) {
   .chatwin { inset: auto 0 0 0; width: 100vw; height: 86vh; border-radius: 18px 18px 0 0; }
   .chatdock.open .chatfab { display: none; }
+}
+
+/* PF-0061: compact progress, readable project facts and agent replies. */
+.hero.compact { gap: 18px; padding: 16px 22px; border-radius: 20px; }
+.hero.compact h1 { font-size: clamp(20px, 2vw, 26px); }
+.hero.compact p { font-size: 14px; line-height: 1.7; }
+.hero.compact .stat { min-width: 78px; padding: 8px 10px; border-radius: 12px; }
+.hero.compact .stat b { font-size: 21px; }
+.hero.compact .stat span { font-size: 12px; }
+.progress-help { margin-top: 4px; }
+.progress-help summary { cursor: pointer; width: fit-content; }
+.hero.compact .progress-help p { font-size: 12px; max-width: 64ch; }
+.ovgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+.ovgrid .panel { min-width: 0; }
+.ovgrid .panel h2 { margin-bottom: 14px; }
+.ovgrid ul.facts { gap: 14px; }
+.ovgrid ul.facts > li { border-inline-start-color: var(--nile); padding-inline-start: 14px; }
+.fact-meta { margin-top: 8px; display: block; }
+.disclosure summary { cursor: pointer; color: var(--ink-2); line-height: 1.8; }
+.disclosure .more-label, .disclosure .less-label { color: var(--nile-2); font-size: 12px; font-weight: 600; margin-inline-start: 8px; white-space: nowrap; }
+.disclosure > summary .less-label, .disclosure[open] > summary .more-label { display: none; }
+.disclosure[open] > summary .less-label { display: inline; }
+.fact-preview { font-size: 14px; overflow-wrap: anywhere; }
+.fact-detail[open] > summary .fact-preview { display: none; }
+.fact-detail > .richtext { margin-top: 8px; }
+.area-more { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 10px; }
+.area-more > ul.facts { margin-top: 14px; }
+.richtext { line-height: 1.85; overflow-wrap: anywhere; min-width: 0; }
+.richtext > :first-child { margin-top: 0; }
+.richtext > :last-child { margin-bottom: 0; }
+.richtext p, .agent .amsg.richtext p { white-space: normal; margin: 8px 0; }
+.richtext h3, .richtext h4, .richtext h5, .richtext h6 { font-size: 1.05em; line-height: 1.6; margin: 14px 0 6px; }
+.richtext ul, .richtext ol { padding-inline-start: 22px; margin: 8px 0; }
+.richtext li + li { margin-top: 4px; }
+.richtext code { font-family: ui-monospace, monospace; font-size: .88em; background: var(--bg); border: 1px solid var(--line); border-radius: 5px; padding: 1px 4px; unicode-bidi: isolate; }
+.richtext pre { max-width: 100%; overflow: auto; white-space: pre; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px; margin: 10px 0; line-height: 1.65; text-align: left; }
+.richtext pre code { border: 0; padding: 0; background: transparent; white-space: pre; }
+.richtext a { color: var(--nile-2); text-decoration: underline; text-underline-offset: 3px; }
+.richtext blockquote { margin: 10px 0; padding: 4px 12px; border-inline-start: 3px solid var(--nile); color: var(--ink-2); }
+.richtext table { border-collapse: collapse; font-size: .9em; min-width: 100%; }
+.richtext th, .richtext td { text-align: start; border: 1px solid var(--line); padding: 6px 10px; }
+.richtext th { background: var(--bg); }
+.agent .amsg.richtext { width: fit-content; min-width: 0; padding: 12px 16px; font-size: 14px; }
+.agent .astream { align-content: start; grid-template-columns: minmax(0, 1fr); min-width: 0; }
+.request-files { margin: 14px 0; border: 1px dashed var(--line); border-radius: 14px; padding: 12px; }
+.request-files .fld { margin-top: 0; }
+.pending-files { list-style: none; display: grid; gap: 8px; padding: 0; margin: 10px 0 0; }
+.pending-files:empty { display: none; }
+.pending-files li { display: flex; align-items: center; gap: 10px; padding: 8px; background: var(--bg); border-radius: 10px; min-width: 0; }
+.pending-files .grow { min-width: 0; }
+.pending-files b { display: block; font-size: 13px; overflow-wrap: anywhere; }
+.pending-files small { display: block; font-size: 12px; }
+.pending-files img { object-fit: contain; border-radius: 6px; background: var(--card); flex: none; }
+.file-error { color: var(--clay); }
+:root[data-theme="dark"] .richtext a, :root[data-theme="dark"] .disclosure .more-label, :root[data-theme="dark"] .disclosure .less-label { color: var(--nile); }
+@media (max-width: 1000px) {
+  .hero.compact { grid-template-columns: auto minmax(0, 1fr); }
+  .hero.compact .stats { grid-column: 1 / -1; justify-content: start; }
+}
+@media (max-width: 640px) {
+  .ovgrid { grid-template-columns: minmax(0, 1fr); }
+  .hero.compact { padding: 14px; gap: 12px; text-align: start; justify-items: stretch; }
+  .hero.compact .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .hero.compact .stat { min-width: 0; padding: 8px 4px; }
+  .hero.compact .stat span { font-size: 10px; }
+  .hero.compact .stat b { font-size: 19px; }
+  .agent .amsg.richtext { max-width: 96%; padding: 10px 12px; }
 }

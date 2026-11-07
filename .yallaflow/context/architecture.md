@@ -646,4 +646,35 @@ print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_commo
   - docs/agents-claude-experimental.md (repository @ ad9fe0d)
   - npm run check (passed) (runtime, PF-0060 V-006)
 
+<!-- yallaflow-fact:CTX-0123 -->
+### CTX-0123 — Agent session records (.yallaflow/local/agent-sessions/<id>.json, git-ignored) keep lastStop {reason: usage_limit|error|crashed|ended|disconnected|unlinked, detail, retryAt, at}; the bridge emits session.stopped after saving it and returns the records as status().history. A Codex usage limit arrives as reply text followed by a generic error, so the bridge reads the turn's recent reply text with the error. The console offers to continue a stopped work item with another ready agent: the old session is ended or unlinked first, nothing switches automatically, and the 'Continue <id>' message is prepared, never sent for the developer.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0066
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-07T23:38:10.732Z
+- **Verified:** 2026-11-07T23:38:10.732Z (commit 9cfe4b5)
+- **Evidence:**
+  - src/agents/bridge.js (repository @ 9cfe4b5)
+  - resources/console/app.js (repository @ 9cfe4b5)
+  - test/agent-continue.test.js (repository @ 9cfe4b5)
+  - npm run check (passed) (runtime, PF-0066 V-002)
+
+<!-- yallaflow-fact:CTX-0124 -->
+### CTX-0124 — The console's floating agent chat follows the page (chatCtx in resources/console/app.js): a work item page is that item's chat; Overview, Flow, Work, Setup, Worktrees and Insights share a project chat whose session has no workId. One agent session per checkout still applies: an item's session appears on project pages as a link, and a project session on an item page is labelled as the project chat.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0067
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-07T23:45:18.289Z
+- **Verified:** 2026-11-07T23:45:18.289Z (commit 9cfe4b5)
+- **Evidence:**
+  - resources/console/app.js (repository @ 9cfe4b5)
+  - test/console-project-chat.test.js (repository @ 9cfe4b5)
+  - npm run check (passed) (runtime, PF-0067 V-001)
+
 <!-- yallaflow-context:end -->

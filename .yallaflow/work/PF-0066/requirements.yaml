@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "When an agent session on a work item stops (usage limit, error, crash, ended, or Claude Code disconnected), the item's chat says why, with the retry time when the provider gave one.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T23:20:29.447Z",
+      "updatedAt": "2026-11-07T23:20:29.447Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "From that state the developer can continue the same work item with another agent (Codex or Claude Code), resume the same agent later, or continue from a terminal; switching ends or unlinks the old session first and never happens automatically.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T23:20:29.447Z",
+      "updatedAt": "2026-11-07T23:20:29.447Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "The new agent starts from the work item's durable state: the chat is prepared with a 'continue <id>' message naming why the previous agent stopped, which the developer sends.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T23:20:29.447Z",
+      "updatedAt": "2026-11-07T23:20:29.447Z"
+    },
+    {
+      "id": "REQ-004",
+      "statement": "The item shows which agent sessions worked on it and when, with how each one stopped.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T23:20:29.447Z",
+      "updatedAt": "2026-11-07T23:20:29.447Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "A Codex turn that fails with a usage-limit message, a crashed Codex session and a disconnected Claude channel each show a 'stopped' notice in the item chat naming the reason (and the retry time when the message has one); the stop is also saved in the session record so it survives a console restart.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T23:20:29.447Z",
+      "updatedAt": "2026-11-07T23:20:29.447Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-002",
+      "statement": "The stopped notice offers 'Continue with Claude Code' / 'Continue with Codex' (only providers that are ready and enabled), and 'Continue in a terminal' (copyable continue text); choosing another agent ends the Codex session or unlinks Claude first, then starts or connects the chosen one; nothing switches without a click.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T23:20:29.447Z",
+      "updatedAt": "2026-11-07T23:20:29.447Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-003",
+      "statement": "After a switch the message box holds 'continue <id>' plus the previous agent and stop reason, unsent until the developer presses Send.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T23:20:29.447Z",
+      "updatedAt": "2026-11-07T23:20:29.447Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-004",
+      "statement": "The item chat lists that item's recent agent sessions (agent, start, end, how it stopped) from the git-ignored local session records; nothing is written outside .yallaflow/local.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T23:20:29.447Z",
+      "updatedAt": "2026-11-07T23:20:29.447Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-07T23:20:29.447Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-07T23:20:29.447Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-07T23:20:29.447Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-004",
+      "at": "2026-11-07T23:20:29.447Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-07T23:20:29.447Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-07T23:20:29.447Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-07T23:20:29.447Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-11-07T23:20:29.447Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-07T23:20:29.447Z"
+}

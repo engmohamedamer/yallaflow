@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/console-presentation.test.js test/request-revision-ui.test.js test/console-agent-errors.test.js test/console-actions.test.js test/console-create.test.js test/console-server.test.js test/console-phase-d.test.js test/console-acceptance.test.js test/overview.test.js test/intake.test.js test/request-revision.test.js test/cli-help-safety.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/console-presentation.test.js",
+        "test/request-revision-ui.test.js",
+        "test/console-agent-errors.test.js",
+        "test/console-actions.test.js",
+        "test/console-create.test.js",
+        "test/console-server.test.js",
+        "test/console-phase-d.test.js",
+        "test/console-acceptance.test.js",
+        "test/overview.test.js",
+        "test/intake.test.js",
+        "test/request-revision.test.js",
+        "test/cli-help-safety.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/console-presentation.test.js test/request-revision-ui.test.js test/console-agent-errors.test.js test/console-actions.test.js test/console-create.test.js test/console-server.test.js test/console-phase-d.test.js test/console-acceptance.test.js test/overview.test.js test/intake.test.js test/request-revision.test.js test/cli-help-safety.test.js",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-07T23:08:47.635Z",
+      "finishedAt": "2026-11-07T23:09:03.926Z",
+      "verifiedAt": "2026-11-07T23:09:03.926Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "node --check resources/console/app.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--check",
+        "resources/console/app.js"
+      ],
+      "displayCommand": "node --check resources/console/app.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T23:10:20.134Z",
+      "finishedAt": "2026-11-07T23:10:20.169Z",
+      "verifiedAt": "2026-11-07T23:10:20.169Z",
+      "log": "V-002-verification.log"
+    },
+    {
+      "id": "V-003",
+      "command": "npm run check:syntax",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check:syntax"
+      ],
+      "displayCommand": "npm run check:syntax",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T23:10:20.301Z",
+      "finishedAt": "2026-11-07T23:10:28.907Z",
+      "verifiedAt": "2026-11-07T23:10:28.907Z",
+      "log": "V-003-verification.log"
+    },
+    {
+      "id": "V-004",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/console-presentation.test.js test/console-actions.test.js test/console-agent-errors.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/console-presentation.test.js",
+        "test/console-actions.test.js",
+        "test/console-agent-errors.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/console-presentation.test.js test/console-actions.test.js test/console-agent-errors.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T23:10:18.967Z",
+      "finishedAt": "2026-11-07T23:10:29.751Z",
+      "verifiedAt": "2026-11-07T23:10:29.751Z",
+      "log": "V-004-verification.log"
+    },
+    {
+      "id": "V-005",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T23:15:57.369Z",
+      "finishedAt": "2026-11-07T23:18:58.292Z",
+      "verifiedAt": "2026-11-07T23:18:58.292Z",
+      "log": "V-005-verification.log"
+    }
+  ]
+}

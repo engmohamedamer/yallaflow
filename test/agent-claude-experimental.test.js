@@ -228,6 +228,10 @@ test('claude (simulated): bridge file, channel takeover, disconnect, bypass, nes
     mcp.close();
     const dropped = await c3.waitFor((e) => e.type === 'permission.resolved' && e.requestId === pending.requestId);
     assert.deepEqual([dropped.decision, dropped.by], ['deny', 'channel disconnected']);
+    // PF-0066: the linked item records that Claude Code disconnected, so it can be continued.
+    const stopped = await c3.waitFor((e) => e.type === 'session.stopped');
+    assert.deepEqual([stopped.provider, stopped.workId, stopped.stop.reason], ['claude', workId, 'disconnected']);
+    assert.equal((await c3.status()).history.find((h) => h.provider === 'claude' && h.workId === workId).lastStop.reason, 'disconnected');
   } finally {
     mcp.close();
     await c3.close();

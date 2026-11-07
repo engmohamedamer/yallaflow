@@ -15,6 +15,18 @@ import { detectProviders } from './detect.js';
 import { acquireCheckoutLock, lockedError, readCheckoutLock } from './checkout-lock.js';
 
 const RECORD_ID = /^[0-9a-f]{12}$/;
+const LIMIT = /usage limit|rate limit|quota|try again (?:at|in)/i;
+
+// Why a session stopped, saved in its record so the console can offer to continue the work
+// item with another agent even after a restart (PF-0066). The provider's text is kept short.
+export function stopFrom(reason, detail = '') {
+  const text = String(detail ?? '').replace(/\s+/g, ' ').trim().slice(0, 300);
+  if (reason === 'error' && LIMIT.test(text)) {
+    const retry = /try again (?:at|in) ([^.\n)]{1,60})/i.exec(text);
+    return { reason: 'usage_limit', detail: text, retryAt: retry ? retry[1].trim() : null, at: new Date().toISOString() };
+  }
+  return { reason, detail: text, retryAt: null, at: new Date().toISOString() };
+}
 const MAX_EVENTS = 400;
 export const DEFAULT_PERMISSION_TIMEOUT_MS = 5 * 60_000;
 
@@ -295,6 +307,8 @@ export class AgentBridge {
       session: this.sessionSummary(project),
       pending: [...project.pending.values()].map((entry) => entry.request),
       resumable: records.filter((record) => record.provider === 'codex' && record.resumable && record.status !== 'running').slice(0, 5).map((record) => ({ id: record.id, workId: record.workId, startedAt: record.startedAt, endedAt: record.endedAt })),
+      // Which agent worked on which item and how each session stopped (PF-0066).
+      history: records.slice(0, 30).map((record) => ({ id: record.id, provider: record.provider, workId: record.workId ?? null, startedAt: record.startedAt, endedAt: record.endedAt ?? null, status: record.status, lastStop: record.lastStop ?? null })),
       events: project.events.slice(-200)
     };
   }
@@ -440,6 +454,14 @@ export class AgentBridge {
           return;
         }
         this.emit(project, event);
+        // Codex reports a usage limit as reply text followed by a generic error, so the
+        // turn's recent text is read with the error (PF-0066).
+        if (event.type === 'turn.started') project.turnText = '';
+        if (event.type === 'message.delta') project.turnText = `${project.turnText ?? ''}${event.text ?? ''}`.slice(-600);
+        if (event.type === 'error' && !project.session.starting) {
+          const said = String(project.turnText ?? '');
+          this.noteStop(project, LIMIT.test(said) ? stopFrom('error', said) : stopFrom('error', event.message));
+        }
         if (event.type === 'session.ended' && !project.session.starting) this.finishCodex(project, event.reason, true, event.cleanup ?? null);
       },
       askPermission: (request) => this.askPermission(project, { ...request, provider: 'codex' })
@@ -468,9 +490,13 @@ export class AgentBridge {
     const cleanup = crashed ? crashCleanup : await session.impl.end();
     session.record.status = crashed ? 'crashed' : 'ended';
     session.record.endedAt = new Date().toISOString();
+    // A usage-limit stop stays the reason when the developer ends the session afterwards.
+    if (crashed || session.record.lastStop?.reason !== 'usage_limit') session.record.lastStop = stopFrom(crashed ? 'crashed' : 'ended', reason);
     if (cleanup && !cleanup.complete) session.record.cleanup = { complete: false, survivors: cleanup.survivors };
     // A session that never got an id (it failed during the handshake) leaves no record.
     if (session.record.sessionId) await this.saveRecord(project, session.record).catch(() => {});
+    // Announced after the record is saved, so a page reloading on it reads the stop (PF-0066).
+    this.emit(project, agentEvent('session.stopped', { provider: 'codex', workId: session.record.workId, stop: session.record.lastStop }));
     if (!crashed) this.emit(project, agentEvent('session.ended', { reason, resumable: session.record.resumable, cleanup }));
     return cleanup;
   }
@@ -534,6 +560,7 @@ export class AgentBridge {
     this.denyPending(project, 'claude', 'unlinked');
     record.status = 'ended';
     record.endedAt = new Date().toISOString();
+    record.lastStop ??= stopFrom('unlinked');
     await this.saveRecord(project, record);
     this.emit(project, agentEvent('session.ended', { reason: 'unlinked in YallaFlow (Claude Code keeps running)', resumable: false }));
     return { ok: true };
@@ -551,8 +578,20 @@ export class AgentBridge {
       },
       settleElsewhere: (key) => this.settleElsewhere(project, key),
       // A dropped channel can't deliver a verdict: its open requests are denied in the console.
-      onDisconnect: () => this.denyPending(project, 'claude', 'channel disconnected')
+      onDisconnect: () => {
+        this.denyPending(project, 'claude', 'channel disconnected');
+        if (project.session?.provider === 'claude') this.noteStop(project, stopFrom('disconnected'));
+      }
     });
+  }
+
+  // Saves why the linked session stopped; best-effort, the session itself is unaffected.
+  noteStop(project, stop) {
+    const record = project.session?.record;
+    if (!record) return;
+    record.lastStop = stop;
+    this.saveRecord(project, record).catch(() => {});
+    this.emit(project, agentEvent('session.stopped', { provider: project.session.provider, workId: record.workId, stop }));
   }
 
   async activate(projectId, workId) {

@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-07T23:28:42.386Z",
+      "completedAt": "2026-11-07T23:28:42.386Z",
+      "summary": "The floating chat (agentDock/agentPanel in resources/console/app.js) is mounted only on item routes (render: r.v === 'item'); loadAgent and renderAgent return early off item pages; agentState/agentDock/agentPanel/suggestions/agentOffPanel assume an item id. Sessions already allow workId null (bridge startCodex/connectClaude take workId ?? null; a channel-only Claude session reports workId null), so a project session needs no server change. One session per checkout is enforced by the bridge."
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T23:28:43.291Z",
+      "completedAt": "2026-11-07T23:28:43.291Z",
+      "summary": "Owner approved the project chat (2026-11-08) and delegated its placement; chosen: floating chat on every project page, context by page (ruling). 3 REQ / 3 AC; no server change; one session per checkout kept."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-07T23:41:16.747Z",
+      "completedAt": "2026-11-07T23:41:16.747Z",
+      "summary": "resources/console/app.js: chatCtx() picks the chat context from the page (item page → that item; overview/map/lines/setup/team/insights → a project chat {id:null, project:true}); the floating dock is mounted on those pages; loadAgent/renderAgent use it; project chat header 'Agent · Project', project suggestions, no activation, sessions start/connect without a work item; another item's session (Codex or Claude) shows as a link on project pages; a project session on an item page is labelled; stopped card and session history stay item-only; project pages load agent state only while the chat is open. Docs (console.md), CHANGELOG. Tests: test/console-project-chat.test.js (6), harness stub in console-agent-errors. Browser check with the simulated agent: chat button on 6 pages x AR/EN x 1440/390 with no overflow, none on #/new; project session replied; item page labels it; 0 console errors."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T23:45:17.407Z",
+      "completedAt": "2026-11-07T23:45:17.407Z",
+      "summary": "V-001 npm run check 986/986; browser check with the simulated agent.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-07T23:45:17.995Z",
+      "completedAt": "2026-11-07T23:45:17.995Z",
+      "summary": "3/3 criteria satisfied; one accepted unrequested detail (agent state loaded on project pages only while the chat is open)."
+    }
+  },
+  "rulings": [
+    {
+      "decision": "The project chat is the same floating window on every project page (not a separate panel on the Overview page only); the page decides the context: a work item page is that item's chat, any other page is the project chat.",
+      "reason": "Owner delegated the placement (2026-11-08: 'شوف انت للانسب'); questions like status or what is waiting come up on Flow and Insights too, and one window keeps one-session-per-checkout understandable.",
+      "costIfWrong": "Moving it to the Overview page only would be a small UI change.",
+      "createdAt": "2026-11-07T23:28:42.996Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-07T23:45:17.995Z"
+}

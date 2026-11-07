@@ -4,7 +4,7 @@
   "scope": "bounded",
   "routingStatus": "routed",
   "rawRequest": "صفحه التدفق  \nالجزء الخاص كمله مساء الخير محتاج يبقى اصغر شويه  عشان الشكل العام\nصفحه المشروع http://127.0.0.1:4747/#/overview\nطريقه عرض البيانات محتاجه تتحسن وتتعرض شكلل افضل فورمات الكلام وكمان شكل الاعمده ممكن يظهر جز والباقى يقى view more احتهد وعدل انت\n- كمان فى الشات  الكلام اللى بيجى من ال  agent محتاج يبقى منسق واحسن فى الشكل  ومحتاح اقدر ارفع صوره عند تعديل الطلب او   طلب جديد من خلال paste ل  screen shot متاخده من ctrl+print",
-  "status": "INTAKE",
+  "status": "DONE",
   "readOnly": false,
   "attestation": {
     "recordedVia": "console",
@@ -23,7 +23,7 @@
     "reviewRequired": true
   },
   "createdAt": "2026-11-07T20:13:56.126Z",
-  "updatedAt": "2026-11-07T21:54:25.782Z",
+  "updatedAt": "2026-11-07T23:19:16.028Z",
   "title": "صفحه التدفق",
   "routingConfidence": "high",
   "routingReason": "Classified by the user in the YallaFlow console.",
@@ -68,6 +68,18 @@
       "previousRequest": "صفحه التدفق  \nالجزء الخاص كمله مساء الخير محتاج يبقى اصغر شويه  عشان الشكل العام\nصفحه المشروع http://127.0.0.1:4747/#/overview\nطريقه عرض البيانات محتاجه تتحسن وتتعرض شكلل افضل فورمات الكلام وكمان شكل الاعمده ممكن يظهر جز والباقى يقى view more احتهد وعدل انت",
       "reason": "ui changes",
       "revisedAt": "2026-11-07T21:54:10.389Z"
+    }
+  ],
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-07T23:19:16.028Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004",
+        "V-005"
+      ]
     }
   ]
 }

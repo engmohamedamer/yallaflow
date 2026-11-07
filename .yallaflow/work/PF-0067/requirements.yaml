@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "The floating agent chat is available on every console page of a project, not only on work item pages.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T23:28:42.698Z",
+      "updatedAt": "2026-11-07T23:28:42.698Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "Outside a work item page the chat is the project chat: it is labelled as such, starts or connects an agent session that is not tied to a work item, and suggests project-level questions (status, what is waiting, what is next).",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T23:28:42.698Z",
+      "updatedAt": "2026-11-07T23:28:42.698Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "On a work item page the chat stays that item's chat, unchanged; the one-session-per-checkout rule still holds and each page says where the running session belongs.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T23:28:42.698Z",
+      "updatedAt": "2026-11-07T23:28:42.698Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "The chat button appears on Overview, Flow, Work, Setup, Worktrees and Insights (not on the new-project and project-list pages), in Arabic and English, with no browser console errors.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T23:28:42.698Z",
+      "updatedAt": "2026-11-07T23:28:42.698Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-002",
+      "statement": "On those pages the chat header reads 'Agent · Project', starting Codex or connecting Claude Code sends no work item, and the suggestions are project-level; with agents off it explains how to turn them on without naming a work item.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T23:28:42.698Z",
+      "updatedAt": "2026-11-07T23:28:42.698Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-003",
+      "statement": "A session started for a work item shows on project pages as 'a session is running on PF-…' with a link, and a project session shows on an item page labelled as the project chat; item-page chat behaviour and the existing agent tests are unchanged.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T23:28:42.698Z",
+      "updatedAt": "2026-11-07T23:28:42.698Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-07T23:28:42.698Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-07T23:28:42.698Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-07T23:28:42.698Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-07T23:28:42.698Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-07T23:28:42.698Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-07T23:28:42.698Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-07T23:28:42.698Z"
+}

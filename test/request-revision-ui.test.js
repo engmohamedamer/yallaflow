@@ -34,6 +34,7 @@ function harness({ readOnly = false, response, lang = 'en' } = {}) {
     L: (value) => value[lang],
     esc: (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])),
     why: (e) => e.message,
+    attachmentFields: () => '<section>Attachments</section>', initRequestFiles() {},
     api: async (url) => { calls.push(url); return response; },
     document: { querySelector: () => null, createElement: () => dialog, body: { appendChild(d) { d.isConnected = true; } } }
   });

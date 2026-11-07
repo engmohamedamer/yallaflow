@@ -1,0 +1,45 @@
+{
+  "id": "PF-0067",
+  "type": "feature",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Project chat in the floating agent window on every console page: outside a work item page the chat is about the project (status, what is waiting, what is next) and shows that context; on a work item page it stays that item's chat; engineering changes requested in project chat are routed to a work item by the agent",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-07T23:19:23.703Z",
+  "updatedAt": "2026-11-07T23:45:18.680Z",
+  "title": "Project chat in the floating agent window on every console page: outside a work item page the chat is about the project (status, what is waiting, what is next) and shows that context; on a work item page it stays that item's chat; engineering changes requested in project chat are routed to a work item by the agent",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope bounded`.",
+  "routedAt": "2026-11-07T23:19:23.721Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "implement",
+    "verify",
+    "converge"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation",
+      "verification",
+      "delivery-convergence"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-07T23:45:18.680Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

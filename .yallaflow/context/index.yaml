@@ -12407,7 +12407,7 @@
     {
       "id": "CTX-0120",
       "area": "business-rule",
-      "state": "current",
+      "state": "superseded",
       "confidence": "confirmed",
       "summary": "Request revisions are allowed only before work starts: pending routing or INTAKE with no checkpoint activity or revision history in the progress ledger. Core preserves request history, sources, classified title and workflow; held, closed and DONE work cannot be edited. Snapshot and work detail expose requestEditable from the same Core policy; console editing loads full raw text and saves through request revise.",
       "provenance": "repository",
@@ -12447,17 +12447,24 @@
       "verifiedAt": "2026-11-07T20:50:53.879Z",
       "verifiedAtCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
       "supersedes": [],
-      "supersededBy": null,
+      "supersededBy": "CTX-0122",
       "history": [
         {
           "action": "introduced",
           "at": "2026-11-07T20:50:53.879Z",
           "workId": "PF-0063",
           "candidateId": "K-001"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-11-07T23:19:11.308Z",
+          "supersededBy": "CTX-0122",
+          "workId": "PF-0061",
+          "candidateId": "K-001"
         }
       ],
       "createdAt": "2026-11-07T20:50:53.879Z",
-      "updatedAt": "2026-11-07T20:50:53.879Z"
+      "updatedAt": "2026-11-07T23:19:11.308Z"
     },
     {
       "id": "CTX-0121",
@@ -12530,7 +12537,168 @@
       ],
       "createdAt": "2026-11-07T21:50:50.090Z",
       "updatedAt": "2026-11-07T21:50:50.090Z"
+    },
+    {
+      "id": "CTX-0122",
+      "area": "business-rule",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Request revisions are allowed only before work starts: pending routing or INTAKE with no checkpoint activity or revision history in the progress ledger. Core preserves request history, sources, classified title and workflow; held, closed and DONE work cannot be edited. Snapshot and work detail expose requestEditable from the same Core policy; console editing loads full raw text and saves through request revise. Files pasted or picked while editing are attached through 'intake add --before-start', which re-checks the same policy under the workspace lock before any source is persisted (console route work/<id>/revision-sources).",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0061",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/behavior/routing.js",
+          "contentHash": "sha256:92baeff59b71c2916893c7e0a13af470064f3de7ba6bd2d18809725c017c3d8a",
+          "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "src/commands/intake.js",
+          "contentHash": "sha256:7caf8416010aacf47d935d3a23ba3cc2f8375a83f7e60651fd48383f24190a74",
+          "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/console/server.js",
+          "contentHash": "sha256:932ed75823d28189044f96133a2ace9273c43e00301f22a755263303694b0a7d",
+          "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+          "workingTree": "modified"
+        },
+        {
+          "type": "runtime",
+          "description": "npm run check (passed)",
+          "workId": "PF-0061",
+          "verificationRunId": "V-005"
+        }
+      ],
+      "verifiedAt": "2026-11-07T23:19:11.308Z",
+      "verifiedAtCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+      "supersedes": [
+        "CTX-0120"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-07T23:19:11.308Z",
+          "workId": "PF-0061",
+          "candidateId": "K-001",
+          "supersedes": "CTX-0120"
+        }
+      ],
+      "createdAt": "2026-11-07T23:19:11.308Z",
+      "updatedAt": "2026-11-07T23:19:11.308Z"
+    },
+    {
+      "id": "CTX-0123",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Agent session records (.yallaflow/local/agent-sessions/<id>.json, git-ignored) keep lastStop {reason: usage_limit|error|crashed|ended|disconnected|unlinked, detail, retryAt, at}; the bridge emits session.stopped after saving it and returns the records as status().history. A Codex usage limit arrives as reply text followed by a generic error, so the bridge reads the turn's recent reply text with the error. The console offers to continue a stopped work item with another ready agent: the old session is ended or unlinked first, nothing switches automatically, and the 'Continue <id>' message is prepared, never sent for the developer.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0066",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/agents/bridge.js",
+          "contentHash": "sha256:7f252d60d5017ab91a4d7b31eb41082d4af06f8385e9d9614a4a03cfbb34156b",
+          "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "resources/console/app.js",
+          "contentHash": "sha256:c43c419dc354d0f2549cd8a573015db38d378da5e5e37c89a3fc8d5323417444",
+          "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/agent-continue.test.js",
+          "contentHash": "sha256:3b23a7b47576979ba930d5a9191e5b3a9c369d73dfdc0abde0d53fccc7dec49e",
+          "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "npm run check (passed)",
+          "workId": "PF-0066",
+          "verificationRunId": "V-002"
+        }
+      ],
+      "verifiedAt": "2026-11-07T23:38:10.732Z",
+      "verifiedAtCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-07T23:38:10.732Z",
+          "workId": "PF-0066",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-07T23:38:10.732Z",
+      "updatedAt": "2026-11-07T23:38:10.732Z"
+    },
+    {
+      "id": "CTX-0124",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "The console's floating agent chat follows the page (chatCtx in resources/console/app.js): a work item page is that item's chat; Overview, Flow, Work, Setup, Worktrees and Insights share a project chat whose session has no workId. One agent session per checkout still applies: an item's session appears on project pages as a link, and a project session on an item page is labelled as the project chat.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0067",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "resources/console/app.js",
+          "contentHash": "sha256:87995c9c1513459989518dcd59b23aa829b3cd113faede921665026f8a241659",
+          "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/console-project-chat.test.js",
+          "contentHash": "sha256:d63ae2ff338a94a734470e32df5e57a2a08a0c46c8a2bac763f94dc020a3c91b",
+          "gitCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "npm run check (passed)",
+          "workId": "PF-0067",
+          "verificationRunId": "V-001"
+        }
+      ],
+      "verifiedAt": "2026-11-07T23:45:18.289Z",
+      "verifiedAtCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-07T23:45:18.289Z",
+          "workId": "PF-0067",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-07T23:45:18.289Z",
+      "updatedAt": "2026-11-07T23:45:18.289Z"
     }
   ],
-  "updatedAt": "2026-11-07T21:50:50.090Z"
+  "updatedAt": "2026-11-07T23:45:18.289Z"
 }

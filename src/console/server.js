@@ -47,7 +47,7 @@ const UI_FILES = Object.freeze({
 // 1.4.0: work-item actions and review-gate decisions (PF-0043) join Create Work.
 // 1.4.0 Greenfield journey (PF-0057): register a project, enable agents for this run, Git init,
 // add a runtime service, attach a planned file to a new project's first work item.
-const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|actions\/[a-z]+|gates\/[a-z]+\/decision))?|runtime\/[a-z][a-z0-9-]{0,31}\/(?:trust|start|stop|restart)|runtime\/services|git\/init)$|^\/api\/new\/(?:plan|create|plans\/NP-\d{14}-[0-9a-f]{6}\/files)$|^\/api\/(?:projects|agents\/enable)$/;
+const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|revision-sources|actions\/[a-z]+|gates\/[a-z]+\/decision))?|runtime\/[a-z][a-z0-9-]{0,31}\/(?:trust|start|stop|restart)|runtime\/services|git\/init)$|^\/api\/new\/(?:plan|create|plans\/NP-\d{14}-[0-9a-f]{6}\/files)$|^\/api\/(?:projects|agents\/enable)$/;
 // Agent Interaction (v1.3.0, only with --agents): the Agent Workspace's actions.
 const AGENT_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/agent\/(start|message|permission|cancel|end|resume|connect|disconnect|activate)$/;
 // The Claude channel server and hook forwarder (bridge token, never a browser).
@@ -312,9 +312,9 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
       return send(response, 200, await runRuntimeAction(project.root, rest[1], rest[2], await readJsonBody(request), runner));
     }
-    if (rest.length === 3 && rest[0] === 'work' && isWorkId(rest[1]) && rest[2] === 'sources') {
+    if (rest.length === 3 && rest[0] === 'work' && isWorkId(rest[1]) && ['sources', 'revision-sources'].includes(rest[2])) {
       if (type !== 'application/octet-stream') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send the file as application/octet-stream.' } });
-      const result = await attachFile(project.root, rest[1], request, runner);
+      const result = await attachFile(project.root, rest[1], request, runner, { revision: rest[2] === 'revision-sources' });
       return send(response, result.duplicate ? 200 : 201, result);
     }
     return send(response, 404, { error: { code: 'NOT_FOUND', message: 'Not found.' } });

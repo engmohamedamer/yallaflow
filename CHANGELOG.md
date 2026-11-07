@@ -8,11 +8,13 @@ All notable changes to YallaFlow are documented here. The format loosely follows
 
 Nothing yet.
 
-## [1.4.0] - local candidate (not yet published) — Engineering workspace
+## [1.4.0] - 2026-11-08 — Engineering workspace
 
-- Runtime trust now includes package/composer script definitions, directly executed shell scripts and selected Compose files; application code remains outside the fingerprint.
+Work lifecycle, console work management, Project Overview, a development runtime manager, a New Project Wizard, and a console agent chat that can continue stopped work with another agent. Agent Contract v11 (`yallaflow agent refresh`). Upgrade notes: [`docs/upgrading-to-v1.4.0.md`](docs/upgrading-to-v1.4.0.md).
 
 ### Added
+- **Project chat on every console page** (PF-0067). The floating agent chat follows the page: a work item page is that item's chat; Overview, Flow, Work, Setup, Worktrees and Insights share one project chat that is not tied to a work item, with project-level suggestions. One session per checkout still holds, and each page says where the running session belongs.
+- **Continue a stopped work item with another agent** (console, PF-0066). When an agent stops (usage limit with its retry time, error, crash, ended, Claude Code disconnected), the item's chat says why and offers to continue with another ready agent or from a terminal. The old session is ended first, nothing switches on its own, and the continue message is prepared, never sent for you. The item lists which agent sessions worked on it and how each stopped.
 - **Hold and resume work** (`yallaflow work hold|resume`).
   - A temporary hold keeps the stage, checkpoints, requirements and evidence.
   - Resume returns the item to the same state, and does not activate it.
@@ -37,6 +39,10 @@ Nothing yet.
   - **Preserved lineage.** The other side's colliding records are kept byte-identically under their original IDs in a read-only lineage with a hashed manifest. Knowledge enters the ledger only through the normal commands, with a verified mapping.
   - **Safety.** Dry-run, atomic and idempotent import, a hash-verified doctor check, and a guarded rollback. See [`docs/history.md`](docs/history.md).
 - **New Project Wizard** (`yallaflow new …` and the console's **New project** page). See [`docs/new-project.md`](docs/new-project.md).
+  - **Stacks.** Laravel, React/Vue with Vite, Next.js, NestJS or Empty, each an official generator pinned to an exact version, or a recommendation from your own agent.
+  - **Plan first.** A plan with the exact commands is reviewed and confirmed by its hash before anything runs.
+  - **Safe creation.** Staged generation is moved only into an absent destination; failures keep staging and the log.
+  - **After creation.** Core `init` records the wizard provenance, so the project is Greenfield with its generated code not reviewed. A first work item is created for Claude Code or Codex.
 - **New-project journey in the console** (first acceptance round, PF-0057/PF-0058):
   - A four-step stepper (idea, stack, environment, review & create) instead of a single form. The idea step keeps your description, requirements and attachments; the first work item gets a short title and your words, with nothing invented.
   - A folder chooser limited to your home folder (directories only), and **Add an existing project**.
@@ -47,11 +53,12 @@ Nothing yet.
   - The console starts with no saved project (except `--read-only`), so the first project can be created from the browser.
   - Unclassified work opens on its request; the Flow explains empty stations for new work.
 - **Agent chat as a floating window** (PF-0059): a corner button with the session state; a chat icon on each board card; stage-aware suggestions that only fill the message box. A failed Codex turn (for example a usage limit) now ends the turn and is explained in plain words instead of a stuck "Working…".
+- **Console requests and agent replies** (PF-0061, PF-0063, PF-0064):
+  - **Edit a request before work starts.** While an item is still new (pending routing, or INTAKE with no checkpoint activity), its request can be edited from the console; files pasted or picked while editing are attached through `yallaflow intake add --before-start`, which re-checks the same rule under the workspace lock.
+  - **Paste screenshots** into Create Work and Edit request, with previews, removal, and a retry that keeps only the files that failed.
+  - **Formatted agent replies.** Headings, lists, tables, code and `http(s)` links in agent messages are rendered from escaped text; your own messages stay literal.
+  - **Clearer cards and pages.** A compact Flow greeting, a clearer card hierarchy with the chat next to the card actions, and an Overview with formatted, expandable facts.
 - **Claude Code as an experimental agent** (PF-0060): the chat's picker offers Codex and Claude Code (experimental). Claude Code joins a session you start yourself; it is off by default and turned on per console run only by an explicit choice (or `--experimental-claude`). The Claude connection files are now part of the package. Anthropic's written confirmation is still pending.
-  - **Stacks.** Laravel, React/Vue with Vite, Next.js, NestJS or Empty, each an official generator pinned to an exact version, or a recommendation from your own agent.
-  - **Plan first.** A plan with the exact commands is reviewed and confirmed by its hash before anything runs.
-  - **Safe creation.** Staged generation is moved only into an absent destination; failures keep staging and the log.
-  - **After creation.** Core `init` records the wizard provenance, so the project is Greenfield with its generated code not reviewed. A first work item is created for Claude Code or Codex.
 - **Development runtime manager** (`yallaflow runtime …` and the console's **Setup** tab). See [`docs/runtime.md`](docs/runtime.md).
   - **Profiles.** Reviewed services in `.yallaflow/runtime.yaml`, with personal overrides in the git-ignored `.yallaflow/local/runtime.yaml`. Suggestions come from Laravel, Node.js and Docker Compose evidence and never run.
   - **Trust.** Personal and git-ignored, bound to the effective command, folder, environment names, ports and checkout, and renewed after any change.
@@ -63,6 +70,8 @@ Nothing yet.
   - **Guided onboarding.** The project-understanding state (needed, discovery in progress, awaiting your review, established, or new-project intent) with the request to give your agent. Flow and Work show it until understanding is established. The console never starts, drafts or approves a baseline.
 
 ### Changed
+- **Faster CLI start** (PF-0062): command modules load only when their command runs, and the test suite uses Node's compile cache.
+- Runtime trust now includes package/composer script definitions, directly executed shell scripts and selected Compose files; application code remains outside the fingerprint.
 - Insights counts New work and no longer counts closed work as open; it shows "No verification runs yet" instead of 0%, and explains empty charts.
 - Empty projects no longer mention generated code (plan, completion message and the Greenfield understanding label); paths in displayed commands are shell-quoted.
 - **Agent Contract v11:** agents hold, close, resume or reopen work only when the developer explicitly asks, and never progress held or closed work. Refresh with `yallaflow agent refresh`.
@@ -74,7 +83,7 @@ Nothing yet.
 - **Agent chat errors are shown.** A refused message or agent action used to disappear when the panel reloaded the session state, so a send could fail silently. The error now stays visible and the typed message is put back.
 - **Claude Code (experimental) waits for its permission mode.** Until Claude Code reports its permission mode, the panel says so and offers no Send, instead of looking ready while messages are refused.
 
-## [1.3.0] - unreleased (in development) — Agent Workspace
+## [1.3.0] - 2026-11-07 — Agent Workspace
 
 Opt-in. Uses only the developer's existing Codex (ChatGPT) subscription: no API keys, no API billing, no credential handling. Codex is the supported provider. A Claude Code connection is not included, pending Anthropic's confirmation. Guide: [`docs/agents.md`](docs/agents.md).
 
@@ -101,7 +110,7 @@ Opt-in. Uses only the developer's existing Codex (ChatGPT) subscription: no API 
 - Opening an existing or newly created work item loads its Agent Workspace immediately, without waiting for a workspace-change event.
 - Streamed replies keep Stop, End and the message composer in place so incoming chunks do not interrupt interaction. Explicit activation waits for the refreshed work state before rendering the panel.
 
-## [1.2.0] - unreleased (prepared 2026-11-06) — Flow Console, read contract & workspace lock
+## [1.2.0] - 2026-11-06 — Flow Console, read contract & workspace lock
 
 Backward compatible. The Agent Contract, bootstrap blocks, Skill Registry, Knowledge Policy, and all workspace schema versions are unchanged. No new runtime dependency. Guide: [`docs/console.md`](docs/console.md). Upgrade notes: [`docs/upgrading-to-v1.2.0.md`](docs/upgrading-to-v1.2.0.md).
 

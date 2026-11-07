@@ -242,15 +242,16 @@ Opt-in Codex sessions in the console (`--agents`), on the developer's own ChatGP
 
 A Claude Code connection is not included until Anthropic confirms it may be distributed.
 
-## 1.4.0 — Engineering workspace (in development)
+## 1.4.0 — Engineering workspace (released 2026-11-08)
 
-Six milestones, each specified, tested and reviewed on its own. All of them ship in 1.4.0; none is deferred to 1.5.0 (owner decision, 2026-11-07).
+Seven milestones, each specified, tested and reviewed on its own. All of them ship in 1.4.0; none is deferred to 1.5.0 (owner decision, 2026-11-07).
 1. **Work lifecycle** (done). Hold, Resume, Close without delivery, and Reopen of closed work. Lifecycle status is kept separate from the stage, and CLOSED is never DONE. The first hold or close confirms the 1.4.0 minimum version.
 2. **Console work management** (done). Work-item actions through Core's commands, blocked-action explanations, Core-validated drag and drop, and review-gate decisions as local-user decisions ("console, identity not verified").
 3. **Project Overview and onboarding** (done). Technology detection from repository evidence, with confirmed, detected, inferred and unknown values kept apart. Architecture and module summaries from approved project memory, project-understanding status and memory freshness, and guided existing-project onboarding through the baseline. Approval stays a human decision.
 4. **Development runtime management** (done). Reviewed runtime profiles (`.yallaflow/runtime.yaml`, with git-ignored personal overrides) for Laravel, Node.js and Docker. Start, Stop and Restart from the console after explicit trust, which is renewed whenever a command changes. Logs, ports, errors and process status. Only services YallaFlow started are ever stopped. Safe handling of crashes, stale processes and reconnects. Detected commands are suggestions and never run automatically.
 5. **New Project Wizard** (done). Name, location and stack choice, using the official framework generators or an agent recommendation. A reviewable plan comes before anything is created. Creation is staged and auditable, followed by `init` and a first setup work item.
-6. **Integration and stabilization** (done for the acceptance candidate; see [`release-1.4-acceptance.md`](release-1.4-acceptance.md)). Carry the published v1.3.0 fixes into 1.4 (done, PF-0044), plus documentation, independent security reviews of the runtime manager and the wizard, full and browser regression, and refreshed stale evidence. The merge into `main` stays blocked until the work-ID collision is reconciled; see [`release-1.4-integration.md`](release-1.4-integration.md).
+6. **Integration and stabilization** (done for the acceptance candidate; see [`release-1.4-acceptance.md`](release-1.4-acceptance.md)). Carry the published v1.3.0 fixes into 1.4 (done, PF-0044), plus documentation, independent security reviews of the runtime manager and the wizard, full and browser regression, and refreshed stale evidence. The work-ID collision was reconciled with preserved lineage and 1.4 was merged into `main` (PF-0056); see [`release-1.4-integration.md`](release-1.4-integration.md).
+7. **Console agent chat** (done). A floating chat on every project page (item chat on a work item page, project chat elsewhere), continuing a stopped work item with another agent, and Claude Code as an opt-in experimental agent.
 
 ## Future directions (not committed, not scheduled)
 
