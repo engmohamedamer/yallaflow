@@ -189,4 +189,20 @@
   - docs/history.md (repository @ 95571b7)
   - docs/release-1.4-integration.md (repository @ 95571b7)
 
+<!-- yallaflow-fact:CTX-0119 -->
+### CTX-0119 — CLI start-up convention (1.4.0): src/cli.js loads every command module lazily through lazy(specifier, name), so a call pays only for the command it runs (--version ~50 ms, status ~80 ms instead of ~250 ms). New commands must be added the same way, never as a static import in cli.js; usage text that cli.js needs synchronously lives in a small src/commands/<name>-usage.js module re-exported by the command. The test preload (test-support/isolate-user-config.js) also sets NODE_COMPILE_CACHE for CLI child processes.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0062
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-07T20:40:34.583Z
+- **Verified:** 2026-11-07T20:40:34.583Z (commit 5ded124)
+- **Evidence:**
+  - src/cli.js (repository @ 5ded124)
+  - src/commands/new-usage.js (repository @ 5ded124)
+  - test-support/isolate-user-config.js (repository @ 5ded124)
+  - npm run check (passed) (runtime, PF-0062 V-001)
+
 <!-- yallaflow-context:end -->

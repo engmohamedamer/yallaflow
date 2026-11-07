@@ -1,0 +1,49 @@
+{
+  "id": "PF-0063",
+  "type": "feature",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Allow editing a console work request while it has not started",
+  "status": "DISCOVERY",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-07T20:39:48.304Z",
+  "updatedAt": "2026-11-07T20:40:17.756Z",
+  "title": "Allow editing a console work request while it has not started",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope bounded`.",
+  "routedAt": "2026-11-07T20:39:48.360Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "implement",
+    "verify",
+    "converge"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation",
+      "verification",
+      "delivery-convergence"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0048",
+      "type": "file",
+      "name": "Screenshot from 2026-11-07 22-38-55.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-07T20:40:17.013Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ]
+}

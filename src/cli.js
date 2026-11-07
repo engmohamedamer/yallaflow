@@ -1,87 +1,111 @@
 #!/usr/bin/env node
 import { parseArgs } from 'node:util';
-import { initCommand } from './commands/init.js';
-import { activateCommand, startCommand } from './commands/start.js';
-import { agentsCommand } from './commands/agents.js';
-import { statusCommand } from './commands/status.js';
-import { resumeCommand } from './commands/resume.js';
-import { doctorCommand } from './commands/doctor.js';
-import { newWorkCommand } from './commands/work.js';
-import { snapshotCommand, workShowCommand } from './commands/snapshot.js';
-import { overviewCommand } from './commands/overview.js';
-import { runtimeCommand, RUNTIME_USAGE } from './commands/runtime.js';
-import { newCommand, NEW_USAGE } from './commands/new.js';
-import { historyCommand, HISTORY_USAGE } from './commands/history.js';
+// Commands load on first use (PF-0062): a call pays only for the command it runs, not for
+// all ~40 command modules (about 200 ms on every invocation before this change).
+const lazy = (specifier, name) => async (...args) => (await import(specifier))[name](...args);
+const initCommand = lazy('./commands/init.js', 'initCommand');
+const activateCommand = lazy('./commands/start.js', 'activateCommand');
+const startCommand = lazy('./commands/start.js', 'startCommand');
+const agentsCommand = lazy('./commands/agents.js', 'agentsCommand');
+const statusCommand = lazy('./commands/status.js', 'statusCommand');
+const resumeCommand = lazy('./commands/resume.js', 'resumeCommand');
+const doctorCommand = lazy('./commands/doctor.js', 'doctorCommand');
+const newWorkCommand = lazy('./commands/work.js', 'newWorkCommand');
+const snapshotCommand = lazy('./commands/snapshot.js', 'snapshotCommand');
+const workShowCommand = lazy('./commands/snapshot.js', 'workShowCommand');
+const overviewCommand = lazy('./commands/overview.js', 'overviewCommand');
+import { RUNTIME_USAGE } from './commands/runtime-usage.js';
+const runtimeCommand = lazy('./commands/runtime.js', 'runtimeCommand');
+import { NEW_USAGE } from './commands/new-usage.js';
+const newCommand = lazy('./commands/new.js', 'newCommand');
+import { HISTORY_USAGE } from './commands/history-usage.js';
+const historyCommand = lazy('./commands/history.js', 'historyCommand');
 import { withWorkspaceLock } from './utils/lock.js';
-import { consoleCommand, consoleProjectsCommand } from './commands/console.js';
-import { advanceCommand } from './commands/advance.js';
-import { verifyCommand, verifyListCommand, verifyScriptCommand, verifyShellCommand } from './commands/verify.js';
-import { routeCommand } from './commands/route.js';
-import { guideCommand } from './commands/guide.js';
-import { skillCommand } from './commands/skill.js';
-import { checkpointCommand, reviseCheckpointCommand } from './commands/checkpoint.js';
-import { knowledgeCommand } from './commands/knowledge.js';
-import { questionCommand } from './commands/question.js';
-import { readyCommand } from './commands/ready.js';
-import { intakeAddCommand, intakeCommand, intakeTicketCommand } from './commands/intake.js';
-import { sourceCommand } from './commands/source.js';
-import { reopenCommand } from './commands/reopen.js';
-import { decomposeExecuteCommand, decomposeProposeCommand, decomposeStatusCommand, decomposeValidateCommand } from './commands/decompose.js';
-import { projectProgressCommand } from './commands/progress.js';
-import { nextCommand } from './commands/next.js';
-import { approveCommand, feedbackCommand } from './commands/review.js';
-import { handoffCommand } from './commands/handoff.js';
-import { requestReviseCommand } from './commands/request.js';
-import {
-  contextAdoptCommand,
-  contextAffectedCommand,
-  contextHistoryCommand,
-  contextListCommand,
-  contextRenderCommand,
-  contextShowCommand,
-  contextStatusCommand
-} from './commands/context.js';
-import { limitationCommand } from './commands/limitation.js';
-import {
-  reconcileApplyCommand,
-  reconcileApproveCommand,
-  reconcileFeedbackCommand,
-  reconcilePlanCommand,
-  reconcilePreviewCommand,
-  reconcileShowCommand,
-  reconcileStartCommand,
-  reconcileStatusCommand
-} from './commands/reconcile.js';
-import { upgradePlanCommand, upgradeStatusCommand } from './commands/upgrade.js';
-import { briefCommand } from './commands/brief.js';
-import { inspectCommand } from './commands/inspect.js';
+const consoleCommand = lazy('./commands/console.js', 'consoleCommand');
+const consoleProjectsCommand = lazy('./commands/console.js', 'consoleProjectsCommand');
+const advanceCommand = lazy('./commands/advance.js', 'advanceCommand');
+const verifyCommand = lazy('./commands/verify.js', 'verifyCommand');
+const verifyListCommand = lazy('./commands/verify.js', 'verifyListCommand');
+const verifyScriptCommand = lazy('./commands/verify.js', 'verifyScriptCommand');
+const verifyShellCommand = lazy('./commands/verify.js', 'verifyShellCommand');
+const routeCommand = lazy('./commands/route.js', 'routeCommand');
+const guideCommand = lazy('./commands/guide.js', 'guideCommand');
+const skillCommand = lazy('./commands/skill.js', 'skillCommand');
+const checkpointCommand = lazy('./commands/checkpoint.js', 'checkpointCommand');
+const reviseCheckpointCommand = lazy('./commands/checkpoint.js', 'reviseCheckpointCommand');
+const knowledgeCommand = lazy('./commands/knowledge.js', 'knowledgeCommand');
+const questionCommand = lazy('./commands/question.js', 'questionCommand');
+const readyCommand = lazy('./commands/ready.js', 'readyCommand');
+const intakeAddCommand = lazy('./commands/intake.js', 'intakeAddCommand');
+const intakeCommand = lazy('./commands/intake.js', 'intakeCommand');
+const intakeTicketCommand = lazy('./commands/intake.js', 'intakeTicketCommand');
+const sourceCommand = lazy('./commands/source.js', 'sourceCommand');
+const reopenCommand = lazy('./commands/reopen.js', 'reopenCommand');
+const decomposeExecuteCommand = lazy('./commands/decompose.js', 'decomposeExecuteCommand');
+const decomposeProposeCommand = lazy('./commands/decompose.js', 'decomposeProposeCommand');
+const decomposeStatusCommand = lazy('./commands/decompose.js', 'decomposeStatusCommand');
+const decomposeValidateCommand = lazy('./commands/decompose.js', 'decomposeValidateCommand');
+const projectProgressCommand = lazy('./commands/progress.js', 'projectProgressCommand');
+const nextCommand = lazy('./commands/next.js', 'nextCommand');
+const approveCommand = lazy('./commands/review.js', 'approveCommand');
+const feedbackCommand = lazy('./commands/review.js', 'feedbackCommand');
+const handoffCommand = lazy('./commands/handoff.js', 'handoffCommand');
+const requestReviseCommand = lazy('./commands/request.js', 'requestReviseCommand');
+const contextAdoptCommand = lazy('./commands/context.js', 'contextAdoptCommand');
+const contextAffectedCommand = lazy('./commands/context.js', 'contextAffectedCommand');
+const contextHistoryCommand = lazy('./commands/context.js', 'contextHistoryCommand');
+const contextListCommand = lazy('./commands/context.js', 'contextListCommand');
+const contextRenderCommand = lazy('./commands/context.js', 'contextRenderCommand');
+const contextShowCommand = lazy('./commands/context.js', 'contextShowCommand');
+const contextStatusCommand = lazy('./commands/context.js', 'contextStatusCommand');
+const limitationCommand = lazy('./commands/limitation.js', 'limitationCommand');
+const reconcileApplyCommand = lazy('./commands/reconcile.js', 'reconcileApplyCommand');
+const reconcileApproveCommand = lazy('./commands/reconcile.js', 'reconcileApproveCommand');
+const reconcileFeedbackCommand = lazy('./commands/reconcile.js', 'reconcileFeedbackCommand');
+const reconcilePlanCommand = lazy('./commands/reconcile.js', 'reconcilePlanCommand');
+const reconcilePreviewCommand = lazy('./commands/reconcile.js', 'reconcilePreviewCommand');
+const reconcileShowCommand = lazy('./commands/reconcile.js', 'reconcileShowCommand');
+const reconcileStartCommand = lazy('./commands/reconcile.js', 'reconcileStartCommand');
+const reconcileStatusCommand = lazy('./commands/reconcile.js', 'reconcileStatusCommand');
+const upgradePlanCommand = lazy('./commands/upgrade.js', 'upgradePlanCommand');
+const upgradeStatusCommand = lazy('./commands/upgrade.js', 'upgradeStatusCommand');
+const briefCommand = lazy('./commands/brief.js', 'briefCommand');
+const inspectCommand = lazy('./commands/inspect.js', 'inspectCommand');
 import { PACKAGE_VERSION } from './version.js';
-import { agentRefreshCommand, agentSetupCommand, agentStatusCommand } from './commands/agent.js';
-import {
-  convergenceRecordCommand,
-  convergenceShowCommand,
-  convergenceStatusCommand,
-  impactAssessCommand,
-  impactStatusCommand,
-  requirementListCommand,
-  requirementRecordCommand,
-  requirementShowCommand
-} from './commands/delivery.js';
-import {
-  baselineApproveCommand,
-  baselineDraftCommand,
-  baselineFeedbackCommand,
-  baselineShowCommand,
-  baselineStartCommand,
-  baselineStatusCommand
-} from './commands/baseline.js';
-import { sharedCheckCommand, sharedEnableCommand, sharedIntegrateCommand, sharedStatusCommand } from './commands/shared.js';
-import { finishCommand } from './commands/finish.js';
-import { demoApproveCommand, demoProposeCommand, demoRecordCommand, demoStatusCommand, qcPlanCommand, qcRecordCommand, qcStatusCommand } from './commands/quality.js';
-import { purposeCommand } from './commands/purpose.js';
+const agentRefreshCommand = lazy('./commands/agent.js', 'agentRefreshCommand');
+const agentSetupCommand = lazy('./commands/agent.js', 'agentSetupCommand');
+const agentStatusCommand = lazy('./commands/agent.js', 'agentStatusCommand');
+const convergenceRecordCommand = lazy('./commands/delivery.js', 'convergenceRecordCommand');
+const convergenceShowCommand = lazy('./commands/delivery.js', 'convergenceShowCommand');
+const convergenceStatusCommand = lazy('./commands/delivery.js', 'convergenceStatusCommand');
+const impactAssessCommand = lazy('./commands/delivery.js', 'impactAssessCommand');
+const impactStatusCommand = lazy('./commands/delivery.js', 'impactStatusCommand');
+const requirementListCommand = lazy('./commands/delivery.js', 'requirementListCommand');
+const requirementRecordCommand = lazy('./commands/delivery.js', 'requirementRecordCommand');
+const requirementShowCommand = lazy('./commands/delivery.js', 'requirementShowCommand');
+const baselineApproveCommand = lazy('./commands/baseline.js', 'baselineApproveCommand');
+const baselineDraftCommand = lazy('./commands/baseline.js', 'baselineDraftCommand');
+const baselineFeedbackCommand = lazy('./commands/baseline.js', 'baselineFeedbackCommand');
+const baselineShowCommand = lazy('./commands/baseline.js', 'baselineShowCommand');
+const baselineStartCommand = lazy('./commands/baseline.js', 'baselineStartCommand');
+const baselineStatusCommand = lazy('./commands/baseline.js', 'baselineStatusCommand');
+const sharedCheckCommand = lazy('./commands/shared.js', 'sharedCheckCommand');
+const sharedEnableCommand = lazy('./commands/shared.js', 'sharedEnableCommand');
+const sharedIntegrateCommand = lazy('./commands/shared.js', 'sharedIntegrateCommand');
+const sharedStatusCommand = lazy('./commands/shared.js', 'sharedStatusCommand');
+const finishCommand = lazy('./commands/finish.js', 'finishCommand');
+const demoApproveCommand = lazy('./commands/quality.js', 'demoApproveCommand');
+const demoProposeCommand = lazy('./commands/quality.js', 'demoProposeCommand');
+const demoRecordCommand = lazy('./commands/quality.js', 'demoRecordCommand');
+const demoStatusCommand = lazy('./commands/quality.js', 'demoStatusCommand');
+const qcPlanCommand = lazy('./commands/quality.js', 'qcPlanCommand');
+const qcRecordCommand = lazy('./commands/quality.js', 'qcRecordCommand');
+const qcStatusCommand = lazy('./commands/quality.js', 'qcStatusCommand');
+const purposeCommand = lazy('./commands/purpose.js', 'purposeCommand');
 import { findProjectRoot, getCurrentState, loadWorkMetaOrThrow } from './core/workspace.js';
 import { assertWorkProgressAllowed, lifecycleOf } from './core/lifecycle.js';
-import { reopenClosedCommand, workLifecycleCommand } from './commands/lifecycle.js';
+const reopenClosedCommand = lazy('./commands/lifecycle.js', 'reopenClosedCommand');
+const workLifecycleCommand = lazy('./commands/lifecycle.js', 'workLifecycleCommand');
 import { checkProjectCompatibility, incompatibleMessage } from './shared/config.js';
 import { SCOPES } from './behavior/constants.js';
 import { INTERACTION_MODES, GATE_NAMES } from './behavior/interaction.js';

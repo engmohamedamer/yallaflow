@@ -12341,7 +12341,62 @@
       ],
       "createdAt": "2026-11-07T19:18:47.384Z",
       "updatedAt": "2026-11-07T19:18:47.384Z"
+    },
+    {
+      "id": "CTX-0119",
+      "area": "convention",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "CLI start-up convention (1.4.0): src/cli.js loads every command module lazily through lazy(specifier, name), so a call pays only for the command it runs (--version ~50 ms, status ~80 ms instead of ~250 ms). New commands must be added the same way, never as a static import in cli.js; usage text that cli.js needs synchronously lives in a small src/commands/<name>-usage.js module re-exported by the command. The test preload (test-support/isolate-user-config.js) also sets NODE_COMPILE_CACHE for CLI child processes.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0062",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/cli.js",
+          "contentHash": "sha256:1b75cbd2d0d1b606bf7cbc56d1086a0d27ec64eadfeb8b010db30ec6ac013067",
+          "gitCommit": "5ded124723edad46e3fcd3557744222530a86e9c",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/commands/new-usage.js",
+          "contentHash": "sha256:8cb98f4bf04c77f9f0388ba4a12feebe87f5412e78b6dc0adff1470b5c5e7f31",
+          "gitCommit": "5ded124723edad46e3fcd3557744222530a86e9c",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "test-support/isolate-user-config.js",
+          "contentHash": "sha256:59bef5667210dabe713be6335c91cfd8bb407882721166565ec01f17fa4d9c07",
+          "gitCommit": "5ded124723edad46e3fcd3557744222530a86e9c",
+          "workingTree": "modified"
+        },
+        {
+          "type": "runtime",
+          "description": "npm run check (passed)",
+          "workId": "PF-0062",
+          "verificationRunId": "V-001"
+        }
+      ],
+      "verifiedAt": "2026-11-07T20:40:34.583Z",
+      "verifiedAtCommit": "5ded124723edad46e3fcd3557744222530a86e9c",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-07T20:40:34.583Z",
+          "workId": "PF-0062",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-07T20:40:34.583Z",
+      "updatedAt": "2026-11-07T20:40:34.583Z"
     }
   ],
-  "updatedAt": "2026-11-07T19:18:47.384Z"
+  "updatedAt": "2026-11-07T20:40:34.583Z"
 }

@@ -8,14 +8,8 @@ import { findProjectRoot } from '../core/workspace.js';
 import { buildPlan, importLineage, listLineages, mapIdentity, readLineage, readLineageIdentity, removeLineage, verifyLineage, verifyMerge } from '../history/lineage.js';
 import { realpath } from 'node:fs/promises';
 
-export const HISTORY_USAGE = [
-  'yallaflow history plan --label LABEL --from-ref REF [--from-dir CHECKOUT] [--out FILE] [--json]   (dry-run)',
-  'yallaflow history import --plan FILE --confirm HASH-PREFIX [--from-dir CHECKOUT] [--allow-secrets]',
-  'yallaflow history verify-merge --plan FILE   (after git merge --no-commit and the plan\'s restore commands)',
-  'yallaflow history list [--json] | yallaflow history show LABEL[:ID] [--json]',
-  'yallaflow history map LABEL:ID --to ID --relation reconfirms|supersedes|disputes|distinct|canonical-continuation --work WORK-ID --reason TEXT',
-  'yallaflow history remove LABEL --confirm HASH-PREFIX [--force]   (rollback; only an intact, unreferenced lineage)'
-].join('\n  ');
+export { HISTORY_USAGE } from './history-usage.js';
+import { HISTORY_USAGE } from './history-usage.js';
 
 const usage = () => Object.assign(new Error(`Usage: ${HISTORY_USAGE}`), { code: 'USAGE' });
 const out = (json, value, lines) => (json ? process.stdout.write(`${JSON.stringify(value)}\n`) : lines.forEach((line) => console.log(line)));

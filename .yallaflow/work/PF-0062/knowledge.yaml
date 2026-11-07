@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "CLI start-up convention (1.4.0): src/cli.js loads every command module lazily through lazy(specifier, name), so a call pays only for the command it runs (--version ~50 ms, status ~80 ms instead of ~250 ms). New commands must be added the same way, never as a static import in cli.js; usage text that cli.js needs synchronously lives in a small src/commands/<name>-usage.js module re-exported by the command. The test preload (test-support/isolate-user-config.js) also sets NODE_COMPILE_CACHE for CLI child processes.",
+      "evidence": [
+        "src/cli.js",
+        "src/commands/new-usage.js",
+        "test-support/isolate-user-config.js",
+        "verification:V-001"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-07T20:40:34.482Z",
+      "factId": "CTX-0119",
+      "promotedAt": "2026-11-07T20:40:34.583Z",
+      "target": "context/conventions.md"
+    }
+  ],
+  "updatedAt": "2026-11-07T20:40:34.583Z",
+  "reviewedAt": "2026-11-07T20:40:34.583Z"
+}

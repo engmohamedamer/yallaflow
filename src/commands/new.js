@@ -7,14 +7,8 @@ import { initProject } from './init.js';
 import { createPendingIntake } from '../behavior/routing.js';
 import { shellQuote } from '../security/redact.js';
 
-export const NEW_USAGE = [
-  'yallaflow new catalog [--json]',
-  'yallaflow new recommend',
-  'yallaflow new plan --name NAME --parent DIR --stack ID [--install] [--allow-nested] [--rationale TEXT] [--description TEXT] [--requirements TEXT] [--environment docker|local|later] [--git] [--attachment SHA256:SIZE:NAME]... [--json]',
-  'yallaflow new show <plan-id> [--json] | yallaflow new list [--json]',
-  'yallaflow new create <plan-id> --confirm <hash-prefix> [--json]',
-  'yallaflow new discard <plan-id> [--json]'
-].join('\n  ');
+export { NEW_USAGE } from './new-usage.js';
+import { NEW_USAGE } from './new-usage.js';
 
 // Core entry points used by creation: canonical init and a first, unrouted work item kept
 // for the developer (never routed on their behalf, never made active).

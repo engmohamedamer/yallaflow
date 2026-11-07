@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-07T20:36:13.557Z",
+      "completedAt": "2026-11-07T20:36:13.557Z",
+      "summary": "Measured: node -e 0 = 35 ms; yallaflow --version = 269 ms, status = 241 ms (20-run averages). src/cli.js statically imports ~42 ./commands modules (and through them officeparser ~36 ms, the whole command graph ~200 ms); core/shared imports used by the dispatcher cost ~25 ms. NODE_COMPILE_CACHE lowers --version to ~198 ms. Full suite: 945 tests, ~1,200 CLI spawn call sites, 3,089 s of test time over 8 cores = 471 s wall (V-005 of PF-0060)."
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T20:36:13.766Z",
+      "completedAt": "2026-11-07T20:36:13.766Z",
+      "summary": "Owner (2026-11-07): the long test runs must be fixed. Goal: same behavior and output for every command, much lower start-up cost per CLI call, shorter full suite; no test weakened or skipped."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-07T20:36:13.982Z",
+      "completedAt": "2026-11-07T20:36:13.982Z",
+      "summary": "1) cli.js: replace static ./commands imports with lazy loaders (import on first call; usage constants moved where needed so --help/usage stays synchronous and identical); 2) test preload sets NODE_COMPILE_CACHE to a per-run temp dir for child processes; 3) measure per-command start-up and the full suite before/after; 4) full suite must stay 945/945 with identical assertions."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-07T20:36:58.565Z",
+      "completedAt": "2026-11-07T20:36:58.565Z",
+      "summary": "cli.js: 96 command functions load on first call through a lazy(specifier, name) wrapper; RUNTIME/NEW/HISTORY usage strings moved to *-usage.js modules re-exported by their commands, so usage text stays synchronous and identical. Test preload sets NODE_COMPILE_CACHE for child processes. Measured (20-run avg): --version 269 -> 52 ms, status 241 -> 78 ms, snapshot --json 91 ms."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T20:40:34.318Z",
+      "completedAt": "2026-11-07T20:40:34.318Z",
+      "summary": "V-001 npm run check 945/945 (no test changed or skipped) in 189 s test time / 198 s wall, down from 471 s (PF-0060 V-005, same machine). Per-call start-up (20-run avg): --version 269 -> 52 ms, status 241 -> 78 ms; usage output unchanged (runtime/new/history usage modules re-exported)."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-07T20:40:34.318Z"
+}
