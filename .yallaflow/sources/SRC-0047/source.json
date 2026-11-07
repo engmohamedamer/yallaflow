@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0047",
+  "sourceType": "file",
+  "sourceName": "flow.png",
+  "detectedFormat": "png",
+  "contentType": "image/png",
+  "contentAvailability": "original-only",
+  "capturedAt": "2026-11-07T20:13:56.957Z",
+  "original": {
+    "path": "sources/SRC-0047/flow.png",
+    "sha256": "2a06de4e35b03df01b00f8827eb073637c3533f4bfc343d46da9f4810b8decc8",
+    "sizeBytes": 272440
+  },
+  "metadata": {
+    "extension": ".png",
+    "detectedFormat": "png",
+    "format": "png",
+    "width": 1889,
+    "height": 966
+  },
+  "linkedWork": [
+    "PF-0061"
+  ]
+}

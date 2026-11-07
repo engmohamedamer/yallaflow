@@ -41,13 +41,32 @@
       "summary": "Restored the five Claude files, its test and doc from ~/Amasi/YallaFlow-agent-1.3 (copied; that checkout untouched) and removed the package.json exclusions. Server: claudeOn per run (flag or explicit {confirm, claude:true} on /api/agents/enable; refused read-only; CLAUDE_NOT_INCLUDED when files absent); /api/agents reports Claude readiness. UI: enable dialog with a separate unchecked Claude choice listing its limits; picker in the floating chat (existing provider picks). Docs: agents, console, limitations, architecture, experimental doc, CHANGELOG."
     },
     "verification": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-07T21:49:42.834Z",
+      "completedAt": "2026-11-07T21:49:42.834Z",
+      "summary": "V-006 npm run check 954/954 fresh on the working tree (Claude simulated tests ran, none skipped); V-002 package lists the five Claude files; independent security review recorded as a ruling. Real session with the owner 2026-11-07: connect, chat both ways, mode shown, live activity, answered-in-terminal, deny from the console all confirmed; console allow ran but its source was not independently confirmed. The silent send error found in the session was fixed as PF-0065.",
+      "evidence": [
+        "verification:V-006",
+        "verification:V-002",
+        "runtime:real Claude Code session with the owner 2026-11-07 — chat both ways and a console deny applied"
+      ]
     },
     "delivery-convergence": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-07T21:49:53.343Z",
+      "completedAt": "2026-11-07T21:49:53.343Z",
+      "summary": "All 4 acceptance criteria satisfied with evidence (V-002, V-006, tests, docs, real session); no unrequested behavior."
     },
     "code-review": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-07T21:50:32.750Z",
+      "completedAt": "2026-11-07T21:50:32.750Z",
+      "summary": "Reviewed 5ded124 (server.js, bridge.js, app.js, package.json) and the restored Claude files (claude.js, claude-files.js, claude-detect.js, claude-channel.mjs, claude-hook.mjs) against the spec. No blocking issue: opt-in is explicit and per run, read-only refuses, Claude routes stay 404 unless on, connect claims the slot before writing launch files, channel/hook prove the console (HMAC over a nonce, live pid) before sending the token, detection keeps no identifying fields, no API-key path. Non-blocking: (1) the silent send error and missing mode wait found in the real session — fixed as PF-0065; (2) when agents were enabled with --agents but without --experimental-claude, Claude can only be added by restarting the console with the flag and the picker gives no hint; (3) stale comments: claude-detect.js still says 'development builds only (not in published releases)' and the channel reports serverInfo version 1.3.0.",
+      "evidence": [
+        "src/console/server.js",
+        "src/agents/claude-detect.js",
+        "resources/agents/claude-channel.mjs"
+      ]
     }
   },
   "rulings": [
@@ -59,5 +78,5 @@
     }
   ],
   "history": [],
-  "updatedAt": "2026-11-07T20:16:35.818Z"
+  "updatedAt": "2026-11-07T21:50:32.750Z"
 }

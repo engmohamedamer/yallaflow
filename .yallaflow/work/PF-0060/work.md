@@ -93,6 +93,18 @@ Restored surface: the bridge routes for the channel and hooks (bridge token, no 
 
 ## Verification Evidence
 
+- V-005 (before the commit) and V-006 (2026-11-07, fresh on the working tree including PF-0063/PF-0064 changes): `npm run check` passed, 954/954.
+- Independent security review on an isolated copy: recorded as a ruling in progress.yaml (2 medium, 2 low, 3 info; all addressed).
+- Real-session check with the owner (2026-11-07, 23:20–23:43, global install packed from the working tree; Claude Code 2.1.319 logged in with a claude.ai subscription; console opted in through the Enable agents dialog):
+  - Connected: the channel joined the restarted console by itself; the handshake (HMAC proof) was confirmed directly.
+  - Mode: `auto` shown with its warning after the first hook.
+  - Activity: tool calls appeared in the floating chat live.
+  - Chat both ways: a console message reached the session and the reply came back (chat 1).
+  - Answered in Claude Code: a Read permission prompt raised in auto mode was answered in the terminal; the console closed it as "Answered in Claude Code".
+  - Deny from the console: `touch /tmp/claude-1000/yf-perm-deny.txt` was refused ("Denied via channel yallaflow"); the file was not created.
+  - Allow from the console: `touch /tmp/claude-1000/yf-perm-allow2.txt` ran outside auto mode after the owner answered the prompt; that the answer came from the console (not the terminal) was not independently confirmed.
+- Found during the session: right after a console restart, messages are refused until Claude Code reports its permission mode (MODE_UNKNOWN), and the console then shows nothing because `agentAction` clears the error when it reloads the agent state (resources/console/app.js:509-515 with :325). That code predates PF-0060 (v1.3.0); it is routed as separate bug work.
+
 ## Decisions / Rulings
 
 ## Knowledge Updates

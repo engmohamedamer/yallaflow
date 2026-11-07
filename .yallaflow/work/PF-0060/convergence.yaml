@@ -1,0 +1,197 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-07T21:49:43.021Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+        "verificationRunIds": [
+          "V-006",
+          "V-002"
+        ]
+      },
+      "summary": "Assessed after V-006 (npm run check 954/954, Claude simulated tests not skipped) and the real-session check with the owner on 2026-11-07.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "The floating chat lists Codex and Claude Code (experimental) from detection, with readiness and plan from `claude auth status` and no credential read; Codex code is untouched by the PF-0060 commit (no src/agents/codex*.js change) and its bridge tests still pass. The owner saw the picker with Claude Code marked experimental and ready.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "range": "483",
+              "contentHash": "sha256:8845a5139acc5683e81ab95a65fb181515bb9e5bb8a785e69a1bebf64031e856",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/agents/bridge.js",
+              "range": "282-284",
+              "contentHash": "sha256:7545884c6eee40eed43166f8d2d60745f876c37d7e5e67b3d551534b79c3883c",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/agents/claude-detect.js",
+              "contentHash": "sha256:2f3e048d0f7523b0714fc8c787d4fdd0d9e1bccc070ed3dad22734bb8b5e649c",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-bridge.test.js",
+              "contentHash": "sha256:b87c5001c97bf229b767adf7fb95430abf759aa1c0e5f672abccc9a6aee2886e",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0060",
+              "verificationRunId": "V-006"
+            },
+            {
+              "type": "user-confirmed",
+              "description": "owner screenshot 2026-11-07 23:33 shows Claude Code, experimental, ready, auto"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Enable turns Claude on only with claude:true, read-only refuses, Claude routes are 404 without it, the package lists the five Claude files, and a build without them refuses with not included.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:749e9c4f1139955bcba1c74c97560b4128e961e5fd529835e059e3903ae9a995",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-greenfield.test.js",
+              "range": "384-393",
+              "contentHash": "sha256:89c48754d9279d5ea48ece283f29024aea4fc62cf2b1666178b26b0948e28cad",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-bridge.test.js",
+              "range": "236",
+              "contentHash": "sha256:b87c5001c97bf229b767adf7fb95430abf759aa1c0e5f672abccc9a6aee2886e",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-bridge.test.js",
+              "range": "517",
+              "contentHash": "sha256:b87c5001c97bf229b767adf7fb95430abf759aa1c0e5f672abccc9a6aee2886e",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "npm pack --dry-run 2>&1 | grep -E 'claude-(channel|hook)\\.mjs|agents/claude(-files|-detect)?\\.js' | wc -l | grep -qx 5 (passed)",
+              "workId": "PF-0060",
+              "verificationRunId": "V-002"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0060",
+              "verificationRunId": "V-006"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "Connect writes only git-ignored files under .yallaflow/local and returns the launch command; the simulated channel test exchanges messages and relays allow and deny. On a real session the chat worked both ways and a console deny was applied by Claude Code; no API key is used (claude.ai login).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/agent-claude-experimental.test.js",
+              "range": "49",
+              "contentHash": "sha256:664265b83620f607a5ab16eb279c58aacba8b5cd7a6612fc75195a16f2de6f65",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-claude-experimental.test.js",
+              "range": "237",
+              "contentHash": "sha256:664265b83620f607a5ab16eb279c58aacba8b5cd7a6612fc75195a16f2de6f65",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/agents/claude-files.js",
+              "contentHash": "sha256:35fdf20a7336f3003e9791d5a4986b55a4192ed5808212cb46f29b067490fb80",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0060",
+              "verificationRunId": "V-006"
+            },
+            {
+              "type": "runtime",
+              "description": "real session 2026-11-07 — console message reached Claude Code and the reply returned; a console deny refused touch /tmp/claude-1000/yf-perm-deny.txt and the file was not created; authMethod claude.ai"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "The enable dialog and the chat state experimental status, the development-channel warning, no Stop, whole-message replies and that Anthropic's written answer is pending; the experimental doc and limitations say the same.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "range": "1440-1443",
+              "contentHash": "sha256:8845a5139acc5683e81ab95a65fb181515bb9e5bb8a785e69a1bebf64031e856",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "range": "506-510",
+              "contentHash": "sha256:8845a5139acc5683e81ab95a65fb181515bb9e5bb8a785e69a1bebf64031e856",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "docs/agents-claude-experimental.md",
+              "contentHash": "sha256:2f6c66c6762c80c3daf552fb74cef48dc5e5d7e0e2f6b3785ecabcf68dd5a14d",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "docs/limitations.md",
+              "contentHash": "sha256:ffdee76a590d42b7d905221746d557ab0c7d7a080053699c69ee9cad730f75c2",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-07T21:49:43.021Z"
+}

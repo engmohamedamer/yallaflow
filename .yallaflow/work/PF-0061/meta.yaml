@@ -1,0 +1,73 @@
+{
+  "id": "PF-0061",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "صفحه التدفق  \nالجزء الخاص كمله مساء الخير محتاج يبقى اصغر شويه  عشان الشكل العام\nصفحه المشروع http://127.0.0.1:4747/#/overview\nطريقه عرض البيانات محتاجه تتحسن وتتعرض شكلل افضل فورمات الكلام وكمان شكل الاعمده ممكن يظهر جز والباقى يقى view more احتهد وعدل انت\n- كمان فى الشات  الكلام اللى بيجى من ال  agent محتاج يبقى منسق واحسن فى الشكل  ومحتاح اقدر ارفع صوره عند تعديل الطلب او   طلب جديد من خلال paste ل  screen shot متاخده من ctrl+print",
+  "status": "INTAKE",
+  "readOnly": false,
+  "attestation": {
+    "recordedVia": "console",
+    "verified": false,
+    "requestId": "30acce48-64d9-4a1c-a833-591d3784f9c1",
+    "at": "2026-11-07T20:13:56.125Z"
+  },
+  "activation": {
+    "deferred": false,
+    "keptActive": "PF-0060",
+    "at": "2026-11-07T20:13:56.126Z",
+    "activatedAt": "2026-11-07T21:54:25.782Z"
+  },
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-07T20:13:56.126Z",
+  "updatedAt": "2026-11-07T21:54:25.782Z",
+  "title": "صفحه التدفق",
+  "routingConfidence": "high",
+  "routingReason": "Classified by the user in the YallaFlow console.",
+  "routedAt": "2026-11-07T20:13:56.401Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0047",
+      "type": "file",
+      "name": "flow.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-07T20:13:56.978Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ],
+  "requestHistory": [
+    {
+      "previousRequest": "صفحه التدفق  \nالجزء الخاص كمله مساء الخير محتاج يبقى اصغر شويه  عشان الشكل العام",
+      "reason": "تحسينات فى الشكل ايضا",
+      "revisedAt": "2026-11-07T21:51:34.986Z"
+    },
+    {
+      "previousRequest": "صفحه التدفق  \nالجزء الخاص كمله مساء الخير محتاج يبقى اصغر شويه  عشان الشكل العام\nصفحه المشروع http://127.0.0.1:4747/#/overview\nطريقه عرض البيانات محتاجه تتحسن وتتعرض شكلل افضل فورمات الكلام وكمان شكل الاعمده ممكن يظهر جز والباقى يقى view more احتهد وعدل انت",
+      "reason": "ui changes",
+      "revisedAt": "2026-11-07T21:54:10.389Z"
+    }
+  ]
+}

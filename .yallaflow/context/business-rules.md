@@ -113,4 +113,20 @@
   - test/new-project.test.js (repository @ 9437b4c)
   - npm run check (passed) (runtime, PF-0057 V-004)
 
+<!-- yallaflow-fact:CTX-0120 -->
+### CTX-0120 — Request revisions are allowed only before work starts: pending routing or INTAKE with no checkpoint activity or revision history in the progress ledger. Core preserves request history, sources, classified title and workflow; held, closed and DONE work cannot be edited. Snapshot and work detail expose requestEditable from the same Core policy; console editing loads full raw text and saves through request revise.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0063
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-07T20:50:53.879Z
+- **Verified:** 2026-11-07T20:50:53.879Z (commit ad9fe0d)
+- **Evidence:**
+  - src/behavior/routing.js (repository @ ad9fe0d)
+  - src/flow/snapshot.js (repository @ ad9fe0d)
+  - resources/console/app.js (repository @ ad9fe0d)
+  - node --import ./test-support/isolate-user-config.js --test test/request-revision.test.js test/request-revision-ui.test.js test/console-actions.test.js test/console-acceptance.test.js test/console-server.test.js (passed) (runtime, PF-0063 V-004)
+
 <!-- yallaflow-context:end -->

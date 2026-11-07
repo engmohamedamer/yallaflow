@@ -1,0 +1,819 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-07T21:58:54.389Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 2,
+        "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "Parent assessment after V-001 (fresh npm run check on the current tree), from the children's convergence; AC-011 assessed here because PF-0029 recorded none.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "Satisfied by PF-0025 (snapshot --json schema and completion formula).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0025",
+              "assessmentId": "CV-001"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0024",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Satisfied by PF-0025 (work show --json).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0025",
+              "assessmentId": "CV-001"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0024",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "Satisfied by PF-0025 (read commands change nothing; golden outputs).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0025",
+              "assessmentId": "CV-001"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0024",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "Satisfied by PF-0026 (parallel stress test, stale lock handling).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0026",
+              "assessmentId": "CV-001"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0024",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "Satisfied by PF-0027 (views in AR RTL and EN at 1440/390 px).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0027",
+              "assessmentId": "CV-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "Satisfied by PF-0027 (live update within 2 s).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0027",
+              "assessmentId": "CV-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "Satisfied by PF-0027; the security tests still pass in the current suite.",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0027",
+              "assessmentId": "CV-001"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:8e0f376d116ec47d0733169bc7ff804098ef1c5b0600d8257506fa0cbb5efc35",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0024",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-008",
+          "status": "satisfied",
+          "reason": "Satisfied by PF-0027 (source previews and handoff summary).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0027",
+              "assessmentId": "CV-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-009",
+          "status": "satisfied",
+          "reason": "Satisfied by PF-0028 (team lanes and conflict warning).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0028",
+              "assessmentId": "CV-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-010",
+          "status": "satisfied",
+          "reason": "Satisfied by PF-0028 (insights and digest on a fixture).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0028",
+              "assessmentId": "CV-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-011",
+          "status": "satisfied",
+          "reason": "package.json runtime dependencies are the same four intake libraries before and after the console (bc14db0 and now); the UI is plain files served from resources/console with no build step; the full suite passes on the current tree.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "package.json",
+              "contentHash": "sha256:1308130896115aa6964597dcd9204422bc05aa0bb2c2a83890f3db7eb81a6715",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:749e9c4f1139955bcba1c74c97560b4128e961e5fd529835e059e3903ae9a995",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:8845a5139acc5683e81ab95a65fb181515bb9e5bb8a785e69a1bebf64031e856",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0024",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-012",
+          "status": "satisfied",
+          "reason": "Satisfied for PF-0024 by PF-0027: browsing changes nothing and Create Work was the only write. Later releases deliberately added more console writes (work actions, gate decisions, sources, runtime, project creation, enabling agents), each routed, approved and tested in its own work item and listed explicitly in WRITE_ROUTE; every other route remains non-mutating.",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0027",
+              "assessmentId": "CV-001"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:749e9c4f1139955bcba1c74c97560b4128e961e5fd529835e059e3903ae9a995",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0024",
+              "verificationRunId": "V-001"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    },
+    {
+      "id": "CV-002",
+      "recordedAt": "2026-11-07T21:59:00.335Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 2,
+        "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "Parent assessment after V-001 (fresh npm run check on the current tree), from the children's convergence; AC-011 assessed here because PF-0029 recorded none.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "Satisfied by PF-0025 (snapshot --json schema and completion formula).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0025",
+              "assessmentId": "CV-001"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0024",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Satisfied by PF-0025 (work show --json).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0025",
+              "assessmentId": "CV-001"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0024",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "Satisfied by PF-0025 (read commands change nothing; golden outputs).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0025",
+              "assessmentId": "CV-001"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0024",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "Satisfied by PF-0026 (parallel stress test, stale lock handling).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0026",
+              "assessmentId": "CV-001"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0024",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "Satisfied by PF-0027 (views in AR RTL and EN at 1440/390 px).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0027",
+              "assessmentId": "CV-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "Satisfied by PF-0027 (live update within 2 s).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0027",
+              "assessmentId": "CV-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "Satisfied by PF-0027; the security tests still pass in the current suite.",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0027",
+              "assessmentId": "CV-001"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:8e0f376d116ec47d0733169bc7ff804098ef1c5b0600d8257506fa0cbb5efc35",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0024",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-008",
+          "status": "satisfied",
+          "reason": "Satisfied by PF-0027 (source previews and handoff summary).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0027",
+              "assessmentId": "CV-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-009",
+          "status": "satisfied",
+          "reason": "Satisfied by PF-0028 (team lanes and conflict warning).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0028",
+              "assessmentId": "CV-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-010",
+          "status": "satisfied",
+          "reason": "Satisfied by PF-0028 (insights and digest on a fixture).",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0028",
+              "assessmentId": "CV-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-011",
+          "status": "satisfied",
+          "reason": "package.json runtime dependencies are the same four intake libraries before and after the console (bc14db0 and now); the UI is plain files served from resources/console with no build step; the full suite passes on the current tree.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "package.json",
+              "contentHash": "sha256:1308130896115aa6964597dcd9204422bc05aa0bb2c2a83890f3db7eb81a6715",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:749e9c4f1139955bcba1c74c97560b4128e961e5fd529835e059e3903ae9a995",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:8845a5139acc5683e81ab95a65fb181515bb9e5bb8a785e69a1bebf64031e856",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0024",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-012",
+          "status": "satisfied",
+          "reason": "Satisfied for PF-0024 by PF-0027: browsing changes nothing and Create Work was the only write. Later releases deliberately added more console writes (work actions, gate decisions, sources, runtime, project creation, enabling agents), each routed, approved and tested in its own work item and listed explicitly in WRITE_ROUTE; every other route remains non-mutating.",
+          "evidence": [
+            {
+              "type": "convergence",
+              "workId": "PF-0027",
+              "assessmentId": "CV-001"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:749e9c4f1139955bcba1c74c97560b4128e961e5fd529835e059e3903ae9a995",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0024",
+              "verificationRunId": "V-001"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    },
+    {
+      "id": "CV-003",
+      "recordedAt": "2026-11-07T22:05:10.093Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 2,
+        "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "Fresh re-assessment against the current code (the children's findings went stale after 1.3/1.4 changed their cited files): V-001 npm run check 960/960 plus a browser check on 2026-11-08 of an isolated copy of this repository served by a --read-only console (port 4799) built from the working tree.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "snapshot --json is validated against yallaflow.snapshot/1 in the contract test and the completion formula is asserted as documented arithmetic; both pass on the current tree.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/snapshot-contract.test.js",
+              "contentHash": "sha256:ff5ee92749d9106f23bde405b200c414b7acd15f99ae97d0d71dee59aa0edbda",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/flow-stations.test.js",
+              "contentHash": "sha256:754243526715a0e14da57bc9033e206a2b2de76d74ee212f9ab1e2b718608d33",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/flow/snapshot.js",
+              "contentHash": "sha256:d1f6b58968aa7ffdc09af516658deebd3de80ab5470692bcdb44bd417edf44d0",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/schemas/snapshot-1.schema.json",
+              "contentHash": "sha256:337dec221ebad3faf11300f1aed2e6610ab555f7aca76109e2294a63e806f1d7",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0024",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "'work show --json returns every section and validates' passes on the current tree.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/snapshot-contract.test.js",
+              "contentHash": "sha256:ff5ee92749d9106f23bde405b200c414b7acd15f99ae97d0d71dee59aa0edbda",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "resources/schemas/work-1.schema.json",
+              "contentHash": "sha256:a8fe4a62fb3d2df7200a1457899cab1b916454dfcf5d9ed8275848f0f9819f61",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0024",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "'read commands never modify .yallaflow, the working tree, or .git/index' passes on the current tree, including the legacy fixture.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/snapshot-contract.test.js",
+              "contentHash": "sha256:ff5ee92749d9106f23bde405b200c414b7acd15f99ae97d0d71dee59aa0edbda",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0024",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "The parallel-start and parallel-mutation stress tests and the stale-lock/doctor tests pass on the current tree.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/workspace-lock.test.js",
+              "contentHash": "sha256:77e6b3fd0df0f4988a55e358715b392735dfe2ebbf8deba7c176fa2f1aae2167",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/utils/lock.js",
+              "contentHash": "sha256:6e7251fa02cb62cf81eb821cdfdb46d9f769ea3ace143a579236e7dbe7a8767a",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0024",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "Browser check: AR (rtl) and EN (ltr) x 1440 and 390 px x Flow, Work, two item views, Worktrees and Insights = 24 combinations, all without horizontal page scroll and with 0 browser console errors.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:8845a5139acc5683e81ab95a65fb181515bb9e5bb8a785e69a1bebf64031e856",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.css",
+              "contentHash": "sha256:45c187b6aa7bb31eb3f23d0bfed5f8b8867ed60fbead574f0e9aac4253af72b3",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "playwright-cli Chromium 2026-11-08 on the isolated copy — 24/24 views, 0 console errors, no horizontal scroll"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "The live-update test passes; in the browser a CLI intake on the copy appeared on the open item page 0.5 s after the command finished (1.2 s after it started), and a CLI advance drew the station baton animation 1.1 s later.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:8e0f376d116ec47d0733169bc7ff804098ef1c5b0600d8257506fa0cbb5efc35",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/watch.js",
+              "contentHash": "sha256:01f9e6ca92ed32095598a0de92832e29b0b8d79ec64dbfcbc3afc0fcb04ea1f6",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0024",
+              "verificationRunId": "V-001"
+            },
+            {
+              "type": "runtime",
+              "description": "playwright-cli 2026-11-08 — new source visible 1.2 s after the CLI write; baton animation 1.1 s after yallaflow advance"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "The console security test (loopback host, token, origin, read-only methods, ID-only paths) passes on the current tree.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:8e0f376d116ec47d0733169bc7ff804098ef1c5b0600d8257506fa0cbb5efc35",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:749e9c4f1139955bcba1c74c97560b4128e961e5fd529835e059e3903ae9a995",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0024",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-008",
+          "status": "satisfied",
+          "reason": "Browser check: a PNG source previewed as an image (1889x966 loaded), a PDF source in the PDF frame, a Markdown source as text (10,434 chars), and a station handoff opened its checkpoint summary.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:8845a5139acc5683e81ab95a65fb181515bb9e5bb8a785e69a1bebf64031e856",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:8e0f376d116ec47d0733169bc7ff804098ef1c5b0600d8257506fa0cbb5efc35",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "playwright-cli 2026-11-08 — image, PDF and text previews and a handoff drawer on the isolated copy"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-009",
+          "status": "satisfied",
+          "reason": "With two worktrees of the copy on different active items (PF-0024, PF-0063) the Worktrees page showed two lanes and the warning 'The same file is changed in more than one worktree: README.md'; the worktree test passes.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/worktrees.js",
+              "contentHash": "sha256:8785f2e7048373b57f70b57c7021f5eb26391ace5b9c3e83bd3532e95d276774",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-phase-d.test.js",
+              "contentHash": "sha256:2f9f7aa9fb9a0dcf3c983c87e1dc899ed0d7b1744113d0ae513299931555b175",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0024",
+              "verificationRunId": "V-001"
+            },
+            {
+              "type": "runtime",
+              "description": "playwright-cli 2026-11-08 — two lanes and a README.md overlap warning"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-010",
+          "status": "satisfied",
+          "reason": "Insights showed 52 done in 30 days, median 1 h over 53 items, 287/319 runs passed — equal to an independent calculation from snapshot --json of the same workspace; after setting the last-visit time, the digest listed only the one item changed afterwards (PF-0066 in the copy).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:8845a5139acc5683e81ab95a65fb181515bb9e5bb8a785e69a1bebf64031e856",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/flow/snapshot.js",
+              "contentHash": "sha256:d1f6b58968aa7ffdc09af516658deebd3de80ab5470692bcdb44bd417edf44d0",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "playwright-cli 2026-11-08 — insights equal the independent snapshot calculation; digest lists only post-visit changes"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-011",
+          "status": "satisfied",
+          "reason": "package.json runtime dependencies are the same four intake libraries before and after the console (bc14db0 and now); the UI is plain files served from resources/console with no build step; the full suite passes.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "package.json",
+              "contentHash": "sha256:1308130896115aa6964597dcd9204422bc05aa0bb2c2a83890f3db7eb81a6715",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:749e9c4f1139955bcba1c74c97560b4128e961e5fd529835e059e3903ae9a995",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0024",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-012",
+          "status": "satisfied",
+          "reason": "'the console never writes: browsing every route leaves the workspace byte-identical' passes on the current tree. Writes beyond Create Work were added later on purpose (work actions, gate decisions, sources, runtime, project creation, enabling agents), each routed, approved and tested in its own work item and listed explicitly in WRITE_ROUTE; every other route stays non-mutating.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:8e0f376d116ec47d0733169bc7ff804098ef1c5b0600d8257506fa0cbb5efc35",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:749e9c4f1139955bcba1c74c97560b4128e961e5fd529835e059e3903ae9a995",
+              "gitCommit": "ad9fe0d457ca055e26ab6f82ef2c19603af3708b",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0024",
+              "verificationRunId": "V-001"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-07T22:05:10.093Z"
+}

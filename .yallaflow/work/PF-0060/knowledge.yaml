@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "From 1.4.0 the experimental Claude Code connection ships in the package (package.json no longer excludes the five Claude files) but stays off by default: it turns on for one console run only with 'yallaflow console --agents --experimental-claude' or the separate, unchecked 'Also allow Claude Code (experimental)' choice when enabling agents in the console, never in --read-only; a build without the files still refuses with CLAUDE_NOT_INCLUDED. The developer starts Claude Code with the launch command the console shows (development-channel flag); the channel and hook send the bridge token only after the console proves it (HMAC over a nonce at /api/agent-bridge/claude/hello, live pid). Messages are refused until a hook reports Claude Code's permission mode, and bypassPermissions is never served. Codex remains the managed provider; subscription logins only, no API keys.",
+      "evidence": [
+        "package.json",
+        "src/console/server.js",
+        "src/agents/bridge.js",
+        "resources/agents/claude-channel.mjs",
+        "docs/agents-claude-experimental.md",
+        "verification:V-006"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0115"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-07T21:50:42.026Z",
+      "factId": "CTX-0121",
+      "promotedAt": "2026-11-07T21:50:50.090Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-07T21:50:50.090Z",
+  "reviewedAt": "2026-11-07T21:50:50.090Z"
+}

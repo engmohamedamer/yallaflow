@@ -590,25 +590,6 @@ print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_commo
   - docs/runtime.md (repository @ 2f86ec7)
   - test/runtime.test.js (repository @ 2f86ec7)
 
-<!-- yallaflow-fact:CTX-0115 -->
-### CTX-0115 — The 1.3.0 release checkout supports opt-in managed Codex sessions through the user-installed ACP adapter and requires reported ChatGPT account authentication. Known API-key environment variables are stripped, full-access modes are refused, unanswered tool permissions are denied, and activation is explicit through Core. Experimental Claude runtime files are absent from this release checkout and explicitly excluded by package.json; optional loading returns CLAUDE_NOT_INCLUDED when absent. Ordinary Claude bootstrap instructions remain packaged.
-
-- **State:** current
-- **Confidence:** confirmed
-- **Provenance:** repository
-- **Source work:** PF-0056
-- **Knowledge ID:** K-001
-- **Promoted at:** 2026-11-07T16:23:41.856Z
-- **Supersedes:** CTX-0102
-- **Verified:** 2026-11-07T16:23:41.856Z (commit 476b917)
-- **Evidence:**
-  - .yallaflow/lineages/main-v1.3.0/other/context/index.yaml#CTX-0105 (repository @ 476b917)
-  - package.json (repository @ 476b917)
-  - src/agents/experimental.js (repository @ 476b917)
-  - src/agents/codex.js (repository @ 476b917)
-  - src/agents/bridge.js (repository @ 476b917)
-  - docs/agents.md (repository @ 476b917)
-
 <!-- yallaflow-fact:CTX-0116 -->
 ### CTX-0116 — Web console (v1.2.0, extended in 1.4.0): 'yallaflow console' is a local web UI inside the yallaflow package (no daemon, no new dependency, no build step). src/console/server.js (node:http on 127.0.0.1; per-run Bearer token; Host 421, Origin 403; GET/HEAD for reads; UI from a fixed file map; sources served by ID only, previews sandboxed) reads by spawning this package's CLI (snapshot/work show/overview/runtime status --json) and refreshes on a debounced .yallaflow watcher with polling fallback. POST is accepted only on WRITE_ROUTE: Create Work and its attach route, work-item actions and gate decisions, runtime trust/start/stop/restart and adding a service, the New Project Wizard (plan, create with the full plan hash, planned files), project registration, enabling agents for the run, and Git init; each needs the console Origin and exact content type, and '--read-only' refuses every POST. The project list can grow at runtime (registration serialized and deduplicated), and the console starts with no saved project unless read-only. GET /api/fs/dirs is the only filesystem listing: directories inside the real home folder, no hidden folders, no files, not in read-only.
 
@@ -645,5 +626,24 @@ print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_commo
   - src/console/server.js (repository @ 9437b4c)
   - src/console/registry.js (repository @ 9437b4c)
   - npm run check (passed) (runtime, PF-0057 V-004)
+
+<!-- yallaflow-fact:CTX-0121 -->
+### CTX-0121 — From 1.4.0 the experimental Claude Code connection ships in the package (package.json no longer excludes the five Claude files) but stays off by default: it turns on for one console run only with 'yallaflow console --agents --experimental-claude' or the separate, unchecked 'Also allow Claude Code (experimental)' choice when enabling agents in the console, never in --read-only; a build without the files still refuses with CLAUDE_NOT_INCLUDED. The developer starts Claude Code with the launch command the console shows (development-channel flag); the channel and hook send the bridge token only after the console proves it (HMAC over a nonce at /api/agent-bridge/claude/hello, live pid). Messages are refused until a hook reports Claude Code's permission mode, and bypassPermissions is never served. Codex remains the managed provider; subscription logins only, no API keys.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0060
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-07T21:50:50.090Z
+- **Supersedes:** CTX-0115
+- **Verified:** 2026-11-07T21:50:50.090Z (commit ad9fe0d)
+- **Evidence:**
+  - package.json (repository @ ad9fe0d)
+  - src/console/server.js (repository @ ad9fe0d)
+  - src/agents/bridge.js (repository @ ad9fe0d)
+  - resources/agents/claude-channel.mjs (repository @ ad9fe0d)
+  - docs/agents-claude-experimental.md (repository @ ad9fe0d)
+  - npm run check (passed) (runtime, PF-0060 V-006)
 
 <!-- yallaflow-context:end -->
