@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --test test/workspace-lock.test.js test/console-server.test.js test/console-actions.test.js test/console-create.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--test",
+        "test/workspace-lock.test.js",
+        "test/console-server.test.js",
+        "test/console-actions.test.js",
+        "test/console-create.test.js"
+      ],
+      "displayCommand": "node --test test/workspace-lock.test.js test/console-server.test.js test/console-actions.test.js test/console-create.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T02:08:10.535Z",
+      "finishedAt": "2026-11-07T02:08:43.206Z",
+      "verifiedAt": "2026-11-07T02:08:43.206Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "node --test test/agent-bridge.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--test",
+        "test/agent-bridge.test.js"
+      ],
+      "displayCommand": "node --test test/agent-bridge.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T02:08:51.440Z",
+      "finishedAt": "2026-11-07T02:09:50.521Z",
+      "verifiedAt": "2026-11-07T02:09:50.521Z",
+      "log": "V-002-verification.log"
+    }
+  ]
+}

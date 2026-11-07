@@ -1,0 +1,342 @@
+TAP version 13
+# Subtest: work-item actions run the canonical commands: same records as the CLI, Core refusals passed through
+ok 1 - work-item actions run the canonical commands: same records as the CLI, Core refusals passed through
+  ---
+  duration_ms: 10632.372076
+  type: 'test'
+  ...
+# Subtest: action input is validated and values never become options
+ok 2 - action input is validated and values never become options
+  ---
+  duration_ms: 1772.550854
+  type: 'test'
+  ...
+# Subtest: security: token, Origin, content type and read-only consoles guard every action and decision
+ok 3 - security: token, Origin, content type and read-only consoles guard every action and decision
+  ---
+  duration_ms: 1494.236973
+  type: 'test'
+  ...
+# Subtest: gate decisions: material shown first, exact confirmation, stale and duplicate protection, console provenance
+ok 4 - gate decisions: material shown first, exact confirmation, stale and duplicate protection, console provenance
+  ---
+  duration_ms: 7798.351662
+  type: 'test'
+  ...
+# Subtest: CLI decisions are recorded exactly as before (no provenance), and a bad provenance channel records nothing
+ok 5 - CLI decisions are recorded exactly as before (no provenance), and a bad provenance channel records nothing
+  ---
+  duration_ms: 4478.351433
+  type: 'test'
+  ...
+# Subtest: the Agent Workspace never reaches gate decisions, and agents never inherit the provenance channel
+ok 6 - the Agent Workspace never reaches gate decisions, and agents never inherit the provenance channel
+  ---
+  duration_ms: 1.659192
+  type: 'test'
+  ...
+# Subtest: review findings: re-deciding after "request changes", request ids per gate, malformed bodies, provenance limits, strict doctor
+ok 7 - review findings: re-deciding after "request changes", request ids per gate, malformed bodies, provenance limits, strict doctor
+  ---
+  duration_ms: 6228.339861
+  type: 'test'
+  ...
+# YallaFlow foundation CLI
+# Give AI your project, not just your prompt.
+# Usage:
+#   yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]
+#   yallaflow start [request]
+#   yallaflow start --keep-active -- <request>
+#   yallaflow activate <work-id>
+#   yallaflow request --help
+#   yallaflow intake <file> [<file> ...] [--title TITLE]
+#   yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]
+#   yallaflow intake ticket <payload-file|ticket-ref> [--provider github|jira|azure-devops] [--work <work-id>] [--reason TEXT] [--fetch [--attachments]] [--attachment <file>]... [--title TITLE] [--max-comments N]
+#   yallaflow source --help
+#   yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]
+#   yallaflow baseline --help
+#   yallaflow guide [work-id]
+#   yallaflow ready [work-id]
+#   yallaflow skill <skill-id> [--work <work-id>]
+#   yallaflow checkpoint --help
+#   yallaflow question --help
+#   yallaflow knowledge --help
+#   yallaflow requirement --help
+#   yallaflow convergence --help
+#   yallaflow impact --help
+#   yallaflow context --help
+#   yallaflow upgrade status|plan
+#   yallaflow brief
+#   yallaflow inspect
+#   yallaflow limitation --help
+#   yallaflow agent --help
+#   yallaflow decompose --help
+#   yallaflow progress <parent-id>
+#   yallaflow next <parent-id>
+#   yallaflow approve <work-id> --stage GATE [--note TEXT]
+#   yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]
+#   yallaflow handoff [work-id]
+#   yallaflow feature <title> --scope SCOPE
+#   yallaflow bug <title> --scope SCOPE
+#   yallaflow investigate <title> --scope SCOPE
+#   yallaflow change <title> --scope SCOPE
+#   yallaflow refactor <title> --scope SCOPE
+#   yallaflow release <title> --scope SCOPE
+#   yallaflow purpose --help
+#   yallaflow finish [work-id] [--verbose]
+#   yallaflow qc --help
+#   yallaflow demo --help
+#   yallaflow shared --help
+#   yallaflow status
+#   yallaflow snapshot [--json]
+#   yallaflow console [--port N] [--no-open] [--project DIR]... [--read-only] [--agents]
+#   yallaflow agents detect
+#   yallaflow work show <work-id> [--json]
+#   yallaflow work hold|resume|close <work-id> ...  (lifecycle: on hold, closed without delivery)
+#   yallaflow resume [work-id]
+#   yallaflow doctor [--clear-lock]
+#   yallaflow advance [work-id]
+#   yallaflow verify [work-id] -- <executable> [args...]
+#   yallaflow verify [work-id] --shell "<command>"
+#   yallaflow verify [work-id] --script <path>
+#   yallaflow verify list [work-id]
+#   yallaflow reopen <work-id> --to implementation|verification|review --reason REASON
+#   yallaflow reopen <work-id> --reason REASON   (closed work)
+#   yallaflow --version
+# Subtest: start without new options behaves exactly as before (focus moves to the new item)
+ok 8 - start without new options behaves exactly as before (focus moves to the new item)
+  ---
+  duration_ms: 2094.581765
+  type: 'test'
+  ...
+# Subtest: parseStartArgs: new options only as leading tokens; anything else is the legacy request
+ok 9 - parseStartArgs: new options only as leading tokens; anything else is the legacy request
+  ---
+  duration_ms: 2.782782
+  type: 'test'
+  ...
+# Subtest: --keep-active never replaces unfinished active work; routing and checkpoints never move focus; activate does
+ok 10 - --keep-active never replaces unfinished active work; routing and checkpoints never move focus; activate does
+  ---
+  duration_ms: 4108.609222
+  type: 'test'
+  ...
+# Subtest: --keep-active never activates, even when no work item is active (owner decision)
+ok 11 - --keep-active never activates, even when no work item is active (owner decision)
+  ---
+  duration_ms: 1888.034909
+  type: 'test'
+  ...
+# Subtest: console create with nothing active leaves nothing active
+ok 12 - console create with nothing active leaves nothing active
+  ---
+  duration_ms: 1436.929656
+  type: 'test'
+  ...
+# Subtest: attachments report what YallaFlow could actually do with each file
+ok 13 - attachments report what YallaFlow could actually do with each file
+  ---
+  duration_ms: 3301.676953
+  type: 'test'
+  ...
+# Subtest: request IDs: a retried or concurrent request creates exactly one item, with an unverified console attestation
+ok 14 - request IDs: a retried or concurrent request creates exactly one item, with an unverified console attestation
+  ---
+  duration_ms: 788.713022
+  type: 'test'
+  ...
+# Subtest: helpers: titles come from the user's words; file names are reduced safely
+ok 15 - helpers: titles come from the user's words; file names are reduced safely
+  ---
+  duration_ms: 0.477116
+  type: 'test'
+  ...
+# Subtest: POST guards: token, Origin, Host, content type, size, read-only, unknown routes
+ok 16 - POST guards: token, Origin, Host, content type, size, read-only, unknown routes
+  ---
+  duration_ms: 64.27477
+  type: 'test'
+  ...
+# Subtest: create: unclassified and classified items through Core; shell text stored verbatim; focus kept
+ok 17 - create: unclassified and classified items through Core; shell text stored verbatim; focus kept
+  ---
+  duration_ms: 3109.420173
+  type: 'test'
+  ...
+# Subtest: create: concurrent requests get distinct IDs; repeated ones never duplicate
+ok 18 - create: concurrent requests get distinct IDs; repeated ones never duplicate
+  ---
+  duration_ms: 3406.429503
+  type: 'test'
+  ...
+# Subtest: brownfield without approved understanding: Core refuses and nothing is created
+ok 19 - brownfield without approved understanding: Core refuses and nothing is created
+  ---
+  duration_ms: 326.412304
+  type: 'test'
+  ...
+# Subtest: attachments: preserved through intake, deduplicated on retry, refused safely, temp files removed, item kept
+ok 20 - attachments: preserved through intake, deduplicated on retry, refused safely, temp files removed, item kept
+  ---
+  duration_ms: 2543.027185
+  type: 'test'
+  ...
+# Subtest: an oversized upload is refused before it is stored
+ok 21 - an oversized upload is refused before it is stored
+  ---
+  duration_ms: 3592.435136
+  type: 'test'
+  ...
+# Subtest: review: requests starting with "-" keep their classification; "--help" is plain text
+ok 22 - review: requests starting with "-" keep their classification; "--help" is plain text
+  ---
+  duration_ms: 2786.631611
+  type: 'test'
+  ...
+# Subtest: review: two identical uploads at once store one copy; a long non-ASCII name is shortened, not leaked
+ok 23 - review: two identical uploads at once store one copy; a long non-ASCII name is shortened, not leaked
+  ---
+  duration_ms: 1227.44697
+  type: 'test'
+  ...
+# Subtest: resume on a deferred item says how to activate it, and changes nothing
+ok 24 - resume on a deferred item says how to activate it, and changes nothing
+  ---
+  duration_ms: 932.692776
+  type: 'test'
+  ...
+# Subtest: security: loopback host, token, origin, read-only methods and ID-only paths
+ok 25 - security: loopback host, token, origin, read-only methods and ID-only paths
+  ---
+  duration_ms: 1722.524255
+  type: 'test'
+  ...
+# Subtest: serves the snapshot, work detail and preserved sources by ID
+ok 26 - serves the snapshot, work detail and preserved sources by ID
+  ---
+  duration_ms: 3807.924828
+  type: 'test'
+  ...
+# Subtest: live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+ok 27 - live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+  ---
+  duration_ms: 2873.657308
+  type: 'test'
+  ...
+# Subtest: the console never writes: browsing every route leaves the workspace byte-identical
+ok 28 - the console never writes: browsing every route leaves the workspace byte-identical
+  ---
+  duration_ms: 2478.322507
+  type: 'test'
+  ...
+# Subtest: extracted text cannot be read outside its source directory; HEAD never opens the event stream
+ok 29 - extracted text cannot be read outside its source directory; HEAD never opens the event stream
+  ---
+  duration_ms: 2115.248245
+  type: 'test'
+  ...
+# Subtest: parallel starts allocate distinct work IDs and leave valid state
+ok 30 - parallel starts allocate distinct work IDs and leave valid state
+  ---
+  duration_ms: 1706.867862
+  type: 'test'
+  ...
+# Subtest: parallel mutating commands across items and verifications keep every ledger intact
+ok 31 - parallel mutating commands across items and verifications keep every ledger intact
+  ---
+  duration_ms: 4206.600325
+  type: 'test'
+  ...
+# Subtest: a stale lock from a dead process is reported, then recovered automatically
+ok 32 - a stale lock from a dead process is reported, then recovered automatically
+  ---
+  duration_ms: 792.696936
+  type: 'test'
+  ...
+# Subtest: doctor --clear-lock removes a stale lock and refuses a live one
+ok 33 - doctor --clear-lock removes a stale lock and refuses a live one
+  ---
+  duration_ms: 1021.726743
+  type: 'test'
+  ...
+# Subtest: a live holder rejects timed-out writes without changes, then permits writes after release
+ok 34 - a live holder rejects timed-out writes without changes, then permits writes after release
+  ---
+  duration_ms: 1179.866745
+  type: 'test'
+  ...
+# Subtest: the lock is re-entrant inside one process and read commands never take it
+ok 35 - the lock is re-entrant inside one process and read commands never take it
+  ---
+  duration_ms: 925.380608
+  type: 'test'
+  ...
+# Subtest: a single-user workspace has no local/ directory after a command, even a refused one
+ok 36 - a single-user workspace has no local/ directory after a command, even a refused one
+  ---
+  duration_ms: 974.233265
+  type: 'test'
+  ...
+# Subtest: a crash can never leave an empty lock; an unreadable one is stale after 30 s
+ok 37 - a crash can never leave an empty lock; an unreadable one is stale after 30 s
+  ---
+  duration_ms: 1254.900908
+  type: 'test'
+  ...
+# Subtest: a reused pid (same pid, different process start) is recognized as stale
+ok 38 - a reused pid (same pid, different process start) is recognized as stale
+  ---
+  duration_ms: 461.800778
+  type: 'test'
+  ...
+# Subtest: the lock records the holder identity, and a positively identified live holder is never cleared
+ok 39 - the lock records the holder identity, and a positively identified live holder is never cleared
+  ---
+  duration_ms: 3109.206455
+  type: 'test'
+  ...
+# Subtest: doctor --clear-lock removes an hour-old lock whose holder cannot be identified
+ok 40 - doctor --clear-lock removes an hour-old lock whose holder cannot be identified
+  ---
+  duration_ms: 689.324208
+  type: 'test'
+  ...
+# Subtest: leftover lock temp files from a crash are swept
+ok 41 - leftover lock temp files from a crash are swept
+  ---
+  duration_ms: 375.810564
+  type: 'test'
+  ...
+# Subtest: a lock taken before the machine last booted is stale on any platform
+ok 42 - a lock taken before the machine last booted is stale on any platform
+  ---
+  duration_ms: 430.125278
+  type: 'test'
+  ...
+# Subtest: release removes only its own lock, never one taken over meanwhile
+ok 43 - release removes only its own lock, never one taken over meanwhile
+  ---
+  duration_ms: 21.641008
+  type: 'test'
+  ...
+# Subtest: verify waits to record a finished run and always shows its output (an exited, unreaped holder counts as gone)
+ok 44 - verify waits to record a finished run and always shows its output (an exited, unreaped holder counts as gone)
+  ---
+  duration_ms: 2089.55076
+  type: 'test'
+  ...
+# Subtest: a lock a crash leaves in a single-user workspace stays out of git status
+ok 45 - a lock a crash leaves in a single-user workspace stays out of git status
+  ---
+  duration_ms: 582.281704
+  type: 'test'
+  ...
+1..45
+# tests 45
+# suites 0
+# pass 45
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 32622.189063

@@ -1,0 +1,46 @@
+{
+  "id": "PF-0044",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Integrate the published v1.3.0 release fixes from main commit 534cdbb (console agent streaming/loading fixes, workspace-lock test, fixture whitespace, CHANGELOG) into feature/workspace-1.4 as product code and tests only, without copying any .yallaflow work records",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-07T02:07:31.982Z",
+  "updatedAt": "2026-11-07T02:09:54.693Z",
+  "title": "Integrate the published v1.3.0 release fixes from main commit 534cdbb (console agent streaming/loading fixes, workspace-lock test, fixture whitespace, CHANGELOG) into feature/workspace-1.4 as product code and tests only, without copying any .yallaflow work records",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-07T02:07:31.999Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-07T02:09:54.693Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002"
+      ]
+    }
+  ]
+}

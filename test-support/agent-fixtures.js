@@ -82,4 +82,3 @@ export async function consoleWith(root, options = {}) {
 }
 export const activeWork = async (root) => JSON.parse(await readFile(path.join(root, '.yallaflow', 'state', 'current.yaml'), 'utf8')).activeWork;
 export const stateLines = async (file) => (await readFile(file, 'utf8')).trim().split('\n').map((line) => JSON.parse(line));
-

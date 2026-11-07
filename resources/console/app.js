@@ -321,18 +321,27 @@
       loadAgent().then(renderAgent);
       return;
     }
-    renderAgent();
+    renderAgent(event.type === 'message.delta');
   }
   // Re-render only the panel, keeping the composer text and focus.
-  function renderAgent() {
+  function renderAgent(streamOnly = false) {
     const host = document.getElementById('agent');
     const it = byId(route().id);
     if (!host || !it) return;
     const focused = document.activeElement?.matches?.('[data-agent-input]');
-    host.outerHTML = agentPanel(it);
+    const streamHost = streamOnly && host.querySelector('.astream');
+    if (streamHost) {
+      // Keep Stop/End and the composer in the DOM while message chunks arrive.
+      // Replacing them every chunk can discard a pointer or keyboard interaction.
+      const template = document.createElement('template');
+      template.innerHTML = agentPanel(it);
+      const nextStream = template.content.querySelector('.astream');
+      if (nextStream) streamHost.innerHTML = nextStream.innerHTML;
+      else host.outerHTML = agentPanel(it);
+    } else host.outerHTML = agentPanel(it);
     const stream = document.querySelector('#agent .astream');
     if (stream) stream.scrollTop = stream.scrollHeight;
-    if (focused) { const box = document.querySelector('[data-agent-input]'); if (box) { box.focus(); box.setSelectionRange(box.value.length, box.value.length); } }
+    if (focused && !streamHost) { const box = document.querySelector('[data-agent-input]'); if (box) { box.focus(); box.setSelectionRange(box.value.length, box.value.length); } }
   }
   // Turn the event list into readable entries: message deltas join into one bubble.
   function agentEntries(events) {
@@ -419,7 +428,7 @@
   }
   async function agentAction(action, body, after) {
     agentBusy = true; agentError = null; renderAgent();
-    try { const result = await agentPost(action, body); after?.(result); } catch (e) { agentError = e.message; }
+    try { const result = await agentPost(action, body); await after?.(result); } catch (e) { agentError = e.message; }
     agentBusy = false;
     await loadAgent();
     renderAgent();
@@ -953,6 +962,7 @@
     toast(`＋ ${A(`«${esc(it.item.title)}» اتسجّلت`, `"${esc(it.item.title)}" was created`)} <span class="ltr">${esc(it.id)}</span><br><span class="tiny">${it.keptActive ? A(`${esc(it.keptActive)} لسه الشغلانة النشطة.`, `${esc(it.keptActive)} stays the active work item.`) : A('مش هتبقى النشطة إلا لما تتفعّل.', 'Not made active; activation stays explicit.')}</span>`);
     location.hash = `#/item/${encodeURIComponent(it.id)}`;
     await load();
+    await loadForView();
     render();
   }
 
@@ -1128,7 +1138,7 @@
       render(); await load(); await buildDigest(); render(); listen();
       return;
     }
-    closeDrawer(); bellOpen = false; dtab = 'delivery'; const v = route().v; if (v === 'item') { detail = null; render(); await load(); } else if (v === 'team' || v === 'projects') { render(); await loadForView(); } render(); scrollTo(0, 0); });
+    closeDrawer(); bellOpen = false; dtab = 'delivery'; const v = route().v; if (v === 'item') { detail = null; render(); await load(); await loadForView(); } else if (v === 'team' || v === 'projects') { render(); await loadForView(); } render(); scrollTo(0, 0); });
   document.addEventListener('click', (e) => {
     // 1.4.0 work management: actions, gate review, the card menu.
     const wm = e.target.closest('[data-act],[data-gate],[data-menu],[data-act-cancel]');
