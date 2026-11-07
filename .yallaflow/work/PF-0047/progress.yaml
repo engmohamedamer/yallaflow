@@ -35,16 +35,28 @@
       "summary": "Implementation plan written in work.md (modules, Core integration, Console routes and UI, tests incl. security/crash-recovery/concurrency, browser, docs, independent security review); awaiting the owner's plan review."
     },
     "implementation": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-07T10:01:29.641Z",
+      "completedAt": "2026-11-07T10:01:29.641Z",
+      "summary": "src/runtime/{profile,trust,state,process,probe,suggest,supervisor,local}.js, src/commands/runtime.js (yallaflow runtime …, schema runtime-1), console routes (src/console/runtime.js, server.js, runner.runAside), Setup tab, doctor check, ownership entries, docs/runtime.md and docs updates. An independent security review on an isolated copy found 4 high, 1 medium and low issues (symlink/hard-link log rotation, forgeable run records and trust inside the checkout, console trust TOCTOU, untrusted dependency starts); all were fixed (trust/runs/locks moved to a 0700 user state folder outside the repository, anchored no-link log handling with rotation only at start, process-group ownership check, hash-bound and interactive trust, dependency trust pre-check, control/bidi refusal, FIFO-safe reads) and re-verified by the reviewer; regression tests added."
     },
     "verification": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-07T10:01:30.085Z",
+      "completedAt": "2026-11-07T10:01:30.085Z",
+      "summary": "V-002 npm run check 892/892 pass (15 runtime tests incl. security, crash-recovery, PID-reuse, process-group forgery, symlink/hard-link/FIFO log attacks, concurrency, console guards). Browser regression (research/release-1.4/browser-check.mjs) passes Overview and Setup on Chromium, Firefox and WebKit with no page errors. V-001 failed on the ownership test before runtime.yaml was classified as developer configuration."
     },
     "delivery-convergence": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-07T10:01:48.257Z",
+      "completedAt": "2026-11-07T10:01:48.257Z",
+      "summary": "CV-001: AC-001..AC-009 satisfied with repository, verification:V-002 and browser evidence."
     },
     "code-review": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-07T10:01:59.095Z",
+      "completedAt": "2026-11-07T10:01:59.095Z",
+      "summary": "Independent security review by a separate reviewer on an isolated copy (real repositories read-only): 4 high (log rotation through symlinks; hard-linked log; stop signalling non-owned processes via forged run records; forgeable trust inside the checkout), 1 medium (console trust TOCTOU), lows/info (lock DoS, read-path links, untrusted dependency starts, bidi spoofing, script-content disclosure). All fixed; re-review confirmed #1-#4, #6, #7 fixed and found the console hash binding and a FIFO read hang remaining plus non-interactive CLI trust; those were fixed afterwards (card-rendered hash, O_NONBLOCK reads, TTY-typed CLI trust) with regression tests. Residual, documented: trust binds the definition, not script contents; a process controlling the whole user account is out of scope; a narrow cwd symlink-swap race between check and spawn."
     }
   },
   "rulings": [
@@ -64,5 +76,5 @@
       "changedAt": "2026-11-07T02:36:28.773Z"
     }
   ],
-  "updatedAt": "2026-11-07T02:45:04.352Z"
+  "updatedAt": "2026-11-07T10:01:59.095Z"
 }

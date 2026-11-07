@@ -133,7 +133,7 @@
       : `<b class="projname">${esc(snap?.project?.name ?? projects[0]?.name ?? '')}</b>`;
     const count = snap ? needs().length : 0;
     return `<header class="top"><a class="brand" href="#/map">${logo} YallaFlow</a><div class="projpick">${picker}<a class="tiny muted" href="#/projects">${A('كل المشاريع', 'All projects')}</a></div>
-      <nav class="tabs" aria-label="views">${tab('#/overview', A('المشروع', 'Overview'), r.v === 'overview')}${tab('#/map', A('التدفق', 'Flow'), r.v === 'map')}${tab('#/lines', A('الشغل', 'Work'), r.v === 'lines' || r.v === 'item')}${tab('#/team', A('نسخ الشغل', 'Worktrees'), r.v === 'team')}${tab('#/insights', A('الأرقام', 'Insights'), r.v === 'insights')}</nav>
+      <nav class="tabs" aria-label="views">${tab('#/overview', A('المشروع', 'Overview'), r.v === 'overview')}${tab('#/map', A('التدفق', 'Flow'), r.v === 'map')}${tab('#/lines', A('الشغل', 'Work'), r.v === 'lines' || r.v === 'item')}${tab('#/setup', A('التشغيل', 'Setup'), r.v === 'setup')}${tab('#/team', A('نسخ الشغل', 'Worktrees'), r.v === 'team')}${tab('#/insights', A('الأرقام', 'Insights'), r.v === 'insights')}</nav>
       <span class="grow"></span>${!readOnly && projects.length ? `<button class="btn sm go create" data-create aria-label="${A('شغل جديد', 'Create work')}">＋<span class="lbl"> ${A('شغل جديد', 'Create work')}</span></button>` : ''}<span class="chip ${offline() ? 'fail' : 'active'}"><i></i>${offline() ? A('مفيش اتصال', 'offline') : A('مباشر', 'Live')}</span>
       <button class="ibtn bell" data-bell aria-expanded="${bellOpen}" aria-label="${A('محتاج انتباهك', 'Needs your attention')}">🔔${count ? `<b>${count}</b>` : ''}</button>
       <button class="ibtn" data-lang aria-label="language">${lang === 'ar' ? 'EN' : 'ع'}</button><button class="ibtn" data-theme-toggle aria-label="theme">◐</button>${bellOpen ? notesPanel() : ''}</header>`;
@@ -851,6 +851,93 @@
       ${devPanel(A('أوامر نظرة المشروع', 'Overview commands'), cmds)}`;
   }
 
+  // ---------- setup (1.4.0): reviewed, trusted local development services ----------
+  // Data: GET /api/p/<project>/runtime (yallaflow runtime status --json), logs on demand.
+  // Opening this view never starts anything. Trust requires typing the service id after
+  // reviewing the exact command; Start/Stop/Restart run the reviewed profile, never a
+  // command from the page. Only processes YallaFlow can positively identify are stopped.
+  let runtime = null; // { pid, data | error }
+  let runtimeBusy = {}; // service id -> action
+  let runtimeErr = {}; // service id -> message
+  let runtimeLogs = {}; // service id -> lines
+  let runtimeTimer = null;
+  async function loadRuntime() {
+    const forPid = pid;
+    try { runtime = { pid: forPid, data: await api(`/api/p/${forPid}/runtime`) }; } catch (e) { runtime = { pid: forPid, error: e.message }; }
+  }
+  const RT_STATE = {
+    stopped: { tone: 'todo', t: { ar: 'متوقف', en: 'stopped' } },
+    starting: { tone: 'active', t: { ar: 'بيبدأ', en: 'starting' } },
+    running: { tone: 'done', t: { ar: 'شغّال', en: 'running' } },
+    failed: { tone: 'fail', t: { ar: 'وقع', en: 'failed' } },
+    unknown: { tone: 'wait', t: { ar: 'مش تحت إدارة YallaFlow', en: 'unmanaged' } }
+  };
+  function serviceCard(sv) {
+    const st = RT_STATE[sv.state] ?? RT_STATE.unknown;
+    const busy = runtimeBusy[sv.id];
+    const running = ['running', 'starting'].includes(sv.state);
+    const dis = (cond) => (readOnly || busy || cond ? 'disabled' : '');
+    const trustLine = sv.trust.trusted
+      ? `<span class="chip done"><i></i>${A('موثوق على الجهاز ده', 'trusted on this machine')}</span>`
+      : `<span class="chip wait">${sv.trust.reason === 'changed' ? A('اتغيّر بعد التوثيق — راجعه تاني', 'changed since you trusted it — review again') : sv.trust.reason === 'moved' ? A('الفولدر اتنقل — راجعه تاني', 'folder moved — review again') : A('لسه مش موثوق', 'not trusted yet')}</span>`;
+    const ports = sv.ports.map((p) => `<span class="tag ltr">${p.port}${p.listening ? ' ●' : ''}</span>`).join(' ');
+    const logs = runtimeLogs[sv.id];
+    return `<article class="panel svc" data-service="${esc(sv.id)}" data-definition-hash="${esc(sv.definitionHash)}"><div class="row"><h3 style="font-size:17px">${esc(sv.name)}</h3><span class="tiny muted ltr">${esc(sv.id)}</span><span class="chip ${st.tone}" data-svc-state="${esc(sv.state)}"><i></i>${L(st.t)}</span>${sv.stale ? `<span class="chip wait">${A('شغّال بتعريف أقدم', 'running an older definition')}</span>` : ''}${trustLine}</div>
+      ${sv.reason ? `<p class="small" style="margin-top:6px">${esc(sv.reason)}</p>` : ''}
+      ${sv.unmanagedPorts.length ? `<p class="small" style="margin-top:6px;color:var(--clay)">${A('المنفذ ده مستخدم من برنامج YallaFlow ماشغّلوش، ومش هيتلمس:', 'This port is held by a process YallaFlow did not start; it will not be touched:')} <span class="ltr">${sv.unmanagedPorts.join(', ')}</span></p>` : ''}
+      <dl class="svcdef"><dt>${A('الأمر', 'Command')}</dt><dd class="ltr mono" title="${esc(A('كل عنصر بين علامتين هو وسيط منفصل؛ مفيش shell.', 'Each quoted item is one separate argument; no shell is used.'))}">${esc(JSON.stringify(sv.command))}</dd><dt>${A('الفولدر', 'Folder')}</dt><dd class="ltr mono">${esc(sv.cwd)}</dd><dt>${A('متغيرات البيئة (أسماء بس)', 'Environment (names only)')}</dt><dd class="ltr mono">${sv.env.length ? esc(sv.env.join(', ')) : '—'}</dd><dt>${A('المنافذ', 'Ports')}</dt><dd>${ports || '—'}</dd><dt>${A('جاهز لما', 'Ready when')}</dt><dd class="small">${sv.ready?.port ? A(`المنفذ ${sv.ready.port} يرد`, `port ${sv.ready.port} answers`) : sv.ready?.log ? `${A('السجل فيه', 'the log shows')} <span class="ltr mono">${esc(sv.ready.log)}</span>` : A('بعد ما يبدأ', 'once started')}</dd><dt>${A('الإيقاف', 'Stop')}</dt><dd class="small ltr">${esc(sv.stopSignal)} · ${sv.stopTimeoutSeconds}s</dd>${sv.overridden.length ? `<dt>${A('متعدّل محليًا', 'Overridden locally')}</dt><dd class="ltr">${esc(sv.overridden.join(', '))}</dd>` : ''}</dl>
+      <div class="row" style="margin-top:10px">
+        ${!sv.trust.trusted ? `<label class="small">${A('اكتب اسم الخدمة علشان توثّق الأمر ده:', 'Type the service id to trust this command:')} <input class="ltr" data-trust-input="${esc(sv.id)}" size="12" autocomplete="off" ${readOnly ? 'disabled' : ''}></label><button class="btn sm" data-rt="trust" data-id="${esc(sv.id)}" ${dis(false)}>${A('وثّق', 'Trust')}</button>` : ''}
+        <button class="btn sm go" data-rt="start" data-id="${esc(sv.id)}" ${dis(running || !sv.trust.trusted)}>${busy === 'start' ? A('بيبدأ…', 'Starting…') : A('شغّل', 'Start')}</button>
+        <button class="btn sm" data-rt="restart" data-id="${esc(sv.id)}" ${dis(!running || !sv.trust.trusted)}>${busy === 'restart' ? A('بيعيد…', 'Restarting…') : A('إعادة تشغيل', 'Restart')}</button>
+        <button class="btn sm ghost" data-rt="stop" data-id="${esc(sv.id)}" ${dis(sv.state === 'stopped')}>${busy === 'stop' ? A('بيوقف…', 'Stopping…') : A('وقّف', 'Stop')}</button>
+        <button class="btn sm ghost" data-rt-logs="${esc(sv.id)}">${logs ? A('حدّث السجل', 'Refresh logs') : A('السجل', 'Logs')}</button>
+      </div>
+      ${runtimeErr[sv.id] ? `<p class="small" role="alert" style="margin-top:8px;color:var(--clay);white-space:pre-wrap">${esc(runtimeErr[sv.id])}</p>` : ''}
+      ${logs ? `<pre class="svclog ltr" tabindex="0" aria-label="${A('سجل الخدمة', 'Service log')}">${logs.length ? logs.map(esc).join('\n') : esc(A('لسه مفيش مخرجات.', 'No output yet.'))}</pre><p class="tiny muted">${A('الأسرار المعروفة بتتخفي من السجل، لكن ده أفضل مجهود ومش مضمون مع أي برنامج.', 'Recognizable secrets are hidden from the log, but this is best effort and cannot be guaranteed for every program.')}</p>` : ''}
+      ${!sv.trust.trusted ? `<p class="tiny muted" style="margin-top:8px">${A('التوثيق بيغطي الأمر ده بالظبط، مش اللي جوه السكريبتات اللي بيشغّلها (زي package scripts). راجعها هي كمان.', 'Trust covers this exact definition, not what the scripts it runs do (for example package scripts). Review those too.')}</p>` : ''}</article>`;
+  }
+  function viewSetup() {
+    if (!runtime || runtime.pid !== pid) return `<p class="muted" style="margin-top:30px">${A('بيقرا خدمات التشغيل…', 'Reading runtime services…')}</p>`;
+    if (runtime.error) return `<section class="errbar data" role="alert"><b>${A('مقدرناش نقرا خدمات التشغيل', 'Runtime services could not be read')}</b><p class="small">${esc(runtime.error)}</p></section>`;
+    const r = runtime.data;
+    const head = `<section class="pagehead"><h1 style="font-size:26px">${A('تشغيل بيئة التطوير', 'Development runtime')}</h1><p class="muted">${A('خدمات محددة ومراجَعة في .yallaflow/runtime.yaml. مفيش حاجة بتشتغل لوحدها: بتوثّق الأمر مرة، وتشغّل وتوقف بنفسك. YallaFlow بيوقف بس البرامج اللي هو شغّلها وقادر يتعرّف عليها.', 'Reviewed services from .yallaflow/runtime.yaml. Nothing runs on its own: you trust a command once, then start and stop it yourself. YallaFlow stops only processes it started and can positively identify.')}</p></section>`;
+    if (!r.supported) return head + `<section class="panel"><p>${A('مدير التشغيل مدعوم على Linux وmacOS بس.', 'The runtime manager supports Linux and macOS only.')}</p></section>`;
+    const profileErr = r.profile.error ? `<section class="errbar data" role="alert"><b>${A('ملف التشغيل فيه مشكلة', 'The runtime profile is invalid')}</b><p class="small">${esc(r.profile.error)}</p></section>` : '';
+    const services = r.services.length ? `<section class="svcs">${r.services.map(serviceCard).join('')}</section>` : `<section class="panel"><p class="small muted">${A('لسه مفيش خدمات معرّفة.', 'No services are defined yet.')}</p></section>`;
+    const sugg = r.suggestions.length ? `<section class="panel" style="margin-top:16px"><h2 style="font-size:17px">${A('اقتراحات من ملفات المشروع', 'Suggestions from repository files')}</h2><p class="tiny muted">${A('الاقتراحات مابتشتغلش. ضيفها من سطر الأوامر، راجعها، ووثّقها.', 'Suggestions never run. Add one from the command line, review it, then trust it.')}</p><ul class="modules">${r.suggestions.map((x) => `<li><b>${esc(x.name)}</b> <span class="ltr mono small">${esc(x.command.join(' '))}</span> <span class="tiny muted">${A('من', 'from')} <span class="ltr">${esc(x.evidence.join(', '))}</span></span>${x.note ? `<p class="tiny muted">${esc(x.note)}</p>` : ''}<div class="cli" dir="ltr">yallaflow runtime add --from-suggestion ${esc(x.id)}</div></li>`).join('')}</ul></section>` : '';
+    return head + profileErr + services + sugg + devPanel(A('أوامر التشغيل', 'Runtime commands'), ['yallaflow runtime status', 'yallaflow runtime suggest', 'yallaflow runtime add <id> --cwd DIR --port N -- <executable> [args...]', 'yallaflow runtime trust <id>', 'yallaflow runtime start|stop|restart <id>', 'yallaflow runtime logs <id>', 'yallaflow runtime stop --all']);
+  }
+  async function runtimeAction(action, id) {
+    if (readOnly || runtimeBusy[id]) return;
+    let body = {};
+    if (action === 'trust') {
+      // Trust is bound to the exact definition shown on this card; a changed profile is refused.
+      // The hash of the definition rendered on the card the user reviewed, not of newer data.
+      const card = document.querySelector(`[data-service="${CSS.escape(id)}"]`);
+      body = { confirm: card?.querySelector('[data-trust-input]')?.value.trim() ?? '', definitionHash: card?.dataset.definitionHash ?? '' };
+    }
+    runtimeBusy[id] = action; runtimeErr[id] = null; render();
+    try {
+      await post(`/api/p/${pid}/runtime/${encodeURIComponent(id)}/${action}`, JSON.stringify(body), { 'Content-Type': 'application/json' });
+    } catch (e) {
+      runtimeErr[id] = e.message;
+    }
+    runtimeBusy[id] = null;
+    await loadRuntime();
+    if (runtimeLogs[id]) await loadServiceLogs(id);
+    render();
+  }
+  async function loadServiceLogs(id) {
+    try { runtimeLogs[id] = (await api(`/api/p/${pid}/runtime/${encodeURIComponent(id)}/logs?lines=200`)).lines; } catch (e) { runtimeErr[id] = e.message; }
+  }
+  // While Setup is open, state is re-read every few seconds (a service can crash at any time).
+  function syncRuntimePolling() {
+    const want = route().v === 'setup';
+    if (want && !runtimeTimer) runtimeTimer = setInterval(async () => { if (Object.values(runtimeBusy).some(Boolean)) return; await loadRuntime(); if (route().v === 'setup' && !document.activeElement?.matches?.('[data-trust-input]')) render(); }, 3000);
+    if (!want && runtimeTimer) { clearInterval(runtimeTimer); runtimeTimer = null; }
+  }
+
   // ---------- projects ----------
   let overview = null; // [{ project, snap | error }]
   async function loadOverview() {
@@ -1067,7 +1154,7 @@
     const hadQ = document.activeElement?.matches?.('[data-q]');
     const hadAgent = document.activeElement?.matches?.('[data-agent-input]');
     document.title = (snap?.counts?.you ? `(${snap.counts.you}) ` : '') + 'YallaFlow' + (snap?.project?.name ? ` · ${snap.project.name}` : '');
-    const views = { overview: viewOverview, item: () => viewItem(r.id), lines: viewLines, team: viewTeam, insights: viewInsights, projects: viewProjects, map: viewMap };
+    const views = { setup: viewSetup, overview: viewOverview, item: () => viewItem(r.id), lines: viewLines, team: viewTeam, insights: viewInsights, projects: viewProjects, map: viewMap };
     const body = !snap ? `<p class="muted" style="margin-top:40px;text-align:center">${error ? '' : A('بيحمّل…', 'Loading…')}</p>` : (views[r.v] ?? viewMap)();
     document.getElementById('app').innerHTML = topbar(r) + `<main>${banner()}${snap && ['map', 'lines'].includes(r.v) ? understandingStrip() : ''}${body}</main>`;
     requestAnimationFrame(placeConnectors);
@@ -1139,6 +1226,8 @@
     if (v === 'team') await loadTeam();
     else if (v === 'projects') await loadOverview();
     else if (v === 'overview' || ((v === 'map' || v === 'lines') && projectOverview?.pid !== pid)) await loadProjectOverview();
+    else if (v === 'setup') await loadRuntime();
+    syncRuntimePolling();
   }
 
   function diff(prev, next) {
@@ -1226,8 +1315,12 @@
       render(); await load(); await buildDigest(); render(); listen();
       return;
     }
-    closeDrawer(); bellOpen = false; dtab = 'delivery'; const v = route().v; if (v === 'item') { detail = null; render(); await load(); await loadForView(); } else if (['team', 'projects', 'overview', 'map', 'lines'].includes(v)) { render(); await loadForView(); } render(); scrollTo(0, 0); });
+    closeDrawer(); bellOpen = false; dtab = 'delivery'; const v = route().v; if (v === 'item') { detail = null; render(); await load(); await loadForView(); } else if (['team', 'projects', 'overview', 'map', 'lines', 'setup'].includes(v)) { render(); await loadForView(); } else syncRuntimePolling(); render(); scrollTo(0, 0); });
   document.addEventListener('click', (e) => {
+    const rt = e.target.closest('[data-rt]');
+    if (rt) { runtimeAction(rt.dataset.rt, rt.dataset.id); return; }
+    const rtl = e.target.closest('[data-rt-logs]');
+    if (rtl) { loadServiceLogs(rtl.dataset.rtLogs).then(render); return; }
     // 1.4.0 work management: actions, gate review, the card menu.
     const wm = e.target.closest('[data-act],[data-gate],[data-menu],[data-act-cancel]');
     if (wm) {

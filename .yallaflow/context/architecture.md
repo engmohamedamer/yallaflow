@@ -594,4 +594,19 @@ print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_commo
   - src/overview/collect.js (repository @ 06ecea9)
   - src/inventory/stack.js (repository @ 06ecea9)
 
+<!-- yallaflow-fact:CTX-0111 -->
+### CTX-0111 — Development runtime (1.4.0, src/runtime/): reviewed services in .yallaflow/runtime.yaml (developer configuration, owner human) with git-ignored overrides in .yallaflow/local/runtime.yaml. Command trust, run records and per-service locks are kept OUTSIDE the repository in $XDG_CONFIG_HOME/yallaflow/runtime/<sha256(realpath)[:32]>/ (0700, owner-checked) so a process that can only write the checkout cannot plant trust or make stop signal another process. Services run detached (argv only, base env + named variables, own process group); ownership = pid + start time + leading its own group; logs stay in .yallaflow/local/runtime/logs via anchored no-link handles. src/runtime/probe.js is the only network code (127.0.0.1 only).
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0047
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-07T10:01:59.488Z
+- **Verified:** 2026-11-07T10:01:59.488Z (commit 24c8adc)
+- **Evidence:**
+  - src/runtime/state.js (repository @ 24c8adc)
+  - src/runtime/supervisor.js (repository @ 24c8adc)
+  - docs/runtime.md (repository @ 24c8adc)
+
 <!-- yallaflow-context:end -->

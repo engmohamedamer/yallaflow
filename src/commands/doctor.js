@@ -17,6 +17,7 @@ import { describeBootstrapState, inspectAllBootstraps } from '../agent/bootstrap
 import { checkDeliveryIntegrity } from '../delivery/integrity.js';
 import { checkQualityIntegrity } from '../quality/integrity.js';
 import { checkWorkRecordOwnership } from '../core/ownership.js';
+import { loadRuntimeProfiles } from '../runtime/profile.js';
 
 import { clearStaleLock, readLock } from '../utils/lock.js';
 import { diagnoseCollisions } from '../core/collisions.js';
@@ -132,6 +133,14 @@ export async function collectDoctorReport(root, { verifyMedia = false } = {}) {
     checks.push([`sources (${sources.length} present)`, true]);
   } catch (error) {
     checks.push([`sources: ${error instanceof Error ? error.message : String(error)}`, false]);
+  }
+
+  // 1.4.0: the runtime profile, only when one exists (validation never runs anything).
+  try {
+    const profiles = await loadRuntimeProfiles(root);
+    if (profiles.exists) checks.push([`runtime profile (${profiles.services.length} service(s))`, true]);
+  } catch (error) {
+    checks.push([`runtime profile: ${error instanceof Error ? error.message : String(error)}`, false]);
   }
 
   try {

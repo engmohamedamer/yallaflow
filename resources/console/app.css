@@ -568,3 +568,16 @@ table.stack th { font-size: 12px; color: var(--muted); font-weight: 600; }
 :root[data-theme="dark"] .tag.basis-inferred { color: var(--amber); }
 .fresh-may-be-stale, .fresh-stale-evidence { color: var(--amber); }
 .understanding q { font-style: normal; }
+
+/* 1.4.0 Setup: runtime services */
+.svcs { display: grid; gap: 16px; }
+.svc h3 { margin: 0; }
+.svcdef { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 10px 0 0; font-size: 14px; }
+.svcdef dt { color: var(--muted); }
+.svcdef dd { margin: 0; overflow-wrap: anywhere; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+.svclog { margin-top: 10px; max-height: 320px; overflow: auto; background: var(--bg-2); border-radius: 10px; padding: 10px 12px; font-size: 12.5px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
+.svc input { font: inherit; padding: 4px 8px; border-radius: 8px; border: 1px solid rgba(127,127,127,.35); background: var(--bg); color: var(--ink); }
+@media (max-width: 560px) { .svcdef { grid-template-columns: 1fr; } .svcdef dt { margin-top: 6px; } }
+.svc .btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+[dir="rtl"] .svcdef dd { text-align: right; }

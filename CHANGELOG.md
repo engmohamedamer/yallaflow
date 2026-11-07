@@ -31,6 +31,11 @@ Nothing yet.
   - **Recorded with provenance `console, identity not verified`** by the unchanged `approve`/`feedback` commands. CLI decisions are recorded as before.
   - **Protected:** stale and duplicate submissions record nothing.
   - **Exposure:** the work read contract exposes gates and their provenance additively.
+- **Development runtime manager** (`yallaflow runtime …` and the console's **Setup** tab). See [`docs/runtime.md`](docs/runtime.md).
+  - **Profiles.** Reviewed services in `.yallaflow/runtime.yaml`, with personal overrides in the git-ignored `.yallaflow/local/runtime.yaml`. Suggestions come from Laravel, Node.js and Docker Compose evidence and never run.
+  - **Trust.** Personal and git-ignored, bound to the effective command, folder, environment names, ports and checkout, and renewed after any change.
+  - **Operations.** Start, Stop, Restart, Status and Logs. States are stopped, starting, running, failed and unknown/unmanaged, recomputed from the live process.
+  - **Safety.** Argv only, a minimal environment plus named variables, refusal when a port is held by someone else, stop only by matching pid and start time (never by port or name), a per-service lock, and services that survive console restarts. The only network code is a `127.0.0.1` port probe.
 - **Project Overview** (`yallaflow overview [--json]`, schema `yallaflow.overview/1`, and the console's **Overview** tab). It is read-only.
   - **Stack from repository evidence.** Frameworks, runtimes and package managers declared in manifests, plus lockfiles and Docker Compose/Dockerfile images and source-file languages. Each entry carries its file, a locator and a basis: `declared` (a file says so, not proof of use), `detected` (a file is present) or `inferred` (counted). `.env` files and compose `environment` values are never read. Modules are grouped by manifest folder, and multiple Node.js lockfiles are flagged.
   - **Understanding from project memory.** Purpose, architecture, stack, data and integration facts with their confidence and mechanical freshness, memory counts, and inventory coverage, including when the scan was truncated.

@@ -4,6 +4,8 @@
 // research/release-1.4/screenshots/<engine>-<name>.png.
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 import { createRequire } from 'node:module';
@@ -32,6 +34,11 @@ async function laravel() {
   writeFileSync(path.join(dir, 'docker-compose.yml'), 'services:\n  db:\n    image: mysql:8.0\n  cache:\n    image: redis:7\n');
   mkdirSync(path.join(dir, 'app'));
   for (const name of ['User.php', 'Order.php']) writeFileSync(path.join(dir, 'app', name), '<?php\n');
+  // A reviewed runtime service (Node on a free loopback port) for the Setup checks.
+  mkdirSync(path.join(dir, 'web'));
+  writeFileSync(path.join(dir, 'web', 'server.js'), "const http=require('http');console.log('booting token=ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');http.createServer((q,r)=>r.end('ok')).listen(Number(process.argv[2]),'127.0.0.1',()=>console.log('listening'));");
+  const port = await new Promise((resolve) => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => resolve(p)); }); });
+  execFileSync(process.execPath, [path.join(root, 'src/cli.js'), 'runtime', 'add', 'web', '--name', 'Web app', '--cwd', 'web', '--port', String(port), '--ready-port', String(port), '--', 'node', 'server.js', String(port)], { cwd: dir, env: process.env });
   return dir;
 }
 
@@ -75,6 +82,46 @@ const checks = {
     assert.ok(overflow <= 1, `no horizontal page scroll on mobile (overflow ${overflow}px)`);
     await page.screenshot({ path: path.join(output, `${engine}-overview-mobile.png`), fullPage: true });
   }
+};
+
+checks.setup = async (page, server) => {
+  await page.goto(`${server.url}#token=${server.token}`);
+  await setLang(page, 'en');
+  await setTheme(page, 'light');
+  await page.locator('nav.tabs a[href="#/setup"]').click();
+  const card = page.locator('[data-service="web"]');
+  await card.waitFor();
+  assert.equal(await card.locator('[data-svc-state]').getAttribute('data-svc-state'), 'stopped', 'opening Setup starts nothing');
+  assert.ok(await card.locator('[data-rt="start"]').isDisabled(), 'start is disabled until trusted');
+  await page.screenshot({ path: path.join(output, `${engine}-setup-untrusted.png`), fullPage: true });
+  await card.locator('[data-trust-input="web"]').fill('wrong');
+  await card.locator('[data-rt="trust"]').click();
+  await card.locator('[role="alert"]').waitFor();
+  await card.locator('[data-trust-input="web"]').fill('web');
+  await card.locator('[data-rt="trust"]').click();
+  await page.locator('[data-service="web"] [data-rt="start"]:not([disabled])').waitFor();
+  await page.locator('[data-service="web"] [data-rt="start"]').click();
+  await page.locator('[data-service="web"] [data-svc-state="running"]').waitFor({ timeout: 30000 });
+  await page.locator('[data-service="web"] [data-rt-logs="web"]').click();
+  await page.locator('[data-service="web"] .svclog').waitFor();
+  const log = await page.locator('[data-service="web"] .svclog').innerText();
+  assert.match(log, /listening/);
+  assert.doesNotMatch(log, /ghp_ABCDEFGHIJ/, 'the log view is redacted');
+  await page.screenshot({ path: path.join(output, `${engine}-setup-running-en.png`), fullPage: true });
+  await setLang(page, 'ar');
+  await setTheme(page, 'dark');
+  await page.locator('[data-service="web"]').waitFor();
+  await page.screenshot({ path: path.join(output, `${engine}-setup-running-ar-dark.png`), fullPage: true });
+  await setLang(page, 'en');
+  await setTheme(page, 'light');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator('[data-service="web"]').waitFor();
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  assert.ok(overflow <= 1, `no horizontal page scroll on mobile (overflow ${overflow}px)`);
+  await page.screenshot({ path: path.join(output, `${engine}-setup-mobile.png`), fullPage: true });
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.locator('[data-service="web"] [data-rt="stop"]').click();
+  await page.locator('[data-service="web"] [data-svc-state="stopped"]').waitFor({ timeout: 30000 });
 };
 
 const browser = await playwright[engine].launch({ headless: true });

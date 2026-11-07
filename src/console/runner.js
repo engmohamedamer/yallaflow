@@ -91,6 +91,16 @@ export function createRunner({ cli = CLI } = {}) {
       }
       return cache.get(key);
     },
+    // 1.4.0 runtime actions: run outside the project's write queue (a start may wait a
+    // minute for readiness and must not block Create Work); the runtime CLI serializes
+    // per service itself. Cached reads are dropped afterwards.
+    async runAside(root, args, { env = null } = {}) {
+      try {
+        return await executeRaw(root, args, WRITE_TIMEOUT_MS, env);
+      } finally {
+        caches.get(root)?.clear();
+      }
+    },
     // Uncached read (1.4.0 overview): it reads repository files the watcher does not follow.
     readFresh(root, args) {
       return run(root, args);

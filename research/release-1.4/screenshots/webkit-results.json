@@ -4,6 +4,10 @@
     {
       "name": "overview",
       "ok": true
+    },
+    {
+      "name": "setup",
+      "ok": true
     }
   ],
   "pageErrors": []

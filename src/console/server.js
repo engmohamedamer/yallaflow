@@ -23,6 +23,7 @@ import { exists } from '../utils/fs.js';
 import { loadSource, loadSourceText, sourceOriginalPath } from '../core/sources.js';
 import { isSourceId, isWorkId } from '../core/ids.js';
 import { HttpError, MAX_JSON_BYTES, attachFile, createWork, validateCreateBody } from './create.js';
+import { isServiceId, runRuntimeAction } from './runtime.js';
 import { AgentBridge } from '../agents/bridge.js';
 import { loadClaude } from '../agents/experimental.js';
 
@@ -39,7 +40,7 @@ const UI_FILES = Object.freeze({
 
 // The only routes that accept POST: create a work item, and attach a file to it.
 // 1.4.0: work-item actions and review-gate decisions (PF-0043) join Create Work.
-const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/work(?:\/[^/]+\/(?:sources|actions\/[a-z]+|gates\/[a-z]+\/decision))?$/;
+const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|actions\/[a-z]+|gates\/[a-z]+\/decision))?|runtime\/[a-z][a-z0-9-]{0,31}\/(?:trust|start|stop|restart))$/;
 // Agent Interaction (v1.3.0, only with --agents): the Agent Workspace's actions.
 const AGENT_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/agent\/(start|message|permission|cancel|end|resume|connect|disconnect|activate)$/;
 // The Claude channel server and hook forwarder (bridge token, never a browser).
@@ -96,7 +97,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     try {
       await handle(request, response);
     } catch (error) {
-      send(response, error.status ?? (error.code === 'WORK_NOT_FOUND' ? 404 : 500), { error: { code: error.code ?? 'ERROR', message: error.message, ...(error.command ? { command: error.command } : {}) }, ...(error.extra ?? {}) });
+      send(response, error.status ?? (['WORK_NOT_FOUND', 'RUNTIME_UNKNOWN_SERVICE'].includes(error.code) ? 404 : 500), { error: { code: error.code ?? 'ERROR', message: error.message, ...(error.command ? { command: error.command } : {}) }, ...(error.extra ?? {}) });
     }
   });
 
@@ -115,7 +116,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     }
     if (request.method === 'POST') {
       // Writes: only the Create Work routes, only with the token, our own Origin and the exact type.
-      if (readOnly || !WRITE_ROUTE.test(url.pathname)) return send(response, 405, { error: { code: 'READ_ONLY', message: readOnly ? 'This console was started with --read-only.' : 'Only Create Work, work-item actions and gate decisions accept POST.' } }, { Allow: 'GET, HEAD' });
+      if (readOnly || !WRITE_ROUTE.test(url.pathname)) return send(response, 405, { error: { code: 'READ_ONLY', message: readOnly ? 'This console was started with --read-only.' : 'Only Create Work, work-item actions, gate decisions and runtime actions accept POST.' } }, { Allow: 'GET, HEAD' });
       if (!authorized(request)) return send(response, 401, { error: { code: 'UNAUTHORIZED', message: 'Missing or wrong console token. Open the link printed by `yallaflow console`.' } });
       if (!origin) return send(response, 403, { error: { code: 'FORBIDDEN_ORIGIN', message: 'A write needs the console page as its Origin.' } });
       return handleWrite(request, response, url);
@@ -138,6 +139,14 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     const rest = parts.slice(3);
     if (rest.length === 1 && rest[0] === 'snapshot') {
       return send(response, 200, await runner.get(project.root, 'snapshot', ['snapshot', '--json']));
+    }
+    // 1.4.0 runtime: services, their live state and suggestions; logs on demand. Never starts anything.
+    if (rest.length === 1 && rest[0] === 'runtime') {
+      return send(response, 200, await runner.readFresh(project.root, ['runtime', 'status', '--json']));
+    }
+    if (rest.length === 3 && rest[0] === 'runtime' && isServiceId(rest[1]) && rest[2] === 'logs') {
+      const lines = Math.max(1, Math.min(1000, Number.parseInt(url.searchParams.get('lines') ?? '200', 10) || 200));
+      return send(response, 200, await runner.readFresh(project.root, ['runtime', 'logs', rest[1], '--lines', String(lines), '--json']));
     }
     // 1.4.0: the project itself — memory, evidence-based stack, onboarding status. Read-only.
     if (rest.length === 1 && rest[0] === 'overview') {
@@ -185,6 +194,11 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     if (rest.length === 5 && rest[0] === 'work' && isWorkId(rest[1]) && rest[2] === 'gates' && rest[4] === 'decision') {
       if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
       return send(response, 200, await decideGate(project.root, rest[1], rest[3], await readJsonBody(request), runner));
+    }
+    // 1.4.0 runtime: POST /api/p/<project>/runtime/<service>/(trust|start|stop|restart)
+    if (rest.length === 3 && rest[0] === 'runtime' && isServiceId(rest[1])) {
+      if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+      return send(response, 200, await runRuntimeAction(project.root, rest[1], rest[2], await readJsonBody(request), runner));
     }
     if (rest.length === 3 && rest[0] === 'work' && isWorkId(rest[1]) && rest[2] === 'sources') {
       if (type !== 'application/octet-stream') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send the file as application/octet-stream.' } });

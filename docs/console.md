@@ -37,6 +37,10 @@ yallaflow console list
 - **What it holds.** Folder paths only. Each project's state stays in its own `.yallaflow/`.
 - **Missing folders.** A saved project whose folder is gone is listed as unavailable, never dropped silently.
 
+## Setup: development runtime (1.4.0)
+
+The **Setup** tab starts, stops and restarts your project's reviewed local development services and shows their logs. A service runs only after you trust its exact command by typing its id, nothing starts when you open the console, and only processes YallaFlow started and can still identify are ever stopped. See [`runtime.md`](runtime.md).
+
 ## Project Overview (1.4.0)
 
 The **Overview** tab shows the project itself, read-only:

@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "yallaflow.runtime/1",
+  "title": "YallaFlow runtime status (yallaflow runtime status --json)",
+  "description": "Reviewed local development services and their live state. State is recomputed from the live process on every read: stopped, starting, running, failed, or unknown (unmanaged: ownership cannot be established, never signalled). Fields are only added within schema version 1.",
+  "type": "object",
+  "required": ["schema", "generatedAt", "yallaflowVersion", "supported", "profile", "services", "suggestions"],
+  "properties": {
+    "schema": { "const": "yallaflow.runtime/1" },
+    "generatedAt": { "type": "string" },
+    "yallaflowVersion": { "type": "string" },
+    "supported": { "type": "boolean" },
+    "profile": { "type": "object", "required": ["exists"], "properties": { "exists": { "type": "boolean" }, "error": { "type": ["string", "null"] } } },
+    "services": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "kind", "source", "overridden", "command", "cwd", "env", "ports", "trust", "state", "pid", "unmanagedPorts"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "kind": { "enum": ["process", "docker-compose"] },
+          "source": { "enum": ["shared", "local"] },
+          "overridden": { "type": "array", "items": { "type": "string" } },
+          "command": { "type": "array", "items": { "type": "string" } },
+          "cwd": { "type": "string" },
+          "env": { "type": "array", "items": { "type": "string" } },
+          "ports": { "type": "array", "items": { "type": "object", "required": ["port", "listening"], "properties": { "port": { "type": "integer" }, "listening": { "type": "boolean" } } } },
+          "trust": { "type": "object", "required": ["trusted"], "properties": { "trusted": { "type": "boolean" }, "reason": { "enum": ["never", "changed", "moved"] }, "trustedAt": { "type": "string" } } },
+          "state": { "enum": ["stopped", "starting", "running", "failed", "unknown"] },
+          "reason": { "type": "string" },
+          "stale": { "type": "boolean" },
+          "pid": { "type": ["integer", "null"] },
+          "startedAt": { "type": ["string", "null"] },
+          "startedBy": { "type": ["string", "null"] },
+          "unmanagedPorts": { "type": "array", "items": { "type": "integer" } }
+        }
+      }
+    },
+    "suggestions": {
+      "type": "array",
+      "items": { "type": "object", "required": ["id", "name", "kind", "command", "cwd", "evidence"], "properties": { "id": { "type": "string" }, "command": { "type": "array", "items": { "type": "string" } }, "evidence": { "type": "array", "items": { "type": "string" } } } }
+    }
+  }
+}

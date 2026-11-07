@@ -719,7 +719,13 @@ test('51/no-network: YallaFlow source never invokes mutating or network Git subc
         // v1.3.0 Agent Workspace (src/agents/, commands/agents.js): local agent processes only. It may
         // name providers (for example the OPENAI_API_KEY it strips) but still makes no network call.
         const agentsLayer = path.relative(srcDir, full).startsWith(`agents${path.sep}`) || path.relative(srcDir, full) === path.join('commands', 'agents.js');
-        const network = agentsLayer
+        // 1.4.0 runtime (owner decision): src/runtime/probe.js is the only file allowed a
+        // TCP connect, to 127.0.0.1 only; it is checked separately below.
+        const runtimeProbe = path.relative(srcDir, full) === path.join('runtime', 'probe.js');
+        if (!runtimeProbe && /node:net['"]/.test(text) && path.relative(srcDir, full).startsWith(`runtime${path.sep}`)) offenders.push(`${entry.name}: runtime network access outside probe.js`);
+        const network = runtimeProbe
+          ? /\bfetch\(|https?:\/\/|node:https?['"]|http\.request|http\.get\(|anthropic|openai/i
+          : agentsLayer
           ? /\bfetch\(|https?:\/\/|node:https?['"]|node:net['"]|http\.request|http\.get\(/i
           : consoleLayer
           ? /\bfetch\(|https:\/\/|http:\/\/(?!127\.0\.0\.1|\$\{)|node:https['"]|node:net['"]|http\.request|http\.get\(|anthropic|openai/i
@@ -735,6 +741,12 @@ test('51/no-network: YallaFlow source never invokes mutating or network Git subc
   const consoleServer = await readFile(path.join(srcDir, 'console', 'server.js'), 'utf8');
   assert.match(consoleServer, /host = '127\.0\.0\.1'/, 'the console binds to loopback by default');
   assert.doesNotMatch(consoleServer, /0\.0\.0\.0|'::'/, 'the console never binds to all interfaces');
+  // The runtime probe connects to the loopback address only, and to nothing else.
+  const probe = await readFile(path.join(srcDir, 'runtime', 'probe.js'), 'utf8');
+  assert.match(probe, /const LOOPBACK = '127\.0\.0\.1';/);
+  assert.match(probe, /net\.connect\(\{ host: LOOPBACK, port \}\)/, 'the only connect targets LOOPBACK');
+  assert.equal((probe.match(/net\.connect|createConnection|\.connect\(/g) ?? []).length, 1, 'exactly one connect call');
+  assert.doesNotMatch(probe, /localhost|0\.0\.0\.0|::1|\d+\.\d+\.\d+\.\d+(?<!127\.0\.0\.1)/, 'no other host literal');
   // The provider layer is loaded lazily, only by the ticket import command.
   const intakeCommand = await readFile(path.join(srcDir, 'commands', 'intake.js'), 'utf8');
   assert.doesNotMatch(intakeCommand, /^import [^\n]*intake\/providers\//m, 'providers are never imported at module load');

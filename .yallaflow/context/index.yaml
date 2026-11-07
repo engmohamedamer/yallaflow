@@ -11810,7 +11810,56 @@
       ],
       "createdAt": "2026-11-07T09:28:25.350Z",
       "updatedAt": "2026-11-07T09:28:25.350Z"
+    },
+    {
+      "id": "CTX-0111",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Development runtime (1.4.0, src/runtime/): reviewed services in .yallaflow/runtime.yaml (developer configuration, owner human) with git-ignored overrides in .yallaflow/local/runtime.yaml. Command trust, run records and per-service locks are kept OUTSIDE the repository in $XDG_CONFIG_HOME/yallaflow/runtime/<sha256(realpath)[:32]>/ (0700, owner-checked) so a process that can only write the checkout cannot plant trust or make stop signal another process. Services run detached (argv only, base env + named variables, own process group); ownership = pid + start time + leading its own group; logs stay in .yallaflow/local/runtime/logs via anchored no-link handles. src/runtime/probe.js is the only network code (127.0.0.1 only).",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0047",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/runtime/state.js",
+          "contentHash": "sha256:72e94ce5b560b91eab6715843c32ae923d030b2a29decf1468d36ec73703c036",
+          "gitCommit": "24c8adc6ca6a28c9fcf8096893c825c60cf32087",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/runtime/supervisor.js",
+          "contentHash": "sha256:cc1cffb1a61bcd20d9b8ebf2f5c524ee75345a49001fa36443f7c377fcdc1387",
+          "gitCommit": "24c8adc6ca6a28c9fcf8096893c825c60cf32087",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "docs/runtime.md",
+          "contentHash": "sha256:f28388c249e9b65290d7a73775de77dd81afa7d42af896d6b7932f285ea88c97",
+          "gitCommit": "24c8adc6ca6a28c9fcf8096893c825c60cf32087",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-07T10:01:59.488Z",
+      "verifiedAtCommit": "24c8adc6ca6a28c9fcf8096893c825c60cf32087",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-07T10:01:59.488Z",
+          "workId": "PF-0047",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-07T10:01:59.488Z",
+      "updatedAt": "2026-11-07T10:01:59.488Z"
     }
   ],
-  "updatedAt": "2026-11-07T09:28:25.350Z"
+  "updatedAt": "2026-11-07T10:01:59.488Z"
 }
