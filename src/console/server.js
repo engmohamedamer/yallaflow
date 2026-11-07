@@ -139,6 +139,10 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     if (rest.length === 1 && rest[0] === 'snapshot') {
       return send(response, 200, await runner.get(project.root, 'snapshot', ['snapshot', '--json']));
     }
+    // 1.4.0: the project itself — memory, evidence-based stack, onboarding status. Read-only.
+    if (rest.length === 1 && rest[0] === 'overview') {
+      return send(response, 200, await runner.readFresh(project.root, ['overview', '--json']));
+    }
     if (rest.length === 2 && rest[0] === 'work' && isWorkId(rest[1])) {
       return send(response, 200, await runner.get(project.root, `work:${rest[1]}`, ['work', 'show', rest[1], '--json']));
     }

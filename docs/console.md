@@ -37,6 +37,18 @@ yallaflow console list
 - **What it holds.** Folder paths only. Each project's state stays in its own `.yallaflow/`.
 - **Missing folders.** A saved project whose folder is gone is listed as unavailable, never dropped silently.
 
+## Project Overview (1.4.0)
+
+The **Overview** tab shows the project itself, read-only:
+
+- **Project understanding.** Whether it is needed (an existing codebase without approved understanding), in progress, awaiting your review, established, or, for a new project, growing from your intent. It names the request to give your agent. Flow and Work show the same card until understanding is established. Viewing it never starts discovery, writes a draft or approves anything: approval stays your explicit decision through your agent or `yallaflow baseline approve`.
+- **Purpose, architecture, stack, data and integrations** from approved project memory. Each fact shows its ID, confidence and freshness. "May be stale" means an evidence file changed, not that the fact is wrong.
+- **Stack from repository evidence.** Frameworks, runtimes, package managers, lockfiles, Docker images and source languages. Each row shows the file it came from and its basis: *declared* (a file says so, which is not proof the code uses it), *detected* (a file is present) or *inferred* (counted, not read). `.env` files and compose `environment` values are never read.
+- **Modules** by manifest folder. Several Node.js lockfiles in one module are flagged as a conflict.
+- **Coverage.** How much of the repository the scan read, including whether it stopped at its limit, and which files could not be read.
+
+The same data is available as `yallaflow overview --json`.
+
 ## What you see
 
 ### The flow
@@ -227,9 +239,10 @@ Still, the safest way to run several agents is one worktree per agent and one wo
 
 ## For scripts: the read contract
 
-The console uses two machine-readable commands you can use too:
+The console uses three machine-readable commands you can use too:
 
 - `yallaflow snapshot --json` returns every work item with its stations, steps, state, completion, blocker, and next action. Schema: `yallaflow.snapshot/1`.
+- `yallaflow overview --json` returns the project itself: understanding state, memory facts with freshness, the evidence-based stack, modules and coverage. Schema: `yallaflow.overview/1`.
 - `yallaflow work show <id> --json` returns one item's request, sources, checkpoints, history, questions, requirements, criteria with convergence, verification runs, knowledge review, and children. Schema: `yallaflow.work/1`.
 
 Both print exactly one JSON document. A failure is `{"error":{"code","message"}}` with exit code 1. The JSON Schemas ship in `resources/schemas/`. Within a schema version, fields are only ever added.

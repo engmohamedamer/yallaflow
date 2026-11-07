@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0034",
+  "sourceType": "file",
+  "sourceName": "owner-1.4-complete-scope.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-11-07T02:12:58.652Z",
+  "original": {
+    "path": "sources/SRC-0034/owner-1.4-complete-scope.md",
+    "sha256": "debcce1133422953787c891c73ea18a29c01c21901174a5192bfe49cc3c29835",
+    "sizeBytes": 3656
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0046"
+  ],
+  "rawText": "# Owner instructions (2026-11-07, later the same day): complete YallaFlow 1.4.0\n\nWorkspace: all 1.4.0 development in /home/engamer/Amasi/YallaFlow-1.4 on feature/workspace-1.4. Do not continue 1.4 implementation in the main checkout. Preserve the uncommitted main changes until useful, non-duplicate work is safely extracted.\n\nMain integration: no full merge or cherry-pick that mixes conflicting .yallaflow/work records. Bring the missing v1.3.0 product-code and test fixes into 1.4 through a narrowly scoped, auditable integration. Prepare a separate reconciliation plan for PF-0041, PF-0042 and PF-0043 that preserves both histories, decisions, evidence, timestamps and provenance. Do not manually rewrite historical evidence or silently renumber IDs. If no supported safe reconciliation procedure exists, document the blocker and propose a verified repair mechanism before any eventual merge into main. Do not modify or close main's PF-0043 to hide the collision.\n\nOwner decisions already given: web gate approvals APPROVED as Option B (exact gate name, mandatory note, identity recorded as unverified, existing Core rules preserved); Hold/Close in 1.4.0 APPROVED.\n\nScope decision: v1.4.0 includes all three remaining capabilities, not deferred to 1.5.0: (1) Project Overview + Existing Project Onboarding; (2) Development Runtime Manager — Start / Stop / Restart / Logs with trusted runtime profiles; (3) New Project Wizard with stack selection, project creation and YallaFlow initialization. Update the roadmap and delivery plan. Each milestone separately specified, tested and reviewed. Request approval for significant security or compatibility decisions without blocking unrelated work.\n\nProject Overview: reuse the useful project-understanding panel from main where appropriate, without duplicate functionality. Real project understanding, evidence-based stack detection, architecture and module summaries, memory and onboarding status, guided discovery through existing YallaFlow governance.\n\nRuntime Manager: reviewed, explicitly trusted commands for starting, stopping and observing local development services. Shared runtime-profile design with safe local overrides. Never automatically execute inferred commands, stop unrelated processes, or expose secrets.\n\nNew Project Wizard: project name, location, stack selection, templates or supported generators, optional agent-recommended setup. No scaffolding before the user has reviewed the plan.\n\nVerification before 1.4.0 is ready: all v1.3.0 fixes included; affected lifecycle and Console tests re-run; stale verification evidence refreshed where implementation changes invalidated it; old and new projects tested; no Git work-ID history mixed; full suite and browser regression; independent security reviews for the Runtime Manager and the Wizard.\n\nExecution authorization: complete the full scope autonomously without stopping after each milestone; create and manage work items, specs and plans, implement, fix, test, and push verified development commits to feature/workspace-1.4. Do not infer approval for new high-impact architectural decisions, security exceptions or new irreversible actions; stop a work item at an unapproved human review gate and continue other work. Do not merge into main, tag, release, publish to npm, deploy, modify production projects, or change provider security settings. Final deliverable: a complete, locally testable 1.4.0 candidate with screenshots, installation instructions, test results and remaining risks, in one consolidated report. Owner (Arabic, same session): \"continue without approvals from me; I want to receive the complete 1.4 to review.\"\n"
+}

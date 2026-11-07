@@ -8,7 +8,7 @@ All notable changes to YallaFlow are documented here. The format loosely follows
 
 Nothing yet.
 
-## [1.4.0] - unreleased (in development) — Work lifecycle
+## [1.4.0] - unreleased (in development) — Engineering workspace
 
 ### Added
 - **Hold and resume work** (`yallaflow work hold|resume`).
@@ -31,6 +31,10 @@ Nothing yet.
   - **Recorded with provenance `console, identity not verified`** by the unchanged `approve`/`feedback` commands. CLI decisions are recorded as before.
   - **Protected:** stale and duplicate submissions record nothing.
   - **Exposure:** the work read contract exposes gates and their provenance additively.
+- **Project Overview** (`yallaflow overview [--json]`, schema `yallaflow.overview/1`, and the console's **Overview** tab). It is read-only.
+  - **Stack from repository evidence.** Frameworks, runtimes and package managers declared in manifests, plus lockfiles and Docker Compose/Dockerfile images and source-file languages. Each entry carries its file, a locator and a basis: `declared` (a file says so, not proof of use), `detected` (a file is present) or `inferred` (counted). `.env` files and compose `environment` values are never read. Modules are grouped by manifest folder, and multiple Node.js lockfiles are flagged.
+  - **Understanding from project memory.** Purpose, architecture, stack, data and integration facts with their confidence and mechanical freshness, memory counts, and inventory coverage, including when the scan was truncated.
+  - **Guided onboarding.** The project-understanding state (needed, discovery in progress, awaiting your review, established, or new-project intent) with the request to give your agent. Flow and Work show it until understanding is established. The console never starts, drafts or approves a baseline.
 
 ### Changed
 - **Agent Contract v11:** agents hold, close, resume or reopen work only when the developer explicitly asks, and never progress held or closed work. Refresh with `yallaflow agent refresh`.

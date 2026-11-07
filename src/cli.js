@@ -8,6 +8,7 @@ import { resumeCommand } from './commands/resume.js';
 import { doctorCommand } from './commands/doctor.js';
 import { newWorkCommand } from './commands/work.js';
 import { snapshotCommand, workShowCommand } from './commands/snapshot.js';
+import { overviewCommand } from './commands/overview.js';
 import { withWorkspaceLock } from './utils/lock.js';
 import { consoleCommand, consoleProjectsCommand } from './commands/console.js';
 import { advanceCommand } from './commands/advance.js';
@@ -87,7 +88,7 @@ const WORK_LIFECYCLE_USAGE = 'yallaflow work show <work-id> [--json]\n  yallaflo
 const VALID_PROJECT_TYPES = new Set(['greenfield', 'brownfield']);
 
 function help() {
-  console.log(`YallaFlow foundation CLI\n\nGive AI your project, not just your prompt.\n\nUsage:\n  yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]\n  yallaflow start [request]\n  yallaflow start --keep-active -- <request>\n  yallaflow activate <work-id>\n  yallaflow request --help\n  yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]\n  yallaflow intake ticket <payload-file|ticket-ref> [--provider github|jira|azure-devops] [--work <work-id>] [--reason TEXT] [--fetch [--attachments]] [--attachment <file>]... [--title TITLE] [--max-comments N]\n  yallaflow source --help\n  yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]\n  yallaflow baseline --help\n  yallaflow guide [work-id]\n  yallaflow ready [work-id]\n  yallaflow skill <skill-id> [--work <work-id>]\n  yallaflow checkpoint --help\n  yallaflow question --help\n  yallaflow knowledge --help\n  yallaflow requirement --help\n  yallaflow convergence --help\n  yallaflow impact --help\n  yallaflow context --help\n  yallaflow upgrade status|plan\n  yallaflow brief\n  yallaflow inspect\n  yallaflow limitation --help\n  yallaflow agent --help\n  yallaflow decompose --help\n  yallaflow progress <parent-id>\n  yallaflow next <parent-id>\n  yallaflow approve <work-id> --stage GATE [--note TEXT]\n  yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]\n  yallaflow handoff [work-id]\n  yallaflow feature <title> --scope SCOPE\n  yallaflow bug <title> --scope SCOPE\n  yallaflow investigate <title> --scope SCOPE\n  yallaflow change <title> --scope SCOPE\n  yallaflow refactor <title> --scope SCOPE\n  yallaflow release <title> --scope SCOPE\n  yallaflow purpose --help\n  yallaflow finish [work-id] [--verbose]\n  yallaflow qc --help\n  yallaflow demo --help\n  yallaflow shared --help\n  yallaflow status\n  yallaflow snapshot [--json]\n  yallaflow console [--port N] [--no-open] [--project DIR]... [--read-only] [--agents]\n  yallaflow agents detect\n  yallaflow work show <work-id> [--json]\n  yallaflow work hold|resume|close <work-id> ...  (lifecycle: on hold, closed without delivery)\n  yallaflow resume [work-id]\n  yallaflow doctor [--clear-lock]\n  yallaflow advance [work-id]\n  yallaflow verify [work-id] -- <executable> [args...]\n  yallaflow verify [work-id] --shell "<command>"\n  yallaflow verify [work-id] --script <path>\n  yallaflow verify list [work-id]\n  yallaflow reopen <work-id> --to implementation|verification|review --reason REASON\n  yallaflow reopen <work-id> --reason REASON   (closed work)\n  yallaflow --version\n`);
+  console.log(`YallaFlow foundation CLI\n\nGive AI your project, not just your prompt.\n\nUsage:\n  yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]\n  yallaflow start [request]\n  yallaflow start --keep-active -- <request>\n  yallaflow activate <work-id>\n  yallaflow request --help\n  yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]\n  yallaflow intake ticket <payload-file|ticket-ref> [--provider github|jira|azure-devops] [--work <work-id>] [--reason TEXT] [--fetch [--attachments]] [--attachment <file>]... [--title TITLE] [--max-comments N]\n  yallaflow source --help\n  yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]\n  yallaflow baseline --help\n  yallaflow guide [work-id]\n  yallaflow ready [work-id]\n  yallaflow skill <skill-id> [--work <work-id>]\n  yallaflow checkpoint --help\n  yallaflow question --help\n  yallaflow knowledge --help\n  yallaflow requirement --help\n  yallaflow convergence --help\n  yallaflow impact --help\n  yallaflow context --help\n  yallaflow upgrade status|plan\n  yallaflow brief\n  yallaflow inspect\n  yallaflow limitation --help\n  yallaflow agent --help\n  yallaflow decompose --help\n  yallaflow progress <parent-id>\n  yallaflow next <parent-id>\n  yallaflow approve <work-id> --stage GATE [--note TEXT]\n  yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]\n  yallaflow handoff [work-id]\n  yallaflow feature <title> --scope SCOPE\n  yallaflow bug <title> --scope SCOPE\n  yallaflow investigate <title> --scope SCOPE\n  yallaflow change <title> --scope SCOPE\n  yallaflow refactor <title> --scope SCOPE\n  yallaflow release <title> --scope SCOPE\n  yallaflow purpose --help\n  yallaflow finish [work-id] [--verbose]\n  yallaflow qc --help\n  yallaflow demo --help\n  yallaflow shared --help\n  yallaflow status\n  yallaflow snapshot [--json]\n  yallaflow overview [--json]\n  yallaflow console [--port N] [--no-open] [--project DIR]... [--read-only] [--agents]\n  yallaflow agents detect\n  yallaflow work show <work-id> [--json]\n  yallaflow work hold|resume|close <work-id> ...  (lifecycle: on hold, closed without delivery)\n  yallaflow resume [work-id]\n  yallaflow doctor [--clear-lock]\n  yallaflow advance [work-id]\n  yallaflow verify [work-id] -- <executable> [args...]\n  yallaflow verify [work-id] --shell "<command>"\n  yallaflow verify [work-id] --script <path>\n  yallaflow verify list [work-id]\n  yallaflow reopen <work-id> --to implementation|verification|review --reason REASON\n  yallaflow reopen <work-id> --reason REASON   (closed work)\n  yallaflow --version\n`);
 }
 
 function decomposeHelp() {
@@ -188,6 +189,7 @@ const USAGE = {
   route: 'yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]',
   status: 'yallaflow status',
   snapshot: 'yallaflow snapshot [--json]',
+  overview: 'yallaflow overview [--json]',
   console: 'yallaflow console [--port N] [--no-open] [--project DIR]... [--read-only]\n  yallaflow console add [DIR] | remove DIR | list',
   work: WORK_LIFECYCLE_USAGE,
   resume: 'yallaflow resume [work-id]',
@@ -395,7 +397,7 @@ async function deliveryCommand(command, rest) {
 // yallaflow.minimumVersion). An older CLI stops before any project-state mutation;
 // read-only orientation, inspection, and integrity commands still run so the developer
 // sees why. YallaFlow never self-updates or downloads anything.
-const READ_ONLY_COMMANDS = new Set(['agents', 'snapshot', 'console', 'brief', 'doctor', 'status', 'inspect', 'upgrade', 'handoff', 'resume', 'ready', 'guide', 'progress', 'next', 'finish', 'skill', 'source']);
+const READ_ONLY_COMMANDS = new Set(['agents', 'snapshot', 'overview', 'console', 'brief', 'doctor', 'status', 'inspect', 'upgrade', 'handoff', 'resume', 'ready', 'guide', 'progress', 'next', 'finish', 'skill', 'source']);
 const READ_ONLY_ACTIONS = {
   shared: ['status', 'check'], context: ['status', 'list', 'show', 'history', 'affected'], knowledge: ['list'], question: ['list'],
   verify: ['list'], baseline: ['status', 'show'], decompose: ['status'], requirement: ['list', 'show'], convergence: ['status', 'show'],
@@ -810,6 +812,11 @@ async function dispatch(command, rest) {
     const port = values.port === undefined ? undefined : Number(values.port);
     if (port !== undefined && !(Number.isInteger(port) && port >= 0 && port < 65536)) throw new Error('--port must be a number between 0 and 65535');
     return consoleCommand({ port, open: !values['no-open'], projects: values.project ?? [], poll: values.poll, readOnly: Boolean(values['read-only']), agents: Boolean(values.agents), experimentalClaude: Boolean(values['experimental-claude']) });
+  }
+  if (command === 'overview') {
+    const { values, positionals } = parseOptions(rest, { json: { type: 'boolean' } });
+    if (positionals.length) throw new Error('Usage: yallaflow overview [--json]');
+    return overviewCommand({ json: values.json });
   }
   if (command === 'snapshot') {
     const { values, positionals } = parseOptions(rest, { json: { type: 'boolean' } });

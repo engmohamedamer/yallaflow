@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "Project Overview: real project understanding with purpose, architecture and module summaries from approved project memory, memory freshness and onboarding status, read-only.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0034",
+          "locator": "Project Overview"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0035",
+          "locator": "Project Overview with technology-stack detection"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:13:19.559Z",
+      "updatedAt": "2026-11-07T02:13:19.559Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "Evidence-based technology-stack detection that keeps declared, detected, inferred and unknown apart and never exposes secrets.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0035",
+          "locator": "accurate confirmed/inferred/unknown distinction"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:13:19.559Z",
+      "updatedAt": "2026-11-07T02:13:19.559Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "Guided onboarding/scan for existing projects through existing YallaFlow governance: the console shows the next step and never starts, drafts or approves a baseline on its own.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0035",
+          "locator": "onboarding/scan for existing projects"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0034",
+          "locator": "guided discovery through existing YallaFlow governance"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:13:19.559Z",
+      "updatedAt": "2026-11-07T02:13:19.559Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "`yallaflow overview --json` is read-only, validates against schema yallaflow.overview/1, and reports project identity, understanding state (required / in progress / awaiting review / established / greenfield intent / unavailable), purpose and architecture facts with CTX id, confidence and mechanical freshness, memory counts (current, fresh, may-be-stale, stale evidence, unknown, disputed, unresolved), and inventory coverage (scanned, truncated, skipped).",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:13:19.559Z",
+      "updatedAt": "2026-11-07T02:13:19.559Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-002",
+      "statement": "Stack entries come only from repository evidence (manifests, declared runtime versions, lockfiles, container images, source-file counts) and each carries component, kind, declared value, evidence path and a basis of declared, detected or inferred; tech-stack memory facts are shown separately with their confidence; unknown or unreadable inputs are reported, and no environment values or credentials are read or shown.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:13:19.559Z",
+      "updatedAt": "2026-11-07T02:13:19.559Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-001",
+      "statement": "Modules are grouped by manifest directory with their ecosystems and framework hints; multiple lockfiles for one module are flagged as a conflict.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:13:19.559Z",
+      "updatedAt": "2026-11-07T02:13:19.559Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-003",
+      "statement": "The Console has an Overview view (Arabic/English, light/dark, mobile) served by a token-protected GET route; it shows the onboarding status with the agent request to make and the CLI command behind details, links the baseline work item when one exists, and has no control that starts, drafts or approves a baseline; viewing it changes no file.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:13:19.559Z",
+      "updatedAt": "2026-11-07T02:13:19.559Z"
+    },
+    {
+      "id": "AC-005",
+      "requirement": "REQ-001",
+      "statement": "Old workspaces (legacy fixture) and greenfield/brownfield projects without memory produce a valid overview; a damaged context ledger yields an explicit unavailable state instead of an error page.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T02:13:19.559Z",
+      "updatedAt": "2026-11-07T02:13:19.559Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-07T02:13:19.559Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-07T02:13:19.559Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-07T02:13:19.559Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-07T02:13:19.559Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-07T02:13:19.559Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-07T02:13:19.559Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-11-07T02:13:19.559Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-005",
+      "at": "2026-11-07T02:13:19.559Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-07T02:13:19.559Z"
+}

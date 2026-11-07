@@ -91,6 +91,10 @@ export function createRunner({ cli = CLI } = {}) {
       }
       return cache.get(key);
     },
+    // Uncached read (1.4.0 overview): it reads repository files the watcher does not follow.
+    readFresh(root, args) {
+      return run(root, args);
+    },
     invalidate(root) {
       caches.get(root)?.clear();
     },

@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "yallaflow.overview/1",
+  "title": "YallaFlow project overview (yallaflow overview --json)",
+  "description": "Read-only. Fields are only added within schema version 1. Stack entries are repository evidence: 'declared' means a file states it (not proof of use), 'detected' means a file's presence shows it, 'inferred' means counted, not read. Memory facts come from approved project memory with mechanical freshness.",
+  "type": "object",
+  "required": ["schema", "generatedAt", "yallaflowVersion", "project", "understanding", "memory", "areas", "stack", "modules", "coverage"],
+  "properties": {
+    "schema": { "const": "yallaflow.overview/1" },
+    "generatedAt": { "type": "string" },
+    "yallaflowVersion": { "type": "string" },
+    "project": {
+      "type": "object",
+      "required": ["name", "kind", "shared", "classification"],
+      "properties": {
+        "name": { "type": "string" },
+        "kind": { "type": ["string", "null"] },
+        "shared": { "type": "boolean" },
+        "classification": {
+          "type": ["object", "null"],
+          "required": ["kind", "reasons"],
+          "properties": { "kind": { "enum": ["greenfield", "brownfield"] }, "reasons": { "type": "array", "items": { "type": "string" } } }
+        }
+      }
+    },
+    "understanding": {
+      "type": "object",
+      "required": ["state", "label", "facts", "baselineId", "ask", "command"],
+      "properties": {
+        "state": { "enum": ["PROJECT_UNDERSTANDING_REQUIRED", "PROJECT_UNDERSTANDING_IN_PROGRESS", "PROJECT_UNDERSTANDING_AWAITING_REVIEW", "PROJECT_UNDERSTANDING_ESTABLISHED", "GREENFIELD_UNDERSTANDING_FROM_INTENT", "PROJECT_UNDERSTANDING_UNAVAILABLE"] },
+        "label": { "type": "string" },
+        "facts": { "type": ["integer", "null"], "minimum": 0 },
+        "baselineId": { "type": ["string", "null"] },
+        "detail": { "type": ["string", "null"] },
+        "ask": { "type": ["string", "null"] },
+        "command": { "type": ["string", "null"] }
+      }
+    },
+    "memory": {
+      "type": "object",
+      "required": ["available", "current", "fresh", "mayBeStale", "staleEvidence", "unknown", "disputed", "unresolved"],
+      "properties": {
+        "available": { "type": "boolean" },
+        "current": { "type": "integer", "minimum": 0 },
+        "fresh": { "type": "integer", "minimum": 0 },
+        "mayBeStale": { "type": "integer", "minimum": 0 },
+        "staleEvidence": { "type": "integer", "minimum": 0 },
+        "unknown": { "type": "integer", "minimum": 0 },
+        "disputed": { "type": "integer", "minimum": 0 },
+        "unresolved": { "type": "integer", "minimum": 0 },
+        "error": { "type": ["string", "null"] }
+      }
+    },
+    "areas": {
+      "type": "object",
+      "description": "Current facts per memory area (project, architecture, tech-stack, database, integration, environment), at most 12 listed per area.",
+      "properties": {
+        "project": { "$ref": "#/$defs/area" },
+        "architecture": { "$ref": "#/$defs/area" },
+        "tech-stack": { "$ref": "#/$defs/area" },
+        "database": { "$ref": "#/$defs/area" },
+        "integration": { "$ref": "#/$defs/area" },
+        "environment": { "$ref": "#/$defs/area" }
+      }
+    },
+    "stack": {
+      "type": "object",
+      "required": ["entries", "unread"],
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["component", "kind", "basis", "declared", "path", "locator"],
+            "properties": {
+              "component": { "type": "string" },
+              "kind": { "type": "string" },
+              "basis": { "enum": ["declared", "detected", "inferred"] },
+              "declared": { "type": ["string", "null"] },
+              "path": { "type": ["string", "null"] },
+              "locator": { "type": "string" },
+              "count": { "type": "integer", "minimum": 0 }
+            }
+          }
+        },
+        "unread": {
+          "type": "array",
+          "items": { "type": "object", "required": ["path", "reason"], "properties": { "path": { "type": "string" }, "reason": { "type": "string" } } }
+        }
+      }
+    },
+    "modules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "manifests", "ecosystems", "frameworks", "lockfiles", "conflicts"],
+        "properties": {
+          "path": { "type": "string" },
+          "manifests": { "type": "array", "items": { "type": "string" } },
+          "ecosystems": { "type": "array", "items": { "type": "string" } },
+          "frameworks": { "type": "array", "items": { "type": "string" } },
+          "lockfiles": { "type": "array", "items": { "type": "string" } },
+          "conflicts": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "required": ["available"],
+      "properties": {
+        "available": { "type": "boolean" },
+        "scannedEntries": { "type": "integer", "minimum": 0 },
+        "truncated": { "type": "boolean" },
+        "sourceFiles": { "type": "integer", "minimum": 0 },
+        "documents": { "type": "integer", "minimum": 0 },
+        "manifests": { "type": "integer", "minimum": 0 },
+        "git": { "type": "boolean" },
+        "error": { "type": ["string", "null"] }
+      }
+    }
+  },
+  "$defs": {
+    "area": {
+      "type": "object",
+      "required": ["total", "facts"],
+      "properties": {
+        "total": { "type": "integer", "minimum": 0 },
+        "facts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "summary", "state", "confidence", "freshness"],
+            "properties": {
+              "id": { "type": "string" },
+              "summary": { "type": "string" },
+              "state": { "enum": ["current", "disputed"] },
+              "confidence": { "type": ["string", "null"] },
+              "freshness": { "enum": ["fresh", "may-be-stale", "stale-evidence", "unknown", "historical"] }
+            }
+          }
+        }
+      }
+    }
+  }
+}

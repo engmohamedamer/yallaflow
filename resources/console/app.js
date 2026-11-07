@@ -133,7 +133,7 @@
       : `<b class="projname">${esc(snap?.project?.name ?? projects[0]?.name ?? '')}</b>`;
     const count = snap ? needs().length : 0;
     return `<header class="top"><a class="brand" href="#/map">${logo} YallaFlow</a><div class="projpick">${picker}<a class="tiny muted" href="#/projects">${A('كل المشاريع', 'All projects')}</a></div>
-      <nav class="tabs" aria-label="views">${tab('#/map', A('التدفق', 'Flow'), r.v === 'map')}${tab('#/lines', A('الشغل', 'Work'), r.v === 'lines' || r.v === 'item')}${tab('#/team', A('نسخ الشغل', 'Worktrees'), r.v === 'team')}${tab('#/insights', A('الأرقام', 'Insights'), r.v === 'insights')}</nav>
+      <nav class="tabs" aria-label="views">${tab('#/overview', A('المشروع', 'Overview'), r.v === 'overview')}${tab('#/map', A('التدفق', 'Flow'), r.v === 'map')}${tab('#/lines', A('الشغل', 'Work'), r.v === 'lines' || r.v === 'item')}${tab('#/team', A('نسخ الشغل', 'Worktrees'), r.v === 'team')}${tab('#/insights', A('الأرقام', 'Insights'), r.v === 'insights')}</nav>
       <span class="grow"></span>${!readOnly && projects.length ? `<button class="btn sm go create" data-create aria-label="${A('شغل جديد', 'Create work')}">＋<span class="lbl"> ${A('شغل جديد', 'Create work')}</span></button>` : ''}<span class="chip ${offline() ? 'fail' : 'active'}"><i></i>${offline() ? A('مفيش اتصال', 'offline') : A('مباشر', 'Live')}</span>
       <button class="ibtn bell" data-bell aria-expanded="${bellOpen}" aria-label="${A('محتاج انتباهك', 'Needs your attention')}">🔔${count ? `<b>${count}</b>` : ''}</button>
       <button class="ibtn" data-lang aria-label="language">${lang === 'ar' ? 'EN' : 'ع'}</button><button class="ibtn" data-theme-toggle aria-label="theme">◐</button>${bellOpen ? notesPanel() : ''}</header>`;
@@ -764,6 +764,93 @@
       <div class="tiny muted">${A('كل سطر من سجل مسجّل في المشروع.', 'Every line comes from a recorded entry.')}</div></div><button class="btn sm" data-digest>${A('تمام', 'Got it')}</button></section>`;
   }
 
+  // ---------- overview (1.4.0): the project itself — read-only ----------
+  // Data: GET /api/p/<project>/overview (yallaflow overview --json). Stack entries are
+  // repository evidence with a basis (declared / detected / inferred); facts come from
+  // approved project memory with mechanical freshness. Nothing here starts, drafts or
+  // approves project understanding: the developer asks the agent, and approval stays a
+  // human decision recorded through YallaFlow.
+  let projectOverview = null; // { pid, data | error }
+  async function loadProjectOverview() {
+    const forPid = pid;
+    try { projectOverview = { pid: forPid, data: await api(`/api/p/${forPid}/overview`) }; } catch (e) { projectOverview = { pid: forPid, error: e.message }; }
+  }
+  const UNDERSTANDING_TEXT = {
+    PROJECT_UNDERSTANDING_REQUIRED: { tone: 'wait', title: { ar: 'فهم المشروع مطلوب', en: 'Project understanding needed' }, body: { ar: 'ده مشروع قايم. قبل أي شغل هندسي، الوكيل بيكتشف المشروع بأدلة، وانت بتراجع المسودة وتعتمدها.', en: 'This is an existing project. Before engineering work, your agent discovers it with evidence, then you review and approve the draft.' } },
+    PROJECT_UNDERSTANDING_IN_PROGRESS: { tone: 'active', title: { ar: 'اكتشاف المشروع جاري', en: 'Project discovery in progress' }, body: { ar: 'الوكيل بيجمع فهم المشروع وأدلته. المسودة هتحتاج مراجعتك قبل ما تتعتمد.', en: 'Your agent is collecting project understanding and evidence. The draft will need your review before it is approved.' } },
+    PROJECT_UNDERSTANDING_AWAITING_REVIEW: { tone: 'you', title: { ar: 'فهم المشروع مستني مراجعتك', en: 'Project understanding awaits your review' }, body: { ar: 'راجع الحقايق والأدلة والحاجات غير المعروفة مع وكيلك، وبعدها اعتمدها أو اطلب تعديل. عرضها هنا مش موافقة.', en: 'Review the facts, evidence and unknowns with your agent, then approve or request changes. Viewing it here is not an approval.' } },
+    PROJECT_UNDERSTANDING_ESTABLISHED: { tone: 'done', title: { ar: 'فهم المشروع معتمد', en: 'Project understanding established' }, body: { ar: 'الوكيل بيقرا الذاكرة المعتمدة وبيراجع بس الأدلة اللي اتغيرت والمتعلقة بالشغل.', en: 'Your agent reads the approved memory and rechecks only changed evidence relevant to each task.' } },
+    GREENFIELD_UNDERSTANDING_FROM_INTENT: { tone: 'active', title: { ar: 'مشروع جديد: الفهم من هدفك', en: 'New project: understanding from your intent' }, body: { ar: 'مفيش كود قديم يتفحص. اوصف هدف المنتج ومتطلباته، والفهم بيتكوّن من قراراتك والشغل.', en: 'There is no existing code to scan. Describe the product goal and requirements; understanding grows from your decisions and the work.' } },
+    PROJECT_UNDERSTANDING_UNAVAILABLE: { tone: 'fail', title: { ar: 'حالة فهم المشروع مش متاحة', en: 'Project understanding unavailable' }, body: { ar: 'YallaFlow مقدرش يقرا السجلات دي. شغّل yallaflow doctor في فولدر المشروع.', en: 'YallaFlow could not read these records. Run yallaflow doctor in the project folder.' } }
+  };
+  const ASK_AR = {
+    PROJECT_UNDERSTANDING_REQUIRED: 'اعمل فهم للمشروع ده بأدلة من المستودع.',
+    PROJECT_UNDERSTANDING_IN_PROGRESS: 'كمّل اكتشاف فهم المشروع.',
+    PROJECT_UNDERSTANDING_AWAITING_REVIEW: 'ورّيني مسودة فهم المشروع علشان أراجعها.',
+    GREENFIELD_UNDERSTANDING_FROM_INTENT: 'ده اللي هنبنيه: <هدف المنتج وأول المتطلبات>.',
+    PROJECT_UNDERSTANDING_UNAVAILABLE: 'افحص سجلات المشروع بـ yallaflow doctor.'
+  };
+  const FRESH_TEXT = { fresh: { ar: 'حديث', en: 'fresh' }, 'may-be-stale': { ar: 'ممكن يكون قديم', en: 'may be stale' }, 'stale-evidence': { ar: 'دليله اتشال', en: 'evidence missing' }, unknown: { ar: 'مش معروف', en: 'unknown' }, historical: { ar: 'تاريخي', en: 'historical' } };
+  const BASIS_TEXT = { declared: { ar: 'مُعلن في ملف', en: 'declared in a file' }, detected: { ar: 'موجود كملف', en: 'detected (file present)' }, inferred: { ar: 'مستنتج من العدد', en: 'inferred from counts' } };
+  function understandingCard(u, compact = false) {
+    const t = UNDERSTANDING_TEXT[u.state] ?? UNDERSTANDING_TEXT.PROJECT_UNDERSTANDING_UNAVAILABLE;
+    const baseline = u.baselineId && byId(u.baselineId);
+    const askText = u.ask ? (lang === 'ar' && ASK_AR[u.state] ? ASK_AR[u.state] : u.ask) : '';
+    const ask = askText ? `<p class="small" style="margin-top:8px"><b>${A('اطلب من وكيلك:', 'Ask your agent:')}</b> <q>${esc(askText)}</q></p>` : '';
+    return `<section class="panel understanding" data-understanding="${esc(u.state)}" style="margin-bottom:16px"><div class="row"><span class="chip ${t.tone}"><i></i>${L(t.title)}</span>${u.facts ? `<span class="tiny muted">${A(`${u.facts} حقيقة حالية`, `${u.facts} current facts`)}</span>` : ''}${compact ? `<a class="tiny" href="#/overview" style="margin-inline-start:auto">${A('نظرة على المشروع', 'Project overview')}</a>` : ''}</div>
+      <p class="small muted" style="margin-top:6px">${L(t.body)}</p>${compact ? '' : ask}${baseline ? `<a class="btn ghost sm" style="margin-top:8px" href="#/item/${encodeURIComponent(baseline.id)}">${A('افتح سجل فهم المشروع', 'Open the project-understanding record')} <span class="ltr">${esc(baseline.id)}</span></a>` : ''}</section>`;
+  }
+  // Flow and Work: only when onboarding needs attention; an established project shows nothing extra.
+  function understandingStrip() {
+    const u = projectOverview?.pid === pid ? projectOverview.data?.understanding : null;
+    if (!u || u.state === 'PROJECT_UNDERSTANDING_ESTABLISHED') return '';
+    return understandingCard(u, true);
+  }
+  function viewOverview() {
+    if (!projectOverview || projectOverview.pid !== pid) return `<p class="muted" style="margin-top:30px">${A('بيقرا المشروع…', 'Reading the project…')}</p>`;
+    if (projectOverview.error) return `<section class="errbar data" role="alert"><b>${A('مقدرناش نقرا نظرة المشروع', 'The project overview could not be read')}</b><p class="small">${esc(projectOverview.error)}</p></section>`;
+    const o = projectOverview.data;
+    const m = o.memory;
+    const facts = (area) => (o.areas[area]?.facts ?? []);
+    const factList = (area, empty) => {
+      const list = facts(area);
+      if (!list.length) return `<p class="small muted">${empty}</p>`;
+      const more = (o.areas[area].total ?? 0) - list.length;
+      return `<ul class="facts">${list.map((f) => `<li><p class="small">${esc(f.summary)}</p><span class="tiny muted"><span class="ltr">${esc(f.id)}</span> · ${esc(f.confidence ?? '')} · <span class="fresh-${esc(f.freshness)}">${L(FRESH_TEXT[f.freshness] ?? FRESH_TEXT.unknown)}</span>${f.state === 'disputed' ? ` · <b>${A('عليه خلاف', 'disputed')}</b>` : ''}</span></li>`).join('')}</ul>${more > 0 ? `<p class="tiny muted">${A(`و ${more} كمان في ذاكرة المشروع.`, `+${more} more in project memory.`)}</p>` : ''}`;
+    };
+    const main = o.stack.entries.filter((e) => e.kind !== 'language' && e.kind !== 'lockfile' && e.kind !== 'ecosystem' && e.kind !== 'ci');
+    const langs = o.stack.entries.filter((e) => e.kind === 'language');
+    const row = (e) => `<tr><td>${esc(e.component)}</td><td class="ltr">${esc(e.declared ?? '—')}</td><td>${esc(e.kind)}</td><td><span class="tag basis-${esc(e.basis)}">${L(BASIS_TEXT[e.basis])}</span></td><td class="ltr tiny">${esc(e.path ?? '')}${e.locator ? ` · ${esc(e.locator)}` : ''}</td></tr>`;
+    const stackTable = main.length
+      ? `<div class="tablewrap"><table class="stack"><thead><tr><th>${A('المكوّن', 'Component')}</th><th>${A('الإصدار المُعلن', 'Declared')}</th><th>${A('النوع', 'Kind')}</th><th>${A('الأساس', 'Basis')}</th><th>${A('الدليل', 'Evidence')}</th></tr></thead><tbody>${main.map(row).join('')}</tbody></table></div>`
+      : `<p class="small muted">${A('مفيش إطار عمل أو خدمة معلنة في الملفات اللي اتقرت.', 'No framework or service is declared in the files that were read.')}</p>`;
+    const memLine = m.available
+      ? `<div class="row tiny" style="margin-top:6px"><span class="chip done"><i></i>${m.fresh} ${A('حديث', 'fresh')}</span><span class="chip wait">${m.mayBeStale + m.staleEvidence} ${A('محتاج مراجعة', 'to revalidate')}</span><span class="chip todo">${m.unknown} ${A('من غير نقطة تحقق', 'no check point')}</span>${m.disputed ? `<span class="chip fail"><i></i>${m.disputed} ${A('عليه خلاف', 'disputed')}</span>` : ''}${m.unresolved ? `<span class="chip you">${m.unresolved} ${A('مش محسوم', 'unresolved')}</span>` : ''}</div><p class="tiny muted" style="margin-top:6px">${A('«ممكن يكون قديم» معناه إن ملف الدليل اتغيّر، مش إن الحقيقة غلط.', '"May be stale" means an evidence file changed, not that the fact is wrong.')}</p>`
+      : `<p class="small" style="color:var(--clay)">${A('ذاكرة المشروع مش متاحة:', 'Project memory unavailable:')} ${esc(m.error ?? '')}</p>`;
+    const modules = o.modules.length
+      ? `<ul class="modules">${o.modules.map((mod) => `<li><b class="ltr">${mod.path === '.' ? A('(الجذر)', '(root)') : esc(mod.path)}</b> <span class="small">${esc(mod.ecosystems.join(', ') || '—')}${mod.frameworks.length ? ` · ${esc(mod.frameworks.join(', '))}` : ''}</span>${mod.lockfiles.length ? `<span class="tiny muted ltr"> · ${esc(mod.lockfiles.join(', '))}</span>` : ''}${mod.conflicts.map((c) => `<p class="tiny" style="color:var(--clay)">⚠ ${esc(c)}</p>`).join('')}</li>`).join('')}</ul>`
+      : `<p class="small muted">${A('مفيش ملفات تعريف (manifests) معروفة.', 'No recognized manifests.')}</p>`;
+    const cov = o.coverage;
+    const coverage = cov.available
+      ? `${A(`اتقرا ${cov.scannedEntries} عنصر · ${cov.sourceFiles} ملف كود · ${cov.manifests} ملف تعريف`, `${cov.scannedEntries} entries scanned · ${cov.sourceFiles} source files · ${cov.manifests} manifests`)}${cov.truncated ? ` · <b>${A('الفحص اتقطع عند الحد', 'scan truncated at its limit')}</b>` : ''}`
+      : `${A('الجرد مش متاح:', 'Inventory unavailable:')} ${esc(cov.error ?? '')}`;
+    const unread = o.stack.unread.length ? `<p class="tiny" style="margin-top:6px">${A('ماتقراش:', 'Not read:')} ${o.stack.unread.map((u) => `<span class="ltr">${esc(u.path)}</span> (${esc(u.reason)})`).join(' · ')}</p>` : '';
+    const cmds = [o.understanding.command, 'yallaflow overview', 'yallaflow context status', 'yallaflow inspect'].filter(Boolean);
+    return `<section class="pagehead"><h1 style="font-size:26px">${esc(o.project.name)}</h1><p class="muted">${A('نظرة على المشروع: إيه هو، معمول بإيه، وفهمه متسجّل لحد فين. القراءة بس — مفيش حاجة بتتغيّر من هنا.', 'The project at a glance: what it is, what it is built with, and how far its understanding is recorded. Read-only — nothing changes from here.')}</p></section>
+      ${understandingCard(o.understanding)}
+      <div class="ovgrid">
+        <section class="panel"><h2>${A('المشروع', 'Purpose')}</h2>${factList('project', A('لسه مفيش وصف معتمد للمشروع.', 'No approved project description yet.'))}</section>
+        <section class="panel"><h2>${A('ذاكرة المشروع', 'Project memory')}</h2><p class="small">${m.available ? A(`${m.current} حقيقة حالية`, `${m.current} current facts`) : ''}</p>${memLine}</section>
+        <section class="panel wide"><h2>${A('التقنيات من أدلة المستودع', 'Stack from repository evidence')}</h2><p class="tiny muted">${A('«مُعلن» معناه إن ملف بيقول كده، مش إثبات إن الكود بيستخدمه. ملفات .env مابتتقراش.', '"Declared" means a file says so, not proof the code uses it. .env files are never read.')}</p>${stackTable}${langs.length ? `<p class="small" style="margin-top:8px">${A('اللغات (مستنتجة من عدد الملفات):', 'Languages (inferred from file counts):')} ${langs.map((l) => `${esc(l.component)} <span class="muted">(${l.count})</span>`).join(' · ')}</p>` : ''}${unread}</section>
+        <section class="panel"><h2>${A('الوحدات', 'Modules')}</h2>${modules}</section>
+        <section class="panel"><h2>${A('المعمارية', 'Architecture')}</h2>${factList('architecture', A('لسه مفيش معمارية معتمدة في الذاكرة.', 'No approved architecture in memory yet.'))}</section>
+        ${facts('tech-stack').length ? `<section class="panel"><h2>${A('التقنيات في الذاكرة المعتمدة', 'Stack in approved memory')}</h2>${factList('tech-stack', '')}</section>` : ''}
+        ${facts('database').length || facts('integration').length ? `<section class="panel"><h2>${A('البيانات والتكاملات', 'Data and integrations')}</h2>${factList('database', '')}${factList('integration', '')}</section>` : ''}
+      </div>
+      <p class="tiny muted" style="margin-top:12px">${coverage}</p>
+      ${devPanel(A('أوامر نظرة المشروع', 'Overview commands'), cmds)}`;
+  }
+
   // ---------- projects ----------
   let overview = null; // [{ project, snap | error }]
   async function loadOverview() {
@@ -980,9 +1067,9 @@
     const hadQ = document.activeElement?.matches?.('[data-q]');
     const hadAgent = document.activeElement?.matches?.('[data-agent-input]');
     document.title = (snap?.counts?.you ? `(${snap.counts.you}) ` : '') + 'YallaFlow' + (snap?.project?.name ? ` · ${snap.project.name}` : '');
-    const views = { item: () => viewItem(r.id), lines: viewLines, team: viewTeam, insights: viewInsights, projects: viewProjects, map: viewMap };
+    const views = { overview: viewOverview, item: () => viewItem(r.id), lines: viewLines, team: viewTeam, insights: viewInsights, projects: viewProjects, map: viewMap };
     const body = !snap ? `<p class="muted" style="margin-top:40px;text-align:center">${error ? '' : A('بيحمّل…', 'Loading…')}</p>` : (views[r.v] ?? viewMap)();
-    document.getElementById('app').innerHTML = topbar(r) + `<main>${banner()}${body}</main>`;
+    document.getElementById('app').innerHTML = topbar(r) + `<main>${banner()}${snap && ['map', 'lines'].includes(r.v) ? understandingStrip() : ''}${body}</main>`;
     requestAnimationFrame(placeConnectors);
     if (hadQ) { const q = document.querySelector('[data-q]'); if (q) { q.focus(); q.setSelectionRange(q.value.length, q.value.length); } }
     if (hadAgent) { const box = document.querySelector('[data-agent-input]'); if (box) { box.focus(); box.setSelectionRange(box.value.length, box.value.length); } }
@@ -1051,6 +1138,7 @@
     if (v === 'item') await loadAgent();
     if (v === 'team') await loadTeam();
     else if (v === 'projects') await loadOverview();
+    else if (v === 'overview' || ((v === 'map' || v === 'lines') && projectOverview?.pid !== pid)) await loadProjectOverview();
   }
 
   function diff(prev, next) {
@@ -1138,7 +1226,7 @@
       render(); await load(); await buildDigest(); render(); listen();
       return;
     }
-    closeDrawer(); bellOpen = false; dtab = 'delivery'; const v = route().v; if (v === 'item') { detail = null; render(); await load(); await loadForView(); } else if (v === 'team' || v === 'projects') { render(); await loadForView(); } render(); scrollTo(0, 0); });
+    closeDrawer(); bellOpen = false; dtab = 'delivery'; const v = route().v; if (v === 'item') { detail = null; render(); await load(); await loadForView(); } else if (['team', 'projects', 'overview', 'map', 'lines'].includes(v)) { render(); await loadForView(); } render(); scrollTo(0, 0); });
   document.addEventListener('click', (e) => {
     // 1.4.0 work management: actions, gate review, the card menu.
     const wm = e.target.closest('[data-act],[data-gate],[data-menu],[data-act-cancel]');
@@ -1264,6 +1352,7 @@
     render();
     await load();
     await buildDigest();
+    await loadForView();
     render();
   }
 

@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-07T02:33:01.152Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "06ecea9f11df9d9364dce1f6fa19109b0637606d",
+        "verificationRunIds": [
+          "V-002"
+        ]
+      },
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "yallaflow overview --json is registered as a read-only command, validates against resources/schemas/overview-1.schema.json in every test, and reports identity, understanding state (all six states in the schema enum), area facts with id/confidence/freshness, memory counts and inventory coverage; tree hashes before/after prove it writes nothing.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/overview/collect.js",
+              "contentHash": "sha256:c300b838afaa1740985c7a748310625ea0284322323a2238f7d1f8cf7d66cb02",
+              "gitCommit": "06ecea9f11df9d9364dce1f6fa19109b0637606d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/overview.js",
+              "contentHash": "sha256:62d395e18c5ff33db87b750bb8a975a2fd5d2720004e2fcd51585ebd6fe72564",
+              "gitCommit": "06ecea9f11df9d9364dce1f6fa19109b0637606d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "resources/schemas/overview-1.schema.json",
+              "contentHash": "sha256:a21ad8f6f9fce168a1a69f56dd510b0218b976f90539117c57254d1fb526aa33",
+              "gitCommit": "06ecea9f11df9d9364dce1f6fa19109b0637606d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/overview.test.js",
+              "contentHash": "sha256:219d1f743f20e7d9d9b154b64db6bfe1cad19c6210e1e75219b2d09a13110d8b",
+              "gitCommit": "06ecea9f11df9d9364dce1f6fa19109b0637606d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0046",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Stack entries come from manifests, runtime constraints, lockfiles, compose images and Dockerfile FROM lines and source counts, each with component, kind, declared, path, locator and basis declared/detected/inferred; tech-stack memory facts are a separate area; unreadable inputs go to stack.unread; the Laravel fixture's .env and compose environment secret never appears in CLI or console output.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/inventory/stack.js",
+              "contentHash": "sha256:63af42c8063a824cb77102765594a12a57c46f87bfb582a388bb6b9a04ac2460",
+              "gitCommit": "06ecea9f11df9d9364dce1f6fa19109b0637606d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/overview.test.js",
+              "contentHash": "sha256:219d1f743f20e7d9d9b154b64db6bfe1cad19c6210e1e75219b2d09a13110d8b",
+              "gitCommit": "06ecea9f11df9d9364dce1f6fa19109b0637606d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0046",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "Modules are grouped by manifest directory with ecosystems, framework hints and lockfiles; two Node.js lockfiles in one module produce a conflict, asserted in the test.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/inventory/stack.js",
+              "contentHash": "sha256:63af42c8063a824cb77102765594a12a57c46f87bfb582a388bb6b9a04ac2460",
+              "gitCommit": "06ecea9f11df9d9364dce1f6fa19109b0637606d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/overview.test.js",
+              "contentHash": "sha256:219d1f743f20e7d9d9b154b64db6bfe1cad19c6210e1e75219b2d09a13110d8b",
+              "gitCommit": "06ecea9f11df9d9364dce1f6fa19109b0637606d",
+              "workingTree": "untracked"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "Console Overview tab (Arabic/English, light/dark, mobile without horizontal scroll) served by token-protected GET /api/p/<id>/overview (401 without token, 405 on POST); it shows the understanding card with the agent request and commands under For developers, links the baseline item when present, and has no start/draft/approve control (browser check asserts no button in the card); Flow/Work show the card until understanding is established.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:655cb44f19c4da12ad91724cf540540eda10e7be5a0b8e2f4eb0461dd58f6ced",
+              "gitCommit": "06ecea9f11df9d9364dce1f6fa19109b0637606d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:45cc85026399954da231d8086e68f00f9ebd32c951a15dad4b7c7a2ab98c2649",
+              "gitCommit": "06ecea9f11df9d9364dce1f6fa19109b0637606d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "research/release-1.4/browser-check.mjs",
+              "contentHash": "sha256:31ba27c2f09316c55a9f715940ad138c55d848bbf4eb7c28b868b2a91f0c7a93",
+              "gitCommit": "06ecea9f11df9d9364dce1f6fa19109b0637606d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "research/release-1.4/screenshots/chromium-results.json",
+              "contentHash": "sha256:e43ec37a701ede19a889574c9261bb0ef10127d5444a148c65513caf9a34733a",
+              "gitCommit": "06ecea9f11df9d9364dce1f6fa19109b0637606d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/overview.test.js",
+              "contentHash": "sha256:219d1f743f20e7d9d9b154b64db6bfe1cad19c6210e1e75219b2d09a13110d8b",
+              "gitCommit": "06ecea9f11df9d9364dce1f6fa19109b0637606d",
+              "workingTree": "untracked"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "The v0.3.6 legacy fixture, a greenfield project and a brownfield project without memory each produce a schema-valid overview; an unparsable context ledger yields memory.available=false with an error instead of a failure.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/overview.test.js",
+              "contentHash": "sha256:219d1f743f20e7d9d9b154b64db6bfe1cad19c6210e1e75219b2d09a13110d8b",
+              "gitCommit": "06ecea9f11df9d9364dce1f6fa19109b0637606d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0046",
+              "verificationRunId": "V-002"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-07T02:33:01.152Z"
+}

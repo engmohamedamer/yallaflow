@@ -580,4 +580,18 @@ print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_commo
   - docs/agents.md (repository @ bdb5e90)
   - npm test (passed) (runtime, PF-0037 V-002)
 
+<!-- yallaflow-fact:CTX-0108 -->
+### CTX-0108 — yallaflow overview --json (schema yallaflow.overview/1, src/overview/collect.js) is the read-only project overview: understanding state, memory facts with freshness, and an evidence-based stack from src/inventory/stack.js where every entry has a basis (declared = a file states it, detected = a file is present, inferred = counted). It reads manifests, compose image: lines and Dockerfile FROM lines only, never .env files or environment values. The console serves it uncached via runner.readFresh because it reads repository files the .yallaflow watcher does not follow.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0046
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-07T02:33:07.497Z
+- **Verified:** 2026-11-07T02:33:07.497Z (commit 06ecea9)
+- **Evidence:**
+  - src/overview/collect.js (repository @ 06ecea9)
+  - src/inventory/stack.js (repository @ 06ecea9)
+
 <!-- yallaflow-context:end -->
