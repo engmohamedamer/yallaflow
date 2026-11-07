@@ -1,0 +1,43 @@
+{
+  "id": "PF-0050",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "doctor reports the normal waiting state (gated checkpoint completed, review awaiting the human) as an integrity FAIL; it should flag only work that moved past a gated stage without approval",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-07T02:45:19.880Z",
+  "updatedAt": "2026-11-07T09:28:25.716Z",
+  "title": "doctor reports the normal waiting state (gated checkpoint completed, review awaiting the human) as an integrity FAIL; it should flag only work that moved past a gated stage without approval",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-11-07T02:45:19.892Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-07T09:28:25.716Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

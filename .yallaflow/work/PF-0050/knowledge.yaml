@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "business-rule",
+      "source": "implementation-runtime",
+      "summary": "A gated checkpoint is completed before its human review is requested (advance requests it and refuses to leave the stage until approval), so 'checkpoint completed + review awaiting_review at the gated stage' is the normal waiting state. doctor reports a gate inconsistency only when the work moved past the gated stage (or reached DONE) without approval.",
+      "evidence": [
+        "src/core/integrity.js",
+        "test/doctor-integrity.test.js"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-07T09:28:25.084Z",
+      "factId": "CTX-0110",
+      "promotedAt": "2026-11-07T09:28:25.350Z",
+      "target": "context/business-rules.md"
+    }
+  ],
+  "updatedAt": "2026-11-07T09:28:25.350Z",
+  "reviewedAt": "2026-11-07T09:28:25.350Z"
+}

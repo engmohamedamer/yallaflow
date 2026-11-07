@@ -8,7 +8,7 @@ import { latestVerification, listVerificationRuns } from './evidence.js';
 import { resolveInteractionPolicy, SKILL_TO_GATE } from '../behavior/interaction.js';
 import { gateStatus, loadReviews } from '../reviews/store.js';
 import { childProgressView, loadDecomposition, validateChildren } from '../decomposition/store.js';
-import { stageForSkill } from './workflows.js';
+import { stageForSkill, workflowStagesFor } from './workflows.js';
 import { loadBaseline } from '../baseline/store.js';
 import { CONTEXT_TARGETS } from '../knowledge/constants.js';
 import { appliedTransition, loadContextLedger, originKey } from '../context/ledger.js';
@@ -157,7 +157,16 @@ export async function checkWorkIntegrity(root, meta) {
     if (!stageForSkill(meta, skillId)) continue; // this workflow never gates this skill's stage exit
     if (ledger.skills[skillId]?.status !== 'completed') continue;
     const status = gateStatus(reviewLedger, gateName);
-    if (status !== 'approved') issues.push(`${meta.id}: ${gateName} checkpoint is completed but its review is ${status}.`);
+    if (status === 'approved') continue;
+    // A completed checkpoint whose review is still pending is the designed waiting state
+    // while the work stays at the gated stage (advance requests the review and refuses to
+    // leave the stage until approval). Only work that moved past the gate without an
+    // approval is inconsistent.
+    const stages = workflowStagesFor(meta);
+    const gated = stages.indexOf(stageForSkill(meta, skillId));
+    const current = stages.indexOf(meta.status);
+    if (gated >= 0 && current >= 0 && current <= gated) continue;
+    issues.push(`${meta.id}: ${gateName} checkpoint is completed but its review is ${status}, and the work has moved past that gate.`);
   }
 
   issues.unshift(...lifecycleIssues);

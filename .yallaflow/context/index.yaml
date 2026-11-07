@@ -11768,7 +11768,49 @@
       ],
       "createdAt": "2026-11-07T02:35:58.537Z",
       "updatedAt": "2026-11-07T02:35:58.537Z"
+    },
+    {
+      "id": "CTX-0110",
+      "area": "business-rule",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "A gated checkpoint is completed before its human review is requested (advance requests it and refuses to leave the stage until approval), so 'checkpoint completed + review awaiting_review at the gated stage' is the normal waiting state. doctor reports a gate inconsistency only when the work moved past the gated stage (or reached DONE) without approval.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0050",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/core/integrity.js",
+          "contentHash": "sha256:4205671c0ea7961792e8e74c700de1d9c401b592ce15d765b5947ba2fec5d61d",
+          "gitCommit": "212579be47e694885bf938c834a75710e1f4a819",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/doctor-integrity.test.js",
+          "contentHash": "sha256:0aa8cc9f47fd3e24a1276fcaa40ed91b52c9e8ede254e18659f043aeded92229",
+          "gitCommit": "212579be47e694885bf938c834a75710e1f4a819",
+          "workingTree": "modified"
+        }
+      ],
+      "verifiedAt": "2026-11-07T09:28:25.350Z",
+      "verifiedAtCommit": "212579be47e694885bf938c834a75710e1f4a819",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-07T09:28:25.350Z",
+          "workId": "PF-0050",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-07T09:28:25.350Z",
+      "updatedAt": "2026-11-07T09:28:25.350Z"
     }
   ],
-  "updatedAt": "2026-11-07T02:35:58.537Z"
+  "updatedAt": "2026-11-07T09:28:25.350Z"
 }

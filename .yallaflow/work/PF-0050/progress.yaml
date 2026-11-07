@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-07T02:45:32.601Z",
+      "completedAt": "2026-11-07T02:45:32.601Z",
+      "summary": "src/core/integrity.js (checkWorkIntegrity) flags every gated skill whose checkpoint is completed while gateStatus !== approved. The workflow itself creates that state: the planning/specification checkpoint must be completed before advance requests the review (reviews/store.js requestReview), and transitions.js blocks leaving the stage until approval. Reproduced on PF-0047/PF-0048: doctor prints 'plan checkpoint is completed but its review is awaiting_review' for both, although they wait correctly at PLAN."
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-07T02:45:38.680Z",
+      "completedAt": "2026-11-07T02:45:38.680Z",
+      "summary": "Root cause: the integrity rule in checkWorkIntegrity ignores the current stage, so the designed waiting state (gated checkpoint completed, review awaiting_review, stage still at the gate) is reported as FAIL. Fix: report only when the stage moved past the gated stage (or DONE) without approval.",
+      "evidence": [
+        "src/core/integrity.js:152-161",
+        "src/core/workflows.js",
+        "runtime:yallaflow doctor reports PF-0047/PF-0048 plan awaiting_review as FAIL while both wait at PLAN"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-07T09:28:24.420Z",
+      "completedAt": "2026-11-07T09:28:24.420Z",
+      "summary": "src/core/integrity.js: a completed gated checkpoint with a pending review is reported only when the work's stage is past the gated stage (or DONE); waiting at the gate is valid. Regression test in test/doctor-integrity.test.js covers both; it fails against the previous rule (mutation check) and passes with the fix."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T09:28:24.858Z",
+      "completedAt": "2026-11-07T09:28:24.858Z",
+      "summary": "V-001 npm run check: 877/877 pass; doctor on this repository reports no FAIL while PF-0047/PF-0048 waited at their plan gates."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-07T09:28:24.858Z"
+}

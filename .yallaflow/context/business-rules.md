@@ -81,4 +81,18 @@
   - test/work-lifecycle.test.js (repository @ b700b2c)
   - npm run check (passed) (runtime, PF-0041 V-002)
 
+<!-- yallaflow-fact:CTX-0110 -->
+### CTX-0110 — A gated checkpoint is completed before its human review is requested (advance requests it and refuses to leave the stage until approval), so 'checkpoint completed + review awaiting_review at the gated stage' is the normal waiting state. doctor reports a gate inconsistency only when the work moved past the gated stage (or reached DONE) without approval.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0050
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-07T09:28:25.350Z
+- **Verified:** 2026-11-07T09:28:25.350Z (commit 212579b)
+- **Evidence:**
+  - src/core/integrity.js (repository @ 212579b)
+  - test/doctor-integrity.test.js (repository @ 212579b)
+
 <!-- yallaflow-context:end -->
