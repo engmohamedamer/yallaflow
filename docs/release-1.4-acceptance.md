@@ -13,7 +13,7 @@ Status as of 2026-11-07, branch `feature/workspace-1.4`. **This is not a release
 | Development Runtime Manager | PF-0047 | Done; security-reviewed; evidence refreshed |
 | New Project Wizard | PF-0048 | Done; security-reviewed |
 | doctor no longer reports a gate awaiting review as a failure | PF-0050 | Done |
-| Integration and work-ID reconciliation plan | PF-0045, [`release-1.4-integration.md`](release-1.4-integration.md) | Plan done; merge blocked (see below) |
+| Integration and work-ID reconciliation plan | PF-0045, [`release-1.4-integration.md`](release-1.4-integration.md) | Preserved-lineage implementation verified (PF-0052); real merge awaits owner authorization |
 
 ## Install the candidate without replacing your 1.3.0
 
@@ -25,15 +25,20 @@ alias yf14="node ~/Amasi/YallaFlow-1.4/src/cli.js"
 yf14 --version            # 1.4.0
 ```
 
-Option 2: install the packaged candidate. This replaces the global `yallaflow`:
+## Isolated manual-testing environment
+
+The final source checkout is `~/Amasi/YallaFlow-1.4` on `feature/workspace-1.4`. Keep test projects separate:
 
 ```bash
-cd ~/Amasi/YallaFlow-1.4 && npm pack       # yallaflow-1.4.0.tgz
-npm install -g ./yallaflow-1.4.0.tgz
-# back to the published version: npm install -g yallaflow@1.3.0
+cd ~/Amasi/YallaFlow-1.4
+bash research/release-1.4/acceptance-env.sh ~/Amasi/YallaFlow-1.4-acceptance --offline
+source ~/Amasi/YallaFlow-1.4-acceptance/env.sh
+~/Amasi/YallaFlow-1.4-acceptance/start-console.sh
 ```
 
-Use a disposable project for the trials below, not a production repository. `yf14` stands for either option.
+The script refuses nonempty destinations. If the environment is already prepared, run only the last two commands. It creates an isolated console registry, a small existing-project fixture and a Node service. Services start only after your trust decision. `--offline` uses a Laravel-shaped detection fixture, not an installed Laravel application; omit it to run the pinned Laravel generator with Composer. Use the New Project Wizard for a real Laravel or JavaScript project inside the environment's `new-projects` folder. Your global 1.3.0 install and real projects stay untouched.
+
+Stop services with `yf14 runtime stop --all` from each project, then close the console. The entire acceptance folder is disposable. Existing browser screenshots are in `research/release-1.4/screenshots/`.
 
 ## Manual acceptance scenarios
 
@@ -49,7 +54,7 @@ Use a disposable project for the trials below, not a production repository. `yf1
 - `yf14 runtime trust <id>` in a terminal → type the id.
 - `yf14 runtime start <id>` → `running`. Then `yf14 runtime logs <id>`, `restart`, `stop`.
 - In the console, **Setup** tab: the same, with Trust needing the typed id.
-- Edit the port in `.yallaflow/runtime.yaml` → Start is disabled until you trust it again.
+- Edit the port in `.yallaflow/runtime.yaml`, a package/composer script, a direct shell script or a selected Compose file → trust must be renewed. Editing application code such as server.js deliberately keeps trust.
 - Kill the service yourself → it shows **failed**, never a false "running".
 - Close the console → the service keeps running; `yf14 runtime stop --all` stops it.
 
@@ -105,12 +110,12 @@ All are fixed:
 
 ## Release blockers (owner decisions needed)
 
-1. **Merge into `main`.** Blocked. Both branches use PF-0041..PF-0043 for different work. A Git merge would mix the histories. The proposed fix is a new, verified `work adopt` command that imports items under new IDs and keeps them byte-identical; it needs your approval first. See [`release-1.4-integration.md`](release-1.4-integration.md).
+1. **Merge into `main`.** The verified `history` mechanism preserves colliding records under their original IDs in immutable lineages. The real import and merge still need your final authorization. See [`release-1.4-integration.md`](release-1.4-integration.md).
 2. **Release authorization.** Version, tag, GitHub Release and npm publish all need your explicit go-ahead after acceptance.
 
 ## Residual risks (documented, not blocking by themselves)
 
-- **Trust covers definitions, not contents.** Command trust covers the definition, not what package scripts or local scripts do.
+- **Trust is bounded.** Package/composer scripts, direct shell scripts and selected Compose files are fingerprinted. Application code, indirect dependencies and environment values remain outside the fingerprint; see [`runtime.md`](runtime.md).
 - **Confirmations are not a security boundary.** "Human decision" confirmations (runtime trust, `new create`) prevent automation from confirming its own actions. A process with full control of your user account can bypass them.
 - **Log redaction is best effort.**
 - **`project.origin` can be added by hand.** Adding it to a config makes `brief` and the Overview show Greenfield wording. The enforced understanding gate already trusts the recorded `kind`, which can be edited just as easily, so this is advisory. Both are unchanged from earlier versions in principle.

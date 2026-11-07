@@ -1,0 +1,59 @@
+{
+  "id": "PF-0054",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Preserve the acceptance environment script in research/release-1.4 and provide an isolated disposable manual-testing setup",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-07T15:46:38.216Z",
+  "updatedAt": "2026-11-07T15:55:29.401Z",
+  "title": "Preserve the acceptance environment script in research/release-1.4 and provide an isolated disposable manual-testing setup",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-07T15:46:38.229Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0044",
+      "type": "file",
+      "name": "acceptance-env.sh",
+      "detectedFormat": "sh",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-07T15:47:34.791Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ],
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-07T15:55:29.401Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002",
+        "V-003"
+      ]
+    }
+  ]
+}

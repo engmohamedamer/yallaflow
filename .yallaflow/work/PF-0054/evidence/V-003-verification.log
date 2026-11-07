@@ -1,0 +1,30 @@
+
+== 1. Existing project (Brownfield): onboarding and stack detection
+Existing Shop — brownfield
+Project understanding: PROJECT_UNDERSTANDING_REQUIRED — an existing project with no approved project understanding yet — establish it once before substantial work
+Ask your agent: Establish project understanding for this repository.
+Project memory: 0 current · 0 fresh · 0 to revalidate · 0 disputed · 0 unresolved
+Declared stack: Laravel ^13.0, PHP ^8.3, Vite ^7.0.0, Node.js >=20, MySQL 8.4, Redis 7
+Languages (inferred from file counts): PHP (2), JavaScript (1)
+
+== 2. Runtime: a small Node web service with a dev script (added, NOT trusted, NOT started)
+web              stopped  NOT trusted · ports 4815
+
+== 3. Work management and gate decisions (in node-web)
+Node Web — 0% complete across 3 work item(s)
+Waiting for you: 0 · Active: 0 · Failing: 0 · Paused: 0 · New: 3 · Done: 0
+- PF-0001   0% New (new) — Change the greeting text
+- PF-0002   0% New (new) — Add a health endpoint with a reviewed specification
+- PF-0003   0% New (new) — Investigate slow responses on /
+
+
+== 4. Console project list (isolated) and launch script
+Saved console projects (/home/engamer/Amasi/YallaFlow-1.4-acceptance/config/yallaflow/console.json):
+  /home/engamer/Amasi/YallaFlow-1.4-acceptance/projects/existing-shop
+  /home/engamer/Amasi/YallaFlow-1.4-acceptance/projects/node-web
+
+Ready. Everything lives in /home/engamer/Amasi/YallaFlow-1.4-acceptance.
+  source /home/engamer/Amasi/YallaFlow-1.4-acceptance/env.sh          # yf14 = the 1.4.0 candidate; isolated config
+  /home/engamer/Amasi/YallaFlow-1.4-acceptance/start-console.sh       # console with the Agent Workspace (Codex, your existing login)
+New projects from the wizard: choose the parent folder /home/engamer/Amasi/YallaFlow-1.4-acceptance/new-projects
+Clean up: stop services (yf14 runtime stop --all in each project), close the console, delete /home/engamer/Amasi/YallaFlow-1.4-acceptance.
