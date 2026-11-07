@@ -58,6 +58,10 @@ test('plan: validated name, absent destination, no nesting, catalog-only stacks;
   assert.deepEqual(await readdir(parent), ['taken'], 'planning created nothing');
   assert.equal((await loadPlan(plan.id)).hash, plan.hash);
   await assert.rejects(createPlan({ name: 'x', parent, stack: 'laravel', install: true }), { code: 'NEW_PROJECT_INSTALL' });
+  // PF-0058: no generator wording for an empty project.
+  const empty = await createPlan({ name: 'notes', parent, stack: 'empty' });
+  assert.match(empty.body.steps.find((step) => step.id === 'promote').note, /^create the project folder .*notes only if it is still absent$/);
+  assert.match(plan.body.steps.find((step) => step.id === 'promote').note, /^move the generated project into /);
 });
 
 test('create: hash confirmation, staging, promotion, Core init with provenance â†’ Greenfield, first work item', { skip: !SUPPORTED }, async () => {
@@ -80,6 +84,11 @@ test('create: hash confirmation, staging, promotion, Core init with provenance â
   assert.equal((facts.facts ?? []).length, 0, 'no project-memory fact is created from generated code');
   const meta = JSON.parse(await readFile(path.join(root, '.yallaflow', 'work', result.workId, 'meta.yaml'), 'utf8'));
   assert.equal(meta.routingStatus, 'pending', 'the first work item is left for the developer to route');
+  // PF-0058: a short human title; the full request stays separate and invents nothing.
+  assert.equal(meta.titleHint, 'Set up storefront');
+  assert.match(meta.rawRequest, /^Set up storefront, Fake fake-ok \(generated with fake-gen@1\.0\.0; the generated code is not reviewed yet\): define the first product requirements/);
+  const snap = json(run(root, ['snapshot', '--json']));
+  assert.equal(snap.items.find((item) => item.id === result.workId).title, 'Set up storefront', 'the board shows the short title');
   assert.equal(JSON.parse(await readFile(path.join(root, '.yallaflow', 'state', 'current.yaml'), 'utf8')).activeWork, null);
   const brief = run(root, ['brief']);
   assert.equal(brief.status, 0, brief.stderr);

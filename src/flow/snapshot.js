@@ -122,7 +122,7 @@ async function collectItem(root, meta, state, metas = null) {
     id: meta.id,
     type: meta.type ?? null,
     scope: meta.scope ?? meta.complexity ?? null,
-    title: meta.title ?? meta.rawRequest ?? meta.id,
+    title: meta.title ?? meta.titleHint ?? meta.rawRequest ?? meta.id,
     routing: meta.routingStatus ?? 'routed',
     stage,
     parent: meta.parent ?? null,

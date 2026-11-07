@@ -107,7 +107,7 @@ export async function createPlan(input, { catalog = CATALOG, env = process.env, 
   const steps = [];
   if (entry.argv) steps.push({ id: 'generate', argv: entry.argv(name), cwd: '<staging>', network: entry.network, installsDependencies: entry.installsDependencies, runsPackageScripts: entry.runsPackageScripts });
   else steps.push({ id: 'generate', argv: null, cwd: '<staging>', network: false, installsDependencies: false, runsPackageScripts: false, note: 'create an empty project folder (no command runs)' });
-  steps.push({ id: 'promote', argv: null, note: `rename the generated folder to ${destination} only if it is still absent` });
+  steps.push({ id: 'promote', argv: null, note: entry.argv ? `move the generated project into ${destination} only if it is still absent` : `create the project folder ${destination} only if it is still absent` });
   if (install && entry.install) steps.push({ id: 'install', argv: entry.install, cwd: destination, network: true, installsDependencies: true, runsPackageScripts: true });
   steps.push({ id: 'init', argv: null, note: `YallaFlow Core init (--type greenfield) with wizard provenance` });
   steps.push({ id: 'first-work', argv: null, note: 'YallaFlow Core start --keep-active: a first setup work item for your agent' });
@@ -312,7 +312,7 @@ export async function createFromPlan(id, confirm, { catalog = CATALOG, env = pro
   }
   let workId = progress.steps['first-work']?.workId ?? null;
   if (!done('first-work')) {
-    workId = await hooks.firstWork(root, `Set up ${body.name} (${body.stackLabel}): confirm the local setup, the runtime profile and the first product requirements.`);
+    workId = await hooks.firstWork(root, firstWorkRequest(body), `Set up ${body.name}`);
     await mark('first-work', 'done', { workId });
   }
   if (progress.staging && !progress.stagingRemoved) {
@@ -328,6 +328,13 @@ export async function createFromPlan(id, confirm, { catalog = CATALOG, env = pro
     await savePlan(plan, env);
   }
   return { id, destination: root, workId, stack: body.stack };
+}
+
+// The first work item: a short title, and the request in the developer's terms. Nothing is
+// invented: no criteria, no architecture, only what the plan records.
+export function firstWorkRequest(body) {
+  const stack = body.generator ? `${body.stackLabel} (generated with ${body.generator.package}@${body.generator.version}; the generated code is not reviewed yet)` : 'an empty project (no code yet)';
+  return `Set up ${body.name}, ${stack}: define the first product requirements, then confirm the local setup and the runtime profile.`;
 }
 
 async function removeStaging(plan) {

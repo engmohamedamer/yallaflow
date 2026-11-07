@@ -5,6 +5,7 @@ import { CATALOG, describeCatalog } from '../newproject/catalog.js';
 import { createFromPlan, createPlan, discardPlan, listPlans, loadPlan } from '../newproject/project.js';
 import { initProject } from './init.js';
 import { createPendingIntake } from '../behavior/routing.js';
+import { shellQuote } from '../security/redact.js';
 
 export const NEW_USAGE = [
   'yallaflow new catalog [--json]',
@@ -19,7 +20,7 @@ export const NEW_USAGE = [
 // for the developer (never routed on their behalf, never made active).
 export const CORE_HOOKS = Object.freeze({
   initProject: (root, { name, origin }) => initProject(root, { name, kind: 'greenfield', mode: 'adaptive', origin }),
-  firstWork: async (root, request) => (await createPendingIntake(root, request, { keepActive: true })).id
+  firstWork: async (root, request, titleHint) => (await createPendingIntake(root, request, { keepActive: true, ...(titleHint ? { titleHint } : {}) })).id
 });
 
 function usage() {
@@ -99,9 +100,9 @@ async function run(rest, json) {
     if (!process.stdin.isTTY && process.env.YALLAFLOW_NEW_VIA !== 'console') throw Object.assign(new Error('Creating a project is a human decision: run `yallaflow new create` in a terminal after reviewing the plan, or confirm it on the console\'s New project page. It cannot be scripted.'), { code: 'NEW_PROJECT_INTERACTIVE' });
     const result = await createFromPlan(positionals[0], values.confirm, { hooks: CORE_HOOKS, onStep: (step, status) => { if (!json) console.log(`${step}: ${status}`); } });
     return out(json, { ok: true, ...result }, [
-      `Created ${result.destination} with YallaFlow initialized (new project; the generated code has not been reviewed).`,
+      `Created ${result.destination} with YallaFlow initialized (${result.stack === 'empty' ? 'new empty project' : 'new project; the generated code has not been reviewed'}).`,
       `First work item: ${result.workId} (not routed, not active).`,
-      `Next: open your coding agent in ${result.destination} and describe what you are building. Add it to the console with \`yallaflow console add ${result.destination}\`.`
+      `Next: open your coding agent in ${result.destination} and describe what you are building. Add it to the console with \`yallaflow console add ${shellQuote(result.destination)}\`.`
     ]);
   }
   if (action === 'discard') {

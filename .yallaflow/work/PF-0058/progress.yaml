@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-07T17:43:38.680Z",
+      "completedAt": "2026-11-07T17:43:38.680Z",
+      "summary": "Insights (resources/console/app.js viewInsights): curIndex maps state 'new' to -1 so New items vanish from 'Open work by station'; closed items are counted in stations and in 'Open work' (state !== 'done'); verification KPI shows 0% for 0/0. Wizard first work (src/commands/new.js CORE_HOOKS, src/newproject/project.js) passes a long generic request as the only text; Core already supports titleHint (behavior/routing.js) but snapshot item title ignores it (flow/snapshot.js:125). Plan 'promote' note says 'rename the generated folder' even for the empty stack. Displayed commands with paths are unquoted: new.js 'console add <destination>', app.js wizard outcome. Wizard review lists commands openly."
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T17:43:38.867Z",
+      "completedAt": "2026-11-07T17:43:38.867Z",
+      "summary": "Owner request (SRC on PF-0057, sections 6, 12, 13): New work shown in the station breakdown; 'No verification runs yet' when 0 runs; closed work excluded from open counts; short human title for the wizard's first work item with the full request kept as rawRequest; no fabricated criteria; empty-project wording; POSIX-quoted paths in displayed commands; commands under a collapsed Technical details. No new security or governance decision."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-07T17:43:39.064Z",
+      "completedAt": "2026-11-07T17:43:39.064Z",
+      "summary": "1) app.js viewInsights: New row + closed excluded + empty-state text for zero runs and for no open work. 2) snapshot.js title: meta.title ?? meta.titleHint ?? rawRequest. 3) new.js CORE_HOOKS.firstWork(root, request, titleHint) + project.js: title 'Set up <name>', request keeps stack and goal. 4) project.js promote note for empty stack. 5) shellQuote destination in new.js and app.js. 6) wizard review: 'What runs' in <details>. Tests: snapshot titleHint, newproject first-work title, empty-stack note."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-07T17:46:43.169Z",
+      "completedAt": "2026-11-07T17:46:43.169Z",
+      "summary": "Insights: New row in 'Open work by station' with an explanation, closed work excluded from station and Open work counts, 'No verification runs yet' instead of 0% for 0/0, weekly chart replaced by a short explanation while nothing is Done. Snapshot item title prefers titleHint for unrouted work. Wizard first work: titleHint 'Set up <name>' with the full request (stack, provenance, goal) kept as rawRequest, nothing invented. Empty stack: 'create the project folder' note, review and CLI completion wording without generator language. Displayed paths POSIX-quoted (CLI console add, console wizard result). Wizard commands under a collapsed Technical details. Tests: new-project (title, request, snapshot title, promote notes). Browser: Insights EN/AR on a disposable empty project in a path with spaces and Arabic, no page errors."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T17:54:32.050Z",
+      "completedAt": "2026-11-07T17:54:32.050Z",
+      "summary": "V-001 npm run check 925/925 (Node 22.23.4); new-project tests cover the title/request/snapshot title and promote notes; Insights checked in Chromium EN/AR on a disposable empty project under a path with spaces and Arabic (no page errors)."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-07T17:54:32.050Z"
+}
