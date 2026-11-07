@@ -21,11 +21,15 @@ BASE="$(cd "$BASE" && pwd)"
 if [ -n "$(ls -A "$BASE" 2>/dev/null)" ]; then echo "Refusing: $BASE is not empty." >&2; exit 1; fi
 case "$BASE" in "$HOME"|"$HOME/"|/|"$YF14_ROOT"|"$YF14_ROOT"/*) echo "Refusing: choose a dedicated folder for the acceptance environment." >&2; exit 1;; esac
 
-mkdir -p "$BASE/config" "$BASE/projects" "$BASE/new-projects"
+mkdir -p "$BASE/bin" "$BASE/config" "$BASE/projects" "$BASE/new-projects"
+printf '#!/usr/bin/env bash\nexec node %q "$@"\n' "$YF14_ROOT/src/cli.js" > "$BASE/bin/yallaflow"
+chmod +x "$BASE/bin/yallaflow"
 {
   printf '# Isolated YallaFlow 1.4.0 candidate environment\n'
   printf 'export XDG_CONFIG_HOME=%q\n' "$BASE/config"
   printf 'export YALLAFLOW_CONSOLE_CONFIG=%q\n' "$BASE/config/yallaflow/console.json"
+  printf 'export PATH=%q:"$PATH"\n' "$BASE/bin"
+  printf 'unalias yf14 2>/dev/null || true\n'
   printf 'yf14() { node %q "$@"; }\n' "$YF14_ROOT/src/cli.js"
   printf 'export -f yf14 2>/dev/null || true\n'
 } > "$BASE/env.sh"

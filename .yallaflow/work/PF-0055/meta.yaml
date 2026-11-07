@@ -1,0 +1,50 @@
+{
+  "id": "PF-0055",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Final 1.4 candidate validation: Node20 suite, 1.3 compatibility, package contents, independent review, concise acceptance report and cleanup of task temporary artifacts",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-07T15:55:30.402Z",
+  "updatedAt": "2026-11-07T16:03:11.142Z",
+  "title": "Final 1.4 candidate validation: Node20 suite, 1.3 compatibility, package contents, independent review, concise acceptance report and cleanup of task temporary artifacts",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-07T15:55:30.415Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-07T16:03:11.142Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004",
+        "V-005",
+        "V-006"
+      ]
+    }
+  ]
+}

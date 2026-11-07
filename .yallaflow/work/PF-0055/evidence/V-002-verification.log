@@ -1,0 +1,3 @@
+PASS frozen v1.3.0 compatibility: old workspace read-only in 1.4, optional runtime profile ignored safely, plain new workspace readable by 1.3.0.
+PASS package contents: 261 files, 2800463 unpacked bytes; required modules included, development/state/private files excluded; nothing published.
+Node 20.16.0

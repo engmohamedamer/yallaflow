@@ -36,7 +36,7 @@ source ~/Amasi/YallaFlow-1.4-acceptance/env.sh
 ~/Amasi/YallaFlow-1.4-acceptance/start-console.sh
 ```
 
-The script refuses nonempty destinations. If the environment is already prepared, run only the last two commands. It creates an isolated console registry, a small existing-project fixture and a Node service. Services start only after your trust decision. `--offline` uses a Laravel-shaped detection fixture, not an installed Laravel application; omit it to run the pinned Laravel generator with Composer. Use the New Project Wizard for a real Laravel or JavaScript project inside the environment's `new-projects` folder. Your global 1.3.0 install and real projects stay untouched.
+The script refuses nonempty destinations. If the environment is already prepared, run only the last two commands. It creates an isolated console registry, a small existing-project fixture and a Node service. Services start only after your trust decision. `--offline` uses a Laravel-shaped detection fixture, not an installed Laravel application; omit it to run the pinned Laravel generator with Composer. Use the New Project Wizard for a real Laravel or JavaScript project inside the environment's `new-projects` folder. The environment prepends its own bin/yallaflow wrapper, so Console agents also use 1.4.0. Your global 1.3.0 install and real projects stay untouched.
 
 Stop services with `yf14 runtime stop --all` from each project, then close the console. The entire acceptance folder is disposable. Existing browser screenshots are in `research/release-1.4/screenshots/`.
 
@@ -75,9 +75,12 @@ Stop services with `yf14 runtime stop --all` from each project, then close the c
 
 ## Test results
 
-- **Full suite (`npm run check`):** 902/902 on the final tree (PF-0048 V-003). The final integration run is recorded in PF-0051.
+- **Final full suite (`npm run check`): 925/925 on Node 20.16.0**, the minimum supported version (PF-0055 V-004). No failures or skips.
+- **Backward compatibility:** frozen v1.3.0 reads plain 1.4 workspaces and safely ignores optional runtime profiles; 1.4 read commands leave a 1.3 workspace byte-identical (PF-0055 V-002).
+- **Package:** 261 files; required history/runtime/console modules present; project state, tests, research, node_modules and environment files excluded. No package was published (PF-0055 V-002).
+- **Final independent review:** no remaining blocking findings after history, Runtime trust and acceptance-launcher fixes. The private acceptance wrapper resolves yallaflow to 1.4.0 without replacing the global CLI.
 - **Targeted refresh runs:** lifecycle, snapshot and doctor (PF-0041 V-003), console (PF-0043 V-002), overview and console server (PF-0046 V-003), runtime and network guard (PF-0047 V-003).
-- **Browser regression** (`research/release-1.4/browser-check.mjs`): Overview, Setup and New project in Chromium, Firefox and WebKit, in English and in Arabic with dark theme, plus mobile at 390 px. All pass with no page errors. Screenshots are in `research/release-1.4/screenshots/`.
+- **Browser regression (earlier acceptance evidence; screenshots retained)** (`research/release-1.4/browser-check.mjs`): Overview, Setup and New project in Chromium, Firefox and WebKit, in English and in Arabic with dark theme, plus mobile at 390 px. All pass with no page errors. Screenshots are in `research/release-1.4/screenshots/`.
 - **Real generators, end to end:** Laravel 13.11.0, create-vite 9.3.4 (React; Vue with install), create-next-app 16.4.5 and @nestjs/cli 12.0.12 created and initialized as Greenfield.
 
 ## Security reviews

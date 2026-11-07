@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "bash -c \"source /home/engamer/Amasi/YallaFlow-1.4-acceptance/env.sh; command -v yallaflow; yallaflow --version; yf14 --version; bash -n /home/engamer/Amasi/YallaFlow-1.4/research/release-1.4/acceptance-env.sh\"",
+      "executionMode": "argv",
+      "executable": "bash",
+      "args": [
+        "-c",
+        "source /home/engamer/Amasi/YallaFlow-1.4-acceptance/env.sh; command -v yallaflow; yallaflow --version; yf14 --version; bash -n /home/engamer/Amasi/YallaFlow-1.4/research/release-1.4/acceptance-env.sh"
+      ],
+      "displayCommand": "bash -c \"source /home/engamer/Amasi/YallaFlow-1.4-acceptance/env.sh; command -v yallaflow; yallaflow --version; yf14 --version; bash -n /home/engamer/Amasi/YallaFlow-1.4/research/release-1.4/acceptance-env.sh\"",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T15:57:13.828Z",
+      "finishedAt": "2026-11-07T15:57:15.174Z",
+      "verifiedAt": "2026-11-07T15:57:15.174Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "env PATH=/home/engamer/.nvm/versions/node/v20.16.0/bin:/usr/local/bin:/usr/bin:/bin node /tmp/yf14-final-check.mjs",
+      "executionMode": "argv",
+      "executable": "env",
+      "args": [
+        "PATH=/home/engamer/.nvm/versions/node/v20.16.0/bin:/usr/local/bin:/usr/bin:/bin",
+        "node",
+        "/tmp/yf14-final-check.mjs"
+      ],
+      "displayCommand": "env PATH=/home/engamer/.nvm/versions/node/v20.16.0/bin:/usr/local/bin:/usr/bin:/bin node /tmp/yf14-final-check.mjs",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T15:57:51.360Z",
+      "finishedAt": "2026-11-07T15:58:06.389Z",
+      "verifiedAt": "2026-11-07T15:58:06.389Z",
+      "log": "V-002-verification.log"
+    },
+    {
+      "id": "V-003",
+      "command": "bash -O expand_aliases -c \"alias yf14=false; source /home/engamer/Amasi/YallaFlow-1.4-acceptance/env.sh; yf14 --version\"",
+      "executionMode": "argv",
+      "executable": "bash",
+      "args": [
+        "-O",
+        "expand_aliases",
+        "-c",
+        "alias yf14=false; source /home/engamer/Amasi/YallaFlow-1.4-acceptance/env.sh; yf14 --version"
+      ],
+      "displayCommand": "bash -O expand_aliases -c \"alias yf14=false; source /home/engamer/Amasi/YallaFlow-1.4-acceptance/env.sh; yf14 --version\"",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T15:59:25.944Z",
+      "finishedAt": "2026-11-07T15:59:26.524Z",
+      "verifiedAt": "2026-11-07T15:59:26.524Z",
+      "log": "V-003-verification.log"
+    },
+    {
+      "id": "V-004",
+      "command": "env PATH=/home/engamer/.nvm/versions/node/v20.16.0/bin:/usr/local/bin:/usr/bin:/bin npm run check",
+      "executionMode": "argv",
+      "executable": "env",
+      "args": [
+        "PATH=/home/engamer/.nvm/versions/node/v20.16.0/bin:/usr/local/bin:/usr/bin:/bin",
+        "npm",
+        "run",
+        "check"
+      ],
+      "displayCommand": "env PATH=/home/engamer/.nvm/versions/node/v20.16.0/bin:/usr/local/bin:/usr/bin:/bin npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T15:55:30.875Z",
+      "finishedAt": "2026-11-07T16:01:39.657Z",
+      "verifiedAt": "2026-11-07T16:01:39.657Z",
+      "log": "V-004-verification.log"
+    },
+    {
+      "id": "V-005",
+      "command": "python3 /tmp/yf14-cleanup.py",
+      "executionMode": "argv",
+      "executable": "python3",
+      "args": [
+        "/tmp/yf14-cleanup.py"
+      ],
+      "displayCommand": "python3 /tmp/yf14-cleanup.py",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T16:02:20.257Z",
+      "finishedAt": "2026-11-07T16:02:33.822Z",
+      "verifiedAt": "2026-11-07T16:02:33.822Z",
+      "log": "V-005-verification.log"
+    },
+    {
+      "id": "V-006",
+      "command": "node src/cli.js doctor",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "src/cli.js",
+        "doctor"
+      ],
+      "displayCommand": "node src/cli.js doctor",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T16:02:49.545Z",
+      "finishedAt": "2026-11-07T16:02:50.192Z",
+      "verifiedAt": "2026-11-07T16:02:50.192Z",
+      "log": "V-006-verification.log"
+    }
+  ]
+}
