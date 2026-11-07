@@ -12,7 +12,19 @@
       "answer": "Owner (2026-11-07, agent session) chose 'Add Claude Code': an agent picker with Codex or Claude Code, each on the developer's own subscription, never API keys; restored from YallaFlow-agent-1.3 as separate work with its own security review. This reverses the 1.3.0 exclusion of Claude Code.",
       "resolution": "Owner decision, accepted.",
       "resolvedAt": "2026-11-07T19:12:03.783Z"
+    },
+    {
+      "id": "Q-002",
+      "category": "architecture",
+      "question": "Claude Code can only join a session the developer starts (Channels, --dangerously-load-development-channels, development warning, no console Stop, whole-message replies) and Anthropic's written answer (D1) has not arrived. How does it enter 1.4?",
+      "status": "resolved",
+      "material": true,
+      "createdAt": "2026-11-07T19:41:32.074Z",
+      "updatedAt": "2026-11-07T19:41:32.667Z",
+      "answer": "Owner (2026-11-07, agent session) chose 'Experimental in the picker': Codex (managed) and Claude Code (experimental) in the agent picker; the console shows the launch command, the developer runs it, then two-way chat; off by default with an explicit opt-in; restored from YallaFlow-agent-1.3 with a full security review.",
+      "resolution": "Owner decision, accepted.",
+      "resolvedAt": "2026-11-07T19:41:32.667Z"
     }
   ],
-  "updatedAt": "2026-11-07T19:12:03.783Z"
+  "updatedAt": "2026-11-07T19:41:32.667Z"
 }

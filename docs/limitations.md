@@ -20,7 +20,7 @@ Known gaps and deliberate boundaries. Planned work is tracked in [`roadmap.md`](
   - **Browser coverage.** It is tested in Chromium, Firefox and WebKit through Playwright on Linux. It has not been tested in desktop Safari, on Windows or macOS hosts, or with screen readers.
 - **Agent Workspace (1.3.0).**
   - **Codex** needs the separately installed `@agentclientprotocol/codex-acp` 2.x adapter, a third-party package. The adapter wraps Codex's App Server, which OpenAI labels experimental; its behavior can change between Codex versions.
-  - **Claude Code is not included.** The Claude Code connection is not part of the release. It exists as an experiment in development builds only, until Anthropic confirms that a third-party tool may distribute it.
+  - **Claude Code is experimental (1.4.0).** The connection joins a Claude Code session you start yourself, needs the development-channel flag (Claude shows a warning), has no Stop from the console and delivers whole-message replies. It is off by default and turned on per console run only by your explicit choice, until Anthropic confirms that a third-party tool may distribute it.
   - **Permission enforcement is the provider's.** YallaFlow denies unanswered requests it receives. It can't see or block actions a provider approves on its own.
   - **One managed session per checkout.** Live attach to a Codex session running in a terminal is not supported.
   - **Process cleanup has limits.** Ending a Codex session ends the adapter's process group. On Linux, it also ends every process the adapter started. Still:

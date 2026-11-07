@@ -11,7 +11,9 @@ test('exposes the YallaFlow product and CLI identity', async () => {
   assert.deepEqual(pkg.repository, { type: 'git', url: 'git+https://github.com/engmohamedamer/yallaflow.git' });
   assert.deepEqual(pkg.publishConfig, { access: 'public' });
   // The experimental Claude Code connection (development builds only) never enters a package.
-  assert.deepEqual(pkg.files, ['src', 'resources', 'docs', 'README.md', 'CHANGELOG.md', 'LICENSE', '!src/agents/claude.js', '!src/agents/claude-files.js', '!src/agents/claude-detect.js', '!resources/agents/claude-channel.mjs', '!resources/agents/claude-hook.mjs', '!docs/agents-claude-experimental.md']);
+  // 1.4.0 (PF-0060, owner decision): the experimental Claude Code connection ships in the
+  // package, off by default; no file is excluded any more.
+  assert.deepEqual(pkg.files, ['src', 'resources', 'docs', 'README.md', 'CHANGELOG.md', 'LICENSE']);
   assert.equal(pkg.description, 'AI-agnostic engineering governance layer for coding agents: durable project memory, adaptive workflows, and evidence-backed delivery.');
   assert.deepEqual(pkg.bin, { yallaflow: 'src/cli.js' });
   assert.equal(pkg.version, '1.4.0');

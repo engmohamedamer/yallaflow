@@ -46,9 +46,23 @@ Classify only relevant decisions as confirmed, proposed, unresolved, or not appl
 
 ### Goal and Scope
 
+Let the developer choose the agent in the console's floating chat: Codex (managed session, unchanged) or Claude Code (experimental). Claude Code joins a session the developer starts in a terminal with the command the console shows; chat then works both ways. In scope: shipping the existing Claude channel files in the package, the picker, the opt-in, the connect flow in the floating window, honest limits, docs and a full security review. Out of scope: YallaFlow launching `claude`, the Agent SDK / ACP adapter / `claude -p` (not allowed on a subscription), Stop for Claude, token streaming.
+
 ### Actors and Permissions
 
+- Developer: enables agents, opts in to Claude Code, runs the launch command, chats, answers permission prompts.
+- Claude Code: the developer's own unmodified binary and subscription login; YallaFlow never starts or authenticates it.
+- Console: relays chat and permission prompts through the YallaFlow channel (bridge token per run) and records activation only through Core.
+
 ### Functional Requirements and Business Rules
+
+1. The five Claude files, its test and its document move into the repository and the package (package.json exclusions removed; CLAUDE_NOT_INCLUDED stays as the guard for builds without them).
+2. Opt-in: Claude Code is never on by default. CLI: `yallaflow console --agents --experimental-claude` (unchanged). Console: the "Enable agents" confirmation offers a separate, unchecked "Also allow Claude Code (experimental)" choice; it lasts for the run only and is refused in `--read-only`.
+3. Picker in the floating chat: Codex and Claude Code, each with its readiness (installed, version, login type from `claude auth status`, never a credential) and its limits; Claude is labelled experimental.
+4. Connecting Claude Code: the window shows the exact launch command (including `--dangerously-load-development-channels`) and explains the development warning Claude will show; it writes only the git-ignored local connection files; after the developer starts Claude, the window shows "connected" and chat works both ways (whole messages).
+5. Limits shown honestly: no Stop from the console, replies arrive whole, permission prompts are relayed when Claude asks (Claude's own mode decides), a mode that skips permissions is flagged and messages are refused.
+6. API keys are never used or required; ANTHROPIC_API_KEY is never passed or read.
+7. Codex behavior is unchanged; one agent session per checkout.
 
 ### Workflows and Lifecycle
 
@@ -58,13 +72,24 @@ Classify only relevant decisions as confirmed, proposed, unresolved, or not appl
 
 ### Security and Privacy
 
+Restored surface: the bridge routes for the channel and hooks (bridge token, no browser Origin), the local connection files under .yallaflow/local, `claude auth status` parsing. Full independent security review on an isolated copy before DONE (the 1.3.0 review of these files is input, not a substitute).
+
 ### UI / Screens
 
 ### Acceptance Criteria
 
 ### Unresolved Items
 
+- Anthropic's written answer (D1) on distributing the channel is still pending; the feature ships as experimental and off by default, and the docs say so.
+- Permission relay was not exercised on a real session in the 1.3 PoC (auto mode approved everything); a manual-mode relay check on the owner's subscription needs the owner to run Claude Code (planned as the last verification step, with the owner).
+
 ## Implementation Plan
+
+1. Bring the files from ~/Amasi/YallaFlow-agent-1.3 (read only there): src/agents/claude.js, claude-files.js, claude-detect.js, resources/agents/claude-channel.mjs, claude-hook.mjs, test/agent-claude-experimental.test.js, docs/agents-claude-experimental.md; reconcile with main's newer bridge.js; remove the package.json exclusions.
+2. Server: enable route accepts {confirm, claude?}; Claude only with an explicit true; GET /api/agents reports Claude readiness when opted in.
+3. UI: picker and connect flow inside the floating chat; enable dialog with the separate Claude choice; limits text.
+4. Docs/CHANGELOG: experimental status, D1 pending, launch command, limits.
+5. Verification: full suite, simulated Claude channel tests, browser check of the picker, independent security review on an isolated copy, then a real-session check with the owner (manual mode: chat, a permission prompt allowed and denied).
 
 ## Verification Evidence
 

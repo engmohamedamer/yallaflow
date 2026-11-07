@@ -46,6 +46,8 @@ Nothing yet.
   - **Enable Codex for this session** in a normal console; the Agent panel explains when agents are off or not ready. **Add a service yourself** and **Add this service** on Setup; **Initialize Git** on the Overview and Worktrees.
   - The console starts with no saved project (except `--read-only`), so the first project can be created from the browser.
   - Unclassified work opens on its request; the Flow explains empty stations for new work.
+- **Agent chat as a floating window** (PF-0059): a corner button with the session state; a chat icon on each board card; stage-aware suggestions that only fill the message box. A failed Codex turn (for example a usage limit) now ends the turn and is explained in plain words instead of a stuck "Working…".
+- **Claude Code as an experimental agent** (PF-0060): the chat's picker offers Codex and Claude Code (experimental). Claude Code joins a session you start yourself; it is off by default and turned on per console run only by an explicit choice (or `--experimental-claude`). The Claude connection files are now part of the package. Anthropic's written confirmation is still pending.
   - **Stacks.** Laravel, React/Vue with Vite, Next.js, NestJS or Empty, each an official generator pinned to an exact version, or a recommendation from your own agent.
   - **Plan first.** A plan with the exact commands is reviewed and confirmed by its hash before anything runs.
   - **Safe creation.** Staged generation is moved only into an absent destination; failures keep staging and the log.

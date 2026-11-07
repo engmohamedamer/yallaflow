@@ -34,13 +34,7 @@
     "docs",
     "README.md",
     "CHANGELOG.md",
-    "LICENSE",
-    "!src/agents/claude.js",
-    "!src/agents/claude-files.js",
-    "!src/agents/claude-detect.js",
-    "!resources/agents/claude-channel.mjs",
-    "!resources/agents/claude-hook.mjs",
-    "!docs/agents-claude-experimental.md"
+    "LICENSE"
   ],
   "scripts": {
     "test": "node --import ./test-support/isolate-user-config.js --test",

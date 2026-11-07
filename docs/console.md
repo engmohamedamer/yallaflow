@@ -218,7 +218,7 @@ When a gate waits for review (for example the specification or the plan), the it
 
 ## Agent Workspace (1.3.0, opt-in)
 
-With `yallaflow console --agents`, a work item gets an **Agent** panel for working with Codex (managed sessions on your ChatGPT login). In a normal console started without the flag, the panel says the Agent Workspace is off and offers **Enable Codex for this session** (with a confirmation): it lasts for this console run only, starts no session and activates no work item. A `--read-only` console never enables it. Activating a work item and starting a session stay two separate, explicit actions. See [`agents.md`](agents.md).
+With `yallaflow console --agents`, a work item gets an **Agent** panel for working with Codex (managed sessions on your ChatGPT login). The chat opens as a floating window from the corner button (its dot shows working, ready or waiting for your approval); each board card has a chat icon that opens the item with a "where is it" question in the box, and suggestions that fit the item's stage only fill the box. In a normal console started without the flag, the chat says the Agent Workspace is off and offers **Enable agents for this session** (with a confirmation): it lasts for this console run only, starts no session and activates no work item. The same dialog offers a separate, unchecked **Also allow Claude Code (experimental)**; see [`agents-claude-experimental.md`](agents-claude-experimental.md). A `--read-only` console never enables it. Activating a work item and starting a session stay two separate, explicit actions. See [`agents.md`](agents.md).
 
 ## Security
 

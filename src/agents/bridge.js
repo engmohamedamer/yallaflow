@@ -4,7 +4,7 @@
 // - Session records and permission decisions live in .yallaflow/local/agent-sessions/
 //   (git-ignored). Transcripts stay with the provider; credentials are never touched.
 // - It never activates work, approves gates, or writes .yallaflow outside local/.
-import { randomBytes, timingSafeEqual } from 'node:crypto';
+import { createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import { lstat, readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { safeAppendFile, safeLocalDir, safeRemove, safeWriteFile } from './local-files.js';
@@ -164,6 +164,18 @@ export class AgentBridge {
     for (const project of this.projects.values()) if (project.bridgeToken && sameToken(token, project.bridgeToken)) return project;
     return null;
   }
+  // Proof for the channel/hook server check: HMAC(token, nonce) for the project whose token
+  // fingerprint matches. It reveals nothing that helps forge a token or a proof.
+  bridgeProof(id, nonce) {
+    if (!/^[0-9a-f]{16}$/.test(id) || !/^[0-9a-f]{32}$/.test(nonce)) return null;
+    for (const project of this.projects.values()) {
+      if (!project.bridgeToken) continue;
+      if (createHash('sha256').update(project.bridgeToken).digest('hex').slice(0, 16) !== id) continue;
+      return createHmac('sha256', project.bridgeToken).update(`yallaflow-bridge:${nonce}`).digest('hex');
+    }
+    return null;
+  }
+
 
   emit(project, event) {
     project.events.push(event);

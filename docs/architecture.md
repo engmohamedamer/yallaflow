@@ -635,7 +635,7 @@ QC policy is advisory (default) or strict. Strict quality approval is *computed*
   - **Process.** A dependency-free ACP client spawns the user-installed `codex-acp` (argv only, cwd = project root). Its environment carries no API keys.
   - **Gates.** A session starts only after the adapter reports a ChatGPT account login, and modes matching full-access/bypass are refused.
   - **Permissions.** Requests become console permission cards.
-- **Claude Code.** Not part of releases. An experimental channel-based connection exists in development builds only (`docs/agents-claude-experimental.md`). Shared code loads it on demand through `experimental.js`, which refuses when its files are absent.
+- **Claude Code.** Experimental in 1.4.0 and off by default (`docs/agents-claude-experimental.md`): a channel-based connection to a session the developer starts. Shared code loads it on demand through `experimental.js`, which refuses when its files are absent; the console enables it per run only with `--experimental-claude` or an explicit choice in the enable dialog.
 - **Bridge** (`bridge.js`).
   - **Concurrency.** One session per project root.
   - **Permissions.** The pending-permission map denies on timeout, on session end, and on console shutdown.

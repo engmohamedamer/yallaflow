@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-07T19:41:50.934Z",
+      "completedAt": "2026-11-07T19:41:50.934Z",
+      "summary": "Bridge, experimental loader (src/agents/experimental.js FILES), console --experimental-claude flag and UI Claude paths are in main; the five Claude files, its test (test/agent-claude-experimental.test.js) and docs/agents-claude-experimental.md exist only untracked in ~/Amasi/YallaFlow-agent-1.3 and are excluded by package.json files. research/agent-interaction/DECISION_SUMMARY.md: Claude via Agent SDK/ACP/-p is NO-GO under subscription terms; joining the user's own session through Channels + hooks is viable on the owner's plan (PoC), needs --dangerously-load-development-channels, no console cancel, whole-message replies; Anthropic D1 unanswered; permission relay not exercised (auto mode)."
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T19:41:51.132Z",
+      "completedAt": "2026-11-07T19:41:51.132Z",
+      "summary": "Owner Q-001: add Claude Code as a selectable agent; Q-002: experimental in the picker, launch command shown, developer runs it, two-way chat, off by default with explicit opt-in, restored from agent-1.3 with a full security review. Subscription only, never API keys."
+    },
+    "design-exploration": {
+      "status": "completed",
+      "startedAt": "2026-11-07T19:41:51.325Z",
+      "completedAt": "2026-11-07T19:41:51.325Z",
+      "summary": "Chosen: restore the existing channel design (no new protocol) and expose it through the PF-0059 floating chat as a picker. Opt-in: the in-console 'Enable agents' dialog gains a separate, unchecked 'Also allow Claude Code (experimental)' choice; the CLI keeps --experimental-claude. Rejected: Agent SDK/ACP/-p (terms), console-launched claude (D1 question 3 unanswered), on-by-default."
+    },
+    "specification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T19:42:21.951Z",
+      "completedAt": "2026-11-07T19:42:21.951Z",
+      "summary": "Specification in work.md: picker in the floating chat, explicit per-run Claude opt-in, connect-your-session flow, honest limits, files shipped in the package, full security review; 4 REQ / 4 AC."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-07T19:42:57.536Z",
+      "completedAt": "2026-11-07T19:42:57.536Z",
+      "summary": "Plan in work.md: restore files from agent-1.3, enable endpoint with separate Claude choice, picker/connect UI in the floating chat, docs, verification incl. isolated security review and a real manual-mode session with the owner."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-07T19:47:42.814Z",
+      "completedAt": "2026-11-07T19:47:42.814Z",
+      "summary": "Restored the five Claude files, its test and doc from ~/Amasi/YallaFlow-agent-1.3 (copied; that checkout untouched) and removed the package.json exclusions. Server: claudeOn per run (flag or explicit {confirm, claude:true} on /api/agents/enable; refused read-only; CLAUDE_NOT_INCLUDED when files absent); /api/agents reports Claude readiness. UI: enable dialog with a separate unchecked Claude choice listing its limits; picker in the floating chat (existing provider picks). Docs: agents, console, limitations, architecture, experimental doc, CHANGELOG."
+    },
+    "verification": {
+      "status": "pending"
+    },
+    "delivery-convergence": {
+      "status": "pending"
+    },
+    "code-review": {
+      "status": "pending"
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Security review findings for the restored Claude connection were fixed in this item: detection only after opt-in; a failed runtime enable closes the half-opened bridge; the channel and hook require the console to prove the bridge token (HMAC over a nonce at /hello) and the recorded pid to be alive before sending anything; launch files written only after the slot is claimed; non-object bodies ignored, one prompt per request id and at most 20 waiting; the UI reports when Claude was not turned on",
+      "reason": "Independent review on an isolated copy (2 medium, 2 low, 3 info); all addressed with regression tests where testable (connect ordering by code reading)",
+      "costIfWrong": "A stale bridge file could still be abused by a same-user process, which can read the token anyway (documented threat model)",
+      "createdAt": "2026-11-07T20:16:35.818Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-07T20:16:35.818Z"
+}

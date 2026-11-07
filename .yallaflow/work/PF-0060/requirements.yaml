@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "The floating chat offers an agent picker with Codex and Claude Code (experimental), each with its readiness and limits.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-001"
+        },
+        {
+          "type": "question",
+          "question": "Q-002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T19:42:21.557Z",
+      "updatedAt": "2026-11-07T19:42:21.557Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "Claude Code is off by default and needs an explicit opt-in for the run (CLI flag or a separate unchecked choice when enabling agents), never in --read-only.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T19:42:21.557Z",
+      "updatedAt": "2026-11-07T19:42:21.557Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "Claude Code joins a session the developer starts with the launch command the console shows; chat then works both ways; YallaFlow never starts or authenticates Claude and never uses API keys.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T19:42:21.557Z",
+      "updatedAt": "2026-11-07T19:42:21.557Z"
+    },
+    {
+      "id": "REQ-004",
+      "statement": "The limits are shown honestly: experimental, development-channel warning, no Stop, whole-message replies, D1 pending.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T19:42:21.557Z",
+      "updatedAt": "2026-11-07T19:42:21.557Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "With agents and Claude enabled, the picker lists Codex and Claude Code with readiness from detection (no credential read); Codex behavior and its tests are unchanged.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-001"
+        },
+        {
+          "type": "question",
+          "question": "Q-002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T19:42:21.557Z",
+      "updatedAt": "2026-11-07T19:42:21.557Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-002",
+      "statement": "POST /api/agents/enable turns Claude on only with claude:true; without it Claude routes stay 404; --read-only refuses; the package contains the Claude files (npm pack lists them) and builds without them still refuse with CLAUDE_NOT_INCLUDED.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T19:42:21.557Z",
+      "updatedAt": "2026-11-07T19:42:21.557Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-003",
+      "statement": "Connecting writes only git-ignored files under .yallaflow/local, shows the exact launch command, and a simulated channel test exchanges a message both ways and relays a permission allow and deny; no ANTHROPIC_API_KEY reaches anything.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T19:42:21.557Z",
+      "updatedAt": "2026-11-07T19:42:21.557Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-004",
+      "statement": "The window and docs state experimental status, the development warning, no Stop, whole-message replies and that Anthropic's answer is pending.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-07T19:42:21.557Z",
+      "updatedAt": "2026-11-07T19:42:21.557Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-07T19:42:21.557Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-07T19:42:21.557Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-07T19:42:21.557Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-004",
+      "at": "2026-11-07T19:42:21.557Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-07T19:42:21.557Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-07T19:42:21.557Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-07T19:42:21.557Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-11-07T19:42:21.557Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-07T19:42:21.557Z"
+}

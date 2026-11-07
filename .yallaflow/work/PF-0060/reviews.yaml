@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "gates": {
+    "specification": {
+      "status": "approved",
+      "respondedAt": "2026-11-07T19:42:57.137Z",
+      "note": "Approved by the owner in the agent session (2026-11-07): selected 'Approve the spec' for the PF-0060 specification summary.",
+      "history": [
+        {
+          "status": "awaiting_review",
+          "at": "2026-11-07T19:42:22.145Z"
+        },
+        {
+          "status": "approved",
+          "at": "2026-11-07T19:42:57.137Z",
+          "note": "Approved by the owner in the agent session (2026-11-07): selected 'Approve the spec' for the PF-0060 specification summary."
+        }
+      ]
+    },
+    "plan": {
+      "status": "approved",
+      "respondedAt": "2026-11-07T19:42:57.943Z",
+      "note": "Approved by the owner in the agent session (2026-11-07): selected 'Approve the plan' for PF-0060, answered separately from the specification.",
+      "history": [
+        {
+          "status": "awaiting_review",
+          "at": "2026-11-07T19:42:57.750Z"
+        },
+        {
+          "status": "approved",
+          "at": "2026-11-07T19:42:57.943Z",
+          "note": "Approved by the owner in the agent session (2026-11-07): selected 'Approve the plan' for PF-0060, answered separately from the specification."
+        }
+      ]
+    }
+  },
+  "updatedAt": "2026-11-07T19:42:57.943Z"
+}

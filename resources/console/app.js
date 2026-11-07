@@ -106,6 +106,7 @@
         readOnly = listed.readOnly !== false;
         agentsOn = Boolean(listed.agents?.enabled);
         agentsCanEnable = Boolean(listed.agents?.canEnable);
+        agentsClaudeAvailable = Boolean(listed.agents?.claudeAvailable);
         if (!projects.some((p) => p.id === pid)) pid = projects[0]?.id ?? null;
       }
       // No project yet (1.4.0): an empty console starts on project creation.
@@ -955,7 +956,7 @@
       row(origin.stack?.length ? 'done' : 'todo', A('التقنية', 'Stack'), origin.stack?.length ? esc(origin.stack.join(' · ')) : A('مفيش تقنية لسه (مشروع فاضي). اختارها مع وكيلك.', 'No stack yet (an empty project). Choose it with your agent.')),
       row(services?.length ? 'done' : envName ? 'now' : 'todo', A('بيئة التطوير', 'Development environment'), services?.length ? A(`${services.length} خدمة معرّفة.`, `${services.length} service(s) defined.`) : envName ? A(`${envName} — مخطّطة، لسه مفيش خدمات معرّفة.`, `${envName} — planned; no services defined yet.`) : A('لسه متحددتش.', 'Not decided yet.'), readOnly ? '' : `<a class="btn sm" href="#/setup">${A('اضبط التشغيل', 'Configure runtime')}</a>`),
       row(gitOn ? 'done' : 'todo', 'Git', gitOn ? A('فيه Git repository.', 'A Git repository exists.') : A('مفيش Git repository لسه.', 'No Git repository yet.'), gitOn || readOnly ? '' : `<button class="btn sm" data-git-init>${A('اعمل Git repository', 'Initialize Git')}</button>`),
-      row(agentsOn ? 'done' : 'todo', A('الوكيل', 'Agent'), agentsOn ? A('مساحة الوكيل مفعّلة: افتح أي شغلانة وابدأ جلسة Codex.', 'The Agent Workspace is on: open a work item and start a Codex session.') : agentInfo?.codex && !agentInfo.codex.ready ? A('Codex مش جاهز على الجهاز ده.', 'Codex is not ready on this machine.') : A('مساحة الوكيل مقفولة. تقدر تشتغل من الوكيل في الترمينال كمان.', 'The Agent Workspace is off. You can also work from your agent in a terminal.'), !agentsOn && agentsCanEnable ? `<button class="btn sm" data-agents-enable>${A('فعّل Codex للجلسة دي', 'Enable Codex for this session')}</button>` : '')
+      row(agentsOn ? 'done' : 'todo', A('الوكيل', 'Agent'), agentsOn ? A('مساحة الوكيل مفعّلة: افتح أي شغلانة وابدأ جلسة Codex.', 'The Agent Workspace is on: open a work item and start a Codex session.') : agentInfo?.codex && !agentInfo.codex.ready ? A('Codex مش جاهز على الجهاز ده.', 'Codex is not ready on this machine.') : A('مساحة الوكيل مقفولة. تقدر تشتغل من الوكيل في الترمينال كمان.', 'The Agent Workspace is off. You can also work from your agent in a terminal.'), !agentsOn && agentsCanEnable ? `<button class="btn sm" data-agents-enable>${A('فعّل الوكلاء للجلسة دي', 'Enable agents for this session')}</button>` : '')
     ].join('');
     const firstCard = first ? `<section class="panel"><h2>${A('أول شغلانة', 'First work item')}</h2><p><a href="#/item/${encodeURIComponent(first.id)}"><span class="ltr tag">${esc(first.id)}</span> ${esc(first.title)}</a></p><p class="small">${chip(first.state === 'new' ? 'todo' : first.state)} ${iso(nowText(first))}</p></section>` : '';
     const main = o.stack.entries.filter((e) => !['language', 'lockfile', 'ecosystem', 'ci'].includes(e.kind));
@@ -1320,6 +1321,7 @@
     unavailable = listed.unavailable ?? [];
     agentsOn = Boolean(listed.agents?.enabled);
     agentsCanEnable = Boolean(listed.agents?.canEnable);
+    agentsClaudeAvailable = Boolean(listed.agents?.claudeAvailable);
   }
   async function afterCreate(outcome) {
     await uploadPlanned();
@@ -1395,12 +1397,29 @@
 
   // ---------- agents (1.4.0, PF-0057): off / unavailable / on, enabled for this run ----------
   let agentsCanEnable = false;
+  let agentsClaudeAvailable = false;
   let agentInfo = null;
   async function loadAgentInfo() { try { agentInfo = await api('/api/agents'); agentsCanEnable = agentInfo.canEnable; } catch { agentInfo = null; } }
-  async function enableAgents() {
-    if (!confirm(A('تفعيل Codex للجلسة دي بس من الكونسول؟ مفيش جلسة بتبدأ ومفيش شغلانة بتتفعّل لوحدها. Codex بيستخدم اشتراك ChatGPT بتاعك، ومن غير مفاتيح API.', 'Enable Codex for this console session only? No session starts and no work item is activated on its own. Codex uses your ChatGPT subscription, never API keys.'))) return;
+  // Enabling agents for this run (PF-0059/PF-0060): Codex, and Claude Code only if the
+  // developer ticks its separate, unchecked, clearly experimental choice.
+  function enableAgents() {
+    let d = document.getElementById('agentsdlg');
+    if (!d) { d = document.createElement('dialog'); d.id = 'agentsdlg'; d.className = 'panel'; document.body.appendChild(d); }
+    const claudeChoice = agentsClaudeAvailable ? `<label class="small optin"><input type="checkbox" name="claude"> <b>${A('اسمح كمان بـ Claude Code (تجريبي)', 'Also allow Claude Code (experimental)')}</b></label>
+      <ul class="tiny muted"><li>${A('بتشغّل Claude Code بنفسك في الترمينال بالأمر اللي هيظهر، وبعدها الشات بيشتغل في الاتجاهين.', 'You start Claude Code yourself in a terminal with the command shown; then the chat works both ways.')}</li><li>${A('بيحتاج --dangerously-load-development-channels، وClaude هيعرض تحذير قناة تطوير.', 'It needs --dangerously-load-development-channels, and Claude shows a development-channel warning.')}</li><li>${A('مفيش «وقّف» من الكونسول، والردود بتوصل كرسالة كاملة.', 'No Stop from the console; replies arrive as whole messages.')}</li><li>${A('رد Anthropic المكتوب على توزيع القناة لسه مستنيينه.', "Anthropic's written answer on distributing the channel is still pending.")}</li><li>${A('بيكتب ملف اتصال في .yallaflow/local (متجاهَل من git) في كل مشروع مفتوح.', 'It writes a connection file in .yallaflow/local (ignored by Git) in each open project.')}</li></ul>` : '';
+    d.innerHTML = `<form method="dialog" data-agents-form class="wizform"><h2 style="font-size:18px">${A('تفعيل الوكلاء للجلسة دي', 'Enable agents for this session')}</h2>
+      <p class="small">${A('Codex بيشتغل باشتراك ChatGPT بتاعك، من غير مفاتيح API. مفيش جلسة بتبدأ ومفيش شغلانة بتتفعّل لوحدها. ده بيخلص لما الكونسول يقفل.', 'Codex runs on your ChatGPT subscription, never API keys. No session starts and no work item is activated on its own. This ends when the console stops.')}</p>
+      ${claudeChoice}
+      <div class="row"><button type="button" class="btn ghost" data-agents-cancel>${A('إلغاء', 'Cancel')}</button><span class="grow"></span><button class="btn go" type="submit">${A('فعّل', 'Enable')}</button></div></form>`;
+    d.showModal();
+    d.querySelector('button[type="submit"]').focus();
+  }
+  async function confirmAgents(form) {
+    const claude = Boolean(form.querySelector('input[name="claude"]')?.checked);
+    document.getElementById('agentsdlg')?.close();
     try {
-      await post('/api/agents/enable', JSON.stringify({ confirm: true }), { 'Content-Type': 'application/json' });
+      const result = await post('/api/agents/enable', JSON.stringify({ confirm: true, ...(claude ? { claude: true } : {}) }), { 'Content-Type': 'application/json' });
+      if (claude && !result?.claude) toast(esc(A('الوكلاء اتفعّلوا، بس Claude Code مااتفعّلش في الجلسة دي (اتفعّلت قبل كده من غيره). أعد تشغيل الكونسول علشان تختاره.', 'Agents are on, but Claude Code was not turned on for this session (it was enabled earlier without it). Restart the console to choose it.')));
       agentsOn = true; agentsCanEnable = false;
       await loadAgentInfo();
       if (route().v === 'item') await loadAgent();
@@ -1415,7 +1434,7 @@
     const status = codex && !codex.ready ? `<p class="small">${A('Codex مش جاهز على الجهاز ده:', 'Codex is not ready on this machine:')}</p><ul class="aprob">${codex.problems.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>` : '';
     return `<section class="panel agent" id="agent"><div class="ahead"><h2>${A('الوكيل', 'Agent')}</h2><span class="grow"></span><span class="chip todo">${A('مقفول', 'off')}</span></div>
       <p class="small">${A(`اشتغل على ${it.id} مع Codex من هنا. مساحة الوكيل مقفولة في الكونسول ده لحد ما تفعّلها.`, `Work on ${it.id} with Codex from here. The Agent Workspace is off in this console until you enable it.`)}</p>${status}
-      ${agentsCanEnable ? `<button class="btn go sm" data-agents-enable>${A('فعّل Codex للجلسة دي', 'Enable Codex for this session')}</button>` : ''}${explain}</section>`;
+      ${agentsCanEnable ? `<button class="btn go sm" data-agents-enable>${A('فعّل الوكلاء للجلسة دي', 'Enable agents for this session')}</button>` : ''}${explain}</section>`;
   }
 
   // ---------- projects ----------
@@ -1842,6 +1861,7 @@
     if (e.target.closest('[data-folder-choose]')) { chooseFolder(); return; }
     if (e.target.closest('[data-folder-close]')) { document.getElementById('folderdlg')?.close(); folder = null; return; }
     if (e.target.closest('[data-agents-enable]')) { enableAgents(); return; }
+    if (e.target.closest('[data-agents-cancel]')) { document.getElementById('agentsdlg')?.close(); return; }
     if (e.target.closest('[data-chat-toggle]')) { toggleChat(); return; }
     const sugg = e.target.closest('[data-suggest]');
     if (sugg) { useSuggestion(sugg.dataset.suggest); return; }
@@ -1958,6 +1978,7 @@
     if (e.target.matches('[data-act-form]')) { e.preventDefault(); submitAction(e.target); return; }
     if (e.target.matches('[data-gate-form]')) { e.preventDefault(); submitGate(e.target); return; }
     if (e.target.matches('[data-rt-form]')) { e.preventDefault(); submitService(e.target); return; }
+    if (e.target.matches('[data-agents-form]')) { e.preventDefault(); confirmAgents(e.target); return; }
     if (e.target.matches('[data-create-form]')) { e.preventDefault(); submitCreate(e.target); }
     else if (e.target.matches('[data-agent-form]')) { e.preventDefault(); const text = agentDraft.trim(); if (!text) return; agentDraft = ''; agentAction('message', { text }); }
   });

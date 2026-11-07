@@ -13,7 +13,7 @@ You can:
 | Agent | How YallaFlow connects | Status |
 |---|---|---|
 | **Codex** | YallaFlow starts and manages the session through the Codex ACP adapter, using your own Codex installation and **ChatGPT** login. | Supported |
-| **Claude Code** | Not included in this release. A connection to a Claude Code session you start yourself exists as an experiment in development builds only, until Anthropic confirms a third-party tool may distribute it. | **Not included** |
+| **Claude Code** | Experimental in 1.4.0, off by default: the console joins a Claude Code session you start yourself (development-channel flag and warning, no Stop, whole-message replies), on your own Claude subscription. Turned on per console run only by your explicit choice; Anthropic's written confirmation is still pending. See [`agents-claude-experimental.md`](agents-claude-experimental.md). | **Experimental** |
 
 ## Turn it on
 

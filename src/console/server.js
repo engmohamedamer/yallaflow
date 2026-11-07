@@ -30,7 +30,7 @@ import { detectProviders } from '../agents/detect.js';
 import { FolderError, listFolders } from './folders.js';
 import { addProject as saveToRegistry } from './registry.js';
 import { addRuntimeService, attachPlannedFile, createdProjectRoot, gitInit, probeTools, workspaceRoot } from './greenfield.js';
-import { loadClaude } from '../agents/experimental.js';
+import { CLAUDE_NOT_INCLUDED, claudeIncluded, loadClaude } from '../agents/experimental.js';
 
 const UI_DIR = fileURLToPath(new URL('../../resources/console/', import.meta.url));
 const UI_FILES = Object.freeze({
@@ -51,7 +51,7 @@ const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|acti
 // Agent Interaction (v1.3.0, only with --agents): the Agent Workspace's actions.
 const AGENT_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/agent\/(start|message|permission|cancel|end|resume|connect|disconnect|activate)$/;
 // The Claude channel server and hook forwarder (bridge token, never a browser).
-const BRIDGE_ROUTE = /^\/api\/agent-bridge\/claude\/(stream|event|hook)$/;
+const BRIDGE_ROUTE = /^\/api\/agent-bridge\/claude\/(stream|event|hook|hello)$/;
 
 const PAGE_CSP = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; " +
   "frame-src blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
@@ -88,6 +88,9 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
   // Agents start on with --agents, or later for this run only by an explicit, confirmed
   // action in a non-read-only console (owner decision, PF-0057 Q-001).
   let agentsOn = Boolean(agents) && !readOnly;
+  // Claude Code (experimental, PF-0060): only with --experimental-claude or an explicit
+  // choice when enabling agents in the console; never by default, never read-only.
+  let claudeOn = agentsOn && Boolean(experimentalClaude);
   let bridge = null;
   const runner = createRunner();
   const projects = await Promise.all(roots.map(async (root) => ({ id: projectId(root), root, name: (await projectName(root)) ?? path.basename(root) })));
@@ -166,7 +169,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
 
     const parts = url.pathname.split('/').filter(Boolean); // ['api', ...]
     if (parts.length === 2 && parts[1] === 'projects') {
-      return send(response, 200, { projects: projects.map(({ id, name, root }) => ({ id, name, root })), unavailable: missing, readOnly, agents: { enabled: agentsOn, claude: agentsOn && Boolean(experimentalClaude), canEnable: !readOnly && !agentsOn } });
+      return send(response, 200, { projects: projects.map(({ id, name, root }) => ({ id, name, root })), unavailable: missing, readOnly, agents: { enabled: agentsOn, claude: claudeOn, canEnable: !readOnly && !agentsOn, claudeAvailable: claudeIncluded() } });
     }
     // 1.4.0 (PF-0057) reads: folders inside home, tool availability, agent readiness.
     if (parts.length === 3 && parts[1] === 'fs' && parts[2] === 'dirs') {
@@ -182,8 +185,8 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     if (parts.length === 3 && parts[1] === 'new' && parts[2] === 'tools') return readOnly ? send(response, 405, { error: { code: 'READ_ONLY', message: 'This console was started with --read-only.' } }) : send(response, 200, await probeTools());
     if (parts.length === 2 && parts[1] === 'agents') {
       if (readOnly) return send(response, 200, { enabled: false, canEnable: false, readOnly: true, claude: false, codex: null });
-      const found = await detectProviders({ env: agentEnv });
-      return send(response, 200, { enabled: agentsOn, canEnable: !readOnly && !agentsOn, readOnly, claude: agentsOn && Boolean(experimentalClaude), codex: { ready: Boolean(found.codex?.ready), problems: found.codex?.problems ?? [] } });
+      const found = await detectProviders({ env: agentEnv, claude: claudeOn });
+      return send(response, 200, { enabled: agentsOn, canEnable: !readOnly && !agentsOn, readOnly, claude: claudeOn, claudeAvailable: claudeIncluded(), codex: { ready: Boolean(found.codex?.ready), problems: found.codex?.problems ?? [] }, ...(found.claude ? { claudeCode: { ready: Boolean(found.claude.ready), problems: found.claude.problems ?? [] } } : {}) });
     }
     if (parts.length === 2 && parts[1] === 'events') {
       if (request.method !== 'GET') return send(response, 405, { error: { code: 'METHOD', message: 'The event stream is GET only.' } }, { Allow: 'GET' });
@@ -255,8 +258,9 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       const type = String(request.headers['content-type'] ?? '').split(';')[0].trim().toLowerCase();
       if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
       const body = await readJsonBody(request);
-      if (!body || body.confirm !== true || Object.keys(body).length !== 1) return send(response, 400, { error: { code: 'CONFIRMATION_REQUIRED', message: 'Confirm enabling Codex for this console session.' } });
-      return send(response, 200, await enableAgents());
+      const keys = body && typeof body === 'object' && !Array.isArray(body) ? Object.keys(body) : [];
+      if (body?.confirm !== true || keys.some((key) => !['confirm', 'claude'].includes(key)) || ('claude' in body && typeof body.claude !== 'boolean')) return send(response, 400, { error: { code: 'CONFIRMATION_REQUIRED', message: 'Confirm enabling agents for this console session.' } });
+      return send(response, 200, await enableAgents({ claude: body.claude === true }));
     }
     if (parts.length === 5 && parts[1] === 'new' && parts[2] === 'plans' && parts[4] === 'files') {
       const type = String(request.headers['content-type'] ?? '').split(';')[0].trim().toLowerCase();
@@ -342,9 +346,10 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       case 'end':
         return send(response, 200, await bridge.end(project.id));
       case 'connect': {
-        if (body.provider !== 'claude' || !experimentalClaude) return send(response, 400, { error: { code: 'UNSUPPORTED', message: 'Claude Code sessions are not enabled in this console.' } });
-        const files = await (await loadClaude()).writeClaudeLaunchFiles(project.root);
+        if (body.provider !== 'claude' || !claudeOn) return send(response, 400, { error: { code: 'UNSUPPORTED', message: 'Claude Code sessions are not enabled in this console.' } });
+        // Claim the slot first; the launch files are written only by the console that owns it.
         const summary = await bridge.connectClaude(project.id, { workId });
+        const files = await (await loadClaude()).writeClaudeLaunchFiles(project.root);
         return send(response, 200, { ...summary, launch: { command: files.command } });
       }
       case 'disconnect':
@@ -360,8 +365,14 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
 
   // ----- Claude channel server + hook forwarder (bridge token; never a browser) -----
   async function handleBridge(request, response, url) {
-    if (!agentsOn || !experimentalClaude) return send(response, 404, { error: { code: 'NOT_FOUND', message: 'Not found.' } });
+    if (!agentsOn || !claudeOn) return send(response, 404, { error: { code: 'NOT_FOUND', message: 'Not found.' } });
     if (request.headers.origin) return send(response, 403, { error: { code: 'FORBIDDEN_ORIGIN', message: 'Not for browsers.' } });
+    // The channel and the hook check this console before they send the token (PF-0060).
+    if (url.pathname.endsWith('/hello')) {
+      if (request.method !== 'GET') return send(response, 405, { error: { code: 'METHOD', message: 'GET only.' } });
+      const proof = bridge.bridgeProof(String(url.searchParams.get('id') ?? ''), String(url.searchParams.get('nonce') ?? ''));
+      return proof ? send(response, 200, { proof }) : send(response, 404, { error: { code: 'NOT_FOUND', message: 'Not found.' } });
+    }
     const header = String(request.headers.authorization ?? '');
     const target = bridge.projectByBridgeToken(header.startsWith('Bearer ') ? header.slice(7) : '');
     if (!target) return send(response, 401, { error: { code: 'UNAUTHORIZED', message: 'Missing or wrong bridge token.' } });
@@ -442,7 +453,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     server.listen(port, host, () => resolve(server.address()));
   });
 
-  const makeBridge = ({ claude = Boolean(experimentalClaude) } = {}) => new AgentBridge({
+  const makeBridge = ({ claude = claudeOn } = {}) => new AgentBridge({
     projects,
     port: listening.port,
     claude,
@@ -462,23 +473,31 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
   // Enabling agents for this run: builds the bridge the --agents flag would have built. It
   // starts no session, claims no checkout and activates nothing.
   let enabling = null;
-  async function enableAgents() {
+  async function enableAgents({ claude = false } = {}) {
     if (readOnly) throw Object.assign(new Error('This console was started with --read-only.'), { status: 405, code: 'READ_ONLY' });
-    if (agentsOn) return { enabled: true, already: true };
+    if (claude && !claudeIncluded()) throw Object.assign(new Error(CLAUDE_NOT_INCLUDED), { status: 409, code: 'CLAUDE_NOT_INCLUDED' });
+    if (agentsOn) return { enabled: true, claude: claudeOn, already: true };
     enabling ??= (async () => {
-      // Enabling here never turns on the experimental Claude connection (security review).
-      const next = makeBridge({ claude: false });
-      await next.open();
+      // Claude Code only when the developer chose it explicitly in this request (PF-0060).
+      const next = makeBridge({ claude });
+      try {
+        await next.open();
+      } catch (error) {
+        // A partly opened bridge must not leave checkout locks or bridge files behind.
+        await next.close().catch(() => {});
+        throw error;
+      }
       bridge = next;
       // A project registered while the bridge was being built is added now.
       for (const project of projects) await next.addProject(project);
       agentsOn = true;
-      api.agents = { enabled: true, claude: false };
-      const message = `data: ${JSON.stringify({ type: 'agents', enabled: true, at: new Date().toISOString() })}\n\n`;
+      claudeOn = claude;
+      api.agents = { enabled: true, claude };
+      const message = `data: ${JSON.stringify({ type: 'agents', enabled: true, claude, at: new Date().toISOString() })}\n\n`;
       for (const client of clients) client.write(message);
     })().finally(() => { enabling = null; });
     await enabling;
-    return { enabled: true, already: false };
+    return { enabled: true, claude: claudeOn, already: false };
   }
   const api = {
     url: `http://127.0.0.1:${listening.port}/`,
@@ -486,7 +505,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     token,
     projects,
     watchModes: watchers.map((entry) => entry.mode),
-    agents: { enabled: agentsOn, claude: agentsOn && Boolean(experimentalClaude) },
+    agents: { enabled: agentsOn, claude: claudeOn },
     // Resolves to the agent sessions whose processes could not all be ended (empty when
     // everything stopped), so the caller can say so instead of claiming a clean stop.
     async close() {

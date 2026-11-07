@@ -363,3 +363,35 @@ test('a registration failure after creation is reported as partial success, neve
   assert.equal(progress.outcome.ok, true, 'the project was created');
   assert.deepEqual(progress.outcome.registration, { ok: false, code: 'EACCES', message: 'the saved project list could not be written' });
 }));
+
+// PF-0060: Claude Code is enabled only by an explicit choice for this run.
+test('Claude Code: off unless chosen explicitly when enabling agents; never read-only', { skip: !SUPPORTED }, async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'yf-claude-optin-'));
+  await initWorkspace(root, 'c', 'greenfield', 'adaptive');
+  const plain = await startConsoleServer({ roots: [root], port: 0, agentEnv: { PATH: '' } });
+  try {
+    assert.equal((await post(plain, '/api/agents/enable', { confirm: true, claude: 'yes' })).status, 400);
+    const codexOnly = await post(plain, '/api/agents/enable', { confirm: true });
+    assert.equal(codexOnly.data.claude, false);
+    assert.equal((await request(plain, '/api/projects')).data.agents.claude, false);
+    const [p] = (await request(plain, '/api/projects')).data.projects;
+    assert.equal((await post(plain, `/api/p/${p.id}/agent/connect`, { provider: 'claude' })).status, 400, 'Claude connect refused');
+  } finally {
+    await plain.close();
+  }
+  const withClaude = await startConsoleServer({ roots: [root], port: 0, agentEnv: { PATH: '' } });
+  try {
+    const on = await post(withClaude, '/api/agents/enable', { confirm: true, claude: true });
+    assert.equal(on.status, 200, on.text);
+    assert.equal(on.data.claude, true);
+    assert.equal((await request(withClaude, '/api/agents')).data.claude, true);
+  } finally {
+    await withClaude.close();
+  }
+  const readOnly = await startConsoleServer({ roots: [root], port: 0, readOnly: true });
+  try {
+    assert.equal((await post(readOnly, '/api/agents/enable', { confirm: true, claude: true })).status, 405);
+  } finally {
+    await readOnly.close();
+  }
+});
