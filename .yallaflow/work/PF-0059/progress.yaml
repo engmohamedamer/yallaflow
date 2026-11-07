@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-07T19:19:29.208Z",
+      "completedAt": "2026-11-07T19:19:29.208Z",
+      "summary": "Screenshot SRC on PF-0059: Codex session shows the ChatGPT usage-limit text then 'Internal error' while the chip stays 'Working…'. Cause: src/agents/codex.js prompt() emits only an 'error' event when session/prompt fails (no turn.ended), and app.js onAgentEvent reloads session status only on lifecycle/turn events, so the status is never refreshed; the 'error' entry shows the adapter's raw JSON-RPC message ('Internal error'). The agent panel is rendered inline between the action bar and the stations (agentPanel in viewItem)."
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T19:19:29.421Z",
+      "completedAt": "2026-11-07T19:19:29.421Z",
+      "summary": "Owner chose a floating button that opens the chat as a window over the page (Q-001). Status must be truthful: after a failed turn the session is idle again (or ended), and the error is explained in plain words, mentioning a usage limit when the agent said so; no raw 'Internal error' alone."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-07T19:19:29.631Z",
+      "completedAt": "2026-11-07T19:19:29.631Z",
+      "summary": "1) codex.js: on prompt failure also emit turn.ended {stopReason:'error'}; 2) app.js: reload status on 'error'; error entries get a plain explanation (usage-limit aware) with the raw code as detail; 3) agent panel moves into a fixed floating window toggled by a corner button (status dot, pending-permission badge), open state remembered per browser, Esc closes, mobile = bottom sheet; the off/enable panel uses the same window; 4) tests: codex prompt failure emits turn.ended (fake adapter); browser check of the window in 3 engines EN/AR 1280/390."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-07T19:27:29.450Z",
+      "completedAt": "2026-11-07T19:27:29.450Z",
+      "summary": "codex.js emits turn.ended {stopReason:'error'} after a failed prompt (usage limit) so the session is shown idle again; app.js reloads status on 'error' and explains it in plain words (usage-limit aware, provider text isolated as a detail). Agent panel moved into a floating window opened by a corner button (status dot, approval badge; Esc minimizes; bottom sheet on mobile; open state remembered). Card chat icon opens the item with the chat and a prefilled 'where is it' question. Stage-aware suggestions only fill the message box. Fake adapter gained a LIMIT scenario; agent-bridge test covers the failed turn (fails without the fix)."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-07T19:37:01.805Z",
+      "completedAt": "2026-11-07T19:37:01.805Z",
+      "summary": "V-001 floating-chat browser check (simulated Codex adapter) in Chromium/Firefox/WebKit x EN-light-1280/AR-dark-390: card icon, prefilled question, stage suggestions fill only, usage-limit turn explained and session ready, Esc minimizes, no page errors/overflow (10/10 each). V-002 npm run check 938/938. New-project journey re-run after the move (Chromium/WebKit AR-dark-390) clean."
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Scope extended at the owner's request in the session (2026-11-07): a chat icon on each work card to ask the agent about that item, and suggested actions in the chat that fit the item's current flow stage",
+      "reason": "Owner: 'كمان وجود ايقون للشات على كارد بهدف استعلام عن الشغل فى ال item دة او وصل لفين ... ولو فى ازرار اكشن ترشحها انت فى مراحل معينه من ال فلوا تمام'. It builds on the floating chat this item delivers; a routed request cannot be rewritten",
+      "costIfWrong": "A suggested action could be read as an instruction; suggestions therefore only fill the message box and the developer sends them",
+      "createdAt": "2026-11-07T19:25:00.854Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-07T19:37:01.805Z"
+}

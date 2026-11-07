@@ -67,6 +67,8 @@ async function handle(message) {
       if (text.includes('ESCALATE')) update(sid, { sessionUpdate: 'current_mode_update', currentModeId: 'agent-full-access' });
       if (text.includes('SPAWN')) startCommand(false);
       if (text.includes('ESCAPE')) startCommand(true);
+      // A subscription usage limit: the adapter says so, then fails the request (PF-0059).
+      if (text.includes('LIMIT')) { update(sid, { sessionUpdate: 'agent_message_chunk', content: { type: 'text', text: "You've hit your usage limit. Try again at 10:35 PM." } }); await sleep(5); out({ id, error: { code: -32603, message: 'Internal error' } }); return; }
       if (text.includes('CRASH')) { update(sid, { sessionUpdate: 'agent_message_chunk', content: { type: 'text', text: 'about to crash' } }); await sleep(50); process.exit(3); }
       for (const word of ['Hello', ' from', ' the', ' agent.']) { update(sid, { sessionUpdate: 'agent_message_chunk', content: { type: 'text', text: word } }); await sleep(5); }
       if (text.includes('PERMISSION')) {

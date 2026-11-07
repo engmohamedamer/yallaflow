@@ -190,6 +190,9 @@ export class CodexSession {
     } catch (error) {
       if (this.status === 'working') this.status = this.conn.closed ? 'ended' : 'idle';
       if (!this.conn.closed) this.emit(agentEvent('error', { code: error.code ?? 'AGENT_ERROR', message: String(error.message).slice(0, 300) }));
+      // The turn is over even when it failed (for example a usage limit): say so, so the
+      // console never keeps showing "Working…" for a turn that ended (PF-0059).
+      this.emit(agentEvent('turn.ended', { stopReason: 'error' }));
     }
   }
 

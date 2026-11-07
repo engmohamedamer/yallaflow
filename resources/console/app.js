@@ -207,7 +207,7 @@
 
   function pchip(it) {
     const old = isOld(it);
-    return `<a class="pchip ${it.state} ${old ? 'old' : ''}" href="#/item/${encodeURIComponent(it.id)}" data-w="${esc(it.id)}" ${readOnly ? '' : 'draggable="true"'}>${readOnly || !itemActions(it).length ? '' : `<button class="pmenu" data-menu="${esc(it.id)}" aria-label="${A('أفعال', 'Actions')} ${esc(it.id)}">⋯</button>`}<div class="tt">${esc(it.title)}</div>
+    return `<a class="pchip ${it.state} ${old ? 'old' : ''}" href="#/item/${encodeURIComponent(it.id)}" data-w="${esc(it.id)}" ${readOnly ? '' : 'draggable="true"'}>${readOnly || !itemActions(it).length ? '' : `<button class="pmenu" data-menu="${esc(it.id)}" aria-label="${A('أفعال', 'Actions')} ${esc(it.id)}">⋯</button>`}<button class="pchat" data-chat-item="${esc(it.id)}" aria-label="${A('اسأل الوكيل عن', 'Ask the agent about')} ${esc(it.id)}" title="${A('اسأل الوكيل عن الشغلانة دي', 'Ask the agent about this item')}">💬</button><div class="tt">${esc(it.title)}</div>
       <div class="meta">${chip(it.state)}<span class="grow"></span><b>${it.completion}%</b></div><div class="mini"><i style="width:${it.completion}%"></i></div>
       <div class="badges"><span class="bdg ltr">${esc(it.id)}</span>${it.lastActivityAt && it.state !== 'done' ? `<span class="bdg ${old ? 'old' : ''}">⏱ ${ago(it.lastActivityAt)}</span>` : ''}${it.sourceCount ? `<span class="bdg">📎 ${it.sourceCount}</span>` : ''}</div></a>`;
   }
@@ -271,7 +271,7 @@
 </section>
       ${nextCard(it)}
       ${actionBar(it)}
-      ${agentPanel(it)}
+      <div class="row chatcue"><button class="btn sm" data-chat-toggle aria-controls="chatwin">💬 ${A('اشتغل على الشغلانة دي مع الوكيل', 'Work on this item with the agent')}</button></div>
       <section class="chain" id="chain"><article class="node start ${it.state === 'new' ? 'active' : 'done'}" data-st="-1" style="--hue:var(--ink-2)"><div class="st-head"><span class="st-ico" aria-hidden="true">＋</span><div class="st-name">${A('الطلب', 'Request')}</div></div><div class="st-out">${it.state === 'new' ? A('جديد', 'new') : A('اتسلّم لـ «افهم»', 'handed to Understand')}</div>
           <p class="small clamp3">${esc(d?.request?.raw ?? it.title)}</p>${(d?.sources ?? []).map((s) => `<button class="flink" data-file="${esc(s.id)}">${fileIcon(s)} <span class="ltr">${esc(s.name)}</span></button>`).join('')}<button class="flink more2" data-dtab="req" data-jump>${A('الطلب كامل ↓', 'Full request ↓')}</button>
           <div class="handoff"><span class="k">${A('اتعمل', 'Created')}</span>${ago(it.createdAt)}</div></article>${it.stations.map((s0, i) => {
@@ -328,7 +328,7 @@
     if (agent.events.length > 400) agent.events.splice(0, agent.events.length - 400);
     if (event.type === 'permission.requested') agent.pending.push(event);
     if (event.type === 'permission.resolved') agent.pending = agent.pending.filter((p) => p.requestId !== event.requestId);
-    if (['session.started', 'session.ended', 'session.connected', 'session.disconnected', 'turn.started', 'turn.ended', 'mode.changed', 'work.activated'].includes(event.type)) {
+    if (['session.started', 'session.ended', 'session.connected', 'session.disconnected', 'turn.started', 'turn.ended', 'mode.changed', 'work.activated', 'error'].includes(event.type)) {
       loadAgent().then(renderAgent);
       return;
     }
@@ -350,6 +350,9 @@
       if (nextStream) streamHost.innerHTML = nextStream.innerHTML;
       else host.outerHTML = agentPanel(it);
     } else host.outerHTML = agentPanel(it);
+    // The floating button follows the session state (working, needs approval, ready).
+    const fab = document.querySelector('.chatfab');
+    if (fab && !streamOnly) { const t = document.createElement('template'); t.innerHTML = agentDock(it); const next = t.content.querySelector('.chatfab'); if (next) fab.replaceWith(next); }
     const stream = document.querySelector('#agent .astream');
     if (stream) stream.scrollTop = stream.scrollHeight;
     if (focused && !streamHost) { const box = document.querySelector('[data-agent-input]'); if (box) { box.focus(); box.setSelectionRange(box.value.length, box.value.length); } }
@@ -385,7 +388,14 @@
       else if (ev.type === 'session.connected') out.push({ kind: 'note', text: A('Claude Code متوصّل.', 'Claude Code connected.') });
       else if (ev.type === 'session.disconnected') out.push({ kind: 'note', warn: true, text: A('Claude Code اتفصل (الجلسة أو القناة وقفت).', 'Claude Code disconnected (the session or its channel stopped).') });
       else if (ev.type === 'work.activated') out.push({ kind: 'note', text: A(`${ev.workId} بقت الشغلانة النشطة.`, `${ev.workId} is now the active work item.`) });
-      else if (ev.type === 'error') out.push({ kind: 'note', warn: true, text: ev.message });
+      else if (ev.type === 'error') {
+        // Plain words first; the provider's own text stays as a detail (PF-0059).
+        const said = out.slice(-4).some((x) => x.kind === 'agent' && /usage limit|rate limit|try again at/i.test(x.text ?? ''));
+        const text = said
+          ? A('الوكيل وقف الرد ده: وصلت لحد الاستخدام في اشتراكك. جرّب تاني في الميعاد اللي فوق، أو اقفل الجلسة.', 'The agent stopped this reply: your subscription reached its usage limit. Try again at the time shown above, or end the session.')
+          : A('الوكيل وقف الرد ده بسبب خطأ. تقدر تبعت رسالة تانية أو تقفل الجلسة.', 'The agent stopped this reply because of an error. You can send another message or end the session.');
+        out.push({ kind: 'note', warn: true, text: `${text} \u2068(${ev.message})\u2069` });
+      }
     }
     return out.slice(-80);
   }
@@ -396,6 +406,63 @@
     const sentNote = p.provider === 'claude' && p.decision ? `<span class="tiny muted">${A('Claude Code بيطبّق أول رد يوصله (الكونسول أو الترمينال).', 'Claude Code applies the first answer it receives (console or terminal).')}</span>` : '';
     return `<div class="aperm ${open ? 'open' : ''}"><div class="row"><span class="ptag">${A('إذن للأداة', 'Tool permission')}</span><b class="grow">${esc(p.title)}</b></div>${p.detail ? `<pre class="pdetail" dir="ltr">${esc(p.detail)}</pre>` : ''}
       ${open ? `<div class="row">${p.decisions.map((d) => `<button class="btn sm ${d === 'deny' ? 'ghost' : 'go'}" data-agent-perm="${esc(p.requestId)}" data-decision="${d}">${{ allow: A('اسمح مرة', 'Allow once'), allow_session: A('اسمح للجلسة', 'Allow for session'), deny: A('ارفض', 'Deny') }[d]}</button>`).join('')}<span class="tiny muted">${A('لو محدش ردّ هيترفض تلقائي.', 'Unanswered requests are denied automatically.')}</span></div>` : `<div class="tiny ${p.overridden ? 'warn' : 'muted'}">${label} ${by}</div>${sentNote}`}</div>`;
+  }
+  // The agent chat as a floating window (owner choice, PF-0059): a corner button shows the
+  // session state and opens the chat over the page. Open/closed is remembered per browser.
+  let chatOpen = store.get('chatOpen', false);
+  function agentState(it) {
+    if (!agentsOn) return { tone: 'off', label: A('الوكيل مقفول', 'Agent off') };
+    const s = agent?.pid === pid ? agent.session : null;
+    const waiting = agent?.pid === pid ? (agent.pending ?? []).length : 0;
+    if (waiting) return { tone: 'you', label: A(`الوكيل مستني إذنك (${waiting})`, `The agent needs your approval (${waiting})`), badge: waiting };
+    if (!s) return { tone: 'idle', label: A('مفيش جلسة', 'No session') };
+    if (s.workId && s.workId !== it.id) return { tone: 'idle', label: A(`جلسة على ${s.workId}`, `Session on ${s.workId}`) };
+    if (s.status === 'working') return { tone: 'active', label: A('الوكيل شغّال…', 'The agent is working…') };
+    return { tone: 'done', label: A('الوكيل جاهز', 'The agent is ready') };
+  }
+  function agentDock(it) {
+    const st = agentState(it);
+    return `<div class="chatdock ${chatOpen ? 'open' : ''}">
+      <section class="chatwin" id="chatwin" role="dialog" aria-modal="false" aria-label="${A('الوكيل', 'Agent')}" ${chatOpen ? '' : 'hidden'}>
+        <div class="chathead"><b class="grow">${A('الوكيل', 'Agent')} · <span class="ltr">${esc(it.id)}</span></b><span class="tiny muted">${esc(st.label)}</span><button type="button" class="ibtn sm" data-chat-toggle aria-label="${A('صغّر', 'Minimize')}">—</button></div>
+        <div class="chatbody">${chatOpen ? agentPanel(it) : ''}</div>
+      </section>
+      <button type="button" class="chatfab ${st.tone}" data-chat-toggle aria-controls="chatwin" aria-expanded="${chatOpen}" aria-label="${esc(st.label)}" title="${esc(st.label)}"><span aria-hidden="true">${chatOpen ? '✕' : '💬'}</span><i class="dot"></i>${st.badge ? `<b class="badge">${st.badge}</b>` : ''}</button>
+    </div>`;
+  }
+  // Suggested requests for the item's current place in the flow (PF-0059). A suggestion only
+  // fills the message box: the developer reads it and sends it, nothing runs on a click.
+  function suggestions(it) {
+    const id = it.id;
+    const list = [A(`${id} وصلت لفين، وإيه الخطوة الجاية؟`, `Where is ${id} now, and what is the next step?`)];
+    const st = it.currentStation;
+    if (it.state === 'held') list.push(A(`ليه ${id} متوقفة مؤقتاً، وإيه اللي محتاجه علشان نكمّل؟`, `Why is ${id} on hold, and what is needed to resume it?`));
+    else if (it.state === 'closed') list.push(A(`لخّصلي ليه ${id} اتقفلت من غير تسليم.`, `Summarize why ${id} was closed without delivery.`));
+    else if (it.state === 'done') list.push(A(`لخّصلي ${id} سلّمت إيه واتحققت إزاي.`, `Summarize what ${id} delivered and how it was verified.`));
+    else if (it.state === 'new' || it.routing === 'pending') list.push(A(`صنّف ${id} (النوع والحجم) وقولّي ليه، قبل ما تبدأ.`, `Classify ${id} (type and size) and tell me why before you start.`));
+    else if (it.waitingFor) list.push(A(`${id} مستنياني أقرر إيه؟ لخّصلي اللي محتاج أراجعه.`, `What decision is ${id} waiting for from me? Summarize what I need to review.`));
+    else if (it.state === 'fail') list.push(A(`التحقق في ${id} فشل: اشرحلي السبب واقترح التصليح.`, `Verification failed on ${id}: explain why and propose a fix.`));
+    else if (st === 'understand') list.push(A(`كمّل اكتشاف ${id} وقولّي لقيت إيه.`, `Continue discovery on ${id} and tell me what you found.`));
+    else if (st === 'decide') list.push(A(`حضّرلي مواصفات ${id} علشان أراجعها.`, `Prepare the specification of ${id} for my review.`));
+    else if (st === 'change') list.push(A(`كمّل تنفيذ ${id} وقولّي فاضل إيه.`, `Continue implementing ${id} and tell me what is left.`));
+    else if (st === 'verify') list.push(A(`شغّل التحقق لـ ${id} واشرحلي النتيجة.`, `Run the verification for ${id} and explain the result.`));
+    else if (st === 'remember') list.push(A(`راجع المعرفة اللي اتعلمناها من ${id} وقفلها.`, `Review what we learned from ${id} and finish it.`));
+    return list;
+  }
+  function suggestionChips(it) {
+    return `<div class="asugg" role="group" aria-label="${A('اقتراحات', 'Suggestions')}">${suggestions(it).map((text) => `<button type="button" class="sugg" data-suggest="${esc(text)}">${esc(text)}</button>`).join('')}</div>`;
+  }
+  function useSuggestion(text) {
+    agentDraft = text;
+    const box = document.querySelector('[data-agent-input]');
+    if (box) { box.value = text; box.focus(); box.setSelectionRange(text.length, text.length); }
+  }
+  function toggleChat(force) {
+    chatOpen = force ?? !chatOpen;
+    store.set('chatOpen', chatOpen);
+    render();
+    if (chatOpen) { if (agentsOn && (!agent || agent.pid !== pid)) loadAgent().then(render); document.querySelector('#chatwin [data-agent-input], #chatwin button')?.focus(); }
+    else document.querySelector('.chatfab')?.focus();
   }
   function agentPanel(it) {
     if (!agentsOn) return agentOffPanel(it);
@@ -434,7 +501,7 @@
       <div class="abar"><b>${PROVIDER[s.provider]}</b>${s.provider === 'claude' ? ` <i class="exp">${A('تجريبي', 'experimental')}</i>` : ''}<span class="chip active"><i></i>${esc(state)}</span>${s.auth ? `<span class="chip todo">${esc(s.auth)}</span>` : ''}${modeChip}<span class="grow"></span>${controls}</div>
       ${warn}${launch}
       <div class="astream" aria-live="polite">${entries || `<p class="tiny muted">${A(`اكتب للوكيل، مثلاً: «كمّل ${it.id}».`, `Message the agent, for example: "Continue ${it.id}".`)}</p>`}</div>
-      <form class="acompose" data-agent-form><textarea data-agent-input rows="2" maxlength="20000" placeholder="${A(`اكتب لـ ${PROVIDER[s.provider]}…`, `Message ${PROVIDER[s.provider]}…`)}" ${canSend ? '' : 'disabled'}>${esc(agentDraft)}</textarea><button class="btn go" type="submit" ${canSend && !agentBusy ? '' : 'disabled'}>${A('ابعت', 'Send')}</button></form>
+      ${suggestionChips(it)}<form class="acompose" data-agent-form><textarea data-agent-input rows="2" maxlength="20000" placeholder="${A(`اكتب لـ ${PROVIDER[s.provider]}…`, `Message ${PROVIDER[s.provider]}…`)}" ${canSend ? '' : 'disabled'}>${esc(agentDraft)}</textarea><button class="btn go" type="submit" ${canSend && !agentBusy ? '' : 'disabled'}>${A('ابعت', 'Send')}</button></form>
       ${s.provider === 'claude' ? `<p class="tiny muted">${A('الإيقاف والإنهاء بيتعملوا من Claude Code نفسه (Esc). الردود بتوصل كرسايل كاملة.', 'Stop and end happen in Claude Code itself (Esc). Replies arrive as whole messages.')}</p>` : ''}</section>`;
   }
   async function agentAction(action, body, after) {
@@ -1574,7 +1641,7 @@
     const body = !snap ? `<p class="muted" style="margin-top:40px;text-align:center">${error ? '' : A('بيحمّل…', 'Loading…')}</p>` : (views[r.v] ?? viewMap)();
     // Forms marked data-keep survive a redraw: typed values and focus are carried over (PF-0057).
     const kept = [...document.querySelectorAll('form[data-keep]')].map((form) => ({ key: form.dataset.keep, values: [...form.elements].filter((el) => el.name && el.type !== 'file' && (el.type === 'checkbox' || el.type === 'radio' ? el.checked !== el.defaultChecked : el.value !== el.defaultValue)).map((el) => [el.name, el.type === 'checkbox' || el.type === 'radio' ? (el.type === 'radio' ? (el.checked ? el.value : null) : el.checked) : el.value, el.type]), focus: form.contains(document.activeElement) ? document.activeElement.name : null, caret: document.activeElement?.selectionStart ?? null }));
-    document.getElementById('app').innerHTML = topbar(r) + `<main>${banner()}${snap && ['map', 'lines'].includes(r.v) ? understandingStrip() : ''}${body}</main>`;
+    document.getElementById('app').innerHTML = topbar(r) + `<main>${banner()}${snap && ['map', 'lines'].includes(r.v) ? understandingStrip() : ''}${body}</main>` + (snap && r.v === 'item' && byId(r.id) ? agentDock(byId(r.id)) : '');
     for (const k of kept) {
       const form = document.querySelector(`form[data-keep="${CSS.escape(k.key)}"]`);
       if (!form) continue;
@@ -1775,6 +1842,19 @@
     if (e.target.closest('[data-folder-choose]')) { chooseFolder(); return; }
     if (e.target.closest('[data-folder-close]')) { document.getElementById('folderdlg')?.close(); folder = null; return; }
     if (e.target.closest('[data-agents-enable]')) { enableAgents(); return; }
+    if (e.target.closest('[data-chat-toggle]')) { toggleChat(); return; }
+    const sugg = e.target.closest('[data-suggest]');
+    if (sugg) { useSuggestion(sugg.dataset.suggest); return; }
+    const ask = e.target.closest('[data-chat-item]');
+    if (ask) {
+      // From a card: open the item with the chat and a question about where it stands.
+      e.preventDefault(); e.stopPropagation();
+      const id = ask.dataset.chatItem;
+      agentDraft = A(`${id} وصلت لفين، وإيه الخطوة الجاية؟`, `Where is ${id} now, and what is the next step?`);
+      chatOpen = true; store.set('chatOpen', true);
+      location.hash = `#/item/${encodeURIComponent(id)}`;
+      return;
+    }
     if (e.target.closest('[data-git-init]')) { gitInitAction(); return; }
     const sg = e.target.closest('[data-rt-suggest]');
     if (sg) { addService({ fromSuggestion: sg.dataset.rtSuggest }); return; }
@@ -1872,6 +1952,7 @@
   document.addEventListener('dragover', (e) => { const st = e.target.closest?.('.station.drop-ok'); if (st) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; } });
   document.addEventListener('drop', (e) => { const st = e.target.closest?.('.station[data-st]'); if (st && dragged) { e.preventDefault(); dropOn(Number(st.dataset.st)); } });
   document.addEventListener('input', (e) => { if (e.target.matches('[data-q]')) { flt.q = e.target.value; render(); } else if (e.target.matches('[data-agent-input]')) agentDraft = e.target.value; });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && chatOpen && document.getElementById('chatwin')?.contains(e.target) && !document.querySelector('dialog[open]')) { e.preventDefault(); toggleChat(false); } });
   document.addEventListener('keydown', (e) => { if (e.target.matches?.('[data-agent-input]') && e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); e.target.form.requestSubmit(); } });
   document.addEventListener('submit', (e) => {
     if (e.target.matches('[data-act-form]')) { e.preventDefault(); submitAction(e.target); return; }

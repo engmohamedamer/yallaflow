@@ -639,3 +639,29 @@ table.stack th { font-size: 12px; color: var(--muted); font-weight: 600; }
 .stackcard .row { flex-wrap: wrap; }
 .stackcard .chip, .wizform .chip { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
 @media (max-width: 560px) { .checklist .ck > .grow { flex-basis: calc(100% - 40px); } }
+/* 1.4.0 (PF-0059): floating agent chat, card chat icon, stage suggestions */
+.chatcue { margin: 6px 0 14px; }
+.chatfab { position: fixed; z-index: 60; inset-block-end: 22px; inset-inline-end: 22px; width: 58px; height: 58px; border-radius: 50%; border: 0; cursor: pointer; display: grid; place-items: center; font-size: 24px; background: var(--nile); color: #fff; box-shadow: 0 10px 30px rgb(0 0 0 / .22); transition: transform .15s; }
+.chatfab:hover { transform: translateY(-2px); }
+.chatfab .dot { position: absolute; inset-block-start: 6px; inset-inline-end: 6px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--card); background: var(--muted); }
+.chatfab.active .dot { background: var(--amber); animation: pulse 1.2s infinite; } .chatfab.done .dot { background: var(--palm); } .chatfab.you .dot { background: var(--clay); } .chatfab.off .dot { background: var(--line); }
+@keyframes pulse { 50% { opacity: .35; } }
+.chatfab .badge { position: absolute; inset-block-start: -4px; inset-inline-start: -4px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--clay); color: #fff; font-size: 12px; display: grid; place-items: center; }
+.chatwin { position: fixed; z-index: 59; inset-block-end: 92px; inset-inline-end: 22px; width: min(460px, calc(100vw - 32px)); height: min(72vh, 680px); display: flex; flex-direction: column; background: var(--card); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 24px 60px rgb(0 0 0 / .25); overflow: hidden; }
+.chatwin[hidden] { display: none; }
+.chathead { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--line); background: var(--bg-2); }
+.chatbody { flex: 1; min-height: 0; overflow: auto; }
+.chatbody .panel.agent { border: 0; box-shadow: none; border-radius: 0; margin: 0; min-height: 100%; display: flex; flex-direction: column; }
+.chatbody .agent .astream { flex: 1; max-height: none; min-height: 120px; overflow: auto; }
+.chatbody .agent .ahead { display: none; }
+.chatbody .agent .acompose { position: sticky; bottom: 0; background: var(--card); padding-top: 6px; }
+.asugg { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.asugg .sugg { font: inherit; font-size: 13px; text-align: start; padding: 6px 10px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--ink-2); cursor: pointer; }
+.asugg .sugg:hover, .asugg .sugg:focus-visible { border-color: var(--nile); color: var(--ink); }
+.pchip { position: relative; }
+.pchat { position: absolute; inset-block-start: 6px; inset-inline-end: 34px; border: 0; background: transparent; cursor: pointer; font-size: 14px; opacity: .55; padding: 2px 4px; border-radius: 6px; }
+.pchip:hover .pchat, .pchat:focus-visible { opacity: 1; background: var(--bg-2); }
+@media (max-width: 560px) {
+  .chatwin { inset: auto 0 0 0; width: 100vw; height: 86vh; border-radius: 18px 18px 0 0; }
+  .chatdock.open .chatfab { display: none; }
+}

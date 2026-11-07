@@ -80,6 +80,15 @@ test('codex: start, stream, follow-up, permissions (allow, deny, timeout), one s
     c.events.length = 0;
     await c.post('message', { text: 'Follow-up' });
     await c.waitFor((e) => e.type === 'turn.ended');
+    // PF-0059: a failed turn (usage limit) still ends the turn; the session is idle again.
+    c.events.length = 0;
+    await c.post('message', { text: 'LIMIT reached' });
+    const failed = await c.waitFor((e) => e.type === 'turn.ended');
+    assert.equal(failed.stopReason, 'error');
+    assert.ok(c.events.some((e) => e.type === 'error' && /Internal error/.test(e.message)));
+    assert.equal((await c.status()).session.status, 'idle', 'the session is ready for another message');
+    assert.equal((await c.post('message', { text: 'Follow-up after the limit' })).status, 202);
+    await c.waitFor((e) => e.type === 'turn.ended' && e.stopReason !== 'error');
 
     // allow
     c.events.length = 0;
