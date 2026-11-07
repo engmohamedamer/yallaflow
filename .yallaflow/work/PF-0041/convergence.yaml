@@ -292,7 +292,397 @@
         }
       ],
       "unrequested": []
+    },
+    {
+      "id": "CV-002",
+      "recordedAt": "2026-11-07T10:34:16.024Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+        "verificationRunIds": [
+          "V-003"
+        ]
+      },
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/work-lifecycle.test.js, test/snapshot-contract.test.js, test/doctor-integrity.test.js pass again in V-003. meta.lifecycle is absent for open items and set only by lifecycle operations; meta.status is never written by them; each change appends to work/<id>/lifecycle.yaml and progress.md; the hold/resume test compares the record and ledgers before and after.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/core/lifecycle.js",
+              "contentHash": "sha256:58b7a15de2345e2aaddec390f16111d6e95444b2a129d41417a63f1fa5a4d8f8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/work-lifecycle.test.js",
+              "contentHash": "sha256:eceab1332e4e89cf3c06e35de9e6a9e57969bc973bfa63ae5759dc343ad5dad2",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/snapshot-contract.test.js",
+              "contentHash": "sha256:ff5ee92749d9106f23bde405b200c414b7acd15f99ae97d0d71dee59aa0edbda",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/doctor-integrity.test.js",
+              "contentHash": "sha256:0aa8cc9f47fd3e24a1276fcaa40ed91b52c9e8ede254e18659f043aeded92229",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/work-lifecycle.test.js test/snapshot-contract.test.js test/doctor-integrity.test.js (passed)",
+              "workId": "PF-0041",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/work-lifecycle.test.js, test/snapshot-contract.test.js, test/doctor-integrity.test.js pass again in V-003. work hold/resume exist; the test shows stage, progress.yaml and the evidence tree identical across hold and resume, resume returns the same record apart from updatedAt, and never activates.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/lifecycle.js",
+              "contentHash": "sha256:315d314f363deb87c86c1f97bd49cfbf6c3e37b33c02569e953abe5e25489666",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/cli.js",
+              "contentHash": "sha256:c761fa9966cbf0883cabeeccd7f4cad762e105a24ab82d6ed574669e1104ac8c",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/work-lifecycle.test.js",
+              "contentHash": "sha256:eceab1332e4e89cf3c06e35de9e6a9e57969bc973bfa63ae5759dc343ad5dad2",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/snapshot-contract.test.js",
+              "contentHash": "sha256:ff5ee92749d9106f23bde405b200c414b7acd15f99ae97d0d71dee59aa0edbda",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/doctor-integrity.test.js",
+              "contentHash": "sha256:0aa8cc9f47fd3e24a1276fcaa40ed91b52c9e8ede254e18659f043aeded92229",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/work-lifecycle.test.js test/snapshot-contract.test.js test/doctor-integrity.test.js (passed)",
+              "workId": "PF-0041",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/work-lifecycle.test.js, test/snapshot-contract.test.js, test/doctor-integrity.test.js pass again in V-003. work close with cancelled/superseded/duplicate and --by rules (required, not self, not a closed target); DONE refused; snapshot counts closed separately, leaves it out of project and open completion, never 100; brief reports it; tests cover each rule.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/core/lifecycle.js",
+              "contentHash": "sha256:58b7a15de2345e2aaddec390f16111d6e95444b2a129d41417a63f1fa5a4d8f8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/flow/snapshot.js",
+              "contentHash": "sha256:7fe9750de13792ddfe0c2b92049cbdd59e903f57e4faff31ae97b354f57b4e2d",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/work-lifecycle.test.js",
+              "contentHash": "sha256:eceab1332e4e89cf3c06e35de9e6a9e57969bc973bfa63ae5759dc343ad5dad2",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/snapshot-contract.test.js",
+              "contentHash": "sha256:ff5ee92749d9106f23bde405b200c414b7acd15f99ae97d0d71dee59aa0edbda",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/doctor-integrity.test.js",
+              "contentHash": "sha256:0aa8cc9f47fd3e24a1276fcaa40ed91b52c9e8ede254e18659f043aeded92229",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/work-lifecycle.test.js test/snapshot-contract.test.js test/doctor-integrity.test.js (passed)",
+              "workId": "PF-0041",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/work-lifecycle.test.js, test/snapshot-contract.test.js, test/doctor-integrity.test.js pass again in V-003. reopen of a closed item reopens it at its preserved stage with an audit event, refuses --to, requires a reason; the DONE reopen with --to is unchanged; normal stage rules apply afterwards; tested.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/cli.js",
+              "contentHash": "sha256:c761fa9966cbf0883cabeeccd7f4cad762e105a24ab82d6ed574669e1104ac8c",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/core/lifecycle.js",
+              "contentHash": "sha256:58b7a15de2345e2aaddec390f16111d6e95444b2a129d41417a63f1fa5a4d8f8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/work-lifecycle.test.js",
+              "contentHash": "sha256:eceab1332e4e89cf3c06e35de9e6a9e57969bc973bfa63ae5759dc343ad5dad2",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/snapshot-contract.test.js",
+              "contentHash": "sha256:ff5ee92749d9106f23bde405b200c414b7acd15f99ae97d0d71dee59aa0edbda",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/doctor-integrity.test.js",
+              "contentHash": "sha256:0aa8cc9f47fd3e24a1276fcaa40ed91b52c9e8ede254e18659f043aeded92229",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/work-lifecycle.test.js test/snapshot-contract.test.js test/doctor-integrity.test.js (passed)",
+              "workId": "PF-0041",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/work-lifecycle.test.js, test/snapshot-contract.test.js, test/doctor-integrity.test.js pass again in V-003. Central guard in the CLI dispatcher, under the workspace lock, finds every referenced work id in any argument shape and falls back to the active item; core checks in advance, activate, checkpoint, checkpoint revise and verification recording; hold/close clear the active focus; the test covers advance, checkpoint, revise, verify, activate, intake add, question add, requirement record, request revise, knowledge review, feedback, approve, flag-first and --opt=value forms, and fails when the guard is disabled or the old id detection is restored.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/cli.js",
+              "contentHash": "sha256:c761fa9966cbf0883cabeeccd7f4cad762e105a24ab82d6ed574669e1104ac8c",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/core/transitions.js",
+              "contentHash": "sha256:4f8208d734b2b9c149ad6abeeb2e038cf47425cee8e3f1054175f129d5129aa4",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/core/progress.js",
+              "contentHash": "sha256:5067d0fc779e137c20afe2af3a65ad9a13fe518017db7074dd50c842f250a8c2",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/core/evidence.js",
+              "contentHash": "sha256:3e06e26adf6f739841d8c8be3ccccc5c931a80f9d136c9a17eefed96c2a944a4",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/behavior/routing.js",
+              "contentHash": "sha256:9cd9c235c2df583972b46861939c1b5b6c32683bbf3149e6dc25e45808e7839b",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/work-lifecycle.test.js",
+              "contentHash": "sha256:eceab1332e4e89cf3c06e35de9e6a9e57969bc973bfa63ae5759dc343ad5dad2",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/snapshot-contract.test.js",
+              "contentHash": "sha256:ff5ee92749d9106f23bde405b200c414b7acd15f99ae97d0d71dee59aa0edbda",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/doctor-integrity.test.js",
+              "contentHash": "sha256:0aa8cc9f47fd3e24a1276fcaa40ed91b52c9e8ede254e18659f043aeded92229",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/work-lifecycle.test.js test/snapshot-contract.test.js test/doctor-integrity.test.js (passed)",
+              "workId": "PF-0041",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/work-lifecycle.test.js, test/snapshot-contract.test.js, test/doctor-integrity.test.js pass again in V-003. Existing records read and progress unchanged (old-records test, full suite 863/863 on Node 22 and 20.16); the first hold/close refuses without --accept-minimum-version 1.4.0 and changes nothing, then raises atomically (failure-injection test after every write); Shared Project policy preserved and only raised; the frozen v1.1.0 CLI refuses mutations on a 1.4.0 project while reading it, and the installed 1.2.0 and 1.3.0 CLIs and consoles were verified to refuse too.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/core/lifecycle.js",
+              "contentHash": "sha256:58b7a15de2345e2aaddec390f16111d6e95444b2a129d41417a63f1fa5a4d8f8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/work-lifecycle.test.js",
+              "contentHash": "sha256:eceab1332e4e89cf3c06e35de9e6a9e57969bc973bfa63ae5759dc343ad5dad2",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "installed yallaflow 1.1.0/1.2.0/1.3.0 refused every mutation on a project requiring 1.4.0, project files byte-unchanged"
+            },
+            {
+              "type": "repository",
+              "path": "test/snapshot-contract.test.js",
+              "contentHash": "sha256:ff5ee92749d9106f23bde405b200c414b7acd15f99ae97d0d71dee59aa0edbda",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/doctor-integrity.test.js",
+              "contentHash": "sha256:0aa8cc9f47fd3e24a1276fcaa40ed91b52c9e8ede254e18659f043aeded92229",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/work-lifecycle.test.js test/snapshot-contract.test.js test/doctor-integrity.test.js (passed)",
+              "workId": "PF-0041",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/work-lifecycle.test.js, test/snapshot-contract.test.js, test/doctor-integrity.test.js pass again in V-003. Flow states held/closed and a lifecycle field in the snapshot (schema extended additively); readyChildren excludes held/closed children; status, brief, guide, work show, finish, handoff and resume label the lifecycle and name the lifting command; doctor validates the block and warns on an active held/closed item; tested.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/flow/stations.js",
+              "contentHash": "sha256:6369399ddbe72d5d75b375cfcdac126b34e8cc7d1f210933b27844d41d01caa8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/flow/snapshot.js",
+              "contentHash": "sha256:7fe9750de13792ddfe0c2b92049cbdd59e903f57e4faff31ae97b354f57b4e2d",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/decomposition/store.js",
+              "contentHash": "sha256:3c279f6e2f7483628c12648d29478c135e84e931190ce0a2a2192bc435156213",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/guide.js",
+              "contentHash": "sha256:323397cbf9659218e87b4fb75cd8282d5f966e9252dac68793ef55ff9563724b",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/finish.js",
+              "contentHash": "sha256:89dd484f3088b621776b08c4791aee4ac9a836a8a854f84c919c7e887e9a1d7a",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/core/integrity.js",
+              "contentHash": "sha256:4205671c0ea7961792e8e74c700de1d9c401b592ce15d765b5947ba2fec5d61d",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/work-lifecycle.test.js",
+              "contentHash": "sha256:eceab1332e4e89cf3c06e35de9e6a9e57969bc973bfa63ae5759dc343ad5dad2",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/snapshot-contract.test.js",
+              "contentHash": "sha256:ff5ee92749d9106f23bde405b200c414b7acd15f99ae97d0d71dee59aa0edbda",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/doctor-integrity.test.js",
+              "contentHash": "sha256:0aa8cc9f47fd3e24a1276fcaa40ed91b52c9e8ede254e18659f043aeded92229",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/work-lifecycle.test.js test/snapshot-contract.test.js test/doctor-integrity.test.js (passed)",
+              "workId": "PF-0041",
+              "verificationRunId": "V-003"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
     }
   ],
-  "updatedAt": "2026-11-06T22:11:12.811Z"
+  "updatedAt": "2026-11-07T10:34:16.024Z"
 }

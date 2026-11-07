@@ -11,7 +11,7 @@
     "reviewRequired": true
   },
   "createdAt": "2026-11-07T02:33:38.628Z",
-  "updatedAt": "2026-11-07T10:01:59.814Z",
+  "updatedAt": "2026-11-07T10:36:21.830Z",
   "title": "Development Runtime Manager: reviewed runtime profiles (.yallaflow/runtime.yaml with git-ignored personal overrides) for Laravel, Node.js and Docker; explicit trust bound to the command definition; Start, Stop, Restart, Logs, ports and process status from the CLI and the Console; never run inferred commands automatically, never stop processes YallaFlow did not start, never expose secrets",
   "routingConfidence": "high",
   "routingReason": "Explicitly classified by the user: `yallaflow feature --scope architectural`.",
@@ -81,6 +81,22 @@
         "V-001",
         "V-002"
       ]
+    },
+    {
+      "completedAt": "2026-11-07T10:36:21.830Z",
+      "verificationRunIds": [
+        "V-003"
+      ]
+    }
+  ],
+  "lastInvalidationAt": "2026-11-07T10:34:45.236Z",
+  "lifecycleHistory": [
+    {
+      "action": "reopen",
+      "fromStage": "DONE",
+      "toStage": "VERIFICATION",
+      "reason": "1.4.0 acceptance candidate: the New Project Wizard changed files cited by the convergence evidence (console server, app.js); refresh verification and convergence against the current tree. No defect is known.",
+      "changedAt": "2026-11-07T10:34:45.236Z"
     }
   ]
 }

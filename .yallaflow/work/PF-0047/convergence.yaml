@@ -307,7 +307,412 @@
         }
       ],
       "unrequested": []
+    },
+    {
+      "id": "CV-002",
+      "recordedAt": "2026-11-07T10:35:59.819Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 2,
+        "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+        "verificationRunIds": [
+          "V-003"
+        ]
+      },
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/runtime.test.js, test/shared-project.test.js pass again in V-003. runtime add/remove validate and write .yallaflow/runtime.yaml or the git-ignored local override; unknown fields, '..'/absolute cwd, bad ids/ports, secret-like keys/values (never echoed) and control/bidi characters are refused; a symlinked cwd escaping the repository is refused at start; overrides merge field-wise and are listed in overridden; doctor validates the profile.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/profile.js",
+              "contentHash": "sha256:3a10a4d1805ecf8d9f65f1237141aa8ceac0dbbd96fea3b5c5ac032b75b2246b",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/doctor.js",
+              "contentHash": "sha256:a2bf31f67e819beffed90c33786701166546ef03831b8f6d48cf4d5208e5eeec",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime.test.js",
+              "contentHash": "sha256:01e56a3621112699dd1d57c8f678f56a3d93bd88abd869cc6d101c457c3f9002",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/shared-project.test.js",
+              "contentHash": "sha256:5230542c53b307518dc2e18c32769733fae8ef6c533e57265f5240b4bf0a1791",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime.test.js test/shared-project.test.js (passed)",
+              "workId": "PF-0047",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/runtime.test.js, test/shared-project.test.js pass again in V-003. runtime suggest derives Laravel, package-script and Compose candidates with their evidence files and never runs them; start refuses untrusted or changed definitions (RUNTIME_UNTRUSTED) with the exact argv/cwd/env/ports, for the service and every dependency before anything starts; trust is kept outside the repository and bound to the definition hash.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/suggest.js",
+              "contentHash": "sha256:ebc11587ee6cfc934e536d6703dccddda492c3c7e76c71f35214ffcd26d12f52",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/trust.js",
+              "contentHash": "sha256:389d93222d51ff6e74bb25ea8bd23ded9dda2329a9180cf57752b26400083cb2",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:cc1cffb1a61bcd20d9b8ebf2f5c524ee75345a49001fa36443f7c377fcdc1387",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime.test.js",
+              "contentHash": "sha256:01e56a3621112699dd1d57c8f678f56a3d93bd88abd869cc6d101c457c3f9002",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/shared-project.test.js",
+              "contentHash": "sha256:5230542c53b307518dc2e18c32769733fae8ef6c533e57265f5240b4bf0a1791",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime.test.js test/shared-project.test.js (passed)",
+              "workId": "PF-0047",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/runtime.test.js, test/shared-project.test.js pass again in V-003. Start spawns argv with shell:false in its own process group with the base+named environment and an anchored, link-refusing log; it refuses PORT_IN_USE and already-running services; run records hold pid, start time, pgid and definition hash; status reports stopped/starting/running/failed/unknown from the live process.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:cc1cffb1a61bcd20d9b8ebf2f5c524ee75345a49001fa36443f7c377fcdc1387",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/process.js",
+              "contentHash": "sha256:3f04e7dca2290dbda4b7fb35b8c00bbb2546882a66cb36374862dab1d318bda2",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime.test.js",
+              "contentHash": "sha256:01e56a3621112699dd1d57c8f678f56a3d93bd88abd869cc6d101c457c3f9002",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/shared-project.test.js",
+              "contentHash": "sha256:5230542c53b307518dc2e18c32769733fae8ef6c533e57265f5240b4bf0a1791",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime.test.js test/shared-project.test.js (passed)",
+              "workId": "PF-0047",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/runtime.test.js, test/shared-project.test.js pass again in V-003. Stop/restart signal only a group whose leader matches pid, start time and own process group; PID reuse and forged pgid records are unmanaged and never signalled (tests keep the stranger processes alive); survivors are reported; stop --all stops owned services only.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:cc1cffb1a61bcd20d9b8ebf2f5c524ee75345a49001fa36443f7c377fcdc1387",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime.test.js",
+              "contentHash": "sha256:01e56a3621112699dd1d57c8f678f56a3d93bd88abd869cc6d101c457c3f9002",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/shared-project.test.js",
+              "contentHash": "sha256:5230542c53b307518dc2e18c32769733fae8ef6c533e57265f5240b4bf0a1791",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime.test.js test/shared-project.test.js (passed)",
+              "workId": "PF-0047",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/runtime.test.js, test/shared-project.test.js pass again in V-003. The Setup tab shows services, suggestions, state, ports, readiness, stop settings and logs and offers Trust (typed id, bound to the rendered definition hash), Start, Stop and Restart via fixed POST routes with token, Origin, JSON, size and read-only guards; state lives in run records and is re-read on every request and every 3 s, so console restarts and reconnects recover it; verified in three browsers.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:d0cb293f373dcf50eac9ba98670c9737a6e597ce5cff36b66184b046302440a9",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/runtime.js",
+              "contentHash": "sha256:b3f8aa05cf43c4cb8180342e28f2f9606164ea95f02565e2150427a2c6f87941",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:18398bb7d40995c8a1ce6fa36c2cc505857ab52e1fe98f9eebda5ed7d031c0a8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "research/release-1.4/browser-check.mjs",
+              "contentHash": "sha256:de33f7aea2bb10297f347c8650d3fb75507b9fd6703ed63260082ac5fb364fa0",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime.test.js",
+              "contentHash": "sha256:01e56a3621112699dd1d57c8f678f56a3d93bd88abd869cc6d101c457c3f9002",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/shared-project.test.js",
+              "contentHash": "sha256:5230542c53b307518dc2e18c32769733fae8ef6c533e57265f5240b4bf0a1791",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime.test.js test/shared-project.test.js (passed)",
+              "workId": "PF-0047",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/runtime.test.js, test/shared-project.test.js pass again in V-003. Profiles store env names only and refuse secret-looking values; service output with a GitHub token is redacted in CLI and console logs while the raw log stays local and git-ignored; the UI and docs state redaction is best effort.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/profile.js",
+              "contentHash": "sha256:3a10a4d1805ecf8d9f65f1237141aa8ceac0dbbd96fea3b5c5ac032b75b2246b",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:cc1cffb1a61bcd20d9b8ebf2f5c524ee75345a49001fa36443f7c377fcdc1387",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime.test.js",
+              "contentHash": "sha256:01e56a3621112699dd1d57c8f678f56a3d93bd88abd869cc6d101c457c3f9002",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "docs/runtime.md",
+              "contentHash": "sha256:f28388c249e9b65290d7a73775de77dd81afa7d42af896d6b7932f285ea88c97",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/shared-project.test.js",
+              "contentHash": "sha256:5230542c53b307518dc2e18c32769733fae8ef6c533e57265f5240b4bf0a1791",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime.test.js test/shared-project.test.js (passed)",
+              "workId": "PF-0047",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/runtime.test.js, test/shared-project.test.js pass again in V-003. Status, the Setup view and project opening never start a service (tested); trust, run records, logs and errors persist outside the console process; five concurrent CLI starts produce one process through the per-service lock.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:cc1cffb1a61bcd20d9b8ebf2f5c524ee75345a49001fa36443f7c377fcdc1387",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime.test.js",
+              "contentHash": "sha256:01e56a3621112699dd1d57c8f678f56a3d93bd88abd869cc6d101c457c3f9002",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "research/release-1.4/browser-check.mjs",
+              "contentHash": "sha256:de33f7aea2bb10297f347c8650d3fb75507b9fd6703ed63260082ac5fb364fa0",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/shared-project.test.js",
+              "contentHash": "sha256:5230542c53b307518dc2e18c32769733fae8ef6c533e57265f5240b4bf0a1791",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime.test.js test/shared-project.test.js (passed)",
+              "workId": "PF-0047",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-008",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/runtime.test.js, test/shared-project.test.js pass again in V-003. States are exactly stopped, starting, running, failed, unknown; a service killed outside YallaFlow reads failed; unidentifiable processes (PID reuse, forged process group) are unmanaged and never signalled; covered by crash-recovery and forgery tests.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:cc1cffb1a61bcd20d9b8ebf2f5c524ee75345a49001fa36443f7c377fcdc1387",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "resources/schemas/runtime-1.schema.json",
+              "contentHash": "sha256:f75adeb675fe7b3b55403dfa9e865994525dc751b5f5696421f1bfe769a655eb",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime.test.js",
+              "contentHash": "sha256:01e56a3621112699dd1d57c8f678f56a3d93bd88abd869cc6d101c457c3f9002",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/shared-project.test.js",
+              "contentHash": "sha256:5230542c53b307518dc2e18c32769733fae8ef6c533e57265f5240b4bf0a1791",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime.test.js test/shared-project.test.js (passed)",
+              "workId": "PF-0047",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-009",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/runtime.test.js, test/shared-project.test.js pass again in V-003. serviceEnvironment passes only the fixed base plus named variables (SECRET_TOKEN from the parent is absent in the service); probe.js is the only network code, connecting to 127.0.0.1 on configured ports with a 300 ms timeout, enforced by the no-network guard test.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/process.js",
+              "contentHash": "sha256:3f04e7dca2290dbda4b7fb35b8c00bbb2546882a66cb36374862dab1d318bda2",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/probe.js",
+              "contentHash": "sha256:0cbd13fef721e29cb57c6f876e89cde178604690b513c3051d2fc5af14f784f7",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/shared-project.test.js",
+              "contentHash": "sha256:5230542c53b307518dc2e18c32769733fae8ef6c533e57265f5240b4bf0a1791",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime.test.js",
+              "contentHash": "sha256:01e56a3621112699dd1d57c8f678f56a3d93bd88abd869cc6d101c457c3f9002",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime.test.js test/shared-project.test.js (passed)",
+              "workId": "PF-0047",
+              "verificationRunId": "V-003"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
     }
   ],
-  "updatedAt": "2026-11-07T10:01:47.682Z"
+  "updatedAt": "2026-11-07T10:35:59.819Z"
 }

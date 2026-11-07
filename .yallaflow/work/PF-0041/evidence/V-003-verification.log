@@ -1,0 +1,160 @@
+TAP version 13
+# Subtest: doctor reports a healthy workspace with no work items
+ok 1 - doctor reports a healthy workspace with no work items
+  ---
+  duration_ms: 249.907444
+  type: 'test'
+  ...
+# Subtest: doctor detects a DONE stage with an incomplete implementation checkpoint
+ok 2 - doctor detects a DONE stage with an incomplete implementation checkpoint
+  ---
+  duration_ms: 303.617601
+  type: 'test'
+  ...
+# Subtest: doctor detects a completed verification checkpoint with no verification evidence
+ok 3 - doctor detects a completed verification checkpoint with no verification evidence
+  ---
+  duration_ms: 350.165691
+  type: 'test'
+  ...
+# Subtest: doctor detects an impossible DONE state missing required review/knowledge
+ok 4 - doctor detects an impossible DONE state missing required review/knowledge
+  ---
+  duration_ms: 364.123817
+  type: 'test'
+  ...
+# Subtest: doctor considers a healthy reopened work item passing
+ok 5 - doctor considers a healthy reopened work item passing
+  ---
+  duration_ms: 308.039912
+  type: 'test'
+  ...
+# Subtest: doctor accepts a completed gated checkpoint awaiting review at its stage, and flags work past an unapproved gate
+ok 6 - doctor accepts a completed gated checkpoint awaiting review at its stage, and flags work past an unapproved gate
+  ---
+  duration_ms: 3257.587387
+  type: 'test'
+  ...
+# Subtest: snapshot --json validates and places each item in the flow
+ok 7 - snapshot --json validates and places each item in the flow
+  ---
+  duration_ms: 1757.366144
+  type: 'test'
+  ...
+# Subtest: a requested human review gate is reported as waiting for you
+ok 8 - a requested human review gate is reported as waiting for you
+  ---
+  duration_ms: 1225.255624
+  type: 'test'
+  ...
+# Subtest: an open material question is reported as waiting for you
+ok 9 - an open material question is reported as waiting for you
+  ---
+  duration_ms: 1233.01647
+  type: 'test'
+  ...
+# Subtest: work show --json returns every section and validates
+ok 10 - work show --json returns every section and validates
+  ---
+  duration_ms: 1597.824025
+  type: 'test'
+  ...
+# Subtest: errors are one JSON document with a code and exit status 1
+ok 11 - errors are one JSON document with a code and exit status 1
+  ---
+  duration_ms: 214.440791
+  type: 'test'
+  ...
+# Subtest: read commands never modify .yallaflow, the working tree, or .git/index
+ok 12 - read commands never modify .yallaflow, the working tree, or .git/index
+  ---
+  duration_ms: 1894.434812
+  type: 'test'
+  ...
+# Subtest: snapshot reads a legacy v0.3.6 workspace fixture without writing to it
+ok 13 - snapshot reads a legacy v0.3.6 workspace fixture without writing to it
+  ---
+  duration_ms: 724.959175
+  type: 'test'
+  ...
+# Subtest: work show reports convergence evidence as stable references (run, path)
+ok 14 - work show reports convergence evidence as stable references (run, path)
+  ---
+  duration_ms: 3897.627233
+  type: 'test'
+  ...
+# Subtest: hold refuses without confirmation and changes nothing; with it, raises the minimum version and preserves everything; resume returns the same state
+ok 15 - hold refuses without confirmation and changes nothing; with it, raises the minimum version and preserves everything; resume returns the same state
+  ---
+  duration_ms: 2496.002117
+  type: 'test'
+  ...
+# Subtest: the central guard refuses progress on held and closed work and names the lifting command
+ok 16 - the central guard refuses progress on held and closed work and names the lifting command
+  ---
+  duration_ms: 7337.804658
+  type: 'test'
+  ...
+# Subtest: close: outcomes, --by rules, never on DONE, never counted as done or delivered
+ok 17 - close: outcomes, --by rules, never on DONE, never counted as done or delivered
+  ---
+  duration_ms: 8015.937382
+  type: 'test'
+  ...
+# Subtest: reopen: closed work returns to its preserved stage (audited, no --to); DONE reopen is unchanged
+ok 18 - reopen: closed work returns to its preserved stage (audited, no --to); DONE reopen is unchanged
+  ---
+  duration_ms: 6450.624185
+  type: 'test'
+  ...
+# Subtest: every write is all-or-nothing: an injected failure after each write leaves every file unchanged
+ok 19 - every write is all-or-nothing: an injected failure after each write leaves every file unchanged
+  ---
+  duration_ms: 1350.524053
+  type: 'test'
+  ...
+# Subtest: Shared Project: the shared policy is preserved and its minimum version is only raised, with the team warning
+ok 20 - Shared Project: the shared policy is preserved and its minimum version is only raised, with the team warning
+  ---
+  duration_ms: 1234.047815
+  type: 'test'
+  ...
+# Subtest: old records: an existing workspace reads and progresses exactly as before (no lifecycle block, no minimum version)
+ok 21 - old records: an existing workspace reads and progresses exactly as before (no lifecycle block, no minimum version)
+  ---
+  duration_ms: 4041.529788
+  type: 'test'
+  ...
+# Subtest: older CLIs read a project that requires 1.4.0 but refuse to change it
+ok 22 - older CLIs read a project that requires 1.4.0 but refuse to change it
+  ---
+  duration_ms: 3045.977418
+  type: 'test'
+  ...
+# Subtest: decomposition: held and closed children are never ready, and closed never counts as done
+ok 23 - decomposition: held and closed children are never ready, and closed never counts as done
+  ---
+  duration_ms: 1.881516
+  type: 'test'
+  ...
+# Subtest: the understanding baseline and legacy reconciliation are never held or closed (review finding H2/H3)
+ok 24 - the understanding baseline and legacy reconciliation are never held or closed (review finding H2/H3)
+  ---
+  duration_ms: 831.002086
+  type: 'test'
+  ...
+# Subtest: a closed child can never satisfy or prove its parent's requirements (review finding M1)
+ok 25 - a closed child can never satisfy or prove its parent's requirements (review finding M1)
+  ---
+  duration_ms: 371.077793
+  type: 'test'
+  ...
+1..25
+# tests 25
+# suites 0
+# pass 25
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 35273.13099

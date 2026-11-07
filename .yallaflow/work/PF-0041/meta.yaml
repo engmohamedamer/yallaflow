@@ -11,7 +11,7 @@
     "reviewRequired": true
   },
   "createdAt": "2026-11-06T21:16:29.098Z",
-  "updatedAt": "2026-11-06T22:11:28.241Z",
+  "updatedAt": "2026-11-07T10:36:20.151Z",
   "title": "Work lifecycle status: hold, resume, close without delivery, reopen closed work (Core operations, separate from workflow stage)",
   "routingConfidence": "high",
   "routingReason": "Explicitly classified by the user: `yallaflow feature --scope architectural`.",
@@ -64,13 +64,28 @@
       "relationship": "work-input"
     }
   ],
-  "lastInvalidationAt": "2026-11-06T22:00:12.529Z",
+  "lastInvalidationAt": "2026-11-07T10:33:40.089Z",
   "completionHistory": [
     {
       "completedAt": "2026-11-06T22:11:28.241Z",
       "verificationRunIds": [
         "V-002"
       ]
+    },
+    {
+      "completedAt": "2026-11-07T10:36:20.151Z",
+      "verificationRunIds": [
+        "V-003"
+      ]
+    }
+  ],
+  "lifecycleHistory": [
+    {
+      "action": "reopen",
+      "fromStage": "DONE",
+      "toStage": "VERIFICATION",
+      "reason": "1.4.0 acceptance candidate: later 1.4 work (overview, runtime, wizard, doctor fix) changed files cited by the convergence evidence; refresh verification and convergence against the current tree. No defect is known.",
+      "changedAt": "2026-11-07T10:33:40.089Z"
     }
   ]
 }

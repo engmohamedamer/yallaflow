@@ -11,7 +11,7 @@
     "reviewRequired": true
   },
   "createdAt": "2026-11-07T02:12:58.414Z",
-  "updatedAt": "2026-11-07T02:33:07.778Z",
+  "updatedAt": "2026-11-07T10:33:29.847Z",
   "title": "Project Overview and existing-project onboarding: read-only yallaflow overview --json (evidence-based stack detection with declared/detected/inferred/unknown kept apart, modules, architecture and purpose from approved memory, memory freshness, project-understanding status, inventory coverage) and a Console Overview view with guided onboarding that never starts or approves a baseline",
   "routingConfidence": "high",
   "routingReason": "Explicitly classified by the user: `yallaflow feature --scope bounded`.",
@@ -63,6 +63,22 @@
         "V-001",
         "V-002"
       ]
+    },
+    {
+      "completedAt": "2026-11-07T10:33:29.847Z",
+      "verificationRunIds": [
+        "V-003"
+      ]
+    }
+  ],
+  "lastInvalidationAt": "2026-11-07T10:32:50.898Z",
+  "lifecycleHistory": [
+    {
+      "action": "reopen",
+      "fromStage": "DONE",
+      "toStage": "VERIFICATION",
+      "reason": "1.4.0 acceptance candidate: later 1.4 work (runtime manager, wizard) changed files cited by the convergence evidence (resources/console/app.js, src/console/server.js, src/overview/collect.js); refresh verification and convergence against the current tree. No defect is known.",
+      "changedAt": "2026-11-07T10:32:50.898Z"
     }
   ]
 }

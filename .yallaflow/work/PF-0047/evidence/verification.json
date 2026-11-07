@@ -36,6 +36,27 @@
       "finishedAt": "2026-11-07T10:01:15.449Z",
       "verifiedAt": "2026-11-07T10:01:15.449Z",
       "log": "V-002-verification.log"
+    },
+    {
+      "id": "V-003",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/runtime.test.js test/shared-project.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/runtime.test.js",
+        "test/shared-project.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/runtime.test.js test/shared-project.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T10:34:45.433Z",
+      "finishedAt": "2026-11-07T10:35:59.386Z",
+      "verifiedAt": "2026-11-07T10:35:59.386Z",
+      "log": "V-003-verification.log"
     }
   ]
 }

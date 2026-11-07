@@ -24,18 +24,33 @@
     },
     "verification": {
       "status": "completed",
-      "startedAt": "2026-11-07T02:32:57.370Z",
-      "completedAt": "2026-11-07T02:32:57.370Z",
-      "summary": "V-002 npm run check: 876/876 pass (5 new overview tests). Chromium browser check research/release-1.4/browser-check.mjs passed: Overview en, ar+dark, mobile without horizontal scroll, Flow onboarding strip; no page errors."
+      "startedAt": "2026-11-07T10:33:25.249Z",
+      "completedAt": "2026-11-07T10:33:25.249Z",
+      "summary": "V-003: fresh run of test/overview.test.js test/console-server.test.js against the 1.4.0 candidate tree passed (evidence refresh after later 1.4 changes; no defect found)."
     },
     "delivery-convergence": {
       "status": "completed",
-      "startedAt": "2026-11-07T02:33:07.130Z",
-      "completedAt": "2026-11-07T02:33:07.130Z",
-      "summary": "CV-001: AC-001..AC-005 satisfied with repository, verification:V-002 and browser-check evidence; no unrequested behavior beyond the specified read-only Overview."
+      "startedAt": "2026-11-07T10:33:25.844Z",
+      "completedAt": "2026-11-07T10:33:25.844Z",
+      "summary": "Convergence re-assessed against the current tree with V-003: every active criterion satisfied."
     }
   },
   "rulings": [],
-  "history": [],
-  "updatedAt": "2026-11-07T02:33:07.130Z"
+  "history": [
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "1.4.0 acceptance candidate: later 1.4 work (runtime manager, wizard) changed files cited by the convergence evidence (resources/console/app.js, src/console/server.js, src/overview/collect.js); refresh verification and convergence against the current tree. No defect is known.",
+      "changedAt": "2026-11-07T10:32:50.898Z"
+    },
+    {
+      "skill": "delivery-convergence",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to verification: 1.4.0 acceptance candidate: later 1.4 work (runtime manager, wizard) changed files cited by the convergence evidence (resources/console/app.js, src/console/server.js, src/overview/collect.js); refresh verification and convergence against the current tree. No defect is known.",
+      "changedAt": "2026-11-07T10:32:50.898Z"
+    }
+  ],
+  "updatedAt": "2026-11-07T10:33:25.844Z"
 }

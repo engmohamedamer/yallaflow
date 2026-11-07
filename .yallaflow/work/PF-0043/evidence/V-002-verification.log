@@ -1,0 +1,249 @@
+TAP version 13
+# Subtest: work-item actions run the canonical commands: same records as the CLI, Core refusals passed through
+ok 1 - work-item actions run the canonical commands: same records as the CLI, Core refusals passed through
+  ---
+  duration_ms: 7065.246576
+  type: 'test'
+  ...
+# Subtest: action input is validated and values never become options
+ok 2 - action input is validated and values never become options
+  ---
+  duration_ms: 1325.66875
+  type: 'test'
+  ...
+# Subtest: security: token, Origin, content type and read-only consoles guard every action and decision
+ok 3 - security: token, Origin, content type and read-only consoles guard every action and decision
+  ---
+  duration_ms: 1219.363492
+  type: 'test'
+  ...
+# Subtest: gate decisions: material shown first, exact confirmation, stale and duplicate protection, console provenance
+ok 4 - gate decisions: material shown first, exact confirmation, stale and duplicate protection, console provenance
+  ---
+  duration_ms: 6514.286574
+  type: 'test'
+  ...
+# Subtest: CLI decisions are recorded exactly as before (no provenance), and a bad provenance channel records nothing
+ok 5 - CLI decisions are recorded exactly as before (no provenance), and a bad provenance channel records nothing
+  ---
+  duration_ms: 3954.214374
+  type: 'test'
+  ...
+# Subtest: the Agent Workspace never reaches gate decisions, and agents never inherit the provenance channel
+ok 6 - the Agent Workspace never reaches gate decisions, and agents never inherit the provenance channel
+  ---
+  duration_ms: 2.111026
+  type: 'test'
+  ...
+# Subtest: review findings: re-deciding after "request changes", request ids per gate, malformed bodies, provenance limits, strict doctor
+ok 7 - review findings: re-deciding after "request changes", request ids per gate, malformed bodies, provenance limits, strict doctor
+  ---
+  duration_ms: 5528.239226
+  type: 'test'
+  ...
+# YallaFlow foundation CLI
+# Give AI your project, not just your prompt.
+# Usage:
+#   yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]
+#   yallaflow start [request]
+#   yallaflow start --keep-active -- <request>
+#   yallaflow activate <work-id>
+#   yallaflow request --help
+#   yallaflow intake <file> [<file> ...] [--title TITLE]
+#   yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT]
+#   yallaflow intake ticket <payload-file|ticket-ref> [--provider github|jira|azure-devops] [--work <work-id>] [--reason TEXT] [--fetch [--attachments]] [--attachment <file>]... [--title TITLE] [--max-comments N]
+#   yallaflow source --help
+#   yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]
+#   yallaflow baseline --help
+#   yallaflow guide [work-id]
+#   yallaflow ready [work-id]
+#   yallaflow skill <skill-id> [--work <work-id>]
+#   yallaflow checkpoint --help
+#   yallaflow question --help
+#   yallaflow knowledge --help
+#   yallaflow requirement --help
+#   yallaflow convergence --help
+#   yallaflow impact --help
+#   yallaflow context --help
+#   yallaflow upgrade status|plan
+#   yallaflow brief
+#   yallaflow inspect
+#   yallaflow limitation --help
+#   yallaflow agent --help
+#   yallaflow decompose --help
+#   yallaflow progress <parent-id>
+#   yallaflow next <parent-id>
+#   yallaflow approve <work-id> --stage GATE [--note TEXT]
+#   yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]
+#   yallaflow handoff [work-id]
+#   yallaflow feature <title> --scope SCOPE
+#   yallaflow bug <title> --scope SCOPE
+#   yallaflow investigate <title> --scope SCOPE
+#   yallaflow change <title> --scope SCOPE
+#   yallaflow refactor <title> --scope SCOPE
+#   yallaflow release <title> --scope SCOPE
+#   yallaflow purpose --help
+#   yallaflow finish [work-id] [--verbose]
+#   yallaflow qc --help
+#   yallaflow demo --help
+#   yallaflow shared --help
+#   yallaflow status
+#   yallaflow snapshot [--json]
+#   yallaflow overview [--json]
+#   yallaflow runtime --help
+#   yallaflow new --help
+#   yallaflow console [--port N] [--no-open] [--project DIR]... [--read-only] [--agents]
+#   yallaflow agents detect
+#   yallaflow work show <work-id> [--json]
+#   yallaflow work hold|resume|close <work-id> ...  (lifecycle: on hold, closed without delivery)
+#   yallaflow resume [work-id]
+#   yallaflow doctor [--clear-lock]
+#   yallaflow advance [work-id]
+#   yallaflow verify [work-id] -- <executable> [args...]
+#   yallaflow verify [work-id] --shell "<command>"
+#   yallaflow verify [work-id] --script <path>
+#   yallaflow verify list [work-id]
+#   yallaflow reopen <work-id> --to implementation|verification|review --reason REASON
+#   yallaflow reopen <work-id> --reason REASON   (closed work)
+#   yallaflow --version
+# Subtest: start without new options behaves exactly as before (focus moves to the new item)
+ok 8 - start without new options behaves exactly as before (focus moves to the new item)
+  ---
+  duration_ms: 1755.723129
+  type: 'test'
+  ...
+# Subtest: parseStartArgs: new options only as leading tokens; anything else is the legacy request
+ok 9 - parseStartArgs: new options only as leading tokens; anything else is the legacy request
+  ---
+  duration_ms: 2.165593
+  type: 'test'
+  ...
+# Subtest: --keep-active never replaces unfinished active work; routing and checkpoints never move focus; activate does
+ok 10 - --keep-active never replaces unfinished active work; routing and checkpoints never move focus; activate does
+  ---
+  duration_ms: 2417.445364
+  type: 'test'
+  ...
+# Subtest: --keep-active never activates, even when no work item is active (owner decision)
+ok 11 - --keep-active never activates, even when no work item is active (owner decision)
+  ---
+  duration_ms: 1318.340082
+  type: 'test'
+  ...
+# Subtest: console create with nothing active leaves nothing active
+ok 12 - console create with nothing active leaves nothing active
+  ---
+  duration_ms: 1079.111002
+  type: 'test'
+  ...
+# Subtest: attachments report what YallaFlow could actually do with each file
+ok 13 - attachments report what YallaFlow could actually do with each file
+  ---
+  duration_ms: 2458.292683
+  type: 'test'
+  ...
+# Subtest: request IDs: a retried or concurrent request creates exactly one item, with an unverified console attestation
+ok 14 - request IDs: a retried or concurrent request creates exactly one item, with an unverified console attestation
+  ---
+  duration_ms: 627.301096
+  type: 'test'
+  ...
+# Subtest: helpers: titles come from the user's words; file names are reduced safely
+ok 15 - helpers: titles come from the user's words; file names are reduced safely
+  ---
+  duration_ms: 0.575576
+  type: 'test'
+  ...
+# Subtest: POST guards: token, Origin, Host, content type, size, read-only, unknown routes
+ok 16 - POST guards: token, Origin, Host, content type, size, read-only, unknown routes
+  ---
+  duration_ms: 50.649543
+  type: 'test'
+  ...
+# Subtest: create: unclassified and classified items through Core; shell text stored verbatim; focus kept
+ok 17 - create: unclassified and classified items through Core; shell text stored verbatim; focus kept
+  ---
+  duration_ms: 2545.598484
+  type: 'test'
+  ...
+# Subtest: create: concurrent requests get distinct IDs; repeated ones never duplicate
+ok 18 - create: concurrent requests get distinct IDs; repeated ones never duplicate
+  ---
+  duration_ms: 2854.384402
+  type: 'test'
+  ...
+# Subtest: brownfield without approved understanding: Core refuses and nothing is created
+ok 19 - brownfield without approved understanding: Core refuses and nothing is created
+  ---
+  duration_ms: 290.304533
+  type: 'test'
+  ...
+# Subtest: attachments: preserved through intake, deduplicated on retry, refused safely, temp files removed, item kept
+ok 20 - attachments: preserved through intake, deduplicated on retry, refused safely, temp files removed, item kept
+  ---
+  duration_ms: 2289.84445
+  type: 'test'
+  ...
+# Subtest: an oversized upload is refused before it is stored
+ok 21 - an oversized upload is refused before it is stored
+  ---
+  duration_ms: 3548.690185
+  type: 'test'
+  ...
+# Subtest: review: requests starting with "-" keep their classification; "--help" is plain text
+ok 22 - review: requests starting with "-" keep their classification; "--help" is plain text
+  ---
+  duration_ms: 2459.870113
+  type: 'test'
+  ...
+# Subtest: review: two identical uploads at once store one copy; a long non-ASCII name is shortened, not leaked
+ok 23 - review: two identical uploads at once store one copy; a long non-ASCII name is shortened, not leaked
+  ---
+  duration_ms: 1156.10917
+  type: 'test'
+  ...
+# Subtest: resume on a deferred item says how to activate it, and changes nothing
+ok 24 - resume on a deferred item says how to activate it, and changes nothing
+  ---
+  duration_ms: 814.493622
+  type: 'test'
+  ...
+# Subtest: security: loopback host, token, origin, read-only methods and ID-only paths
+ok 25 - security: loopback host, token, origin, read-only methods and ID-only paths
+  ---
+  duration_ms: 1061.886865
+  type: 'test'
+  ...
+# Subtest: serves the snapshot, work detail and preserved sources by ID
+ok 26 - serves the snapshot, work detail and preserved sources by ID
+  ---
+  duration_ms: 2090.523367
+  type: 'test'
+  ...
+# Subtest: live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+ok 27 - live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+  ---
+  duration_ms: 2272.775323
+  type: 'test'
+  ...
+# Subtest: the console never writes: browsing every route leaves the workspace byte-identical
+ok 28 - the console never writes: browsing every route leaves the workspace byte-identical
+  ---
+  duration_ms: 1815.921396
+  type: 'test'
+  ...
+# Subtest: extracted text cannot be read outside its source directory; HEAD never opens the event stream
+ok 29 - extracted text cannot be read outside its source directory; HEAD never opens the event stream
+  ---
+  duration_ms: 1660.014826
+  type: 'test'
+  ...
+1..29
+# tests 29
+# suites 0
+# pass 29
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 25963.757418

@@ -48,24 +48,21 @@
     },
     "verification": {
       "status": "completed",
-      "startedAt": "2026-11-06T22:11:12.276Z",
-      "completedAt": "2026-11-06T22:11:12.450Z",
-      "summary": "V-002: npm run check 863/863 on Node 22; 863/863 on Node 20.16; lifecycle tests with mutation checks",
-      "evidence": [
-        "verification:V-002"
-      ]
+      "startedAt": "2026-11-07T10:34:15.800Z",
+      "completedAt": "2026-11-07T10:34:15.800Z",
+      "summary": "V-003: fresh run of test/work-lifecycle.test.js test/snapshot-contract.test.js test/doctor-integrity.test.js against the 1.4.0 candidate tree passed (evidence refresh after later 1.4 changes; no defect found)."
     },
     "delivery-convergence": {
       "status": "completed",
-      "startedAt": "2026-11-06T22:11:13.268Z",
-      "completedAt": "2026-11-06T22:11:13.620Z",
-      "summary": "7/7 acceptance criteria satisfied"
+      "startedAt": "2026-11-07T10:34:16.733Z",
+      "completedAt": "2026-11-07T10:34:16.733Z",
+      "summary": "Convergence re-assessed against the current tree with V-003: every active criterion satisfied."
     },
     "code-review": {
       "status": "completed",
-      "startedAt": "2026-11-06T22:11:13.443Z",
-      "completedAt": "2026-11-06T22:11:13.809Z",
-      "summary": "Independent review on an isolated copy: 3 high, 3 medium, 7 low; high and medium fixed with tests, low items fixed or documented (ruling)"
+      "startedAt": "2026-11-07T10:36:19.597Z",
+      "completedAt": "2026-11-07T10:36:19.597Z",
+      "summary": "Evidence-refresh review: the lifecycle modules (src/core/lifecycle.js, src/commands/lifecycle.js, test/work-lifecycle.test.js) are unchanged since 4ee3377. Changes nearby are additive: console routes and views for overview/runtime/wizard, and the PF-0050 doctor gate rule in src/core/integrity.js, which does not touch lifecycle integrity checks. Lifecycle, snapshot and doctor tests pass in V-003. No finding."
     }
   },
   "rulings": [
@@ -108,7 +105,28 @@
       "to": "in_progress",
       "reason": "Independent review: guard missed ids after options (H1), held/closed baseline and reconciliation could be approved to DONE (H2/H3), closed child as parent convergence evidence (M1), guard ran before the lock (M2), misleading finish/handoff/resume output (M3), low items",
       "changedAt": "2026-11-06T22:00:12.518Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "1.4.0 acceptance candidate: later 1.4 work (overview, runtime, wizard, doctor fix) changed files cited by the convergence evidence; refresh verification and convergence against the current tree. No defect is known.",
+      "changedAt": "2026-11-07T10:33:40.089Z"
+    },
+    {
+      "skill": "delivery-convergence",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to verification: 1.4.0 acceptance candidate: later 1.4 work (overview, runtime, wizard, doctor fix) changed files cited by the convergence evidence; refresh verification and convergence against the current tree. No defect is known.",
+      "changedAt": "2026-11-07T10:33:40.089Z"
+    },
+    {
+      "skill": "code-review",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to verification: 1.4.0 acceptance candidate: later 1.4 work (overview, runtime, wizard, doctor fix) changed files cited by the convergence evidence; refresh verification and convergence against the current tree. No defect is known.",
+      "changedAt": "2026-11-07T10:33:40.089Z"
     }
   ],
-  "updatedAt": "2026-11-06T22:11:13.809Z"
+  "updatedAt": "2026-11-07T10:36:19.597Z"
 }

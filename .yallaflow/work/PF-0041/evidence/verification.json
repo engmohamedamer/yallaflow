@@ -36,6 +36,28 @@
       "finishedAt": "2026-11-06T22:05:38.568Z",
       "verifiedAt": "2026-11-06T22:05:38.568Z",
       "log": "V-002-verification.log"
+    },
+    {
+      "id": "V-003",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/work-lifecycle.test.js test/snapshot-contract.test.js test/doctor-integrity.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/work-lifecycle.test.js",
+        "test/snapshot-contract.test.js",
+        "test/doctor-integrity.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/work-lifecycle.test.js test/snapshot-contract.test.js test/doctor-integrity.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T10:33:40.275Z",
+      "finishedAt": "2026-11-07T10:34:15.584Z",
+      "verifiedAt": "2026-11-07T10:34:15.584Z",
+      "log": "V-003-verification.log"
     }
   ]
 }

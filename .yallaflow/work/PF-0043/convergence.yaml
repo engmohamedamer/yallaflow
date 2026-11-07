@@ -298,7 +298,451 @@
         }
       ],
       "unrequested": []
+    },
+    {
+      "id": "CV-002",
+      "recordedAt": "2026-11-07T10:34:43.957Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 2,
+        "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+        "verificationRunIds": [
+          "V-002"
+        ]
+      },
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/console-actions.test.js, test/console-create.test.js, test/console-server.test.js pass again in V-002. POST work/<id>/actions/<action> maps activate, advance, reopen, revise, answer, hold, resume and close to the exact CLI argv through the runner (no shell, --opt=value); tests drive each against a real project and check the records.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/actions.js",
+              "contentHash": "sha256:3468bc2d762cd407a77a12b3df58a32f3e70567c0c8470a8f0b705f925c8fde8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:18398bb7d40995c8a1ce6fa36c2cc505857ab52e1fe98f9eebda5ed7d031c0a8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-actions.test.js",
+              "contentHash": "sha256:efb5d96a87da55ff0709b1f15198644223ae5f6b32ceda09809e4e399ab056d6",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-create.test.js",
+              "contentHash": "sha256:5db0e16e027d1f768a5fedd32952f39968abe00c9f53f136d3c87df19b83db98",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:f9a24835d0fa5a982b8e0bb4418da03c6f2d8a081f204a2b546d64510f662ad8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/console-actions.test.js test/console-create.test.js test/console-server.test.js (passed)",
+              "workId": "PF-0043",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/console-actions.test.js, test/console-create.test.js, test/console-server.test.js pass again in V-002. Refusals return Core's own text (409 REFUSED, CONFIRM_MINIMUM_VERSION, 422 validation); the item page shows the blocker and next valid action and the board shows Core's refusal; tests cover a blocked advance, a lifecycle refusal and a routed-request revise refusal.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/actions.js",
+              "contentHash": "sha256:3468bc2d762cd407a77a12b3df58a32f3e70567c0c8470a8f0b705f925c8fde8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:d0cb293f373dcf50eac9ba98670c9737a6e597ce5cff36b66184b046302440a9",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-actions.test.js",
+              "contentHash": "sha256:efb5d96a87da55ff0709b1f15198644223ae5f6b32ceda09809e4e399ab056d6",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-create.test.js",
+              "contentHash": "sha256:5db0e16e027d1f768a5fedd32952f39968abe00c9f53f136d3c87df19b83db98",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:f9a24835d0fa5a982b8e0bb4418da03c6f2d8a081f204a2b546d64510f662ad8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/console-actions.test.js test/console-create.test.js test/console-server.test.js (passed)",
+              "workId": "PF-0043",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/console-actions.test.js, test/console-create.test.js, test/console-server.test.js pass again in V-002. dropVerdict allows only the next station (advance) or, for DONE work, an earlier station (reopen dialog); other stations are dimmed and refuse the drop; Core still decides; checked in the browser (a far drop changed nothing, a next-station drop advanced one Core step).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:d0cb293f373dcf50eac9ba98670c9737a6e597ce5cff36b66184b046302440a9",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "Chromium drag-and-drop check on a demo project"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-actions.test.js",
+              "contentHash": "sha256:efb5d96a87da55ff0709b1f15198644223ae5f6b32ceda09809e4e399ab056d6",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-create.test.js",
+              "contentHash": "sha256:5db0e16e027d1f768a5fedd32952f39968abe00c9f53f136d3c87df19b83db98",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:f9a24835d0fa5a982b8e0bb4418da03c6f2d8a081f204a2b546d64510f662ad8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/console-actions.test.js test/console-create.test.js test/console-server.test.js (passed)",
+              "workId": "PF-0043",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/console-actions.test.js, test/console-create.test.js, test/console-server.test.js pass again in V-002. Action and decision routes require the token, the console Origin and JSON; a read-only console answers 405; the first hold returns CONFIRM_MINIMUM_VERSION and changes nothing until confirmed; tests cover each.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:18398bb7d40995c8a1ce6fa36c2cc505857ab52e1fe98f9eebda5ed7d031c0a8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-actions.test.js",
+              "contentHash": "sha256:efb5d96a87da55ff0709b1f15198644223ae5f6b32ceda09809e4e399ab056d6",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-create.test.js",
+              "contentHash": "sha256:5db0e16e027d1f768a5fedd32952f39968abe00c9f53f136d3c87df19b83db98",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:f9a24835d0fa5a982b8e0bb4418da03c6f2d8a081f204a2b546d64510f662ad8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/console-actions.test.js test/console-create.test.js test/console-server.test.js (passed)",
+              "workId": "PF-0043",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/console-actions.test.js, test/console-create.test.js, test/console-server.test.js pass again in V-002. docs/roadmap.md has 1.2.0, 1.3.0 and 1.4.0 sections; 1.4.0 lists work lifecycle, console work management, project overview and onboarding, development runtime management and the new project wizard.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "docs/roadmap.md",
+              "contentHash": "sha256:76f5a4bef5985c570dd98d541eae64acfaca1f52df387e531b94362f08bb8b80",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-actions.test.js",
+              "contentHash": "sha256:efb5d96a87da55ff0709b1f15198644223ae5f6b32ceda09809e4e399ab056d6",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-create.test.js",
+              "contentHash": "sha256:5db0e16e027d1f768a5fedd32952f39968abe00c9f53f136d3c87df19b83db98",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:f9a24835d0fa5a982b8e0bb4418da03c6f2d8a081f204a2b546d64510f662ad8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/console-actions.test.js test/console-create.test.js test/console-server.test.js (passed)",
+              "workId": "PF-0043",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/console-actions.test.js, test/console-create.test.js, test/console-server.test.js pass again in V-002. GET work/<id>/gates/<gate> returns the gate's work.md sections (empty template headings omitted), requirements, acceptance criteria, latest verification, warnings (open questions, lifecycle, failed verification, convergence at verification), gate history and a digest; the browser dialog shows them before the decision.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/actions.js",
+              "contentHash": "sha256:3468bc2d762cd407a77a12b3df58a32f3e70567c0c8470a8f0b705f925c8fde8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:d0cb293f373dcf50eac9ba98670c9737a6e597ce5cff36b66184b046302440a9",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-actions.test.js",
+              "contentHash": "sha256:efb5d96a87da55ff0709b1f15198644223ae5f6b32ceda09809e4e399ab056d6",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-create.test.js",
+              "contentHash": "sha256:5db0e16e027d1f768a5fedd32952f39968abe00c9f53f136d3c87df19b83db98",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:f9a24835d0fa5a982b8e0bb4418da03c6f2d8a081f204a2b546d64510f662ad8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/console-actions.test.js test/console-create.test.js test/console-server.test.js (passed)",
+              "workId": "PF-0043",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-008",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/console-actions.test.js, test/console-create.test.js, test/console-server.test.js pass again in V-002. Decisions require the exact typed gate name and a non-empty note, a gate awaiting review or sent back with changes requested, the same requestedAt and digest, all inside runner.exclusive; duplicates (same request id for the same project, item and gate) never record twice; tests cover wrong names, empty notes, changed material, decided gates, duplicate and cross-gate request ids, and re-deciding after request changes.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/actions.js",
+              "contentHash": "sha256:3468bc2d762cd407a77a12b3df58a32f3e70567c0c8470a8f0b705f925c8fde8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-actions.test.js",
+              "contentHash": "sha256:efb5d96a87da55ff0709b1f15198644223ae5f6b32ceda09809e4e399ab056d6",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-create.test.js",
+              "contentHash": "sha256:5db0e16e027d1f768a5fedd32952f39968abe00c9f53f136d3c87df19b83db98",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:f9a24835d0fa5a982b8e0bb4418da03c6f2d8a081f204a2b546d64510f662ad8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/console-actions.test.js test/console-create.test.js test/console-server.test.js (passed)",
+              "workId": "PF-0043",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-009",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/console-actions.test.js, test/console-create.test.js, test/console-server.test.js pass again in V-002. The unchanged approve/feedback commands record console decisions with provenance {via:'console', identity:'not verified', host, claimedGitName} on the gate and its history; CLI decisions carry no provenance; console provenance is refused for baseline and reconciliation; work show, the work read contract and doctor (strict shape) handle it; tested.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/reviews/store.js",
+              "contentHash": "sha256:a859a3d67c66ee333ab8e765bf054282cb90429a87ac6460c91181ea02b44c60",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/flow/snapshot.js",
+              "contentHash": "sha256:7fe9750de13792ddfe0c2b92049cbdd59e903f57e4faff31ae97b354f57b4e2d",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/core/integrity.js",
+              "contentHash": "sha256:4205671c0ea7961792e8e74c700de1d9c401b592ce15d765b5947ba2fec5d61d",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/work.js",
+              "contentHash": "sha256:72986394e30de27c7e29b56a0848d5cce661cb6badbcb3a6b74f8fe4c6ebc28f",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-actions.test.js",
+              "contentHash": "sha256:efb5d96a87da55ff0709b1f15198644223ae5f6b32ceda09809e4e399ab056d6",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-create.test.js",
+              "contentHash": "sha256:5db0e16e027d1f768a5fedd32952f39968abe00c9f53f136d3c87df19b83db98",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:f9a24835d0fa5a982b8e0bb4418da03c6f2d8a081f204a2b546d64510f662ad8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/console-actions.test.js test/console-create.test.js test/console-server.test.js (passed)",
+              "workId": "PF-0043",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-010",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/console-actions.test.js, test/console-create.test.js, test/console-server.test.js pass again in V-002. Decision routes require token, Origin and JSON and answer 405 read-only; the agent and bridge routes cannot reach them; the provenance variable is set only for the console's own approve/feedback child (never process.env); docs/console.md states it is a local-user decision, not a verified identity, with the remaining limitations; tests cover unauthorized requests, incorrect confirmations, stale gates, duplicates and audit integrity.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:18398bb7d40995c8a1ce6fa36c2cc505857ab52e1fe98f9eebda5ed7d031c0a8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/runner.js",
+              "contentHash": "sha256:c9246a628585a256ac47cc38a32e76f9bfc18ccc877dcbd74c4fd22c651f1d46",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "docs/console.md",
+              "contentHash": "sha256:8cbb7cc535e47b3fbde810a527f7f4a908835feb6653dc9a76d9d5c3956de149",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-actions.test.js",
+              "contentHash": "sha256:efb5d96a87da55ff0709b1f15198644223ae5f6b32ceda09809e4e399ab056d6",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-create.test.js",
+              "contentHash": "sha256:5db0e16e027d1f768a5fedd32952f39968abe00c9f53f136d3c87df19b83db98",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:f9a24835d0fa5a982b8e0bb4418da03c6f2d8a081f204a2b546d64510f662ad8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/console-actions.test.js test/console-create.test.js test/console-server.test.js (passed)",
+              "workId": "PF-0043",
+              "verificationRunId": "V-002"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
     }
   ],
-  "updatedAt": "2026-11-06T23:18:22.088Z"
+  "updatedAt": "2026-11-07T10:34:43.957Z"
 }

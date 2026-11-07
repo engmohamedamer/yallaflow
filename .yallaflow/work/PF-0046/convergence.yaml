@@ -166,7 +166,220 @@
         }
       ],
       "unrequested": []
+    },
+    {
+      "id": "CV-002",
+      "recordedAt": "2026-11-07T10:33:25.445Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+        "verificationRunIds": [
+          "V-003"
+        ]
+      },
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/overview.test.js, test/console-server.test.js pass again in V-003. yallaflow overview --json is registered as a read-only command, validates against resources/schemas/overview-1.schema.json in every test, and reports identity, understanding state (all six states in the schema enum), area facts with id/confidence/freshness, memory counts and inventory coverage; tree hashes before/after prove it writes nothing.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/overview/collect.js",
+              "contentHash": "sha256:ab6cda38327c458e1d3a53b3fdacb736096d9149759c1744aabbbba2f33a733c",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/overview.js",
+              "contentHash": "sha256:62d395e18c5ff33db87b750bb8a975a2fd5d2720004e2fcd51585ebd6fe72564",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "resources/schemas/overview-1.schema.json",
+              "contentHash": "sha256:0141b5a09740f8dfb3f5cfc93d32e0169b702d7f7cfc0c58c727f4bea985c732",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/overview.test.js",
+              "contentHash": "sha256:219d1f743f20e7d9d9b154b64db6bfe1cad19c6210e1e75219b2d09a13110d8b",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:f9a24835d0fa5a982b8e0bb4418da03c6f2d8a081f204a2b546d64510f662ad8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/overview.test.js test/console-server.test.js (passed)",
+              "workId": "PF-0046",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/overview.test.js, test/console-server.test.js pass again in V-003. Stack entries come from manifests, runtime constraints, lockfiles, compose images and Dockerfile FROM lines and source counts, each with component, kind, declared, path, locator and basis declared/detected/inferred; tech-stack memory facts are a separate area; unreadable inputs go to stack.unread; the Laravel fixture's .env and compose environment secret never appears in CLI or console output.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/inventory/stack.js",
+              "contentHash": "sha256:63af42c8063a824cb77102765594a12a57c46f87bfb582a388bb6b9a04ac2460",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/overview.test.js",
+              "contentHash": "sha256:219d1f743f20e7d9d9b154b64db6bfe1cad19c6210e1e75219b2d09a13110d8b",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:f9a24835d0fa5a982b8e0bb4418da03c6f2d8a081f204a2b546d64510f662ad8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/overview.test.js test/console-server.test.js (passed)",
+              "workId": "PF-0046",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/overview.test.js, test/console-server.test.js pass again in V-003. Modules are grouped by manifest directory with ecosystems, framework hints and lockfiles; two Node.js lockfiles in one module produce a conflict, asserted in the test.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/inventory/stack.js",
+              "contentHash": "sha256:63af42c8063a824cb77102765594a12a57c46f87bfb582a388bb6b9a04ac2460",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/overview.test.js",
+              "contentHash": "sha256:219d1f743f20e7d9d9b154b64db6bfe1cad19c6210e1e75219b2d09a13110d8b",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:f9a24835d0fa5a982b8e0bb4418da03c6f2d8a081f204a2b546d64510f662ad8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/overview.test.js test/console-server.test.js (passed)",
+              "workId": "PF-0046",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/overview.test.js, test/console-server.test.js pass again in V-003. Console Overview tab (Arabic/English, light/dark, mobile without horizontal scroll) served by token-protected GET /api/p/<id>/overview (401 without token, 405 on POST); it shows the understanding card with the agent request and commands under For developers, links the baseline item when present, and has no start/draft/approve control (browser check asserts no button in the card); Flow/Work show the card until understanding is established.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:d0cb293f373dcf50eac9ba98670c9737a6e597ce5cff36b66184b046302440a9",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:18398bb7d40995c8a1ce6fa36c2cc505857ab52e1fe98f9eebda5ed7d031c0a8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "research/release-1.4/browser-check.mjs",
+              "contentHash": "sha256:de33f7aea2bb10297f347c8650d3fb75507b9fd6703ed63260082ac5fb364fa0",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "research/release-1.4/screenshots/chromium-results.json",
+              "contentHash": "sha256:63d4bb3baf5add4c1f62df356f7fd76d06bd745a16b7a731492387323f2bff0e",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/overview.test.js",
+              "contentHash": "sha256:219d1f743f20e7d9d9b154b64db6bfe1cad19c6210e1e75219b2d09a13110d8b",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:f9a24835d0fa5a982b8e0bb4418da03c6f2d8a081f204a2b546d64510f662ad8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/overview.test.js test/console-server.test.js (passed)",
+              "workId": "PF-0046",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "Re-assessed for the 1.4.0 acceptance candidate: later 1.4 work changed cited files but not this behaviour; test/overview.test.js, test/console-server.test.js pass again in V-003. The v0.3.6 legacy fixture, a greenfield project and a brownfield project without memory each produce a schema-valid overview; an unparsable context ledger yields memory.available=false with an error instead of a failure.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/overview.test.js",
+              "contentHash": "sha256:219d1f743f20e7d9d9b154b64db6bfe1cad19c6210e1e75219b2d09a13110d8b",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-server.test.js",
+              "contentHash": "sha256:f9a24835d0fa5a982b8e0bb4418da03c6f2d8a081f204a2b546d64510f662ad8",
+              "gitCommit": "149143011d71c4a46f507eefc93ff972ddd15e51",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/overview.test.js test/console-server.test.js (passed)",
+              "workId": "PF-0046",
+              "verificationRunId": "V-003"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
     }
   ],
-  "updatedAt": "2026-11-07T02:33:01.152Z"
+  "updatedAt": "2026-11-07T10:33:25.445Z"
 }

@@ -15,3 +15,5 @@ Created: 2026-11-07T02:33:38.628Z
 - 2026-11-07T09:28:15.632Z Stage: PLAN → IMPLEMENTATION
 - 2026-11-07T10:01:29.886Z Stage: IMPLEMENTATION → VERIFICATION
 - 2026-11-07T10:01:59.814Z Stage: VERIFICATION → DONE
+- 2026-11-07T10:34:45.236Z Reopened: DONE → VERIFICATION (1.4.0 acceptance candidate: the New Project Wizard changed files cited by the convergence evidence (console server, app.js); refresh verification and convergence against the current tree. No defect is known.)
+- 2026-11-07T10:36:21.830Z Stage: VERIFICATION → DONE

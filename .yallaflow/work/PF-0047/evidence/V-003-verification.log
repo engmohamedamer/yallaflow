@@ -1,0 +1,256 @@
+TAP version 13
+# Subtest: profiles: argv only, repository-relative cwd, names not values; secrets and unknown fields refused without echo
+ok 1 - profiles: argv only, repository-relative cwd, names not values; secrets and unknown fields refused without echo
+  ---
+  duration_ms: 2157.797067
+  type: 'test'
+  ...
+# Subtest: trust: required before start, personal, and renewed after any material change (shared or override)
+ok 2 - trust: required before start, personal, and renewed after any material change (shared or override)
+  ---
+  duration_ms: 2690.724934
+  type: 'test'
+  ...
+# Subtest: start/stop/logs: readiness, minimal environment, redacted logs, graceful stop; nothing auto-starts
+ok 3 - start/stop/logs: readiness, minimal environment, redacted logs, graceful stop; nothing auto-starts
+  ---
+  duration_ms: 4121.018666
+  type: 'test'
+  ...
+# Subtest: a port held by someone else refuses start and that process is never touched
+ok 4 - a port held by someone else refuses start and that process is never touched
+  ---
+  duration_ms: 1675.633372
+  type: 'test'
+  ...
+# Subtest: crash recovery: a service killed outside YallaFlow reads failed; a reused PID is unmanaged and never signalled
+ok 5 - crash recovery: a service killed outside YallaFlow reads failed; a reused PID is unmanaged and never signalled
+  ---
+  duration_ms: 4056.648947
+  type: 'test'
+  ...
+# Subtest: concurrency: five simultaneous starts start one process; restart replaces it; stop --all stops owned services only
+ok 6 - concurrency: five simultaneous starts start one process; restart replaces it; stop --all stops owned services only
+  ---
+  duration_ms: 4189.887027
+  type: 'test'
+  ...
+# Subtest: start failures are reported with the log tail; a cwd escaping through a symlink is refused
+ok 7 - start failures are reported with the log tail; a cwd escaping through a symlink is refused
+  ---
+  duration_ms: 3502.748141
+  type: 'test'
+  ...
+# Subtest: suggestions come from repository evidence and never run
+ok 8 - suggestions come from repository evidence and never run
+  ---
+  duration_ms: 1057.858999
+  type: 'test'
+  ...
+# Subtest: console: runtime routes are token/Origin/JSON guarded, trust needs the typed id, read-only refuses
+ok 9 - console: runtime routes are token/Origin/JSON guarded, trust needs the typed id, read-only refuses
+  ---
+  duration_ms: 3732.157207
+  type: 'test'
+  ...
+# Subtest: review: trust and run records planted inside the repository are ignored; trust needs the reviewed definition
+ok 10 - review: trust and run records planted inside the repository are ignored; trust needs the reviewed definition
+  ---
+  duration_ms: 1851.898728
+  type: 'test'
+  ...
+# Subtest: review: a run record whose process no longer leads its own group is unmanaged and never signalled
+ok 11 - review: a run record whose process no longer leads its own group is unmanaged and never signalled
+  ---
+  duration_ms: 1604.769524
+  type: 'test'
+  ...
+# Subtest: review: log symlinks and hard links are refused; reading logs never writes, truncates or rotates
+ok 12 - review: log symlinks and hard links are refused; reading logs never writes, truncates or rotates
+  ---
+  duration_ms: 2076.242595
+  type: 'test'
+  ...
+# Subtest: review: an untrusted dependency starts nothing; control and bidi characters are refused
+ok 13 - review: an untrusted dependency starts nothing; control and bidi characters are refused
+  ---
+  duration_ms: 2244.545449
+  type: 'test'
+  ...
+# Subtest: review: CLI trust is a human decision — refused when not interactive
+ok 14 - review: CLI trust is a human decision — refused when not interactive
+  ---
+  duration_ms: 957.827653
+  type: 'test'
+  ...
+# Subtest: review: a FIFO planted as the log never hangs reads
+ok 15 - review: a FIFO planted as the log never hangs reads
+  ---
+  duration_ms: 742.055895
+  type: 'test'
+  ...
+# Subtest: 8/9/11. shared enable is explicit, records policy and version, never commits or pushes
+ok 16 - 8/9/11. shared enable is explicit, records policy and version, never commits or pushes
+  ---
+  duration_ms: 2007.631151
+  type: 'test'
+  ...
+# Subtest: 10. an unhealthy or non-Git workspace cannot enable sharing, and nothing changes
+ok 17 - 10. an unhealthy or non-Git workspace cannot enable sharing, and nothing changes
+  ---
+  duration_ms: 955.472089
+  type: 'test'
+  ...
+# Subtest: 11. an incompatible YallaFlow stops before any project-state mutation; read-only orientation still explains why
+ok 18 - 11. an incompatible YallaFlow stops before any project-state mutation; read-only orientation still explains why
+  ---
+  duration_ms: 3418.027011
+  type: 'test'
+  ...
+# Subtest: 12/52. a single-user workspace is unchanged until sharing is enabled: same IDs, no memory records, reads write nothing
+ok 19 - 12/52. a single-user workspace is unchanged until sharing is enabled: same IDs, no memory records, reads write nothing
+  ---
+  duration_ms: 3536.209328
+  type: 'test'
+  ...
+# Subtest: 13/14/16. two branches from the same base create work and sources without ID or path collision, and merge cleanly
+ok 20 - 13/14/16. two branches from the same base create work and sources without ID or path collision, and merge cleanly
+  ---
+  duration_ms: 2984.625792
+  type: 'test'
+  ...
+# Subtest: 15. legacy PF-\#\#\#\# and SRC-\#\#\#\# stay readable and keep allocating in single-user mode; both forms coexist
+ok 21 - 15. legacy PF-\#\#\#\# and SRC-\#\#\#\# stay readable and keep allocating in single-user mode; both forms coexist
+  ---
+  duration_ms: 1263.683196
+  type: 'test'
+  ...
+# Subtest: checkout tags: 10 Crockford-base32 characters, an unbiased byte mapping, drawn from crypto.randomBytes
+ok 22 - checkout tags: 10 Crockford-base32 characters, an unbiased byte mapping, drawn from crypto.randomBytes
+  ---
+  duration_ms: 3.599793
+  type: 'test'
+  ...
+# Subtest: high-volume deterministic non-reuse: one checkout allocating thousands of IDs across branch switches never repeats a number
+ok 23 - high-volume deterministic non-reuse: one checkout allocating thousands of IDs across branch switches never repeats a number
+  ---
+  duration_ms: 3106.173877
+  type: 'test'
+  ...
+# Subtest: a copied checkout gets a fresh clone tag; the identity is local, gitignored, and needs no join command
+ok 24 - a copied checkout gets a fresh clone tag; the identity is local, gitignored, and needs no join command
+  ---
+  duration_ms: 2637.445822
+  type: 'test'
+  ...
+# Subtest: one checkout never reuses an ID across branch switches or stashes
+ok 25 - one checkout never reuses an ID across branch switches or stashes
+  ---
+  duration_ms: 1587.41139
+  type: 'test'
+  ...
+# Subtest: 17. every global namespace is branch-safe after a multi-branch merge; work-scoped IDs are safe by scope
+ok 26 - 17. every global namespace is branch-safe after a multi-branch merge; work-scoped IDs are safe by scope
+  ---
+  duration_ms: 3712.602183
+  type: 'test'
+  ...
+# Subtest: 18/19/20/21. work captures its memory base; unchanged, unrelated, and referenced changes are told apart
+ok 27 - 18/19/20/21. work captures its memory base; unchanged, unrelated, and referenced changes are told apart
+  ---
+  duration_ms: 1752.478581
+  type: 'test'
+  ...
+# Subtest: 22. without Git the memory base is still a deterministic content fingerprint
+ok 28 - 22. without Git the memory base is still a deterministic content fingerprint
+  ---
+  duration_ms: 45.692999
+  type: 'test'
+  ...
+# Subtest: 23/24/25/26. on a feature branch knowledge is staged work-locally; canonical memory is untouched; DONE and handoff stay coherent
+ok 29 - 23/24/25/26. on a feature branch knowledge is staged work-locally; canonical memory is untouched; DONE and handoff stay coherent
+  ---
+  duration_ms: 3472.629121
+  type: 'test'
+  ...
+# Subtest: a relation proposed against a fact that changes before promotion is refused at staging (revalidate first)
+ok 30 - a relation proposed against a fact that changes before promotion is refused at staging (revalidate first)
+  ---
+  duration_ms: 1720.821433
+  type: 'test'
+  ...
+# Subtest: 27/28/29/30/35. safe new facts, reconfirmations, supersessions, and exact duplicates integrate with full provenance
+ok 31 - 27/28/29/30/35. safe new facts, reconfirmations, supersessions, and exact duplicates integrate with full provenance
+  ---
+  duration_ms: 6003.272716
+  type: 'test'
+  ...
+# Subtest: 31/40. conflicting parallel supersessions block, never overwrite, and memory stays healthy until reconciled
+ok 32 - 31/40. conflicting parallel supersessions block, never overwrite, and memory stays healthy until reconciled
+  ---
+  duration_ms: 7741.156844
+  type: 'test'
+  ...
+# Subtest: 32. a stale base on a feature branch is detected before push, with developer-facing guidance
+ok 33 - 32. a stale base on a feature branch is detected before push, with developer-facing guidance
+  ---
+  duration_ms: 3057.96383
+  type: 'test'
+  ...
+# Subtest: 33/34. integration retry is idempotent and an interrupted or failed integration is never half-applied
+ok 34 - 33/34. integration retry is idempotent and an interrupted or failed integration is never half-applied
+  ---
+  duration_ms: 3888.271207
+  type: 'test'
+  ...
+# Subtest: integration is deterministic: two maintainers integrating the same merge produce identical files
+ok 35 - integration is deterministic: two maintainers integrating the same merge produce identical files
+  ---
+  duration_ms: 1962.983005
+  type: 'test'
+  ...
+# Subtest: doctor detects unsafe shared state: legacy IDs after sharing, local state committed or misplaced, bad metadata, missing CTX, missing provenance
+ok 36 - doctor detects unsafe shared state: legacy IDs after sharing, local state committed or misplaced, bad metadata, missing CTX, missing provenance
+  ---
+  duration_ms: 3666.685939
+  type: 'test'
+  ...
+# Subtest: 47/48/49/50/51. shared check is read-only, provider-neutral, passes a safe branch, and fails a stale one with actionable output
+ok 37 - 47/48/49/50/51. shared check is read-only, provider-neutral, passes a safe branch, and fails a stale one with actionable output
+  ---
+  duration_ms: 2140.060059
+  type: 'test'
+  ...
+# Subtest: 51/no-network: YallaFlow source never invokes mutating or network Git subcommands and calls no LLM provider
+ok 38 - 51/no-network: YallaFlow source never invokes mutating or network Git subcommands and calls no LLM provider
+  ---
+  duration_ms: 31.584823
+  type: 'test'
+  ...
+# Subtest: 42/43/44/45. the adapter orients automatically; finish speaks outcome language and keeps the audit in --verbose
+ok 39 - 42/43/44/45. the adapter orients automatically; finish speaks outcome language and keeps the audit in --verbose
+  ---
+  duration_ms: 2156.241933
+  type: 'test'
+  ...
+# Subtest: 53/54. single-user baseline, freshness, reconciliation helpers and durable sources behave as before
+ok 40 - 53/54. single-user baseline, freshness, reconciliation helpers and durable sources behave as before
+  ---
+  duration_ms: 1609.391327
+  type: 'test'
+  ...
+# Subtest: read commands never write in a Shared Project — not even a fresh clone's local identity
+ok 41 - read commands never write in a Shared Project — not even a fresh clone's local identity
+  ---
+  duration_ms: 9346.565922
+  type: 'test'
+  ...
+1..41
+# tests 41
+# suites 0
+# pass 41
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 73916.680774

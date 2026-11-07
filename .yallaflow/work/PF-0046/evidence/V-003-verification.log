@@ -1,0 +1,70 @@
+TAP version 13
+# Subtest: security: loopback host, token, origin, read-only methods and ID-only paths
+ok 1 - security: loopback host, token, origin, read-only methods and ID-only paths
+  ---
+  duration_ms: 710.087983
+  type: 'test'
+  ...
+# Subtest: serves the snapshot, work detail and preserved sources by ID
+ok 2 - serves the snapshot, work detail and preserved sources by ID
+  ---
+  duration_ms: 1244.830847
+  type: 'test'
+  ...
+# Subtest: live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+ok 3 - live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+  ---
+  duration_ms: 1404.488634
+  type: 'test'
+  ...
+# Subtest: the console never writes: browsing every route leaves the workspace byte-identical
+ok 4 - the console never writes: browsing every route leaves the workspace byte-identical
+  ---
+  duration_ms: 1010.459094
+  type: 'test'
+  ...
+# Subtest: extracted text cannot be read outside its source directory; HEAD never opens the event stream
+ok 5 - extracted text cannot be read outside its source directory; HEAD never opens the event stream
+  ---
+  duration_ms: 938.195435
+  type: 'test'
+  ...
+# Subtest: overview: evidence-based stack with declared / detected / inferred kept apart; no secret is read
+ok 6 - overview: evidence-based stack with declared / detected / inferred kept apart; no secret is read
+  ---
+  duration_ms: 283.055092
+  type: 'test'
+  ...
+# Subtest: overview: greenfield intent, a legacy workspace and a damaged ledger all yield a valid document
+ok 7 - overview: greenfield intent, a legacy workspace and a damaged ledger all yield a valid document
+  ---
+  duration_ms: 826.588212
+  type: 'test'
+  ...
+# Subtest: overview: memory facts come with confidence and mechanical freshness
+ok 8 - overview: memory facts come with confidence and mechanical freshness
+  ---
+  duration_ms: 200.154895
+  type: 'test'
+  ...
+# Subtest: composeImages: tags, digests, quotes and variables
+ok 9 - composeImages: tags, digests, quotes and variables
+  ---
+  duration_ms: 0.534909
+  type: 'test'
+  ...
+# Subtest: console: GET overview is token-protected, read-only and returns the contract
+ok 10 - console: GET overview is token-protected, read-only and returns the contract
+  ---
+  duration_ms: 298.120763
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8044.781608

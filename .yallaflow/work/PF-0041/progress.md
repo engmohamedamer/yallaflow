@@ -16,3 +16,5 @@ Created: 2026-11-06T21:16:29.098Z
 - 2026-11-06T22:00:12.529Z Stage corrected: VERIFICATION → IMPLEMENTATION
 - 2026-11-06T22:00:13.298Z Stage: IMPLEMENTATION → VERIFICATION
 - 2026-11-06T22:11:28.241Z Stage: VERIFICATION → DONE
+- 2026-11-07T10:33:40.089Z Reopened: DONE → VERIFICATION (1.4.0 acceptance candidate: later 1.4 work (overview, runtime, wizard, doctor fix) changed files cited by the convergence evidence; refresh verification and convergence against the current tree. No defect is known.)
+- 2026-11-07T10:36:20.151Z Stage: VERIFICATION → DONE

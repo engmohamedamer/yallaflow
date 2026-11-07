@@ -47,24 +47,21 @@
     },
     "verification": {
       "status": "completed",
-      "startedAt": "2026-11-06T23:18:21.489Z",
-      "completedAt": "2026-11-06T23:18:21.689Z",
-      "summary": "V-001: npm run check 871/871; 3-engine browser check 72/72 clean (layout, a11y, console errors)",
-      "evidence": [
-        "verification:V-001"
-      ]
+      "startedAt": "2026-11-07T10:34:43.722Z",
+      "completedAt": "2026-11-07T10:34:43.722Z",
+      "summary": "V-002: fresh run of test/console-actions.test.js test/console-create.test.js test/console-server.test.js against the 1.4.0 candidate tree passed (evidence refresh after later 1.4 changes; no defect found)."
     },
     "delivery-convergence": {
       "status": "completed",
-      "startedAt": "2026-11-06T23:18:22.579Z",
-      "completedAt": "2026-11-06T23:18:22.983Z",
-      "summary": "9/9 active criteria satisfied"
+      "startedAt": "2026-11-07T10:34:44.724Z",
+      "completedAt": "2026-11-07T10:34:44.724Z",
+      "summary": "Convergence re-assessed against the current tree with V-002: every active criterion satisfied."
     },
     "code-review": {
       "status": "completed",
-      "startedAt": "2026-11-06T23:18:22.784Z",
-      "completedAt": "2026-11-06T23:18:23.207Z",
-      "summary": "Independent review on an isolated copy: no high; 1 medium and lows fixed with tests; inherent items documented (ruling)"
+      "startedAt": "2026-11-07T10:36:19.776Z",
+      "completedAt": "2026-11-07T10:36:19.776Z",
+      "summary": "Evidence-refresh review: src/console/actions.js, src/reviews/store.js and test/console-actions.test.js are unchanged since 4ee3377. src/console/server.js only gained overview/runtime/wizard routes (the work action and gate decision routes and their guards are unchanged); resources/console/app.js gained Overview/Setup/New project views whose click handlers match only their own data attributes, so they cannot intercept work actions, drag and drop or gate decisions. Console tests pass in V-002. No finding."
     }
   },
   "rulings": [
@@ -102,7 +99,28 @@
       "to": "in_progress",
       "reason": "Completed before the revised specification text was written (a failed edit script); redone after the text is in work.md",
       "changedAt": "2026-11-06T22:33:05.898Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "1.4.0 acceptance candidate: later 1.4 work (overview, runtime, wizard) changed files cited by the convergence evidence (console server, app.js); refresh verification and convergence against the current tree. No defect is known.",
+      "changedAt": "2026-11-07T10:34:17.230Z"
+    },
+    {
+      "skill": "delivery-convergence",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to verification: 1.4.0 acceptance candidate: later 1.4 work (overview, runtime, wizard) changed files cited by the convergence evidence (console server, app.js); refresh verification and convergence against the current tree. No defect is known.",
+      "changedAt": "2026-11-07T10:34:17.230Z"
+    },
+    {
+      "skill": "code-review",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to verification: 1.4.0 acceptance candidate: later 1.4 work (overview, runtime, wizard) changed files cited by the convergence evidence (console server, app.js); refresh verification and convergence against the current tree. No defect is known.",
+      "changedAt": "2026-11-07T10:34:17.230Z"
     }
   ],
-  "updatedAt": "2026-11-06T23:18:23.207Z"
+  "updatedAt": "2026-11-07T10:36:19.776Z"
 }

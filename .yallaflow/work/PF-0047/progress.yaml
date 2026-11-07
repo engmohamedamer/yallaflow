@@ -42,21 +42,21 @@
     },
     "verification": {
       "status": "completed",
-      "startedAt": "2026-11-07T10:01:30.085Z",
-      "completedAt": "2026-11-07T10:01:30.085Z",
-      "summary": "V-002 npm run check 892/892 pass (15 runtime tests incl. security, crash-recovery, PID-reuse, process-group forgery, symlink/hard-link/FIFO log attacks, concurrency, console guards). Browser regression (research/release-1.4/browser-check.mjs) passes Overview and Setup on Chromium, Firefox and WebKit with no page errors. V-001 failed on the ownership test before runtime.yaml was classified as developer configuration."
+      "startedAt": "2026-11-07T10:35:59.601Z",
+      "completedAt": "2026-11-07T10:35:59.601Z",
+      "summary": "V-003: fresh run of test/runtime.test.js test/shared-project.test.js against the 1.4.0 candidate tree passed (evidence refresh after later 1.4 changes; no defect found)."
     },
     "delivery-convergence": {
       "status": "completed",
-      "startedAt": "2026-11-07T10:01:48.257Z",
-      "completedAt": "2026-11-07T10:01:48.257Z",
-      "summary": "CV-001: AC-001..AC-009 satisfied with repository, verification:V-002 and browser evidence."
+      "startedAt": "2026-11-07T10:36:00.457Z",
+      "completedAt": "2026-11-07T10:36:00.457Z",
+      "summary": "Convergence re-assessed against the current tree with V-003: every active criterion satisfied."
     },
     "code-review": {
       "status": "completed",
-      "startedAt": "2026-11-07T10:01:59.095Z",
-      "completedAt": "2026-11-07T10:01:59.095Z",
-      "summary": "Independent security review by a separate reviewer on an isolated copy (real repositories read-only): 4 high (log rotation through symlinks; hard-linked log; stop signalling non-owned processes via forged run records; forgeable trust inside the checkout), 1 medium (console trust TOCTOU), lows/info (lock DoS, read-path links, untrusted dependency starts, bidi spoofing, script-content disclosure). All fixed; re-review confirmed #1-#4, #6, #7 fixed and found the console hash binding and a FIFO read hang remaining plus non-interactive CLI trust; those were fixed afterwards (card-rendered hash, O_NONBLOCK reads, TTY-typed CLI trust) with regression tests. Residual, documented: trust binds the definition, not script contents; a process controlling the whole user account is out of scope; a narrow cwd symlink-swap race between check and spawn."
+      "startedAt": "2026-11-07T10:36:19.954Z",
+      "completedAt": "2026-11-07T10:36:19.954Z",
+      "summary": "Evidence-refresh review: src/runtime/, src/commands/runtime.js and src/console/runtime.js are unchanged since d5fa5f3; the only change touching it is the optional timeoutMs on runner.runAside (default unchanged), added for the wizard. Runtime and guard tests pass in V-003. No finding."
     }
   },
   "rulings": [
@@ -74,7 +74,28 @@
       "to": "in_progress",
       "reason": "The specification checkpoint was completed before its owner review; it stays in progress until the owner approves or requests changes at the specification gate (doctor integrity).",
       "changedAt": "2026-11-07T02:36:28.773Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "1.4.0 acceptance candidate: the New Project Wizard changed files cited by the convergence evidence (console server, app.js); refresh verification and convergence against the current tree. No defect is known.",
+      "changedAt": "2026-11-07T10:34:45.236Z"
+    },
+    {
+      "skill": "delivery-convergence",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to verification: 1.4.0 acceptance candidate: the New Project Wizard changed files cited by the convergence evidence (console server, app.js); refresh verification and convergence against the current tree. No defect is known.",
+      "changedAt": "2026-11-07T10:34:45.236Z"
+    },
+    {
+      "skill": "code-review",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to verification: 1.4.0 acceptance candidate: the New Project Wizard changed files cited by the convergence evidence (console server, app.js); refresh verification and convergence against the current tree. No defect is known.",
+      "changedAt": "2026-11-07T10:34:45.236Z"
     }
   ],
-  "updatedAt": "2026-11-07T10:01:59.095Z"
+  "updatedAt": "2026-11-07T10:36:19.954Z"
 }

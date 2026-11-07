@@ -14,3 +14,5 @@ Created: 2026-11-06T22:24:09.489Z
 - 2026-11-06T22:35:11.545Z Stage: PLAN → IMPLEMENTATION
 - 2026-11-06T23:10:23.865Z Stage: IMPLEMENTATION → VERIFICATION
 - 2026-11-06T23:18:23.954Z Stage: VERIFICATION → DONE
+- 2026-11-07T10:34:17.230Z Reopened: DONE → VERIFICATION (1.4.0 acceptance candidate: later 1.4 work (overview, runtime, wizard) changed files cited by the convergence evidence (console server, app.js); refresh verification and convergence against the current tree. No defect is known.)
+- 2026-11-07T10:36:21.013Z Stage: VERIFICATION → DONE
