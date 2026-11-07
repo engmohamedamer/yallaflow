@@ -11387,7 +11387,7 @@
     {
       "id": "CTX-0102",
       "area": "architecture",
-      "state": "current",
+      "state": "superseded",
       "confidence": "confirmed",
       "summary": "Agent Workspace (v1.3.0, opt-in via 'yallaflow console --agents'): provider-aware code is confined to src/agents/ (plus commands/agents.js and the console entry points), which makes no network calls of its own. Codex is a managed session through the user-installed ACP adapter codex-acp, refused unless it reports a ChatGPT account login, with API-key variables stripped from its environment. Claude Code is experimental (--experimental-claude): the user starts it and it joins through the bundled Channels MCP server (resources/agents/claude-channel.mjs) and command hooks, authenticated by a per-run bridge token in .yallaflow/local/agent-bridge.json. One managed session per checkout; unanswered permissions are denied after YALLAFLOW_AGENT_PERMISSION_TIMEOUT_MS (default 5 min); full-access/bypass modes are never used; session records live in git-ignored .yallaflow/local/agent-sessions/; activation only through yallaflow activate.",
       "provenance": "repository",
@@ -11441,17 +11441,24 @@
       "verifiedAt": "2026-11-06T17:43:40.304Z",
       "verifiedAtCommit": "bdb5e90b20e44977b52174d0d105563e9f6c5b2f",
       "supersedes": [],
-      "supersededBy": null,
+      "supersededBy": "CTX-0105",
       "history": [
         {
           "action": "introduced",
           "at": "2026-11-06T17:43:40.304Z",
           "workId": "PF-0037",
           "candidateId": "K-001"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-11-06T23:56:39.400Z",
+          "supersededBy": "CTX-0105",
+          "workId": "PF-0039",
+          "candidateId": "K-001"
         }
       ],
       "createdAt": "2026-11-06T17:43:40.304Z",
-      "updatedAt": "2026-11-06T17:43:40.304Z"
+      "updatedAt": "2026-11-06T23:56:39.400Z"
     },
     {
       "id": "CTX-0103",
@@ -11553,7 +11560,79 @@
       ],
       "createdAt": "2026-11-06T19:24:23.662Z",
       "updatedAt": "2026-11-06T19:24:23.662Z"
+    },
+    {
+      "id": "CTX-0105",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "The 1.3.0 release checkout supports opt-in managed Codex sessions through the user-installed ACP adapter and requires reported ChatGPT account authentication. Known API-key environment variables are stripped, full-access modes are refused, unanswered tool permissions are denied, and activation is explicit through Core. Experimental Claude runtime files are absent from this release checkout and explicitly excluded by package.json; optional loading returns CLAUDE_NOT_INCLUDED when absent. Ordinary Claude bootstrap instructions remain packaged.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0039",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "package.json",
+          "contentHash": "sha256:3e2fc810aa9dd1e5b7da5b10c49e994db87f5cf1f7e9125542301680209ef998",
+          "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "src/agents/experimental.js",
+          "contentHash": "sha256:566d14ae903d1440a6fc4bc24adcbf93ffcf3648e7981de3c4c2378ad8469d97",
+          "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "src/agents/codex.js",
+          "contentHash": "sha256:a316b0b2f144e1c53e7f01f3371d50269adcac734213572aa09401a703f1e6ce",
+          "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "src/agents/bridge.js",
+          "contentHash": "sha256:521890f9984dee0dc5cc8fb9702c01a688a52735d4a923b28a401e8155f7a916",
+          "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "docs/agents.md",
+          "contentHash": "sha256:f09cabf8d27d515cadbb653e1439b6f8f01f56f6a6b2e8d2886bcde4c5a69f21",
+          "gitCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+          "workingTree": "head"
+        },
+        {
+          "type": "runtime",
+          "description": "node research/release-review/verify-artifacts.mjs (passed)",
+          "workId": "PF-0039",
+          "verificationRunId": "V-003"
+        }
+      ],
+      "verifiedAt": "2026-11-06T23:56:39.400Z",
+      "verifiedAtCommit": "b700b2cb9d0f0d8eee1f440dc8484c8bb7382d14",
+      "supersedes": [
+        "CTX-0102"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-06T23:56:39.400Z",
+          "workId": "PF-0039",
+          "candidateId": "K-001",
+          "supersedes": "CTX-0102"
+        }
+      ],
+      "createdAt": "2026-11-06T23:56:39.400Z",
+      "updatedAt": "2026-11-06T23:56:39.400Z"
     }
   ],
-  "updatedAt": "2026-11-06T19:24:23.662Z"
+  "updatedAt": "2026-11-06T23:56:39.400Z"
 }

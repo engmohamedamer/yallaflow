@@ -1,0 +1,1 @@
+PASS acceptance startup: two disposable projects, isolated registry, loopback server and clean shutdown. No provider session started.

@@ -1,0 +1,90 @@
+TAP version 13
+# Subtest: parallel starts allocate distinct work IDs and leave valid state
+ok 1 - parallel starts allocate distinct work IDs and leave valid state # SKIP test name does not match pattern
+  ---
+  duration_ms: 1.575772
+  ...
+# Subtest: parallel mutating commands across items and verifications keep every ledger intact
+ok 2 - parallel mutating commands across items and verifications keep every ledger intact # SKIP test name does not match pattern
+  ---
+  duration_ms: 0.194858
+  ...
+# Subtest: a stale lock from a dead process is reported, then recovered automatically
+ok 3 - a stale lock from a dead process is reported, then recovered automatically # SKIP test name does not match pattern
+  ---
+  duration_ms: 0.115743
+  ...
+# Subtest: doctor --clear-lock removes a stale lock and refuses a live one
+ok 4 - doctor --clear-lock removes a stale lock and refuses a live one # SKIP test name does not match pattern
+  ---
+  duration_ms: 0.307283
+  ...
+# Subtest: a live holder rejects timed-out writes without changes, then permits writes after release
+ok 5 - a live holder rejects timed-out writes without changes, then permits writes after release
+  ---
+  duration_ms: 1591.579827
+  ...
+# Subtest: the lock is re-entrant inside one process and read commands never take it
+ok 6 - the lock is re-entrant inside one process and read commands never take it # SKIP test name does not match pattern
+  ---
+  duration_ms: 0.239464
+  ...
+# Subtest: a single-user workspace has no local/ directory after a command, even a refused one
+ok 7 - a single-user workspace has no local/ directory after a command, even a refused one # SKIP test name does not match pattern
+  ---
+  duration_ms: 0.217986
+  ...
+# Subtest: a crash can never leave an empty lock; an unreadable one is stale after 30 s
+ok 8 - a crash can never leave an empty lock; an unreadable one is stale after 30 s # SKIP test name does not match pattern
+  ---
+  duration_ms: 0.118334
+  ...
+# Subtest: a reused pid (same pid, different process start) is recognized as stale
+ok 9 - a reused pid (same pid, different process start) is recognized as stale # SKIP test name does not match pattern
+  ---
+  duration_ms: 0.295364
+  ...
+# Subtest: the lock records the holder identity, and a positively identified live holder is never cleared
+ok 10 - the lock records the holder identity, and a positively identified live holder is never cleared
+  ---
+  duration_ms: 3075.576109
+  ...
+# Subtest: doctor --clear-lock removes an hour-old lock whose holder cannot be identified
+ok 11 - doctor --clear-lock removes an hour-old lock whose holder cannot be identified # SKIP test name does not match pattern
+  ---
+  duration_ms: 0.704345
+  ...
+# Subtest: leftover lock temp files from a crash are swept
+ok 12 - leftover lock temp files from a crash are swept # SKIP test name does not match pattern
+  ---
+  duration_ms: 0.356156
+  ...
+# Subtest: a lock taken before the machine last booted is stale on any platform
+ok 13 - a lock taken before the machine last booted is stale on any platform # SKIP test name does not match pattern
+  ---
+  duration_ms: 0.308573
+  ...
+# Subtest: release removes only its own lock, never one taken over meanwhile
+ok 14 - release removes only its own lock, never one taken over meanwhile # SKIP test name does not match pattern
+  ---
+  duration_ms: 0.189605
+  ...
+# Subtest: verify waits to record a finished run and always shows its output (an exited, unreaped holder counts as gone)
+ok 15 - verify waits to record a finished run and always shows its output (an exited, unreaped holder counts as gone) # SKIP test name does not match pattern
+  ---
+  duration_ms: 0.148781
+  ...
+# Subtest: a lock a crash leaves in a single-user workspace stays out of git status
+ok 16 - a lock a crash leaves in a single-user workspace stays out of git status # SKIP test name does not match pattern
+  ---
+  duration_ms: 0.226024
+  ...
+1..16
+# tests 16
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 14
+# todo 0
+# duration_ms 4758.360484

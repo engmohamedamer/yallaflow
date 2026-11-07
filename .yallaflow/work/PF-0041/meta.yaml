@@ -1,0 +1,46 @@
+{
+  "id": "PF-0041",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Restore missing workspace UX design and visual prototype for owner review; recover consolidated release acceptance documentation without expanding product scope",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-06T23:39:19.598Z",
+  "updatedAt": "2026-11-07T00:17:14.115Z",
+  "title": "Recover workspace UX proposal and consolidated release review artifacts",
+  "routingConfidence": "high",
+  "routingReason": "Recover missing review documentation and a standalone static UX prototype from recorded owner requirements; no product behavior, public API or lifecycle changes.",
+  "routedAt": "2026-11-06T23:39:35.563Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-07T00:17:14.115Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002"
+      ]
+    }
+  ]
+}

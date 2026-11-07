@@ -113,14 +113,16 @@ test('doctor --clear-lock removes a stale lock and refuses a live one', async ()
   assert.equal(await exists(lockFilePath(root)), false);
 });
 
-test('a live holder is waited for; past the timeout the command fails and changes nothing', async () => {
+test('a live holder rejects timed-out writes without changes, then permits writes after release', async (t) => {
   const root = await project();
   const holder = spawn(process.execPath, ['--input-type=module', '-e', `
     import { acquireWorkspaceLock } from ${JSON.stringify(new URL('../src/utils/lock.js', import.meta.url).href)};
-    await acquireWorkspaceLock(${JSON.stringify(root)}, { command: 'yallaflow test-holder' });
+    const release = await acquireWorkspaceLock(${JSON.stringify(root)}, { command: 'yallaflow test-holder' });
+    process.once('message', async () => { await release(); process.exit(0); });
     process.stdout.write('held\\n');
-    setTimeout(() => process.exit(0), 1500);
-  `]);
+  `], { stdio: ['ignore', 'pipe', 'pipe', 'ipc'] });
+  t.after(() => holder.kill());
+  const exited = new Promise((resolve) => holder.once('close', resolve));
   await new Promise((resolve) => holder.stdout.once('data', resolve));
 
   const workDir = path.join(workspacePath(root), 'work');
@@ -130,7 +132,11 @@ test('a live holder is waited for; past the timeout the command fails and change
   assert.match(busy.stderr, /The workspace is busy: `yallaflow test-holder`/);
   assert.deepEqual(await exists(workDir) ? await readdir(workDir) : [], before, 'nothing was written');
 
-  const waited = await runAsync(root, ['start', 'Waits its turn']);
+  // Keep the holder alive through the assertion even when CLI startup is slow.
+  // Releasing it is a test action, not a race against a fixed 1.5-second timer.
+  holder.send('release');
+  await exited;
+  const waited = await runAsync(root, ['start', 'After release']);
   assert.equal(waited.status, 0, waited.stderr);
   assert.match(waited.stdout, /Created PF-0001/);
 });

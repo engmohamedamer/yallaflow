@@ -1,0 +1,684 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node src/cli.js doctor",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "src/cli.js",
+        "doctor"
+      ],
+      "displayCommand": "node src/cli.js doctor",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-06T23:40:56.159Z",
+      "finishedAt": "2026-11-06T23:40:59.949Z",
+      "verifiedAt": "2026-11-06T23:40:59.949Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-06T23:40:26.913Z",
+      "finishedAt": "2026-11-06T23:46:31.891Z",
+      "verifiedAt": "2026-11-06T23:46:31.891Z",
+      "log": "V-002-verification.log"
+    },
+    {
+      "id": "V-003",
+      "command": "node research/release-review/verify-artifacts.mjs",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "research/release-review/verify-artifacts.mjs"
+      ],
+      "displayCommand": "node research/release-review/verify-artifacts.mjs",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-06T23:46:34.366Z",
+      "finishedAt": "2026-11-06T23:46:41.343Z",
+      "verifiedAt": "2026-11-06T23:46:41.343Z",
+      "log": "V-003-verification.log"
+    },
+    {
+      "id": "V-004",
+      "command": "git diff --check bc14db0 b700b2c",
+      "executionMode": "argv",
+      "executable": "git",
+      "args": [
+        "diff",
+        "--check",
+        "bc14db0",
+        "b700b2c"
+      ],
+      "displayCommand": "git diff --check bc14db0 b700b2c",
+      "success": false,
+      "status": "failed",
+      "exitCode": 2,
+      "startedAt": "2026-11-06T23:46:58.668Z",
+      "finishedAt": "2026-11-06T23:46:58.711Z",
+      "verifiedAt": "2026-11-06T23:46:58.711Z",
+      "log": "V-004-verification.log"
+    },
+    {
+      "id": "V-005",
+      "command": "npm audit --omit=dev --json",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "audit",
+        "--omit=dev",
+        "--json"
+      ],
+      "displayCommand": "npm audit --omit=dev --json",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-06T23:46:59.151Z",
+      "finishedAt": "2026-11-06T23:47:01.304Z",
+      "verifiedAt": "2026-11-06T23:47:01.304Z",
+      "log": "V-005-verification.log"
+    },
+    {
+      "id": "V-006",
+      "command": "git diff --check bc14db0",
+      "executionMode": "argv",
+      "executable": "git",
+      "args": [
+        "diff",
+        "--check",
+        "bc14db0"
+      ],
+      "displayCommand": "git diff --check bc14db0",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-06T23:47:24.428Z",
+      "finishedAt": "2026-11-06T23:47:24.468Z",
+      "verifiedAt": "2026-11-06T23:47:24.468Z",
+      "log": "V-006-verification.log"
+    },
+    {
+      "id": "V-007",
+      "command": "/home/engamer/.cache/JetBrains/PhpStorm2026.1/acp-agents/.runtimes/node/24.13.0/bin/node --version",
+      "executionMode": "argv",
+      "executable": "/home/engamer/.cache/JetBrains/PhpStorm2026.1/acp-agents/.runtimes/node/24.13.0/bin/node",
+      "args": [
+        "--version"
+      ],
+      "displayCommand": "/home/engamer/.cache/JetBrains/PhpStorm2026.1/acp-agents/.runtimes/node/24.13.0/bin/node --version",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-06T23:49:07.846Z",
+      "finishedAt": "2026-11-06T23:49:07.997Z",
+      "verifiedAt": "2026-11-06T23:49:07.997Z",
+      "log": "V-007-verification.log"
+    },
+    {
+      "id": "V-008",
+      "command": "node research/release-review/browser-check.mjs /home/engamer/.cache/ms-playwright-go/1.57.0/package chromium /home/engamer/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "research/release-review/browser-check.mjs",
+        "/home/engamer/.cache/ms-playwright-go/1.57.0/package",
+        "chromium",
+        "/home/engamer/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome"
+      ],
+      "displayCommand": "node research/release-review/browser-check.mjs /home/engamer/.cache/ms-playwright-go/1.57.0/package chromium /home/engamer/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-06T23:48:58.017Z",
+      "finishedAt": "2026-11-06T23:49:25.532Z",
+      "verifiedAt": "2026-11-06T23:49:25.532Z",
+      "log": "V-008-verification.log"
+    },
+    {
+      "id": "V-009",
+      "command": "node research/release-review/install-check.mjs",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "research/release-review/install-check.mjs"
+      ],
+      "displayCommand": "node research/release-review/install-check.mjs",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-06T23:50:00.576Z",
+      "finishedAt": "2026-11-06T23:50:00.632Z",
+      "verifiedAt": "2026-11-06T23:50:00.632Z",
+      "log": "V-009-verification.log"
+    },
+    {
+      "id": "V-010",
+      "command": "node research/release-review/browser-check.mjs /home/engamer/.cache/ms-playwright-go/1.57.0/package firefox /home/engamer/.cache/ms-playwright/firefox-1553/firefox/firefox",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "research/release-review/browser-check.mjs",
+        "/home/engamer/.cache/ms-playwright-go/1.57.0/package",
+        "firefox",
+        "/home/engamer/.cache/ms-playwright/firefox-1553/firefox/firefox"
+      ],
+      "displayCommand": "node research/release-review/browser-check.mjs /home/engamer/.cache/ms-playwright-go/1.57.0/package firefox /home/engamer/.cache/ms-playwright/firefox-1553/firefox/firefox",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-06T23:50:07.438Z",
+      "finishedAt": "2026-11-06T23:50:49.658Z",
+      "verifiedAt": "2026-11-06T23:50:49.658Z",
+      "log": "V-010-verification.log"
+    },
+    {
+      "id": "V-011",
+      "command": "node research/release-review/install-check.mjs",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "research/release-review/install-check.mjs"
+      ],
+      "displayCommand": "node research/release-review/install-check.mjs",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-06T23:50:20.141Z",
+      "finishedAt": "2026-11-06T23:51:02.993Z",
+      "verifiedAt": "2026-11-06T23:51:02.993Z",
+      "log": "V-011-verification.log"
+    },
+    {
+      "id": "V-012",
+      "command": "node research/release-review/browser-check.mjs /home/engamer/.cache/ms-playwright-go/1.57.0/package firefox /home/engamer/.cache/ms-playwright/firefox-1553/firefox/firefox",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "research/release-review/browser-check.mjs",
+        "/home/engamer/.cache/ms-playwright-go/1.57.0/package",
+        "firefox",
+        "/home/engamer/.cache/ms-playwright/firefox-1553/firefox/firefox"
+      ],
+      "displayCommand": "node research/release-review/browser-check.mjs /home/engamer/.cache/ms-playwright-go/1.57.0/package firefox /home/engamer/.cache/ms-playwright/firefox-1553/firefox/firefox",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-06T23:51:58.393Z",
+      "finishedAt": "2026-11-06T23:52:48.181Z",
+      "verifiedAt": "2026-11-06T23:52:48.181Z",
+      "log": "V-012-verification.log"
+    },
+    {
+      "id": "V-013",
+      "command": "node research/release-review/browser-check.mjs /home/engamer/.cache/ms-playwright-go/1.57.0/package webkit /home/engamer/.cache/ms-playwright/webkit-2368/pw_run.sh",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "research/release-review/browser-check.mjs",
+        "/home/engamer/.cache/ms-playwright-go/1.57.0/package",
+        "webkit",
+        "/home/engamer/.cache/ms-playwright/webkit-2368/pw_run.sh"
+      ],
+      "displayCommand": "node research/release-review/browser-check.mjs /home/engamer/.cache/ms-playwright-go/1.57.0/package webkit /home/engamer/.cache/ms-playwright/webkit-2368/pw_run.sh",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-06T23:51:59.709Z",
+      "finishedAt": "2026-11-06T23:53:28.251Z",
+      "verifiedAt": "2026-11-06T23:53:28.251Z",
+      "log": "V-013-verification.log"
+    },
+    {
+      "id": "V-014",
+      "command": "node research/release-review/browser-check.mjs /home/engamer/.cache/ms-playwright-go/1.57.0/package webkit /home/engamer/.cache/ms-playwright/webkit-2368/pw_run.sh",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "research/release-review/browser-check.mjs",
+        "/home/engamer/.cache/ms-playwright-go/1.57.0/package",
+        "webkit",
+        "/home/engamer/.cache/ms-playwright/webkit-2368/pw_run.sh"
+      ],
+      "displayCommand": "node research/release-review/browser-check.mjs /home/engamer/.cache/ms-playwright-go/1.57.0/package webkit /home/engamer/.cache/ms-playwright/webkit-2368/pw_run.sh",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-06T23:54:29.953Z",
+      "finishedAt": "2026-11-06T23:55:41.022Z",
+      "verifiedAt": "2026-11-06T23:55:41.022Z",
+      "log": "V-014-verification.log"
+    },
+    {
+      "id": "V-015",
+      "command": "node research/release-review/verify-artifacts.mjs",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "research/release-review/verify-artifacts.mjs"
+      ],
+      "displayCommand": "node research/release-review/verify-artifacts.mjs",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-06T23:55:05.836Z",
+      "finishedAt": "2026-11-06T23:55:45.855Z",
+      "verifiedAt": "2026-11-06T23:55:45.855Z",
+      "log": "V-015-verification.log"
+    },
+    {
+      "id": "V-016",
+      "command": "node research/release-review/browser-check.mjs /home/engamer/.cache/ms-playwright-go/1.57.0/package chromium /home/engamer/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "research/release-review/browser-check.mjs",
+        "/home/engamer/.cache/ms-playwright-go/1.57.0/package",
+        "chromium",
+        "/home/engamer/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome"
+      ],
+      "displayCommand": "node research/release-review/browser-check.mjs /home/engamer/.cache/ms-playwright-go/1.57.0/package chromium /home/engamer/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-06T23:57:46.274Z",
+      "finishedAt": "2026-11-06T23:58:15.599Z",
+      "verifiedAt": "2026-11-06T23:58:15.599Z",
+      "log": "V-016-verification.log"
+    },
+    {
+      "id": "V-017",
+      "command": "node research/release-review/verify-artifacts.mjs",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "research/release-review/verify-artifacts.mjs"
+      ],
+      "displayCommand": "node research/release-review/verify-artifacts.mjs",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-06T23:59:31.531Z",
+      "finishedAt": "2026-11-07T00:00:15.062Z",
+      "verifiedAt": "2026-11-07T00:00:15.062Z",
+      "log": "V-017-verification.log"
+    },
+    {
+      "id": "V-018",
+      "command": "node --check resources/console/app.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--check",
+        "resources/console/app.js"
+      ],
+      "displayCommand": "node --check resources/console/app.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:01:38.733Z",
+      "finishedAt": "2026-11-07T00:01:38.988Z",
+      "verifiedAt": "2026-11-07T00:01:38.988Z",
+      "log": "V-018-verification.log"
+    },
+    {
+      "id": "V-019",
+      "command": "node research/release-review/browser-check.mjs /home/engamer/.cache/ms-playwright-go/1.57.0/package chromium /home/engamer/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "research/release-review/browser-check.mjs",
+        "/home/engamer/.cache/ms-playwright-go/1.57.0/package",
+        "chromium",
+        "/home/engamer/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome"
+      ],
+      "displayCommand": "node research/release-review/browser-check.mjs /home/engamer/.cache/ms-playwright-go/1.57.0/package chromium /home/engamer/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:01:36.223Z",
+      "finishedAt": "2026-11-07T00:02:42.627Z",
+      "verifiedAt": "2026-11-07T00:02:42.627Z",
+      "log": "V-019-verification.log"
+    },
+    {
+      "id": "V-020",
+      "command": "node research/release-review/install-check.mjs",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "research/release-review/install-check.mjs"
+      ],
+      "displayCommand": "node research/release-review/install-check.mjs",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:01:37.701Z",
+      "finishedAt": "2026-11-07T00:02:44.459Z",
+      "verifiedAt": "2026-11-07T00:02:44.459Z",
+      "log": "V-020-verification.log"
+    },
+    {
+      "id": "V-021",
+      "command": "node research/release-review/browser-check.mjs /home/engamer/.cache/ms-playwright-go/1.57.0/package firefox /home/engamer/.cache/ms-playwright/firefox-1553/firefox/firefox",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "research/release-review/browser-check.mjs",
+        "/home/engamer/.cache/ms-playwright-go/1.57.0/package",
+        "firefox",
+        "/home/engamer/.cache/ms-playwright/firefox-1553/firefox/firefox"
+      ],
+      "displayCommand": "node research/release-review/browser-check.mjs /home/engamer/.cache/ms-playwright-go/1.57.0/package firefox /home/engamer/.cache/ms-playwright/firefox-1553/firefox/firefox",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:01:35.940Z",
+      "finishedAt": "2026-11-07T00:03:04.901Z",
+      "verifiedAt": "2026-11-07T00:03:04.901Z",
+      "log": "V-021-verification.log"
+    },
+    {
+      "id": "V-022",
+      "command": "node research/release-review/acceptance.mjs --self-check",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "research/release-review/acceptance.mjs",
+        "--self-check"
+      ],
+      "displayCommand": "node research/release-review/acceptance.mjs --self-check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:03:26.869Z",
+      "finishedAt": "2026-11-07T00:03:30.840Z",
+      "verifiedAt": "2026-11-07T00:03:30.840Z",
+      "log": "V-022-verification.log"
+    },
+    {
+      "id": "V-023",
+      "command": "node research/release-review/browser-check.mjs /home/engamer/.cache/ms-playwright-go/1.57.0/package webkit /home/engamer/.cache/ms-playwright/webkit-2368/pw_run.sh",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "research/release-review/browser-check.mjs",
+        "/home/engamer/.cache/ms-playwright-go/1.57.0/package",
+        "webkit",
+        "/home/engamer/.cache/ms-playwright/webkit-2368/pw_run.sh"
+      ],
+      "displayCommand": "node research/release-review/browser-check.mjs /home/engamer/.cache/ms-playwright-go/1.57.0/package webkit /home/engamer/.cache/ms-playwright/webkit-2368/pw_run.sh",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-07T00:01:35.741Z",
+      "finishedAt": "2026-11-07T00:03:42.314Z",
+      "verifiedAt": "2026-11-07T00:03:42.314Z",
+      "log": "V-023-verification.log"
+    },
+    {
+      "id": "V-024",
+      "command": "node research/release-review/verify-artifacts.mjs",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "research/release-review/verify-artifacts.mjs"
+      ],
+      "displayCommand": "node research/release-review/verify-artifacts.mjs",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:03:59.102Z",
+      "finishedAt": "2026-11-07T00:04:50.607Z",
+      "verifiedAt": "2026-11-07T00:04:50.607Z",
+      "log": "V-024-verification.log"
+    },
+    {
+      "id": "V-025",
+      "command": "git diff --check bc14db0",
+      "executionMode": "argv",
+      "executable": "git",
+      "args": [
+        "diff",
+        "--check",
+        "bc14db0"
+      ],
+      "displayCommand": "git diff --check bc14db0",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:06:05.598Z",
+      "finishedAt": "2026-11-07T00:06:05.754Z",
+      "verifiedAt": "2026-11-07T00:06:05.754Z",
+      "log": "V-025-verification.log"
+    },
+    {
+      "id": "V-026",
+      "command": "node research/release-review/browser-check.mjs /home/engamer/.cache/ms-playwright-go/1.57.0/package webkit /home/engamer/.cache/ms-playwright/webkit-2368/pw_run.sh",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "research/release-review/browser-check.mjs",
+        "/home/engamer/.cache/ms-playwright-go/1.57.0/package",
+        "webkit",
+        "/home/engamer/.cache/ms-playwright/webkit-2368/pw_run.sh"
+      ],
+      "displayCommand": "node research/release-review/browser-check.mjs /home/engamer/.cache/ms-playwright-go/1.57.0/package webkit /home/engamer/.cache/ms-playwright/webkit-2368/pw_run.sh",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:04:44.521Z",
+      "finishedAt": "2026-11-07T00:06:26.194Z",
+      "verifiedAt": "2026-11-07T00:06:26.194Z",
+      "log": "V-026-verification.log"
+    },
+    {
+      "id": "V-027",
+      "command": "node research/release-review/install-check.mjs",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "research/release-review/install-check.mjs"
+      ],
+      "displayCommand": "node research/release-review/install-check.mjs",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:05:35.616Z",
+      "finishedAt": "2026-11-07T00:06:32.159Z",
+      "verifiedAt": "2026-11-07T00:06:32.159Z",
+      "log": "V-027-verification.log"
+    },
+    {
+      "id": "V-028",
+      "command": "/home/engamer/.cache/JetBrains/PhpStorm2026.1/acp-agents/.runtimes/node/24.13.0/bin/node --import ./test-support/isolate-user-config.js --test --test-concurrency=4",
+      "executionMode": "argv",
+      "executable": "/home/engamer/.cache/JetBrains/PhpStorm2026.1/acp-agents/.runtimes/node/24.13.0/bin/node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "--test-concurrency=4"
+      ],
+      "displayCommand": "/home/engamer/.cache/JetBrains/PhpStorm2026.1/acp-agents/.runtimes/node/24.13.0/bin/node --import ./test-support/isolate-user-config.js --test --test-concurrency=4",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-06T23:50:22.978Z",
+      "finishedAt": "2026-11-07T00:07:15.449Z",
+      "verifiedAt": "2026-11-07T00:07:15.449Z",
+      "log": "V-028-verification.log"
+    },
+    {
+      "id": "V-029",
+      "command": "/home/engamer/.nvm/versions/node/v20.16.0/bin/node --import ./test-support/isolate-user-config.js --test --test-concurrency=4",
+      "executionMode": "argv",
+      "executable": "/home/engamer/.nvm/versions/node/v20.16.0/bin/node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "--test-concurrency=4"
+      ],
+      "displayCommand": "/home/engamer/.nvm/versions/node/v20.16.0/bin/node --import ./test-support/isolate-user-config.js --test --test-concurrency=4",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-06T23:50:21.516Z",
+      "finishedAt": "2026-11-07T00:07:26.926Z",
+      "verifiedAt": "2026-11-07T00:07:26.926Z",
+      "log": "V-029-verification.log"
+    },
+    {
+      "id": "V-030",
+      "command": "node research/release-review/acceptance.mjs --self-check",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "research/release-review/acceptance.mjs",
+        "--self-check"
+      ],
+      "displayCommand": "node research/release-review/acceptance.mjs --self-check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:07:38.670Z",
+      "finishedAt": "2026-11-07T00:07:39.420Z",
+      "verifiedAt": "2026-11-07T00:07:39.420Z",
+      "log": "V-030-verification.log"
+    },
+    {
+      "id": "V-031",
+      "command": "/home/engamer/.cache/JetBrains/PhpStorm2026.1/acp-agents/.runtimes/node/24.13.0/bin/node --import ./test-support/isolate-user-config.js --test \"--test-name-pattern=live holder\" test/workspace-lock.test.js",
+      "executionMode": "argv",
+      "executable": "/home/engamer/.cache/JetBrains/PhpStorm2026.1/acp-agents/.runtimes/node/24.13.0/bin/node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "--test-name-pattern=live holder",
+        "test/workspace-lock.test.js"
+      ],
+      "displayCommand": "/home/engamer/.cache/JetBrains/PhpStorm2026.1/acp-agents/.runtimes/node/24.13.0/bin/node --import ./test-support/isolate-user-config.js --test \"--test-name-pattern=live holder\" test/workspace-lock.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:08:17.913Z",
+      "finishedAt": "2026-11-07T00:08:22.758Z",
+      "verifiedAt": "2026-11-07T00:08:22.758Z",
+      "log": "V-031-verification.log"
+    },
+    {
+      "id": "V-032",
+      "command": "node --import ./test-support/isolate-user-config.js --test \"--test-name-pattern=live holder\" test/workspace-lock.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "--test-name-pattern=live holder",
+        "test/workspace-lock.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test \"--test-name-pattern=live holder\" test/workspace-lock.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:08:32.141Z",
+      "finishedAt": "2026-11-07T00:08:36.795Z",
+      "verifiedAt": "2026-11-07T00:08:36.795Z",
+      "log": "V-032-verification.log"
+    },
+    {
+      "id": "V-033",
+      "command": "/home/engamer/.nvm/versions/node/v20.16.0/bin/node --import ./test-support/isolate-user-config.js --test \"--test-name-pattern=live holder\" test/workspace-lock.test.js",
+      "executionMode": "argv",
+      "executable": "/home/engamer/.nvm/versions/node/v20.16.0/bin/node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "--test-name-pattern=live holder",
+        "test/workspace-lock.test.js"
+      ],
+      "displayCommand": "/home/engamer/.nvm/versions/node/v20.16.0/bin/node --import ./test-support/isolate-user-config.js --test \"--test-name-pattern=live holder\" test/workspace-lock.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:08:32.138Z",
+      "finishedAt": "2026-11-07T00:08:36.938Z",
+      "verifiedAt": "2026-11-07T00:08:36.938Z",
+      "log": "V-033-verification.log"
+    },
+    {
+      "id": "V-034",
+      "command": "node research/release-review/verify-artifacts.mjs",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "research/release-review/verify-artifacts.mjs"
+      ],
+      "displayCommand": "node research/release-review/verify-artifacts.mjs",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:08:33.500Z",
+      "finishedAt": "2026-11-07T00:08:43.227Z",
+      "verifiedAt": "2026-11-07T00:08:43.227Z",
+      "log": "V-034-verification.log"
+    },
+    {
+      "id": "V-035",
+      "command": "/home/engamer/.cache/JetBrains/PhpStorm2026.1/acp-agents/.runtimes/node/24.13.0/bin/node --import ./test-support/isolate-user-config.js --test test/workspace-lock.test.js",
+      "executionMode": "argv",
+      "executable": "/home/engamer/.cache/JetBrains/PhpStorm2026.1/acp-agents/.runtimes/node/24.13.0/bin/node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/workspace-lock.test.js"
+      ],
+      "displayCommand": "/home/engamer/.cache/JetBrains/PhpStorm2026.1/acp-agents/.runtimes/node/24.13.0/bin/node --import ./test-support/isolate-user-config.js --test test/workspace-lock.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:08:32.143Z",
+      "finishedAt": "2026-11-07T00:08:47.264Z",
+      "verifiedAt": "2026-11-07T00:08:47.264Z",
+      "log": "V-035-verification.log"
+    },
+    {
+      "id": "V-036",
+      "command": "git diff --check bc14db0",
+      "executionMode": "argv",
+      "executable": "git",
+      "args": [
+        "diff",
+        "--check",
+        "bc14db0"
+      ],
+      "displayCommand": "git diff --check bc14db0",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-07T00:16:37.507Z",
+      "finishedAt": "2026-11-07T00:16:37.542Z",
+      "verifiedAt": "2026-11-07T00:16:37.542Z",
+      "log": "V-036-verification.log"
+    }
+  ]
+}

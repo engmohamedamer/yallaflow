@@ -1,0 +1,1147 @@
+[
+  {
+    "path": "CHANGELOG.md",
+    "size": 129168,
+    "mode": 420
+  },
+  {
+    "path": "LICENSE",
+    "size": 1079,
+    "mode": 420
+  },
+  {
+    "path": "README.md",
+    "size": 10659,
+    "mode": 420
+  },
+  {
+    "path": "docs/acceptance-scenarios.md",
+    "size": 3703,
+    "mode": 420
+  },
+  {
+    "path": "docs/agents.md",
+    "size": 6557,
+    "mode": 420
+  },
+  {
+    "path": "docs/architecture.md",
+    "size": 104713,
+    "mode": 420
+  },
+  {
+    "path": "docs/cli.md",
+    "size": 35936,
+    "mode": 420
+  },
+  {
+    "path": "docs/connected-requirements-and-quality.md",
+    "size": 13548,
+    "mode": 420
+  },
+  {
+    "path": "docs/console.md",
+    "size": 13866,
+    "mode": 420
+  },
+  {
+    "path": "docs/guide.md",
+    "size": 30156,
+    "mode": 420
+  },
+  {
+    "path": "docs/inspiration.md",
+    "size": 1276,
+    "mode": 420
+  },
+  {
+    "path": "docs/installation.md",
+    "size": 5723,
+    "mode": 420
+  },
+  {
+    "path": "docs/internal-pilot.md",
+    "size": 3854,
+    "mode": 420
+  },
+  {
+    "path": "docs/limitations.md",
+    "size": 24653,
+    "mode": 420
+  },
+  {
+    "path": "docs/project-memory.md",
+    "size": 19709,
+    "mode": 420
+  },
+  {
+    "path": "docs/releasing.md",
+    "size": 13659,
+    "mode": 420
+  },
+  {
+    "path": "docs/roadmap.md",
+    "size": 26302,
+    "mode": 420
+  },
+  {
+    "path": "docs/security.md",
+    "size": 10333,
+    "mode": 420
+  },
+  {
+    "path": "docs/shared-projects.md",
+    "size": 15373,
+    "mode": 420
+  },
+  {
+    "path": "docs/upgrading-to-v0.3.6.md",
+    "size": 5436,
+    "mode": 420
+  },
+  {
+    "path": "docs/upgrading-to-v0.3.7.md",
+    "size": 15589,
+    "mode": 420
+  },
+  {
+    "path": "docs/upgrading-to-v0.3.8.md",
+    "size": 4873,
+    "mode": 420
+  },
+  {
+    "path": "docs/upgrading-to-v0.3.9.md",
+    "size": 6360,
+    "mode": 420
+  },
+  {
+    "path": "docs/upgrading-to-v0.3.10.md",
+    "size": 10459,
+    "mode": 420
+  },
+  {
+    "path": "docs/upgrading-to-v1.0.1.md",
+    "size": 7082,
+    "mode": 420
+  },
+  {
+    "path": "docs/upgrading-to-v1.0.md",
+    "size": 2662,
+    "mode": 420
+  },
+  {
+    "path": "docs/upgrading-to-v1.1.0.md",
+    "size": 5237,
+    "mode": 420
+  },
+  {
+    "path": "docs/upgrading-to-v1.2.0.md",
+    "size": 2216,
+    "mode": 420
+  },
+  {
+    "path": "docs/using-yallaflow.md",
+    "size": 15732,
+    "mode": 420
+  },
+  {
+    "path": "docs/workflows.md",
+    "size": 28803,
+    "mode": 420
+  },
+  {
+    "path": "package.json",
+    "size": 1632,
+    "mode": 420
+  },
+  {
+    "path": "resources/agents/claude/README.md",
+    "size": 1793,
+    "mode": 420
+  },
+  {
+    "path": "resources/agents/codex/README.md",
+    "size": 1753,
+    "mode": 420
+  },
+  {
+    "path": "resources/console/app.css",
+    "size": 46846,
+    "mode": 420
+  },
+  {
+    "path": "resources/console/app.js",
+    "size": 108503,
+    "mode": 420
+  },
+  {
+    "path": "resources/console/favicon.svg",
+    "size": 319,
+    "mode": 420
+  },
+  {
+    "path": "resources/console/fonts/OFL.txt",
+    "size": 4444,
+    "mode": 420
+  },
+  {
+    "path": "resources/console/fonts/ReadexPro.ttf",
+    "size": 278544,
+    "mode": 420
+  },
+  {
+    "path": "resources/console/index.html",
+    "size": 449,
+    "mode": 420
+  },
+  {
+    "path": "resources/schemas/snapshot-1.schema.json",
+    "size": 4685,
+    "mode": 420
+  },
+  {
+    "path": "resources/schemas/work-1.schema.json",
+    "size": 3015,
+    "mode": 420
+  },
+  {
+    "path": "resources/skills/ai-qc.md",
+    "size": 6594,
+    "mode": 420
+  },
+  {
+    "path": "resources/skills/archive/context-discovery.v1.md",
+    "size": 1879,
+    "mode": 420
+  },
+  {
+    "path": "resources/skills/archive/repository-baseline.v1.md",
+    "size": 5101,
+    "mode": 420
+  },
+  {
+    "path": "resources/skills/archive/repository-baseline.v2.md",
+    "size": 6653,
+    "mode": 420
+  },
+  {
+    "path": "resources/skills/archive/repository-baseline.v3.md",
+    "size": 7218,
+    "mode": 420
+  },
+  {
+    "path": "resources/skills/code-review.md",
+    "size": 816,
+    "mode": 420
+  },
+  {
+    "path": "resources/skills/context-discovery.md",
+    "size": 2352,
+    "mode": 420
+  },
+  {
+    "path": "resources/skills/context-reconciliation.md",
+    "size": 6024,
+    "mode": 420
+  },
+  {
+    "path": "resources/skills/delivery-convergence.md",
+    "size": 3193,
+    "mode": 420
+  },
+  {
+    "path": "resources/skills/design-exploration.md",
+    "size": 2482,
+    "mode": 420
+  },
+  {
+    "path": "resources/skills/implementation-planning.md",
+    "size": 904,
+    "mode": 420
+  },
+  {
+    "path": "resources/skills/implementation.md",
+    "size": 779,
+    "mode": 420
+  },
+  {
+    "path": "resources/skills/repository-baseline.md",
+    "size": 9148,
+    "mode": 420
+  },
+  {
+    "path": "resources/skills/requirement-clarification.md",
+    "size": 2901,
+    "mode": 420
+  },
+  {
+    "path": "resources/skills/requirement-import.md",
+    "size": 3118,
+    "mode": 420
+  },
+  {
+    "path": "resources/skills/smart-demo.md",
+    "size": 6062,
+    "mode": 420
+  },
+  {
+    "path": "resources/skills/specification.md",
+    "size": 2238,
+    "mode": 420
+  },
+  {
+    "path": "resources/skills/systematic-debugging.md",
+    "size": 1575,
+    "mode": 420
+  },
+  {
+    "path": "resources/skills/verification.md",
+    "size": 1691,
+    "mode": 420
+  },
+  {
+    "path": "resources/templates/execution-contract.md",
+    "size": 164,
+    "mode": 420
+  },
+  {
+    "path": "resources/workflows/bug.md",
+    "size": 340,
+    "mode": 420
+  },
+  {
+    "path": "resources/workflows/change.md",
+    "size": 192,
+    "mode": 420
+  },
+  {
+    "path": "resources/workflows/feature.md",
+    "size": 541,
+    "mode": 420
+  },
+  {
+    "path": "resources/workflows/investigation.md",
+    "size": 255,
+    "mode": 420
+  },
+  {
+    "path": "src/agent/bootstrap.js",
+    "size": 15540,
+    "mode": 420
+  },
+  {
+    "path": "src/agent/contract.js",
+    "size": 49513,
+    "mode": 420
+  },
+  {
+    "path": "src/agents/acp.js",
+    "size": 10633,
+    "mode": 420
+  },
+  {
+    "path": "src/agents/bridge.js",
+    "size": 27860,
+    "mode": 420
+  },
+  {
+    "path": "src/agents/checkout-lock.js",
+    "size": 3314,
+    "mode": 420
+  },
+  {
+    "path": "src/agents/codex.js",
+    "size": 10210,
+    "mode": 420
+  },
+  {
+    "path": "src/agents/detect.js",
+    "size": 4211,
+    "mode": 420
+  },
+  {
+    "path": "src/agents/events.js",
+    "size": 3309,
+    "mode": 420
+  },
+  {
+    "path": "src/agents/experimental.js",
+    "size": 1240,
+    "mode": 420
+  },
+  {
+    "path": "src/agents/local-files.js",
+    "size": 5445,
+    "mode": 420
+  },
+  {
+    "path": "src/baseline/constants.js",
+    "size": 1690,
+    "mode": 420
+  },
+  {
+    "path": "src/baseline/store.js",
+    "size": 21337,
+    "mode": 420
+  },
+  {
+    "path": "src/baseline/understanding.js",
+    "size": 8818,
+    "mode": 420
+  },
+  {
+    "path": "src/behavior/constants.js",
+    "size": 962,
+    "mode": 420
+  },
+  {
+    "path": "src/behavior/guidance.js",
+    "size": 7381,
+    "mode": 420
+  },
+  {
+    "path": "src/behavior/interaction.js",
+    "size": 4319,
+    "mode": 420
+  },
+  {
+    "path": "src/behavior/objective.js",
+    "size": 1310,
+    "mode": 420
+  },
+  {
+    "path": "src/behavior/policy.js",
+    "size": 2490,
+    "mode": 420
+  },
+  {
+    "path": "src/behavior/readiness.js",
+    "size": 2724,
+    "mode": 420
+  },
+  {
+    "path": "src/behavior/routing.js",
+    "size": 19263,
+    "mode": 420
+  },
+  {
+    "path": "src/cli.js",
+    "size": 67917,
+    "mode": 493
+  },
+  {
+    "path": "src/commands/advance.js",
+    "size": 1113,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/agent.js",
+    "size": 4644,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/agents.js",
+    "size": 2319,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/baseline.js",
+    "size": 11697,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/brief.js",
+    "size": 15426,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/checkpoint.js",
+    "size": 2078,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/console.js",
+    "size": 6385,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/context.js",
+    "size": 12628,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/decompose.js",
+    "size": 4931,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/delivery.js",
+    "size": 17550,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/doctor.js",
+    "size": 13944,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/finish.js",
+    "size": 9470,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/guide.js",
+    "size": 7402,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/handoff.js",
+    "size": 10812,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/init.js",
+    "size": 3308,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/inspect.js",
+    "size": 5804,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/intake.js",
+    "size": 19481,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/knowledge.js",
+    "size": 3119,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/limitation.js",
+    "size": 1479,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/next.js",
+    "size": 1362,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/progress.js",
+    "size": 1508,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/purpose.js",
+    "size": 1659,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/quality.js",
+    "size": 13252,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/question.js",
+    "size": 2688,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/ready.js",
+    "size": 1516,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/reconcile.js",
+    "size": 14176,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/reopen.js",
+    "size": 699,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/request.js",
+    "size": 608,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/resume.js",
+    "size": 10847,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/review.js",
+    "size": 2355,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/route.js",
+    "size": 1421,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/shared.js",
+    "size": 15480,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/skill.js",
+    "size": 3942,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/snapshot.js",
+    "size": 3351,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/source.js",
+    "size": 4182,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/start.js",
+    "size": 3958,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/status.js",
+    "size": 2996,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/upgrade.js",
+    "size": 5003,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/verify.js",
+    "size": 9376,
+    "mode": 420
+  },
+  {
+    "path": "src/commands/work.js",
+    "size": 2251,
+    "mode": 420
+  },
+  {
+    "path": "src/console/create.js",
+    "size": 11783,
+    "mode": 420
+  },
+  {
+    "path": "src/console/registry.js",
+    "size": 2847,
+    "mode": 420
+  },
+  {
+    "path": "src/console/runner.js",
+    "size": 4452,
+    "mode": 420
+  },
+  {
+    "path": "src/console/server.js",
+    "size": 23984,
+    "mode": 420
+  },
+  {
+    "path": "src/console/watch.js",
+    "size": 2279,
+    "mode": 420
+  },
+  {
+    "path": "src/console/worktrees.js",
+    "size": 4421,
+    "mode": 420
+  },
+  {
+    "path": "src/context/adopt.js",
+    "size": 4477,
+    "mode": 420
+  },
+  {
+    "path": "src/context/constants.js",
+    "size": 3853,
+    "mode": 420
+  },
+  {
+    "path": "src/context/evidence.js",
+    "size": 7669,
+    "mode": 420
+  },
+  {
+    "path": "src/context/freshness.js",
+    "size": 3722,
+    "mode": 420
+  },
+  {
+    "path": "src/context/integrity.js",
+    "size": 4745,
+    "mode": 420
+  },
+  {
+    "path": "src/context/ledger.js",
+    "size": 28123,
+    "mode": 420
+  },
+  {
+    "path": "src/context/legacy.js",
+    "size": 3500,
+    "mode": 420
+  },
+  {
+    "path": "src/context/projection.js",
+    "size": 14099,
+    "mode": 420
+  },
+  {
+    "path": "src/context/summary.js",
+    "size": 6544,
+    "mode": 420
+  },
+  {
+    "path": "src/core/assessment.js",
+    "size": 6173,
+    "mode": 420
+  },
+  {
+    "path": "src/core/collisions.js",
+    "size": 4946,
+    "mode": 420
+  },
+  {
+    "path": "src/core/discovery.js",
+    "size": 3649,
+    "mode": 420
+  },
+  {
+    "path": "src/core/evidence.js",
+    "size": 3343,
+    "mode": 420
+  },
+  {
+    "path": "src/core/git.js",
+    "size": 3791,
+    "mode": 420
+  },
+  {
+    "path": "src/core/ids.js",
+    "size": 3666,
+    "mode": 420
+  },
+  {
+    "path": "src/core/integrity.js",
+    "size": 14384,
+    "mode": 420
+  },
+  {
+    "path": "src/core/ownership.js",
+    "size": 10347,
+    "mode": 420
+  },
+  {
+    "path": "src/core/progress.js",
+    "size": 20613,
+    "mode": 420
+  },
+  {
+    "path": "src/core/sources.js",
+    "size": 7907,
+    "mode": 420
+  },
+  {
+    "path": "src/core/transitions.js",
+    "size": 23519,
+    "mode": 420
+  },
+  {
+    "path": "src/core/workflows.js",
+    "size": 3790,
+    "mode": 420
+  },
+  {
+    "path": "src/core/workspace.js",
+    "size": 9970,
+    "mode": 420
+  },
+  {
+    "path": "src/core/yaml.js",
+    "size": 926,
+    "mode": 420
+  },
+  {
+    "path": "src/decomposition/constants.js",
+    "size": 152,
+    "mode": 420
+  },
+  {
+    "path": "src/decomposition/store.js",
+    "size": 17959,
+    "mode": 420
+  },
+  {
+    "path": "src/delivery/assess.js",
+    "size": 11025,
+    "mode": 420
+  },
+  {
+    "path": "src/delivery/constants.js",
+    "size": 2090,
+    "mode": 420
+  },
+  {
+    "path": "src/delivery/convergence.js",
+    "size": 25546,
+    "mode": 420
+  },
+  {
+    "path": "src/delivery/impact.js",
+    "size": 7938,
+    "mode": 420
+  },
+  {
+    "path": "src/delivery/integrity.js",
+    "size": 10048,
+    "mode": 420
+  },
+  {
+    "path": "src/delivery/policy.js",
+    "size": 2046,
+    "mode": 420
+  },
+  {
+    "path": "src/delivery/requirements.js",
+    "size": 21543,
+    "mode": 420
+  },
+  {
+    "path": "src/delivery/summary.js",
+    "size": 3287,
+    "mode": 420
+  },
+  {
+    "path": "src/domain/types.js",
+    "size": 682,
+    "mode": 420
+  },
+  {
+    "path": "src/flow/snapshot.js",
+    "size": 16449,
+    "mode": 420
+  },
+  {
+    "path": "src/flow/stations.js",
+    "size": 9050,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/adapters/binary.js",
+    "size": 424,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/adapters/image.js",
+    "size": 2570,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/adapters/office.js",
+    "size": 1551,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/adapters/pdf.js",
+    "size": 455,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/adapters/rtf.js",
+    "size": 239,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/adapters/text.js",
+    "size": 319,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/constants.js",
+    "size": 8017,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/detect.js",
+    "size": 3414,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/extractors/pdf.js",
+    "size": 3057,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/extractors/pptx.js",
+    "size": 1422,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/extractors/rtf.js",
+    "size": 2808,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/extractors/xlsx.js",
+    "size": 4012,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/extractors/zip.js",
+    "size": 2694,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/file.js",
+    "size": 4183,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/normalize.js",
+    "size": 2529,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/providers/azure-devops.js",
+    "size": 6015,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/providers/github.js",
+    "size": 6300,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/providers/http.js",
+    "size": 5101,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/providers/index.js",
+    "size": 1407,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/providers/jira.js",
+    "size": 5860,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/providers/ticket.js",
+    "size": 13632,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/registry.js",
+    "size": 1048,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/ticket.js",
+    "size": 3865,
+    "mode": 420
+  },
+  {
+    "path": "src/intake/validation.js",
+    "size": 8198,
+    "mode": 420
+  },
+  {
+    "path": "src/inventory/constants.js",
+    "size": 3548,
+    "mode": 420
+  },
+  {
+    "path": "src/inventory/frameworks.js",
+    "size": 6004,
+    "mode": 420
+  },
+  {
+    "path": "src/inventory/inventory.js",
+    "size": 9691,
+    "mode": 420
+  },
+  {
+    "path": "src/knowledge/constants.js",
+    "size": 2619,
+    "mode": 420
+  },
+  {
+    "path": "src/knowledge/promotion.js",
+    "size": 9221,
+    "mode": 420
+  },
+  {
+    "path": "src/knowledge/store.js",
+    "size": 25221,
+    "mode": 420
+  },
+  {
+    "path": "src/limitations/store.js",
+    "size": 3938,
+    "mode": 420
+  },
+  {
+    "path": "src/purpose/store.js",
+    "size": 5709,
+    "mode": 420
+  },
+  {
+    "path": "src/quality/artifacts.js",
+    "size": 8274,
+    "mode": 420
+  },
+  {
+    "path": "src/quality/constants.js",
+    "size": 3821,
+    "mode": 420
+  },
+  {
+    "path": "src/quality/demo.js",
+    "size": 18381,
+    "mode": 420
+  },
+  {
+    "path": "src/quality/input.js",
+    "size": 2758,
+    "mode": 420
+  },
+  {
+    "path": "src/quality/integrity.js",
+    "size": 7095,
+    "mode": 420
+  },
+  {
+    "path": "src/quality/qc.js",
+    "size": 22188,
+    "mode": 420
+  },
+  {
+    "path": "src/quality/report.js",
+    "size": 13607,
+    "mode": 420
+  },
+  {
+    "path": "src/questions/constants.js",
+    "size": 216,
+    "mode": 420
+  },
+  {
+    "path": "src/questions/store.js",
+    "size": 8485,
+    "mode": 420
+  },
+  {
+    "path": "src/reconciliation/constants.js",
+    "size": 1999,
+    "mode": 420
+  },
+  {
+    "path": "src/reconciliation/integrity.js",
+    "size": 9468,
+    "mode": 420
+  },
+  {
+    "path": "src/reconciliation/plan.js",
+    "size": 20647,
+    "mode": 420
+  },
+  {
+    "path": "src/reconciliation/store.js",
+    "size": 35756,
+    "mode": 420
+  },
+  {
+    "path": "src/reviews/store.js",
+    "size": 4415,
+    "mode": 420
+  },
+  {
+    "path": "src/security/redact.js",
+    "size": 9039,
+    "mode": 420
+  },
+  {
+    "path": "src/shared/config.js",
+    "size": 14356,
+    "mode": 420
+  },
+  {
+    "path": "src/shared/fingerprint.js",
+    "size": 1929,
+    "mode": 420
+  },
+  {
+    "path": "src/shared/git.js",
+    "size": 2048,
+    "mode": 420
+  },
+  {
+    "path": "src/shared/identity.js",
+    "size": 6399,
+    "mode": 420
+  },
+  {
+    "path": "src/shared/integrity.js",
+    "size": 8192,
+    "mode": 420
+  },
+  {
+    "path": "src/shared/memory.js",
+    "size": 31965,
+    "mode": 420
+  },
+  {
+    "path": "src/skills/constants.js",
+    "size": 2175,
+    "mode": 420
+  },
+  {
+    "path": "src/skills/instructions.js",
+    "size": 6225,
+    "mode": 420
+  },
+  {
+    "path": "src/skills/registry.js",
+    "size": 4707,
+    "mode": 420
+  },
+  {
+    "path": "src/skills/resolver.js",
+    "size": 2538,
+    "mode": 420
+  },
+  {
+    "path": "src/skills/validation.js",
+    "size": 5858,
+    "mode": 420
+  },
+  {
+    "path": "src/utils/fs.js",
+    "size": 1814,
+    "mode": 420
+  },
+  {
+    "path": "src/utils/lock.js",
+    "size": 13535,
+    "mode": 420
+  },
+  {
+    "path": "src/version.js",
+    "size": 128,
+    "mode": 420
+  }
+]

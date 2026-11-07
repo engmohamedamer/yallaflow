@@ -1,0 +1,14 @@
+{
+  "browser": "chromium",
+  "browserVersion": "156.0.8078.4",
+  "checkedAt": "2026-11-07T00:02:41.739Z",
+  "passed": [
+    "prototype navigation, theme persistence, onboarding states, simulated run/stop, blocked advance, modal Escape, text injection and mobile overflow",
+    "1.2.0 packed console: create with attachment, detail/Flow, no auto-activation, theme regression, mobile RTL",
+    "1.3.0 existing-item navigation loads Agent Workspace without a workspace event",
+    "1.3.0 SIMULATED provider: start, stream, permission deny, stop, end, resume, explicit activation",
+    "1.3.0 packed console: create with attachment, detail/Flow, no auto-activation, theme regression, mobile RTL"
+  ],
+  "errors": [],
+  "limitation": "Provider is simulated; real subscription acceptance remains a manual gate."
+}

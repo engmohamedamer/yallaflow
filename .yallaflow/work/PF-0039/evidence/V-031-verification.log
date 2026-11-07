@@ -1,0 +1,10 @@
+✔ a live holder is waited for; past the timeout the command fails and changes nothing (1696.426148ms)
+✔ the lock records the holder identity, and a positively identified live holder is never cleared (3046.488867ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4812.777356

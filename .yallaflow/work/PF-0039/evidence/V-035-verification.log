@@ -1,0 +1,24 @@
+✔ parallel starts allocate distinct work IDs and leave valid state (1515.605208ms)
+✔ parallel mutating commands across items and verifications keep every ledger intact (3256.840987ms)
+✔ a stale lock from a dead process is reported, then recovered automatically (509.152669ms)
+✔ doctor --clear-lock removes a stale lock and refuses a live one (511.891797ms)
+✔ a live holder rejects timed-out writes without changes, then permits writes after release (915.999195ms)
+✔ the lock is re-entrant inside one process and read commands never take it (488.718538ms)
+✔ a single-user workspace has no local/ directory after a command, even a refused one (497.563706ms)
+✔ a crash can never leave an empty lock; an unreadable one is stale after 30 s (859.652963ms)
+✔ a reused pid (same pid, different process start) is recognized as stale (260.617596ms)
+✔ the lock records the holder identity, and a positively identified live holder is never cleared (3059.019481ms)
+✔ doctor --clear-lock removes an hour-old lock whose holder cannot be identified (408.745788ms)
+✔ leftover lock temp files from a crash are swept (216.717107ms)
+✔ a lock taken before the machine last booted is stale on any platform (248.830376ms)
+✔ release removes only its own lock, never one taken over meanwhile (9.511938ms)
+✔ verify waits to record a finished run and always shows its output (an exited, unreaped holder counts as gone) (1882.132043ms)
+✔ a lock a crash leaves in a single-user workspace stays out of git status (356.482277ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15078.448478

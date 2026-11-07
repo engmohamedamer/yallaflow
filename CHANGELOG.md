@@ -32,6 +32,8 @@ Opt-in. Uses only the developer's existing Codex (ChatGPT) subscription: no API 
 
 ### Fixed
 - The console's bell badge and warning chip now meet WCAG AA contrast in light and dark themes.
+- Opening an existing or newly created work item loads its Agent Workspace immediately, without waiting for a workspace-change event.
+- Streamed replies keep Stop, End and the message composer in place so incoming chunks do not interrupt interaction. Explicit activation waits for the refreshed work state before rendering the panel.
 
 ## [1.2.0] - unreleased (prepared 2026-11-06) — Flow Console, read contract & workspace lock
 
