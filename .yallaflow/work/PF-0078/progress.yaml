@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-08T19:38:18.370Z",
+      "completedAt": "2026-11-08T19:38:18.370Z",
+      "summary": "docs/releasing.md checklist: npm ci && npm run check, doctor, npm audit (classify), npm pack --dry-run plus a real pack with file list and secret scan, a packed-candidate smoke test in an isolated prefix, a provider/network scan, git diff --check, CHANGELOG section, version bump (package.json + package-lock + src/version.js; domain versions only if changed), an annotated tag, and a GitHub Release, which runs release.yml (guard: tag == v+version, on main, not yet published; test on Node 20/22/24; publish with provenance via OIDC). Package version is pinned in tests cli.test.js:19 and pilot-hardening.test.js:410-411. minimumVersion 1.4.0 references are compatibility rules and stay. release-1.4.1-prep is a fast-forward of origin/main. A push to main touching site/** deploys Pages.",
+      "evidence": [
+        "docs/releasing.md",
+        ".github/workflows/release.yml",
+        ".github/workflows/pages.yml",
+        "src/version.js"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-08T19:38:26.245Z",
+      "completedAt": "2026-11-08T19:38:26.245Z",
+      "summary": "1) Bump the package to 1.4.1 (package.json, package-lock.json, src/version.js, and the two tests that pin it); domain versions unchanged (Agent Contract v11, Skill Registry v9). 2) CHANGELOG: [Unreleased] becomes [1.4.1] - 2026-11-08 — Project Setup and Run, add the PF-0077 fix, new empty Unreleased. 3) Release checklist on the branch: npm ci && npm run check, doctor, npm audit, npm pack plus a secret scan, a packed smoke test, a network scan, git diff --check. 4) Commit 'release: v1.4.1', fast-forward main, push main (Pages deploys the site), annotated tag v1.4.1, push the tag, gh release create from the CHANGELOG section. 5) Watch the Release and Pages workflows; confirm npm view yallaflow version = 1.4.1 and the live site (EN + /ar/)."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-08T19:38:49.516Z",
+      "completedAt": "2026-11-08T19:38:49.516Z",
+      "summary": "Version bumped to 1.4.1 in package.json, package-lock.json (root + packages['']), src/version.js, test/cli.test.js and test/pilot-hardening.test.js; domain versions unchanged. CHANGELOG: [1.4.1] - 2026-11-08 — Project Setup and Run (with the PF-0076 README and PF-0077 fix entries), new empty [Unreleased].",
+      "evidence": [
+        "package.json",
+        "src/version.js",
+        "CHANGELOG.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-08T19:44:55.867Z",
+      "completedAt": "2026-11-08T19:44:55.867Z",
+      "summary": "Release checklist on a clean clone of a09ad41: npm ci && npm run check 1023/1023 (V-002). doctor healthy. npm audit shows only the known, mitigated file-type advisory (2 moderate entries, docs/releasing.md). git diff --check clean. npm pack 1.4.1: 282 files, 1.0 MB, no images, records, research or tests; secret scan clean. Outbound network code only in src/intake/providers; no provider or telemetry code. Packed smoke test in an isolated prefix: --version 1.4.1, greenfield init plus bootstraps, brownfield gate refused with nothing created, runtime analyze (V-004). V-001 and V-003 failed only because of the read-only node_modules in the dev checkout and a pipefail bug in the smoke script, both explained.",
+      "evidence": [
+        "verification:V-002",
+        "verification:V-004"
+      ]
+    },
+    "code-review": {
+      "status": "completed",
+      "startedAt": "2026-11-08T19:45:14.127Z",
+      "completedAt": "2026-11-08T19:45:14.127Z",
+      "summary": "Reviewed the release commit: package.json, package-lock.json (root and packages['']) and src/version.js move 1.4.0 → 1.4.1 only; the version-pinning tests were updated to match; the compatibility constants (minimumVersion 1.4.0 for work lifecycle) are deliberately unchanged; domain versions (Agent Contract v11, Skill Registry v9) unchanged as no behavior shape changed. The diff since v1.4.0 (23 source/resource files) was delivered and verified under PF-0069 to PF-0077. The CHANGELOG 1.4.1 section covers PF-0069/72/73/74/75/76/77; the missing website entry (PF-0075) was added during review. Release checklist evidence: V-002, V-004.",
+      "evidence": [
+        "CHANGELOG.md",
+        "package.json",
+        "src/version.js",
+        "verification:V-004"
+      ]
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Release 1.4.1 approved by the developer in the agent session ('تمام اعتمد واعمل release'): merge release-1.4.1-prep to main, tag, GitHub Release, npm publish through the release workflow, and the website deploy that follows the main push",
+      "reason": "The developer reviewed the branch on GitHub after the README intro work and explicitly approved and asked for the release",
+      "costIfWrong": "A public npm version and website update; npm versions cannot be republished, so a mistake needs a 1.4.2",
+      "createdAt": "2026-11-08T19:38:18.050Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-08T19:45:14.127Z"
+}

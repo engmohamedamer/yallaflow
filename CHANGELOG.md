@@ -6,8 +6,16 @@ All notable changes to YallaFlow are documented here. The format loosely follows
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [1.4.1] - 2026-11-08 — Project Setup and Run
+
+Set the project up once, then run it from one page. The agent works out how an existing project really runs, you review and trust each service once, then press **Start project**. Plus a visual tour, a README that shows the console, and an Arabic website.
+
 ### Added
+- **A README intro that shows YallaFlow at work** (PF-0076): a logo, a problem-then-solution opening, an animated hero built from real screens, and clear Install and tour links. The npm, license and node badges now come from badgen.net, because shields' npm badges timed out through GitHub's image proxy.
 - **A visual tour of the console in English and Arabic** (PF-0074): [`docs/tour.md`](docs/tour.md) and [`docs/tour.ar.md`](docs/tour.ar.md). Twelve real screens go from the New project wizard and a simple request (Create work → Done) to Setup and Run. They are captured from a disposable demo project by [`research/docs-tour/capture.mjs`](research/docs-tour/capture.mjs). The README now opens with the console, a visual Install, and a visual Upgrade.
+- **The website in Arabic** (PF-0075): [engmohamedamer.github.io/yallaflow/ar/](https://engmohamedamer.github.io/yallaflow/ar/), right to left, with a language switch. Both pages show the console with real screens, what's new in 1.4.1, and Install and Upgrade steps.
 - **Project setup on the console's Setup page** (PF-0069). Three sections:
   - **Stack:** a scan of repository evidence, never `.env`. **Rescan** says what changed since the last scan.
   - **Run:**
@@ -43,6 +51,9 @@ All notable changes to YallaFlow are documented here. The format loosely follows
 - **Runtime trust also covers the Dockerfiles of Compose build contexts, and fails closed** (PF-0072). A Compose file the reader cannot read with certainty blocks trust and start until it is resolved. Examples: anchors, merge keys, flow mappings, `include`/`extends`, or a build folder an `.env` could change. If the trusted configuration changes while a service starts, YallaFlow stops only the process it has just started; a shared service is left running and reported. Status says what changed (fields, or which files).
 - **The Claude Code launch command starts with a first prompt** (`Run yallaflow brief…`). Claude Code's `SessionStart` hook carries no permission mode, so the console used to wait until you typed something. The mode is now reported at once.
 - **The chat's agent picker** links to Setup → Agents when an agent is off or not ready for the project.
+
+### Fixed
+- **The Setup result message follows the current language** (PF-0077). Before, the message from Save, Start project and Stop project stayed in the language that was active when you pressed the button, so after switching between Arabic and English it was left untranslated.
 
 ## [1.4.0] - 2026-11-08 — Engineering workspace
 

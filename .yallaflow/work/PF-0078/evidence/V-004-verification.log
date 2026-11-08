@@ -1,0 +1,23 @@
+== doctor
+
+Workspace healthy.
+245 warning(s) — informational only, does not affect workspace health.
+== npm audit
+2 moderate severity vulnerabilities
+known, mitigated file-type advisory only (docs/releasing.md)
+== git diff --check
+no whitespace errors
+== pack
+files: 282
+file set ok (no images, records, research, tests)
+secret scan clean
+== network scan
+outbound network code only in src/intake/providers (console is a loopback server)
+no model-provider or telemetry code
+== smoke (isolated prefix)
+1.4.1
+Workspace healthy.
+greenfield init + Claude/Codex bootstraps ok
+brownfield first-request gate ok (refused, nothing created)
+runtime analyze ok
+checklist passed

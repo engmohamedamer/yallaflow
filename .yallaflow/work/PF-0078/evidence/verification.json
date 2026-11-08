@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "npm ci --no-audit --no-fund >/dev/null && npm run check",
+      "executionMode": "shell",
+      "executable": "npm ci --no-audit --no-fund >/dev/null && npm run check",
+      "args": [],
+      "displayCommand": "npm ci --no-audit --no-fund >/dev/null && npm run check",
+      "success": false,
+      "status": "failed",
+      "exitCode": 243,
+      "startedAt": "2026-11-08T19:38:49.891Z",
+      "finishedAt": "2026-11-08T19:38:50.422Z",
+      "verifiedAt": "2026-11-08T19:38:50.422Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "cd /tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/rc && npm ci --no-audit --no-fund && npm run check",
+      "executionMode": "shell",
+      "executable": "cd /tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/rc && npm ci --no-audit --no-fund && npm run check",
+      "args": [],
+      "displayCommand": "cd /tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/rc && npm ci --no-audit --no-fund && npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-08T19:39:26.209Z",
+      "finishedAt": "2026-11-08T19:43:09.874Z",
+      "verifiedAt": "2026-11-08T19:43:09.874Z",
+      "log": "V-002-verification.log"
+    },
+    {
+      "id": "V-003",
+      "command": "bash /tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/rcsmoke/checklist.sh /tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/rc /tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/rcsmoke",
+      "executionMode": "argv",
+      "executable": "bash",
+      "args": [
+        "/tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/rcsmoke/checklist.sh",
+        "/tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/rc",
+        "/tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/rcsmoke"
+      ],
+      "displayCommand": "bash /tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/rcsmoke/checklist.sh /tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/rc /tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/rcsmoke",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-08T19:43:29.337Z",
+      "finishedAt": "2026-11-08T19:43:43.750Z",
+      "verifiedAt": "2026-11-08T19:43:43.750Z",
+      "log": "V-003-verification.log"
+    },
+    {
+      "id": "V-004",
+      "command": "bash /tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/rcsmoke/checklist.sh /tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/rc /tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/rcsmoke",
+      "executionMode": "argv",
+      "executable": "bash",
+      "args": [
+        "/tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/rcsmoke/checklist.sh",
+        "/tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/rc",
+        "/tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/rcsmoke"
+      ],
+      "displayCommand": "bash /tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/rcsmoke/checklist.sh /tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/rc /tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/rcsmoke",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-08T19:44:34.285Z",
+      "finishedAt": "2026-11-08T19:44:43.944Z",
+      "verifiedAt": "2026-11-08T19:44:43.944Z",
+      "log": "V-004-verification.log"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "testing",
+      "summary": "The packed-candidate smoke test did not clone a Shared Project",
+      "reason": "The full suite (1023 tests, clean clone) covers Shared Projects; the isolated smoke covered version, Greenfield init with the Claude/Codex bootstraps, the Brownfield gate, doctor and runtime analyze",
+      "recordedAt": "2026-11-08T19:44:55.691Z"
+    }
+  ],
+  "updatedAt": "2026-11-08T19:44:55.691Z"
+}
