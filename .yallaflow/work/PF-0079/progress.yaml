@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-08T19:49:56.621Z",
+      "completedAt": "2026-11-08T19:49:56.621Z",
+      "summary": "Real figures from the repository on main at v1.4.1 (2026-11-08): first commit 2026-09-19; 67 commits; 7 public releases (v1.0.0 2026-10-13, v1.0.1 10-15, v1.1.0 10-20, v1.2.0 11-07, v1.3.0 11-07, v1.4.0 11-08, v1.4.1 11-08) after 13 internal prereleases; 78 work items in .yallaflow/work; 348 verification logs; npm run check 1,023 tests in 103 files; 204 source files, ~30,700 lines; 4 runtime dependencies; 16 skills; 77 current project facts; 36 docs; 51 preserved sources. The site is generated as EN (site/index.html) plus AR via research/site/make-ar.py, so new English strings need Arabic pairs there. Pages deploys only on a main push.",
+      "evidence": [
+        "site/index.html",
+        "research/site/make-ar.py",
+        "package.json",
+        "runtime:git rev-list --count, git for-each-ref tags, ls .yallaflow/work, find V-*-verification.log, npm run check 1023 tests"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-08T19:49:56.942Z",
+      "completedAt": "2026-11-08T19:49:56.942Z",
+      "summary": "Developer asked to put their LinkedIn (https://www.linkedin.com/in/mohamedamer2050/) on the site, and to make the site more professional so it shows the size of the work and the effort done together. Only verifiable figures; maker name as in git (Mohamed Amer); built together with AI coding agents, which is factual (Claude is a repository contributor).",
+      "evidence": [
+        "user:ما تحط راط linkedin بتاعى فى الموقع https://www.linkedin.com/in/mohamedamer2050/ وكمان الموقه محتاج يقى احترافى اكتر يوضح حجم الشغل والمجهود اللى عملناه مع بعض"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-08T19:49:57.596Z",
+      "completedAt": "2026-11-08T19:49:57.596Z",
+      "summary": "Add (EN, then AR pairs in make-ar.py): a 'By the numbers' band after the hero (7 releases, 78 work items, 348 verification runs, 1,023 tests, 4 dependencies, 7 weeks); a 'Built with YallaFlow' section with a release timeline (v1.0.0 → v1.4.1 with dates and one-line themes) and the dogfooding explanation; a maker section (Mohamed Amer, LinkedIn and GitHub buttons, built together with Claude Code and Codex); LinkedIn in the header and footer. Polish: section spacing and stat-tile design. Preview locally (EN/AR, desktop/mobile, light/dark), push to a branch, and deploy to main only after the developer approves."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-08T19:52:11.315Z",
+      "completedAt": "2026-11-08T19:52:11.315Z",
+      "summary": "site/index.html: LinkedIn icon in the header, a stats band after the hero (7 releases, 78 work items, 348 verification runs, 1,023 tests, 30k lines, 4 dependencies, with the counting basis), a #built section ('YallaFlow is built with YallaFlow', proof list, link to .yallaflow/work, a release timeline 1.0.0 → 1.4.1 with CHANGELOG dates), a #maker section (Mohamed Amer, the built-together-with-agents line, LinkedIn and GitHub buttons), and a footer credit. site/site.css: styles for these. research/site/make-ar.py: Arabic pairs; site/ar/index.html regenerated.",
+      "evidence": [
+        "site/index.html",
+        "site/ar/index.html",
+        "site/site.css",
+        "research/site/make-ar.py"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-08T19:52:19.220Z",
+      "completedAt": "2026-11-08T19:52:19.220Z",
+      "summary": "V-001: sitemap valid; site/ar/index.html exactly matches the generator output and is RTL; all local links, anchors and linked repo files resolve. LinkedIn appears 3 times per page (header icon, maker button, footer). A local static preview in headless Chromium showed EN and AR at 1366px dark and light and at 390px: 0px overflow, 0 broken images, no errors or 4xx. The stats band, built section and maker section were reviewed visually in EN dark and AR light. Every figure is taken from the repository at v1.4.1 (see context discovery).",
+      "evidence": [
+        "verification:V-001",
+        "runtime:headless Chromium on the local preview: overflow 0, broken 0, errors none for en/ar desktop-dark, desktop-light and mobile"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-08T19:52:19.220Z"
+}

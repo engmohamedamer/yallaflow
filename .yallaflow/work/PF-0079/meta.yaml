@@ -1,0 +1,45 @@
+{
+  "id": "PF-0079",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Website: a more professional page that shows the scale of the work — real numbers from the repository (releases, work items, verification runs, tests, code, dependencies), the release timeline, 'built with YallaFlow' dogfooding, and a maker section with the owner's LinkedIn (https://www.linkedin.com/in/mohamedamer2050/), in English and Arabic",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-08T19:49:56.226Z",
+  "updatedAt": "2026-11-08T19:52:19.546Z",
+  "title": "Website: a more professional page that shows the scale of the work — real numbers from the repository (releases, work items, verification runs, tests, code, dependencies), the release timeline, 'built with YallaFlow' dogfooding, and a maker section with the owner's LinkedIn (https://www.linkedin.com/in/mohamedamer2050/), in English and Arabic",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-08T19:49:56.264Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-08T19:52:19.546Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}
