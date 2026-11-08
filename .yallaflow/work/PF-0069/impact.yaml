@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "impacts": [
+    {
+      "id": "IM-001",
+      "status": "assessed",
+      "raisedAt": "2026-11-08T00:28:30.216Z",
+      "stageAtRaise": "SPECIFICATION",
+      "triggers": [
+        {
+          "type": "requirements",
+          "changes": [
+            {
+              "id": "REQ-006",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "REQ-007",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-007",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-008",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-009",
+              "action": "added",
+              "to": "active"
+            }
+          ],
+          "at": "2026-11-08T00:28:30.216Z"
+        }
+      ],
+      "assessment": {
+        "assessedAt": "2026-11-08T00:28:41.683Z",
+        "stages": {
+          "context-discovery": {
+            "verdict": "affected",
+            "reason": "The stack scan and Start/Open project need discovery of the Overview detection and the runtime manager (profile fields, dependsOn, trust, readiness)."
+          },
+          "requirement-clarification": {
+            "verdict": "affected",
+            "reason": "Owner feedback added REQ-006/REQ-007 and AC-007..AC-009."
+          },
+          "design-exploration": {
+            "verdict": "affected",
+            "reason": "Setup becomes Stack, Run and Agents; start-all/stop-all and Open links are new design."
+          },
+          "specification": {
+            "verdict": "affected",
+            "reason": "The specification was revised for the new scope and must be reviewed again."
+          }
+        },
+        "applied": {
+          "revised": [
+            "context-discovery",
+            "requirement-clarification",
+            "design-exploration",
+            "specification"
+          ],
+          "stage": {
+            "from": "SPECIFICATION",
+            "to": "DISCOVERY"
+          },
+          "convergenceInvalidated": false
+        }
+      }
+    },
+    {
+      "id": "IM-002",
+      "status": "assessed",
+      "raisedAt": "2026-11-08T00:32:44.519Z",
+      "stageAtRaise": "IMPLEMENTATION",
+      "triggers": [
+        {
+          "type": "requirements",
+          "changes": [
+            {
+              "id": "REQ-008",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-010",
+              "action": "added",
+              "to": "active"
+            }
+          ],
+          "at": "2026-11-08T00:32:44.519Z"
+        }
+      ],
+      "assessment": {
+        "assessedAt": "2026-11-08T00:33:11.677Z",
+        "stages": {
+          "context-discovery": {
+            "verdict": "affected",
+            "reason": "The Add-an-existing-project flow (folder dialog → POST /api/projects {root} → registerRoot, requires an existing .yallaflow → Overview) had to be discovered."
+          },
+          "requirement-clarification": {
+            "verdict": "affected",
+            "reason": "Owner added REQ-008/AC-010 (first-time guided setup that saves the scan and setup state)."
+          },
+          "design-exploration": {
+            "verdict": "affected",
+            "reason": "A first-time setup mode on Setup and a local setup.json record are new design."
+          },
+          "specification": {
+            "verdict": "affected",
+            "reason": "The specification gains the first-time setup and must be approved again."
+          },
+          "implementation-planning": {
+            "verdict": "affected",
+            "reason": "The plan gains the first-time setup step and setup.json."
+          }
+        },
+        "applied": {
+          "revised": [
+            "context-discovery",
+            "requirement-clarification",
+            "design-exploration",
+            "specification",
+            "implementation-planning"
+          ],
+          "stage": {
+            "from": "IMPLEMENTATION",
+            "to": "DISCOVERY"
+          },
+          "convergenceInvalidated": false
+        }
+      }
+    }
+  ],
+  "updatedAt": "2026-11-08T00:33:11.677Z"
+}

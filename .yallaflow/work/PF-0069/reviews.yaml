@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "gates": {
+    "specification": {
+      "status": "approved",
+      "respondedAt": "2026-11-08T00:30:23.496Z",
+      "note": "Approved by the owner in the agent session (2026-11-08): selected 'Approve the spec' for the revised PF-0069 specification (Stack, Run with Start/Stop project and Open, Agents).",
+      "history": [
+        {
+          "status": "changes_requested",
+          "at": "2026-11-08T00:28:03.633Z",
+          "note": "Owner (2026-11-08, agent session) requested changes: 'Add extra feature to scan the project stack and the ability to start the project and open the apps'."
+        },
+        {
+          "status": "approved",
+          "at": "2026-11-08T00:30:23.496Z",
+          "note": "Approved by the owner in the agent session (2026-11-08): selected 'Approve the spec' for the revised PF-0069 specification (Stack, Run with Start/Stop project and Open, Agents)."
+        }
+      ]
+    },
+    "plan": {
+      "status": "approved",
+      "respondedAt": "2026-11-08T00:31:06.412Z",
+      "note": "Approved by the owner in the agent session (2026-11-08): selected 'Approve the plan' for PF-0069, answered separately from the specification.",
+      "history": [
+        {
+          "status": "approved",
+          "at": "2026-11-08T00:31:06.412Z",
+          "note": "Approved by the owner in the agent session (2026-11-08): selected 'Approve the plan' for PF-0069, answered separately from the specification."
+        }
+      ]
+    }
+  },
+  "updatedAt": "2026-11-08T00:31:06.412Z"
+}

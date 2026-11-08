@@ -573,23 +573,6 @@ print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_commo
   - src/runtime/supervisor.js (repository @ 24c8adc)
   - docs/runtime.md (repository @ 24c8adc)
 
-<!-- yallaflow-fact:CTX-0114 -->
-### CTX-0114 — Runtime trust includes hashes of package/composer script definitions, directly invoked local shell scripts and selected Compose files; the reviewed hash is rechecked inside the service lock before spawn and stored without post-spawn input reads. Unsafe inputs revoke trust but do not prevent stopping an owned process. Application code such as node server.js and indirect dependencies remain outside the fingerprint.
-
-- **State:** current
-- **Confidence:** confirmed
-- **Provenance:** repository
-- **Source work:** PF-0053
-- **Knowledge ID:** K-001
-- **Promoted at:** 2026-11-07T15:45:40.420Z
-- **Verified:** 2026-11-07T15:45:40.420Z (commit 2f86ec7)
-- **Evidence:**
-  - src/runtime/inputs.js (repository @ 2f86ec7)
-  - src/runtime/trust.js (repository @ 2f86ec7)
-  - src/runtime/supervisor.js (repository @ 2f86ec7)
-  - docs/runtime.md (repository @ 2f86ec7)
-  - test/runtime.test.js (repository @ 2f86ec7)
-
 <!-- yallaflow-fact:CTX-0116 -->
 ### CTX-0116 — Web console (v1.2.0, extended in 1.4.0): 'yallaflow console' is a local web UI inside the yallaflow package (no daemon, no new dependency, no build step). src/console/server.js (node:http on 127.0.0.1; per-run Bearer token; Host 421, Origin 403; GET/HEAD for reads; UI from a fixed file map; sources served by ID only, previews sandboxed) reads by spawning this package's CLI (snapshot/work show/overview/runtime status --json) and refreshes on a debounced .yallaflow watcher with polling fallback. POST is accepted only on WRITE_ROUTE: Create Work and its attach route, work-item actions and gate decisions, runtime trust/start/stop/restart and adding a service, the New Project Wizard (plan, create with the full plan hash, planned files), project registration, enabling agents for the run, and Git init; each needs the console Origin and exact content type, and '--read-only' refuses every POST. The project list can grow at runtime (registration serialized and deduplicated), and the console starts with no saved project unless read-only. GET /api/fs/dirs is the only filesystem listing: directories inside the real home folder, no hidden folders, no files, not in read-only.
 
@@ -627,25 +610,6 @@ print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_commo
   - src/console/registry.js (repository @ 9437b4c)
   - npm run check (passed) (runtime, PF-0057 V-004)
 
-<!-- yallaflow-fact:CTX-0121 -->
-### CTX-0121 — From 1.4.0 the experimental Claude Code connection ships in the package (package.json no longer excludes the five Claude files) but stays off by default: it turns on for one console run only with 'yallaflow console --agents --experimental-claude' or the separate, unchecked 'Also allow Claude Code (experimental)' choice when enabling agents in the console, never in --read-only; a build without the files still refuses with CLAUDE_NOT_INCLUDED. The developer starts Claude Code with the launch command the console shows (development-channel flag); the channel and hook send the bridge token only after the console proves it (HMAC over a nonce at /api/agent-bridge/claude/hello, live pid). Messages are refused until a hook reports Claude Code's permission mode, and bypassPermissions is never served. Codex remains the managed provider; subscription logins only, no API keys.
-
-- **State:** current
-- **Confidence:** confirmed
-- **Provenance:** repository
-- **Source work:** PF-0060
-- **Knowledge ID:** K-001
-- **Promoted at:** 2026-11-07T21:50:50.090Z
-- **Supersedes:** CTX-0115
-- **Verified:** 2026-11-07T21:50:50.090Z (commit ad9fe0d)
-- **Evidence:**
-  - package.json (repository @ ad9fe0d)
-  - src/console/server.js (repository @ ad9fe0d)
-  - src/agents/bridge.js (repository @ ad9fe0d)
-  - resources/agents/claude-channel.mjs (repository @ ad9fe0d)
-  - docs/agents-claude-experimental.md (repository @ ad9fe0d)
-  - npm run check (passed) (runtime, PF-0060 V-006)
-
 <!-- yallaflow-fact:CTX-0123 -->
 ### CTX-0123 — Agent session records (.yallaflow/local/agent-sessions/<id>.json, git-ignored) keep lastStop {reason: usage_limit|error|crashed|ended|disconnected|unlinked, detail, retryAt, at}; the bridge emits session.stopped after saving it and returns the records as status().history. A Codex usage limit arrives as reply text followed by a generic error, so the bridge reads the turn's recent reply text with the error. The console offers to continue a stopped work item with another ready agent: the old session is ended or unlinked first, nothing switches automatically, and the 'Continue <id>' message is prepared, never sent for the developer.
 
@@ -676,5 +640,73 @@ print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_commo
   - resources/console/app.js (repository @ 9cfe4b5)
   - test/console-project-chat.test.js (repository @ 9cfe4b5)
   - npm run check (passed) (runtime, PF-0067 V-001)
+
+<!-- yallaflow-fact:CTX-0125 -->
+### CTX-0125 — The experimental Claude Code connection ships in the package but is off by default. It is turned on per project from the console's Setup page: the choice (agents, and Claude Code) is saved in .yallaflow/local/agents.json (git-ignored, owner-only 0600, ignored when tracked by Git or readable by others) and applied whenever the console opens, with no flags and no restart; 'yallaflow console --agents --experimental-claude' still turns it on for one run, and --read-only ignores the saved choice. The developer starts Claude Code with the launch command Setup shows; it opens with a short first prompt (run yallaflow brief) because SessionStart hooks carry no permission mode, so the mode is reported at once. The channel and hook send the bridge token only after the console proves it (HMAC over a nonce at /api/agent-bridge/claude/hello, live pid); messages are refused until a hook reports the mode, and bypassPermissions is never served. Codex remains the managed provider; subscription logins only, no API keys.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0069
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-08T13:32:37.776Z
+- **Supersedes:** CTX-0121
+- **Verified:** 2026-11-08T13:32:37.776Z (commit a8236e9)
+- **Evidence:**
+  - src/agents/settings.js (repository @ a8236e9)
+  - src/agents/claude-files.js (repository @ a8236e9)
+  - src/console/server.js (repository @ a8236e9)
+  - npm test (passed) (runtime, PF-0069 V-004)
+  - portal session 2026-11-08: saved choice applied after a restart with no flags; mode known without typing (runtime)
+
+<!-- yallaflow-fact:CTX-0126 -->
+### CTX-0126 — Runtime trust is bound to the effective configuration: the material definition fields plus hashes of package/composer script definitions, directly invoked local shell scripts, the Compose files a service loads (named -f files in any spelling, else the default file and its override) and the Dockerfiles of the build contexts they declare; .env and --env-file files are bound by file metadata only (content never read) and COMPOSE_/DOCKER_ settings passed by name by a digest of their value. Compose files are read by a conservative in-house reader (src/runtime/compose.js) that fails closed: anchors, aliases, merge keys, tags, flow mappings, several documents, include/extends, escaped or unknown keys, env-dependent or remote builds block trust and start until resolved. The reviewed hash is rechecked inside the service lock before spawn and again after the settle window; if it changed, only the process group YallaFlow just started and positively owns is stopped, and a shared service is left running. Trust and plan save come only from a person: a terminal for the CLI, or the console, which runs them in-process (no environment flag stands in for a person). Application code and indirect dependencies remain outside the fingerprint.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0072
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-08T15:49:07.740Z
+- **Supersedes:** CTX-0114
+- **Verified:** 2026-11-08T15:49:07.740Z (commit a8236e9)
+- **Evidence:**
+  - src/runtime/inputs.js (repository @ a8236e9)
+  - src/runtime/compose.js (repository @ a8236e9)
+  - src/runtime/trust.js (repository @ a8236e9)
+  - src/runtime/supervisor.js (repository @ a8236e9)
+  - npm test (passed) (runtime, PF-0072 V-002)
+
+<!-- yallaflow-fact:CTX-0127 -->
+### CTX-0127 — Analyze Project (yallaflow runtime analyze, console Setup → Run the project): a read-only workspace discovery (src/runtime/discover.js) of the repository and up to 3 parent folders inside the home folder finds Compose stacks that mount or build the project, reads the web-server vhost folders they mount to learn *.localhost links, observes docker ps and listening ports (src/runtime/observe.js), and stores a plan in the git-ignored .yallaflow/local/runtime-plan.json with confidence, evidence and coverage; what is out of scope or unreadable is unresolved, never absent. An agent can only propose a plan (runtime plan propose --file, validated by src/runtime/plan.js). Save writes untrusted definitions; Trust and Start are separate steps. A working folder outside the repository is allowed only for personal services in .yallaflow/local/runtime.yaml, inside home. Shared infrastructure (databases, a stack defined outside the project, mounts or vhosts serving other folders, outside dependants) is re-derived from evidence at every stop or restart decision (a stored marker only adds protection); Stop project never stops it, and stopping it needs --confirm-shared or a typed confirmation. A Compose stack already running outside YallaFlow is never started, attached to or stopped.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0072
+- **Knowledge ID:** K-002
+- **Promoted at:** 2026-11-08T15:49:08.190Z
+- **Verified:** 2026-11-08T15:49:08.190Z (commit a8236e9)
+- **Evidence:**
+  - src/runtime/discover.js (repository @ a8236e9)
+  - src/runtime/plan.js (repository @ a8236e9)
+  - src/runtime/supervisor.js (repository @ a8236e9)
+  - docs/runtime.md (repository @ a8236e9)
+  - npm test (passed) (runtime, PF-0072 V-002)
+
+<!-- yallaflow-fact:CTX-0128 -->
+### CTX-0128 — The console Setup page (viewSetup in resources/console/app.js) has two layouts. Before any service is saved it is a guided flow: 1) find how the project runs, with Ask the agent first and recommended (the agent runs yallaflow runtime analyze itself and proposes the plan, which arrives preselected while the page polls for it) and the quick scan as the fallback; 2) choose and save; 3) review, trust, then start. Once services exist, the Run control is the head of the page (overall state, Start/Stop project, Open links, one compact row per service with Review and trust or Start/Restart/Stop and Logs), and plan, suggestions, add form, stack and agents fold into a Configuration disclosure. Disclosure state survives the 3-second redraw through data-sx keys. Save, trust (typed id bound to the reviewed definitionHash) and start remain human actions.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0073
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-08T16:25:58.149Z
+- **Verified:** 2026-11-08T16:25:58.149Z (commit a8236e9)
+- **Evidence:**
+  - resources/console/app.js (repository @ a8236e9)
+  - resources/console/app.css (repository @ a8236e9)
+  - npm test (passed) (runtime, PF-0073 V-002)
 
 <!-- yallaflow-context:end -->

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0051",
+  "sourceType": "file",
+  "sourceName": "pf0072-owner-spec-feedback.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-11-08T13:54:48.818Z",
+  "original": {
+    "path": "sources/SRC-0051/pf0072-owner-spec-feedback.md",
+    "sha256": "c5aec6d131320740135bbf6cf05e9e4ab63fedb81dee85d9acd6a1e5895463da",
+    "sizeBytes": 1619
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0072"
+  ],
+  "rawText": "# Owner feedback on the PF-0072 specification (2026-11-08, agent session)\n\nPF-0072 looks aligned with my goal: YallaFlow should understand how an existing project actually runs and help configure it from the Web Console.\n\nI agree with the proposed architecture, but request three clarifications in the specification before final approval.\n\n1. Separate Review/Save, Trust, and Start. Saving a discovered runtime plan must never implicitly authorize execution. Require explicit trust for the effective commands before starting services.\n\n2. Protect shared infrastructure. Detect and clearly display shared dependencies such as MySQL and shared Docker Compose services. Never automatically stop or restart a service that may be used by another project. Show the affected service scope and require explicit confirmation when necessary.\n\n3. Bind runtime trust to the effective configuration, including relevant Compose files and referenced project scripts where feasible. Material changes must invalidate previous trust. Avoid trusting a command name alone.\n\nAlso ensure scan limitations are visible: services, vhosts or dependencies outside the allowed discovery scope should remain unresolved rather than being reported as absent.\n\nPreserve read-only discovery, explicit agent proposals, evidence and confidence levels, personal configuration for external paths, and the existing process-ownership protections.\n\nPlease revise PF-0072's specification, then present the updated specification gate for approval. Do not begin implementation before that approval.\n\nKeep all changes local. No push, tag, release or npm publish.\n"
+}

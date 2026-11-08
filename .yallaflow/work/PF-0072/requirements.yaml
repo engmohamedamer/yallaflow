@@ -1,0 +1,484 @@
+{
+  "schemaVersion": 1,
+  "revision": 2,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "Analyze Project runs a safe, read-only discovery of the repository and the relevant parent workspace configuration (compose files that mount or build the project, the vhosts that serve it, services, dependencies, ports, domains) plus a read-only observation of what is running, and drafts a runtime plan with evidence, confidence and visible scan coverage; anything outside the discovery scope stays unresolved, never reported as absent; it never runs a discovered command and never reads secrets.",
+      "provenance": [
+        {
+          "type": "request"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0050"
+        },
+        {
+          "type": "question",
+          "question": "Q-001"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0051"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T13:49:24.227Z",
+      "updatedAt": "2026-11-08T13:56:01.622Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "The selected agent can analyze the full development setup and propose a revised runtime plan through a validated YallaFlow command; it can only propose, never save, trust or start.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0050"
+        },
+        {
+          "type": "question",
+          "question": "Q-001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T13:49:24.227Z",
+      "updatedAt": "2026-11-08T13:49:24.227Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "Review Runtime Setup presents the plan (services in start order with command, folder, ports, dependencies, links, evidence, confidence, conflicts and shared scope); Save, Trust and Start are separate explicit steps: saving writes untrusted definitions and never authorizes execution, and only services the developer explicitly trusted, after seeing their effective configuration, can start.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0050"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0051"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T13:49:24.227Z",
+      "updatedAt": "2026-11-08T13:56:01.622Z"
+    },
+    {
+      "id": "REQ-004",
+      "statement": "A service may run from a folder outside the repository only when defined in the personal .yallaflow/local/runtime.yaml, inside the developer's home folder.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T13:49:24.227Z",
+      "updatedAt": "2026-11-08T13:49:24.227Z"
+    },
+    {
+      "id": "REQ-005",
+      "statement": "Start Project starts the trusted services in order, never starts, attaches to or stops a service running outside YallaFlow, reports busy ports with their owner, and Open goes to the project's real app links.",
+      "provenance": [
+        {
+          "type": "request"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0050"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T13:49:24.227Z",
+      "updatedAt": "2026-11-08T13:49:24.227Z"
+    },
+    {
+      "id": "REQ-006",
+      "statement": "Shared infrastructure (databases such as MySQL, compose services or stacks that serve other projects) is detected and shown with its scope; it is never stopped or restarted automatically, and stopping or restarting it needs an explicit confirmation that lists who else may be affected.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0051"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T13:56:01.622Z",
+      "updatedAt": "2026-11-08T13:56:01.622Z"
+    },
+    {
+      "id": "REQ-007",
+      "statement": "Runtime trust is bound to the effective configuration: the material fields plus the content of the compose files, build Dockerfiles and project scripts the command uses (also for outside-repository services, within the home folder); any material change ends the trust, and inputs not covered are shown.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0051"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T13:56:01.622Z",
+      "updatedAt": "2026-11-08T13:56:01.622Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "For ~/YaSchools/portal-like fixtures, Analyze finds the parent compose file that bind-mounts the project, its services (ports, depends_on/links, container names) and the vhosts whose document root maps inside the project with their host names, and saves .yallaflow/local/runtime-plan.json (git-ignored, 0600) with a confidence and evidence per item; it reads no .env, keeps compose environment names only, stays within home and at most 3 levels up, and runs no discovered command. The plan's coverage lists the scanned folders and what was not scanned and why; a referenced compose file, vhost folder or dependency outside the scope (or too large, unreadable, past the file limit, or behind an escaping link) is recorded as unresolved with that reason, and an empty result reads as nothing found within the scanned folders.",
+      "provenance": [
+        {
+          "type": "request"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0050"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0051"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T13:49:24.227Z",
+      "updatedAt": "2026-11-08T13:56:01.622Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "The analysis reports running containers and listening ports read-only (docker ps, OS socket list) as transient observations; without Docker it says so and continues.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0050"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T13:49:24.227Z",
+      "updatedAt": "2026-11-08T13:49:24.227Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-002",
+      "statement": "With agents on for the project, Ask the agent prepares (does not send) a project-chat message carrying the draft plan and the read-only, no-secrets, propose-by-command contract.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0050"
+        },
+        {
+          "type": "question",
+          "question": "Q-001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T13:49:24.227Z",
+      "updatedAt": "2026-11-08T13:49:24.227Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-002",
+      "statement": "yallaflow runtime plan propose --file stores a valid agent plan beside the scan plan and refuses, listing every problem, a plan with environment values, secret-looking strings, shell strings, a cwd outside home or escaping through a symbolic link, links other than loopback or *.localhost, or unresolved ids; it never writes runtime.yaml or trust.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0050"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T13:49:24.227Z",
+      "updatedAt": "2026-11-08T13:49:24.227Z"
+    },
+    {
+      "id": "AC-005",
+      "requirement": "REQ-003",
+      "statement": "Setup's Run section shows Analyze, Review and save, Trust, Start; Review lists each plan service with the exact command, folder, ports, depends on, links, confidence, evidence, source, conflicts and shared scope, plus unresolved items and coverage; Save selected writes only ticked services as untrusted definitions (an existing id changes only after confirmation) and trusts nothing; Start refuses a saved but untrusted service.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0050"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0051"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T13:49:24.227Z",
+      "updatedAt": "2026-11-08T13:56:01.622Z"
+    },
+    {
+      "id": "AC-006",
+      "requirement": "REQ-004",
+      "statement": "A personal service with an absolute cwd inside home starts from that folder; the same in the shared runtime.yaml, a cwd outside home, or a symbolic link escaping home is refused; outside-repository services from a plan are saved only to the personal file.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T13:49:24.227Z",
+      "updatedAt": "2026-11-08T13:49:24.227Z"
+    },
+    {
+      "id": "AC-007",
+      "requirement": "REQ-005",
+      "statement": "Start Project marks a compose service whose project already has running containers as running outside YallaFlow, does not start it, treats it as ready for dependants, and Stop never touches it; a declared port held by something else is reported with its owner and that service and its dependants are skipped; nothing is killed.",
+      "provenance": [
+        {
+          "type": "request"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0050"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T13:49:24.227Z",
+      "updatedAt": "2026-11-08T13:49:24.227Z"
+    },
+    {
+      "id": "AC-008",
+      "requirement": "REQ-005",
+      "statement": "Running services (YallaFlow's or outside) show their plan links (loopback or *.localhost only) in a new tab; nothing opens automatically; read-only consoles can view the plan but not analyze, propose, save, start or stop.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0050"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T13:49:24.227Z",
+      "updatedAt": "2026-11-08T13:49:24.227Z"
+    },
+    {
+      "id": "AC-009",
+      "requirement": "REQ-003",
+      "statement": "Trust is a separate per-service action that shows the effective configuration (command, resolved folder, env names, ports, readiness, stop behaviour, dependencies) and the inputs covered and not covered, and records the hash of exactly what was shown; if it changed in between nothing is trusted; trusting several at once lists every one.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0051"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T13:56:01.622Z",
+      "updatedAt": "2026-11-08T13:56:01.622Z"
+    },
+    {
+      "id": "AC-010",
+      "requirement": "REQ-006",
+      "statement": "A database image (MySQL/MariaDB/PostgreSQL, Redis and similar) or a compose service whose file is outside the project, whose mounts or vhosts serve other folders, or on which outside services depend is marked Shared with its scope (and 'may serve others outside the scanned scope' when coverage is partial); Stop Project leaves shared services running even when YallaFlow started them; Stop or Restart of a shared service requires a confirmation listing the scope, and still only for a process YallaFlow started.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0051"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T13:56:01.622Z",
+      "updatedAt": "2026-11-08T13:56:01.622Z"
+    },
+    {
+      "id": "AC-011",
+      "requirement": "REQ-007",
+      "statement": "Changing a used compose file, an override file, a build-context Dockerfile, the scripts section a package-manager command runs, or a called shell script (inside the repository or in an outside-repository service folder within home) ends the trust; the same command name with a changed configuration is untrusted; env files are never read and are listed as not covered.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0051"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T13:56:01.622Z",
+      "updatedAt": "2026-11-08T13:56:01.622Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-08T13:49:24.227Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-08T13:49:24.227Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-08T13:49:24.227Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-004",
+      "at": "2026-11-08T13:49:24.227Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-005",
+      "at": "2026-11-08T13:49:24.227Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-08T13:49:24.227Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-08T13:49:24.227Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-08T13:49:24.227Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-11-08T13:49:24.227Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-005",
+      "at": "2026-11-08T13:49:24.227Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-006",
+      "at": "2026-11-08T13:49:24.227Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-007",
+      "at": "2026-11-08T13:49:24.227Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-008",
+      "at": "2026-11-08T13:49:24.227Z",
+      "revision": 1
+    },
+    {
+      "action": "revised",
+      "id": "REQ-001",
+      "at": "2026-11-08T13:56:01.622Z",
+      "revision": 2,
+      "previous": {
+        "id": "REQ-001",
+        "statement": "Analyze Project runs a safe, read-only discovery of the repository and the relevant parent workspace configuration (compose files that mount or build the project, the vhosts that serve it, services, dependencies, ports, domains) plus a read-only observation of what is running, and drafts a runtime plan with evidence and confidence; it never runs a discovered command and never reads secrets.",
+        "provenance": [
+          {
+            "type": "request"
+          },
+          {
+            "type": "source",
+            "source": "SRC-0050"
+          },
+          {
+            "type": "question",
+            "question": "Q-001"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "REQ-003",
+      "at": "2026-11-08T13:56:01.622Z",
+      "revision": 2,
+      "previous": {
+        "id": "REQ-003",
+        "statement": "Review Runtime Setup presents the plan (services in start order with command, folder, ports, dependencies, links, evidence, confidence and conflicts) and nothing executable is saved or started before the developer explicitly saves and trusts the selected services.",
+        "provenance": [
+          {
+            "type": "source",
+            "source": "SRC-0050"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "added",
+      "id": "REQ-006",
+      "at": "2026-11-08T13:56:01.622Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "REQ-007",
+      "at": "2026-11-08T13:56:01.622Z",
+      "revision": 2
+    },
+    {
+      "action": "revised",
+      "id": "AC-001",
+      "at": "2026-11-08T13:56:01.622Z",
+      "revision": 2,
+      "previous": {
+        "id": "AC-001",
+        "requirement": "REQ-001",
+        "statement": "For ~/YaSchools/portal-like fixtures, Analyze finds the parent compose file that bind-mounts the project, its services (ports, depends_on/links, container names) and the vhosts whose document root maps inside the project with their host names, and saves .yallaflow/local/runtime-plan.json (git-ignored, 0600) with a confidence and evidence per item; it reads no .env, keeps compose environment names only, stays within home and at most 3 levels up, and runs no discovered command.",
+        "provenance": [
+          {
+            "type": "request"
+          },
+          {
+            "type": "source",
+            "source": "SRC-0050"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "AC-005",
+      "at": "2026-11-08T13:56:01.622Z",
+      "revision": 2,
+      "previous": {
+        "id": "AC-005",
+        "requirement": "REQ-003",
+        "statement": "Setup's Run section shows Analyze → Review → Start; Review lists each plan service with the exact command, folder, ports, depends on, links, confidence, evidence, source and conflicts, plus unresolved items; nothing is saved or trusted until Save and trust selected, which saves only ticked services and trusts each with its definition hash; an existing id changes only after confirmation.",
+        "provenance": [
+          {
+            "type": "source",
+            "source": "SRC-0050"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "added",
+      "id": "AC-009",
+      "at": "2026-11-08T13:56:01.622Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-010",
+      "at": "2026-11-08T13:56:01.622Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-011",
+      "at": "2026-11-08T13:56:01.622Z",
+      "revision": 2
+    }
+  ],
+  "updatedAt": "2026-11-08T13:56:01.622Z"
+}

@@ -49,9 +49,13 @@ test('runtime inputs: default and explicitly selected Compose files and project 
     await mkdir(path.dirname(path.join(f.root, file)), { recursive: true });
     await f.put(file, 'services: {}');
     const before = await f.inputs();
-    await f.put(file, 'services: {web: {image: test}}');
+    await f.put(file, 'services:\n  web:\n    image: test\n');
     assert.notDeepEqual(await f.inputs(), before);
   }
+  // PF-0072 (S1): a Compose construct the reader cannot read with certainty blocks trust.
+  const f = await fixture(['docker', 'compose', 'up']);
+  await f.put('compose.yaml', 'services: {web: {image: test}}');
+  await assert.rejects(f.inputs(), (error) => error.code === 'RUNTIME_TRUST_BLOCKED' && /flow mapping/.test(error.message));
 });
 
 test('runtime inputs: selected package directories and ancestors are included', async () => {

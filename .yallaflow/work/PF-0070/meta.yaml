@@ -1,0 +1,43 @@
+{
+  "id": "PF-0070",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Agent chat opens on the oldest messages: the window body (.chatbody) is what scrolls, but the console scrolls .astream, so the newest message is never shown on open, on send, or as replies arrive",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-08T13:10:36.423Z",
+  "updatedAt": "2026-11-08T13:26:23.430Z",
+  "title": "Agent chat opens on the oldest messages: the window body (.chatbody) is what scrolls, but the console scrolls .astream, so the newest message is never shown on open, on send, or as replies arrive",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-11-08T13:10:36.480Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-08T13:26:23.430Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

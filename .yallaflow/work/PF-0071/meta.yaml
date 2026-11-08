@@ -1,0 +1,43 @@
+{
+  "id": "PF-0071",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "A Codex usage-limit stop can be announced before it is saved: noteStop emits session.stopped while saveRecord is still writing, so the session history read right after can miss lastStop (agent-continue test fails under load)",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-08T13:21:23.441Z",
+  "updatedAt": "2026-11-08T13:26:25.952Z",
+  "title": "A Codex usage-limit stop can be announced before it is saved: noteStop emits session.stopped while saveRecord is still writing, so the session history read right after can miss lastStop (agent-continue test fails under load)",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-11-08T13:21:23.494Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-08T13:26:25.952Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

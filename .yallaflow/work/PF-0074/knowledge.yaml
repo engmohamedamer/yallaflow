@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Documentation screenshots live in docs/images/tour/ as WebP, and research/docs-tour/capture.mjs regenerates them. The script builds a disposable demo project through the console's New project wizard in an isolated XDG_CONFIG_HOME, walks one request to DONE through the real CLI, and saves, trusts and starts its runtime. It captures English-light and Arabic-dark; research/docs-tour/to-webp.py then converts them. docs/images/.npmignore keeps the images out of the npm package, because test/cli.test.js pins package.json files. Screens must never come from a real project, since the repository is public.",
+      "evidence": [
+        "research/docs-tour/capture.mjs",
+        "research/docs-tour/to-webp.py",
+        "docs/images/.npmignore",
+        "test/cli.test.js"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-08T19:07:48.473Z",
+      "factId": "CTX-0129",
+      "promotedAt": "2026-11-08T19:07:48.651Z",
+      "target": "context/conventions.md"
+    }
+  ],
+  "updatedAt": "2026-11-08T19:07:48.651Z",
+  "reviewedAt": "2026-11-08T19:07:48.651Z"
+}

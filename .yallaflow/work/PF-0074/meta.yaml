@@ -1,0 +1,46 @@
+{
+  "id": "PF-0074",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Docs: bilingual (English + Arabic) visual tour of the latest 1.4 experience — a simple request from creation to DONE, and project Setup (agent-first plan, review and trust, Run control) — with real console screenshots captured from a disposable demo project, plus README and console/runtime docs updated to the new Setup layout",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-08T18:42:18.160Z",
+  "updatedAt": "2026-11-08T19:07:49.084Z",
+  "title": "Docs: bilingual (English + Arabic) visual tour of the latest 1.4 experience — a simple request from creation to DONE, and project Setup (agent-first plan, review and trust, Run control) — with real console screenshots captured from a disposable demo project, plus README and console/runtime docs updated to the new Setup layout",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-08T18:42:18.198Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "lastInvalidationAt": "2026-11-08T19:03:11.386Z",
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-08T19:07:49.084Z",
+      "verificationRunIds": [
+        "V-002"
+      ]
+    }
+  ]
+}

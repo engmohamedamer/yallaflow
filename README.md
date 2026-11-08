@@ -15,16 +15,59 @@ YallaFlow is an engineering governance layer for AI coding agents. **You describ
 
 It works with **Claude Code** and **Codex**, runs locally, and keeps everything in your repository.
 
-**Website:** [engmohamedamer.github.io/yallaflow](https://engmohamedamer.github.io/yallaflow/) · **npm:** [yallaflow](https://www.npmjs.com/package/yallaflow) · **Docs:** [Using YallaFlow](docs/using-yallaflow.md)
+**Website:** [engmohamedamer.github.io/yallaflow](https://engmohamedamer.github.io/yallaflow/) · **npm:** [yallaflow](https://www.npmjs.com/package/yallaflow) · **Docs:** [Using YallaFlow](docs/using-yallaflow.md) · **Visual tour:** [English](docs/tour.md) · [العربية](docs/tour.ar.md)
 
-## Quick start
+![The YallaFlow console: a request delivered, proven and remembered](docs/images/tour/05-item-done-en.webp)
 
-Requires **Node.js ≥ 20.16.0**.
+## The console: your project at a glance
+
+`yallaflow console` opens a local web app in **Arabic or English**, light or dark. It shows every project, every request and every running service on one screen. Nothing runs on its own, and nothing leaves your machine.
+
+| | |
+| --- | --- |
+| **Create work in your own words.** Write the request the way you'd tell a colleague, and attach a screenshot or a BRD if you have one. Your agent takes it from there.<br><br>![Create work](docs/images/tour/02-create-work-en.webp) | **Watch every request move.** Each item moves through Understand → Decide → Change → Verify → Remember, and its % is computed from evidence.<br><br>![Work board](docs/images/tour/03-work-board-en.webp) |
+| **Set the project up with your agent.** The agent works out how the project really runs, including Docker, vhosts and parent folders, and proposes a plan with its evidence. Its investigation is read-only and never touches secrets.<br><br>![The agent's runtime plan](docs/images/tour/07-setup-plan-en.webp) | **Then just press ▶ Start project.** One page shows the state, Start/Stop, the apps to open, and a row per service. Shared infrastructure is never stopped by mistake.<br><br>![Run the project](docs/images/tour/09-setup-running-en.webp) |
+
+<details>
+<summary><b>The same console in Arabic, dark theme</b> · نفس الكونسول بالعربي</summary>
+
+| | |
+| --- | --- |
+| ![شغل جديد](docs/images/tour/02-create-work-ar.webp) | ![شغلانة خلصت](docs/images/tour/05-item-done-ar.webp) |
+| ![خطة الوكيل](docs/images/tour/07-setup-plan-ar.webp) | ![تشغيل المشروع](docs/images/tour/09-setup-running-ar.webp) |
+
+</details>
+
+**[Take the full visual tour →](docs/tour.md)** It goes from an empty folder to a running app in 12 screens. **[الجولة كاملة بالعربي ←](docs/tour.ar.md)**
+
+## Install
+
+```mermaid
+flowchart LR
+    n(["Node.js ≥ 20.16"]) --> i["npm install -g yallaflow"]
+    i --> p["cd your-project<br/>yallaflow init"]
+    p --> a["Open Claude Code or Codex<br/>and describe the work"]
+    p --> c["yallaflow console<br/>(optional, in your browser)"]
+```
+
+**1 · Install the CLI** (once per machine). Install it globally or in a tools prefix, never as a dependency of your app. [Options →](docs/installation.md)
 
 ```bash
 npm install -g yallaflow
+yallaflow --version
+```
+
+**2 · Connect a project** (once per project), or create a new one from the console's **New project** wizard:
+
+```bash
 cd your-project
 yallaflow init
+```
+
+**3 · Work.** Open your agent in the project and describe the work, or open the console:
+
+```bash
+yallaflow console
 ```
 
 `init` connects Claude Code (`CLAUDE.md`) and Codex (`AGENTS.md`) with a small pointer and keeps anything already in those files. Then open **Claude Code or Codex in the project** and describe the work. These are prompts for your agent, not terminal commands:
@@ -40,6 +83,35 @@ Build an anonymous employee survey platform.
 You don't need to say "use YallaFlow", explain the architecture, or ask for specs and tests. Every session orients itself automatically.
 
 **On an existing project, the first request comes with one review step.** The agent first builds an evidence-backed understanding of the codebase, without changing code. It shows you what it found and what it did not inspect, and waits for you to reply `Approve`. After that, your original request continues, and every later session and teammate starts from that approved understanding. [More on first use →](docs/using-yallaflow.md#3-first-use)
+
+## Upgrade
+
+```mermaid
+flowchart LR
+    v["yallaflow --version"] --> u["npm install -g yallaflow@latest"]
+    u --> s["yallaflow upgrade status<br/>(read-only)"]
+    s --> r["yallaflow agent refresh<br/>once per project"]
+    r --> d["yallaflow doctor"]
+    d --> c(["Restart yallaflow console"])
+```
+
+YallaFlow never updates itself and never checks the network for versions. You decide when to upgrade:
+
+```bash
+npm install -g yallaflow@latest     # or an exact version: yallaflow@1.4.1
+yallaflow --version
+
+# in each project
+yallaflow upgrade status            # read-only: what, if anything, needs attention
+yallaflow agent refresh             # only if the agent contract is reported outdated
+yallaflow doctor
+```
+
+- **Your work is safe.** Work items, project memory and sources are kept as they are, and nothing is migrated without a command you run.
+- **Restart the console** after upgrading, so the browser loads the new version (`Ctrl-C`, then `yallaflow console`).
+- **Teams:** upgrade every machine and CI job that works on a Shared Project together.
+
+[Updating in detail →](docs/installation.md#updating-yallaflow) · [Upgrading to 1.4.0 →](docs/upgrading-to-v1.4.0.md) · [1.2.0 →](docs/upgrading-to-v1.2.0.md) · [from 1.0.x: 1.1.0 →](docs/upgrading-to-v1.1.0.md)
 
 ## How it works
 
@@ -81,6 +153,16 @@ flowchart TB
 ```
 
 The depth adapts to the work. A bounded bug fix goes from root-cause analysis straight to the fix, while architectural work gets a reviewed design, specification, or plan. Nothing is called done without fresh verification evidence, and work that carries acceptance criteria is checked against them before it closes. What was learned becomes reviewed project knowledge. [Workflows in detail →](docs/workflows.md)
+
+## What's new in 1.4.1
+
+**Set the project up once, then run it from one page.** [See it →](docs/tour.md#part-3--set-the-project-up-once-then-just-press-start)
+
+- **Ask the agent how the project runs.** On **Setup**, the agent analyzes the project and reads its real configuration: Docker Compose, vhosts, and the folders above the project. It then proposes services, start order, ports and `*.localhost` links, with confidence and evidence. The investigation is read-only, never opens `.env`, and marks what it can't verify as unresolved. The proposal arrives preselected. A quick scan without an agent is still there (`yallaflow runtime analyze`).
+- **Run control first.** Once services are saved, Setup becomes the Run page. It shows one state, **▶ Start project** / **■ Stop project**, Open links, and a row per service with Start, Restart, Stop and Logs. Configuration folds away beneath.
+- **Review and trust, once per service.** Trust is bound to the exact command, folder and files you reviewed. Any later change ends it.
+- **Shared infrastructure is protected.** A Docker stack or database that serves other projects is never stopped by Stop project. Stopping it is a separate, typed confirmation.
+- **A first-time setup guide** for existing projects: scan the stack, choose services, choose agents.
 
 ## What's new in 1.4.0
 
@@ -160,16 +242,6 @@ A maintainer runs `yallaflow init`, approves the project understanding, runs `ya
 
 > **Developers work with Git. Agents work with YallaFlow.**
 
-## Upgrading
-
-```bash
-npm install -g yallaflow@1.4.0
-yallaflow doctor
-yallaflow agent refresh
-```
-
-Existing work items, project memory and sources are unchanged. 1.4.0 brings Agent Contract v11, so run `agent refresh` once per project. [Upgrading to 1.4.0 →](docs/upgrading-to-v1.4.0.md) · [1.2.0 →](docs/upgrading-to-v1.2.0.md) · [from 1.0.x: 1.1.0 →](docs/upgrading-to-v1.1.0.md)
-
 ## Commands you might run yourself
 
 Day to day, you talk to your agent. These are for setup and for looking under the hood:
@@ -190,13 +262,15 @@ The YallaFlow website, [engmohamedamer.github.io/yallaflow](https://engmohamedam
 
 | Guide | What it covers |
 | --- | --- |
+| [Visual tour](docs/tour.md) · [العربية](docs/tour.ar.md) | 12 real console screens, from an empty folder to a running app |
 | [Using YallaFlow](docs/using-yallaflow.md) | the practical end-to-end guide: start here |
 | [Installation](docs/installation.md) | install options, updating, legacy projects |
 | [Tickets, AI QC & Smart Demo](docs/connected-requirements-and-quality.md) | connected requirements, optional QC and demos |
 | [Shared Projects](docs/shared-projects.md) | one project understanding for the whole team, through Git |
 | [Canonical workflows](docs/workflows.md) | Greenfield, Brownfield, bugs, features, investigations, teams |
 | [Project memory](docs/project-memory.md) | durable context, evidence and freshness |
-| [Console](docs/console.md) | the local browser view and Create Work |
+| [Console](docs/console.md) | the local browser view, Create Work, New project, Setup |
+| [Development runtime](docs/runtime.md) | analyze, review, trust, start and stop your app's services |
 | [CLI reference](docs/cli.md) | every command and flag |
 | [Architecture](docs/architecture.md) | internal concepts and design |
 | [Security](docs/security.md) | trust model, secret redaction, network boundary |
@@ -206,7 +280,7 @@ The YallaFlow website, [engmohamedamer.github.io/yallaflow](https://engmohamedam
 
 ## Status
 
-**1.1.0** adds connected requirements and optional AI QC and Smart Demo. 1.0.0 was the first public, stable release. YallaFlow follows Semantic Versioning and keeps existing workspaces readable ([compatibility promise](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise)).
+**1.4.1** makes running your project part of the console: the agent proposes how it runs, you trust it once, then press Start. 1.0.0 was the first public, stable release. YallaFlow follows Semantic Versioning and keeps existing workspaces readable ([compatibility promise](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise)).
 
 - **Local-first.** There is no YallaFlow server, account, or cloud service.
 - **Agent-agnostic**, with first-party setup for Claude Code and Codex.

@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "The experimental Claude Code connection ships in the package but is off by default. It is turned on per project from the console's Setup page: the choice (agents, and Claude Code) is saved in .yallaflow/local/agents.json (git-ignored, owner-only 0600, ignored when tracked by Git or readable by others) and applied whenever the console opens, with no flags and no restart; 'yallaflow console --agents --experimental-claude' still turns it on for one run, and --read-only ignores the saved choice. The developer starts Claude Code with the launch command Setup shows; it opens with a short first prompt (run yallaflow brief) because SessionStart hooks carry no permission mode, so the mode is reported at once. The channel and hook send the bridge token only after the console proves it (HMAC over a nonce at /api/agent-bridge/claude/hello, live pid); messages are refused until a hook reports the mode, and bypassPermissions is never served. Codex remains the managed provider; subscription logins only, no API keys.",
+      "evidence": [
+        "src/agents/settings.js",
+        "src/agents/claude-files.js",
+        "src/console/server.js",
+        "verification:V-004",
+        "runtime:portal session 2026-11-08: saved choice applied after a restart with no flags; mode known without typing"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0121"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-08T13:32:27.043Z",
+      "factId": "CTX-0125",
+      "promotedAt": "2026-11-08T13:32:37.776Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-08T13:32:37.776Z",
+  "reviewedAt": "2026-11-08T13:32:37.776Z"
+}

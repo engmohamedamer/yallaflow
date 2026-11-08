@@ -1,0 +1,406 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-08T13:31:51.645Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 3,
+        "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+        "verificationRunIds": [
+          "V-004"
+        ]
+      },
+      "summary": "Assessed after V-004 (full suite) and the real session on ~/YaSchools/portal with the owner's console (2026-11-08), driven through Playwright.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "Setup's Agents table shows Codex and Claude Code with version, login method and plan (claude.ai (team)) and problems; Rescan refreshes with the Claude probe (the reload after it keeps scanAgents, fixed in the real session); Claude is probed only on rescan, when chosen, or when on.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:7c23cf37b637a9181aa2a818f3d16380a1e825ce61ad93bf7581d50ecc947b26",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:fbd26df65d10376e5d98f2e8c21958c9e2ae687bd89712ea6c74b185e87e80ba",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/project-setup.test.js",
+              "contentHash": "sha256:4744fbf2cf43c86f2c30d79802073edcd6a500bf809c112657ac1b0f99fe1b5e",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0069",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "portal session 2026-11-08: Rescan showed Claude Code 2.1.319 claude.ai (team) and Codex 0.167.0"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Saving Agents + Claude Code writes .yallaflow/local/agents.json (0600, git-ignored); after a console restart with no flags portal had agents and Claude on by itself while other projects kept theirs; --read-only ignores it; turning Claude off removes the bridge file.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/settings.js",
+              "contentHash": "sha256:00130b289bd8f5a7cfc72ec9f1235428d0814a22e9c25b74d6225d5a2ecda06b",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:7c23cf37b637a9181aa2a818f3d16380a1e825ce61ad93bf7581d50ecc947b26",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/project-setup.test.js",
+              "contentHash": "sha256:4744fbf2cf43c86f2c30d79802073edcd6a500bf809c112657ac1b0f99fe1b5e",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0069",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "portal session 2026-11-08: after Ctrl+C and yallaflow console with no flags the checklist was on for portal without saving again"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "Saving with Claude on while the console ran applied at once (applied.claude true, bridge file written, launch files ticked) with no restart.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/bridge.js",
+              "contentHash": "sha256:f12ffec21d69a2e82f1a7c9ae61cd11ac6ecc37c236cc5c50a01ec3e2ea9f894",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:7c23cf37b637a9181aa2a818f3d16380a1e825ce61ad93bf7581d50ecc947b26",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/project-setup.test.js",
+              "contentHash": "sha256:4744fbf2cf43c86f2c30d79802073edcd6a500bf809c112657ac1b0f99fe1b5e",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0069",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "portal session 2026-11-08: agents were off at console start; Save turned agents and Claude on immediately"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "The checklist reports Claude ready, checkout owner, launch files, channel, hooks and permission mode (allowed, auto-approving, bypass refused) each with a fix; tests drive every state with a simulated channel and hooks; in the real session all six turned green and the Agents section now redraws live on connection events.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/bridge.js",
+              "contentHash": "sha256:f12ffec21d69a2e82f1a7c9ae61cd11ac6ecc37c236cc5c50a01ec3e2ea9f894",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:fbd26df65d10376e5d98f2e8c21958c9e2ae687bd89712ea6c74b185e87e80ba",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/project-setup.test.js",
+              "contentHash": "sha256:4744fbf2cf43c86f2c30d79802073edcd6a500bf809c112657ac1b0f99fe1b5e",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0069",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "portal session 2026-11-08: six ticks turned green while the page stayed loaded (no reload, 649 s), permission mode auto shown as auto-approving"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "The launch command carries a quoted first prompt to run yallaflow brief. It is placed right after claude rather than at the end because --mcp-config takes several values and would swallow a trailing prompt (ruling recorded); the intent, a first prompt so the mode is reported at once, holds: in the real session Claude ran yallaflow brief by itself and the mode was known without typing.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/claude-files.js",
+              "contentHash": "sha256:ec696d6249b89886112c8d5239f660936b1c72a3e81dd2856915348e9d747173",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/agent-claude-experimental.test.js",
+              "contentHash": "sha256:4c0ba6d54b403847cd0e89891d580f2e72fad72999c822958b85dbac8ec71e58",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0069",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "portal session 2026-11-08: mode auto known and hooks reporting before anything was typed in Claude Code"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "The chat picker says Claude Code is off for the project, or an agent is not ready, and links to #/setup Agents.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:fbd26df65d10376e5d98f2e8c21958c9e2ae687bd89712ea6c74b185e87e80ba",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-project-chat.test.js",
+              "contentHash": "sha256:e0678aeacc72a89a3c855cd9d59d8d72f12e7c83185ddf598b3c3f873071b50e",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0069",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "Setup shows the scanned stack (component, declared version, kind, basis, evidence file) as a summary with the full table folded, with Rescan, and the runtime suggestions with Add this service; nothing runs and .env is never read.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/setup.js",
+              "contentHash": "sha256:b568bcd8920172415b0cca37787acd9b0aa835f28d59e250a061a443a0af4617",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:fbd26df65d10376e5d98f2e8c21958c9e2ae687bd89712ea6c74b185e87e80ba",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/project-setup.test.js",
+              "contentHash": "sha256:4744fbf2cf43c86f2c30d79802073edcd6a500bf809c112657ac1b0f99fe1b5e",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0069",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "portal session 2026-11-08: 27 entries, summary Yii2 ~2.0.14, PHP >=7.1.0, TypeScript 5.5.2, JavaScript, Node.js, Azure Pipelines"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-008",
+          "status": "satisfied",
+          "reason": "startAllServices starts trusted services in dependsOn order waiting for readiness, lists untrusted or stale chains as skipped with what to review, stops at the first failure; stop-all stops only YallaFlow-started services in reverse; both refused read-only; per-project busy guard and a sequence timeout.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:6a4b9e378f227f7c1f98385869a29ebe413da7066b62df75f644a271eb3a93fe",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/runtime.js",
+              "contentHash": "sha256:c5fefb26a82b1dd2e09aa031bc75b01305b25b203aa4e8500f5dd45d1fa18a79",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/runtime.js",
+              "contentHash": "sha256:b003dd06f6f4680a3078477d87fbc6672b1c52729ea2a7da0e9ee0c7180c3342",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/project-setup.test.js",
+              "contentHash": "sha256:4744fbf2cf43c86f2c30d79802073edcd6a500bf809c112657ac1b0f99fe1b5e",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0069",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-009",
+          "status": "satisfied",
+          "reason": "Each running service with a port shows Open to http://127.0.0.1:<port> plus its validated relative open path in a new tab; a bad path falls back to /; nothing opens on its own.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/profile.js",
+              "contentHash": "sha256:4d172daf3077b219584a008333a42b2f1ec9ebbed704580a39fdc4ba519b0d60",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:fbd26df65d10376e5d98f2e8c21958c9e2ae687bd89712ea6c74b185e87e80ba",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/project-setup.test.js",
+              "contentHash": "sha256:4744fbf2cf43c86f2c30d79802073edcd6a500bf809c112657ac1b0f99fe1b5e",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0069",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-010",
+          "status": "satisfied",
+          "reason": "After adding an existing project the console goes to Setup with the first-time guide (scan, services, agents) which runs no command; added services are untrusted; the agent choice goes to agents.json; setup.json records scan time, stack summary and steps; the guide is offered again from Setup but not forced.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/setup.js",
+              "contentHash": "sha256:b568bcd8920172415b0cca37787acd9b0aa835f28d59e250a061a443a0af4617",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:fbd26df65d10376e5d98f2e8c21958c9e2ae687bd89712ea6c74b185e87e80ba",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/project-setup.test.js",
+              "contentHash": "sha256:4744fbf2cf43c86f2c30d79802073edcd6a500bf809c112657ac1b0f99fe1b5e",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0069",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "portal session 2026-11-08: setup.json held scannedAt, 27 stack entries and steps stack, services, then agents after Save; the guide disappeared once all three were done"
+            }
+          ]
+        }
+      ],
+      "unrequested": [
+        {
+          "id": "UR-001",
+          "disposition": "accepted",
+          "summary": "Setup polish from the real session: stack summary chips with the full table folded, known suggestion notes shown in Arabic, 'No services for now' when none were added, and Codex login shown as 'checked when a session starts'.",
+          "reason": "Owner reported the Setup experience was not good enough and asked to walk it on the real project; these keep the approved behavior and only make it readable.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:fbd26df65d10376e5d98f2e8c21958c9e2ae687bd89712ea6c74b185e87e80ba",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/project-setup.test.js",
+              "contentHash": "sha256:4744fbf2cf43c86f2c30d79802073edcd6a500bf809c112657ac1b0f99fe1b5e",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "updatedAt": "2026-11-08T13:31:51.645Z"
+}

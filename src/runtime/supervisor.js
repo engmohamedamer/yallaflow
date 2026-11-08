@@ -26,6 +26,8 @@ import { portListening } from './probe.js';
 import { SUPPORTED, descendantsOf, groupAlive, identify, processGroupOf, processStartTime, serviceEnvironment, signalGroup, signalIfSame } from './process.js';
 import { localRuntimeDir } from './local.js';
 import { readState, stateDir, writeState } from './state.js';
+import { composeIdentity, sharedNow } from './discover.js';
+import { observeContainers, observeRuntime, portOwner, runningContainersOf } from './observe.js';
 
 export const LOG_CAP_BYTES = 5 * 1024 * 1024;
 const LOCK_WAIT_MS = 60_000;
@@ -182,22 +184,30 @@ async function readiness(root, service, run) {
 export async function runtimeStatus(root) {
   const profiles = await loadRuntimeProfiles(root);
   const services = [];
+  const containers = profiles.services.some((service) => service.kind === 'docker-compose') ? await observeContainers() : null;
   for (const service of profiles.services) {
     const run = await readRun(root, service.id);
     const state = await computeState(root, service, run);
     let trust;
     let hash = null;
     try { hash = await definitionHash(root, service); trust = await trustState(root, service); }
-    catch (error) { trust = { trusted: false, reason: 'changed', error: error.message }; }
+    catch (error) { trust = { trusted: false, reason: error.code === 'RUNTIME_TRUST_BLOCKED' ? 'blocked' : 'changed', error: error.message, ...(error.blocking ? { blocking: error.blocking } : {}) }; }
+    // PF-0072: a Compose stack that already runs, not started by YallaFlow.
+    let runningOutside = null;
+    if (containers?.available && !['running', 'starting'].includes(state.state)) {
+      try { const identity = await composeIdentity(root, service); if (identity) { const found = runningContainersOf({ docker: containers }, identity); if (found.length) runningOutside = found.map((entry) => entry.name); } } catch { runningOutside = null; }
+    }
     const ports = [];
     for (const port of service.ports) ports.push({ port, listening: await portListening(port) });
     const ours = ['running', 'starting'].includes(state.state);
     services.push({
       id: service.id, name: service.name, kind: service.kind, source: service.source, overridden: service.overridden,
-      command: service.command, cwd: service.cwd, env: service.env, ports, ready: service.ready, dependsOn: service.dependsOn,
+      command: service.command, cwd: service.cwd, env: service.env, ports, ready: service.ready, dependsOn: service.dependsOn, open: service.open,
       stopSignal: service.stopSignal, stopTimeoutSeconds: service.stopTimeoutSeconds, readyTimeoutSeconds: service.readyTimeoutSeconds,
       definitionHash: hash,
       trust,
+      links: service.links, sharedMarker: service.shared,
+      runningOutside,
       ...state,
       pid: ours ? run.pid : null,
       startedAt: run && !run.stoppedAt ? run.startedAt : null,
@@ -257,8 +267,22 @@ async function startOne(root, service, startedBy) {
     const current = await computeState(root, service, run);
     if (['running', 'starting'].includes(current.state)) return { id, state: current.state, already: true, pid: run.pid };
     if (current.state === 'unknown') throw new RuntimeError('RUNTIME_UNMANAGED', `Service ${id} has an unmanaged process record: ${current.reason} Stop that process yourself if it is yours, then run \`yallaflow runtime stop ${id}\` to clear the record.`);
+    // PF-0072 pre-flight: a Compose stack already up outside YallaFlow is never started
+    // (attaching to it would let a later stop end containers YallaFlow did not start).
+    const identity = await composeIdentity(root, service).catch(() => null);
+    if (identity) {
+      const containers = await observeContainers();
+      // Review finding 7: without seeing the containers, YallaFlow cannot rule out attaching
+      // to a stack someone else started, so it does not start it.
+      if (!containers.available) throw new RuntimeError('RUNTIME_OBSERVE_FAILED', `${id} was not started: YallaFlow could not check whether its Compose stack already runs (${containers.reason}). Nothing was started or stopped.`);
+      const found = runningContainersOf({ docker: containers }, identity);
+      if (found.length) return { id, state: 'running-outside', already: true, outside: found.map((entry) => entry.name), pid: null };
+    }
     for (const port of service.ports) {
-      if (await portListening(port)) throw new RuntimeError('PORT_IN_USE', `Port ${port} on 127.0.0.1 is already in use by a process YallaFlow did not start; ${id} was not started and that process was not touched.`);
+      if (await portListening(port)) {
+        const owner = portOwner(await observeRuntime(), port, { exceptProject: identity?.project ?? null });
+        throw new RuntimeError('PORT_IN_USE', `Port ${port} on 127.0.0.1 is already in use by ${owner ?? 'a process YallaFlow did not start'}; ${id} was not started and nothing was stopped.`, { port, owner });
+      }
     }
     const cwd = await resolveServiceCwd(root, service);
     const trusted = await trustState(root, service);
@@ -304,16 +328,37 @@ async function startOne(root, service, startedBy) {
       const tail = (await serviceLogs(root, id, { lines: 20 })).join('\n');
       throw new RuntimeError('RUNTIME_START_FAILED', `Service ${id} exited during start (${exited.code !== null ? `code ${exited.code}` : exited.signal}). Last log lines:\n${tail}`);
     }
+    // D2/S2: the configuration must still be the trusted one once the service is up. If it
+    // changed meanwhile, only the process group YallaFlow just started (verified as ours) is
+    // stopped — never anything else — and a shared service is left running and reported.
+    let after = null;
+    try { after = await definitionHash(root, service); } catch { after = null; }
+    if (after !== trustedHash) {
+      record.configChangedDuringStart = new Date().toISOString();
+      await writeRun(root, record);
+      const shared = await sharedNow(root, service);
+      if (shared.shared) throw new RuntimeError('RUNTIME_CHANGED_DURING_START', `The configuration of ${id} changed while it was starting. It is shared infrastructure (${shared.reasons[0]}), so YallaFlow left it running and stopped nothing. Review it, trust it again, and stop it yourself if needed.`);
+      if (ownership(record) === 'ours') await terminateOwned(root, service, record, 'config-changed-during-start');
+      throw new RuntimeError('RUNTIME_CHANGED_DURING_START', `The configuration of ${id} changed while it was starting, so the process YallaFlow had just started was stopped; nothing else was touched. Review it and trust it again.`);
+    }
     if (state === 'running' && service.ready) { record.readyAt = new Date().toISOString(); await writeRun(root, record); }
     return { id, state, pid: child.pid };
   });
 }
 
-export async function stopService(root, id, { reason = 'stop' } = {}) {
+export async function stopService(root, id, { reason = 'stop', confirmShared = false } = {}) {
   assertSupported();
   const profiles = await loadRuntimeProfiles(root);
   const service = serviceById(profiles, id);
   return withServiceLock(root, id, async () => {
+    // Shared infrastructure (S3: judged from the evidence now, a marker only adds protection)
+    // is stopped only with an explicit confirmation that saw who else may be affected. Checked
+    // under the service lock, so a start cannot slip in between (review finding 9).
+    const pending = await readRun(root, id);
+    if (pending && !pending.stoppedAt && !confirmShared) {
+      const shared = await sharedNow(root, service);
+      if (shared.shared) throw new RuntimeError('RUNTIME_SHARED', `${id} is shared infrastructure, so it is not ${reason === 'restart' ? 'restarted' : 'stopped'} without your confirmation: ${shared.reasons.join('; ')}.${shared.scope.length ? ` It may also serve: ${shared.scope.slice(0, 12).join(', ')}${shared.scope.length > 12 ? ', …' : ''}.` : ''} Nothing was signalled.`, { shared });
+    }
     const run = await readRun(root, id);
     const current = await computeState(root, service, run);
     if (current.state === 'stopped') return { id, state: 'stopped', already: true };
@@ -329,9 +374,16 @@ export async function stopService(root, id, { reason = 'stop' } = {}) {
       await writeRun(root, run);
       throw new RuntimeError('RUNTIME_UNMANAGED', `Service ${id}: ${current.reason} Its record was cleared; no process was signalled.`);
     }
-    // Ours: graceful signal to its own group, wait, then SIGKILL the group. Descendants
-    // that left the group are tracked from the verified leader and killed only while
-    // their own start time still matches.
+    return terminateOwned(root, service, run, reason);
+  });
+}
+
+// Ours only (the caller verified the run record's pid, start time and group): graceful
+// signal to its own group, wait, then SIGKILL the group. Descendants that left the group are
+// tracked from the verified leader and killed only while their own start time still matches.
+async function terminateOwned(root, service, run, reason) {
+  const id = service.id;
+  {
     const tracked = descendantsOf(run.pid);
     run.stopRequestedAt = new Date().toISOString();
     await writeRun(root, run);
@@ -355,13 +407,57 @@ export async function stopService(root, id, { reason = 'stop' } = {}) {
     Object.assign(run, { stoppedAt: new Date().toISOString(), stopReason: reason, forced, survivors });
     await writeRun(root, run);
     return { id, state: survivors.length ? 'unknown' : 'stopped', forced, survivors };
-  });
+  }
 }
 
-export async function restartService(root, id, { startedBy = 'cli' } = {}) {
-  const stopped = await stopService(root, id, { reason: 'restart' });
+export async function restartService(root, id, { startedBy = 'cli', confirmShared = false } = {}) {
+  const stopped = await stopService(root, id, { reason: 'restart', confirmShared });
   if (stopped.survivors?.length) throw new RuntimeError('RUNTIME_STOP_INCOMPLETE', `Service ${id} did not stop cleanly (still running: ${stopped.survivors.join(', ')}); not restarted.`);
   return startService(root, id, { startedBy });
+}
+
+// Start project (PF-0069): every service whose whole dependency chain is trusted, in
+// dependency order, one at a time, waiting for each to be ready. A service with an untrusted
+// or changed link in its chain is skipped (with what to review); the first failure stops
+// the sequence. Services already running are left as they are.
+export async function startAllServices(root, { startedBy = 'cli' } = {}) {
+  assertSupported();
+  const profiles = await loadRuntimeProfiles(root);
+  const order = [];
+  const seen = new Set();
+  for (const service of profiles.services) startOrder(profiles, service.id, seen, new Set(), order);
+  const trust = new Map();
+  for (const service of order) {
+    try { trust.set(service.id, await trustState(root, service)); }
+    catch (error) { trust.set(service.id, { trusted: false, reason: 'blocked', blocking: error.blocking ?? [{ item: 'definition', reason: error.message }] }); }
+  }
+  const unavailable = new Map(); // id -> why (a busy port): it and its dependants are skipped
+  const blockedBy = (service) => {
+    for (const link of startOrder(profiles, service.id)) if (!trust.get(link.id).trusted) return link;
+    return null;
+  };
+  const started = [];
+  const skipped = [];
+  for (const service of order) {
+    const blocker = blockedBy(service);
+    if (blocker) {
+      const state = trust.get(blocker.id);
+      const why = state.reason === 'changed' ? 'changed since it was trusted' : state.reason === 'blocked' ? `blocked until resolved (${(state.blocking ?? []).map((entry) => entry.reason).join('; ')})` : 'not trusted in this checkout';
+      let hash = null;
+      try { hash = await definitionHash(root, blocker); } catch { hash = null; }
+      skipped.push({ id: service.id, blockedBy: blocker.id, reason: blocker.id === service.id ? why : `depends on ${blocker.id} (${why})`, review: blocker.id === service.id && hash ? { id: service.id, definitionHash: hash, command: service.command, cwd: service.cwd, env: service.env, ports: service.ports } : null });
+      continue;
+    }
+    const busy = startOrder(profiles, service.id).find((link) => unavailable.has(link.id));
+    if (busy) { skipped.push({ id: service.id, blockedBy: busy.id, reason: busy.id === service.id ? unavailable.get(busy.id) : `depends on ${busy.id} (${unavailable.get(busy.id)})`, review: null }); continue; }
+    try {
+      started.push(await startOne(root, service, startedBy));
+    } catch (error) {
+      if (error.code === 'PORT_IN_USE') { unavailable.set(service.id, error.message); skipped.push({ id: service.id, blockedBy: service.id, reason: error.message, review: null }); continue; }
+      return { ok: false, started, skipped, failed: { id: service.id, code: error.code ?? 'RUNTIME_START_FAILED', message: error.message } };
+    }
+  }
+  return { ok: true, started, skipped, failed: null };
 }
 
 export async function stopAllServices(root) {
@@ -371,6 +467,9 @@ export async function stopAllServices(root) {
   for (const service of [...profiles.services].reverse()) {
     const run = await readRun(root, service.id);
     if (!run || run.stoppedAt) continue;
+    // Stop project never stops shared infrastructure, even one YallaFlow started (S3).
+    const shared = await sharedNow(root, service);
+    if (shared.shared) { results.push({ id: service.id, left: 'shared', reasons: shared.reasons, scope: shared.scope }); continue; }
     try {
       results.push(await stopService(root, service.id));
     } catch (error) {

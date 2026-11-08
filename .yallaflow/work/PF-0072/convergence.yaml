@@ -1,0 +1,466 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-08T15:48:34.026Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 2,
+        "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+        "verificationRunIds": [
+          "V-002"
+        ]
+      },
+      "summary": "Assessed after V-002 (npm test 1022/1022), the browser flow on an isolated YaSchools-like fixture console, and the real ~/YaSchools/portal session (Analyze, agent proposal, Review only).",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "Analyze finds the parent Compose file that bind-mounts the project, its services (ports, links/depends_on, container names) and the vhosts mapped into the project with their host names; stores runtime-plan.json (0600, git-ignored) with confidence and evidence; never reads .env (sentinel never appears), keeps env names only, stays within home and 3 levels up; coverage lists scanned and not-scanned folders with reasons; out-of-scope, unreadable, missing-folder and unreadable-Compose items are unresolved and blocking where they affect execution; an empty result reads Nothing found/confirmed within.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/discover.js",
+              "contentHash": "sha256:0c37e0922bba7bad35f56170582d6b674007b4661e1291d2f628e46001ab40a7",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/compose.js",
+              "contentHash": "sha256:74010a2fb44369cc076392e06b751c07bc6521aaa0dade0bc24a8852f025a2ac",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/plan.js",
+              "contentHash": "sha256:cc87fd9df15f48385d81df9823a65e13c06b996f308a26eb8502efdbfdf2c29a",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-plan.test.js",
+              "contentHash": "sha256:0eb4847797a81a66088ce124be99988adbdfefa390756ee147d1646513a32ee9",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0072",
+              "verificationRunId": "V-002"
+            },
+            {
+              "type": "runtime",
+              "description": "portal 2026-11-08: ~/YaSchools stack, 10 project links, Shared with scope, unresolved sekaya symlink and 4 vhosts with missing folders"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "docker ps and ss/lsof are read through fixed argv with a timeout; results are transient in the plan; without Docker the analysis says Docker is not installed and still reads the files.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/observe.js",
+              "contentHash": "sha256:96ba64dc488915eff5bc39da94ff4ad5f09349d943978adbdd8c872fc6054a70",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-plan.test.js",
+              "contentHash": "sha256:0eb4847797a81a66088ce124be99988adbdfefa390756ee147d1646513a32ee9",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0072",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "Ask the agent fills the project chat draft with the fixed read-only, no-secrets, propose-by-command request and does not send it; with no session the chat shows that a prepared message is waiting.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:d02ae8bcfb8c32b1ddf6daeed96d07dafdaf82050918f5214d2d43c802a05f46",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-plan.test.js",
+              "contentHash": "sha256:0eb4847797a81a66088ce124be99988adbdfefa390756ee147d1646513a32ee9",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0072",
+              "verificationRunId": "V-002"
+            },
+            {
+              "type": "runtime",
+              "description": "portal 2026-11-08: the request waited in the chat and was sent only by pressing Send"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "runtime plan propose stores a valid plan beside the scan and refuses, listing every problem, env values, secret-looking strings, shell strings (incl. sh -c), cwd outside home or via an escaping link, non-loopback/*.localhost links, unknown deps, cycles, confirmed without existing evidence, and scan-only fields; it never writes a profile or trust.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/plan.js",
+              "contentHash": "sha256:cc87fd9df15f48385d81df9823a65e13c06b996f308a26eb8502efdbfdf2c29a",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-plan.test.js",
+              "contentHash": "sha256:0eb4847797a81a66088ce124be99988adbdfefa390756ee147d1646513a32ee9",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0072",
+              "verificationRunId": "V-002"
+            },
+            {
+              "type": "runtime",
+              "description": "portal 2026-11-08: Claude Code's proposal passed validation and nothing was saved"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "Setup shows Analyze, Review and save, Trust, Start; plan cards show command, folder, ports, depends on, links, confidence, evidence, source, conflicts and shared scope plus unresolved items and coverage; Save selected writes only ticked services as untrusted definitions (Replace needs confirmation and never deletes a shared definition); Start refuses saved untrusted services; no log or run record is created.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:d02ae8bcfb8c32b1ddf6daeed96d07dafdaf82050918f5214d2d43c802a05f46",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/plan.js",
+              "contentHash": "sha256:cc87fd9df15f48385d81df9823a65e13c06b996f308a26eb8502efdbfdf2c29a",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/runtime.js",
+              "contentHash": "sha256:aa3911db6eb2d73f7c74d7f6d9aed12ba5b71256bf06a223a61590dc42b7a000",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-plan.test.js",
+              "contentHash": "sha256:0eb4847797a81a66088ce124be99988adbdfefa390756ee147d1646513a32ee9",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0072",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "An absolute cwd is refused in the shared runtime.yaml, allowed in the personal file only inside home (real path checked, escaping link refused); plan saves of outside folders always go to the personal file; a personal service inside home started and stopped.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/profile.js",
+              "contentHash": "sha256:8194cf42a7ea262a380debb622362ed4940eb35641651398b10ec5291f164d3a",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/inputs.js",
+              "contentHash": "sha256:f4749fc7608805b9863de3be430ad7d19033f6844bdef9a663f8405eabeb6e23",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-plan.test.js",
+              "contentHash": "sha256:0eb4847797a81a66088ce124be99988adbdfefa390756ee147d1646513a32ee9",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0072",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "A Compose service whose project, container names or working folder already run is running-outside, not started, counts as ready and is never stopped; a busy declared port is reported with its owner and that service and its dependants are skipped; nothing is killed; a Compose service is not started when docker ps cannot be read.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:55bab5cd8ab7229141c0a51d5923eb042ef0293c639c0516c718931f90401f06",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/observe.js",
+              "contentHash": "sha256:96ba64dc488915eff5bc39da94ff4ad5f09349d943978adbdd8c872fc6054a70",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-plan.test.js",
+              "contentHash": "sha256:0eb4847797a81a66088ce124be99988adbdfefa390756ee147d1646513a32ee9",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0072",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-008",
+          "status": "satisfied",
+          "reason": "Running services show their plan links (loopback or *.localhost only) in new tabs; nothing opens automatically; a read-only console views the plan and refuses analyze and save (405).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:d02ae8bcfb8c32b1ddf6daeed96d07dafdaf82050918f5214d2d43c802a05f46",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:18f22fd2ae47a07b4efe5b97c3c1d0aafa55cd4f0e8a56f591a703c3319494f6",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-plan.test.js",
+              "contentHash": "sha256:0eb4847797a81a66088ce124be99988adbdfefa390756ee147d1646513a32ee9",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0072",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-009",
+          "status": "satisfied",
+          "reason": "Trust is a separate per-service action in Setup showing the effective configuration and the inputs covered and not covered; it records exactly the reviewed hash (a change in between is refused); the console trusts in-process and the CLI only for a person at a terminal; blocking items hide the trust input.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/review.js",
+              "contentHash": "sha256:f709d6ccc80bd054243f2d43225e90f0e28af90c56896ceb660014425e8e44f7",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/trust.js",
+              "contentHash": "sha256:dec435c292fd6b5b599f73dfad023e88ff9c4a73436f1f84c3c0d5287a2a316c",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/runtime.js",
+              "contentHash": "sha256:aa3911db6eb2d73f7c74d7f6d9aed12ba5b71256bf06a223a61590dc42b7a000",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:d02ae8bcfb8c32b1ddf6daeed96d07dafdaf82050918f5214d2d43c802a05f46",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-plan.test.js",
+              "contentHash": "sha256:0eb4847797a81a66088ce124be99988adbdfefa390756ee147d1646513a32ee9",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0072",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-010",
+          "status": "satisfied",
+          "reason": "Databases, Compose files outside the project, mounts or vhosts serving other folders and outside dependants mark a service shared with its scope (partial coverage noted); the decision is re-derived from current evidence including override files under the stop lock; Stop project leaves shared services running even when YallaFlow started them; stop or restart needs --confirm-shared or the typed id in the console; a marker alone also protects.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/discover.js",
+              "contentHash": "sha256:0c37e0922bba7bad35f56170582d6b674007b4661e1291d2f628e46001ab40a7",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:55bab5cd8ab7229141c0a51d5923eb042ef0293c639c0516c718931f90401f06",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/runtime.js",
+              "contentHash": "sha256:aa3911db6eb2d73f7c74d7f6d9aed12ba5b71256bf06a223a61590dc42b7a000",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-plan.test.js",
+              "contentHash": "sha256:0eb4847797a81a66088ce124be99988adbdfefa390756ee147d1646513a32ee9",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0072",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-011",
+          "status": "satisfied",
+          "reason": "Changing a used Compose file, an override, a build-context Dockerfile, the package scripts or a called shell script ends the trust and start refuses; .env and --env-file edits end it through file metadata (content never read); COMPOSE_/DOCKER_ settings are bound by value digest; env files are listed as not covered; unreadable or escaped/unknown Compose keys block trust.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/inputs.js",
+              "contentHash": "sha256:f4749fc7608805b9863de3be430ad7d19033f6844bdef9a663f8405eabeb6e23",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/compose.js",
+              "contentHash": "sha256:74010a2fb44369cc076392e06b751c07bc6521aaa0dade0bc24a8852f025a2ac",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-plan.test.js",
+              "contentHash": "sha256:0eb4847797a81a66088ce124be99988adbdfefa390756ee147d1646513a32ee9",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-inputs.test.js",
+              "contentHash": "sha256:34345222ef351f96bb7d5787324380f3ae9798673f0227f5d18a7fc5627755a4",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0072",
+              "verificationRunId": "V-002"
+            }
+          ]
+        }
+      ],
+      "unrequested": [
+        {
+          "id": "UR-001",
+          "disposition": "accepted",
+          "summary": "No-network guard exception for src/runtime/discover.js (loopback and template-built http:// link text only), the project chat's waiting-message note, and the stricter fail-closed checks added by the security review (unknown/escaped Compose keys, docker ps required to start a Compose service).",
+          "reason": "Needed to meet the approved safety requirements (S1, agent-can-only-propose, never attach to an outside stack) and the owner's Analyze, agent, Review flow; recorded as rulings.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/shared-project.test.js",
+              "contentHash": "sha256:de328c5552b73185f379deea9214a64e15f62b98833fa5da4fa2822707ce4a77",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/compose.js",
+              "contentHash": "sha256:74010a2fb44369cc076392e06b751c07bc6521aaa0dade0bc24a8852f025a2ac",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:55bab5cd8ab7229141c0a51d5923eb042ef0293c639c0516c718931f90401f06",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:d02ae8bcfb8c32b1ddf6daeed96d07dafdaf82050918f5214d2d43c802a05f46",
+              "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+              "workingTree": "modified"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "updatedAt": "2026-11-08T15:48:34.026Z"
+}

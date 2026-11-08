@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YallaFlow — ذاكرة للمشروع وشغل متثبت لوكلاء البرمجة بالذكاء الاصطناعي</title>
+<meta name="description" content="YallaFlow أداة مفتوحة المصدر بتدّي Claude Code وCodex ذاكرة دايمة للمشروع، وطريقة شغل على قد الطلب، وتسليم متثبت بالأدلة، وكونسول بالعربي تشغّل منه مشروعك.">
+<link rel="canonical" href="https://engmohamedamer.github.io/yallaflow/ar/">
+<link rel="alternate" hreflang="en" href="https://engmohamedamer.github.io/yallaflow/">
+<link rel="alternate" hreflang="ar" href="https://engmohamedamer.github.io/yallaflow/ar/">
+<link rel="alternate" hreflang="x-default" href="https://engmohamedamer.github.io/yallaflow/">
+<meta name="theme-color" content="#0a111f">
+<meta name="google-site-verification" content="3R7WptzIqENffyyYsLfwZY4B75xEgjSkio1YAyk9erc">
+<link rel="icon" href="/yallaflow/favicon.svg" type="image/svg+xml">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="YallaFlow">
+<meta property="og:title" content="YallaFlow — ادّي الذكاء الاصطناعي مشروعك، مش بس طلبك.">
+<meta property="og:description" content="ذاكرة دايمة للمشروع، وشغل على قد الطلب، وتسليم متثبت، لـClaude Code وCodex.">
+<meta property="og:url" content="https://engmohamedamer.github.io/yallaflow/ar/">
+<meta property="og:locale" content="ar_EG">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:image" content="https://engmohamedamer.github.io/yallaflow/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="YallaFlow — Give AI your project, not just your prompt.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="YallaFlow — ادّي الذكاء الاصطناعي مشروعك، مش بس طلبك.">
+<meta name="twitter:description" content="ذاكرة دايمة للمشروع، وشغل على قد الطلب، وتسليم متثبت، لـClaude Code وCodex.">
+<meta name="twitter:image" content="https://engmohamedamer.github.io/yallaflow/og-image.jpg">
+<meta name="twitter:image:alt" content="YallaFlow — Give AI your project, not just your prompt.">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://engmohamedamer.github.io/yallaflow/#software",
+      "name": "YallaFlow",
+      "description": "An engineering governance layer for AI coding agents: durable project memory, adaptive workflows, and evidence-backed delivery for Claude Code and Codex.",
+      "url": "https://engmohamedamer.github.io/yallaflow/",
+      "applicationCategory": "DeveloperApplication",
+      "softwareRequirements": "Node.js >= 20.16.0",
+      "license": "https://opensource.org/licenses/MIT",
+      "downloadUrl": "https://www.npmjs.com/package/yallaflow",
+      "installUrl": "https://www.npmjs.com/package/yallaflow",
+      "sameAs": [
+        "https://github.com/engmohamedamer/yallaflow",
+        "https://www.npmjs.com/package/yallaflow"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://engmohamedamer.github.io/yallaflow/#website",
+      "name": "YallaFlow",
+      "url": "https://engmohamedamer.github.io/yallaflow/",
+      "about": { "@id": "https://engmohamedamer.github.io/yallaflow/#software" }
+    }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="/yallaflow/site.css">
+</head>
+<body>
+<a class="skip" href="#main">انتقل للمحتوى</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="yf-mark" viewBox="0 0 59 53"><g fill="none" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path stroke="#4ed0a5" d="M4.5 4.5 25.5 26.5 4.5 48.5"/><path stroke="#6485ce" d="M33.5 4.5 54.5 26.5 33.5 48.5"/></g></symbol>
+</svg>
+
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="/yallaflow/"><svg class="mark" aria-hidden="true"><use href="#yf-mark"/></svg>YallaFlow</a>
+    <nav class="primary" aria-label="القائمة">
+      <ul>
+        <li><a href="#console">الكونسول</a></li>
+        <li><a href="#whats-new">الجديد</a></li>
+        <li><a href="#how-it-works">بيشتغل إزاي</a></li>
+        <li><a href="#quick-start">التثبيت</a></li>
+        <li class="keep"><a class="lang" href="/yallaflow/" hreflang="en" lang="en">English</a></li>
+        <li class="keep"><a class="gh" href="https://github.com/engmohamedamer/yallaflow">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <a class="pill" href="#whats-new"><b>1.4.1</b>اضبط المشروع مرة، وبعدها دوس «شغّل» ←</a>
+        <p class="eyebrow"><svg class="mark" aria-hidden="true"><use href="#yf-mark"/></svg>مفتوح المصدر · لـClaude Code وCodex</p>
+        <h1><span class="name">YallaFlow</span><span class="tagline">ادّي الذكاء الاصطناعي <em>مشروعك</em>، مش بس طلبك.</span></h1>
+        <p class="lede">YallaFlow بيدّي وكيل البرمجة بتاعك ذاكرة متراجعة للكود بتاعك، وطريقة شغل على قد كل طلب، وأدلة قبل ما أي حاجة تتقال إنها خلصت.</p>
+        <div class="install">
+          <code id="install-cmd" tabindex="0">npm install -g yallaflow</code>
+          <button class="copy" type="button" data-copy="install-cmd" aria-label="انسخ أمر التثبيت">انسخ</button>
+        </div>
+        <div class="ctas">
+          <a class="btn primary" href="#quick-start">ابدأ</a>
+          <a class="btn" href="#console">شوف الكونسول</a>
+        </div>
+        <ul class="facts">
+          <li>رخصة MIT</li>
+          <li>على جهازك، من غير تتبّع</li>
+          <li>Node.js ≥ 20.16.0</li>
+          <li>عربي وإنجليزي</li>
+        </ul>
+      </div>
+
+      <figure class="concept">
+        <div class="term" role="img" aria-label="رسم توضيحي: بتطلب من الوكيل يصلّح إجماليات الفواتير؛ ومع YallaFlow بيفهم المشروع، ويخطّط وينفّذ، ويتحقّق بأدلة، ويفتكر اللي اتعلّمه.">
+          <div class="term-bar" aria-hidden="true"><i></i><i></i><i></i><span>وكيلك · مع YallaFlow</span></div>
+          <div class="term-body" aria-hidden="true">
+            <p class="prompt"><b>إنت ‹</b> صلّح إجماليات الفواتير.</p>
+            <ol class="flow">
+              <li><span class="dot">1</span><span><strong>افهم المشروع</strong><small>بيبدأ من ذاكرة المشروع المعتمدة، مش من الصفر</small></span></li>
+              <li><span class="dot">2</span><span><strong>خطّط ونفّذ</strong><small>طريقة شغل على قد الطلب</small></span></li>
+              <li><span class="dot">3</span><span><strong>اتحقّق بأدلة</strong><small>فحوصات جديدة، ومقارنة باللي اتطلب</small></span></li>
+              <li><span class="dot">4</span><span><strong>افتكر اللي حصل</strong><small>معرفة متراجعة للجلسة الجاية</small></span></li>
+            </ol>
+            <p class="result">✓ اتحقّق · ذاكرة المشروع محدّثة</p>
+          </div>
+        </div>
+        <figcaption>رسم توضيحي لجلسة، مش شاشة من YallaFlow.</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <section id="console" aria-labelledby="console-h">
+    <div class="wrap">
+      <p class="kicker">الكونسول</p>
+      <h2 id="console-h">مشاريعك، وطلباتك، والأبلكيشن وهو شغّال، في شاشة واحدة</h2>
+      <p class="section-lede"><code>yallaflow console</code> بيفتح أبلكيشن ويب على جهازك، بالعربي أو الإنجليزي، فاتح أو غامق. اكتب طلباتك بكلامك، وتابع كل طلب لحد ما يخلص متثبت، وشغّل الأبلكيشن بتاعك بزرار واحد. دي شاشات حقيقية.</p>
+      <div class="showcase">
+        <figure class="shot wide">
+          <img src="/yallaflow/media/tour/05-item-done-ar.webp" alt="شغلانة ١٠٠٪: كل المحطات خلصت، واتحقّقت بالدليل V-001، واتسجّلت" width="1600" height="1012" loading="lazy" decoding="async">
+          <figcaption><b>«خلص» يعني متثبت</b>كل طلب بيمشي على افهم، وقرّر، ونفّذ، واتحقّق، وافتكر. النسبة YallaFlow بيحسبها من الأدلة، وعمره ما بيقفل شغلانة علشان الوكيل قال إنها خلصت.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="/yallaflow/media/tour/02-create-work-ar.webp" alt="شاشة «شغل جديد» وفيها طلب مكتوب بكلام عادي" width="1240" height="1388" loading="lazy" decoding="async">
+          <figcaption><b>اكتب الطلب بكلامك</b>اوصفه زي ما بتقوله لزميلك، وارفق صورة أو BRD. مفيش وكيل بيبدأ لوحده.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="/yallaflow/media/tour/03-work-board-ar.webp" alt="لوحة الشغل وفيها الشغلانات بمحطاتها وخطوتها الجاية ونسبة الإنجاز" width="1600" height="1012" loading="lazy" decoding="async">
+          <figcaption><b>تابع كل طلب وهو ماشي</b>كل شغلانة بتوريك محطاتها، وخطوتها الجاية ومين صاحبها، واللي مستنيك.</figcaption>
+        </figure>
+      </div>
+      <div class="console-cta">
+        <a class="btn primary" href="https://github.com/engmohamedamer/yallaflow/blob/main/docs/tour.ar.md">خد الجولة: ١٢ شاشة</a>
+        <a class="btn" href="https://github.com/engmohamedamer/yallaflow/blob/main/docs/tour.md" hreflang="en">The tour in English</a>
+        <code>yallaflow console</code>
+      </div>
+    </div>
+  </section>
+
+  <section id="whats-new" class="new-section" aria-labelledby="new-h">
+    <div class="wrap new-grid">
+      <div>
+        <p class="kicker">الجديد في 1.4.1</p>
+        <h2 id="new-h">اضبط المشروع مرة واحدة، وبعدها دوس «شغّل» وبس.</h2>
+        <p class="section-lede">تشغيل الأبلكيشن بقى جزء من الكونسول، حتى لو الـDocker stack في فولدر فوق المشروع، ومعاه قاعدة البيانات ومواقع <code>*.localhost</code>.</p>
+        <ol class="new-list">
+          <li><span class="n">1</span><span><h3>اسأل الوكيل المشروع بيشتغل إزاي</h3><p>الوكيل بيقرا الإعدادات الحقيقية (Compose، وvhosts، والفولدرات اللي فوق المشروع)، ويقترح الخدمات وترتيب التشغيل والمنافذ والروابط، ومع كل حاجة درجة تأكدها ودليلها. تحقيقه للقراءة بس، وعمره ما بيفتح <code>.env</code>.</p></span></li>
+          <li><span class="n">2</span><span><h3>راجع ووثّق، مرة واحدة</h3><p>بتشوف بالظبط الأمر والفولدر والملفات اللي التوثيق مربوط بيها، وبعدها بتكتب اسم الخدمة. أي تغيير بعد كده بيلغي التوثيق لحد ما تراجعها تاني.</p></span></li>
+          <li><span class="n">3</span><span><h3>▶ شغّل المشروع</h3><p>صفحة الإعداد بتبقى لوحة التشغيل: حالة واحدة، وشغّل ووقّف، والتطبيقات اللي تفتحها، وسطر لكل خدمة بسجلّها. الخدمات بتشتغل بترتيب الاعتماد.</p></span></li>
+        </ol>
+        <ul class="safe" aria-label="قواعد الأمان">
+          <li>مفيش حاجة بتشتغل لوحدها</li>
+          <li>الـstack المشترك عمره ما بيتوقف بالغلط</li>
+          <li>مفيش أسرار في الخطط ولا السجلات</li>
+        </ul>
+      </div>
+      <div class="stack-shots">
+        <figure class="shot">
+          <img src="/yallaflow/media/tour/07-setup-plan-ar.webp" alt="الإعداد: «اسأل الوكيل» مُقترح، وخطة الوكيل فيها خدمتين بدرجة التأكد والدليل" width="1600" height="1616" loading="lazy" decoding="async">
+          <figcaption><b>خطة الوكيل، بالأدلة</b>الاقتراح بيوصل مختار جاهز، فحفظه دوسة واحدة. واللي مقدرش يتأكد منه بيتعلّم «مش محسوم».</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="/yallaflow/media/tour/09-setup-running-ar.webp" alt="تشغيل المشروع: المشروع شغّال، وفيه زرار شغّل ووقّف المشروع، وروابط الفتح، وسطر لكل خدمة" width="1600" height="1012" loading="lazy" decoding="async">
+          <figcaption><b>صفحة واحدة تشغّله منها</b>«وقّف المشروع» بيوقف بس اللي YallaFlow شغّله، وعمره ما بيوقف stack بتستخدمه مشاريع تانية.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="video" class="video-section" aria-labelledby="video-h">
+    <div class="wrap video-grid">
+      <div>
+        <p class="kicker">شوف</p>
+        <h2 id="video-h">YallaFlow في ٣٠ ثانية</h2>
+        <p class="section-lede">ليه وكيل البرمجة السريع لسه محتاج سياق مشروعك، وإزاي YallaFlow بينظّم الشغل حواليه. (الفيديو بالإنجليزي.)</p>
+        <ol class="chapters">
+          <li><span>0:00</span>الذكاء الاصطناعي بيكتب كود بسرعة، بس الكود جزء من الشغل وبس.</li>
+          <li><span>0:06</span>المتطلبات والقرارات وقواعد البيزنس بتتوه.</li>
+          <li><span>0:12</span>اتعرّف على YallaFlow: افهم، حدّد، ابني، اتحقّق.</li>
+          <li><span>0:19</span>من المتطلبات للتحقّق، والقرارات متسجّلة.</li>
+          <li><span>0:25</span>مفتوح المصدر ومعمول للمطوّرين.</li>
+        </ol>
+        <p class="full-demo">عايز الشرح كامل، من الإعداد للتسليم؟ <a href="https://lnkd.in/p/dG-JC_xq" target="_blank" rel="noopener noreferrer">شوف الديمو كامل على LinkedIn<svg class="ext" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h4v4M13 3 7 9M11 9.5V13H3V5h3.5"/></svg><span class="sr-only"> (بيفتح في تاب جديدة)</span></a> <span class="len">٨ دقايق</span></p>
+      </div>
+      <figure class="player">
+        <video controls preload="none" playsinline width="1280" height="720" poster="/yallaflow/media/yallaflow-promo-poster.jpg" aria-describedby="promo-desc">
+          <source src="/yallaflow/media/yallaflow-promo.mp4" type="video/mp4">
+          المتصفح مش قادر يشغّل الفيديو. <a href="/yallaflow/media/yallaflow-promo.mp4">نزّل فيديو YallaFlow (MP4، ٠٫٤ ميجا)</a>.
+        </video>
+        <figcaption id="promo-desc">نظرة متحركة في ٣٠ ثانية. أهم نقطها مكتوبة على الشاشة وفي قايمة الفصول هنا، وبيخلص بمستودع YallaFlow على GitHub.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="why-h">
+    <div class="wrap">
+      <p class="kicker">ليه YallaFlow</p>
+      <h2 id="why-h">السياق اللي ناقص وكيلك</h2>
+      <p class="section-lede">إنت بتوصف المطلوب. YallaFlow بيحفظ الحالة الدايمة حوالين الوكيل، والوكيل بيفكّر ويكتب الكود.</p>
+      <div class="cards">
+        <article class="card">
+          <svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><ellipse cx="18" cy="9" rx="11" ry="4"/><path d="M7 9v9c0 2.2 4.9 4 11 4s11-1.8 11-4V9"/><path d="M7 18v9c0 2.2 4.9 4 11 4s11-1.8 11-4v-9"/></svg>
+          <h3>ذاكرة دايمة للمشروع</h3>
+          <p>فهم متراجع للكود بتاعك، بأدلة، وبينبّهك لما الأدلة دي تتغيّر.</p>
+        </article>
+        <article class="card">
+          <svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="9" r="3"/><circle cx="8" cy="27" r="3"/><circle cx="28" cy="18" r="3"/><path d="M8 12v12M11 9h5a6 6 0 0 1 6 6v0a3 3 0 0 0 3 3M11 27h5a6 6 0 0 0 6-6"/></svg>
+          <h3>شغل على قد الطلب</h3>
+          <p>الباج، والفيتشر، والتحقيق، كل واحد ليه دورة على قد حجمه. الصغير بيفضل خفيف.</p>
+        </article>
+        <article class="card">
+          <svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 4l11 4v9c0 7-4.6 12.4-11 15-6.4-2.6-11-8-11-15V8z"/><path d="M12.5 18l4 4 7-8"/></svg>
+          <h3>تسليم متثبت</h3>
+          <p>مفيش حاجة بتخلص من غير دليل تحقّق جديد، ومتقارن باللي اتطلب.</p>
+        </article>
+        <article class="card">
+          <svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 18a13 13 0 0 1 22.5-8.9M31 18a13 13 0 0 1-22.5 8.9"/><path d="M28 4v6h-6M8 32v-6h6"/></svg>
+          <h3>استمرارية الوكيل</h3>
+          <p>كل جلسة جديدة وكل زميل بيبدأ من الفهم المعتمد واللي اتسجّل من شغل.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="how-it-works" aria-labelledby="how-h">
+    <div class="wrap">
+      <p class="kicker">بيشتغل إزاي</p>
+      <h2 id="how-h">من الطلب لنتيجة متسجّلة</h2>
+      <p class="section-lede">كل يوم إنت بتكلّم وكيلك. YallaFlow نفسه مابيكلّمش أي موديل ذكاء اصطناعي، ومابيبعتش أي بيانات تتبّع.</p>
+      <ol class="steps">
+        <li><h3>جهّز المشروع</h3><p><code>yallaflow init</code> بيربط Claude Code وCodex، وملفات التعليمات الموجودة بتفضل زي ما هي.</p></li>
+        <li><h3>اوصف الشغل</h3><p>اطلب من وكيلك بكلام عادي. مش محتاج تقول «استخدم YallaFlow».</p></li>
+        <li class="once"><h3>وافق مرة واحدة <span class="badge once">المشاريع القايمة</span></h3><p>الوكيل بيرسم خريطة الكود من غير ما يغيّر حاجة، ويوريك لقى إيه وفاته إيه، ويستنى موافقتك <code>Approve</code>.</p></li>
+        <li><h3>وجّه وابني</h3><p>الطلب بياخد طريقة الشغل المناسبة، من تصليح سريع لخطة متراجعة.</p></li>
+        <li><h3>اتحقّق وافتكر</h3><p>الدليل الأول. واللي اتعلّم بيبقى معرفة متراجعة للمشروع.</p></li>
+      </ol>
+      <p class="note">بعد الموافقة الأولى، طلبك الأصلي بيكمل لوحده. <a href="https://github.com/engmohamedamer/yallaflow/blob/main/docs/using-yallaflow.md">اقرا الدليل الكامل (بالإنجليزي)</a>.</p>
+    </div>
+  </section>
+
+  <section id="capabilities" aria-labelledby="caps-h">
+    <div class="wrap">
+      <p class="kicker">الإمكانيات</p>
+      <h2 id="caps-h">YallaFlow بيغطّي إيه</h2>
+      <p class="section-lede">الأساسيات شغّالة على طول. اللي عليه <span class="badge">اختياري</span> بيشتغل بس لما تطلبه.</p>
+      <ul class="caps">
+        <li><h3>Claude Code وCodex</h3><p>ربط رسمي من خلال ملف التعليمات بتاع كل وكيل.</p></li>
+        <li><h3>التعرّف على المشروع</h3><p>فهم أساسي بيعتمده إنسان، وبيقول بصراحة غطّى إيه وحدوده فين.</p></li>
+        <li><h3>حفظ المعرفة</h3><p>الحقايق والقواعد والقرارات ملفات جوه الريبو بتاعك. <a href="https://github.com/engmohamedamer/yallaflow/blob/main/docs/project-memory.md">ذاكرة المشروع</a></p></li>
+        <li><h3>متابعة الشغل</h3><p>دورات تقدر تكمّلها بعدين، للباجات والفيتشرز والتعديلات وغيرها. <a href="https://github.com/engmohamedamer/yallaflow/blob/main/docs/workflows.md">طرق الشغل</a></p></li>
+        <li><h3>التحقّق والأدلة</h3><p>سجل بيتضاف عليه بس، للفحوصات اللي اشتغلت فعلاً.</p></li>
+        <li><h3>المشاريع المشتركة</h3><p>فهم واحد للفريق كله، عن طريق Git العادي. <a href="https://github.com/engmohamedamer/yallaflow/blob/main/docs/shared-projects.md">المشاريع المشتركة</a></p></li>
+        <li><h3>كونسول بالعربي والإنجليزي</h3><p>شغل جديد، والتدفق، وأدلة كل شغلانة، والأرقام، كله في المتصفح. <a href="https://github.com/engmohamedamer/yallaflow/blob/main/docs/console.md">الكونسول</a></p></li>
+        <li><h3>شغّل مشروعك</h3><p>خدمات بيقترحها الوكيل، وبتوثّقها مرة، وتشغّلها وتوقفها من صفحة واحدة. <a href="https://github.com/engmohamedamer/yallaflow/blob/main/docs/runtime.md">التشغيل</a></p></li>
+        <li><h3>معالج المشروع الجديد</h3><p>الفكرة، والتقنية، والبيئة، ومراجعة دقيقة قبل ما أي حاجة تتعمل. <a href="https://github.com/engmohamedamer/yallaflow/blob/main/docs/new-project.md">مشروع جديد</a></p></li>
+        <li class="opt"><h3>متطلبات من التيكتات <span class="badge">اختياري</span></h3><p>استورد تيكت GitHub أو Jira أو Azure DevOps كمصدر محفوظ.</p></li>
+        <li class="opt"><h3>اختبار بالذكاء الاصطناعي مع Playwright <span class="badge">اختياري</span></h3><p>فحوصات في المتصفح من معايير القبول، ومحدش بيعدّي إلا لو اشتغل فعلاً.</p></li>
+        <li class="opt"><h3>ديمو ذكي <span class="badge">اختياري</span></h3><p>إنت بتوافق على السيناريوهات قبل أي تسجيل. وهو مش دليل اختبار. <a href="https://github.com/engmohamedamer/yallaflow/blob/main/docs/connected-requirements-and-quality.md">التيكتات والاختبار والديمو</a></p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="quick-start" aria-labelledby="qs-h">
+    <div class="wrap">
+      <p class="kicker">التثبيت والترقية</p>
+      <h2 id="qs-h">ابدأ في ٣ خطوات</h2>
+      <p class="section-lede">بيشتغل على مشروع جديد أو قايم، ومحتاج Node.js ≥ 20.16.0. سطّبه كأداة، وعمره ما يتسطّب كـdependency في الأبلكيشن بتاعك.</p>
+      <ol class="pipeline" aria-label="خطوات التثبيت"><li>npm install -g yallaflow</li><li>yallaflow init</li><li>describe the work · اوصف الشغل</li><li>yallaflow console</li></ol>
+      <div class="qs">
+        <div>
+          <p class="panel-label"><span class="tag">Terminal</span>سطّب مرة، واربط كل مشروع</p>
+<pre class="code" tabindex="0" aria-label="أوامر التثبيت"><code><span class="p">$ </span>npm install -g yallaflow
+<span class="p">$ </span>cd your-project
+<span class="p">$ </span>yallaflow init
+<span class="p">$ </span>yallaflow console      <span class="c"># optional: open it in your browser · اختياري</span></code></pre>
+          <p class="hint">بتبدأ من الصفر؟ استخدم <b>كل المشاريع ← مشروع جديد</b> في الكونسول بدل <code>init</code>.</p>
+        </div>
+        <div>
+          <p class="panel-label"><span class="tag">Prompt</span>وبعدها اطلب من Claude Code أو Codex</p>
+          <ul class="chat" aria-label="أمثلة لطلبات لوكيلك">
+            <li>صلّح إجماليات الفواتير.</li>
+            <li>ابني منصة استبيان مجهول للموظفين.</li>
+          </ul>
+          <p class="chat-note">دي رسايل لوكيلك، مش أوامر ترمينال.</p>
+        </div>
+        <div class="full">
+          <p class="panel-label"><span class="tag">Upgrade</span>لما تنزل نسخة جديدة، إنت اللي بتقرر إمتى تترقّى</p>
+          <ol class="pipeline" aria-label="خطوات الترقية"><li>npm install -g yallaflow@latest</li><li>yallaflow upgrade status</li><li>yallaflow agent refresh</li><li>yallaflow doctor</li><li>restart the console · أعد تشغيل الكونسول</li></ol>
+<pre class="code" tabindex="0" aria-label="أوامر الترقية"><code><span class="p">$ </span>npm install -g yallaflow@latest   <span class="c"># or an exact version: yallaflow@1.4.1</span>
+<span class="p">$ </span>yallaflow upgrade status          <span class="c"># read-only: what, if anything, needs attention</span>
+<span class="p">$ </span>yallaflow agent refresh           <span class="c"># only if the agent contract is reported outdated</span>
+<span class="p">$ </span>yallaflow doctor</code></pre>
+          <p class="hint">YallaFlow عمره ما بيحدّث نفسه. شغلك وذاكرة المشروع والمصادر بتفضل زي ما هي. أعد تشغيل <code>yallaflow console</code> علشان المتصفح يحمّل النسخة الجديدة. <a href="https://github.com/engmohamedamer/yallaflow/blob/main/docs/installation.md#updating-yallaflow">التفاصيل (بالإنجليزي)</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="resources" aria-labelledby="res-h">
+    <div class="wrap">
+      <p class="kicker">روابط</p>
+      <h2 id="res-h">توثيق YallaFlow وروابط مهمة</h2>
+      <ul class="links">
+        <li><a href="https://github.com/engmohamedamer/yallaflow/blob/main/docs/tour.ar.md">الجولة المصوّرة<span>١٢ شاشة حقيقية بالعربي</span></a></li>
+        <li><a href="https://github.com/engmohamedamer/yallaflow/blob/main/docs/using-yallaflow.md">استخدام YallaFlow<span>الدليل الكامل (بالإنجليزي)</span></a></li>
+        <li><a href="https://github.com/engmohamedamer/yallaflow/blob/main/docs/cli.md">مرجع الأوامر<span>كل أمر وكل خيار</span></a></li>
+        <li><a href="https://github.com/engmohamedamer/yallaflow">مستودع GitHub<span>الكود، والـREADME، والإصدارات</span></a></li>
+        <li><a href="https://www.npmjs.com/package/yallaflow">حزمة npm<span>yallaflow على npm</span></a></li>
+        <li><a href="https://github.com/engmohamedamer/yallaflow/blob/main/CHANGELOG.md">سجل التغييرات<span>تاريخ الإصدارات</span></a></li>
+        <li><a href="https://github.com/engmohamedamer/yallaflow/issues">مشاكل واقتراحات<span>بلّغ عن باج أو شارك فكرة</span></a></li>
+        <li><a href="https://lnkd.in/p/dG-JC_xq" target="_blank" rel="noopener noreferrer">شوف الديمو كامل على LinkedIn<svg class="ext" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h4v4M13 3 7 9M11 9.5V13H3V5h3.5"/></svg><span class="sr-only"> (بيفتح في تاب جديدة)</span><span>شرح ٨ دقايق، من الإعداد للتسليم</span></a></li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <a class="brand" href="/yallaflow/"><svg class="mark" aria-hidden="true"><use href="#yf-mark"/></svg>YallaFlow</a>
+    <p>الوكيل بيفكّر. YallaFlow بيحكم. ذاكرة المشروع بتفضل.</p>
+    <p>مفتوح المصدر برخصة <a href="https://github.com/engmohamedamer/yallaflow/blob/main/LICENSE">MIT</a>. مفيش سيرفر، ولا حساب، ولا تتبّع.</p>
+    <p><a href="/yallaflow/" hreflang="en" lang="en">English website</a></p>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll('button[data-copy]').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var text = document.getElementById(btn.getAttribute('data-copy')).textContent;
+    if (!navigator.clipboard) return;
+    navigator.clipboard.writeText(text).then(function () {
+      btn.textContent = 'اتنسخ';
+      setTimeout(function () { btn.textContent = 'انسخ'; }, 1500);
+    }, function () {});
+  });
+});
+</script>
+</body>
+</html>

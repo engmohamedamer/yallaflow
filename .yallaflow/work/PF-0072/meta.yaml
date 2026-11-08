@@ -1,0 +1,86 @@
+{
+  "id": "PF-0072",
+  "type": "feature",
+  "scope": "architectural",
+  "routingStatus": "routed",
+  "rawRequest": "Smart project run from Setup: the project's agent works out how the project really runs (including a Docker stack outside the repository, its database, and local domains such as *.localhost), proposes the services, asks the developer for each permission it needs (trust), then Start/Stop project runs them and Open goes to the real app URLs",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-08T13:32:49.208Z",
+  "updatedAt": "2026-11-08T15:49:08.670Z",
+  "title": "Smart project run from Setup: the project's agent works out how the project really runs (including a Docker stack outside the repository, its database, and local domains such as *.localhost), proposes the services, asks the developer for each permission it needs (trust), then Start/Stop project runs them and Open goes to the real app URLs",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope architectural`.",
+  "routedAt": "2026-11-08T13:32:49.270Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "brainstorm",
+    "specify",
+    "plan",
+    "implement",
+    "verify",
+    "converge",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "design-exploration",
+      "specification",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "delivery-convergence",
+      "code-review"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0049",
+      "type": "file",
+      "name": "Screenshot from 2026-11-08 15-06-48.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-08T13:32:53.802Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0050",
+      "type": "file",
+      "name": "pf0072-owner-direction.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-08T13:47:19.254Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0051",
+      "type": "file",
+      "name": "pf0072-owner-spec-feedback.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-08T13:54:48.866Z",
+      "workStatusAtLink": "SPECIFICATION",
+      "relationship": "work-input"
+    }
+  ],
+  "lastInvalidationAt": "2026-11-08T15:42:05.360Z",
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-08T15:49:08.670Z",
+      "verificationRunIds": [
+        "V-002"
+      ]
+    }
+  ]
+}

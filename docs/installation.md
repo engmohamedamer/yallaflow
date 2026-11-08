@@ -98,7 +98,9 @@ YallaFlow never checks for, downloads, or installs updates by itself — there i
    yallaflow doctor
    ```
 
-6. **Commit** the updated `.yallaflow/` (and `AGENTS.md` / `CLAUDE.md`, if refreshed).
+6. **Restart the console** if it is running (`Ctrl-C`, then `yallaflow console`). A console keeps the version it started with, and each run prints a new private link.
+
+7. **Commit** the updated `.yallaflow/` (and `AGENTS.md` / `CLAUDE.md`, if refreshed).
 
 Read the version's `upgrading-to-<version>.md` for behavior changes. Downgrades are not supported once a newer version has written to a workspace.
 

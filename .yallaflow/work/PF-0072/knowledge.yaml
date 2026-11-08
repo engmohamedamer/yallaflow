@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Runtime trust is bound to the effective configuration: the material definition fields plus hashes of package/composer script definitions, directly invoked local shell scripts, the Compose files a service loads (named -f files in any spelling, else the default file and its override) and the Dockerfiles of the build contexts they declare; .env and --env-file files are bound by file metadata only (content never read) and COMPOSE_/DOCKER_ settings passed by name by a digest of their value. Compose files are read by a conservative in-house reader (src/runtime/compose.js) that fails closed: anchors, aliases, merge keys, tags, flow mappings, several documents, include/extends, escaped or unknown keys, env-dependent or remote builds block trust and start until resolved. The reviewed hash is rechecked inside the service lock before spawn and again after the settle window; if it changed, only the process group YallaFlow just started and positively owns is stopped, and a shared service is left running. Trust and plan save come only from a person: a terminal for the CLI, or the console, which runs them in-process (no environment flag stands in for a person). Application code and indirect dependencies remain outside the fingerprint.",
+      "evidence": [
+        "src/runtime/inputs.js",
+        "src/runtime/compose.js",
+        "src/runtime/trust.js",
+        "src/runtime/supervisor.js",
+        "verification:V-002"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0114"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-08T15:49:00.470Z",
+      "factId": "CTX-0126",
+      "promotedAt": "2026-11-08T15:49:07.740Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-002",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Analyze Project (yallaflow runtime analyze, console Setup → Run the project): a read-only workspace discovery (src/runtime/discover.js) of the repository and up to 3 parent folders inside the home folder finds Compose stacks that mount or build the project, reads the web-server vhost folders they mount to learn *.localhost links, observes docker ps and listening ports (src/runtime/observe.js), and stores a plan in the git-ignored .yallaflow/local/runtime-plan.json with confidence, evidence and coverage; what is out of scope or unreadable is unresolved, never absent. An agent can only propose a plan (runtime plan propose --file, validated by src/runtime/plan.js). Save writes untrusted definitions; Trust and Start are separate steps. A working folder outside the repository is allowed only for personal services in .yallaflow/local/runtime.yaml, inside home. Shared infrastructure (databases, a stack defined outside the project, mounts or vhosts serving other folders, outside dependants) is re-derived from evidence at every stop or restart decision (a stored marker only adds protection); Stop project never stops it, and stopping it needs --confirm-shared or a typed confirmation. A Compose stack already running outside YallaFlow is never started, attached to or stopped.",
+      "evidence": [
+        "src/runtime/discover.js",
+        "src/runtime/plan.js",
+        "src/runtime/supervisor.js",
+        "docs/runtime.md",
+        "verification:V-002"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-08T15:49:00.665Z",
+      "factId": "CTX-0127",
+      "promotedAt": "2026-11-08T15:49:08.190Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-08T15:49:08.190Z",
+  "reviewedAt": "2026-11-08T15:49:08.190Z"
+}

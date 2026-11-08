@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "questions": [
+    {
+      "id": "Q-001",
+      "category": "architecture",
+      "question": "Should the agent choice on the Setup page be saved per project and applied automatically when the console opens?",
+      "status": "resolved",
+      "material": true,
+      "createdAt": "2026-11-08T00:23:14.619Z",
+      "updatedAt": "2026-11-08T00:23:14.771Z",
+      "answer": "Owner (2026-11-08, agent session) chose 'Save it per project': saved locally in .yallaflow/local (git-ignored) for that checkout, applied automatically when the console opens, never in --read-only, can be turned off from Setup.",
+      "resolution": "Owner decision, accepted.",
+      "resolvedAt": "2026-11-08T00:23:14.771Z"
+    },
+    {
+      "id": "Q-002",
+      "category": "architecture",
+      "question": "Claude Code does not report its permission mode until the developer types or a tool runs; how should the console avoid waiting at the start?",
+      "status": "resolved",
+      "material": true,
+      "createdAt": "2026-11-08T00:23:14.852Z",
+      "updatedAt": "2026-11-08T00:23:15.013Z",
+      "answer": "Owner (2026-11-08, agent session) chose 'Start with a first message': the launch command the console shows starts Claude Code with a short first prompt (run yallaflow brief), so the permission mode is reported at once and the agent is oriented; one small subscription turn per launch, accepted by the owner.",
+      "resolution": "Owner decision, accepted.",
+      "resolvedAt": "2026-11-08T00:23:15.013Z"
+    }
+  ],
+  "updatedAt": "2026-11-08T00:23:15.013Z"
+}

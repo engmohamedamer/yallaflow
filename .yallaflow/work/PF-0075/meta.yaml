@@ -1,0 +1,45 @@
+{
+  "id": "PF-0075",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Website for 1.4.1: add a full Arabic version (site/ar/, RTL, hreflang, language switch) and show the updates on both languages — a console showcase with real screens, What's new in 1.4.1 (Setup: agent proposes, review and trust, Start project), and install plus upgrade steps",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-08T19:08:18.432Z",
+  "updatedAt": "2026-11-08T19:15:36.098Z",
+  "title": "Website for 1.4.1: add a full Arabic version (site/ar/, RTL, hreflang, language switch) and show the updates on both languages — a console showcase with real screens, What's new in 1.4.1 (Setup: agent proposes, review and trust, Start project), and install plus upgrade steps",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-08T19:08:18.471Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-08T19:15:36.098Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

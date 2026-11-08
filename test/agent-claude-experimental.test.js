@@ -242,7 +242,8 @@ test('claude (simulated): agents claude-files writes git-ignored launch files', 
   const { root } = await project();
   const files = run(root, ['agents', 'claude-files']);
   assert.equal(files.status, 0, files.stderr);
-  assert.match(files.stdout, /claude --mcp-config/);
+  // PF-0069: a first prompt comes before the flags, so the permission mode is reported at once.
+  assert.match(files.stdout, /claude 'Run yallaflow brief, then wait for messages from the YallaFlow console\.' --mcp-config /);
   const settings = JSON.parse(await readFile(path.join(root, '.yallaflow', 'local', 'agent', 'claude-settings.json'), 'utf8'));
   assert.ok(settings.hooks.Stop[0].hooks[0].command.includes('claude-hook.mjs'));
   assert.equal(JSON.stringify(settings).includes('PermissionRequest'), false, 'hooks never answer permissions');

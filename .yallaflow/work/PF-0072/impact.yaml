@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "impacts": [
+    {
+      "id": "IM-001",
+      "status": "assessed",
+      "raisedAt": "2026-11-08T13:54:48.866Z",
+      "stageAtRaise": "SPECIFICATION",
+      "triggers": [
+        {
+          "type": "source",
+          "source": "SRC-0051",
+          "at": "2026-11-08T13:54:48.866Z"
+        },
+        {
+          "type": "requirements",
+          "changes": [
+            {
+              "id": "REQ-001",
+              "action": "revised",
+              "from": "active",
+              "to": "active"
+            },
+            {
+              "id": "REQ-003",
+              "action": "revised",
+              "from": "active",
+              "to": "active"
+            },
+            {
+              "id": "REQ-006",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "REQ-007",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-001",
+              "action": "revised",
+              "from": "active",
+              "to": "active"
+            },
+            {
+              "id": "AC-005",
+              "action": "revised",
+              "from": "active",
+              "to": "active"
+            },
+            {
+              "id": "AC-009",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-010",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-011",
+              "action": "added",
+              "to": "active"
+            }
+          ],
+          "at": "2026-11-08T13:56:01.622Z"
+        }
+      ],
+      "assessment": {
+        "assessedAt": "2026-11-08T13:56:09.386Z",
+        "stages": {
+          "context-discovery": {
+            "verdict": "unaffected",
+            "reason": "The discovery facts stand; the feedback asks for stricter rules, not different facts. Trust binding today (src/runtime/inputs.js) was read for the revision and is consistent with the discovery notes."
+          },
+          "requirement-clarification": {
+            "verdict": "affected",
+            "reason": "The owner's spec feedback (SRC-0051) is a new clarification of intent: separate Save/Trust/Start, shared-infrastructure protection, trust bound to the effective configuration, visible scan limits."
+          },
+          "design-exploration": {
+            "verdict": "affected",
+            "reason": "The design merged save and trust in one action and had no shared-service protection; it was revised to a separate Trust step and protected shared services."
+          },
+          "specification": {
+            "verdict": "affected",
+            "reason": "Rules 1, 6, 7, 7a, 7b, 9, 10, the workflow, security and UI sections and REQ/AC were revised for the four clarifications."
+          }
+        },
+        "applied": {
+          "revised": [
+            "requirement-clarification",
+            "design-exploration",
+            "specification"
+          ],
+          "stage": {
+            "from": "SPECIFICATION",
+            "to": "CLARIFICATION"
+          },
+          "convergenceInvalidated": false
+        }
+      }
+    }
+  ],
+  "updatedAt": "2026-11-08T13:56:09.386Z"
+}

@@ -205,4 +205,36 @@
   - test-support/isolate-user-config.js (repository @ 5ded124)
   - npm run check (passed) (runtime, PF-0062 V-001)
 
+<!-- yallaflow-fact:CTX-0129 -->
+### CTX-0129 — Documentation screenshots live in docs/images/tour/ as WebP, and research/docs-tour/capture.mjs regenerates them. The script builds a disposable demo project through the console's New project wizard in an isolated XDG_CONFIG_HOME, walks one request to DONE through the real CLI, and saves, trusts and starts its runtime. It captures English-light and Arabic-dark; research/docs-tour/to-webp.py then converts them. docs/images/.npmignore keeps the images out of the npm package, because test/cli.test.js pins package.json files. Screens must never come from a real project, since the repository is public.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0074
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-08T19:07:48.651Z
+- **Verified:** 2026-11-08T19:07:48.651Z (commit a8236e9)
+- **Evidence:**
+  - research/docs-tour/capture.mjs (repository @ a8236e9)
+  - research/docs-tour/to-webp.py (repository @ a8236e9)
+  - docs/images/.npmignore (repository @ a8236e9)
+  - test/cli.test.js (repository @ a8236e9)
+
+<!-- yallaflow-fact:CTX-0130 -->
+### CTX-0130 — The website is bilingual. site/index.html is the English source, and site/ar/index.html is generated from it by research/site/make-ar.py, which uses Egyptian-Arabic string pairs, sets dir=rtl and its own canonical/og locale, and swaps in the Arabic screens. The generator stops on any English string it does not expect, so edit English first and then regenerate. Both pages share site/site.css, which holds the RTL rules. Screens shown on the site are copied into site/media/tour/, because the Pages workflow deploys site/** only. sitemap.xml lists both URLs with hreflang alternates.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0075
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-08T19:15:35.656Z
+- **Verified:** 2026-11-08T19:15:35.656Z (commit a8236e9)
+- **Evidence:**
+  - research/site/make-ar.py (repository @ a8236e9)
+  - site/site.css (repository @ a8236e9)
+  - site/sitemap.xml (repository @ a8236e9)
+  - .github/workflows/pages.yml (repository @ a8236e9)
+
 <!-- yallaflow-context:end -->

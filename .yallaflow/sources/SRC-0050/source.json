@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0050",
+  "sourceType": "file",
+  "sourceName": "pf0072-owner-direction.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-11-08T13:47:19.207Z",
+  "original": {
+    "path": "sources/SRC-0050/pf0072-owner-direction.md",
+    "sha256": "e3081105ddf83271e1f7f41efbbbb7db5aad5264225d61a675d77019cfd64174",
+    "sizeBytes": 1065
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0072"
+  ],
+  "rawText": "# Owner direction for PF-0072 (2026-11-08, agent session)\n\nI choose Option 3: Both.\n\nI want YallaFlow to understand how an existing project actually runs, not merely find Docker Compose files.\n\nStart with safe, read-only discovery of the project and relevant parent workspace configuration. Then let the selected agent analyze the full development setup, including services, dependencies, ports, domains, startup order, and existing Docker or local runtime configuration.\n\nPresent a proposed runtime plan with evidence and confidence levels. Require my explicit review and trust confirmation before saving executable commands or starting any services.\n\nNever execute discovered commands automatically, read secrets, or stop services not owned by YallaFlow.\n\nThe experience should be simple: **Analyze Project → Review Runtime Setup → Start Project**.\n\nAlso decided: a service that runs from outside the project folder (like ~/YaSchools/docker-compose.yml) is allowed only in the personal, git-ignored .yallaflow/local/runtime.yaml, never in the shared profile.\n"
+}

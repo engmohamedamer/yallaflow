@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-08T00:33:20.478Z",
+      "completedAt": "2026-11-08T00:33:20.478Z",
+      "summary": "Revised for IM-002. Add an existing project = folder dialog → POST /api/projects {root} → registerRoot (requires an existing .yallaflow, else 'Run yallaflow init there first') → switchProject(overview). No first-time state exists; runtime suggestions come from suggest.js and are added through runtime add --from-suggestion. Earlier findings (agents console-wide, SessionStart has no permission_mode, runtime start/stop per service, overview stack detection) stand."
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-08T00:33:20.668Z",
+      "completedAt": "2026-11-08T00:33:20.668Z",
+      "summary": "Q-001, Q-002 unchanged; owner feedback added REQ-006/007 (stack scan, start/stop project, open apps) and mid-implementation REQ-008 (first-time setup when adding an existing project, saving the scan and setup state). 8 REQ / 10 AC."
+    },
+    "design-exploration": {
+      "status": "completed",
+      "startedAt": "2026-11-08T00:33:20.850Z",
+      "completedAt": "2026-11-08T00:33:20.850Z",
+      "summary": "Setup = Stack, Run, Agents plus a guided first-time mode (Stack → Services → Agents) after Add an existing project, with .yallaflow/local/setup.json holding the scan summary and completed steps; services added untrusted through Core."
+    },
+    "specification": {
+      "status": "completed",
+      "startedAt": "2026-11-08T00:33:21.032Z",
+      "completedAt": "2026-11-08T00:33:21.032Z",
+      "summary": "Specification revised in work.md with rule 11 (first-time setup and setup.json), reviewed again by the owner."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-08T00:34:30.867Z",
+      "completedAt": "2026-11-08T00:34:30.867Z",
+      "summary": "Plan in work.md with step 4c (first-time setup, setup.json, Rescan diff) added; owner approved the addition."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-08T00:45:12.972Z",
+      "completedAt": "2026-11-08T13:04:10.554Z",
+      "summary": "Real-session fixes: Rescan keeps the Claude probe (setupDo reloads with scanAgents); settings view carries launchCommand once launch files are current and the Agents section shows it with a run hint; the Agents section redraws live on session.connected/disconnected/started/ended/mode.changed; stack summary chips (root manifests first) with the full table folded; known suggestion notes shown in Arabic; 'No services for now' when none were added; Codex login explained. Tests added to test/project-setup.test.js. Confirmed on the owner's console for ~/YaSchools/portal: saved choice applied after restart, command shown without a click, all six checklist ticks turned green without a reload."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-08T13:31:51.212Z",
+      "completedAt": "2026-11-08T13:31:51.212Z",
+      "summary": "V-004 npm test 1003/1003 after the real-session fixes; real session on ~/YaSchools/portal confirmed saving, restart persistence, the launch command, live checklist and two-way chat."
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-08T13:31:58.646Z",
+      "completedAt": "2026-11-08T13:31:58.646Z",
+      "summary": "CV recorded: 10/10 criteria satisfied, one unrequested polish item accepted."
+    },
+    "code-review": {
+      "status": "completed",
+      "startedAt": "2026-11-08T13:32:07.092Z",
+      "completedAt": "2026-11-08T13:32:07.092Z",
+      "summary": "The security review of the implementation (6 findings, all fixed and ruled) stands. The real-session fixes were reviewed: launchCommand is served only behind the console token and holds repository-relative paths, built only when the launch files on disk are current; refreshAgentSetup redraws only #setup-agents and keeps the chat composer; setupDo's scanAgents option affects only the reload. No new findings."
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Owner added scope mid-implementation (2026-11-08): 'This should affect adding existing project for first time a way to scan and save these data is important'. Recorded as REQ-008/AC-010; edits to code continue only after the impact is assessed and the revised spec is approved.",
+      "reason": "Approved intent changed during implementation.",
+      "costIfWrong": "Building the first-time setup without approval could diverge from what the owner wants.",
+      "createdAt": "2026-11-08T00:32:44.612Z"
+    },
+    {
+      "decision": "Owner approved the IM-002 additions in the agent session (2026-11-08), separately: spec addition 'Approve the addition' (first-time guided setup, setup.json, Rescan with diff; also asked 'we can add a refresh scan to get any updates', covered by Rescan) and plan addition 'Approve the addition'. The gate record did not reopen on its own, so the approval is recorded here.",
+      "reason": "Scope added after the gates were approved; the owner's explicit approval is kept with the work.",
+      "costIfWrong": "None; the approval is the owner's own words.",
+      "createdAt": "2026-11-08T00:34:30.671Z"
+    },
+    {
+      "decision": "Independent security review on an isolated copy (2026-11-08; real repo HEAD/refs/reflog verified unchanged; not made read-only because the running suite and the owner's console write to it): 2 medium, 2 low-medium, 2 low, info. Fixed: (1) agents.json and setup.json are honoured only when personal — owned by this user, mode 0600, not tracked by Git — so a repository cannot switch agents/Claude on; (2) a read-only console runs no agent probes; (3) Start/Stop project use a profile-based time limit (ready+stop timeouts per service) instead of the 120 s write limit, and one run at a time per project; (4) Claude on/off run in order per project and disable cuts the token and flag before awaiting, bridge requests re-check after reading the body; (5) the launch-files tick compares content with YallaFlow's files, which are written when Claude is turned on; (6) turning Claude off releases the checkout lock when no session needs it; (7) the UI says turning agents off applies from the next start. Regression tests in test/project-setup.test.js.",
+      "reason": "Review findings and their resolution.",
+      "costIfWrong": "A planted agents.json could open the Claude bridge without the developer's choice; a long start could orphan a service.",
+      "createdAt": "2026-11-08T00:51:37.828Z"
+    },
+    {
+      "decision": "Real session on ~/YaSchools/portal (2026-11-08, owner's console on :4747, driven through Playwright): saving Agents + Claude Code applied at once; the launch command started Claude Code, which ran yallaflow brief by itself; channel connected, hooks reported and the permission mode (auto) was known without typing; a chat message sent from the console got its reply back through the reply tool. Problems found: Rescan this machine drops the Claude result (setupDo reloads without scanAgents); the launch command is hidden until Write launch files is pressed even when the files are current; the Setup checklist does not refresh when Claude connects; the stack table is noisy (27 rows, vendored WordPress themes) with no summary; suggestions show an English warning in Arabic; Done choosing services and Start project with no services; Codex login shows a bare dash",
+      "reason": "Owner asked to walk the Setup steps on the real project; these UX defects are inside PF-0069's approved scope (Setup scan, agents checklist, launch command) and are fixed before verification",
+      "costIfWrong": "Developers would see a misleading Setup page in the first-time flow PF-0069 exists to improve",
+      "createdAt": "2026-11-08T12:32:38.517Z"
+    },
+    {
+      "decision": "The launch command puts the quoted first prompt right after claude, not at the end as the AC-005 wording says",
+      "reason": "The mcp-config option takes several values and would read a trailing prompt as another config file; the intent (a first prompt so the permission mode is reported at once) is kept and was confirmed in the real session",
+      "costIfWrong": "None for behavior; only the criterion's wording differs from the argument order",
+      "createdAt": "2026-11-08T13:31:58.414Z"
+    }
+  ],
+  "history": [
+    {
+      "skill": "context-discovery",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-001: The stack scan and Start/Open project need discovery of the Overview detection and the runtime manager (profile fields, dependsOn, trust, readiness).",
+      "changedAt": "2026-11-08T00:28:41.683Z"
+    },
+    {
+      "skill": "requirement-clarification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-001: Owner feedback added REQ-006/REQ-007 and AC-007..AC-009.",
+      "changedAt": "2026-11-08T00:28:41.683Z"
+    },
+    {
+      "skill": "design-exploration",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-001: Setup becomes Stack, Run and Agents; start-all/stop-all and Open links are new design.",
+      "changedAt": "2026-11-08T00:28:41.683Z"
+    },
+    {
+      "skill": "specification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-001: The specification was revised for the new scope and must be reviewed again.",
+      "changedAt": "2026-11-08T00:28:41.683Z"
+    },
+    {
+      "skill": "context-discovery",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-002: The Add-an-existing-project flow (folder dialog → POST /api/projects {root} → registerRoot, requires an existing .yallaflow → Overview) had to be discovered.",
+      "changedAt": "2026-11-08T00:33:11.677Z"
+    },
+    {
+      "skill": "requirement-clarification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-002: Owner added REQ-008/AC-010 (first-time guided setup that saves the scan and setup state).",
+      "changedAt": "2026-11-08T00:33:11.677Z"
+    },
+    {
+      "skill": "design-exploration",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-002: A first-time setup mode on Setup and a local setup.json record are new design.",
+      "changedAt": "2026-11-08T00:33:11.677Z"
+    },
+    {
+      "skill": "specification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-002: The specification gains the first-time setup and must be approved again.",
+      "changedAt": "2026-11-08T00:33:11.677Z"
+    },
+    {
+      "skill": "implementation-planning",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-002: The plan gains the first-time setup step and setup.json.",
+      "changedAt": "2026-11-08T00:33:11.677Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Fix Setup UX defects found in the real portal session (see ruling): rescan keeps the Claude result, launch command shown when files are current, checklist refresh on agent events, stack summary, suggestion text, empty-services guidance, Codex login label",
+      "changedAt": "2026-11-08T12:32:43.400Z"
+    }
+  ],
+  "updatedAt": "2026-11-08T13:32:07.092Z"
+}

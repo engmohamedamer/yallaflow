@@ -41,9 +41,28 @@ yallaflow console list
 
 **All projects → New project** creates a new project in four steps: idea (name, description, requirements, attachments, location from a home-folder chooser), stack, environment (Docker, local tools or later; Git on by default) and review & create. **Create the project** is bound to the exact plan you reviewed; a plan that installs dependencies also asks for the project name. Progress, the log (collapsed) and failure recovery are shown on the page. When it finishes, the project is added to the console and its Overview opens. **All projects → Add an existing project** registers a folder that already has YallaFlow. The console starts without any saved project, so the first one can be created here. See [`new-project.md`](new-project.md).
 
-## Setup: development runtime (1.4.0)
+## Setup: run your project (1.4.1)
 
-The **Setup** tab starts, stops and restarts your project's reviewed local development services and shows their logs. Add a service from a suggestion (with the files it came from) or with **Add a service yourself** (name, id, kind, working folder, command, ports, environment variable names, shared or this machine only); adding runs `yallaflow runtime add` and starts nothing. A service runs only after you trust its exact command by typing its id, nothing starts when you open the console, and only processes YallaFlow started and can still identify are ever stopped. See [`runtime.md`](runtime.md).
+**Setup** has two layouts. [Screens →](tour.md#part-3--set-the-project-up-once-then-just-press-start)
+
+**Before any service is saved, it is a three-step guide.**
+1. **Find how the project runs.** **Ask the agent** comes first and is recommended. It prepares a fixed, read-only request in the project chat, and nothing is sent until you press Send. The agent runs `yallaflow runtime analyze` itself, reads the real configuration (Compose files, vhosts, parent folders), and proposes the plan with `yallaflow runtime plan propose`. While you wait, the page shows *Waiting for the agent's proposal* and checks for it every few seconds. When it arrives, the page switches to it and preselects the new services that nothing blocks. **Quick scan** (`yallaflow runtime analyze`) is the fallback, and it becomes the main button when agents are off. A link then takes you to the Agents settings.
+2. **Choose the services and save.** Each proposed service shows its command, folder, ports, dependencies, links, confidence, evidence and notes. Shared infrastructure, port conflicts and anything that blocks trust are shown too. Unresolved items are listed apart. **Save selected** writes untrusted definitions only.
+3. **Review, trust, then start.**
+
+**Once services are saved, Setup is the Run page.**
+- **The run control is on top.** It shows one overall state (*running*, *partly running*, *stopped*, *a service failed*, or *not ready to start yet*), trusted and running counts, **▶ Start project**, **■ Stop project**, and **Open** links for the running apps.
+- **One compact row per service.** Each row shows the state, the trust status, a Shared badge and its ports. An untrusted service offers **Review and trust**, and the review opens in the row. A trusted service offers Start, Restart and Stop. Every service has **Logs**. The exact definition is under *Definition* in each row.
+- **Configuration is folded away below.** It holds finding and adding services, the other suggestions, adding a service yourself, the stack and the agents.
+- Sections you open stay open while the page refreshes its state.
+
+The safety rules do not change:
+- A service runs only after you trust its exact command by typing its id.
+- Opening the console starts nothing.
+- Start project starts trusted services in dependency order.
+- Stop project stops only what YallaFlow started and can still identify. It never stops shared infrastructure, which needs its own typed confirmation.
+
+See [`runtime.md`](runtime.md).
 
 ## Project Overview (1.4.0)
 
@@ -228,6 +247,25 @@ When a gate waits for review (for example the specification or the plan), the it
 ## Agent Workspace (1.3.0, opt-in)
 
 With `yallaflow console --agents`, a work item gets an **Agent** panel for working with Codex (managed sessions on your ChatGPT login). The chat opens as a floating window from the corner button (its dot shows working, ready or waiting for your approval); each board card has a chat icon that opens the item with a "where is it" question in the box, and suggestions that fit the item's stage only fill the box. In a normal console started without the flag, the chat says the Agent Workspace is off and offers **Enable agents for this session** (with a confirmation): it lasts for this console run only, starts no session and activates no work item. The same dialog offers a separate, unchecked **Also allow Claude Code (experimental)**; see [`agents-claude-experimental.md`](agents-claude-experimental.md). A `--read-only` console never enables it. Activating a work item and starting a session stay two separate, explicit actions. See [`agents.md`](agents.md).
+
+**Setup** is where a project gets running. It has three sections.
+- **Stack:** what the project is built with, from repository files. Each entry has its file, `.env` files are never read, and **Rescan** says what changed since the last scan.
+- **Run the project**, in four steps (PF-0072):
+  1. **Analyze project.** A read-only scan of the project and up to 3 parent folders inside your home folder: the Docker stack that mounts the project, its services, ports and `*.localhost` domains, and what is running now. It never opens `.env` and runs nothing it finds. What was not scanned, and why, is listed, and what could not be inspected is **unresolved**. **Ask the agent to complete the plan** prepares a request in the project chat; you press Send, and the agent can only propose.
+  2. **Review and save.** Each proposed service shows its command, folder, ports, links, confidence, evidence, conflicts and **Shared** scope. **Save selected** writes untrusted definitions; anything outside the project goes to your personal file only.
+  3. **Trust each service.** **Review and trust** shows the effective configuration and the files the trust is bound to (and what it does not cover), then you type the service id. Anything blocking must be resolved first.
+  4. **Start project / Stop project.**
+     - Start project starts trusted services only.
+     - A stack already running outside YallaFlow is left alone.
+     - A busy port is reported with its owner.
+     - **Stop project never stops shared services** (databases, a stack serving other projects); stopping one is a separate action with a typed confirmation that lists who else may be affected.
+  - **Open** next to a running service opens its app (its `*.localhost` links, or its port) in a new tab. Other repository suggestions and **Add a service yourself** are folded below.
+- **Agents:**
+  - Codex and Claude Code on this machine (version, subscription login, problems), and the agents you choose for this project.
+  - The choice is saved in `.yallaflow/local/agents.json` (git-ignored) and applied whenever the console opens. It is never applied in `--read-only`.
+  - With Claude Code on, a checklist shows each connection step with its fix: launch files, channel, hooks, permission mode.
+
+When you add an existing project for the first time, Setup opens as a short guide: scan the stack, choose services, choose agents. The scan and the steps you finished are kept in `.yallaflow/local/setup.json` (git-ignored). You can skip the guide, and it can be run again.
 
 The corner chat button is on every project page (Overview, Flow, Work, Setup, Worktrees, Insights), and the page decides what the chat is about. On a work item page it is that item's chat. On the other pages it is the **project chat** ("Agent · Project"): its session is not tied to a work item, its suggestions are project questions (where the project stands, what is waiting for you, what is stuck), and the agent routes any change you ask for there to a work item first. There is still one agent session per checkout: a session running on a work item shows on project pages as a link to that item, and a project session shows on an item page labelled as the project chat. When an agent stops in the middle of a work item, the item's chat offers to continue with another agent (see [`agents.md`](agents.md#when-an-agent-stops-in-the-middle-of-a-work-item)).
 

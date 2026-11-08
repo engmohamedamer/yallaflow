@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "questions": [
+    {
+      "id": "Q-001",
+      "category": "architecture",
+      "question": "How should Setup work out how to run the project: agent proposes, file scan only, or both?",
+      "status": "resolved",
+      "material": true,
+      "createdAt": "2026-11-08T13:47:19.446Z",
+      "updatedAt": "2026-11-08T13:47:24.630Z",
+      "answer": "Both (owner, 2026-11-08): safe read-only discovery of the project and relevant parent workspace configuration first, then the selected agent analyzes the full development setup; it presents a runtime plan with evidence and confidence for explicit review and trust before anything executable is saved or started.",
+      "resolution": "Both (owner, 2026-11-08): safe read-only discovery of the project and relevant parent workspace configuration first, then the selected agent analyzes the full development setup; it presents a runtime plan with evidence and confidence for explicit review and trust before anything executable is saved or started.",
+      "resolvedAt": "2026-11-08T13:47:24.630Z"
+    },
+    {
+      "id": "Q-002",
+      "category": "architecture",
+      "question": "Where may a service that runs from outside the project folder be defined?",
+      "status": "resolved",
+      "material": true,
+      "createdAt": "2026-11-08T13:47:19.822Z",
+      "updatedAt": "2026-11-08T13:47:24.806Z",
+      "answer": "Personal file only (owner, 2026-11-08): .yallaflow/local/runtime.yaml, never the shared profile.",
+      "resolution": "Personal file only (owner, 2026-11-08): .yallaflow/local/runtime.yaml, never the shared profile.",
+      "resolvedAt": "2026-11-08T13:47:24.806Z"
+    }
+  ],
+  "updatedAt": "2026-11-08T13:47:24.806Z"
+}

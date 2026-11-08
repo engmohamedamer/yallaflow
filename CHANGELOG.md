@@ -6,7 +6,43 @@ All notable changes to YallaFlow are documented here. The format loosely follows
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+- **A visual tour of the console in English and Arabic** (PF-0074): [`docs/tour.md`](docs/tour.md) and [`docs/tour.ar.md`](docs/tour.ar.md). Twelve real screens go from the New project wizard and a simple request (Create work → Done) to Setup and Run. They are captured from a disposable demo project by [`research/docs-tour/capture.mjs`](research/docs-tour/capture.mjs). The README now opens with the console, a visual Install, and a visual Upgrade.
+- **Project setup on the console's Setup page** (PF-0069). Three sections:
+  - **Stack:** a scan of repository evidence, never `.env`. **Rescan** says what changed since the last scan.
+  - **Run:**
+    - **Start project** starts every trusted service in dependency order, waiting for each to be ready. Untrusted services are listed with what to review, and a failure stops the sequence. **Stop project** stops only what YallaFlow started.
+    - **Open** links each running service to `http://127.0.0.1:<port>`, plus an optional `open` path in the runtime profile.
+  - **Agents:**
+    - detection of Codex and Claude Code on this machine;
+    - a per-project choice saved in `.yallaflow/local/agents.json` (git-ignored), applied whenever the console opens and never in `--read-only`;
+    - Claude Code turned on or off for one project while the console runs;
+    - a connection checklist with fixes.
+- **First-time project setup.** Adding an existing project opens a short guide: scan the stack, choose services, choose agents. The scan and the finished steps are kept in `.yallaflow/local/setup.json` (git-ignored). It can be skipped and run again.
+- **`yallaflow runtime start --all`.**
+- **Analyze Project → Review and save → Trust → Start** (PF-0072). Setup works out how an existing project really runs, including a Docker stack defined in a parent folder, its database and its `*.localhost` domains.
+  - **Analyze** is read-only:
+    - it reads the repository, up to 3 parent folders inside home, and the vhost folders those stacks mount;
+    - it observes `docker ps` and listening ports;
+    - it never opens `.env` or keeps environment values;
+    - its plan states what was scanned and what was not, with what could not be inspected marked unresolved.
+  - **Ask the agent to complete the plan.** A request is prepared in the project chat; the agent can only propose (`yallaflow runtime plan propose --file`, validated).
+  - **Save** writes untrusted definitions. **Trust** is a separate step that shows the effective configuration and the files it is bound to. **Start** runs trusted services only.
+  - New commands: `yallaflow runtime analyze`, `runtime plan show|propose|save|discard`, `runtime review <id>`.
+- **Shared infrastructure is protected** (PF-0072). Shared means databases, a stack defined outside the project, or mounts and vhosts serving other projects. It is judged from current evidence, never from the stored marker alone.
+  - Stop project never stops it.
+  - Stopping or restarting it needs `--confirm-shared` or a typed confirmation that lists who else may be affected.
+- **A stack already running outside YallaFlow** is never started, attached to or stopped. A busy port is reported with its owner, and that service and its dependants are skipped.
+- **Personal services may run from a folder outside the repository**, inside the home folder, in `.yallaflow/local/runtime.yaml` only. They also get `links` to `*.localhost` app addresses.
+
+### Changed
+- **Setup leads with running the project** (PF-0073).
+  - Once services are saved, the page opens on the run control: one state, **Start project** / **Stop project**, Open links, and a compact row per service. Configuration folds away beneath.
+  - Before that, it is a three-step guide, and **Ask the agent** comes first. The agent runs the analysis itself, and its proposal arrives preselected while the page waits for it. The quick scan is the fallback.
+  - Opened sections stay open across the page's refresh. Save, trust and start remain your actions.
+- **Runtime trust also covers the Dockerfiles of Compose build contexts, and fails closed** (PF-0072). A Compose file the reader cannot read with certainty blocks trust and start until it is resolved. Examples: anchors, merge keys, flow mappings, `include`/`extends`, or a build folder an `.env` could change. If the trusted configuration changes while a service starts, YallaFlow stops only the process it has just started; a shared service is left running and reported. Status says what changed (fields, or which files).
+- **The Claude Code launch command starts with a first prompt** (`Run yallaflow brief…`). Claude Code's `SessionStart` hook carries no permission mode, so the console used to wait until you typed something. The mode is now reported at once.
+- **The chat's agent picker** links to Setup → Agents when an agent is off or not ready for the project.
 
 ## [1.4.0] - 2026-11-08 — Engineering workspace
 

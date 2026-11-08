@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "The console Setup page (viewSetup in resources/console/app.js) has two layouts. Before any service is saved it is a guided flow: 1) find how the project runs, with Ask the agent first and recommended (the agent runs yallaflow runtime analyze itself and proposes the plan, which arrives preselected while the page polls for it) and the quick scan as the fallback; 2) choose and save; 3) review, trust, then start. Once services exist, the Run control is the head of the page (overall state, Start/Stop project, Open links, one compact row per service with Review and trust or Start/Restart/Stop and Logs), and plan, suggestions, add form, stack and agents fold into a Configuration disclosure. Disclosure state survives the 3-second redraw through data-sx keys. Save, trust (typed id bound to the reviewed definitionHash) and start remain human actions.",
+      "evidence": [
+        "resources/console/app.js",
+        "resources/console/app.css",
+        "verification:V-002"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-08T16:25:45.807Z",
+      "factId": "CTX-0128",
+      "promotedAt": "2026-11-08T16:25:58.149Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-08T16:25:58.149Z",
+  "reviewedAt": "2026-11-08T16:25:58.149Z"
+}

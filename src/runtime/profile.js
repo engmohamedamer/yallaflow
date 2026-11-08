@@ -10,6 +10,7 @@
 // never echoes the offending value.
 import { createHash } from 'node:crypto';
 import { realpath, stat } from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import { readYaml, writeYaml } from '../core/yaml.js';
 import { workspacePath } from '../core/workspace.js';
@@ -26,8 +27,12 @@ const ENV_NAME = /^[A-Za-z_][A-Za-z0-9_]{0,127}$/;
 const UNSAFE_TEXT = /[\u0000-\u001f\u007f\u0080-\u009f\u200b-\u200f\u202a-\u202e\u2060-\u2064\u2066-\u2069\ufeff\u00ad\u061c\u2028\u2029]/;
 const KINDS = Object.freeze(['process', 'docker-compose']);
 const SIGNALS = Object.freeze(['SIGTERM', 'SIGINT']);
-const SERVICE_FIELDS = Object.freeze(['id', 'name', 'kind', 'command', 'cwd', 'env', 'ports', 'ready', 'stopSignal', 'stopTimeoutSeconds', 'readyTimeoutSeconds', 'dependsOn']);
-const OVERRIDABLE = Object.freeze(['name', 'command', 'cwd', 'env', 'ports', 'ready', 'stopSignal', 'stopTimeoutSeconds', 'readyTimeoutSeconds']);
+const SERVICE_FIELDS = Object.freeze(['id', 'name', 'kind', 'command', 'cwd', 'env', 'ports', 'ready', 'stopSignal', 'stopTimeoutSeconds', 'readyTimeoutSeconds', 'dependsOn', 'open', 'links', 'shared']);
+const OVERRIDABLE = Object.freeze(['name', 'command', 'cwd', 'env', 'ports', 'ready', 'stopSignal', 'stopTimeoutSeconds', 'readyTimeoutSeconds', 'open', 'links', 'shared']);
+// App links (PF-0072): loopback or a *.localhost name only, http(s), no credentials.
+export const LINK_URL = /^https?:\/\/(?:127\.0\.0\.1|localhost|(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+localhost)(?::\d{1,5})?(?:\/[A-Za-z0-9._~!$&'()*+,;=:@%\/?#-]{0,199})?$/;
+// The page Open goes to on a running service (PF-0069): a path on 127.0.0.1:<port>, never a URL.
+const OPEN_PATH = /^\/(?!\/)[A-Za-z0-9._~!$&'()*+,;=:@%\/?#-]{0,199}$/;
 const MAX_SERVICES = 32;
 
 export function sharedProfilePath(root) {
@@ -70,7 +75,9 @@ function checkInteger(where, value, min, max) {
 }
 
 // Validates one service (a full definition, or a partial override when partial = true).
-export function validateService(input, { partial = false, where = 'service' } = {}) {
+// `personal`: the definition lives in .yallaflow/local/runtime.yaml, the only place where a
+// working directory outside the repository is allowed (PF-0072, owner decision Q-002).
+export function validateService(input, { partial = false, where = 'service', personal = false } = {}) {
   if (!input || typeof input !== 'object' || Array.isArray(input)) throw invalid(`${where} must be an object.`);
   const allowed = partial ? ['id', ...OVERRIDABLE] : SERVICE_FIELDS;
   const unknown = Object.keys(input).filter((key) => !allowed.includes(key));
@@ -88,9 +95,11 @@ export function validateService(input, { partial = false, where = 'service' } = 
     }
   }
   if (!partial || 'cwd' in input) {
-    if (typeof input.cwd !== 'string' || !input.cwd.length || input.cwd.length > 512 || path.isAbsolute(input.cwd) || input.cwd.split(/[\\/]/).includes('..') || input.cwd.includes('\0')) {
+    const absolute = typeof input.cwd === 'string' && path.isAbsolute(input.cwd);
+    if (typeof input.cwd !== 'string' || !input.cwd.length || input.cwd.length > 512 || input.cwd.split(/[\\/]/).includes('..') || input.cwd.includes('\0') || (absolute && path.normalize(input.cwd) !== input.cwd)) {
       throw invalid(`${at}: cwd must be a repository-relative path without "..".`);
     }
+    if (absolute && !personal) throw invalid(`${at}: cwd must be repository-relative here; a folder outside the repository (${input.cwd}) is allowed only in your personal .yallaflow/local/runtime.yaml.`);
   }
   if ('env' in input) {
     if (!Array.isArray(input.env) || input.env.length > 64) throw invalid(`${at}: env must be an array of environment variable names.`);
@@ -115,6 +124,19 @@ export function validateService(input, { partial = false, where = 'service' } = 
     if (!Array.isArray(input.dependsOn) || input.dependsOn.length > 16 || input.dependsOn.some((id) => !SERVICE_ID.test(String(id)))) throw invalid(`${at}: dependsOn must list service ids.`);
     if (input.dependsOn.includes(input.id)) throw invalid(`${at}: a service cannot depend on itself.`);
   }
+  if ('links' in input) {
+    if (!Array.isArray(input.links) || input.links.length > 24) throw invalid(`${at}: links must be an array (max 24).`);
+    for (const [index, link] of input.links.entries()) {
+      if (!link || typeof link !== 'object' || Array.isArray(link) || Object.keys(link).some((key) => !['label', 'url'].includes(key))) throw invalid(`${at}: links[${index}] must be { "label", "url" }.`);
+      if (typeof link.label !== 'string' || !link.label.trim() || link.label.length > 80) throw invalid(`${at}: links[${index}].label must be 1-80 characters.`);
+      if (typeof link.url !== 'string' || !LINK_URL.test(link.url) || link.url.includes('\\')) throw invalid(`${at}: links[${index}].url must be http(s) on 127.0.0.1, localhost or a *.localhost name.`);
+    }
+  }
+  if ('shared' in input && input.shared !== null) {
+    const shared = input.shared;
+    if (!shared || typeof shared !== 'object' || Array.isArray(shared) || Object.keys(shared).some((key) => key !== 'scope') || !Array.isArray(shared.scope) || shared.scope.length > 24 || shared.scope.some((entry) => typeof entry !== 'string' || !entry.trim() || entry.length > 200)) throw invalid(`${at}: shared must be { "scope": [text, …] }.`);
+  }
+  if ('open' in input && (typeof input.open !== 'string' || !OPEN_PATH.test(input.open) || input.open.includes('\\'))) throw invalid(`${at}: open must be a path on the service's own port, starting with a single / (for example /admin).`);
   return true;
 }
 
@@ -153,7 +175,7 @@ export async function loadRuntimeProfiles(root) {
   if (local) {
     // An override names an existing shared service (partial) or defines a personal one (full).
     if (!local || typeof local !== 'object' || Array.isArray(local) || local.schemaVersion !== RUNTIME_PROFILE_SCHEMA || !Array.isArray(local.services)) throw invalid('.yallaflow/local/runtime.yaml must have schemaVersion 1 and a services array.');
-    for (const [index, service] of local.services.entries()) validateService(service, { partial: sharedIds.has(service?.id), where: `.yallaflow/local/runtime.yaml services[${index}]` });
+    for (const [index, service] of local.services.entries()) validateService(service, { partial: sharedIds.has(service?.id), where: `.yallaflow/local/runtime.yaml services[${index}]`, personal: true });
   }
   const services = [];
   for (const base of shared?.services ?? []) {
@@ -184,31 +206,51 @@ function withDefaults(service) {
     stopSignal: service.stopSignal ?? (service.kind === 'docker-compose' ? 'SIGINT' : 'SIGTERM'),
     stopTimeoutSeconds: service.stopTimeoutSeconds ?? (service.kind === 'docker-compose' ? 30 : 10),
     readyTimeoutSeconds: service.readyTimeoutSeconds ?? 60,
-    dependsOn: [...(service.dependsOn ?? [])]
+    dependsOn: [...(service.dependsOn ?? [])],
+    open: service.open ?? '/',
+    links: [...(service.links ?? [])],
+    shared: service.shared ?? null
   };
 }
 
 // The material definition: everything that changes what runs, where, with which
 // environment names, ports, readiness and stop behaviour. Trust binds to its hash.
 export async function definitionHash(root, service) {
+  return (await definitionParts(root, service)).hash;
+}
+
+// The hash plus what it is made of (input paths with their content hashes, and a hash of the
+// fields alone), so a lost trust can say what changed (PF-0072). Hashes only, never content.
+export async function definitionParts(root, service) {
   const material = {
     kind: service.kind, command: service.command, cwd: service.cwd, env: [...service.env].sort(), ports: [...service.ports].sort((a, b) => a - b),
     ready: service.ready, stopSignal: service.stopSignal, stopTimeoutSeconds: service.stopTimeoutSeconds,
-    readyTimeoutSeconds: service.readyTimeoutSeconds, dependsOn: [...service.dependsOn].sort(), inputs: await executionInputs(root, service)
+    readyTimeoutSeconds: service.readyTimeoutSeconds, dependsOn: [...service.dependsOn].sort(), inputs: await executionInputs(root, service),
+    // Shared marking is part of what was reviewed (plan decision D3); absent stays absent so
+    // definitions from before PF-0072 keep their hash.
+    ...(service.shared ? { shared: [...service.shared.scope].sort() } : {})
   };
-  return `sha256:${createHash('sha256').update(JSON.stringify(material)).digest('hex')}`;
+  const sha = (value) => `sha256:${createHash('sha256').update(JSON.stringify(value)).digest('hex')}`;
+  const { inputs, ...fields } = material;
+  return { hash: sha(material), fieldsHash: sha(fields), inputs };
 }
 
-// The cwd must resolve inside the repository (symbolic links are followed and checked).
+// The cwd must resolve inside the repository (symbolic links are followed and checked), or,
+// for a personal service with an absolute folder (PF-0072), inside the home folder.
 export async function resolveServiceCwd(root, service) {
   const realRoot = await realpath(root);
+  const absolute = path.isAbsolute(service.cwd);
+  if (absolute && service.source !== 'local' && !service.overridden?.includes('cwd')) throw Object.assign(new Error(`service ${service.id}: a folder outside the repository is allowed only in your personal .yallaflow/local/runtime.yaml; refused.`), { code: 'RUNTIME_CWD' });
   let resolved;
   try {
-    resolved = await realpath(path.join(realRoot, service.cwd));
+    resolved = await realpath(absolute ? service.cwd : path.join(realRoot, service.cwd));
   } catch {
     throw Object.assign(new Error(`service ${service.id}: working directory ${service.cwd} does not exist.`), { code: 'RUNTIME_CWD' });
   }
-  if (resolved !== realRoot && !resolved.startsWith(`${realRoot}${path.sep}`)) throw Object.assign(new Error(`service ${service.id}: working directory ${service.cwd} resolves outside the repository; refused.`), { code: 'RUNTIME_CWD' });
+  if (absolute) {
+    const home = await realpath(os.homedir());
+    if (!resolved.startsWith(`${home}${path.sep}`)) throw Object.assign(new Error(`service ${service.id}: working directory ${service.cwd} resolves outside your home folder; refused.`), { code: 'RUNTIME_CWD' });
+  } else if (resolved !== realRoot && !resolved.startsWith(`${realRoot}${path.sep}`)) throw Object.assign(new Error(`service ${service.id}: working directory ${service.cwd} resolves outside the repository; refused.`), { code: 'RUNTIME_CWD' });
   if (!(await stat(resolved)).isDirectory()) throw Object.assign(new Error(`service ${service.id}: ${service.cwd} is not a directory.`), { code: 'RUNTIME_CWD' });
   return resolved;
 }
@@ -219,7 +261,7 @@ export async function addService(root, service, { local = false } = {}) {
   if (local) {
     const doc = localDoc ?? { schemaVersion: RUNTIME_PROFILE_SCHEMA, services: [] };
     const partial = (shared?.services ?? []).some((entry) => entry.id === service.id);
-    validateService(service, { partial });
+    validateService(service, { partial, personal: true });
     doc.services = [...doc.services.filter((entry) => entry.id !== service.id), service];
     const dir = await localRuntimeDir(root);
     await safeWriteFile(dir, 'runtime.yaml', `${JSON.stringify(doc, null, 2)}\n`, 0o600);

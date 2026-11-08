@@ -12006,7 +12006,7 @@
     {
       "id": "CTX-0114",
       "area": "architecture",
-      "state": "current",
+      "state": "superseded",
       "confidence": "confirmed",
       "summary": "Runtime trust includes hashes of package/composer script definitions, directly invoked local shell scripts and selected Compose files; the reviewed hash is rechecked inside the service lock before spawn and stored without post-spawn input reads. Unsafe inputs revoke trust but do not prevent stopping an owned process. Application code such as node server.js and indirect dependencies remain outside the fingerprint.",
       "provenance": "repository",
@@ -12054,17 +12054,24 @@
       "verifiedAt": "2026-11-07T15:45:40.420Z",
       "verifiedAtCommit": "2f86ec728498fc135fb5dc539d9864a2ba442595",
       "supersedes": [],
-      "supersededBy": null,
+      "supersededBy": "CTX-0126",
       "history": [
         {
           "action": "introduced",
           "at": "2026-11-07T15:45:40.420Z",
           "workId": "PF-0053",
           "candidateId": "K-001"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-11-08T15:49:07.740Z",
+          "supersededBy": "CTX-0126",
+          "workId": "PF-0072",
+          "candidateId": "K-001"
         }
       ],
       "createdAt": "2026-11-07T15:45:40.420Z",
-      "updatedAt": "2026-11-07T15:45:40.420Z"
+      "updatedAt": "2026-11-08T15:49:07.740Z"
     },
     {
       "id": "CTX-0115",
@@ -12469,7 +12476,7 @@
     {
       "id": "CTX-0121",
       "area": "architecture",
-      "state": "current",
+      "state": "superseded",
       "confidence": "confirmed",
       "summary": "From 1.4.0 the experimental Claude Code connection ships in the package (package.json no longer excludes the five Claude files) but stays off by default: it turns on for one console run only with 'yallaflow console --agents --experimental-claude' or the separate, unchecked 'Also allow Claude Code (experimental)' choice when enabling agents in the console, never in --read-only; a build without the files still refuses with CLAUDE_NOT_INCLUDED. The developer starts Claude Code with the launch command the console shows (development-channel flag); the channel and hook send the bridge token only after the console proves it (HMAC over a nonce at /api/agent-bridge/claude/hello, live pid). Messages are refused until a hook reports Claude Code's permission mode, and bypassPermissions is never served. Codex remains the managed provider; subscription logins only, no API keys.",
       "provenance": "repository",
@@ -12525,7 +12532,7 @@
       "supersedes": [
         "CTX-0115"
       ],
-      "supersededBy": null,
+      "supersededBy": "CTX-0125",
       "history": [
         {
           "action": "introduced",
@@ -12533,10 +12540,17 @@
           "workId": "PF-0060",
           "candidateId": "K-001",
           "supersedes": "CTX-0115"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-11-08T13:32:37.776Z",
+          "supersededBy": "CTX-0125",
+          "workId": "PF-0069",
+          "candidateId": "K-001"
         }
       ],
       "createdAt": "2026-11-07T21:50:50.090Z",
-      "updatedAt": "2026-11-07T21:50:50.090Z"
+      "updatedAt": "2026-11-08T13:32:37.776Z"
     },
     {
       "id": "CTX-0122",
@@ -12698,7 +12712,356 @@
       ],
       "createdAt": "2026-11-07T23:45:18.289Z",
       "updatedAt": "2026-11-07T23:45:18.289Z"
+    },
+    {
+      "id": "CTX-0125",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "The experimental Claude Code connection ships in the package but is off by default. It is turned on per project from the console's Setup page: the choice (agents, and Claude Code) is saved in .yallaflow/local/agents.json (git-ignored, owner-only 0600, ignored when tracked by Git or readable by others) and applied whenever the console opens, with no flags and no restart; 'yallaflow console --agents --experimental-claude' still turns it on for one run, and --read-only ignores the saved choice. The developer starts Claude Code with the launch command Setup shows; it opens with a short first prompt (run yallaflow brief) because SessionStart hooks carry no permission mode, so the mode is reported at once. The channel and hook send the bridge token only after the console proves it (HMAC over a nonce at /api/agent-bridge/claude/hello, live pid); messages are refused until a hook reports the mode, and bypassPermissions is never served. Codex remains the managed provider; subscription logins only, no API keys.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0069",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/agents/settings.js",
+          "contentHash": "sha256:00130b289bd8f5a7cfc72ec9f1235428d0814a22e9c25b74d6225d5a2ecda06b",
+          "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/agents/claude-files.js",
+          "contentHash": "sha256:ec696d6249b89886112c8d5239f660936b1c72a3e81dd2856915348e9d747173",
+          "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/console/server.js",
+          "contentHash": "sha256:7c23cf37b637a9181aa2a818f3d16380a1e825ce61ad93bf7581d50ecc947b26",
+          "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "runtime",
+          "description": "npm test (passed)",
+          "workId": "PF-0069",
+          "verificationRunId": "V-004"
+        },
+        {
+          "type": "runtime",
+          "description": "portal session 2026-11-08: saved choice applied after a restart with no flags; mode known without typing"
+        }
+      ],
+      "verifiedAt": "2026-11-08T13:32:37.776Z",
+      "verifiedAtCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+      "supersedes": [
+        "CTX-0121"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-08T13:32:37.776Z",
+          "workId": "PF-0069",
+          "candidateId": "K-001",
+          "supersedes": "CTX-0121"
+        }
+      ],
+      "createdAt": "2026-11-08T13:32:37.776Z",
+      "updatedAt": "2026-11-08T13:32:37.776Z"
+    },
+    {
+      "id": "CTX-0126",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Runtime trust is bound to the effective configuration: the material definition fields plus hashes of package/composer script definitions, directly invoked local shell scripts, the Compose files a service loads (named -f files in any spelling, else the default file and its override) and the Dockerfiles of the build contexts they declare; .env and --env-file files are bound by file metadata only (content never read) and COMPOSE_/DOCKER_ settings passed by name by a digest of their value. Compose files are read by a conservative in-house reader (src/runtime/compose.js) that fails closed: anchors, aliases, merge keys, tags, flow mappings, several documents, include/extends, escaped or unknown keys, env-dependent or remote builds block trust and start until resolved. The reviewed hash is rechecked inside the service lock before spawn and again after the settle window; if it changed, only the process group YallaFlow just started and positively owns is stopped, and a shared service is left running. Trust and plan save come only from a person: a terminal for the CLI, or the console, which runs them in-process (no environment flag stands in for a person). Application code and indirect dependencies remain outside the fingerprint.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0072",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/runtime/inputs.js",
+          "contentHash": "sha256:f4749fc7608805b9863de3be430ad7d19033f6844bdef9a663f8405eabeb6e23",
+          "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/runtime/compose.js",
+          "contentHash": "sha256:74010a2fb44369cc076392e06b751c07bc6521aaa0dade0bc24a8852f025a2ac",
+          "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/runtime/trust.js",
+          "contentHash": "sha256:dec435c292fd6b5b599f73dfad023e88ff9c4a73436f1f84c3c0d5287a2a316c",
+          "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/runtime/supervisor.js",
+          "contentHash": "sha256:55bab5cd8ab7229141c0a51d5923eb042ef0293c639c0516c718931f90401f06",
+          "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "runtime",
+          "description": "npm test (passed)",
+          "workId": "PF-0072",
+          "verificationRunId": "V-002"
+        }
+      ],
+      "verifiedAt": "2026-11-08T15:49:07.740Z",
+      "verifiedAtCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+      "supersedes": [
+        "CTX-0114"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-08T15:49:07.740Z",
+          "workId": "PF-0072",
+          "candidateId": "K-001",
+          "supersedes": "CTX-0114"
+        }
+      ],
+      "createdAt": "2026-11-08T15:49:07.740Z",
+      "updatedAt": "2026-11-08T15:49:07.740Z"
+    },
+    {
+      "id": "CTX-0127",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Analyze Project (yallaflow runtime analyze, console Setup → Run the project): a read-only workspace discovery (src/runtime/discover.js) of the repository and up to 3 parent folders inside the home folder finds Compose stacks that mount or build the project, reads the web-server vhost folders they mount to learn *.localhost links, observes docker ps and listening ports (src/runtime/observe.js), and stores a plan in the git-ignored .yallaflow/local/runtime-plan.json with confidence, evidence and coverage; what is out of scope or unreadable is unresolved, never absent. An agent can only propose a plan (runtime plan propose --file, validated by src/runtime/plan.js). Save writes untrusted definitions; Trust and Start are separate steps. A working folder outside the repository is allowed only for personal services in .yallaflow/local/runtime.yaml, inside home. Shared infrastructure (databases, a stack defined outside the project, mounts or vhosts serving other folders, outside dependants) is re-derived from evidence at every stop or restart decision (a stored marker only adds protection); Stop project never stops it, and stopping it needs --confirm-shared or a typed confirmation. A Compose stack already running outside YallaFlow is never started, attached to or stopped.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0072",
+        "candidateId": "K-002"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/runtime/discover.js",
+          "contentHash": "sha256:0c37e0922bba7bad35f56170582d6b674007b4661e1291d2f628e46001ab40a7",
+          "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/runtime/plan.js",
+          "contentHash": "sha256:cc87fd9df15f48385d81df9823a65e13c06b996f308a26eb8502efdbfdf2c29a",
+          "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/runtime/supervisor.js",
+          "contentHash": "sha256:55bab5cd8ab7229141c0a51d5923eb042ef0293c639c0516c718931f90401f06",
+          "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "docs/runtime.md",
+          "contentHash": "sha256:69e93890e58c64979fe412b3e0b31a6641d10c959789c56a247d29a03f1174d7",
+          "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "runtime",
+          "description": "npm test (passed)",
+          "workId": "PF-0072",
+          "verificationRunId": "V-002"
+        }
+      ],
+      "verifiedAt": "2026-11-08T15:49:08.190Z",
+      "verifiedAtCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-08T15:49:08.190Z",
+          "workId": "PF-0072",
+          "candidateId": "K-002"
+        }
+      ],
+      "createdAt": "2026-11-08T15:49:08.190Z",
+      "updatedAt": "2026-11-08T15:49:08.190Z"
+    },
+    {
+      "id": "CTX-0128",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "The console Setup page (viewSetup in resources/console/app.js) has two layouts. Before any service is saved it is a guided flow: 1) find how the project runs, with Ask the agent first and recommended (the agent runs yallaflow runtime analyze itself and proposes the plan, which arrives preselected while the page polls for it) and the quick scan as the fallback; 2) choose and save; 3) review, trust, then start. Once services exist, the Run control is the head of the page (overall state, Start/Stop project, Open links, one compact row per service with Review and trust or Start/Restart/Stop and Logs), and plan, suggestions, add form, stack and agents fold into a Configuration disclosure. Disclosure state survives the 3-second redraw through data-sx keys. Save, trust (typed id bound to the reviewed definitionHash) and start remain human actions.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0073",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "resources/console/app.js",
+          "contentHash": "sha256:3a35a0586a35a105f04504ef2e5cf1e337651f4558ac325f077f6f1740a30272",
+          "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "resources/console/app.css",
+          "contentHash": "sha256:be530e2bde8ed262dd742a242ec2d8525ee2d6f9c49302a71bb7ea43eb4d4dde",
+          "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "runtime",
+          "description": "npm test (passed)",
+          "workId": "PF-0073",
+          "verificationRunId": "V-002"
+        }
+      ],
+      "verifiedAt": "2026-11-08T16:25:58.149Z",
+      "verifiedAtCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-08T16:25:58.149Z",
+          "workId": "PF-0073",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-08T16:25:58.149Z",
+      "updatedAt": "2026-11-08T16:25:58.149Z"
+    },
+    {
+      "id": "CTX-0129",
+      "area": "convention",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Documentation screenshots live in docs/images/tour/ as WebP, and research/docs-tour/capture.mjs regenerates them. The script builds a disposable demo project through the console's New project wizard in an isolated XDG_CONFIG_HOME, walks one request to DONE through the real CLI, and saves, trusts and starts its runtime. It captures English-light and Arabic-dark; research/docs-tour/to-webp.py then converts them. docs/images/.npmignore keeps the images out of the npm package, because test/cli.test.js pins package.json files. Screens must never come from a real project, since the repository is public.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0074",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "research/docs-tour/capture.mjs",
+          "contentHash": "sha256:ca95d2af8773f5cacb81dd4f6d1f1ef6c0717225301097ac8cb901b7db819eee",
+          "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "research/docs-tour/to-webp.py",
+          "contentHash": "sha256:5c105efbbcd5f3903dfa5273142fdffde28cdbf215f92de04133dfc75ab7e48d",
+          "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "docs/images/.npmignore",
+          "contentHash": "sha256:27b6eabc1cf7aafb9dbd8801ac4991c682d04b57b56a9e4a331061a9c2c64c15",
+          "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "test/cli.test.js",
+          "contentHash": "sha256:439747e08371b96d614ce27cfc1bedf25631073332d1e090e49beb98fe493671",
+          "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+          "workingTree": "head"
+        }
+      ],
+      "verifiedAt": "2026-11-08T19:07:48.651Z",
+      "verifiedAtCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-08T19:07:48.651Z",
+          "workId": "PF-0074",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-08T19:07:48.651Z",
+      "updatedAt": "2026-11-08T19:07:48.651Z"
+    },
+    {
+      "id": "CTX-0130",
+      "area": "convention",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "The website is bilingual. site/index.html is the English source, and site/ar/index.html is generated from it by research/site/make-ar.py, which uses Egyptian-Arabic string pairs, sets dir=rtl and its own canonical/og locale, and swaps in the Arabic screens. The generator stops on any English string it does not expect, so edit English first and then regenerate. Both pages share site/site.css, which holds the RTL rules. Screens shown on the site are copied into site/media/tour/, because the Pages workflow deploys site/** only. sitemap.xml lists both URLs with hreflang alternates.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0075",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "research/site/make-ar.py",
+          "contentHash": "sha256:d4e9c3c21953823e909bd906b65697aee80f65afab3b819f1b38f471262d281f",
+          "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "site/site.css",
+          "contentHash": "sha256:46d8da2100686253b7d9279f7edb1b4659cce1df7328458a2a1f93f33269c938",
+          "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "site/sitemap.xml",
+          "contentHash": "sha256:4106e6692839afd7d830eefc5d3b877244c113162a80b8acfcd2825fed894c8c",
+          "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": ".github/workflows/pages.yml",
+          "contentHash": "sha256:105d80f6c0969ac3b7c56d420cd77e587ee9d0107dd9498d3860f025e6174f34",
+          "gitCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+          "workingTree": "head"
+        }
+      ],
+      "verifiedAt": "2026-11-08T19:15:35.656Z",
+      "verifiedAtCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-08T19:15:35.656Z",
+          "workId": "PF-0075",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-08T19:15:35.656Z",
+      "updatedAt": "2026-11-08T19:15:35.656Z"
     }
   ],
-  "updatedAt": "2026-11-07T23:45:18.289Z"
+  "updatedAt": "2026-11-08T19:15:35.656Z"
 }

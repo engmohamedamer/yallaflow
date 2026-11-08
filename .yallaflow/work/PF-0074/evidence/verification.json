@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "npm test",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "test"
+      ],
+      "displayCommand": "npm test",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-08T18:58:21.362Z",
+      "finishedAt": "2026-11-08T19:02:37.795Z",
+      "verifiedAt": "2026-11-08T19:02:37.795Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "npm test",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "test"
+      ],
+      "displayCommand": "npm test",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-08T19:03:11.979Z",
+      "finishedAt": "2026-11-08T19:07:38.016Z",
+      "verifiedAt": "2026-11-08T19:07:38.016Z",
+      "log": "V-002-verification.log"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "gates": {
+    "specification": {
+      "status": "approved",
+      "respondedAt": "2026-11-08T13:57:53.093Z",
+      "note": "Approved by the owner in the agent session (2026-11-08): 'I explicitly approve the revised PF-0072 specification. The separation of Save, Trust and Start, shared-service protection, configuration-bound trust, scan limitations, agent proposal boundaries and process-ownership requirements are accepted. Proceed to the implementation plan and its required review gate.' Plan must include regression tests: compose/script changes block execution; Stop Project never stops shared infrastructure automatically; running services not owned by YallaFlow never terminated; saving a plan grants no execution; unresolved scan results not presented as confirmed; concurrent changes cannot bypass trust checks. Stay within the existing Runtime Core and Console architecture, no separate execution engine. Local only: no commit, push, tag, release or publish without authorization.",
+      "history": [
+        {
+          "status": "awaiting_review",
+          "at": "2026-11-08T13:49:37.818Z"
+        },
+        {
+          "status": "changes_requested",
+          "at": "2026-11-08T13:54:48.565Z",
+          "note": "Owner (agent session, 2026-11-08): aligned with the goal; three clarifications before approval: (1) separate Review/Save, Trust and Start; saving never authorizes execution; explicit trust of the effective commands before starting; (2) protect shared infrastructure: detect and show shared dependencies (MySQL, shared compose services), never automatically stop or restart a service another project may use, show the affected scope and require explicit confirmation when necessary; (3) bind trust to the effective configuration including relevant compose files and referenced project scripts where feasible; material changes invalidate trust; never trust a command name alone. Also: scan limitations visible; things outside the discovery scope stay unresolved, not absent. Keep all changes local: no push, tag, release or npm publish."
+        },
+        {
+          "status": "approved",
+          "at": "2026-11-08T13:57:53.093Z",
+          "note": "Approved by the owner in the agent session (2026-11-08): 'I explicitly approve the revised PF-0072 specification. The separation of Save, Trust and Start, shared-service protection, configuration-bound trust, scan limitations, agent proposal boundaries and process-ownership requirements are accepted. Proceed to the implementation plan and its required review gate.' Plan must include regression tests: compose/script changes block execution; Stop Project never stops shared infrastructure automatically; running services not owned by YallaFlow never terminated; saving a plan grants no execution; unresolved scan results not presented as confirmed; concurrent changes cannot bypass trust checks. Stay within the existing Runtime Core and Console architecture, no separate execution engine. Local only: no commit, push, tag, release or publish without authorization."
+        }
+      ]
+    },
+    "plan": {
+      "status": "approved",
+      "respondedAt": "2026-11-08T14:04:16.007Z",
+      "note": "Approved by the owner in the agent session (2026-11-08): 'I explicitly approve the PF-0072 implementation plan and its three technical decisions. Proceed with the 11 implementation steps and the R1-R6 regression tests.' Additional safety requirements: (1) the compose reader fails closed: unresolved configuration that materially affects execution blocks Trust/Start until reviewed and resolved; (2) if configuration changes during startup, terminate only processes positively owned by YallaFlow, never external or shared infrastructure as a rollback side effect; (3) shared classification is revalidated from actual evidence at execution time; a stored marker alone never makes a service safe to stop. Real portal: Analyze, agent proposal and Review only; no start/stop of its Docker services without separate approval. Local only: no commit, push, tag, release or publish. Afterwards update the local installation and give exact test steps.",
+      "history": [
+        {
+          "status": "awaiting_review",
+          "at": "2026-11-08T13:59:01.929Z"
+        },
+        {
+          "status": "approved",
+          "at": "2026-11-08T14:04:16.007Z",
+          "note": "Approved by the owner in the agent session (2026-11-08): 'I explicitly approve the PF-0072 implementation plan and its three technical decisions. Proceed with the 11 implementation steps and the R1-R6 regression tests.' Additional safety requirements: (1) the compose reader fails closed: unresolved configuration that materially affects execution blocks Trust/Start until reviewed and resolved; (2) if configuration changes during startup, terminate only processes positively owned by YallaFlow, never external or shared infrastructure as a rollback side effect; (3) shared classification is revalidated from actual evidence at execution time; a stored marker alone never makes a service safe to stop. Real portal: Analyze, agent proposal and Review only; no start/stop of its Docker services without separate approval. Local only: no commit, push, tag, release or publish. Afterwards update the local installation and give exact test steps."
+        }
+      ]
+    }
+  },
+  "updatedAt": "2026-11-08T14:04:16.007Z"
+}

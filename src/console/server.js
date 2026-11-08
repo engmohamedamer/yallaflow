@@ -23,7 +23,7 @@ import { exists } from '../utils/fs.js';
 import { loadSource, loadSourceText, sourceOriginalPath } from '../core/sources.js';
 import { isSourceId, isWorkId } from '../core/ids.js';
 import { HttpError, MAX_JSON_BYTES, attachFile, createWork, validateCreateBody } from './create.js';
-import { isServiceId, runRuntimeAction } from './runtime.js';
+import { isServiceId, runRuntimeAction, runRuntimePlanAction, runRuntimeProjectAction } from './runtime.js';
 import { wizardCatalog, wizardCreate, wizardPlan, wizardProgress } from './newproject.js';
 import { AgentBridge } from '../agents/bridge.js';
 import { detectProviders } from '../agents/detect.js';
@@ -31,6 +31,8 @@ import { FolderError, listFolders } from './folders.js';
 import { addProject as saveToRegistry } from './registry.js';
 import { addRuntimeService, attachPlannedFile, createdProjectRoot, gitInit, probeTools, workspaceRoot } from './greenfield.js';
 import { CLAUDE_NOT_INCLUDED, claudeIncluded, loadClaude } from '../agents/experimental.js';
+import { readAgentSettings, writeAgentSettings } from '../agents/settings.js';
+import { markSetup, readSetup, scanSetup, setupPending } from './setup.js';
 
 const UI_DIR = fileURLToPath(new URL('../../resources/console/', import.meta.url));
 const UI_FILES = Object.freeze({
@@ -47,7 +49,7 @@ const UI_FILES = Object.freeze({
 // 1.4.0: work-item actions and review-gate decisions (PF-0043) join Create Work.
 // 1.4.0 Greenfield journey (PF-0057): register a project, enable agents for this run, Git init,
 // add a runtime service, attach a planned file to a new project's first work item.
-const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|revision-sources|actions\/[a-z]+|gates\/[a-z]+\/decision))?|runtime\/[a-z][a-z0-9-]{0,31}\/(?:trust|start|stop|restart)|runtime\/services|git\/init)$|^\/api\/new\/(?:plan|create|plans\/NP-\d{14}-[0-9a-f]{6}\/files)$|^\/api\/(?:projects|agents\/enable)$/;
+const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|revision-sources|actions\/[a-z]+|gates\/[a-z]+\/decision))?|runtime\/[a-z][a-z0-9-]{0,31}\/(?:trust|start|stop|restart)|runtime\/services|runtime\/(?:start|stop)-all|runtime\/analyze|runtime\/plan\/save|agents\/(?:settings|launch-files)|setup\/(?:scan|step)|git\/init)$|^\/api\/new\/(?:plan|create|plans\/NP-\d{14}-[0-9a-f]{6}\/files)$|^\/api\/(?:projects|agents\/enable)$/;
 // Agent Interaction (v1.3.0, only with --agents): the Agent Workspace's actions.
 const AGENT_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/agent\/(start|message|permission|cancel|end|resume|connect|disconnect|activate)$/;
 // The Claude channel server and hook forwarder (bridge token, never a browser).
@@ -95,6 +97,12 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
   const runner = createRunner();
   const projects = await Promise.all(roots.map(async (root) => ({ id: projectId(root), root, name: (await projectName(root)) ?? path.basename(root) })));
   const byId = new Map(projects.map((entry) => [entry.id, entry]));
+  // PF-0069: each project's saved agent choice (.yallaflow/local/agents.json) applies when
+  // the console opens. A read-only console ignores it.
+  const savedChoices = new Map();
+  if (!readOnly) for (const entry of projects) savedChoices.set(entry.id, await readAgentSettings(entry.root));
+  if (!readOnly && [...savedChoices.values()].some((choice) => choice.chosen && choice.agents)) agentsOn = true;
+  const claudeChosen = () => (claudeIncluded() ? [...savedChoices.entries()].filter(([, choice]) => choice.chosen && choice.claude).map(([id]) => id) : []);
   const clients = new Set();
   const tokenBuffer = Buffer.from(token);
 
@@ -126,10 +134,36 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     projects.push(entry);
     byId.set(entry.id, entry);
     watchers.push(watch(entry));
+    if (!readOnly) {
+      const choice = await readAgentSettings(entry.root);
+      savedChoices.set(entry.id, choice);
+      if (choice.chosen && choice.agents && !agentsOn) await enableAgents();
+    }
     await bridge?.addProject(entry);
+    if (bridge && savedChoices.get(entry.id)?.claude && claudeIncluded()) await bridge.enableClaude(entry.id);
     const message = `data: ${JSON.stringify({ type: 'projects', project: entry.id, at: new Date().toISOString() })}\n\n`;
     for (const client of clients) client.write(message);
     return { id: entry.id, name: entry.name, root: entry.root, added: true, saved: saved.added };
+  }
+  async function agentSettingsView(project, scan) {
+    // A read-only console runs no agent probes (security review, PF-0069).
+    if (readOnly) return { readOnly: true, claudeAvailable: claudeIncluded(), saved: { chosen: false }, applied: { agents: false, claude: false }, codex: null, claude: null, checklist: null };
+    const choice = savedChoices.get(project.id) ?? (readOnly ? { chosen: false } : await readAgentSettings(project.root));
+    const claudeOnHere = Boolean(bridge?.claudeOnFor(project.id));
+    const detected = await detectProviders({ env: agentEnv, claude: (scan || claudeOnHere || choice.claude) && claudeIncluded(), maxAgeMs: scan ? 0 : 30_000 });
+    const claudeKit = claudeOnHere ? await loadClaude() : null;
+    const launchFiles = claudeKit ? await claudeKit.launchFilesCurrent(project.root) : false;
+    const provider = (found) => (found ? { ready: Boolean(found.ready), problems: found.problems ?? [], version: found.claude?.version ?? found.codex?.version ?? null, auth: found.auth ? { loggedIn: Boolean(found.auth.loggedIn), method: found.auth.method ?? null, plan: found.auth.plan ?? null } : null } : null);
+    return {
+      readOnly, claudeAvailable: claudeIncluded(),
+      saved: choice,
+      applied: { agents: agentsOn, claude: claudeOnHere },
+      codex: provider(detected.codex),
+      claude: detected.claude ? provider(detected.claude) : null,
+      checklist: claudeOnHere ? { ...bridge.claudeChecklist(project.id), launchFiles } : null,
+      // The command to run, once the launch files on disk are current (never before).
+      launchCommand: launchFiles ? claudeKit.launchCommand(project.root) : null
+    };
   }
   const heartbeat = setInterval(() => { for (const client of clients) client.write(': ping\n\n'); }, 25_000);
   heartbeat.unref();
@@ -202,8 +236,25 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       return send(response, 200, await runner.get(project.root, 'snapshot', ['snapshot', '--json']));
     }
     // 1.4.0 runtime: services, their live state and suggestions; logs on demand. Never starts anything.
+    // PF-0069: Setup → Agents. The saved choice, what is applied in this run, detection
+    // (Claude only on request: ?scan=1) and the connection checklist. Read-only.
+    if (rest.length === 2 && rest[0] === 'agents' && rest[1] === 'settings') {
+      return send(response, 200, await agentSettingsView(project, url.searchParams.get('scan') === '1'));
+    }
+    // PF-0069: the saved project setup (last stack scan, steps) and whether to offer it.
+    if (rest.length === 1 && rest[0] === 'setup') {
+      const record = await readSetup(project.root);
+      return send(response, 200, { record, pending: !readOnly && setupPending(record), readOnly });
+    }
     if (rest.length === 1 && rest[0] === 'runtime') {
       return send(response, 200, await runner.readFresh(project.root, ['runtime', 'status', '--json']));
+    }
+    // PF-0072: the runtime plan (scan + agent proposal) and the review before trust. Read-only.
+    if (rest.length === 2 && rest[0] === 'runtime' && rest[1] === 'plan') {
+      return send(response, 200, await runner.readFresh(project.root, ['runtime', 'plan', 'show', '--json']));
+    }
+    if (rest.length === 3 && rest[0] === 'runtime' && isServiceId(rest[1]) && rest[2] === 'review') {
+      return send(response, 200, await runner.readFresh(project.root, ['runtime', 'review', rest[1], '--json']));
     }
     if (rest.length === 3 && rest[0] === 'runtime' && isServiceId(rest[1]) && rest[2] === 'logs') {
       const lines = Math.max(1, Math.min(1000, Number.parseInt(url.searchParams.get('lines') ?? '200', 10) || 200));
@@ -307,6 +358,51 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       teamCache.delete(project.id);
       return send(response, 200, await gitInit(project.root));
     }
+    // PF-0069: save the project's agent choice and apply it now; write the launch files.
+    if (rest.length === 2 && rest[0] === 'agents' && ['settings', 'launch-files'].includes(rest[1])) {
+      if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+      const body = await readJsonBody(request);
+      if (rest[1] === 'launch-files') {
+        if (!body || typeof body !== 'object' || Array.isArray(body) || Object.keys(body).length) return send(response, 400, { error: { code: 'BAD_REQUEST', message: 'Send an empty JSON object.' } });
+        if (!bridge?.claudeOnFor(project.id)) return send(response, 409, { error: { code: 'CLAUDE_OFF', message: 'Turn Claude Code on for this project first.' } });
+        const files = await (await loadClaude()).writeClaudeLaunchFiles(project.root);
+        return send(response, 200, { command: files.command });
+      }
+      const keys = body && typeof body === 'object' && !Array.isArray(body) ? Object.keys(body) : [];
+      if (keys.length !== 2 || typeof body.agents !== 'boolean' || typeof body.claude !== 'boolean') return send(response, 400, { error: { code: 'BAD_REQUEST', message: 'Send { "agents": true|false, "claude": true|false }.' } });
+      if (body.claude && !claudeIncluded()) return send(response, 409, { error: { code: 'CLAUDE_NOT_INCLUDED', message: CLAUDE_NOT_INCLUDED } });
+      const choice = await writeAgentSettings(project.root, body);
+      savedChoices.set(project.id, choice);
+      if (choice.agents && !agentsOn) await enableAgents();
+      if (bridge) {
+        if (choice.claude) {
+          await bridge.enableClaude(project.id);
+          // Written now, so the command the checklist shows always runs YallaFlow's own files.
+          await (await loadClaude()).writeClaudeLaunchFiles(project.root);
+        } else await bridge.disableClaude(project.id);
+      }
+      return send(response, 200, await agentSettingsView(project, false));
+    }
+    // PF-0069: scan (or rescan) the stack and save it; mark a setup step done or skipped.
+    if (rest.length === 2 && rest[0] === 'setup' && ['scan', 'step'].includes(rest[1])) {
+      if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+      const body = await readJsonBody(request);
+      if (rest[1] === 'scan') {
+        if (!body || typeof body !== 'object' || Array.isArray(body) || Object.keys(body).length) return send(response, 400, { error: { code: 'BAD_REQUEST', message: 'Send an empty JSON object.' } });
+        return send(response, 200, await scanSetup(project.root, runner));
+      }
+      return send(response, 200, { record: await markSetup(project.root, body) });
+    }
+    // PF-0072: Analyze (read-only scan) and Save selected (untrusted definitions).
+    if ((rest.length === 2 && rest[0] === 'runtime' && rest[1] === 'analyze') || (rest.length === 3 && rest[0] === 'runtime' && rest[1] === 'plan' && rest[2] === 'save')) {
+      if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+      return send(response, 200, await runRuntimePlanAction(project.root, rest[1] === 'analyze' ? 'analyze' : 'save', await readJsonBody(request), runner));
+    }
+    // PF-0069: Start project / Stop project.
+    if (rest.length === 2 && rest[0] === 'runtime' && ['start-all', 'stop-all'].includes(rest[1])) {
+      if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+      return send(response, 200, await runRuntimeProjectAction(project.root, rest[1].replace('-all', ''), await readJsonBody(request), runner));
+    }
     // 1.4.0 runtime: POST /api/p/<project>/runtime/<service>/(trust|start|stop|restart)
     if (rest.length === 3 && rest[0] === 'runtime' && isServiceId(rest[1])) {
       if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
@@ -346,7 +442,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       case 'end':
         return send(response, 200, await bridge.end(project.id));
       case 'connect': {
-        if (body.provider !== 'claude' || !claudeOn) return send(response, 400, { error: { code: 'UNSUPPORTED', message: 'Claude Code sessions are not enabled in this console.' } });
+        if (body.provider !== 'claude' || !bridge.claudeOnFor(project.id)) return send(response, 400, { error: { code: 'UNSUPPORTED', message: 'Claude Code sessions are not enabled in this console.' } });
         // Claim the slot first; the launch files are written only by the console that owns it.
         const summary = await bridge.connectClaude(project.id, { workId });
         const files = await (await loadClaude()).writeClaudeLaunchFiles(project.root);
@@ -365,7 +461,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
 
   // ----- Claude channel server + hook forwarder (bridge token; never a browser) -----
   async function handleBridge(request, response, url) {
-    if (!agentsOn || !claudeOn) return send(response, 404, { error: { code: 'NOT_FOUND', message: 'Not found.' } });
+    if (!agentsOn || !bridge?.anyClaude()) return send(response, 404, { error: { code: 'NOT_FOUND', message: 'Not found.' } });
     if (request.headers.origin) return send(response, 403, { error: { code: 'FORBIDDEN_ORIGIN', message: 'Not for browsers.' } });
     // The channel and the hook check this console before they send the token (PF-0060).
     if (url.pathname.endsWith('/hello')) {
@@ -376,6 +472,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     const header = String(request.headers.authorization ?? '');
     const target = bridge.projectByBridgeToken(header.startsWith('Bearer ') ? header.slice(7) : '');
     if (!target) return send(response, 401, { error: { code: 'UNAUTHORIZED', message: 'Missing or wrong bridge token.' } });
+    if (!target.claudeOn || !target.claude) return send(response, 404, { error: { code: 'NOT_FOUND', message: 'Not found.' } });
     const kind = url.pathname.split('/').pop();
     if (kind === 'stream') {
       if (request.method !== 'GET') return send(response, 405, { error: { code: 'METHOD', message: 'GET only.' } });
@@ -390,6 +487,8 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     }
     if (request.method !== 'POST') return send(response, 405, { error: { code: 'METHOD', message: 'POST only.' } });
     const body = await readJsonBody(request);
+    // Claude may have been turned off while the body was read.
+    if (!target.claudeOn || !target.claude) return send(response, 404, { error: { code: 'NOT_FOUND', message: 'Not found.' } });
     if (kind === 'event') {
       target.claude.onChannelEvent(body).catch(() => {});
       return send(response, 200, { ok: true });
@@ -457,6 +556,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     projects,
     port: listening.port,
     claude,
+    claudeFor: claudeChosen(),
     env: agentEnv,
     broadcast: (projectId, event) => {
       const message = `data: ${JSON.stringify({ type: 'agent', project: projectId, event })}\n\n`;
@@ -476,7 +576,17 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
   async function enableAgents({ claude = false } = {}) {
     if (readOnly) throw Object.assign(new Error('This console was started with --read-only.'), { status: 405, code: 'READ_ONLY' });
     if (claude && !claudeIncluded()) throw Object.assign(new Error(CLAUDE_NOT_INCLUDED), { status: 409, code: 'CLAUDE_NOT_INCLUDED' });
-    if (agentsOn) return { enabled: true, claude: claudeOn, already: true };
+    if (agentsOn && bridge) {
+      // Agents already on (PF-0069): Claude can still be added for every project, no restart.
+      if (claude && !claudeOn) {
+        claudeOn = true;
+        bridge.claudeEnabled = true;
+        for (const project of projects) await bridge.enableClaude(project.id);
+        api.agents = { enabled: true, claude: true };
+        return { enabled: true, claude: true, already: false };
+      }
+      return { enabled: true, claude: claudeOn, already: true };
+    }
     enabling ??= (async () => {
       // Claude Code only when the developer chose it explicitly in this request (PF-0060).
       const next = makeBridge({ claude });

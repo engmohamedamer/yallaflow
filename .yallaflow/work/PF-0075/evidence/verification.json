@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "bash /tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/sitecheck.sh /home/engamer/Amasi/YallaFlow /tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad",
+      "executionMode": "argv",
+      "executable": "bash",
+      "args": [
+        "/tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/sitecheck.sh",
+        "/home/engamer/Amasi/YallaFlow",
+        "/tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad"
+      ],
+      "displayCommand": "bash /tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad/sitecheck.sh /home/engamer/Amasi/YallaFlow /tmp/claude-1000/-home-engamer-YaSchools-portal/30ddc1a0-ec7b-4f15-a52b-652f5247f41b/scratchpad",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-08T19:15:26.159Z",
+      "finishedAt": "2026-11-08T19:15:26.453Z",
+      "verifiedAt": "2026-11-08T19:15:26.453Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

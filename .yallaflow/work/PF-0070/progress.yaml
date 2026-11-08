@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-08T13:10:42.173Z",
+      "completedAt": "2026-11-08T13:10:42.173Z",
+      "summary": "Live console (portal, 2026-11-08): the only scrolling element in #chatwin is .chatbody (scrollHeight 2686, clientHeight 617, scrollTop 0); renderAgent and the start path set scrollTop on #agent .astream, which does not scroll. resources/console/app.js:423 and :2102."
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-08T13:10:47.414Z",
+      "completedAt": "2026-11-08T13:10:47.414Z",
+      "summary": "Root cause: the scroll target is the wrong element (.astream instead of the scrolling .chatbody). Fix: scroll .chatbody to the bottom on open, after sending, and as events arrive when the reader is already near the bottom.",
+      "evidence": [
+        "resources/console/app.js:423",
+        "runtime:live console 2026-11-08 #chatwin .chatbody scrollHeight 2686 clientHeight 617 scrollTop 0 after opening; .astream has no overflow"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-08T13:24:48.126Z",
+      "completedAt": "2026-11-08T13:24:48.126Z",
+      "summary": "resources/console/app.js: chatAtEnd/toChatEnd scroll the real scrolling element (#chatwin .chatbody); renderAgent and render() follow the newest message when the reader is near the end, keep the reader's place otherwise, and always go to the end on opening the chat and on send (chatForceEnd). Live check on the owner's console: gap to the end 0 after reload, open, send (after scrolling to the top) and the reply."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-08T13:26:11.564Z",
+      "completedAt": "2026-11-08T13:26:11.564Z",
+      "summary": "Fresh verification V-001 passed."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-08T13:26:11.564Z"
+}

@@ -58,9 +58,13 @@ export function bridgeFile(root) {
 }
 
 export class AgentBridge {
-  constructor({ projects, broadcast, claude = false, env = process.env, runActivate, permissionTimeoutMs, port }) {
+  // `claude` turns the experimental Claude connection on for every project (the
+  // --experimental-claude flag); `claudeFor` names the projects whose saved choice turns it on
+  // (PF-0069). enableClaude/disableClaude change one project while the console runs.
+  constructor({ projects, broadcast, claude = false, claudeFor = [], env = process.env, runActivate, permissionTimeoutMs, port }) {
     this.env = env;
     this.claudeEnabled = claude;
+    this.claudeFor = new Set(claudeFor);
     this.broadcast = broadcast;
     this.runActivate = runActivate;
     this.port = port;
@@ -75,7 +79,8 @@ export class AgentBridge {
       pending: new Map(),
       events: [],
       claude: null,
-      bridgeToken: this.claudeEnabled ? randomBytes(24).toString('hex') : null,
+      claudeOn: false,
+      bridgeToken: null,
       owner: null, // the checkout lock while this console holds it
       holder: null // who holds it when another console does
     };
@@ -87,23 +92,95 @@ export class AgentBridge {
     if (this.projects.has(project.id)) return;
     const entry = this.entry(project);
     this.projects.set(project.id, entry);
-    if (!this.claudeEnabled) return;
-    await ensureLocalIgnored(entry.root);
-    entry.claude = this.newClaudeLink(entry);
-    await this.claimCheckout(entry);
+    if (this.claudeEnabled || this.claudeFor.has(entry.id)) await this.enableClaude(entry.id);
+  }
+
+  claudeOnFor(projectId) {
+    return Boolean(this.projects.get(projectId)?.claudeOn);
+  }
+  anyClaude() {
+    for (const project of this.projects.values()) if (project.claudeOn) return true;
+    return false;
+  }
+
+  // On and off for one project run one at a time, in order (security review, PF-0069).
+  claudeStep(project, fn) {
+    const next = (project.claudeChain ?? Promise.resolve()).then(fn);
+    project.claudeChain = next.catch(() => {});
+    return next;
+  }
+
+  // Turns the Claude connection on for one project: a fresh bridge token, its link, and the
+  // bridge file once this console owns the checkout (PF-0069).
+  enableClaude(projectId) {
+    const project = this.project(projectId);
+    return this.claudeStep(project, async () => {
+      if (project.claudeOn) return { claude: true, already: true };
+      this.ClaudeLink ??= (await loadClaude()).ClaudeLink;
+      await ensureLocalIgnored(project.root);
+      project.bridgeToken = randomBytes(24).toString('hex');
+      project.claude = this.newClaudeLink(project);
+      project.claudeOn = true;
+      if (await this.claimCheckout(project)) await this.writeBridgeFile(project);
+      return { claude: true, already: false };
+    });
+  }
+
+  // Turns it off. The token and the flag go first, before anything awaits, so no channel,
+  // hook or connect gets in meanwhile; then a linked session is unlinked, open requests are
+  // denied, the channel is dropped, the bridge file goes, and the checkout is released when
+  // no session needs it.
+  disableClaude(projectId) {
+    const project = this.project(projectId);
+    return this.claudeStep(project, async () => {
+      if (!project.claudeOn) return { claude: false, already: true };
+      project.claudeOn = false;
+      project.bridgeToken = null;
+      const link = project.claude;
+      if (project.session?.provider === 'claude') await this.disconnectClaude(projectId).catch(() => {});
+      this.denyPending(project, 'claude', 'Claude Code turned off for this project');
+      link?.detach();
+      if (project.claude === link) project.claude = null;
+      if (project.owner) {
+        await safeRemove(localDir(project.root), 'agent-bridge.json').catch(() => {});
+        if (!project.session) {
+          await project.owner.release().catch(() => {});
+          project.owner = null;
+        }
+      }
+      return { claude: false, already: false };
+    });
+  }
+
+  // The connection checklist for Setup → Agents (PF-0069). Read-only.
+  claudeChecklist(projectId) {
+    const project = this.project(projectId);
+    const link = project.claude;
+    const mode = link?.permissionMode ?? null;
+    return {
+      on: project.claudeOn,
+      owner: Boolean(project.owner),
+      lockedBy: project.holder ? lockedError(project.holder).message : null,
+      channelConnected: Boolean(link?.connected),
+      lastHookAt: link?.lastHookAt ? new Date(link.lastHookAt).toISOString() : null,
+      mode,
+      modeState: !mode ? 'unknown' : isForbiddenMode(mode) ? 'refused' : ['auto', 'acceptEdits'].includes(mode) ? 'auto-approves' : 'allowed',
+      linked: project.session?.provider === 'claude'
+    };
+  }
+
+  async writeBridgeFile(project) {
+    if (!project.claudeOn || !project.owner) return;
+    await safeWriteFile(await ensureLocalIgnored(project.root), 'agent-bridge.json', JSON.stringify({ port: this.port, token: project.bridgeToken, pid: process.pid }));
   }
 
   // ----- lifecycle -----
   async open() {
     // Development builds only: the Claude connection is loaded on demand (see experimental.js).
-    if (this.claudeEnabled) this.ClaudeLink = (await loadClaude()).ClaudeLink;
     // Opening the console writes nothing into a project: the checkout is claimed only when
-    // a session starts (or, in development builds, for the Claude bridge file).
+    // a session starts, or for the Claude bridge file of a project with Claude on.
     for (const project of this.projects.values()) {
-      if (!this.claudeEnabled) continue;
-      await ensureLocalIgnored(project.root);
-      project.claude = this.newClaudeLink(project);
-      await this.claimCheckout(project);
+      if (this.claudeEnabled || this.claudeFor.has(project.id)) await this.enableClaude(project.id);
     }
   }
 
@@ -137,9 +214,7 @@ export class AgentBridge {
     project.holder = null;
     // Only the owner publishes the Claude bridge file, so it is never overwritten by
     // another console.
-    if (this.claudeEnabled) {
-      await safeWriteFile(await ensureLocalIgnored(project.root), 'agent-bridge.json', JSON.stringify({ port: this.port, token: project.bridgeToken, pid: process.pid }));
-    }
+    await this.writeBridgeFile(project);
     return true;
   }
 
@@ -158,7 +233,7 @@ export class AgentBridge {
       if (cleanup && !cleanup.complete) incomplete.push({ project: project.name ?? project.root, cleanup });
       project.claude?.detach();
       if (project.owner) {
-        if (this.claudeEnabled) await safeRemove(localDir(project.root), 'agent-bridge.json').catch(() => {});
+        if (project.claudeOn) await safeRemove(localDir(project.root), 'agent-bridge.json').catch(() => {});
         await project.owner.release();
         project.owner = null;
       }
@@ -291,9 +366,9 @@ export class AgentBridge {
   // ----- status -----
   async status(projectId) {
     const project = this.project(projectId);
-    const detected = await detectProviders({ env: this.env, claude: this.claudeEnabled });
+    const detected = await detectProviders({ env: this.env, claude: project.claudeOn });
     const providers = [{ id: 'codex', label: 'Codex', ready: detected.codex.ready, problems: detected.codex.problems, versions: { codex: detected.codex.codex?.version ?? null, adapter: detected.codex.adapter?.version ?? null }, capabilities: CAPABILITIES.codex }];
-    if (this.claudeEnabled) providers.push({ id: 'claude', label: 'Claude Code', experimental: true, ready: detected.claude.ready, problems: detected.claude.problems, versions: { claude: detected.claude.claude?.version ?? null }, auth: detected.claude.auth ? { method: detected.claude.auth.method, plan: detected.claude.auth.plan } : null, capabilities: CAPABILITIES.claude });
+    if (project.claudeOn) providers.push({ id: 'claude', label: 'Claude Code', experimental: true, ready: detected.claude.ready, problems: detected.claude.problems, versions: { claude: detected.claude.claude?.version ?? null }, auth: detected.claude.auth ? { method: detected.claude.auth.method, plan: detected.claude.auth.plan } : null, capabilities: CAPABILITIES.claude });
     const records = await this.listRecords(project);
     // Read-only: another live console's lock is reported; nothing is claimed here.
     const holder = project.owner ? null : await readCheckoutLock(project.root).catch(() => null);
@@ -301,7 +376,7 @@ export class AgentBridge {
     return {
       enabled: true,
       lockedBy: foreign ? { message: lockedError(holder).message } : null,
-      claudeExperimental: this.claudeEnabled,
+      claudeExperimental: project.claudeOn,
       permissionTimeoutMs: this.timeoutMs,
       providers,
       session: this.sessionSummary(project),
@@ -362,7 +437,7 @@ export class AgentBridge {
 
   async launch(project, slot, run) {
     try {
-      const detected = (await detectProviders({ env: this.env, claude: this.claudeEnabled })).codex;
+      const detected = (await detectProviders({ env: this.env })).codex;
       if (!detected.ready) throw Object.assign(new Error(detected.problems.join(' ')), { status: 422, code: 'PROVIDER_UNAVAILABLE' });
       if (slot.cancelled) throw Object.assign(new Error('The console stopped before the session started.'), { status: 409, code: 'CANCELLED' });
       slot.impl = this.newCodex(project, detected);
@@ -590,8 +665,9 @@ export class AgentBridge {
     const record = project.session?.record;
     if (!record) return;
     record.lastStop = stop;
-    this.saveRecord(project, record).catch(() => {});
-    this.emit(project, agentEvent('session.stopped', { provider: project.session.provider, workId: record.workId, stop }));
+    const provider = project.session.provider;
+    // Saved before it is announced, so a reader that reacts to the event sees it (PF-0071).
+    this.saveRecord(project, record).catch(() => {}).then(() => this.emit(project, agentEvent('session.stopped', { provider, workId: record.workId, stop })));
   }
 
   async activate(projectId, workId) {

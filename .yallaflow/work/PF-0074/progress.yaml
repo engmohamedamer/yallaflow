@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-08T18:42:18.638Z",
+      "completedAt": "2026-11-08T18:42:18.638Z",
+      "summary": "Docs live in README.md and docs/*.md (console.md, runtime.md, using-yallaflow.md, guide.md); no docs images exist yet. research/release-1.4/browser-check.mjs already captures console screens with Playwright against disposable projects using an isolated XDG_CONFIG_HOME/YALLAFLOW_CONSOLE_CONFIG and startConsoleServer, so the same pattern can produce doc screenshots without touching real projects. console.md and runtime.md still describe the pre-PF-0073 Setup order. The repo is public, so screenshots must contain only demo data.",
+      "evidence": [
+        "research/release-1.4/browser-check.mjs",
+        "docs/console.md",
+        "docs/runtime.md",
+        "README.md"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-08T18:42:27.065Z",
+      "completedAt": "2026-11-08T18:42:27.065Z",
+      "summary": "Developer asked to revise the documentation to show the latest, important features with polished screenshots in Arabic and English: a simple request task from creation to done, and project setup — everything developed so far. Screens come from a disposable demo project only (public repo).",
+      "evidence": [
+        "user:now lets revise the documentation to show the latest and impotant feature with prett screens in araic and english to show the simple request task till done and setup projects every thing we developed"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-08T18:42:27.882Z",
+      "completedAt": "2026-11-08T18:42:27.882Z",
+      "summary": "1) research/docs-tour/capture.mjs: isolated config, demo project 'Clinic Booking' (Node web + Docker-less API), walks a request through the real CLI (start, route, checkpoints, verify, finish) and captures console screens with Playwright (Chromium headless shell) in English-light and Arabic-dark: overview, create work, work board, item mid-flow, flow map, item done, setup first-time (agent proposal preselected), trust review, run control running, mobile. 2) docs/images/tour/*.png. 3) docs/tour.md (EN) and docs/tour.ar.md (AR, RTL). 4) README: 'See it' section with hero screens + links. 5) docs/console.md and docs/runtime.md: Setup section updated to the PF-0073 layout. No product code change."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-08T18:58:20.909Z",
+      "completedAt": "2026-11-08T19:03:11.571Z",
+      "summary": "Docs tour, screenshots, README (console showcase, visual Install/Upgrade, What's new in 1.4.1), console/runtime/installation docs and CHANGELOG updated. Screenshots are kept out of the npm package by docs/images/.npmignore; package.json files unchanged (package ~1 MB).",
+      "evidence": [
+        "docs/tour.md",
+        "docs/tour.ar.md",
+        "README.md",
+        "research/docs-tour/capture.mjs",
+        "package.json",
+        "docs/images/.npmignore"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-08T19:07:48.295Z",
+      "completedAt": "2026-11-08T19:07:48.295Z",
+      "summary": "Full suite passes (V-002, after V-001 caught the pinned files list). All 154 local links/images in the changed docs resolve. npm pack --dry-run: 282 files, ~1 MB, tour docs included, no screenshots. Screens reviewed visually in EN light and AR dark, desktop and 390px.",
+      "evidence": [
+        "verification:V-002",
+        "runtime:npm pack --dry-run shows docs/tour.md and docs/tour.ar.md and no docs/images files"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "V-001 failed: test/cli.test.js pins package.json files. Reverted the files change; docs/images/.npmignore now keeps the screenshots out of the npm package instead.",
+      "changedAt": "2026-11-08T19:03:11.375Z"
+    }
+  ],
+  "updatedAt": "2026-11-08T19:07:48.295Z"
+}

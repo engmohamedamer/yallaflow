@@ -15,5 +15,5 @@ export function claudeIncluded() {
 export async function loadClaude() {
   if (!claudeIncluded()) throw Object.assign(new Error(CLAUDE_NOT_INCLUDED), { status: 409, code: 'CLAUDE_NOT_INCLUDED' });
   const [link, files, detect] = await Promise.all([import('./claude.js'), import('./claude-files.js'), import('./claude-detect.js')]);
-  return { ClaudeLink: link.ClaudeLink, writeClaudeLaunchFiles: files.writeClaudeLaunchFiles, detectClaude: detect.detectClaude };
+  return { ClaudeLink: link.ClaudeLink, writeClaudeLaunchFiles: files.writeClaudeLaunchFiles, launchFilesCurrent: files.launchFilesCurrent, launchCommand: files.launchCommand, detectClaude: detect.detectClaude };
 }

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --test test/console-agent-errors.test.js test/console-project-chat.test.js test/agent-continue.test.js test/project-setup.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--test",
+        "test/console-agent-errors.test.js",
+        "test/console-project-chat.test.js",
+        "test/agent-continue.test.js",
+        "test/project-setup.test.js"
+      ],
+      "displayCommand": "node --test test/console-agent-errors.test.js test/console-project-chat.test.js test/agent-continue.test.js test/project-setup.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-08T13:24:48.619Z",
+      "finishedAt": "2026-11-08T13:25:05.922Z",
+      "verifiedAt": "2026-11-08T13:25:05.922Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

@@ -1,0 +1,358 @@
+{
+  "schemaVersion": 1,
+  "revision": 3,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "The project's Setup page has an Agents section that scans the machine for Codex and Claude Code (installed, version, subscription login, problems) and can rescan.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T00:23:40.114Z",
+      "updatedAt": "2026-11-08T00:23:40.114Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "The developer chooses the agents for each project on the Setup page; the choice is saved locally (git-ignored, per checkout) and applied automatically when the console opens, without flags or restarts, and never in --read-only.",
+      "provenance": [
+        {
+          "type": "request"
+        },
+        {
+          "type": "question",
+          "question": "Q-001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T00:23:40.114Z",
+      "updatedAt": "2026-11-08T00:23:40.114Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "A connection checklist shows each step of the Claude Code connection (launch files, channel connected, hooks reporting, permission mode known and allowed) and Codex readiness, each with a plain fix when it fails.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T00:23:40.114Z",
+      "updatedAt": "2026-11-08T00:23:40.114Z"
+    },
+    {
+      "id": "REQ-004",
+      "statement": "The console no longer waits silently for Claude Code's permission mode at the start: the launch command starts Claude Code with a short first prompt so the mode is reported at once.",
+      "provenance": [
+        {
+          "type": "request"
+        },
+        {
+          "type": "question",
+          "question": "Q-002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T00:23:40.114Z",
+      "updatedAt": "2026-11-08T00:23:40.114Z"
+    },
+    {
+      "id": "REQ-005",
+      "statement": "The chat's agent picker points to the Setup page when an agent is off or not ready for the project.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T00:23:40.114Z",
+      "updatedAt": "2026-11-08T00:23:40.114Z"
+    },
+    {
+      "id": "REQ-006",
+      "statement": "The Setup page scans and shows the project's stack from repository evidence and lists the runtime services suggested from it.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T00:28:30.216Z",
+      "updatedAt": "2026-11-08T00:28:30.216Z"
+    },
+    {
+      "id": "REQ-007",
+      "statement": "From Setup the developer can start the whole project, stop it, and open its running apps in the browser.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T00:28:30.216Z",
+      "updatedAt": "2026-11-08T00:28:30.216Z"
+    },
+    {
+      "id": "REQ-008",
+      "statement": "Adding an existing project to the console for the first time runs a guided project setup: scan the stack, pick suggested services, choose agents; the scan and the setup state are saved so later visits show them without rescanning.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T00:32:44.519Z",
+      "updatedAt": "2026-11-08T00:32:44.519Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "Setup shows Codex and Claude Code each with installed/version/login (method and plan, never a credential) and its problems, and Rescan refreshes it; Claude detection runs only when the developer opens or rescans the Agents section or Claude is chosen.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T00:23:40.114Z",
+      "updatedAt": "2026-11-08T00:23:40.114Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-002",
+      "statement": "Choosing 'Agents on' and 'Claude Code (experimental)' for a project saves .yallaflow/local/agents.json (git-ignored); a console started later with no flags turns agents on and opens the Claude connection for that project only; other projects keep their own choice; --read-only ignores the file; turning Claude off removes that project's bridge file and unlinks Claude.",
+      "provenance": [
+        {
+          "type": "request"
+        },
+        {
+          "type": "question",
+          "question": "Q-001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T00:23:40.114Z",
+      "updatedAt": "2026-11-08T00:23:40.114Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-002",
+      "statement": "Turning Claude on in Setup while the console runs takes effect immediately for that project, with no restart, including when agents were already enabled without Claude.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T00:23:40.114Z",
+      "updatedAt": "2026-11-08T00:23:40.114Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-003",
+      "statement": "For a project with Claude chosen, the checklist reports launch files written, channel connected, hooks reporting, and the permission mode (allowed, auto-approving, or bypass refused), each step green or with a fix; a simulated channel and hooks drive every state.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T00:23:40.114Z",
+      "updatedAt": "2026-11-08T00:23:40.114Z"
+    },
+    {
+      "id": "AC-005",
+      "requirement": "REQ-004",
+      "statement": "The launch command ends with a quoted first prompt to run yallaflow brief; in a simulated and a real session the permission mode is known without the developer typing first.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T00:23:40.114Z",
+      "updatedAt": "2026-11-08T00:23:40.114Z"
+    },
+    {
+      "id": "AC-006",
+      "requirement": "REQ-005",
+      "statement": "When Claude Code is not chosen for the project (or Codex is not ready), the chat picker says so and links to Setup's Agents section.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T00:23:40.114Z",
+      "updatedAt": "2026-11-08T00:23:40.114Z"
+    },
+    {
+      "id": "AC-007",
+      "requirement": "REQ-006",
+      "statement": "Setup shows the stack entries (component, declared version, kind, basis, evidence file) from the read-only overview detection with Rescan, and the runtime suggestions from it with Add this service; nothing runs and .env is never read.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T00:28:30.216Z",
+      "updatedAt": "2026-11-08T00:28:30.216Z"
+    },
+    {
+      "id": "AC-008",
+      "requirement": "REQ-007",
+      "statement": "Start project starts every trusted service in dependsOn order and waits for each to be ready; untrusted or stale-trust services are listed and not started; a failure stops the sequence and is reported; Stop project stops only services YallaFlow started, in reverse order; both are refused in --read-only.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T00:28:30.216Z",
+      "updatedAt": "2026-11-08T00:28:30.216Z"
+    },
+    {
+      "id": "AC-009",
+      "requirement": "REQ-007",
+      "statement": "Each running service with a declared port shows Open, linking to http://127.0.0.1:<port>/ plus its optional validated relative open path, in a new tab; nothing opens automatically.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T00:28:30.216Z",
+      "updatedAt": "2026-11-08T00:28:30.216Z"
+    },
+    {
+      "id": "AC-010",
+      "requirement": "REQ-008",
+      "statement": "After Add an existing project, the console opens a first-time setup (Stack scan → Services to add → Agents) that runs no command; chosen services are added to the reviewed runtime profile untrusted, the agent choice is saved to agents.json, and .yallaflow/local/setup.json (git-ignored) records the scan time, the scanned stack summary and the completed steps; the setup is offered again from Setup but not forced on later visits.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-08T00:32:44.519Z",
+      "updatedAt": "2026-11-08T00:32:44.519Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-08T00:23:40.114Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-08T00:23:40.114Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-08T00:23:40.114Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-004",
+      "at": "2026-11-08T00:23:40.114Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-005",
+      "at": "2026-11-08T00:23:40.114Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-08T00:23:40.114Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-08T00:23:40.114Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-08T00:23:40.114Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-11-08T00:23:40.114Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-005",
+      "at": "2026-11-08T00:23:40.114Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-006",
+      "at": "2026-11-08T00:23:40.114Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-006",
+      "at": "2026-11-08T00:28:30.216Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "REQ-007",
+      "at": "2026-11-08T00:28:30.216Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-007",
+      "at": "2026-11-08T00:28:30.216Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-008",
+      "at": "2026-11-08T00:28:30.216Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-009",
+      "at": "2026-11-08T00:28:30.216Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "REQ-008",
+      "at": "2026-11-08T00:32:44.519Z",
+      "revision": 3
+    },
+    {
+      "action": "added",
+      "id": "AC-010",
+      "at": "2026-11-08T00:32:44.519Z",
+      "revision": 3
+    }
+  ],
+  "updatedAt": "2026-11-08T00:32:44.519Z"
+}

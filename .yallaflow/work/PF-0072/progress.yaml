@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-08T13:49:31.681Z",
+      "completedAt": "2026-11-08T13:49:31.681Z",
+      "summary": "Discovery in work.md: runtime profile/trust/supervisor today; the real portal case (parent docker-compose, 14 vhosts into the project, shared stack, port 80 held by another container); the risk of attaching to a running compose stack.",
+      "evidence": [
+        "src/runtime/profile.js",
+        "src/runtime/suggest.js",
+        "src/runtime/supervisor.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-08T13:56:17.455Z",
+      "completedAt": "2026-11-08T13:56:17.455Z",
+      "summary": "Owner spec feedback SRC-0051 incorporated: separate Save/Trust/Start, shared-infrastructure protection, trust bound to the effective configuration including external compose inputs, visible scan limits (outside scope = unresolved); keep changes local."
+    },
+    "design-exploration": {
+      "status": "completed",
+      "startedAt": "2026-11-08T13:56:17.880Z",
+      "completedAt": "2026-11-08T13:56:17.880Z",
+      "summary": "Design revised: Review and save (untrusted) then a separate Trust step showing the effective configuration and inputs, then Start; shared services protected from automatic stop/restart."
+    },
+    "specification": {
+      "status": "completed",
+      "startedAt": "2026-11-08T13:56:18.341Z",
+      "completedAt": "2026-11-08T13:56:18.341Z",
+      "summary": "Specification revised for SRC-0051: rules 1 (coverage), 6-7b (save, trust, binding), 9-10 (start, shared infrastructure), workflow, security, UI; REQ-001..007, AC-001..011."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-08T13:59:01.616Z",
+      "completedAt": "2026-11-08T13:59:01.616Z",
+      "summary": "Plan in work.md: decisions D1 (no new dependency; bounded compose reader, uncertain = unresolved), D2 (post-spawn re-hash + busy guard against concurrent changes), D3 (shared marking in the hashed definition); 11 steps within Runtime Core and Console; owner-required regressions R1-R6 mapped to tests."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-08T14:38:31.456Z",
+      "completedAt": "2026-11-08T15:42:05.572Z",
+      "summary": "Fixes from the real portal session: the project chat shows a waiting prepared message with a preview when no session runs; an agent service matching a scanned one shows and saves the scan's shared scope, conflicts and blocking items; vhosts whose mapped document root does not exist are unresolved, not links. Tests added (runtime-plan 19)."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-08T15:48:08.463Z",
+      "completedAt": "2026-11-08T15:48:08.463Z",
+      "summary": "V-002 npm test 1022/1022. Browser flow on the isolated fixture console passed (before and after the review fixes). Real portal session on the owner's console: Analyze (read-only) found the ~/YaSchools stack with 10 project links, Shared with scope, and unresolved items; Ask the agent prepared the request, sent from the chat; Claude Code investigated read-only (no .env opened, no start) and proposed a plan that passed validation; Review showed the proposal beside the scan with the scan's shared scope. Nothing was saved, trusted, started or stopped."
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-08T15:48:36.444Z",
+      "completedAt": "2026-11-08T15:48:36.444Z",
+      "summary": "CV-001: 11/11 criteria satisfied; one unrequested item accepted."
+    },
+    "code-review": {
+      "status": "completed",
+      "startedAt": "2026-11-08T15:49:00.282Z",
+      "completedAt": "2026-11-08T15:49:00.282Z",
+      "summary": "Independent security review on an isolated copy: 9 findings (5 confirmed, 4 plausible), all fixed with regression tests and ruled; the inherent swap-and-restore window between the trust check and spawn accepted. The later real-session fixes (waiting-message note, scan twin for agent services, missing vhost folders) reviewed: UI text escaped, no new routes, plan save still in-process and untrusted."
+    }
+  },
+  "rulings": [
+    {
+      "decision": "The no-network guard in test/shared-project.test.js gained a narrow exception for src/runtime/discover.js: only loopback and template-built http:// link text, the same rule the console layer has; node:net, node:http(s), fetch and https:// stay forbidden there",
+      "reason": "discover.js builds the display text of the project's app links (http://<name>.localhost/ from a vhost, http://127.0.0.1:<port>/) for the developer to open; it opens no connection. Hiding the literal from the guard would defeat its purpose",
+      "costIfWrong": "A future network call written as http://${host} in discover.js would not be flagged by this guard; node:net/http imports and fetch still are",
+      "createdAt": "2026-11-08T14:36:05.296Z"
+    },
+    {
+      "decision": "Security review (isolated copy) findings 1-9 fixed: escaped/unknown Compose keys block (allowlists); console trust and plan save run in-process and the CLI requires a terminal (no env flag stands in for a person); unreadable parent Compose files are unresolved and blocking; only *.conf non-secret single-file mounts are read; one Compose argv parser with overrides, -fX/-pX, project directory and working-folder container match; .env/--env-file bound by metadata and COMPOSE_/DOCKER_ names by value digest; start refused when docker ps cannot be read; Replace writes a personal override; shell -c, missing confirmed evidence and scan-only fields refused; shared check under the stop lock. Finding 9's swap-and-restore between the trust check and spawn is inherent and accepted",
+      "reason": "Each finding contradicted an approved safety requirement (S1, S3, agent-can-only-propose, unresolved-not-absent, never stop unowned/shared); the fixes stay within Runtime Core and Console",
+      "costIfWrong": "A residual bypass would let configuration run or a shared service stop without the developer's explicit decision",
+      "createdAt": "2026-11-08T14:54:40.664Z"
+    }
+  ],
+  "history": [
+    {
+      "skill": "requirement-clarification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-001: The owner's spec feedback (SRC-0051) is a new clarification of intent: separate Save/Trust/Start, shared-infrastructure protection, trust bound to the effective configuration, visible scan limits.",
+      "changedAt": "2026-11-08T13:56:09.386Z"
+    },
+    {
+      "skill": "design-exploration",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-001: The design merged save and trust in one action and had no shared-service protection; it was revised to a separate Trust step and protected shared services.",
+      "changedAt": "2026-11-08T13:56:09.386Z"
+    },
+    {
+      "skill": "specification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-001: Rules 1, 6, 7, 7a, 7b, 9, 10, the workflow, security and UI sections and REQ/AC were revised for the four clarifications.",
+      "changedAt": "2026-11-08T13:56:09.386Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Security review (isolated copy) found: escaped/unknown Compose keys hide include/extends/build (fail-open); YALLAFLOW_RUNTIME_VIA=console lets a non-human caller trust and save; a parent Compose file with problems but no visible relation reads as nothing found; a single-file web-server mount can open .env; sharedNow/composeIdentity ignore overrides and -fX/-pX forms; .env and COMPOSE_/DOCKER_ variables can change what runs after trust; start proceeds when docker ps fails; Replace from a plan deletes a shared definition; weak shell-string check and unvalidated agent-only fields; shared check outside the stop lock",
+      "changedAt": "2026-11-08T14:43:57.693Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Real portal session (Analyze + agent proposal + Review, nothing saved/started): the chat hid a prepared message when no session ran; an agent proposal did not show the scan's shared scope; the scan offered links for vhosts whose project folder does not exist (the agent caught 4)",
+      "changedAt": "2026-11-08T15:42:05.347Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Downstream of implementation revision: Real portal session (Analyze + agent proposal + Review, nothing saved/started): the chat hid a prepared message when no session ran; an agent proposal did not show the scan's shared scope; the scan offered links for vhosts whose project folder does not exist (the agent caught 4)",
+      "changedAt": "2026-11-08T15:42:05.347Z"
+    }
+  ],
+  "updatedAt": "2026-11-08T15:49:00.282Z"
+}

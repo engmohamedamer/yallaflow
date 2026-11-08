@@ -63,6 +63,13 @@ YallaFlow never selects Codex's full-access mode.
   - the checkout frees up when the first console stops, or when its process is gone.
 - **Gates stay human decisions, by command.** An agent that may run shell commands could also run `yallaflow approve`. The Agent Contract forbids that, but the Agent Workspace does not add a technical lock against it, just as the terminal doesn't. Check the approval notes and the progress ledger.
 
+## Choose the agents for a project
+Open **Setup → Agents** in the console:
+- **Detection:** it shows Codex and Claude Code on this machine (version, subscription login, problems), with **Rescan this machine**.
+- **Saved choice:** what you tick (**Agents for this project**, **Also Claude Code (experimental)**) is saved for this project in `.yallaflow/local/agents.json` (git-ignored). It is applied whenever the console opens, with no flags and no restarts. It is never applied in `--read-only`.
+- **Checklist:** with Claude Code on, it shows each connection step and how to fix it.
+- **Chat picker:** when an agent is off or not ready for the project, the picker links here.
+
 ## When an agent stops in the middle of a work item
 The work lives in the work item, not in the chat, so another agent can pick it up.
 - **The chat says why the agent stopped:** it reached its subscription usage limit (with the time to try again when the provider gives one), stopped on an error, stopped unexpectedly, had its session ended, or Claude Code disconnected.

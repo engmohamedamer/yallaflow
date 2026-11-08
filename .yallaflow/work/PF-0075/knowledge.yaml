@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "The website is bilingual. site/index.html is the English source, and site/ar/index.html is generated from it by research/site/make-ar.py, which uses Egyptian-Arabic string pairs, sets dir=rtl and its own canonical/og locale, and swaps in the Arabic screens. The generator stops on any English string it does not expect, so edit English first and then regenerate. Both pages share site/site.css, which holds the RTL rules. Screens shown on the site are copied into site/media/tour/, because the Pages workflow deploys site/** only. sitemap.xml lists both URLs with hreflang alternates.",
+      "evidence": [
+        "research/site/make-ar.py",
+        "site/site.css",
+        "site/sitemap.xml",
+        ".github/workflows/pages.yml"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-08T19:15:35.497Z",
+      "factId": "CTX-0130",
+      "promotedAt": "2026-11-08T19:15:35.656Z",
+      "target": "context/conventions.md"
+    }
+  ],
+  "updatedAt": "2026-11-08T19:15:35.656Z",
+  "reviewedAt": "2026-11-08T19:15:35.656Z"
+}

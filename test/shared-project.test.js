@@ -724,8 +724,14 @@ test('51/no-network: YallaFlow source never invokes mutating or network Git subc
         // TCP connect, to 127.0.0.1 only; it is checked separately below.
         const runtimeProbe = path.relative(srcDir, full) === path.join('runtime', 'probe.js');
         if (!runtimeProbe && /node:net['"]/.test(text) && path.relative(srcDir, full).startsWith(`runtime${path.sep}`)) offenders.push(`${entry.name}: runtime network access outside probe.js`);
+        // PF-0072: src/runtime/discover.js builds the text of app links (loopback or a
+        // *.localhost name from a vhost, interpolated) for the developer to open; it makes no
+        // network call, so only loopback and template-built http:// text is allowed there.
+        const runtimeDiscover = path.relative(srcDir, full) === path.join('runtime', 'discover.js');
         const network = runtimeProbe
           ? /\bfetch\(|https?:\/\/|node:https?['"]|http\.request|http\.get\(|anthropic|openai/i
+          : runtimeDiscover
+          ? /\bfetch\(|https:\/\/|http:\/\/(?!127\.0\.0\.1|\$\{)|node:https?['"]|node:net['"]|http\.request|http\.get\(|anthropic|openai/i
           : agentsLayer
           ? /\bfetch\(|https?:\/\/|node:https?['"]|node:net['"]|http\.request|http\.get\(/i
           : consoleLayer

@@ -21,7 +21,7 @@ function harness({ hash = '#/map', session = null, agentsOn = true, lang = 'en',
   ].join('\n');
   const context = vm.createContext({
     location: { hash }, snap: { items, project: { activeWork: null } }, pid: 'p', readOnly: false,
-    agentsOn, agentsCanEnable: true, agentInfo: null, agentError: null, agentBusy: false, agentDraft: '', agentLaunch: null, agentProvider: null, agentMode: 'read-only', chatOpen: true,
+    agentsOn, agentsCanEnable: true, agentsClaudeAvailable: false, agentInfo: null, agentError: null, agentBusy: false, agentDraft: '', agentLaunch: null, agentProvider: null, agentMode: 'read-only', chatOpen: true,
     agent: { pid: 'p', session, events: [], resumable: [], history: [], pending: [], providers: [{ id: 'codex', ready: true, capabilities: { start: true, send: true, modes: ['read-only'] } }] },
     A: (ar, en) => (lang === 'ar' ? ar : en), L: (value) => value?.[lang] ?? String(value ?? ''), esc, ago: () => '',
     MODE_LABEL: { 'read-only': { ar: 'قراءة', en: 'Read only' } },
@@ -78,4 +78,15 @@ test('the item chat is unchanged', () => {
   const h = harness({ hash: '#/item/PF-0001' });
   assert.match(h.dock(), /Agent · <span class="ltr">PF-0001<\/span>/);
   assert.match(h.panel(), /data-agent-activate="PF-0001"/);
+});
+
+// PF-0069: the picker points to Setup → Agents when Claude Code is off here or an agent is not ready.
+test('the picker links to Setup → Agents when Claude Code is off for the project', () => {
+  const h = harness({ hash: '#/item/PF-0001' });
+  vm.runInContext('agentsClaudeAvailable = true;', h);
+  assert.match(h.panel(), /Claude Code \(experimental\) is off for this project\. <a href="#\/setup" data-setup-agents>Open Setup → Agents<\/a>/);
+  vm.runInContext("agentsClaudeAvailable = false; agent.providers = [{ id: 'codex', ready: false, problems: ['codex-acp missing'], capabilities: { start: true, send: true, modes: ['read-only'] } }];", h);
+  assert.match(h.panel(), /An agent is not ready\. <a href="#\/setup"/);
+  vm.runInContext("agent.providers = [{ id: 'codex', ready: true, capabilities: { start: true, send: true, modes: ['read-only'] } }];", h);
+  assert.doesNotMatch(h.panel(), /data-setup-agents/);
 });

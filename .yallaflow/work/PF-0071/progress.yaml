@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-08T13:21:28.663Z",
+      "completedAt": "2026-11-08T13:21:28.663Z",
+      "summary": "test/agent-continue.test.js:36 fails 3/3 when run with the console and agent suites (TypeError: lastStop null right after turn.ended), passes alone; history comes from the saved session records (src/agents/bridge.js:386)."
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-08T13:21:28.858Z",
+      "completedAt": "2026-11-08T13:21:28.858Z",
+      "summary": "Root cause: noteStop (src/agents/bridge.js:664) starts saveRecord and emits session.stopped without waiting, so a reader can see the event before the record is on disk. finishCodex already saves before announcing (PF-0066 V-001). Fix: emit after the save settles.",
+      "evidence": [
+        "src/agents/bridge.js:664",
+        "test/agent-continue.test.js:36"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-08T13:25:06.157Z",
+      "completedAt": "2026-11-08T13:25:06.157Z",
+      "summary": "src/agents/bridge.js noteStop: session.stopped is emitted after saveRecord settles. The console and agent suites that failed 3/3 now pass 135/135 twice."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-08T13:26:13.599Z",
+      "completedAt": "2026-11-08T13:26:13.599Z",
+      "summary": "Fresh verification V-001 passed."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-08T13:26:13.599Z"
+}

@@ -14,6 +14,7 @@ import { processStartTime } from '../src/runtime/process.js';
 import { checkoutFingerprint, runtimeStateBase } from '../src/runtime/state.js';
 import { link } from 'node:fs/promises';
 import { loadSchema, validate } from '../test-support/schema.js';
+import { consoleTrustSync } from '../test-support/runtime-trust.js';
 
 const RUNTIME = loadSchema('runtime-1.schema.json');
 
@@ -67,7 +68,7 @@ async function webService(root, extra = []) {
 // Trust the way the console does: confirmed and bound to the reviewed definition.
 function trust(root, id) {
   const hash = service(root, id).definitionHash;
-  const result = run(root, ['runtime', 'trust', id, '--expect', hash], { YALLAFLOW_RUNTIME_VIA: 'console' });
+  const result = consoleTrustSync(root, id, hash);
   assert.equal(result.status, 0, result.stderr);
   return result;
 }
@@ -237,7 +238,7 @@ test('start failures are reported with the log tail; a cwd escaping through a sy
   await symlink(outside, path.join(root, 'escape'));
   assert.equal(run(root, ['runtime', 'add', 'esc', '--cwd', 'escape', '--', process.execPath, '-e', '1']).status, 0);
   assert.equal(service(root, 'esc').trust.trusted, false);
-  const unsafeTrust = run(root, ['runtime', 'trust', 'esc', '--expect', 'unsafe', '--json'], { YALLAFLOW_RUNTIME_VIA: 'console' });
+  const unsafeTrust = consoleTrustSync(root, 'esc', 'unsafe');
   assert.equal(json(unsafeTrust).error.code, 'RUNTIME_TRUST_INPUT');
   const escaped = run(root, ['runtime', 'start', 'esc', '--json']);
   assert.equal(json(escaped).error.code, 'RUNTIME_TRUST_INPUT');
@@ -332,7 +333,7 @@ test('review: trust and run records planted inside the repository are ignored; t
     assert.equal(service(root).state, 'stopped', 'a run record in the checkout is not a run');
     assert.equal(json(run(root, ['runtime', 'stop', 'web', '--json'])).already, true);
     assert.equal(alive(victim.pid), true, 'the planted process was never signalled');
-    const wrong = run(root, ['runtime', 'trust', 'web', '--expect', `sha256:${'1'.repeat(64)}`, '--json'], { YALLAFLOW_RUNTIME_VIA: 'console' });
+    const wrong = consoleTrustSync(root, 'web', `sha256:${'1'.repeat(64)}`);
     assert.equal(json(wrong).error.code, 'RUNTIME_TRUST_STALE');
     assert.equal(service(root).trust.trusted, false);
   } finally {
@@ -415,8 +416,9 @@ test('review: CLI trust is a human decision — refused when not interactive', {
   await webService(root);
   const scripted = run(root, ['runtime', 'trust', 'web', '--json']);
   assert.equal(json(scripted).error.code, 'RUNTIME_TRUST_INTERACTIVE');
-  const noExpect = run(root, ['runtime', 'trust', 'web', '--json'], { YALLAFLOW_RUNTIME_VIA: 'console' });
-  assert.equal(json(noExpect).error.code, 'RUNTIME_TRUST_INTERACTIVE', 'the console path must name the reviewed definition');
+  // PF-0072 review finding 2: no environment flag stands in for a person.
+  const flagged = run(root, ['runtime', 'trust', 'web', '--expect', service(root).definitionHash, '--json'], { YALLAFLOW_RUNTIME_VIA: 'console' });
+  assert.equal(json(flagged).error.code, 'RUNTIME_TRUST_INTERACTIVE', 'YALLAFLOW_RUNTIME_VIA=console is not a person');
   assert.equal(service(root).trust.trusted, false);
 });
 
@@ -443,7 +445,7 @@ test('trust: script edits reject stale confirmation and start, while application
   assert.equal(service(root).trust.trusted, true);
   await writeFile(path.join(root, 'web/package.json'), '{"scripts":{"dev":"node changed.js"}}');
   assert.equal(service(root).trust.trusted, false);
-  const stale = run(root, ['runtime', 'trust', 'web', '--expect', reviewedHash, '--json'], { YALLAFLOW_RUNTIME_VIA: 'console' });
+  const stale = consoleTrustSync(root, 'web', reviewedHash);
   assert.equal(json(stale).error.code, 'RUNTIME_TRUST_STALE');
   assert.equal(json(run(root, ['runtime', 'start', 'web', '--json'])).error.code, 'RUNTIME_UNTRUSTED');
   trust(root, 'web');
@@ -451,22 +453,24 @@ test('trust: script edits reject stale confirmation and start, while application
 });
 
 
-test('trust: a service changing its inputs during startup stays recorded and stoppable', { skip: !SUPPORTED }, async () => {
+test('trust: a service changing its inputs during startup is stopped (only its own process) and the start fails (PF-0072 D2/R6)', { skip: !SUPPORTED }, async () => {
   const root = await project();
   await writeFile(path.join(root, 'web/package.json'), '{"scripts":{"dev":"node server.js"}}');
-  await writeFile(path.join(root, 'web/server.js'), "require('fs').writeFileSync('package.json','{invalid');setInterval(()=>{},1000);");
+  await writeFile(path.join(root, 'web/server.js'), "require('fs').writeFileSync('package.json','{\"scripts\":{\"dev\":\"changed\"}}');setInterval(()=>{},1000);");
   assert.equal(run(root, ['runtime', 'add', 'web', '--cwd', 'web', '--', process.execPath, 'server.js']).status, 0);
   trust(root, 'web');
-  const started = run(root, ['runtime', 'start', 'web', '--json']);
-  assert.equal(started.status, 0, started.stdout + started.stderr);
-  const pid = json(started).pid;
+  // An unrelated process (not started by YallaFlow) must survive the rollback.
+  const bystander = spawn(process.execPath, ['-e', 'setInterval(()=>{},1000)'], { stdio: 'ignore', detached: true });
+  bystander.unref();
   try {
+    const started = run(root, ['runtime', 'start', 'web', '--json']);
+    assert.notEqual(started.status, 0);
+    assert.equal(json(started).error.code, 'RUNTIME_CHANGED_DURING_START');
+    assert.match(json(started).error.message, /process YallaFlow had just started was stopped; nothing else was touched/);
     const current = service(root);
-    assert.equal(current.pid, pid);
+    assert.equal(current.state, 'stopped');
+    assert.equal(current.pid, null);
     assert.equal(current.trust.trusted, false);
-    assert.equal(current.stale, true);
-    const stopped = run(root, ['runtime', 'stop', 'web', '--json']);
-    assert.equal(stopped.status, 0, stopped.stdout + stopped.stderr);
-    assert.equal(alive(pid), false);
-  } finally { if (alive(pid)) process.kill(pid, 'SIGKILL'); }
+    assert.equal(alive(bystander.pid), true, 'a process YallaFlow did not start is never terminated');
+  } finally { try { process.kill(bystander.pid, 'SIGKILL'); } catch { /* gone */ } }
 });

@@ -6,7 +6,8 @@ import { PACKAGE_VERSION } from '../version.js';
 import { addService, definitionHash, loadRuntimeProfiles, removeService } from '../runtime/profile.js';
 import { suggestServices } from '../runtime/suggest.js';
 import { trustService, trustState } from '../runtime/trust.js';
-import { RuntimeError, restartService, runtimeStatus, serviceLogs, startService, stopAllServices, stopService } from '../runtime/supervisor.js';
+import { RuntimeError, restartService, runtimeStatus, serviceLogs, startAllServices, startService, stopAllServices, stopService } from '../runtime/supervisor.js';
+import { readFile } from 'node:fs/promises';
 
 export const RUNTIME_SCHEMA = 'yallaflow.runtime/1';
 export { RUNTIME_USAGE } from './runtime-usage.js';
@@ -27,7 +28,7 @@ export async function runtimeCommand(rest) {
     return await run(rest, json);
   } catch (error) {
     if (!json) throw error;
-    process.stdout.write(`${JSON.stringify({ error: { code: error.code ?? 'ERROR', message: error.message, ...(error.review ? { review: error.review } : {}) } })}\n`);
+    process.stdout.write(`${JSON.stringify({ error: { code: error.code ?? 'ERROR', message: error.message, ...(error.review ? { review: error.review } : {}), ...(error.shared ? { shared: error.shared } : {}), ...(error.problems ? { problems: error.problems } : {}), ...(error.blocking ? { blocking: error.blocking } : {}) } })}\n`);
     process.exitCode = 1;
     return null;
   }
@@ -53,6 +54,22 @@ async function run(rest, json) {
       : ['No suggestions from this repository. Add a service with `yallaflow runtime add`.']);
   }
   if (action === 'add') return add(root, args, json);
+  // PF-0072: Analyze Project, the runtime plan, and the review before trust.
+  if (action === 'analyze') {
+    if (plain.length) throw usage();
+    const { analyzeWorkspace } = await import('../runtime/discover.js');
+    const { storeScanPlan } = await import('../runtime/plan.js');
+    const scan = await analyzeWorkspace(root);
+    const { plan, changes } = await storeScanPlan(root, scan);
+    return out(json, { schema: RUNTIME_SCHEMA, scan: plan.scan, changes }, planLines(plan.scan, 'Analysis (read-only; nothing was run)'));
+  }
+  if (action === 'plan') return planCommand(root, plain, json);
+  if (action === 'review') {
+    if (plain.length !== 1) throw usage();
+    const { reviewService } = await import('../runtime/review.js');
+    const review = await reviewService(root, plain[0]);
+    return out(json, { schema: RUNTIME_SCHEMA, review }, reviewLines(review));
+  }
   if (action === 'remove') {
     const { values, positionals } = parseArgs({ args: plain, options: { local: { type: 'boolean' } }, allowPositionals: true, strict: true });
     if (positionals.length !== 1) throw usage();
@@ -65,14 +82,13 @@ async function run(rest, json) {
     const profiles = await loadRuntimeProfiles(root);
     const service = profiles.services.find((entry) => entry.id === positionals[0]);
     if (!service) throw new RuntimeError('RUNTIME_UNKNOWN_SERVICE', `No service ${positionals[0]} in the runtime profile.`);
-    // Trust is a human decision. From the console it arrives confirmed (typed id, bound to the
-    // reviewed definition with --expect); on the command line a person types the id in a
-    // terminal. A non-interactive caller (a script, or an agent's tool call) is refused.
-    // This prevents accidental trust by automation; it is not a boundary against a process
-    // that controls the whole user account.
+    // Trust is a human decision. On the command line a person types the id in a terminal; the
+    // console trusts in its own process after the typed confirmation (PF-0072 review finding
+    // 2: no environment flag can stand in for a person). A non-interactive caller (a script,
+    // or an agent's tool call) is refused. This prevents trust by automation; it is not a
+    // boundary against a process that controls the whole user account.
     const reviewedHash = values.expect ?? await definitionHash(root, service);
-    const viaConsole = process.env.YALLAFLOW_RUNTIME_VIA === 'console' && values.expect;
-    if (!viaConsole) {
+    {
       if (!process.stdin.isTTY) throw new RuntimeError('RUNTIME_TRUST_INTERACTIVE', `Trusting a command is a human decision: run \`yallaflow runtime trust ${service.id}\` in a terminal and type the service id, or use Trust in the console. It cannot be scripted.`);
       for (const line of [`Review ${service.id} before trusting it:`, `  command: ${JSON.stringify(service.command)}`, `  cwd: ${service.cwd}`, `  env names: ${service.env.join(', ') || '(none)'}`, `  ports: ${service.ports.join(', ') || '(none)'}`]) console.log(line);
       const typed = await ask(`Type ${service.id} to trust it (anything else cancels): `);
@@ -86,19 +102,35 @@ async function run(rest, json) {
       'Trust is personal (kept in your user config folder, not in the repository). Changes to the definition, package/composer script definitions, directly executed shell scripts or selected Compose files require trusting it again. Application code and indirect dependencies remain outside this fingerprint. Nothing was started.'
     ]);
   }
-  if (action === 'start' || action === 'restart') {
-    if (plain.length !== 1) throw usage();
+  if (action === 'start' && plain.length === 1 && plain[0] === '--all') {
+    // Start project (PF-0069): trusted services only, in dependency order.
     const startedBy = process.env.YALLAFLOW_RUNTIME_VIA === 'console' ? 'console' : 'cli';
-    const result = action === 'start' ? await startService(root, plain[0], { startedBy }) : await restartService(root, plain[0], { startedBy });
-    return out(json, { ok: true, ...result }, [result.already ? `${result.id} is already ${result.state} (pid ${result.pid}).` : `${result.id} ${action === 'restart' ? 'restarted' : 'started'}: ${result.state} (pid ${result.pid}). Logs: yallaflow runtime logs ${result.id}`]);
+    const result = await startAllServices(root, { startedBy });
+    if (!result.ok) process.exitCode = 1;
+    return out(json, result, [
+      ...result.started.map((entry) => entry.already ? `${entry.id} is already ${entry.state}.` : `${entry.id} started: ${entry.state} (pid ${entry.pid}).`),
+      ...result.skipped.map((entry) => `${entry.id} not started: ${entry.reason}. Review it, then \`yallaflow runtime trust ${entry.blockedBy}\`.`),
+      ...(result.failed ? [`${result.failed.id} failed; the remaining services were not started. ${result.failed.message}`] : []),
+      ...(!result.started.length && !result.skipped.length && !result.failed ? ['No runtime services defined. See `yallaflow runtime suggest`.'] : [])
+    ]);
+  }
+  if (action === 'start' || action === 'restart') {
+    const confirmShared = action === 'restart' && plain.includes('--confirm-shared');
+    const ids = plain.filter((token) => token !== '--confirm-shared');
+    if (ids.length !== 1 || (action === 'start' && confirmShared)) throw usage();
+    const startedBy = process.env.YALLAFLOW_RUNTIME_VIA === 'console' ? 'console' : 'cli';
+    const result = action === 'start' ? await startService(root, ids[0], { startedBy }) : await restartService(root, ids[0], { startedBy, confirmShared });
+    return out(json, { ok: true, ...result }, [result.state === 'running-outside' ? `${result.id} already runs outside YallaFlow (${(result.outside ?? []).join(', ')}); it was not started and YallaFlow will never stop it.` : result.already ? `${result.id} is already ${result.state} (pid ${result.pid}).` : `${result.id} ${action === 'restart' ? 'restarted' : 'started'}: ${result.state} (pid ${result.pid}). Logs: yallaflow runtime logs ${result.id}`]);
   }
   if (action === 'stop') {
     if (plain.length === 1 && plain[0] === '--all') {
       const results = await stopAllServices(root);
       return out(json, { ok: results.every((entry) => !entry.error && !entry.survivors?.length), results }, results.length ? results.map(describeStop) : ['No YallaFlow-started service is running.']);
     }
-    if (plain.length !== 1) throw usage();
-    const result = await stopService(root, plain[0]);
+    const confirmShared = plain.includes('--confirm-shared');
+    const ids = plain.filter((token) => token !== '--confirm-shared');
+    if (ids.length !== 1) throw usage();
+    const result = await stopService(root, ids[0], { confirmShared });
     if (result.survivors?.length) process.exitCode = 1;
     return out(json, { ok: !result.survivors?.length, ...result }, [describeStop(result)]);
   }
@@ -115,6 +147,88 @@ async function run(rest, json) {
   throw usage();
 }
 
+function humanOnly(what) {
+  // Like trust: a person in a terminal. The console saves in its own process (finding 2).
+  if (!process.stdin.isTTY) throw new RuntimeError('RUNTIME_HUMAN_ONLY', `${what} is the developer's decision: run it in a terminal yourself, or use Setup in the console. An agent can only propose a plan (\`yallaflow runtime plan propose --file\`).`);
+}
+
+async function planCommand(root, plain, json) {
+  const plan = await import('../runtime/plan.js');
+  const [sub, ...rest] = plain;
+  if (sub === 'show' && !rest.length) {
+    const doc = await plan.readPlan(root);
+    return out(json, { schema: RUNTIME_SCHEMA, ...doc }, [
+      ...(doc.agent ? planLines(doc.agent, `Agent proposal (${doc.agent.proposedAt})`) : ['No agent proposal.']),
+      '',
+      ...(doc.scan ? planLines(doc.scan, `Scan (${doc.scan.analyzedAt})`) : ['No scan yet. Run `yallaflow runtime analyze`.'])
+    ]);
+  }
+  if (sub === 'propose') {
+    const { values, positionals } = parseArgs({ args: rest, options: { file: { type: 'string' } }, allowPositionals: true, strict: true });
+    if (positionals.length || !values.file) throw usage();
+    let input;
+    try { input = JSON.parse(await readFile(values.file, 'utf8')); } catch { throw Object.assign(new Error(`${values.file} is not a readable JSON file.`), { code: 'RUNTIME_PLAN_INVALID' }); }
+    const doc = await plan.storeAgentPlan(root, input);
+    return out(json, { ok: true, schema: RUNTIME_SCHEMA, agent: doc.agent }, [
+      `Proposal stored: ${doc.agent.services.length} service(s), ${doc.agent.unresolved.length} unresolved item(s).`,
+      'Nothing was saved to the runtime profile, trusted or started. The developer reviews it in Setup (or `yallaflow runtime plan show`).'
+    ]);
+  }
+  if (sub === 'discard') {
+    const which = rest.includes('--agent') ? 'agent' : rest.includes('--scan') ? 'scan' : rest.length ? null : 'all';
+    if (!which) throw usage();
+    await plan.discardPlan(root, which);
+    return out(json, { ok: true, discarded: which }, [`Discarded the ${which === 'all' ? 'whole plan' : `${which} plan`}. The runtime profile is unchanged.`]);
+  }
+  if (sub === 'save') {
+    const { values, positionals } = parseArgs({ args: rest, options: { 'shared-profile': { type: 'boolean' }, replace: { type: 'boolean' }, from: { type: 'string' } }, allowPositionals: true, strict: true });
+    if (!positionals.length || (values.from && !['agent', 'scan'].includes(values.from))) throw usage();
+    humanOnly('Saving services to the runtime profile');
+    const result = await plan.savePlanServices(root, positionals, { from: values.from ?? 'agent', sharedProfile: Boolean(values['shared-profile']), replace: Boolean(values.replace) });
+    return out(json, { ok: true, ...result }, [
+      ...result.saved.map((entry) => `Saved ${entry.id} to ${entry.profile} — NOT trusted.`),
+      'Saving never allows anything to run. Review and trust each service (`yallaflow runtime review <id>`, then `yallaflow runtime trust <id>`), then start it.'
+    ]);
+  }
+  throw usage();
+}
+
+function planLines(plan, title) {
+  const lines = [title];
+  for (const service of plan.services ?? []) {
+    lines.push(`- ${service.id} — ${service.name} [${service.confidence}]`, `    command: ${JSON.stringify(service.command)} in ${service.cwd}`);
+    if (service.ports?.length) lines.push(`    ports: ${service.ports.join(', ')}`);
+    if (service.links?.length) lines.push(`    links: ${service.links.map((link) => link.url).join(' ')}`);
+    if (service.shared) lines.push(`    SHARED: ${(service.shared.reasons ?? service.shared.scope ?? []).join('; ')}`);
+    if (service.runningOutside?.length) lines.push(`    already running outside YallaFlow: ${service.runningOutside.join(', ')}`);
+    for (const conflict of service.conflicts ?? []) lines.push(`    port ${conflict.port} is held by ${conflict.owner}`);
+    for (const item of service.blocking ?? []) lines.push(`    BLOCKING: ${item}`);
+  }
+  for (const item of plan.unresolved ?? []) lines.push(`? unresolved: ${item.item} — ${item.reason}${item.blocking ? ' (blocks trust until resolved)' : ''}`);
+  if (plan.nothingFound) lines.push(plan.nothingFound);
+  if (plan.coverage) {
+    lines.push(`Scanned: ${plan.coverage.scanned.join(', ')}`);
+    for (const limit of plan.coverage.limits ?? []) lines.push(`Not scanned: ${limit.what} — ${limit.why}`);
+    for (const skipped of plan.coverage.skipped ?? []) lines.push(`Not read: ${skipped.path} — ${skipped.why}`);
+  }
+  return lines;
+}
+
+function reviewLines(review) {
+  const e = review.effective;
+  return [
+    `Review ${review.id} before trusting it:`,
+    `  command: ${JSON.stringify(e.command)}`,
+    `  folder: ${e.folder ?? e.cwd} (${e.profile})`,
+    `  env names: ${e.env.join(', ') || '(none)'} · ports: ${e.ports.join(', ') || '(none)'} · depends on: ${e.dependsOn.join(', ') || '(none)'}`,
+    `  trust covers: ${review.covered.join(', ') || '(the definition only)'}`,
+    ...review.notCovered.map((entry) => `  not covered: ${entry.what} — ${entry.why}`),
+    ...review.blocking.map((entry) => `  BLOCKING: ${entry.reason}`),
+    ...(review.shared.shared ? [`  SHARED: ${review.shared.reasons.join('; ')}`] : []),
+    review.definitionHash ? `  definition: ${review.definitionHash}` : '  It cannot be trusted until the blocking items are resolved.'
+  ];
+}
+
 function ask(question) {
   return new Promise((resolve) => {
     const rl = createInterface({ input: process.stdin, output: process.stdout });
@@ -123,6 +237,7 @@ function ask(question) {
 }
 
 function describeStop(result) {
+  if (result.left === 'shared') return `${result.id} left running: shared infrastructure (${result.reasons.join('; ')}). Stop it on its own with \`yallaflow runtime stop ${result.id} --confirm-shared\` if no one else needs it.`;
   if (result.error) return `${result.id}: ${result.error}`;
   if (result.already) return `${result.id} was not running.`;
   if (result.acknowledged) return `${result.id} had already ended; marked stopped.`;
