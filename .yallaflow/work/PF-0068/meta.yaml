@@ -4,14 +4,14 @@
   "scope": "bounded",
   "routingStatus": "routed",
   "rawRequest": "Release YallaFlow 1.4.0 (Engineering workspace): docs and CHANGELOG dated, freeze checks, tag v1.4.0, push, GitHub Release, npm publish through release.yml",
-  "status": "VERIFICATION",
+  "status": "DONE",
   "readOnly": false,
   "knowledgePolicy": {
     "version": 1,
     "reviewRequired": true
   },
   "createdAt": "2026-11-07T23:50:10.569Z",
-  "updatedAt": "2026-11-07T23:52:13.633Z",
+  "updatedAt": "2026-11-08T00:04:29.965Z",
   "title": "Release YallaFlow 1.4.0 (Engineering workspace): docs and CHANGELOG dated, freeze checks, tag v1.4.0, push, GitHub Release, npm publish through release.yml",
   "routingConfidence": "high",
   "routingReason": "Explicitly classified by the user: `yallaflow release --scope bounded`.",
@@ -33,5 +33,14 @@
       "verification",
       "code-review"
     ]
-  }
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-08T00:04:29.965Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002"
+      ]
+    }
+  ]
 }

@@ -39,7 +39,14 @@
       "summary": "Release review: every work item in 1.4.0 is DONE (PF-0055..PF-0067) with its own verification; docs match the shipped behaviour (CHANGELOG, README, upgrading-to-v1.4.0, roadmap, installation); domain versions checked against v1.3.0 (Agent Contract 10->11 bumped for the lifecycle rules; Skill Registry 9, bootstrap 3, knowledge policy 1 and schemas unchanged); package contents include the Claude channel files deliberately (PF-0060). No blocking issue."
     }
   },
-  "rulings": [],
+  "rulings": [
+    {
+      "decision": "Released 2026-11-08 with the owner's approval: annotated tag v1.4.0 (7db30ac) on 237da23 pushed with main; GitHub Release https://github.com/engmohamedamer/yallaflow/releases/tag/v1.4.0 created as engmohamedamer; release.yml run 42427573884 green (guard, test 20/22/24, publish); npm yallaflow@1.4.0 dist-tag latest with SLSA provenance, shasum c75aa6bb357afe20d54c0e27e5beb3dca57cbda8 identical to the locally tested tarball.",
+      "reason": "Records the publication outcome on the release work item.",
+      "costIfWrong": "None; the facts are checkable on GitHub and npm.",
+      "createdAt": "2026-11-08T00:04:29.835Z"
+    }
+  ],
   "history": [],
-  "updatedAt": "2026-11-07T23:56:53.341Z"
+  "updatedAt": "2026-11-08T00:04:29.835Z"
 }
