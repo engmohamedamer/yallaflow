@@ -16,19 +16,21 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="YallaFlow">
 <meta property="og:title" content="YallaFlow — Give AI your project, not just your prompt.">
-<meta property="og:description" content="Durable project memory, adaptive workflows, and verified delivery for Claude Code and Codex.">
+<meta property="og:description" content="Project memory, workflows sized to the work, and proof before done, for Claude Code and Codex. A local console in English and Arabic. Free and open source.">
 <meta property="og:url" content="https://engmohamedamer.github.io/yallaflow/">
 <meta property="og:locale" content="en_US">
 <meta property="og:locale:alternate" content="ar_EG">
 <meta property="og:image" content="https://engmohamedamer.github.io/yallaflow/og-image.jpg">
+<meta property="og:image:secure_url" content="https://engmohamedamer.github.io/yallaflow/og-image.jpg">
+<meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="YallaFlow — Give AI your project, not just your prompt.">
+<meta property="og:image:alt" content="YallaFlow 1.4.1: the console on a real project, with 64 work items, 216 verification runs and 61 done.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="YallaFlow — Give AI your project, not just your prompt.">
-<meta name="twitter:description" content="Durable project memory, adaptive workflows, and verified delivery for Claude Code and Codex.">
+<meta name="twitter:description" content="Project memory, workflows sized to the work, and proof before done, for Claude Code and Codex. A local console in English and Arabic. Free and open source.">
 <meta name="twitter:image" content="https://engmohamedamer.github.io/yallaflow/og-image.jpg">
-<meta name="twitter:image:alt" content="YallaFlow — Give AI your project, not just your prompt.">
+<meta name="twitter:image:alt" content="YallaFlow 1.4.1: the console on a real project, with 64 work items, 216 verification runs and 61 done.">
 
 <script type="application/ld+json">
 {
@@ -76,6 +78,7 @@
     <nav class="primary" aria-label="Primary">
       <ul>
         <li><a href="#console">Console</a></li>
+        <li><a href="#real">Real work</a></li>
         <li><a href="#whats-new">What's new</a></li>
         <li><a href="#how-it-works">How it works</a></li>
         <li><a href="#quick-start">Install</a></li>
@@ -169,6 +172,55 @@
         <a class="btn" href="https://github.com/engmohamedamer/yallaflow/blob/main/docs/tour.ar.md" hreflang="ar">الجولة بالعربي</a>
         <code>yallaflow console</code>
       </div>
+    </div>
+  </section>
+
+  <section id="real" class="real-section" aria-labelledby="real-h">
+    <div class="wrap">
+      <p class="kicker">Real work, not a demo</p>
+      <h2 id="real-h">A real project, run on YallaFlow every day</h2>
+      <p class="section-lede"><b>DmagAI</b> is the production studio of the <span lang="ar">دماغ AI</span> YouTube channel: Egyptian-Arabic videos built with Claude Code, Remotion and ffmpeg, plus the tools around them. Since 21 October 2026, every change in it has gone through YallaFlow. These screens are from that project, unedited.</p>
+      <ul class="stats real-stats">
+        <li><b>64</b><span>work items in 3 weeks</span></li>
+        <li><b>61</b><span>done, each with evidence</span></li>
+        <li><b>216</b><span>verification runs recorded</span></li>
+        <li><b>238</b><span>requirements and acceptance criteria</span></li>
+        <li><b>66</b><span>current facts in project memory</span></li>
+        <li><b>155</b><span>commits</span></li>
+      </ul>
+      <div class="showcase real-shots">
+        <figure class="shot wide">
+          <img src="/yallaflow/media/real/real-flow-en.webp" alt="DmagAI in the YallaFlow console: the Flow board with 61 work items done, 3 open and none failing" width="1600" height="1000" loading="lazy" decoding="async">
+          <figcaption><b>The whole project at a glance</b>Every request sits on its station, from New to Done. Nothing is done without proof.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="/yallaflow/media/real/real-item-en.webp" alt="An architectural work item at 100 percent: design, specification and plan, implementation, verification with code review, and 24 facts saved to project memory" width="1600" height="1000" loading="lazy" decoding="async">
+          <figcaption><b>One feature, every decision kept</b>Design, spec and plan; the change; an independent review that caught a blocking issue; 24 facts saved for the next session.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="/yallaflow/media/real/real-work-en.webp" alt="The Work board of DmagAI listing open work with stations, progress and the next step" width="1600" height="1000" loading="lazy" decoding="async">
+          <figcaption><b>Open work, honestly</b>Each open item shows exactly what is pending, for example "implementation checkpoint is pending".</figcaption>
+        </figure>
+      </div>
+      <h3 class="stories-h">Recorded in real sessions</h3>
+      <div class="stories">
+        <article class="story">
+          <p class="tag">Two agents, one work item</p>
+          <h4>Codex picked up where Claude Code stopped</h4>
+          <p>Claude Code built phase 1 of an expense-approval policy, and 24 tests passed. Codex then got only <q>Continue the work in progress.</q> It read YallaFlow's records, built the rest and finished with <b>29 tests and 9/9 acceptance criteria satisfied</b>.</p>
+        </article>
+        <article class="story">
+          <p class="tag">QC that only counts what ran</p>
+          <h4>9/9 browser scenarios passed</h4>
+          <p>The agent planned QC from the acceptance criteria and ran it in a real browser. All 9 scenarios passed, including a forged request the server refused, and the agent listed what it did not cover.</p>
+        </article>
+        <article class="story">
+          <p class="tag">Changing your mind is safe</p>
+          <h4>Reopened, re-assessed, done again</h4>
+          <p>After review, a finished item was reopened with a reason. YallaFlow raised an impact assessment, the requirements were revised first, and the item was re-verified and closed again.</p>
+        </article>
+      </div>
+      <p class="note">The stories come from a technical showcase recorded inside DmagAI (work item PF-0051). The figures were counted from DmagAI's own YallaFlow records on 8 November 2026.</p>
     </div>
   </section>
 

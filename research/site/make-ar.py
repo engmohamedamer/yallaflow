@@ -24,9 +24,7 @@ pairs = [
  (f'<meta property="og:url" content="{U}">', f'<meta property="og:url" content="{U}ar/">'),
  ('<meta property="og:locale" content="en_US">\n<meta property="og:locale:alternate" content="ar_EG">', '<meta property="og:locale" content="ar_EG">\n<meta property="og:locale:alternate" content="en_US">'),
  ('<meta property="og:title" content="YallaFlow — Give AI your project, not just your prompt.">', '<meta property="og:title" content="YallaFlow — ادّي الذكاء الاصطناعي مشروعك، مش بس طلبك.">'),
- ('<meta property="og:description" content="Durable project memory, adaptive workflows, and verified delivery for Claude Code and Codex.">', '<meta property="og:description" content="ذاكرة دايمة للمشروع، وشغل على قد الطلب، وتسليم متثبت، لـClaude Code وCodex.">'),
  ('<meta name="twitter:title" content="YallaFlow — Give AI your project, not just your prompt.">', '<meta name="twitter:title" content="YallaFlow — ادّي الذكاء الاصطناعي مشروعك، مش بس طلبك.">'),
- ('<meta name="twitter:description" content="Durable project memory, adaptive workflows, and verified delivery for Claude Code and Codex.">', '<meta name="twitter:description" content="ذاكرة دايمة للمشروع، وشغل على قد الطلب، وتسليم متثبت، لـClaude Code وCodex.">'),
  ('<a class="skip" href="#main">Skip to content</a>', '<a class="skip" href="#main">انتقل للمحتوى</a>'),
  ('<nav class="primary" aria-label="Primary">', '<nav class="primary" aria-label="القائمة">'),
  ('<li><a href="#console">Console</a></li>', '<li><a href="#console">الكونسول</a></li>'),
@@ -236,6 +234,40 @@ pairs = [
   '<p>عملت YallaFlow علشان الوكيل السريع من غير سياق المشروع بيسلّم الحاجة الغلط برضه. ومتبني بنفس الطريقة اللي بيطلبها منك: مع وكلاء البرمجة بالذكاء الاصطناعي (Claude Code وCodex)، وYallaFlow ماسك كل تغيير.</p>'),
  ('Connect on LinkedIn<span class="sr-only"> (opens in a new tab)</span></a>', 'تواصل معايا على LinkedIn<span class="sr-only"> (بيفتح في تاب جديدة)</span></a>'),
  ('<p>Made by <a href="https://www.linkedin.com/in/mohamedamer2050/" target="_blank" rel="noopener noreferrer">Mohamed Amer<span class="sr-only"> on LinkedIn (opens in a new tab)</span></a>.</p>', '<p>من تطوير <a href="https://www.linkedin.com/in/mohamedamer2050/" target="_blank" rel="noopener noreferrer">محمد عامر<span class="sr-only"> على LinkedIn (بيفتح في تاب جديدة)</span></a>.</p>'),
+ # PF-0080: real work and share metadata
+ ('<meta property="og:image" content="https://engmohamedamer.github.io/yallaflow/og-image.jpg">\n<meta property="og:image:secure_url" content="https://engmohamedamer.github.io/yallaflow/og-image.jpg">', '<meta property="og:image" content="https://engmohamedamer.github.io/yallaflow/og-image-ar.jpg">\n<meta property="og:image:secure_url" content="https://engmohamedamer.github.io/yallaflow/og-image-ar.jpg">'),
+ ('<meta name="twitter:image" content="https://engmohamedamer.github.io/yallaflow/og-image.jpg">', '<meta name="twitter:image" content="https://engmohamedamer.github.io/yallaflow/og-image-ar.jpg">'),
+ ('<meta property="og:image:alt" content="YallaFlow 1.4.1: the console on a real project, with 64 work items, 216 verification runs and 61 done.">', '<meta property="og:image:alt" content="YallaFlow 1.4.1: الكونسول على مشروع حقيقي، فيه 64 شغلانة و216 عملية تحقّق و61 خلصت.">'),
+ ('<meta name="twitter:image:alt" content="YallaFlow 1.4.1: the console on a real project, with 64 work items, 216 verification runs and 61 done.">', '<meta name="twitter:image:alt" content="YallaFlow 1.4.1: الكونسول على مشروع حقيقي، فيه 64 شغلانة و216 عملية تحقّق و61 خلصت.">'),
+ ('<meta property="og:description" content="Project memory, workflows sized to the work, and proof before done, for Claude Code and Codex. A local console in English and Arabic. Free and open source.">', '<meta property="og:description" content="ذاكرة للمشروع، وشغل على قد الطلب، وإثبات قبل «خلص»، لـClaude Code وCodex. وكونسول على جهازك بالعربي والإنجليزي. مجاني ومفتوح المصدر.">'),
+ ('<meta name="twitter:description" content="Project memory, workflows sized to the work, and proof before done, for Claude Code and Codex. A local console in English and Arabic. Free and open source.">', '<meta name="twitter:description" content="ذاكرة للمشروع، وشغل على قد الطلب، وإثبات قبل «خلص»، لـClaude Code وCodex. وكونسول على جهازك بالعربي والإنجليزي. مجاني ومفتوح المصدر.">'),
+ ('<li><a href="#real">Real work</a></li>', '<li><a href="#real">شغل حقيقي</a></li>'),
+ ('<p class="kicker">Real work, not a demo</p>', '<p class="kicker">شغل حقيقي، مش ديمو</p>'),
+ ('<h2 id="real-h">A real project, run on YallaFlow every day</h2>', '<h2 id="real-h">مشروع حقيقي شغّال بـYallaFlow كل يوم</h2>'),
+ ('<p class="section-lede"><b>DmagAI</b> is the production studio of the <span lang="ar">دماغ AI</span> YouTube channel: Egyptian-Arabic videos built with Claude Code, Remotion and ffmpeg, plus the tools around them. Since 21 October 2026, every change in it has gone through YallaFlow. These screens are from that project, unedited.</p>', '<p class="section-lede"><b>DmagAI</b> هو استوديو الإنتاج بتاع قناة «دماغ AI» على يوتيوب: فيديوهات بالمصري معمولة بـClaude Code وRemotion وffmpeg، والأدوات اللي حواليها. من ٢١ أكتوبر ٢٠٢٦، كل تغيير فيه بيعدّي على YallaFlow. الشاشات دي من المشروع ده، من غير أي تعديل.</p>'),
+ ('<li><b>64</b><span>work items in 3 weeks</span></li>', '<li><b>64</b><span>شغلانة في ٣ أسابيع</span></li>'),
+ ('<li><b>61</b><span>done, each with evidence</span></li>', '<li><b>61</b><span>خلصت، كل واحدة بدليلها</span></li>'),
+ ('<li><b>216</b><span>verification runs recorded</span></li>', '<li><b>216</b><span>عملية تحقّق متسجّلة</span></li>'),
+ ('<li><b>238</b><span>requirements and acceptance criteria</span></li>', '<li><b>238</b><span>متطلب ومعيار قبول</span></li>'),
+ ('<li><b>66</b><span>current facts in project memory</span></li>', '<li><b>66</b><span>حقيقة حالية في ذاكرة المشروع</span></li>'),
+ ('<li><b>155</b><span>commits</span></li>', '<li><b>155</b><span>commit</span></li>'),
+ ('alt="DmagAI in the YallaFlow console: the Flow board with 61 work items done, 3 open and none failing"', 'alt="DmagAI في كونسول YallaFlow: لوحة التدفق، و61 شغلانة خلصت، و3 مفتوحة، ومفيش ولا واحدة فيها مشكلة"'),
+ ('<figcaption><b>The whole project at a glance</b>Every request sits on its station, from New to Done. Nothing is done without proof.</figcaption>', '<figcaption><b>المشروع كله في نظرة</b>كل طلب على محطته من «جديد» لحد «خلص»، ومفيش حاجة بتخلص من غير إثبات.</figcaption>'),
+ ('alt="An architectural work item at 100 percent: design, specification and plan, implementation, verification with code review, and 24 facts saved to project memory"', 'alt="شغلانة معمارية ١٠٠٪: تصميم ومواصفات وخطة، وتنفيذ، وتحقّق مع مراجعة كود، و24 حقيقة اتحفظت في ذاكرة المشروع"'),
+ ('<figcaption><b>One feature, every decision kept</b>Design, spec and plan; the change; an independent review that caught a blocking issue; 24 facts saved for the next session.</figcaption>', '<figcaption><b>فيتشر واحدة، وكل قرار محفوظ</b>تصميم ومواصفات وخطة، والتنفيذ، ومراجعة مستقلة مسكت مشكلة كانت هتوقف الشغل، و24 حقيقة اتحفظت للجلسة الجاية.</figcaption>'),
+ ('alt="The Work board of DmagAI listing open work with stations, progress and the next step"', 'alt="لوحة الشغل في DmagAI وفيها الشغل المفتوح بمحطاته ونسبته وخطوته الجاية"'),
+ ('<figcaption><b>Open work, honestly</b>Each open item shows exactly what is pending, for example "implementation checkpoint is pending".</figcaption>', '<figcaption><b>الشغل المفتوح، بصراحة</b>كل شغلانة مفتوحة بتقول بالظبط إيه اللي مستني، زي «implementation checkpoint is pending».</figcaption>'),
+ ('<h3 class="stories-h">Recorded in real sessions</h3>', '<h3 class="stories-h">متسجّل في جلسات حقيقية</h3>'),
+ ('<p class="tag">Two agents, one work item</p>', '<p class="tag">وكيلين، وشغلانة واحدة</p>'),
+ ('<h4>Codex picked up where Claude Code stopped</h4>', '<h4>Codex كمّل من مكان ما Claude Code وقف</h4>'),
+ ("<p>Claude Code built phase 1 of an expense-approval policy, and 24 tests passed. Codex then got only <q>Continue the work in progress.</q> It read YallaFlow's records, built the rest and finished with <b>29 tests and 9/9 acceptance criteria satisfied</b>.</p>", '<p>Claude Code بنى المرحلة الأولى من سياسة اعتماد المصروفات، و24 اختبار عدّوا. بعدها Codex خد جملة واحدة بس: <q>Continue the work in progress.</q> قرا سجلات YallaFlow، وبنى الباقي، وخلّص بـ<b>29 اختبار و9 من 9 معايير قبول متحقّقة</b>.</p>'),
+ ('<p class="tag">QC that only counts what ran</p>', '<p class="tag">اختبار مابيحسبش غير اللي اشتغل فعلاً</p>'),
+ ('<h4>9/9 browser scenarios passed</h4>', '<h4>9 من 9 سيناريوهات في المتصفح عدّت</h4>'),
+ ('<p>The agent planned QC from the acceptance criteria and ran it in a real browser. All 9 scenarios passed, including a forged request the server refused, and the agent listed what it did not cover.</p>', '<p>الوكيل خطّط الاختبار من معايير القبول وشغّله في متصفح حقيقي. الـ9 سيناريوهات كلهم عدّوا، ومنهم طلب مزوّر السيرفر رفضه، والوكيل قال بصراحة إيه اللي ماغطّاهوش.</p>'),
+ ('<p class="tag">Changing your mind is safe</p>', '<p class="tag">تغيير رأيك آمن</p>'),
+ ('<h4>Reopened, re-assessed, done again</h4>', '<h4>اتفتحت تاني، واتراجع أثرها، وخلصت تاني</h4>'),
+ ('<p>After review, a finished item was reopened with a reason. YallaFlow raised an impact assessment, the requirements were revised first, and the item was re-verified and closed again.</p>', '<p>بعد المراجعة، شغلانة خلصانة اتفتحت تاني بسبب مكتوب. YallaFlow طلّع تقييم أثر، والمتطلبات اتعدّلت الأول، وبعدها الشغلانة اتحقّقت تاني واتقفلت.</p>'),
+ ('<p class="note">The stories come from a technical showcase recorded inside DmagAI (work item PF-0051). The figures were counted from DmagAI\'s own YallaFlow records on 8 November 2026.</p>', '<p class="note">القصص دي من عرض تقني اتسجّل جوه DmagAI (الشغلانة PF-0051)، والأرقام محسوبة من سجلات YallaFlow بتاعة DmagAI نفسه يوم ٨ نوفمبر ٢٠٢٦.</p>'),
 ]
 for en, ar in pairs:
     c = s.count(en)
@@ -248,7 +280,7 @@ def fix(m):
     w, h = Image.open(site + src.replace('/yallaflow', '')).size
     tag = m.group(0).replace(m.group(1), src)
     return re.sub(r'width="\d+" height="\d+"', f'width="{w}" height="{h}"', tag)
-s = re.sub(r'<img src="(/yallaflow/media/tour/[^"]+-en\.webp)"[^>]*>', fix, s)
+s = re.sub(r'<img src="(/yallaflow/media/(?:tour|real)/[^"]+-en\.webp)"[^>]*>', fix, s)
 s = s.replace('<span class="sr-only"> (opens in a new tab)</span>', '<span class="sr-only"> (بيفتح في تاب جديدة)</span>')
 open(site + '/ar/index.html', 'w', encoding='utf8').write(s)
 print('ok')

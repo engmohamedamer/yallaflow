@@ -251,4 +251,19 @@
   - README.md (repository @ 040b103)
   - research/docs-tour/make-hero.py (repository @ 040b103)
 
+<!-- yallaflow-fact:CTX-0133 -->
+### CTX-0133 — Website evidence of real use comes from real projects captured read-only. research/docs-tour/capture-real.mjs opens a --read-only console with an isolated config, takes Flow, Work, Insights, Overview and one item in EN light and AR dark, and fails if any file under the project's .yallaflow/ changed. Share cards (site/og-image.jpg, site/og-image-ar.jpg) are built by research/site/make-og.py at 1200x630 and under 300 KB for chat apps; Arabic card text must avoid Latin words, because the Arabic font has no Latin glyphs. Unpublished internal media, such as DmagAI's yallaflow-showcase video, is never put on the public site.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0080
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-08T20:10:51.451Z
+- **Verified:** 2026-11-08T20:10:51.451Z (commit 1b2899f)
+- **Evidence:**
+  - research/docs-tour/capture-real.mjs (repository @ 1b2899f)
+  - research/site/make-og.py (repository @ 1b2899f)
+  - site/og-image-ar.jpg (repository @ 1b2899f)
+
 <!-- yallaflow-context:end -->

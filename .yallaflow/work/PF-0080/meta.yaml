@@ -1,0 +1,45 @@
+{
+  "id": "PF-0080",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Website: show the real effort — fix the link preview (WhatsApp/social: richer og image per language, secure_url/type/alt, Arabic og for /ar/), and add a real-work showcase built from the DmagAI project (real console screens captured read-only, real numbers, and the recorded Claude Code → Codex handoff, QC and reopen stories from its production log), in English and Arabic",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-08T20:05:08.910Z",
+  "updatedAt": "2026-11-08T20:10:51.868Z",
+  "title": "Website: show the real effort — fix the link preview (WhatsApp/social: richer og image per language, secure_url/type/alt, Arabic og for /ar/), and add a real-work showcase built from the DmagAI project (real console screens captured read-only, real numbers, and the recorded Claude Code → Codex handoff, QC and reopen stories from its production log), in English and Arabic",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-08T20:05:08.952Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-08T20:10:51.868Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

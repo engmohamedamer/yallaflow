@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Website evidence of real use comes from real projects captured read-only. research/docs-tour/capture-real.mjs opens a --read-only console with an isolated config, takes Flow, Work, Insights, Overview and one item in EN light and AR dark, and fails if any file under the project's .yallaflow/ changed. Share cards (site/og-image.jpg, site/og-image-ar.jpg) are built by research/site/make-og.py at 1200x630 and under 300 KB for chat apps; Arabic card text must avoid Latin words, because the Arabic font has no Latin glyphs. Unpublished internal media, such as DmagAI's yallaflow-showcase video, is never put on the public site.",
+      "evidence": [
+        "research/docs-tour/capture-real.mjs",
+        "research/site/make-og.py",
+        "site/og-image-ar.jpg"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-08T20:10:51.282Z",
+      "factId": "CTX-0133",
+      "promotedAt": "2026-11-08T20:10:51.451Z",
+      "target": "context/conventions.md"
+    }
+  ],
+  "updatedAt": "2026-11-08T20:10:51.451Z",
+  "reviewedAt": "2026-11-08T20:10:51.451Z"
+}

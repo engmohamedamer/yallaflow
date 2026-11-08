@@ -307,3 +307,18 @@ footer p { margin: 0; }
 .maker-body p { color: var(--muted); max-width: 46em; margin: 0; }
 .maker-body .ctas { margin-top: 20px; }
 [dir="rtl"] .avatar { font-family: var(--sans); }
+
+/* ---------- PF-0080: real work ---------- */
+.real-section { background: linear-gradient(180deg, var(--bg-glow), var(--bg) 40%); }
+.real-stats { margin: 0 0 36px; }
+.real-shots { margin-bottom: 8px; }
+.stories-h { margin: 44px 0 16px; font-size: 1.25rem; }
+.stories { display: grid; gap: 16px; }
+@media (min-width: 900px) { .stories { grid-template-columns: repeat(3, 1fr); } }
+.story { padding: 22px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); position: relative; }
+.story::before { content: ""; position: absolute; top: -1px; inset-inline: 22px; height: 3px; border-radius: 3px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+.story .tag { margin: 0 0 8px; font: 600 0.74rem/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+.story h4 { margin: 0 0 8px; font-size: 1.08rem; }
+.story p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+.story b { color: var(--fg); }
+[dir="rtl"] .story .tag { text-transform: none; letter-spacing: 0; font-family: inherit; font-size: .85rem; }

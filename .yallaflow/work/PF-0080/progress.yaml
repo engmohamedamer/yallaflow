@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-08T20:05:24.136Z",
+      "completedAt": "2026-11-08T20:05:24.136Z",
+      "summary": "Link preview: the live page answers a WhatsApp user agent with 200, has og:title/description/image/url and a 1200x630, 73 KB og-image.jpg. The developer's WhatsApp showed only the domain, which points to a cached or failed earlier fetch; the image is generic, has no secure_url/type, and /ar/ reuses the English card. DmagAI (~/MyDrive/DemaghAI, the دماغ AI channel workspace) is a YallaFlow project: 64 work items (61 DONE: 32 features, 29 changes, 2 investigations, 1 bug), 216 verification runs, 238 requirement records, 66 current facts, 11 sources, 155 commits since 2026-10-21, approved brownfield baseline. projects/yallaflow-showcase/PRODUCTION-LOG.md records real takes: Claude Code built ExpenseFlow phase 1 (24 tests), Codex continued with only 'Continue the work in progress' from the records (29 tests, 9/9 criteria), RoomFlow QC 9/9 in the browser, a DONE item reopened with impact IM-001. That showcase video is internal ('nothing is published'), so it is not used.",
+      "evidence": [
+        "site/index.html",
+        "site/og-image.jpg",
+        "runtime:curl with a WhatsApp user agent returned 200 and og tags in the first 3.5 KB",
+        "runtime:DmagAI yallaflow snapshot --json counts and its projects/yallaflow-showcase/PRODUCTION-LOG.md"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-08T20:05:24.512Z",
+      "completedAt": "2026-11-08T20:05:24.512Z",
+      "summary": "Developer: the share data needs fixing (WhatsApp shows only the domain), the work screens don't express the effort, the work is high quality, use the DmagAI project to make something that really shows the effort. Approach: real read-only screens and real numbers from DmagAI plus its recorded stories; no unpublished internal video; show the result to the developer before deploying.",
+      "evidence": [
+        "user:بيانات النشر محتاجه تتظبط والصور لشغل مش معبره عنالمجهود احنا عملنا شغل عالى حاول تستفيد بمشروع ال demaghai اللى عم لناها واعمل حاجه توضح الجهد بجد"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-08T20:05:25.283Z",
+      "completedAt": "2026-11-08T20:05:25.283Z",
+      "summary": "1) research/docs-tour/capture-real.mjs: a read-only console (isolated config) on a given project; captures Flow, Work, Insights, Overview and one rich item (EN light, AR dark), with the project's .yallaflow fingerprinted before and after. 2) A 'Real work' section (#real) on both pages: DmagAI numbers, real screens, and three recorded stories (agent handoff, QC 9/9, reopen with impact). 3) New og images (EN and AR) from real screens and numbers, plus og:image:secure_url/type/alt and an Arabic og for /ar/. 4) Preview locally, push a branch, and deploy only after the developer approves."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-08T20:10:21.008Z",
+      "completedAt": "2026-11-08T20:10:21.008Z",
+      "summary": "Share metadata: new og-image.jpg (EN) and og-image-ar.jpg (AR), 1200x630, ~66 KB, built by research/site/make-og.py from a real DmagAI Flow screen and real numbers; og:image:secure_url and og:image:type added, richer og/twitter description and image alt, and /ar/ points to its Arabic card. Real work: research/docs-tour/capture-real.mjs (read-only console, project .yallaflow fingerprinted before/after: 712 files unchanged) captured DmagAI Flow, item PF-0002 and the Work board (site/media/real/*.webp, EN light / AR dark); a #real section on both pages with DmagAI numbers, 3 real screens and 3 recorded stories (Claude Code → Codex handoff, QC 9/9, reopen with impact), plus a 'Real work' nav link. make-ar.py gained the Arabic pairs, dropped 2 stale ones, and maps /media/real/ to Arabic screens.",
+      "evidence": [
+        "site/index.html",
+        "site/ar/index.html",
+        "site/og-image.jpg",
+        "site/og-image-ar.jpg",
+        "research/site/make-og.py",
+        "research/docs-tour/capture-real.mjs"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-08T20:10:51.111Z",
+      "completedAt": "2026-11-08T20:10:51.111Z",
+      "summary": "V-001: sitemap valid; Arabic page exactly matches the generator and is RTL; all local links, anchors and repo targets resolve. Local preview in headless Chromium: EN and AR at 1366px dark and light and at 390px with 0 overflow, 0 broken images and no errors. The #real section and both og cards were reviewed visually (no overlap, no missing glyphs). The read-only capture left DmagAI's 712 .yallaflow files unchanged. Not verifiable from here: WhatsApp's own preview cache; it refetches when the link is shared fresh or after its cache expires.",
+      "evidence": [
+        "verification:V-001",
+        "runtime:capture-real.mjs reported 'project .yallaflow unchanged (712 files)'"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-08T20:10:51.111Z"
+}

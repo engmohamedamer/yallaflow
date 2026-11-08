@@ -13149,7 +13149,56 @@
       ],
       "createdAt": "2026-11-08T19:54:28.164Z",
       "updatedAt": "2026-11-08T19:54:28.164Z"
+    },
+    {
+      "id": "CTX-0133",
+      "area": "convention",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Website evidence of real use comes from real projects captured read-only. research/docs-tour/capture-real.mjs opens a --read-only console with an isolated config, takes Flow, Work, Insights, Overview and one item in EN light and AR dark, and fails if any file under the project's .yallaflow/ changed. Share cards (site/og-image.jpg, site/og-image-ar.jpg) are built by research/site/make-og.py at 1200x630 and under 300 KB for chat apps; Arabic card text must avoid Latin words, because the Arabic font has no Latin glyphs. Unpublished internal media, such as DmagAI's yallaflow-showcase video, is never put on the public site.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0080",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "research/docs-tour/capture-real.mjs",
+          "contentHash": "sha256:8bb66cfe9edadaee648f069483f8c03cbd981fa22eefd118c3a5af1300d88a4b",
+          "gitCommit": "1b2899fdf7a20ffeabefdcbb037534d93c0ec1e8",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "research/site/make-og.py",
+          "contentHash": "sha256:31ee31f5d4a4847024018b89f5845b132624bd72502414b6228c4622b076cf84",
+          "gitCommit": "1b2899fdf7a20ffeabefdcbb037534d93c0ec1e8",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "site/og-image-ar.jpg",
+          "contentHash": "sha256:3af50ffb2443e10bc6c932ae350b35fa75712472bc56a03b8df1c69cc7397062",
+          "gitCommit": "1b2899fdf7a20ffeabefdcbb037534d93c0ec1e8",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-08T20:10:51.451Z",
+      "verifiedAtCommit": "1b2899fdf7a20ffeabefdcbb037534d93c0ec1e8",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-08T20:10:51.451Z",
+          "workId": "PF-0080",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-08T20:10:51.451Z",
+      "updatedAt": "2026-11-08T20:10:51.451Z"
     }
   ],
-  "updatedAt": "2026-11-08T19:54:28.164Z"
+  "updatedAt": "2026-11-08T20:10:51.451Z"
 }
