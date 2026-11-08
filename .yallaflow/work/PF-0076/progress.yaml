@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-08T19:22:37.031Z",
+      "completedAt": "2026-11-08T19:22:37.031Z",
+      "summary": "README.md opens with a plain '# YallaFlow', a blockquote tagline, four shields badges, then 'engineering governance layer' copy, three bullets, a crowded links line, and a dense 1600px work-item screenshot. The npm badge URL returns 200 (npm: v1.4.0) today, so the broken image seen on GitHub was a transient camo/shields failure; a changed URL forces a fresh fetch. The logo is site/favicon.svg (the >> mark). The tour screens 03/04/05/09 (1600x1012) share one size and suit an animated sequence.",
+      "evidence": [
+        "README.md",
+        "site/favicon.svg",
+        "runtime:curl https://img.shields.io/npm/v/yallaflow?label=npm returned 200 with title npm: v1.4.0"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-08T19:22:37.367Z",
+      "completedAt": "2026-11-08T19:22:37.367Z",
+      "summary": "Developer approved the proposed intro rework ('اعمل'): logo and centered tagline on top, a problem-then-solution opening, a visual right away (animated GIF of the flow), the three bullets, two clear calls to action (Install, Visual tour EN/AR), badges after, the npm badge fixed, the Arabic console visible.",
+      "evidence": [
+        "user:اعمل"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-08T19:22:38.046Z",
+      "completedAt": "2026-11-08T19:22:38.046Z",
+      "summary": "research/docs-tour/make-hero.py builds docs/images/tour/hero.gif (960px, 4 captioned frames: board in progress, item in progress, item done, project running). Rewrite the README head as centered HTML (logo, title, tagline, badges with a cache-refreshing npm URL, hook paragraph, hero, CTA row), then the three bullets, and drop the old single screenshot. Check that links resolve and render the head locally with a GitHub-like markdown preview."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-08T19:34:50.451Z",
+      "completedAt": "2026-11-08T19:34:50.451Z",
+      "summary": "README head rewritten: centered logo (site/favicon.svg), title and tagline, badges (npm, license and node moved to badgen.net because shields' npm endpoints time out through GitHub's camo proxy with a 504; static agents and console badges stay on shields), a problem-then-solution hook, the animated hero (docs/images/tour/hero.gif, 960px, 4 captioned real frames, ~500 KB, built by research/docs-tour/make-hero.py), a CTA row (Install, Visual tour, Arabic tour, Website, Docs), four bullets including 'Your app, one button'. The old single screenshot is gone. Tour screens and site images were recaptured after PF-0077.",
+      "evidence": [
+        "README.md",
+        "docs/images/tour/hero.gif",
+        "research/docs-tour/make-hero.py"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-08T19:35:08.215Z",
+      "completedAt": "2026-11-08T19:35:08.215Z",
+      "summary": "V-001: README local links resolve, hero.gif has 4 frames at 960px, dynamic badges use badgen. The README head, rendered with GitHub's own Markdown API (gh api /markdown) and fetched through GitHub's camo proxy, returned 200 for all five badges in two rounds; the earlier shields npm URLs returned 504 every round. A headless screenshot of the rendered head was reviewed. The full suite also passed after the PF-0077 fix (PF-0077 V-001).",
+      "evidence": [
+        "verification:V-001",
+        "runtime:gh api /markdown render of the README head; every camo badge URL returned 200 twice after switching npm, license and node to badgen.net (shields npm URLs returned 504 in 5 rounds)"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-08T19:35:08.215Z"
+}

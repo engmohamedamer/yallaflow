@@ -13061,7 +13061,49 @@
       ],
       "createdAt": "2026-11-08T19:15:35.656Z",
       "updatedAt": "2026-11-08T19:15:35.656Z"
+    },
+    {
+      "id": "CTX-0131",
+      "area": "convention",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "README badges that read live npm data (version, license, node) use badgen.net. shields.io's npm endpoints repeatedly time out (504) through GitHub's camo image proxy, which shows a broken badge on the repository page. Static badges can stay on shields. The README hero is docs/images/tour/hero.gif, built from the tour screens by research/docs-tour/make-hero.py: regenerate it after recapturing the tour.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0076",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "README.md",
+          "contentHash": "sha256:808f7b4e5fb16d27721e0a3e3c32f347d5a75cd0050641307890f78a52c4f2f8",
+          "gitCommit": "040b103f042a475eca8cdf2029216070b59493ad",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "research/docs-tour/make-hero.py",
+          "contentHash": "sha256:40380d8597f7e2953f2965a97349a0d267f82f150f3907360f65de8cd2984d5d",
+          "gitCommit": "040b103f042a475eca8cdf2029216070b59493ad",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-08T19:35:08.530Z",
+      "verifiedAtCommit": "040b103f042a475eca8cdf2029216070b59493ad",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-08T19:35:08.530Z",
+          "workId": "PF-0076",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-08T19:35:08.530Z",
+      "updatedAt": "2026-11-08T19:35:08.530Z"
     }
   ],
-  "updatedAt": "2026-11-08T19:15:35.656Z"
+  "updatedAt": "2026-11-08T19:35:08.530Z"
 }

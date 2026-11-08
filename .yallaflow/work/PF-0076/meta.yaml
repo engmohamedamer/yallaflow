@@ -1,0 +1,45 @@
+{
+  "id": "PF-0076",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "README intro that grabs attention: centered logo and tagline, a problem-then-solution opening, an animated hero showing a request moving to Done and the project running, clear Install / Visual tour (EN, AR) links, the Arabic console called out, and a refreshed npm badge URL",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-08T19:22:36.624Z",
+  "updatedAt": "2026-11-08T19:35:08.903Z",
+  "title": "README intro that grabs attention: centered logo and tagline, a problem-then-solution opening, an animated hero showing a request moving to Done and the project running, clear Install / Visual tour (EN, AR) links, the Arabic console called out, and a refreshed npm badge URL",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-08T19:22:36.659Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-08T19:35:08.903Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

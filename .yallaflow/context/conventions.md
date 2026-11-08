@@ -237,4 +237,18 @@
   - site/sitemap.xml (repository @ a8236e9)
   - .github/workflows/pages.yml (repository @ a8236e9)
 
+<!-- yallaflow-fact:CTX-0131 -->
+### CTX-0131 — README badges that read live npm data (version, license, node) use badgen.net. shields.io's npm endpoints repeatedly time out (504) through GitHub's camo image proxy, which shows a broken badge on the repository page. Static badges can stay on shields. The README hero is docs/images/tour/hero.gif, built from the tour screens by research/docs-tour/make-hero.py: regenerate it after recapturing the tour.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0076
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-08T19:35:08.530Z
+- **Verified:** 2026-11-08T19:35:08.530Z (commit 040b103)
+- **Evidence:**
+  - README.md (repository @ 040b103)
+  - research/docs-tour/make-hero.py (repository @ 040b103)
+
 <!-- yallaflow-context:end -->

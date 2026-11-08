@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "python3 -c \"\nimport re,os\nfrom PIL import Image\ns=open('README.md',encoding='utf8').read()\nbad=[u for u in re.findall(r'(?:\\]\\(|src=\\\"|href=\\\")([^)\\\"\\s]+)',s) if not u.startswith(('http','#','mailto')) and not os.path.exists(u.split('#')[0])]\nassert not bad, bad\nim=Image.open('docs/images/tour/hero.gif'); assert im.n_frames==4 and im.size[0]==960\nassert s.startswith('<p align=\\\"center\\\">') and 'hero.gif' in s[:3000] and 'badgen.net/npm/v/yallaflow' in s\nprint('README head ok: links resolve, hero has 4 frames at 960px, badges use badgen')\n\"",
+      "executionMode": "shell",
+      "executable": "python3 -c \"\nimport re,os\nfrom PIL import Image\ns=open('README.md',encoding='utf8').read()\nbad=[u for u in re.findall(r'(?:\\]\\(|src=\\\"|href=\\\")([^)\\\"\\s]+)',s) if not u.startswith(('http','#','mailto')) and not os.path.exists(u.split('#')[0])]\nassert not bad, bad\nim=Image.open('docs/images/tour/hero.gif'); assert im.n_frames==4 and im.size[0]==960\nassert s.startswith('<p align=\\\"center\\\">') and 'hero.gif' in s[:3000] and 'badgen.net/npm/v/yallaflow' in s\nprint('README head ok: links resolve, hero has 4 frames at 960px, badges use badgen')\n\"",
+      "args": [],
+      "displayCommand": "python3 -c \"\nimport re,os\nfrom PIL import Image\ns=open('README.md',encoding='utf8').read()\nbad=[u for u in re.findall(r'(?:\\]\\(|src=\\\"|href=\\\")([^)\\\"\\s]+)',s) if not u.startswith(('http','#','mailto')) and not os.path.exists(u.split('#')[0])]\nassert not bad, bad\nim=Image.open('docs/images/tour/hero.gif'); assert im.n_frames==4 and im.size[0]==960\nassert s.startswith('<p align=\\\"center\\\">') and 'hero.gif' in s[:3000] and 'badgen.net/npm/v/yallaflow' in s\nprint('README head ok: links resolve, hero has 4 frames at 960px, badges use badgen')\n\"",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-08T19:34:59.506Z",
+      "finishedAt": "2026-11-08T19:34:59.635Z",
+      "verifiedAt": "2026-11-08T19:34:59.635Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

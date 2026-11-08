@@ -1,23 +1,41 @@
-# YallaFlow
+<p align="center">
+  <img src="site/favicon.svg" alt="YallaFlow logo" width="88">
+</p>
 
-> **Give AI your project, not just your prompt.**
+<h1 align="center">YallaFlow</h1>
 
-[![npm version](https://img.shields.io/npm/v/yallaflow?label=npm)](https://www.npmjs.com/package/yallaflow)
-[![license: MIT](https://img.shields.io/npm/l/yallaflow)](LICENSE)
-[![node](https://img.shields.io/node/v/yallaflow)](docs/installation.md)
-[![agents: Claude Code · Codex](https://img.shields.io/badge/agents-Claude%20Code%20%C2%B7%20Codex-informational)](#how-it-works)
+<p align="center"><b>Give AI your project, not just your prompt.</b></p>
 
-YallaFlow is an engineering governance layer for AI coding agents. **You describe the intent. YallaFlow supplies the rest:**
+<p align="center">
+  <a href="https://www.npmjs.com/package/yallaflow"><img alt="npm" src="https://badgen.net/npm/v/yallaflow?label=npm&color=4ed0a5"></a>
+  <a href="LICENSE"><img alt="MIT" src="https://badgen.net/npm/license/yallaflow?color=6485ce"></a>
+  <a href="docs/installation.md"><img alt="node ≥ 20.16" src="https://badgen.net/npm/node/yallaflow"></a>
+  <a href="#how-it-works"><img alt="Claude Code · Codex" src="https://img.shields.io/badge/agents-Claude%20Code%20%C2%B7%20Codex-informational"></a>
+  <a href="docs/tour.ar.md"><img alt="console: English · Arabic" src="https://img.shields.io/badge/console-English%20%C2%B7%20Arabic-0a111f"></a>
+</p>
+
+Your coding agent writes code fast. Then the next session forgets your project, and it says **"done"** without proof.
+
+**YallaFlow fixes that.** It gives **Claude Code** and **Codex** a reviewed memory of your codebase, a workflow sized to each request, and evidence before anything is called done. A local console, in **English and Arabic**, lets you watch every request move and start your app with one button.
+
+<p align="center">
+  <img src="docs/images/tour/hero.gif" alt="The YallaFlow console: a request described in plain words moves through Understand, Decide, Change and Verify to a proven Done, then the project starts from one Run page" width="900">
+</p>
+
+<p align="center">
+  <a href="#install"><b>Install in 1 minute</b></a> ·
+  <a href="docs/tour.md"><b>Visual tour</b></a> ·
+  <a href="docs/tour.ar.md"><b>الجولة بالعربي</b></a> ·
+  <a href="https://engmohamedamer.github.io/yallaflow/">Website</a> ·
+  <a href="docs/using-yallaflow.md">Docs</a>
+</p>
 
 - **Project understanding.** A reviewed, durable memory of your codebase, so a new session never starts from zero.
 - **The right workflow.** A bug, a feature, and an investigation each get a lifecycle sized to the work.
 - **Evidence.** "Done" means verified and checked against what was asked, not just "the agent said so".
+- **Your app, one button.** The agent works out how your project runs. You trust it once, then press **Start project**.
 
-It works with **Claude Code** and **Codex**, runs locally, and keeps everything in your repository.
-
-**Website:** [engmohamedamer.github.io/yallaflow](https://engmohamedamer.github.io/yallaflow/) · **npm:** [yallaflow](https://www.npmjs.com/package/yallaflow) · **Docs:** [Using YallaFlow](docs/using-yallaflow.md) · **Visual tour:** [English](docs/tour.md) · [العربية](docs/tour.ar.md)
-
-![The YallaFlow console: a request delivered, proven and remembered](docs/images/tour/05-item-done-en.webp)
+It runs locally, sends no telemetry, and keeps everything in your repository.
 
 ## The console: your project at a glance
 
