@@ -1300,7 +1300,7 @@
         const result = await setupPost('runtime/plan/save', { ids, from: currentPlanView(), ...(replace ? { replace: true } : {}) });
         planReplaceAsk = null;
         planPick.clear();
-        setupMsg = { tone: 'done', html: esc(A(`اتحفظ ${result.saved.length} خدمة — ومش موثوقة. راجع كل واحدة ووثّقها تحت قبل التشغيل.`, `Saved ${result.saved.length} service(s), not trusted. Review and trust each one below before starting.`)) };
+        setupMsg = { tone: 'done', html: () => esc(A(`اتحفظ ${result.saved.length} خدمة — ومش موثوقة. راجع كل واحدة ووثّقها تحت قبل التشغيل.`, `Saved ${result.saved.length} service(s), not trusted. Review and trust each one below before starting.`)) };
       } catch (e) {
         if (e.code === 'RUNTIME_PLAN_EXISTS') { planReplaceAsk = ids; return; }
         throw e;
@@ -1423,7 +1423,7 @@
   let setupInfo = null; // { pid, record, pending, changes }
   let agentSetup = null; // { pid, data | error }
   let setupBusy = null; // 'scan' | 'start' | 'stop' | 'agents' | 'launch' | 'step'
-  let setupMsg = null; // { tone, html }
+  let setupMsg = null; // { tone, html } — html is a string (Core's own words) or a function evaluated in the current language (PF-0077)
   let setupLaunch = null; // launch command shown after writing the files
   async function loadSetup({ scanAgents = false } = {}) {
     const forPid = pid;
@@ -1464,15 +1464,15 @@
       if (action === 'stop') {
         const left = (r.results ?? []).filter((x) => x.left === 'shared');
         const stopped = (r.results ?? []).filter((x) => !x.left);
-        setupMsg = { tone: 'done', html: [stopped.length ? esc(A('الخدمات اللي YallaFlow شغّلها وقفت.', 'The services YallaFlow started are stopped.')) : esc(A('مفيش خدمة غير مشتركة شغّالة من YallaFlow.', 'No non-shared service started by YallaFlow is running.')), ...left.map((x) => esc(A(`${x.id} فضلت شغّالة لأنها مشتركة. توقفها لوحدها من الكارت بتاعها بتأكيد.`, `${x.id} was left running because it is shared. Stop it on its own from its card, with a confirmation.`)))].join('<br>') };
+        setupMsg = { tone: 'done', html: () => [stopped.length ? esc(A('الخدمات اللي YallaFlow شغّلها وقفت.', 'The services YallaFlow started are stopped.')) : esc(A('مفيش خدمة غير مشتركة شغّالة من YallaFlow.', 'No non-shared service started by YallaFlow is running.')), ...left.map((x) => esc(A(`${x.id} فضلت شغّالة لأنها مشتركة. توقفها لوحدها من الكارت بتاعها بتأكيد.`, `${x.id} was left running because it is shared. Stop it on its own from its card, with a confirmation.`)))].join('<br>') };
         return;
       }
-      const lines = [
+      const lines = () => [
         ...r.started.map((x) => x.state === 'running-outside' ? A(`${x.id}: شغّال برا YallaFlow — ماتشغّلش وعمره ما هيتوقف من هنا`, `${x.id}: running outside YallaFlow — not started, and never stopped from here`) : A(`${x.id}: ${x.already ? 'شغّال من قبل' : 'اشتغل'}`, `${x.id}: ${x.already ? 'already running' : 'started'}`)),
         ...r.skipped.map((x) => A(`${x.id}: ماتشغّلش — ${x.reason}. راجعه ووثّقه تحت.`, `${x.id}: not started — ${x.reason}. Review and trust it below.`)),
         ...(r.failed ? [A(`${r.failed.id} وقع، فالباقي ماتشغّلش: ${r.failed.message}`, `${r.failed.id} failed, so the rest were not started: ${r.failed.message}`)] : [])
       ];
-      setupMsg = { tone: r.failed ? 'fail' : r.skipped.length ? 'wait' : 'done', html: lines.length ? lines.map(esc).join('<br>') : esc(A('مفيش خدمات معرّفة لسه.', 'No services are defined yet.')) };
+      setupMsg = { tone: r.failed ? 'fail' : r.skipped.length ? 'wait' : 'done', html: () => lines().length ? lines().map(esc).join('<br>') : esc(A('مفيش خدمات معرّفة لسه.', 'No services are defined yet.')) };
     });
   }
   function saveAgents(form) {
@@ -1558,7 +1558,7 @@
     const hint = untrusted ? A(`${untrusted} من ${all.length} خدمة محتاجة مراجعتك وتوثيقك قبل ما تشتغل. دوس «راجع ووثّق» على كل واحدة تحت.`, `${untrusted} of ${all.length} service(s) need your review and trust before they can start. Press Review and trust on each one below.`)
       : A('«شغّل المشروع» بيشغّل الخدمات بترتيب الاعتماد ويستنى كل واحدة تجهز. «وقّف» بيوقف اللي YallaFlow شغّله بس، ومابيوقفش الخدمات المشتركة أبداً.', 'Start project starts the services in dependency order, waiting for each to be ready. Stop stops only what YallaFlow started, and never shared services.');
     const opens = up.map((sv) => openLinks(sv)).filter(Boolean);
-    const msg = setupMsg ? `<p class="small runmsg ${setupMsg.tone === 'fail' ? 'warn' : ''}" role="status">${setupMsg.html}</p>` : '';
+    const msg = setupMsg ? `<p class="small runmsg ${setupMsg.tone === 'fail' ? 'warn' : ''}" role="status">${typeof setupMsg.html === 'function' ? setupMsg.html() : setupMsg.html}</p>` : '';
     const progress = all.length ? `<div class="trustbar" title="${esc(A('الموثوق', 'Trusted'))}"><i style="width:${Math.round((trusted.length / all.length) * 100)}%"></i></div><span class="tiny muted">${A(`${trusted.length}/${all.length} موثوق · ${up.length} شغّال`, `${trusted.length}/${all.length} trusted · ${up.length} running`)}</span>` : '';
     return `<section class="panel runpanel ${state.tone}" id="setup-run">
       <div class="runhead"><div class="runstate"><span class="sdot big ${state.tone}" aria-hidden="true"></span><div><h2>${state.t}</h2><div class="row runprog">${progress}</div></div></div>

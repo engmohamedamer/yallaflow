@@ -1,0 +1,43 @@
+{
+  "id": "PF-0077",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console Setup: the result message of Save, Start project and Stop project stays in the language that was active when it was produced; switching between Arabic and English leaves it untranslated (seen in the docs screens: English page showing 'api: اشتغل')",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-08T19:23:24.748Z",
+  "updatedAt": "2026-11-08T19:34:48.862Z",
+  "title": "Console Setup: the result message of Save, Start project and Stop project stays in the language that was active when it was produced; switching between Arabic and English leaves it untranslated (seen in the docs screens: English page showing 'api: اشتغل')",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-11-08T19:23:24.783Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-08T19:34:48.862Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

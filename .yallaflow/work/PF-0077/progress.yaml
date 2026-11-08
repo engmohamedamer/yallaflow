@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-08T19:23:39.460Z",
+      "completedAt": "2026-11-08T19:23:39.460Z",
+      "summary": "setupMsg (resources/console/app.js) is { tone, html }. The html is built once with A(ar, en) at the moment Save (savePlan), Start/Stop project (runProject) or a failure (setupDo) completes, then shown by runSection as-is. render() runs again on a language switch, but setupMsg.html is a frozen string, so it keeps the old language. Error messages come from Core in English (e.message) and are language-neutral by design.",
+      "evidence": [
+        "resources/console/app.js"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-08T19:23:39.790Z",
+      "completedAt": "2026-11-08T19:23:39.790Z",
+      "summary": "Reproduced: in research/docs-tour/capture.mjs the Arabic-dark shot was taken last, Start project was then pressed while the console was Arabic, and the English screens (09-setup-running-en) show 'api: اشتغل / web: اشتغل'. Root cause: setupMsg.html is evaluated eagerly in the language active at that moment. Fix: store a function for the translatable messages and evaluate it at render time (runSection), keeping plain strings for Core errors. No server change.",
+      "evidence": [
+        "resources/console/app.js",
+        "docs/images/tour/09-setup-running-en.webp"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-08T19:24:54.717Z",
+      "completedAt": "2026-11-08T19:24:54.717Z",
+      "summary": "setupMsg.html may now be a function: Save, Start project and Stop project build their message lazily (A(ar,en) at render time), and runSection evaluates it, so a language switch re-renders the message. Core error text stays a plain string. Regression test 'the run message is re-rendered in the current language after a switch' in test/project-setup.test.js fails on the previous app.js and passes now.",
+      "evidence": [
+        "resources/console/app.js",
+        "test/project-setup.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-08T19:34:48.547Z",
+      "completedAt": "2026-11-08T19:34:48.547Z",
+      "summary": "Full suite passes (V-001), including the new regression test, which fails against the previous app.js. A recapture of the tour with the fix shows the English run page reading 'api: started / web: started' and the Arabic one 'api: اشتغل / web: اشتغل'.",
+      "evidence": [
+        "verification:V-001",
+        "docs/images/tour/09-setup-running-en.webp",
+        "docs/images/tour/09-setup-running-ar.webp"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-08T19:34:48.547Z"
+}

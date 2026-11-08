@@ -276,6 +276,25 @@ test('UI: Stack lists the scan with what changed; Run links running services to 
   assert.match(runHtml, /Open :8000/);
 });
 
+// PF-0077: the Start/Stop/Save message follows the language the page is shown in now.
+test('UI: the run message is re-rendered in the current language after a switch', async () => {
+  const code = cut('  // ---------- project setup: Stack, Run, Agents', '  function viewSetup(');
+  const context = vm.createContext({
+    pid: 'p', readOnly: false, lang: 'en', runtime: null, agentsOn: false, esc, toast() {}, render() {},
+    api: async () => ({}), loadRuntime: async () => {}, loadPlan: async () => {},
+    post: async () => ({ started: [{ id: 'web', already: false }], skipped: [], failed: null })
+  });
+  context.A = (ar, en) => (context.lang === 'ar' ? ar : en);
+  vm.runInContext(`${code}\nthis.start = () => runProject('start'); this.runS = runSection;`, context);
+  await context.start();
+  const svc = { services: [{ id: 'web', name: 'Web', state: 'running', ports: [], trust: { trusted: true } }] };
+  assert.match(context.runS(svc), /web: started/);
+  context.lang = 'ar';
+  const ar = context.runS(svc);
+  assert.match(ar, /web: اشتغل/);
+  assert.doesNotMatch(ar, /web: started/, 'no English left after switching to Arabic');
+});
+
 test('UI: Agents shows detection, the saved choice and a checklist with fixes', () => {
   const data = {
     claudeAvailable: true, saved: { chosen: true, agents: true, claude: true }, applied: { agents: true, claude: true },
