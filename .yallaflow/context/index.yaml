@@ -13103,7 +13103,53 @@
       ],
       "createdAt": "2026-11-08T19:35:08.530Z",
       "updatedAt": "2026-11-08T19:35:08.530Z"
+    },
+    {
+      "id": "CTX-0132",
+      "area": "environment",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Releasing YallaFlow: publishing the GitHub Release must use the repository owner's gh account (engmohamedamer). Another logged-in gh account (altantawi2050) is the default and is refused ('workflow scope may be required'); GH_TOKEN=$(gh auth token -u engmohamedamer) works for one command without switching accounts. The dev checkout's node_modules is read-only, so the checklist's npm ci runs in a clean clone. npm can take about a minute to show a new version after the Release workflow's publish job succeeds.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0078",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "docs/releasing.md",
+          "contentHash": "sha256:df89cdb2dcf769757353e53cba8dff02d82dfe4273f3ba53ffd75557bfb33234",
+          "gitCommit": "8e4eac3beaa5519c8e560153ad647fb59dc9df03",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": ".github/workflows/release.yml",
+          "contentHash": "sha256:125e655925cfe9cd2902494aa63101ef3c50ef127308fa4815d37aab2d424cf7",
+          "gitCommit": "8e4eac3beaa5519c8e560153ad647fb59dc9df03",
+          "workingTree": "head"
+        },
+        {
+          "type": "runtime",
+          "description": "gh release create as altantawi2050 failed; as engmohamedamer via GH_TOKEN succeeded; Release run 42516773427 all jobs success; npm view yallaflow@latest = 1.4.1 with SLSA provenance"
+        }
+      ],
+      "verifiedAt": "2026-11-08T19:54:28.164Z",
+      "verifiedAtCommit": "8e4eac3beaa5519c8e560153ad647fb59dc9df03",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-08T19:54:28.164Z",
+          "workId": "PF-0078",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-08T19:54:28.164Z",
+      "updatedAt": "2026-11-08T19:54:28.164Z"
     }
   ],
-  "updatedAt": "2026-11-08T19:35:08.530Z"
+  "updatedAt": "2026-11-08T19:54:28.164Z"
 }

@@ -50,4 +50,19 @@
 - **Evidence:**
   - research/release-1.4/browser-check.mjs (repository @ 7fecae2)
 
+<!-- yallaflow-fact:CTX-0132 -->
+### CTX-0132 — Releasing YallaFlow: publishing the GitHub Release must use the repository owner's gh account (engmohamedamer). Another logged-in gh account (altantawi2050) is the default and is refused ('workflow scope may be required'); GH_TOKEN=$(gh auth token -u engmohamedamer) works for one command without switching accounts. The dev checkout's node_modules is read-only, so the checklist's npm ci runs in a clean clone. npm can take about a minute to show a new version after the Release workflow's publish job succeeds.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0078
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-08T19:54:28.164Z
+- **Verified:** 2026-11-08T19:54:28.164Z (commit 8e4eac3)
+- **Evidence:**
+  - docs/releasing.md (repository @ 8e4eac3)
+  - .github/workflows/release.yml (repository @ 8e4eac3)
+  - gh release create as altantawi2050 failed; as engmohamedamer via GH_TOKEN succeeded; Release run 42516773427 all jobs success; npm view yallaflow@latest = 1.4.1 with SLSA provenance (runtime)
+
 <!-- yallaflow-context:end -->

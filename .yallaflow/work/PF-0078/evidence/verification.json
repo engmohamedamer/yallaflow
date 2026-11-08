@@ -68,6 +68,21 @@
       "finishedAt": "2026-11-08T19:44:43.944Z",
       "verifiedAt": "2026-11-08T19:44:43.944Z",
       "log": "V-004-verification.log"
+    },
+    {
+      "id": "V-005",
+      "command": "test \"$(npm view yallaflow@latest version --prefer-online)\" = 1.4.1 && npm view yallaflow@1.4.1 dist.attestations.provenance.predicateType --prefer-online | grep -q slsa.dev/provenance && test \"$(gh release view v1.4.1 --json tagName -q .tagName)\" = v1.4.1 && curl -sf https://engmohamedamer.github.io/yallaflow/ar/ | grep -q 'dir=\"rtl\"' && echo 'npm latest 1.4.1 with provenance; GitHub Release v1.4.1; Arabic site live'",
+      "executionMode": "shell",
+      "executable": "test \"$(npm view yallaflow@latest version --prefer-online)\" = 1.4.1 && npm view yallaflow@1.4.1 dist.attestations.provenance.predicateType --prefer-online | grep -q slsa.dev/provenance && test \"$(gh release view v1.4.1 --json tagName -q .tagName)\" = v1.4.1 && curl -sf https://engmohamedamer.github.io/yallaflow/ar/ | grep -q 'dir=\"rtl\"' && echo 'npm latest 1.4.1 with provenance; GitHub Release v1.4.1; Arabic site live'",
+      "args": [],
+      "displayCommand": "test \"$(npm view yallaflow@latest version --prefer-online)\" = 1.4.1 && npm view yallaflow@1.4.1 dist.attestations.provenance.predicateType --prefer-online | grep -q slsa.dev/provenance && test \"$(gh release view v1.4.1 --json tagName -q .tagName)\" = v1.4.1 && curl -sf https://engmohamedamer.github.io/yallaflow/ar/ | grep -q 'dir=\"rtl\"' && echo 'npm latest 1.4.1 with provenance; GitHub Release v1.4.1; Arabic site live'",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-08T19:54:21.387Z",
+      "finishedAt": "2026-11-08T19:54:27.828Z",
+      "verifiedAt": "2026-11-08T19:54:27.828Z",
+      "log": "V-005-verification.log"
     }
   ]
 }

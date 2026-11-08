@@ -4,14 +4,14 @@
   "scope": "bounded",
   "routingStatus": "routed",
   "rawRequest": "Release 1.4.1 — Project Setup and Run: merge release-1.4.1-prep to main, bump the package version to 1.4.1, date the CHANGELOG, run the release checklist, tag v1.4.1, publish the GitHub Release (npm publish through the release workflow), and confirm the npm package and the website",
-  "status": "VERIFICATION",
+  "status": "DONE",
   "readOnly": false,
   "knowledgePolicy": {
     "version": 1,
     "reviewRequired": true
   },
   "createdAt": "2026-11-08T19:38:02.767Z",
-  "updatedAt": "2026-11-08T19:38:49.735Z",
+  "updatedAt": "2026-11-08T19:54:28.557Z",
   "title": "Release 1.4.1 — Project Setup and Run: merge release-1.4.1-prep to main, bump the package version to 1.4.1, date the CHANGELOG, run the release checklist, tag v1.4.1, publish the GitHub Release (npm publish through the release workflow), and confirm the npm package and the website",
   "routingConfidence": "high",
   "routingReason": "Explicitly classified by the user: `yallaflow release --scope bounded`.",
@@ -33,5 +33,17 @@
       "verification",
       "code-review"
     ]
-  }
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-08T19:54:28.557Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004",
+        "V-005"
+      ]
+    }
+  ]
 }
