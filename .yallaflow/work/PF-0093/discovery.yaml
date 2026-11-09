@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "testing",
+      "summary": "The chat suggestions and the 'your turn' line were not seen in a browser",
+      "reason": "They render only inside a live agent session; the isolated test console has no signed-in Codex. Covered by the console-project-chat harness test.",
+      "recordedAt": "2026-11-09T10:16:59.792Z"
+    }
+  ],
+  "updatedAt": "2026-11-09T10:16:59.792Z"
+}

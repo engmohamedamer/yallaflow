@@ -95,6 +95,23 @@ export class AgentBridge {
     if (this.claudeEnabled || this.claudeFor.has(entry.id)) await this.enableClaude(entry.id);
   }
 
+  // A project taken off the running console (PF-0081). Refused while an agent session is
+  // live or starting, or a Claude Code channel is connected; otherwise it lets go of the
+  // checkout (lock and Claude connection file) and forgets the project.
+  async removeProject(projectId) {
+    const project = this.projects.get(projectId);
+    if (!project) return;
+    if (project.session || project.claude?.streamBusy()) throw conflict('An agent session is running in this project. End it first, then remove the project.');
+    if (project.claudeOn) await this.disableClaude(projectId);
+    if (project.session || project.claude?.streamBusy()) throw conflict('An agent session is running in this project. End it first, then remove the project.');
+    this.denyPending(project, null, 'project removed from the console');
+    if (project.owner) {
+      await project.owner.release().catch(() => {});
+      project.owner = null;
+    }
+    this.projects.delete(projectId);
+  }
+
   claudeOnFor(projectId) {
     return Boolean(this.projects.get(projectId)?.claudeOn);
   }
@@ -368,7 +385,7 @@ export class AgentBridge {
     const project = this.project(projectId);
     const detected = await detectProviders({ env: this.env, claude: project.claudeOn });
     const providers = [{ id: 'codex', label: 'Codex', ready: detected.codex.ready, problems: detected.codex.problems, versions: { codex: detected.codex.codex?.version ?? null, adapter: detected.codex.adapter?.version ?? null }, capabilities: CAPABILITIES.codex }];
-    if (project.claudeOn) providers.push({ id: 'claude', label: 'Claude Code', experimental: true, ready: detected.claude.ready, problems: detected.claude.problems, versions: { claude: detected.claude.claude?.version ?? null }, auth: detected.claude.auth ? { method: detected.claude.auth.method, plan: detected.claude.auth.plan } : null, capabilities: CAPABILITIES.claude });
+    if (project.claudeOn) providers.push({ id: 'claude', label: 'Claude Code', experimental: true, ready: detected.claude.ready, problems: detected.claude.problems, warnings: detected.claude.warnings ?? [], versions: { claude: detected.claude.claude?.version ?? null }, auth: detected.claude.auth ? { method: detected.claude.auth.method, plan: detected.claude.auth.plan } : null, capabilities: CAPABILITIES.claude });
     const records = await this.listRecords(project);
     // Read-only: another live console's lock is reported; nothing is claimed here.
     const holder = project.owner ? null : await readCheckoutLock(project.root).catch(() => null);

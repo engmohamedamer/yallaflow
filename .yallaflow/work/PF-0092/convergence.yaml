@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-09T09:54:18.051Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+        "verificationRunIds": []
+      },
+      "summary": "Assessed after V-001 and a browser walkthrough.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "With Codex connected the next-step card showed 'Continue with the agent here' with the terminal phrase as a hint.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:a9d10cb04ecf4b34699692bcbb2e394ce4d79e44c3ccf09566664c493bb5fa64",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "Playwright walkthrough on an isolated throwaway console, 2026-11-09: work item page"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "The action row showed 'Make it active' and '⋯ More'; More held Edit request, Put on hold and Close without delivery.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:a9d10cb04ecf4b34699692bcbb2e394ce4d79e44c3ccf09566664c493bb5fa64",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "Playwright walkthrough on an isolated throwaway console, 2026-11-09: More menu contents"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-09T09:54:18.051Z"
+}

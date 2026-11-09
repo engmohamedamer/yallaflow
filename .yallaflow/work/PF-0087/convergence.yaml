@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-09T09:22:12.195Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "Assessed after V-001 and a browser walkthrough. New generators were deferred (recorded limitation); they were not among these criteria.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "In Arabic each card's description and trade-offs come from STACK_AR; seen on the stack step.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:91e417f17ee385e61444759ff1e7156f32306c2c7e8899b2d1be483e15742b29",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "stack step screenshot in Arabic"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Something else sends customStack with the empty stack; nothing runs (executesExternalCommands false); the plan, origin.stack and the first work request carry it and ask the agent to set it up with approval.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/newproject/project.js",
+              "contentHash": "sha256:f4a8e5428f692745c76026b6c26b836c6b34814566178771f06a1bcd919420da",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/newproject.js",
+              "contentHash": "sha256:0cf23751d23b0bf014896eada7f5d3bdcf8a0735afc7e4227211bcd4abc3b6df",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:91e417f17ee385e61444759ff1e7156f32306c2c7e8899b2d1be483e15742b29",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/new-project.test.js",
+              "contentHash": "sha256:eb52dbedf8bc431dbba8e8ad247bca1ea00c49233bf029e38feb7c4e35f9b9cb",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0087",
+              "verificationRunId": "V-001"
+            },
+            {
+              "type": "runtime",
+              "description": "browser-created project with origin.stack [Flutter]"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "yallaflow new plan --stack empty --custom-stack TEXT works; with laravel or a control character it is refused (NEW_PROJECT_CUSTOM_STACK).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/new.js",
+              "contentHash": "sha256:badb8864aebedff6f8ed73de131bdb8416bc1aa2ebbc1eb6e4ad2797416d009b",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/new-project.test.js",
+              "contentHash": "sha256:eb52dbedf8bc431dbba8e8ad247bca1ea00c49233bf029e38feb7c4e35f9b9cb",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0087",
+              "verificationRunId": "V-001"
+            }
+          ]
+        }
+      ],
+      "unrequested": [
+        {
+          "id": "UR-001",
+          "disposition": "accepted",
+          "summary": "Fixed the stack card highlight so only one card stays selected across stack groups.",
+          "reason": "A visible bug found while testing the same step; selecting a card in another group left the earlier one highlighted.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:91e417f17ee385e61444759ff1e7156f32306c2c7e8899b2d1be483e15742b29",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "updatedAt": "2026-11-09T09:22:12.195Z"
+}

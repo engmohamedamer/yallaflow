@@ -1,0 +1,43 @@
+{
+  "id": "PF-0095",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console chat: the status at the top of the chat window stays 'working' after the agent's turn ends (only the floating button and the body refresh), and the chat body does not say plainly whether the agent is working or waiting for the developer",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T10:27:21.033Z",
+  "updatedAt": "2026-11-09T10:28:25.365Z",
+  "title": "Console chat: the status at the top of the chat window stays 'working' after the agent's turn ends (only the floating button and the body refresh), and the chat body does not say plainly whether the agent is working or waiting for the developer",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-11-09T10:27:21.080Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T10:28:25.365Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

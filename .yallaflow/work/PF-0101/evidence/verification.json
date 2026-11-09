@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --test test/runtime.test.js test/runtime-plan.test.js test/console-greenfield.test.js test/console-actions.test.js test/console-presentation.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--test",
+        "test/runtime.test.js",
+        "test/runtime-plan.test.js",
+        "test/console-greenfield.test.js",
+        "test/console-actions.test.js",
+        "test/console-presentation.test.js"
+      ],
+      "displayCommand": "node --test test/runtime.test.js test/runtime-plan.test.js test/console-greenfield.test.js test/console-actions.test.js test/console-presentation.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-09T12:06:15.328Z",
+      "finishedAt": "2026-11-09T12:06:49.965Z",
+      "verifiedAt": "2026-11-09T12:06:49.965Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

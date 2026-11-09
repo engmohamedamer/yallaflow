@@ -1,0 +1,202 @@
+TAP version 13
+# Subtest: stopFrom: a usage limit is recognised with its retry time; other stops keep their reason
+ok 1 - stopFrom: a usage limit is recognised with its retry time; other stops keep their reason
+  ---
+  duration_ms: 3.407665
+  type: 'test'
+  ...
+# Subtest: codex: a usage-limit turn is a stop with its retry time, kept after End and across a console restart
+ok 2 - codex: a usage-limit turn is a stop with its retry time, kept after End and across a console restart
+  ---
+  duration_ms: 4569.182965
+  type: 'test'
+  ...
+# Subtest: codex: a crash and a plain End are recorded as such
+ok 3 - codex: a crash and a plain End are recorded as such
+  ---
+  duration_ms: 4588.082413
+  type: 'test'
+  ...
+# Subtest: UI: a live Codex usage limit offers Claude Code and a terminal message, not Codex again
+ok 4 - UI: a live Codex usage limit offers Claude Code and a terminal message, not Codex again
+  ---
+  duration_ms: 4.516314
+  type: 'test'
+  ...
+# Subtest: UI: a session started after the stop (the switch itself) clears the card
+ok 5 - UI: a session started after the stop (the switch itself) clears the card
+  ---
+  duration_ms: 1.724457
+  type: 'test'
+  ...
+# Subtest: UI: a message sent after the stop clears the card; another item never shows it
+ok 6 - UI: a message sent after the stop clears the card; another item never shows it
+  ---
+  duration_ms: 4.066875
+  type: 'test'
+  ...
+# Subtest: UI: with no session, the last recorded stop of this item is offered, including the same agent; Arabic too
+ok 7 - UI: with no session, the last recorded stop of this item is offered, including the same agent; Arabic too
+  ---
+  duration_ms: 5.989708
+  type: 'test'
+  ...
+# Subtest: UI: only ready providers are offered
+ok 8 - UI: only ready providers are offered
+  ---
+  duration_ms: 1.983177
+  type: 'test'
+  ...
+# Subtest: UI: switching ends Codex first, connects Claude, and prepares (never sends) the continue message
+ok 9 - UI: switching ends Codex first, connects Claude, and prepares (never sends) the continue message
+  ---
+  duration_ms: 4.945338
+  type: 'test'
+  ...
+# Subtest: UI: a failed End stops the switch; nothing else starts
+ok 10 - UI: a failed End stops the switch; nothing else starts
+  ---
+  duration_ms: 3.474754
+  type: 'test'
+  ...
+# Subtest: UI: the item lists which agent worked on it and how each session stopped
+ok 11 - UI: the item lists which agent worked on it and how each session stopped
+  ---
+  duration_ms: 2.185995
+  type: 'test'
+  ...
+# Subtest: a merge-collided work item is listed as invalid and never hides the project
+ok 12 - a merge-collided work item is listed as invalid and never hides the project
+  ---
+  duration_ms: 2386.295308
+  type: 'test'
+  ...
+# Subtest: the exact Vult message: a ledger pinned to another registry version
+ok 13 - the exact Vult message: a ledger pinned to another registry version
+  ---
+  duration_ms: 827.688381
+  type: 'test'
+  ...
+# Subtest: an unreadable meta.yaml is reported, not fatal
+ok 14 - an unreadable meta.yaml is reported, not fatal
+  ---
+  duration_ms: 790.409735
+  type: 'test'
+  ...
+# Subtest: zero work items: no completion is claimed
+ok 15 - zero work items: no completion is claimed
+  ---
+  duration_ms: 546.437999
+  type: 'test'
+  ...
+# Subtest: console: an invalid item is a data warning in a 200 snapshot, not a failed project
+ok 16 - console: an invalid item is a data warning in a 200 snapshot, not a failed project
+  ---
+  duration_ms: 1754.155998
+  type: 'test'
+  ...
+# Subtest: console UI: the theme button is matched by its own attribute, never by <html data-theme>
+ok 17 - console UI: the theme button is matched by its own attribute, never by <html data-theme>
+  ---
+  duration_ms: 12.288833
+  type: 'test'
+  ...
+# Subtest: agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+ok 18 - agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+  ---
+  duration_ms: 10.331962
+  type: 'test'
+  ...
+# Subtest: paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+ok 19 - paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+  ---
+  duration_ms: 6.803191
+  type: 'test'
+  ...
+# Subtest: file selection and paste combine; unsupported, empty and oversized files are explained
+ok 20 - file selection and paste combine; unsupported, empty and oversized files are explained
+  ---
+  duration_ms: 3.082917
+  type: 'test'
+  ...
+# Subtest: revision partial failure keeps pending files and retries without duplicating text or successful uploads
+ok 21 - revision partial failure keeps pending files and retries without duplicating text or successful uploads
+  ---
+  duration_ms: 4.254512
+  type: 'test'
+  ...
+# Subtest: create uploads pasted files through the existing bound request endpoint
+ok 22 - create uploads pasted files through the existing bound request endpoint
+  ---
+  duration_ms: 4.437442
+  type: 'test'
+  ...
+# Subtest: overview previews keep full facts available under View more, including after redraw
+ok 23 - overview previews keep full facts available under View more, including after redraw
+  ---
+  duration_ms: 5.316249
+  type: 'test'
+  ...
+# Subtest: every project page gets the project chat; a work item page gets its own; new-project pages get none
+ok 24 - every project page gets the project chat; a work item page gets its own; new-project pages get none
+  ---
+  duration_ms: 28.501749
+  type: 'test'
+  ...
+# Subtest: the project chat is labelled, starts no work item and suggests project questions
+ok 25 - the project chat is labelled, starts no work item and suggests project questions
+  ---
+  duration_ms: 7.397247
+  type: 'test'
+  ...
+# Subtest: a running item session shows on project pages as a link to that item
+ok 26 - a running item session shows on project pages as a link to that item
+  ---
+  duration_ms: 4.912137
+  type: 'test'
+  ...
+# Subtest: a project session shows on an item page labelled as the project chat
+ok 27 - a project session shows on an item page labelled as the project chat
+  ---
+  duration_ms: 3.35285
+  type: 'test'
+  ...
+# Subtest: with agents off the project chat explains how to turn them on without naming an item
+ok 28 - with agents off the project chat explains how to turn them on without naming an item
+  ---
+  duration_ms: 2.11419
+  type: 'test'
+  ...
+# Subtest: the item chat is unchanged
+ok 29 - the item chat is unchanged
+  ---
+  duration_ms: 2.952941
+  type: 'test'
+  ...
+# Subtest: the picker links to Setup → Agents when Claude Code is off for the project
+ok 30 - the picker links to Setup → Agents when Claude Code is off for the project
+  ---
+  duration_ms: 2.7633
+  type: 'test'
+  ...
+# Subtest: blocker texts read in Arabic; suggestions say they only fill the box; your turn after a reply
+ok 31 - blocker texts read in Arabic; suggestions say they only fill the box; your turn after a reply
+  ---
+  duration_ms: 8.37755
+  type: 'test'
+  ...
+# Subtest: the chat says when the agent is working, waiting for an approval, or waiting for a reply
+ok 32 - the chat says when the agent is working, waiting for an approval, or waiting for a reply
+  ---
+  duration_ms: 9.532039
+  type: 'test'
+  ...
+1..32
+# tests 32
+# suites 0
+# pass 32
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9525.872416

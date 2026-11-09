@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-09T09:54:15.407Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+        "verificationRunIds": []
+      },
+      "summary": "Assessed after V-001 and a browser walkthrough.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "The new project's Overview opened with 'Start here': created, one next step with 'Start with the agent', running optional; the button opened the first work item with the chat and the drafted message.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:a9d10cb04ecf4b34699692bcbb2e394ce4d79e44c3ccf09566664c493bb5fa64",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "Playwright walkthrough on an isolated throwaway console, 2026-11-09: Start here card and its button"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "The ready screen's button resets the wizard and opens the Overview (data-wiz-open → switchProject overview).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:a9d10cb04ecf4b34699692bcbb2e394ce4d79e44c3ccf09566664c493bb5fa64",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-09T09:54:15.407Z"
+}

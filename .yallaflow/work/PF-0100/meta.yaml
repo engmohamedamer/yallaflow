@@ -1,0 +1,45 @@
+{
+  "id": "PF-0100",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console: after a review decision the chat opens with a ready message telling the agent to continue (or to revise), and chat suggestions follow the real stage (design, specification, plan, ready to move on) instead of one fixed 'prepare the specification' line",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T11:11:13.361Z",
+  "updatedAt": "2026-11-09T11:14:04.974Z",
+  "title": "Console: after a review decision the chat opens with a ready message telling the agent to continue (or to revise), and chat suggestions follow the real stage (design, specification, plan, ready to move on) instead of one fixed 'prepare the specification' line",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-09T11:11:13.408Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T11:14:04.974Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

@@ -14,6 +14,13 @@ import { initWorkspace } from '../src/core/workspace.js';
 import { startConsoleServer } from '../src/console/server.js';
 import { assessProjectUnderstanding } from '../src/baseline/understanding.js';
 
+import { registryPath } from '../src/console/registry.js';
+
+// PF-0094: plans and console registrations go to a private folder for this test run, never
+// to the developer's own ~/.config/yallaflow. Child processes inherit it through process.env.
+const isolatedConfig = path.join(await mkdtemp(path.join(os.tmpdir(), 'yf-new-cfg-')), 'console.json');
+process.env.YALLAFLOW_CONSOLE_CONFIG = isolatedConfig;
+
 const cli = fileURLToPath(new URL('../src/cli.js', import.meta.url));
 const run = (cwd, args, env = {}) => spawnSync(process.execPath, [cli, ...args], { cwd, encoding: 'utf8', env: { ...process.env, ...env } });
 const json = (result) => JSON.parse(result.stdout.trim().split('\n').at(-1));
@@ -87,6 +94,7 @@ test('create: hash confirmation, staging, promotion, Core init with provenance â
   // PF-0058: a short human title; the full request stays separate and invents nothing.
   assert.equal(meta.titleHint, 'Set up storefront');
   assert.match(meta.rawRequest, /^Project: storefront, Fake fake-ok \(generated with fake-gen@1\.0\.0; the generated code is not reviewed yet\)\.\nNext: define the first product requirements/);
+  assert.match(meta.rawRequest, /propose the chosen stack, the development environment and the product goal as project knowledge/);
   const snap = json(run(root, ['snapshot', '--json']));
   assert.equal(snap.items.find((item) => item.id === result.workId).title, 'Set up storefront', 'the board shows the short title');
   assert.equal(JSON.parse(await readFile(path.join(root, '.yallaflow', 'state', 'current.yaml'), 'utf8')).activeWork, null);
@@ -303,4 +311,29 @@ test('plan carries intent, environment, git and attachments; creation initialize
   stored.hash = planHash(stored.body);
   await writeFile(file, JSON.stringify(stored));
   await assert.rejects(createFromPlan(other.id, stored.hash, { catalog: CATALOG_T, hooks: CORE_HOOKS }), { code: 'NEW_PROJECT_PLAN_TAMPERED' });
+});
+
+test('custom stack (PF-0087): only with the empty project; recorded in the plan, origin and first work item; nothing runs', { skip: !SUPPORTED }, async () => {
+  const parent = await parentDir();
+  const refused = run(parent, ['new', 'plan', '--name', 'shop', '--parent', parent, '--stack', 'laravel', '--custom-stack', 'Flutter', '--json']);
+  assert.equal(json(refused).error.code, 'NEW_PROJECT_CUSTOM_STACK');
+  assert.equal(json(run(parent, ['new', 'plan', '--name', 'shop', '--parent', parent, '--stack', 'empty', '--custom-stack', 'a\u0007b', '--json'])).error.code, 'NEW_PROJECT_CUSTOM_STACK');
+  const plan = json(run(parent, ['new', 'plan', '--name', 'mobile', '--parent', parent, '--stack', 'empty', '--custom-stack', ' Flutter ', '--json']));
+  assert.equal(plan.body.customStack, 'Flutter');
+  assert.deepEqual(plan.body.technologies, ['Flutter']);
+  assert.equal(plan.body.executesExternalCommands, false, 'nothing runs for a named stack');
+  const created = run(parent, ['new', 'create', plan.id, '--confirm', plan.hash.slice(0, 10)], { YALLAFLOW_NEW_VIA: 'console' });
+  assert.equal(created.status, 0, created.stderr);
+  const root = path.join(parent, 'mobile');
+  const overview = json(run(root, ['overview', '--json']));
+  assert.deepEqual(overview.project.origin.stack, ['Flutter']);
+  const meta = JSON.parse(await readFile(path.join(root, '.yallaflow', 'work', 'PF-0001', 'meta.yaml'), 'utf8'));
+  assert.match(meta.rawRequest, /the developer chose Flutter as the stack/);
+  assert.match(meta.rawRequest, /Set up Flutter in this project with the developer/);
+});
+
+test('isolation (PF-0094): plans and registrations stay in this run\'s own config folder', () => {
+  assert.equal(registryPath(), isolatedConfig);
+  assert.equal(path.dirname(plansDir()), path.dirname(isolatedConfig));
+  assert.ok(!plansDir().startsWith(path.join(os.homedir(), '.config')), 'never the developer\'s own config');
 });

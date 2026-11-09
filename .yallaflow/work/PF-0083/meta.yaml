@@ -1,0 +1,45 @@
+{
+  "id": "PF-0083",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Prepare 1.4.2 as the working version: package and CLI version 1.4.2, CHANGELOG section for 1.4.2 (unreleased) collecting PF-0081 and PF-0082; README, site and tour stay on the released 1.4.1 until release",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T08:39:37.844Z",
+  "updatedAt": "2026-11-09T08:44:47.322Z",
+  "title": "Prepare 1.4.2 as the working version: package and CLI version 1.4.2, CHANGELOG section for 1.4.2 (unreleased) collecting PF-0081 and PF-0082; README, site and tour stay on the released 1.4.1 until release",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-09T08:39:37.887Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T08:44:47.322Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

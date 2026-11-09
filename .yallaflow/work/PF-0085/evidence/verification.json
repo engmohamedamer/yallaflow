@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --test test/console-greenfield.test.js test/new-project.test.js test/console-create.test.js test/console-server.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--test",
+        "test/console-greenfield.test.js",
+        "test/new-project.test.js",
+        "test/console-create.test.js",
+        "test/console-server.test.js"
+      ],
+      "displayCommand": "node --test test/console-greenfield.test.js test/new-project.test.js test/console-create.test.js test/console-server.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-09T09:20:29.503Z",
+      "finishedAt": "2026-11-09T09:20:50.750Z",
+      "verifiedAt": "2026-11-09T09:20:50.750Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

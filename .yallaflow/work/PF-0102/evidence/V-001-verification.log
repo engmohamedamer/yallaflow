@@ -1,0 +1,445 @@
+TAP version 13
+# Subtest: versions, forbidden modes, ACP normalization, and API keys stripped from the adapter env
+ok 1 - versions, forbidden modes, ACP normalization, and API keys stripped from the adapter env
+  ---
+  duration_ms: 4.756684
+  type: 'test'
+  ...
+# Subtest: detection: adapter missing, unsupported version, and ready
+ok 2 - detection: adapter missing, unsupported version, and ready
+  ---
+  duration_ms: 46.147556
+  type: 'test'
+  ...
+# Subtest: codex: start, stream, follow-up, permissions (allow, deny, timeout), one session per checkout, no activation
+ok 3 - codex: start, stream, follow-up, permissions (allow, deny, timeout), one session per checkout, no activation
+  ---
+  duration_ms: 5349.174537
+  type: 'test'
+  ...
+# Subtest: codex: cancel, crash, resume after a console restart, explicit activation through Core
+ok 4 - codex: cancel, crash, resume after a console restart, explicit activation through Core
+  ---
+  duration_ms: 8942.906486
+  type: 'test'
+  ...
+# Subtest: codex: ending a session while a permission is pending denies it and never crashes the console
+ok 5 - codex: ending a session while a permission is pending denies it and never crashes the console
+  ---
+  duration_ms: 4670.085403
+  type: 'test'
+  ...
+# Subtest: codex: a non-subscription login is refused and no session starts
+ok 6 - codex: a non-subscription login is refused and no session starts
+  ---
+  duration_ms: 4301.68385
+  type: 'test'
+  ...
+# Subtest: security: opt-in, token, Origin, content type, read-only, unsupported controls
+ok 7 - security: opt-in, token, Origin, content type, read-only, unsupported controls
+  ---
+  duration_ms: 240.642664
+  type: 'test'
+  ...
+# Subtest: security review regressions: start race, modes, symlinks
+ok 8 - security review regressions: start race, modes, symlinks
+  ---
+  duration_ms: 8458.573125
+  type: 'test'
+  ...
+# Subtest: codex: an adapter that cannot be spawned fails the start promptly and frees the checkout
+ok 9 - codex: an adapter that cannot be spawned fails the start promptly and frees the checkout
+  ---
+  duration_ms: 4225.065043
+  type: 'test'
+  ...
+# Subtest: stabilization: Allow for session is session-scoped only; nothing persists or carries to another session
+ok 10 - stabilization: Allow for session is session-scoped only; nothing persists or carries to another session
+  ---
+  duration_ms: 4638.493503
+  type: 'test'
+  ...
+# Subtest: stabilization: ending a Codex session ends what it started, and an incomplete cleanup is never reported as a clean stop
+ok 11 - stabilization: ending a Codex session ends what it started, and an incomplete cleanup is never reported as a clean stop
+  ---
+  duration_ms: 8036.236437
+  type: 'test'
+  ...
+# Subtest: stabilization: one agent console per checkout across separate console processes
+ok 12 - stabilization: one agent console per checkout across separate console processes
+  ---
+  duration_ms: 4715.289226
+  type: 'test'
+  ...
+# Subtest: stabilization: a directory swapped for a link after the check cannot redirect a local write
+ok 13 - stabilization: a directory swapped for a link after the check cannot redirect a local write
+  ---
+  duration_ms: 8.067157
+  type: 'test'
+  ...
+# Subtest: stabilization review: hard links, End while starting, overlapping lock claims, crash cleanup
+ok 14 - stabilization review: hard links, End while starting, overlapping lock claims, crash cleanup
+  ---
+  duration_ms: 2613.841066
+  type: 'test'
+  ...
+# Subtest: CLI: agents detect is read-only; console flag combinations are validated
+ok 15 - CLI: agents detect is read-only; console flag combinations are validated
+  ---
+  duration_ms: 1315.702513
+  type: 'test'
+  ...
+# Subtest: claude (simulated): channel server registers, relays chat, replies, permissions, hooks; bridge token protected
+ok 16 - claude (simulated): channel server registers, relays chat, replies, permissions, hooks; bridge token protected
+  ---
+  duration_ms: 6893.640884
+  type: 'test'
+  ...
+# Subtest: claude (simulated): the channel waits for a console and reports undelivered replies honestly
+ok 17 - claude (simulated): the channel waits for a console and reports undelivered replies honestly
+  ---
+  duration_ms: 328.946419
+  type: 'test'
+  ...
+# Subtest: claude (simulated): bridge file, channel takeover, disconnect, bypass, nested workspaces
+ok 18 - claude (simulated): bridge file, channel takeover, disconnect, bypass, nested workspaces
+  ---
+  duration_ms: 6687.446448
+  type: 'test'
+  ...
+# Subtest: claude (simulated): agents claude-files writes git-ignored launch files
+ok 19 - claude (simulated): agents claude-files writes git-ignored launch files
+  ---
+  duration_ms: 317.692354
+  type: 'test'
+  ...
+# Subtest: review: a stale bridge file pointing at another listener receives no token and no data
+ok 20 - review: a stale bridge file pointing at another listener receives no token and no data
+  ---
+  duration_ms: 1440.15359
+  type: 'test'
+  ...
+# Subtest: review: Claude detection runs only after opt-in; a failed Claude enable leaves no lock or bridge file
+ok 21 - review: Claude detection runs only after opt-in; a failed Claude enable leaves no lock or bridge file
+  ---
+  duration_ms: 433.368392
+  type: 'test'
+  ...
+# Subtest: Claude Team accounts get a channel warning; an unanswered console message is reported
+ok 22 - Claude Team accounts get a channel warning; an unanswered console message is reported
+  ---
+  duration_ms: 265.682023
+  type: 'test'
+  ...
+# Subtest: stopFrom: a usage limit is recognised with its retry time; other stops keep their reason
+ok 23 - stopFrom: a usage limit is recognised with its retry time; other stops keep their reason
+  ---
+  duration_ms: 3.181115
+  type: 'test'
+  ...
+# Subtest: codex: a usage-limit turn is a stop with its retry time, kept after End and across a console restart
+ok 24 - codex: a usage-limit turn is a stop with its retry time, kept after End and across a console restart
+  ---
+  duration_ms: 4632.988726
+  type: 'test'
+  ...
+# Subtest: codex: a crash and a plain End are recorded as such
+ok 25 - codex: a crash and a plain End are recorded as such
+  ---
+  duration_ms: 4488.872337
+  type: 'test'
+  ...
+# Subtest: UI: a live Codex usage limit offers Claude Code and a terminal message, not Codex again
+ok 26 - UI: a live Codex usage limit offers Claude Code and a terminal message, not Codex again
+  ---
+  duration_ms: 4.403531
+  type: 'test'
+  ...
+# Subtest: UI: a session started after the stop (the switch itself) clears the card
+ok 27 - UI: a session started after the stop (the switch itself) clears the card
+  ---
+  duration_ms: 1.749127
+  type: 'test'
+  ...
+# Subtest: UI: a message sent after the stop clears the card; another item never shows it
+ok 28 - UI: a message sent after the stop clears the card; another item never shows it
+  ---
+  duration_ms: 3.698598
+  type: 'test'
+  ...
+# Subtest: UI: with no session, the last recorded stop of this item is offered, including the same agent; Arabic too
+ok 29 - UI: with no session, the last recorded stop of this item is offered, including the same agent; Arabic too
+  ---
+  duration_ms: 5.242677
+  type: 'test'
+  ...
+# Subtest: UI: only ready providers are offered
+ok 30 - UI: only ready providers are offered
+  ---
+  duration_ms: 2.25485
+  type: 'test'
+  ...
+# Subtest: UI: switching ends Codex first, connects Claude, and prepares (never sends) the continue message
+ok 31 - UI: switching ends Codex first, connects Claude, and prepares (never sends) the continue message
+  ---
+  duration_ms: 6.687907
+  type: 'test'
+  ...
+# Subtest: UI: a failed End stops the switch; nothing else starts
+ok 32 - UI: a failed End stops the switch; nothing else starts
+  ---
+  duration_ms: 3.95464
+  type: 'test'
+  ...
+# Subtest: UI: the item lists which agent worked on it and how each session stopped
+ok 33 - UI: the item lists which agent worked on it and how each session stopped
+  ---
+  duration_ms: 2.150611
+  type: 'test'
+  ...
+# Subtest: a refused send keeps its error after the agent state reloads
+ok 34 - a refused send keeps its error after the agent state reloads
+  ---
+  duration_ms: 5.260793
+  type: 'test'
+  ...
+# Subtest: a successful send reports success and leaves no error
+ok 35 - a successful send reports success and leaves no error
+  ---
+  duration_ms: 4.52238
+  type: 'test'
+  ...
+# Subtest: a connected Claude Code whose mode is unknown cannot be sent to and says why
+ok 36 - a connected Claude Code whose mode is unknown cannot be sent to and says why
+  ---
+  duration_ms: 8.683847
+  type: 'test'
+  ...
+# Subtest: once the mode is reported the panel offers Send
+ok 37 - once the mode is reported the panel offers Send
+  ---
+  duration_ms: 3.338852
+  type: 'test'
+  ...
+# Subtest: the Arabic panel explains the wait too
+ok 38 - the Arabic panel explains the wait too
+  ---
+  duration_ms: 6.558999
+  type: 'test'
+  ...
+# Subtest: a failed send puts the typed message back
+ok 39 - a failed send puts the typed message back
+  ---
+  duration_ms: 0.546547
+  type: 'test'
+  ...
+# Subtest: agent replies use formatted content while user messages stay literal
+ok 40 - agent replies use formatted content while user messages stay literal
+  ---
+  duration_ms: 4.836592
+  type: 'test'
+  ...
+# Subtest: folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+ok 41 - folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+  ---
+  duration_ms: 103.12307
+  type: 'test'
+  ...
+# Subtest: registration: an existing YallaFlow project inside home is added once, live; others are refused
+ok 42 - registration: an existing YallaFlow project inside home is added once, live; others are refused
+  ---
+  duration_ms: 263.555587
+  type: 'test'
+  ...
+# Subtest: stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+ok 43 - stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+  ---
+  duration_ms: 1010.25148
+  type: 'test'
+  ...
+# Subtest: a plan that installs dependencies needs an explicit acknowledgement (PF-0085)
+ok 44 - a plan that installs dependencies needs an explicit acknowledgement (PF-0085)
+  ---
+  duration_ms: 356.88363
+  type: 'test'
+  ...
+# Subtest: Git init: explicit, once, never inside another repository; refused read-only
+ok 45 - Git init: explicit, once, never inside another repository; refused read-only
+  ---
+  duration_ms: 78.144832
+  type: 'test'
+  ...
+# Subtest: runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+ok 46 - runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+  ---
+  duration_ms: 582.875667
+  type: 'test'
+  ...
+# Subtest: agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+ok 47 - agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+  ---
+  duration_ms: 31.177165
+  type: 'test'
+  ...
+# Subtest: review: parallel registrations add a project once and lose none from the saved list
+ok 48 - review: parallel registrations add a project once and lose none from the saved list
+  ---
+  duration_ms: 66.501807
+  type: 'test'
+  ...
+# Subtest: review: hidden folders are refused even by path; read-only consoles probe no tools
+ok 49 - review: hidden folders are refused even by path; read-only consoles probe no tools
+  ---
+  duration_ms: 8.08219
+  type: 'test'
+  ...
+# Subtest: review: plans that run package scripts need an acknowledgement; control characters and NUL are refused
+ok 50 - review: plans that run package scripts need an acknowledgement; control characters and NUL are refused
+  ---
+  duration_ms: 453.409907
+  type: 'test'
+  ...
+# Subtest: review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+ok 51 - review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+  ---
+  duration_ms: 278.640317
+  type: 'test'
+  ...
+# Subtest: a registration failure after creation is reported as partial success, never as a failed creation
+ok 52 - a registration failure after creation is reported as partial success, never as a failed creation
+  ---
+  duration_ms: 449.519203
+  type: 'test'
+  ...
+# Subtest: Claude Code: off unless chosen explicitly when enabling agents; never read-only
+ok 53 - Claude Code: off unless chosen explicitly when enabling agents; never read-only
+  ---
+  duration_ms: 56.176521
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): a project leaves the running console and the saved list; its files stay
+ok 54 - removal (PF-0081): a project leaves the running console and the saved list; its files stay
+  ---
+  duration_ms: 43.113243
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): refused while an agent session is live in the project
+ok 55 - removal (PF-0081): refused while an agent session is live in the project
+  ---
+  duration_ms: 1.548087
+  type: 'test'
+  ...
+# Subtest: every project page gets the project chat; a work item page gets its own; new-project pages get none
+ok 56 - every project page gets the project chat; a work item page gets its own; new-project pages get none
+  ---
+  duration_ms: 39.419004
+  type: 'test'
+  ...
+# Subtest: the project chat is labelled, starts no work item and suggests project questions
+not ok 57 - the project chat is labelled, starts no work item and suggests project questions
+  ---
+  duration_ms: 5.167942
+  type: 'test'
+  location: '/home/engamer/Amasi/YallaFlow/test/console-project-chat.test.js:44:1'
+  failureType: 'testCodeFailure'
+  error: 'claudeWarnings is not defined'
+  code: 'ERR_TEST_FAILURE'
+  name: 'ReferenceError'
+  stack: |-
+    agentPanel (evalmachine.<anonymous>:308:106)
+    Object.panel (evalmachine.<anonymous>:349:88)
+    TestContext.<anonymous> (file:///home/engamer/Amasi/YallaFlow/test/console-project-chat.test.js:47:18)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: a running item session shows on project pages as a link to that item
+ok 58 - a running item session shows on project pages as a link to that item
+  ---
+  duration_ms: 5.941376
+  type: 'test'
+  ...
+# Subtest: a project session shows on an item page labelled as the project chat
+ok 59 - a project session shows on an item page labelled as the project chat
+  ---
+  duration_ms: 4.83936
+  type: 'test'
+  ...
+# Subtest: with agents off the project chat explains how to turn them on without naming an item
+ok 60 - with agents off the project chat explains how to turn them on without naming an item
+  ---
+  duration_ms: 3.470574
+  type: 'test'
+  ...
+# Subtest: the item chat is unchanged
+not ok 61 - the item chat is unchanged
+  ---
+  duration_ms: 3.174112
+  type: 'test'
+  location: '/home/engamer/Amasi/YallaFlow/test/console-project-chat.test.js:77:1'
+  failureType: 'testCodeFailure'
+  error: 'claudeWarnings is not defined'
+  code: 'ERR_TEST_FAILURE'
+  name: 'ReferenceError'
+  stack: |-
+    agentPanel (evalmachine.<anonymous>:308:106)
+    Object.panel (evalmachine.<anonymous>:349:88)
+    TestContext.<anonymous> (file:///home/engamer/Amasi/YallaFlow/test/console-project-chat.test.js:80:18)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: the picker links to Setup → Agents when Claude Code is off for the project
+not ok 62 - the picker links to Setup → Agents when Claude Code is off for the project
+  ---
+  duration_ms: 3.199521
+  type: 'test'
+  location: '/home/engamer/Amasi/YallaFlow/test/console-project-chat.test.js:84:1'
+  failureType: 'testCodeFailure'
+  error: 'claudeWarnings is not defined'
+  code: 'ERR_TEST_FAILURE'
+  name: 'ReferenceError'
+  stack: |-
+    agentPanel (evalmachine.<anonymous>:308:106)
+    Object.panel (evalmachine.<anonymous>:349:88)
+    TestContext.<anonymous> (file:///home/engamer/Amasi/YallaFlow/test/console-project-chat.test.js:87:18)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: blocker texts read in Arabic; suggestions say they only fill the box; your turn after a reply
+ok 63 - blocker texts read in Arabic; suggestions say they only fill the box; your turn after a reply
+  ---
+  duration_ms: 9.965514
+  type: 'test'
+  ...
+# Subtest: the chat says when the agent is working, waiting for an approval, or waiting for a reply
+ok 64 - the chat says when the agent is working, waiting for an approval, or waiting for a reply
+  ---
+  duration_ms: 11.287439
+  type: 'test'
+  ...
+# Subtest: suggestions follow the stage: move on after an approval, plan and design wording
+ok 65 - suggestions follow the stage: move on after an approval, plan and design wording
+  ---
+  duration_ms: 14.399671
+  type: 'test'
+  ...
+1..65
+# tests 65
+# suites 0
+# pass 62
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 57928.78297

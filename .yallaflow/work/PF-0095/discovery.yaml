@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "testing",
+      "summary": "The header status refresh and the turn line were not watched in a browser during a live agent turn",
+      "reason": "They change only during a live Codex session; the isolated test console has no signed-in Codex. The turn line is covered by a harness test; the header refresh is a one-line DOM update next to the floating button's existing refresh.",
+      "recordedAt": "2026-11-09T10:28:24.790Z"
+    }
+  ],
+  "updatedAt": "2026-11-09T10:28:24.790Z"
+}

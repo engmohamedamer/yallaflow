@@ -331,6 +331,19 @@ html[dir="rtl"] .drawer { --dirx: -1; } .drawer.open { transform: none; }
 .projects { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 16px; }
 .proj { display: flex; gap: 18px; align-items: center; transition: transform .2s var(--spring); } .proj:hover { transform: translateY(-2px); }
 .proj.here { box-shadow: 0 0 0 2px var(--nile), var(--shadow); }
+.projwrap { position: relative; } .projwrap > .proj { height: 100%; }
+.projrm { position: absolute; top: 10px; inset-inline-end: 10px; min-width: 32px; padding-inline: 8px; }
+.wizbar { height: 10px; border-radius: 99px; background: rgba(127,127,127,.15); overflow: hidden; margin: 6px 0 4px; } .wizbar > i { display: block; height: 100%; background: var(--nile); transition: width .4s ease; } .wizbar.ok > i { background: var(--palm); } .wizbar.fail > i { background: var(--clay); }
+.wizprog { list-style: none; padding-inline-start: 0; }
+.wizprog li { display: flex; gap: 8px; align-items: baseline; } .wizprog .wsm { width: 1.2em; text-align: center; } .wizprog li[data-state="done"] .wsm { color: var(--palm); } .wizprog li[data-state="running"] .wsm { color: var(--nile); } .wizprog li[data-state="failed"] .wsm { color: var(--clay); } .wizprog li[data-state="pending"] { opacity: .65; }
+@keyframes wizspin { to { transform: rotate(360deg); } } .wizprog li[data-state="running"] .wsm { display: inline-block; animation: wizspin 1.2s linear infinite; } @media (prefers-reduced-motion: reduce) { .wizprog li[data-state="running"] .wsm { animation: none; } }
+.wizlast { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.actmore { position: relative; display: inline-block; } .actmore > summary { list-style: none; cursor: pointer; } .actmore > summary::-webkit-details-marker { display: none; }
+.actmenu { position: absolute; z-index: 20; inset-inline-start: 0; top: calc(100% + 4px); display: grid; gap: 4px; padding: 6px; min-width: 200px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+.starthere { border: 2px solid var(--nile); }
+.wizready { border: 2px solid var(--palm); }
+.memh { margin-top: 6px; gap: 6px; flex-wrap: wrap; align-items: center; }
+.tagx { border: 0; background: none; color: inherit; cursor: pointer; padding: 0 2px; font: inherit; }
 .pflow { display: flex; gap: 6px; align-items: flex-end; margin-top: 12px; height: 70px; }
 .pflow span { display: grid; justify-items: center; gap: 2px; flex: 1; } .pflow i { width: 100%; max-width: 30px; border-radius: 4px 4px 0 0; background: var(--hue); } .pflow b { font-size: 12px; color: var(--muted); font-weight: 500; }
 
@@ -548,8 +561,30 @@ html[lang="en"] dialog.create .seg span::first-letter { text-transform: uppercas
 .station.drop-no { opacity: .5; }
 dialog.act pre, dialog.act .gtext { white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--font); font-size: 14px; margin: 0; }
 dialog.act pre.warn { background: var(--amber-soft); color: var(--ink); border-radius: 12px; padding: 10px 12px; }
-dialog.act .gsec { border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; max-height: 280px; overflow: auto; }
+dialog.act .gsec { border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; max-height: 280px; overflow: auto; }
 dialog.act .gsec h3 { font-size: 15px; margin: 0 0 6px; }
+/* PF-0097: the review dialog reads like a document: wide, no inner scroll boxes, expandable. */
+dialog.act.gate { width: min(1040px, calc(100vw - 32px)); }
+dialog.act.gate.full { width: calc(100vw - 16px); max-width: none; height: calc(100vh - 16px); max-height: none; border-radius: 16px; }
+dialog.act.gate .gatehead { position: sticky; top: -22px; z-index: 2; background: var(--card); padding-block: 6px; margin-top: -6px; }
+dialog.act.gate .gsec { max-height: none; overflow: visible; padding: 14px 18px; scroll-margin-top: 60px; }
+dialog.act.gate .gsec h3 { font-size: 17px; color: var(--nile-2); }
+dialog.act.gate .gtext { font-size: 15px; line-height: 1.85; max-width: 80ch; }
+dialog.act.gate .gtext h3, dialog.act.gate .gtext h4, dialog.act.gate .gtext h5 { font-size: 15.5px; margin: 14px 0 4px; padding-top: 8px; border-top: 1px dashed var(--line); }
+dialog.act.gate .gtext ul, dialog.act.gate .gtext ol { padding-inline-start: 22px; display: grid; gap: 4px; }
+dialog.act.gate .gtoc { display: flex; flex-wrap: wrap; gap: 6px; }
+dialog.act.gate .gtoc a { padding: 2px 10px; border-radius: 99px; background: var(--bg-2); color: var(--ink-2); }
+dialog.act.gate .gtoc a:hover { color: var(--ink); }
+dialog.act.gate .gcrit { display: grid; gap: 8px; padding-inline-start: 22px; }
+dialog.act.gate .gnotes { gap: 6px; }
+/* PF-0098: full screen uses the width: material on one side, contents and decision on the other. */
+dialog.act.gate .gbody, dialog.act.gate .gmain, dialog.act.gate .gside { display: grid; gap: 14px; align-content: start; min-width: 0; }
+dialog.act.gate.full .gbody { grid-template-columns: minmax(0, 1100px) minmax(300px, 380px); justify-content: center; gap: 24px; align-items: start; }
+dialog.act.gate.full .gtext { max-width: none; }
+dialog.act.gate.full .gside { position: sticky; top: 56px; max-height: calc(100vh - 96px); overflow: auto; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--bg); }
+dialog.act.gate.full .gside textarea { min-height: 120px; }
+@media (max-width: 900px) { dialog.act.gate.full .gbody { grid-template-columns: minmax(0, 1fr); } dialog.act.gate.full .gside { position: static; max-height: none; } }
+dialog.act.gate .sugg { font: inherit; font-size: 13px; padding: 3px 10px; border-radius: 99px; border: 1px dashed var(--nile); background: transparent; color: var(--nile-2); cursor: pointer; }
 dialog.act fieldset { border: 0; padding: 0; margin: 0; }
 dialog.act .awarn { background: var(--amber-soft); border-radius: 12px; padding: 8px 12px; }
 /* 1.4.0 contrast: text on the soft state colours stays >= 4.5:1 in both themes */
@@ -663,7 +698,11 @@ table.stack th { font-size: 12px; color: var(--muted); font-weight: 600; }
 .chatbody .agent .ahead { display: none; }
 .chatbody .agent .acompose { position: sticky; bottom: 0; background: var(--card); padding-top: 6px; }
 .asugg { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
-.asugg .sugg { font: inherit; font-size: 13px; text-align: start; padding: 6px 10px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--ink-2); cursor: pointer; }
+.aturn { margin: 8px 0 0; padding: 6px 10px; border-radius: 10px; background: var(--palm-soft); color: var(--palm); font-size: 13.5px; font-weight: 600; }
+.aswitch { display: grid; gap: 6px; margin: 8px 0; padding: 10px 12px; border-radius: 12px; border: 1px dashed var(--nile); background: var(--nile-soft); }
+.aturn.working { background: var(--nile-soft); color: var(--nile-2); } .aturn.approval { background: var(--dusk-soft); color: var(--dusk); }
+.asugg > .tiny { flex-basis: 100%; }
+.asugg .sugg { font: inherit; font-size: 13px; text-align: start; padding: 4px 10px; border-radius: 99px; border: 1px dashed var(--nile); background: transparent; color: var(--nile-2); cursor: pointer; }
 .asugg .sugg:hover, .asugg .sugg:focus-visible { border-color: var(--nile); color: var(--ink); }
 .pchat { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; border: 0; background: transparent; color: var(--nile-2); cursor: pointer; font-size: 12.5px; font-weight: 500; padding: 4px 8px; border-radius: 8px; }
 .pchat svg { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }

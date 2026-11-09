@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "Choosing the agent is one of the steps of adding a new project, so the agent is ready to help from the start.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T09:08:37.031Z",
+      "updatedAt": "2026-11-09T09:08:37.031Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "The wizard offers no agent, Codex, or Claude Code (when available) with each one's readiness on this machine, and the review shows the choice.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T09:08:37.031Z",
+      "updatedAt": "2026-11-09T09:08:37.031Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "After creation the choice is saved for the project and applied (agents on, Claude Code connected), the Setup agents step counts as done, and no session starts on its own.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T09:08:37.031Z",
+      "updatedAt": "2026-11-09T09:08:37.031Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-001",
+      "statement": "With an agent chosen, the new project opens on its first work item, where the session can be started.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T09:08:37.031Z",
+      "updatedAt": "2026-11-09T09:08:37.031Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-09T09:08:37.031Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-09T09:08:37.031Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-09T09:08:37.031Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-09T09:08:37.031Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-09T09:08:37.031Z"
+}

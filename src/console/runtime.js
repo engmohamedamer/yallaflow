@@ -38,12 +38,14 @@ export async function runRuntimeAction(root, serviceId, action, body, runner) {
   let confirmShared = false;
   if (action === 'trust') {
     // Trusting authorizes future execution: the user types the service id after reviewing it.
-    if (keys.length !== 2 || !keys.includes('confirm') || !keys.includes('definitionHash') || body.confirm !== serviceId) throw new HttpError(400, 'CONFIRMATION_REQUIRED', `Type the service id (${serviceId}) to confirm that you reviewed its command, folder, environment names and ports.`);
+    // PF-0101: the page sends a ticked checkbox (confirmed: true); a typed service id still works.
+    const confirmedNow = keys.includes('confirmed') ? body.confirmed === true : body.confirm === serviceId;
+    if (keys.length !== 2 || !(keys.includes('confirm') || keys.includes('confirmed')) || !keys.includes('definitionHash') || !confirmedNow) throw new HttpError(400, 'CONFIRMATION_REQUIRED', `Type the service id (${serviceId}) to confirm that you reviewed its command, folder, environment names and ports.`);
     if (!/^sha256:[0-9a-f]{64}$/.test(String(body.definitionHash))) throw new HttpError(400, 'BAD_REQUEST', 'The reviewed definition is missing; reload the page.');
-  } else if (['stop', 'restart'].includes(action) && keys.length === 1 && keys[0] === 'confirmShared') {
+  } else if (['stop', 'restart'].includes(action) && keys.length === 1 && ['confirmShared', 'confirmedShared'].includes(keys[0])) {
     // Stopping or restarting shared infrastructure: the developer typed the service id after
     // seeing who else may be affected (PF-0072).
-    if (body.confirmShared !== serviceId) throw new HttpError(400, 'CONFIRMATION_REQUIRED', `Type the service id (${serviceId}) to confirm that other projects may lose this shared service.`);
+    if (!(body.confirmedShared === true || body.confirmShared === serviceId)) throw new HttpError(400, 'CONFIRMATION_REQUIRED', `Type the service id (${serviceId}) to confirm that other projects may lose this shared service.`);
     confirmShared = true;
   } else if (keys.length) {
     throw new HttpError(400, 'BAD_REQUEST', 'Send an empty JSON object; the service is named in the URL.');

@@ -1,0 +1,45 @@
+{
+  "id": "PF-0090",
+  "type": "feature",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "New project wizard creation: a progress bar with done and remaining steps, and a 'project ready' screen with one primary action instead of jumping to another page",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T09:47:03.336Z",
+  "updatedAt": "2026-11-09T09:54:13.377Z",
+  "title": "New project wizard creation: a progress bar with done and remaining steps, and a 'project ready' screen with one primary action instead of jumping to another page",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope bounded`.",
+  "routedAt": "2026-11-09T09:47:03.395Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "implement",
+    "verify",
+    "converge"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation",
+      "verification",
+      "delivery-convergence"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T09:54:13.377Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

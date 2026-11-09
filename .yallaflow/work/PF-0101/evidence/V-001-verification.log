@@ -1,0 +1,418 @@
+TAP version 13
+# Subtest: work-item actions run the canonical commands: same records as the CLI, Core refusals passed through
+ok 1 - work-item actions run the canonical commands: same records as the CLI, Core refusals passed through
+  ---
+  duration_ms: 4584.391349
+  type: 'test'
+  ...
+# Subtest: request edits use full text before work starts and refuse stale or invalid saves
+ok 2 - request edits use full text before work starts and refuse stale or invalid saves
+  ---
+  duration_ms: 2064.075431
+  type: 'test'
+  ...
+# Subtest: action input is validated and values never become options
+ok 3 - action input is validated and values never become options
+  ---
+  duration_ms: 690.583931
+  type: 'test'
+  ...
+# Subtest: security: token, Origin, content type and read-only consoles guard every action and decision
+ok 4 - security: token, Origin, content type and read-only consoles guard every action and decision
+  ---
+  duration_ms: 580.646301
+  type: 'test'
+  ...
+# Subtest: gate decisions: material shown first, exact confirmation, stale and duplicate protection, console provenance
+ok 5 - gate decisions: material shown first, exact confirmation, stale and duplicate protection, console provenance
+  ---
+  duration_ms: 4638.765842
+  type: 'test'
+  ...
+# Subtest: CLI decisions are recorded exactly as before (no provenance), and a bad provenance channel records nothing
+ok 6 - CLI decisions are recorded exactly as before (no provenance), and a bad provenance channel records nothing
+  ---
+  duration_ms: 3191.806459
+  type: 'test'
+  ...
+# Subtest: the Agent Workspace never reaches gate decisions, and agents never inherit the provenance channel
+ok 7 - the Agent Workspace never reaches gate decisions, and agents never inherit the provenance channel
+  ---
+  duration_ms: 4.425816
+  type: 'test'
+  ...
+# Subtest: review findings: re-deciding after "request changes", request ids per gate, malformed bodies, provenance limits, strict doctor
+ok 8 - review findings: re-deciding after "request changes", request ids per gate, malformed bodies, provenance limits, strict doctor
+  ---
+  duration_ms: 4253.661804
+  type: 'test'
+  ...
+# Subtest: revision attachments preserve bytes, deduplicate retries and respect request-edit and HTTP guards
+ok 9 - revision attachments preserve bytes, deduplicate retries and respect request-edit and HTTP guards
+  ---
+  duration_ms: 3349.539595
+  type: 'test'
+  ...
+# Subtest: revision upload rechecks eligibility in the CLI if work starts after its queued check
+ok 10 - revision upload rechecks eligibility in the CLI if work starts after its queued check
+  ---
+  duration_ms: 1098.677557
+  type: 'test'
+  ...
+# Subtest: gate decisions: a required gate that was never requested can be decided while the item waits on it
+ok 11 - gate decisions: a required gate that was never requested can be decided while the item waits on it
+  ---
+  duration_ms: 3473.212738
+  type: 'test'
+  ...
+# Subtest: folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+ok 12 - folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+  ---
+  duration_ms: 140.716931
+  type: 'test'
+  ...
+# Subtest: registration: an existing YallaFlow project inside home is added once, live; others are refused
+ok 13 - registration: an existing YallaFlow project inside home is added once, live; others are refused
+  ---
+  duration_ms: 286.413046
+  type: 'test'
+  ...
+# Subtest: stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+ok 14 - stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+  ---
+  duration_ms: 1228.703187
+  type: 'test'
+  ...
+# Subtest: a plan that installs dependencies needs an explicit acknowledgement (PF-0085)
+ok 15 - a plan that installs dependencies needs an explicit acknowledgement (PF-0085)
+  ---
+  duration_ms: 423.421803
+  type: 'test'
+  ...
+# Subtest: Git init: explicit, once, never inside another repository; refused read-only
+ok 16 - Git init: explicit, once, never inside another repository; refused read-only
+  ---
+  duration_ms: 106.912482
+  type: 'test'
+  ...
+# Subtest: runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+ok 17 - runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+  ---
+  duration_ms: 783.115284
+  type: 'test'
+  ...
+# Subtest: agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+ok 18 - agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+  ---
+  duration_ms: 51.150407
+  type: 'test'
+  ...
+# Subtest: review: parallel registrations add a project once and lose none from the saved list
+ok 19 - review: parallel registrations add a project once and lose none from the saved list
+  ---
+  duration_ms: 112.727201
+  type: 'test'
+  ...
+# Subtest: review: hidden folders are refused even by path; read-only consoles probe no tools
+ok 20 - review: hidden folders are refused even by path; read-only consoles probe no tools
+  ---
+  duration_ms: 14.419809
+  type: 'test'
+  ...
+# Subtest: review: plans that run package scripts need an acknowledgement; control characters and NUL are refused
+ok 21 - review: plans that run package scripts need an acknowledgement; control characters and NUL are refused
+  ---
+  duration_ms: 677.243856
+  type: 'test'
+  ...
+# Subtest: review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+ok 22 - review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+  ---
+  duration_ms: 435.619532
+  type: 'test'
+  ...
+# Subtest: a registration failure after creation is reported as partial success, never as a failed creation
+ok 23 - a registration failure after creation is reported as partial success, never as a failed creation
+  ---
+  duration_ms: 528.763343
+  type: 'test'
+  ...
+# Subtest: Claude Code: off unless chosen explicitly when enabling agents; never read-only
+ok 24 - Claude Code: off unless chosen explicitly when enabling agents; never read-only
+  ---
+  duration_ms: 69.241439
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): a project leaves the running console and the saved list; its files stay
+ok 25 - removal (PF-0081): a project leaves the running console and the saved list; its files stay
+  ---
+  duration_ms: 75.435215
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): refused while an agent session is live in the project
+ok 26 - removal (PF-0081): refused while an agent session is live in the project
+  ---
+  duration_ms: 2.03061
+  type: 'test'
+  ...
+# Subtest: agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+ok 27 - agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+  ---
+  duration_ms: 12.277065
+  type: 'test'
+  ...
+# Subtest: paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+ok 28 - paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+  ---
+  duration_ms: 7.093753
+  type: 'test'
+  ...
+# Subtest: file selection and paste combine; unsupported, empty and oversized files are explained
+ok 29 - file selection and paste combine; unsupported, empty and oversized files are explained
+  ---
+  duration_ms: 4.050526
+  type: 'test'
+  ...
+# Subtest: revision partial failure keeps pending files and retries without duplicating text or successful uploads
+ok 30 - revision partial failure keeps pending files and retries without duplicating text or successful uploads
+  ---
+  duration_ms: 5.640612
+  type: 'test'
+  ...
+# Subtest: create uploads pasted files through the existing bound request endpoint
+ok 31 - create uploads pasted files through the existing bound request endpoint
+  ---
+  duration_ms: 8.759818
+  type: 'test'
+  ...
+# Subtest: overview previews keep full facts available under View more, including after redraw
+ok 32 - overview previews keep full facts available under View more, including after redraw
+  ---
+  duration_ms: 6.634382
+  type: 'test'
+  ...
+# Subtest: Analyze finds the parent Compose stack, its vhost domains and its shared scope; reads no .env and keeps no environment values
+ok 33 - Analyze finds the parent Compose stack, its vhost domains and its shared scope; reads no .env and keeps no environment values
+  ---
+  duration_ms: 628.711636
+  type: 'test'
+  ...
+# Subtest: R5: what cannot be inspected is unresolved, never confirmed; an empty scan says where it looked
+ok 34 - R5: what cannot be inspected is unresolved, never confirmed; an empty scan says where it looked
+  ---
+  duration_ms: 776.310313
+  type: 'test'
+  ...
+# Subtest: the Compose reader fails closed on what it cannot read with certainty
+ok 35 - the Compose reader fails closed on what it cannot read with certainty
+  ---
+  duration_ms: 7.136209
+  type: 'test'
+  ...
+# Subtest: agent proposals are validated and stored beside the scan; they never touch the profile or trust
+ok 36 - agent proposals are validated and stored beside the scan; they never touch the profile or trust
+  ---
+  duration_ms: 2537.786182
+  type: 'test'
+  ...
+# Subtest: the agent request is prepared in the chat, never sent
+ok 37 - the agent request is prepared in the chat, never sent
+  ---
+  duration_ms: 10.547621
+  type: 'test'
+  ...
+# Subtest: R4: saving a plan grants no execution; only a person can save; outside folders go to the personal file only
+ok 38 - R4: saving a plan grants no execution; only a person can save; outside folders go to the personal file only
+  ---
+  duration_ms: 2284.234165
+  type: 'test'
+  ...
+# Subtest: AC-006: an outside folder is allowed only in the personal file and only inside home
+ok 39 - AC-006: an outside folder is allowed only in the personal file and only inside home
+  ---
+  duration_ms: 2431.522976
+  type: 'test'
+  ...
+# Subtest: R1: changing a trusted Compose file, override, Dockerfile, package script or shell script blocks execution
+ok 40 - R1: changing a trusted Compose file, override, Dockerfile, package script or shell script blocks execution
+  ---
+  duration_ms: 5126.879685
+  type: 'test'
+  ...
+# Subtest: R6: a change between review and trust is refused; console runtime writes cannot interleave
+ok 41 - R6: a change between review and trust is refused; console runtime writes cannot interleave
+  ---
+  duration_ms: 6153.63171
+  type: 'test'
+  ...
+# Subtest: R2: Stop project never stops shared infrastructure; stopping it needs a typed confirmation (S3: evidence, not the marker)
+ok 42 - R2: Stop project never stops shared infrastructure; stopping it needs a typed confirmation (S3: evidence, not the marker)
+  ---
+  duration_ms: 5576.05289
+  type: 'test'
+  ...
+# Subtest: R3: a stack already running outside YallaFlow is never started or stopped; a busy port is reported with its owner and nothing is killed
+ok 43 - R3: a stack already running outside YallaFlow is never started or stopped; a busy port is reported with its owner and nothing is killed
+  ---
+  duration_ms: 3323.93592
+  type: 'test'
+  ...
+# Subtest: without Docker the analysis says so and continues; a read-only console views the plan but changes nothing
+ok 44 - without Docker the analysis says so and continues; a read-only console views the plan but changes nothing
+  ---
+  duration_ms: 423.885282
+  type: 'test'
+  ...
+# Subtest: UI: the plan shows confidence, shared scope, unresolved items and coverage; Save starts disabled; the review shows what trust covers
+ok 45 - UI: the plan shows confidence, shared scope, unresolved items and coverage; Save starts disabled; the review shows what trust covers
+  ---
+  duration_ms: 46.44797
+  type: 'test'
+  ...
+# Subtest: review 1: escaped or unknown Compose keys block trust instead of hiding include/extends/build
+ok 46 - review 1: escaped or unknown Compose keys block trust instead of hiding include/extends/build
+  ---
+  duration_ms: 1059.365512
+  type: 'test'
+  ...
+# Subtest: review 3/4: a parent Compose file that cannot be read is unresolved and blocking, never "nothing found"; a mounted .env is never opened
+ok 47 - review 3/4: a parent Compose file that cannot be read is unresolved and blocking, never "nothing found"; a mounted .env is never opened
+  ---
+  duration_ms: 482.838089
+  type: 'test'
+  ...
+# Subtest: review 5: shared and running-outside checks see override files and every -f/-p spelling
+ok 48 - review 5: shared and running-outside checks see override files and every -f/-p spelling
+  ---
+  duration_ms: 40.4577
+  type: 'test'
+  ...
+# Subtest: review 6/7: editing .env ends the trust (its content is never read); without docker ps, a Compose service is not started
+ok 49 - review 6/7: editing .env ends the trust (its content is never read); without docker ps, a Compose service is not started
+  ---
+  duration_ms: 1601.936197
+  type: 'test'
+  ...
+# Subtest: review 8/9: Replace never deletes a shared definition; shell -c, missing evidence and scan-only fields are refused
+ok 50 - review 8/9: Replace never deletes a shared definition; shell -c, missing evidence and scan-only fields are refused
+  ---
+  duration_ms: 760.514202
+  type: 'test'
+  ...
+# Subtest: an agent service matching the scanned one carries the scan's shared scope into Review and Save
+ok 51 - an agent service matching the scanned one carries the scan's shared scope into Review and Save
+  ---
+  duration_ms: 801.652086
+  type: 'test'
+  ...
+# Subtest: profiles: argv only, repository-relative cwd, names not values; secrets and unknown fields refused without echo
+ok 52 - profiles: argv only, repository-relative cwd, names not values; secrets and unknown fields refused without echo
+  ---
+  duration_ms: 1647.078775
+  type: 'test'
+  ...
+# Subtest: trust: required before start, personal, and renewed after any material change (shared or override)
+ok 53 - trust: required before start, personal, and renewed after any material change (shared or override)
+  ---
+  duration_ms: 2133.839048
+  type: 'test'
+  ...
+# Subtest: start/stop/logs: readiness, minimal environment, redacted logs, graceful stop; nothing auto-starts
+ok 54 - start/stop/logs: readiness, minimal environment, redacted logs, graceful stop; nothing auto-starts
+  ---
+  duration_ms: 3388.545258
+  type: 'test'
+  ...
+# Subtest: a port held by someone else refuses start and that process is never touched
+ok 55 - a port held by someone else refuses start and that process is never touched
+  ---
+  duration_ms: 1214.52472
+  type: 'test'
+  ...
+# Subtest: crash recovery: a service killed outside YallaFlow reads failed; a reused PID is unmanaged and never signalled
+ok 56 - crash recovery: a service killed outside YallaFlow reads failed; a reused PID is unmanaged and never signalled
+  ---
+  duration_ms: 3204.800999
+  type: 'test'
+  ...
+# Subtest: concurrency: five simultaneous starts start one process; restart replaces it; stop --all stops owned services only
+ok 57 - concurrency: five simultaneous starts start one process; restart replaces it; stop --all stops owned services only
+  ---
+  duration_ms: 3956.038555
+  type: 'test'
+  ...
+# Subtest: start failures are reported with the log tail; a cwd escaping through a symlink is refused
+ok 58 - start failures are reported with the log tail; a cwd escaping through a symlink is refused
+  ---
+  duration_ms: 2339.355978
+  type: 'test'
+  ...
+# Subtest: suggestions come from repository evidence and never run
+ok 59 - suggestions come from repository evidence and never run
+  ---
+  duration_ms: 677.509134
+  type: 'test'
+  ...
+# Subtest: console: runtime routes are token/Origin/JSON guarded, trust needs the typed id, read-only refuses
+ok 60 - console: runtime routes are token/Origin/JSON guarded, trust needs the typed id, read-only refuses
+  ---
+  duration_ms: 2760.94376
+  type: 'test'
+  ...
+# Subtest: review: trust and run records planted inside the repository are ignored; trust needs the reviewed definition
+ok 61 - review: trust and run records planted inside the repository are ignored; trust needs the reviewed definition
+  ---
+  duration_ms: 1473.115898
+  type: 'test'
+  ...
+# Subtest: review: a run record whose process no longer leads its own group is unmanaged and never signalled
+ok 62 - review: a run record whose process no longer leads its own group is unmanaged and never signalled
+  ---
+  duration_ms: 1119.312414
+  type: 'test'
+  ...
+# Subtest: review: log symlinks and hard links are refused; reading logs never writes, truncates or rotates
+ok 63 - review: log symlinks and hard links are refused; reading logs never writes, truncates or rotates
+  ---
+  duration_ms: 1392.414072
+  type: 'test'
+  ...
+# Subtest: review: an untrusted dependency starts nothing; control and bidi characters are refused
+ok 64 - review: an untrusted dependency starts nothing; control and bidi characters are refused
+  ---
+  duration_ms: 1482.042041
+  type: 'test'
+  ...
+# Subtest: review: CLI trust is a human decision — refused when not interactive
+ok 65 - review: CLI trust is a human decision — refused when not interactive
+  ---
+  duration_ms: 867.445216
+  type: 'test'
+  ...
+# Subtest: review: a FIFO planted as the log never hangs reads
+ok 66 - review: a FIFO planted as the log never hangs reads
+  ---
+  duration_ms: 531.765487
+  type: 'test'
+  ...
+# Subtest: trust: script edits reject stale confirmation and start, while application edits retain trust
+ok 67 - trust: script edits reject stale confirmation and start, while application edits retain trust
+  ---
+  duration_ms: 1916.904812
+  type: 'test'
+  ...
+# Subtest: trust: a service changing its inputs during startup is stopped (only its own process) and the start fails (PF-0072 D2/R6)
+ok 68 - trust: a service changing its inputs during startup is stopped (only its own process) and the start fails (PF-0072 D2/R6)
+  ---
+  duration_ms: 2120.538671
+  type: 'test'
+  ...
+1..68
+# tests 68
+# suites 0
+# pass 68
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 34549.831508

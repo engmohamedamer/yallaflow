@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "testing",
+      "summary": "The switch was not exercised with live Codex and Claude Code sessions",
+      "reason": "That would start sessions on the owner's subscriptions; the panel states are covered by the chat harness test and the actions reuse the existing end action and disconnect event",
+      "recordedAt": "2026-11-09T13:39:57.676Z"
+    }
+  ],
+  "updatedAt": "2026-11-09T13:39:57.676Z"
+}

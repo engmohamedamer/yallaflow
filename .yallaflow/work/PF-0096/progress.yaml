@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:35:24.722Z",
+      "completedAt": "2026-11-09T10:35:24.722Z",
+      "summary": "Agent events carry 'at' (src/agents/events.js agentEvent); the chat keeps them in agent.events (message.sent, turn.started, tool.started/updated, message.delta, permission.*). turnLine (PF-0095, resources/console/app.js) shows a fixed 'working' sentence with no time or activity; renderAgent only runs on events, so nothing updates while the agent is silent.",
+      "evidence": [
+        "src/agents/events.js",
+        "resources/console/app.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:35:25.105Z",
+      "completedAt": "2026-11-09T10:35:25.105Z",
+      "summary": "Owner approved ('تمام ضيف', 2026-11-09): show how long the agent has been working and its last step with its age."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:35:25.689Z",
+      "completedAt": "2026-11-09T10:35:25.689Z",
+      "summary": "workingInfo(events): start = last message.sent/turn.started; last step = last tool/message/permission event with a plain label; turnLine shows both with ago-style minutes; a 30 s timer refreshes only the working line."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:36:15.916Z",
+      "completedAt": "2026-11-09T10:36:15.916Z",
+      "summary": "workingInfo() reads the turn start (last message sent) and the last step (tool, writing the reply, permission answered, message received) with its time from agent events; the working line reads e.g. 'الوكيل شغّال من 4 د · آخر خطوة: Run command، من 1 د'; a 30 s timer refreshes only that line. Harness test and CHANGELOG updated.",
+      "evidence": [
+        "resources/console/app.js",
+        "test/console-project-chat.test.js",
+        "CHANGELOG.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:36:26.431Z",
+      "completedAt": "2026-11-09T10:36:26.431Z",
+      "summary": "Console tests pass (V-001), including the timed working-line assertion.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-09T10:36:26.431Z"
+}

@@ -1,0 +1,45 @@
+{
+  "id": "PF-0082",
+  "type": "feature",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console projects page: show each project's memory health (current facts, how many need revalidation, disputed, unresolved) on its card",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T08:37:07.451Z",
+  "updatedAt": "2026-11-09T08:39:26.575Z",
+  "title": "Console projects page: show each project's memory health (current facts, how many need revalidation, disputed, unresolved) on its card",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope bounded`.",
+  "routedAt": "2026-11-09T08:37:07.495Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "implement",
+    "verify",
+    "converge"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation",
+      "verification",
+      "delivery-convergence"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T08:39:26.575Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

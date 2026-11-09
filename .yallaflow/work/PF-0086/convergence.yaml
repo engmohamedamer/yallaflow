@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-09T09:21:52.554Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+        "verificationRunIds": []
+      },
+      "summary": "Assessed after V-001 and a browser walkthrough.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "Step 3 offers no agent, Codex and Claude Code (available here) with readiness; the review row showed Agent = Codex.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:91e417f17ee385e61444759ff1e7156f32306c2c7e8899b2d1be483e15742b29",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "wizard step 3 and review in the browser"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "After creation agents.json was saved (agents true, claude false) through the existing settings route, setup steps.agents was true, and no session started.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:91e417f17ee385e61444759ff1e7156f32306c2c7e8899b2d1be483e15742b29",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:b7cc975d65e7d844ce5dda0d161058212a033bd268e74cb51c64ebd7091409b3",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "agents.json and setup.json of the browser-created project"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "With Codex chosen the page opened the first work item (#/item/PF-0001), which has the work-with-agent control.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:91e417f17ee385e61444759ff1e7156f32306c2c7e8899b2d1be483e15742b29",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "location after creation was #/item/PF-0001"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-09T09:21:52.554Z"
+}

@@ -1,0 +1,142 @@
+TAP version 13
+# Subtest: a merge-collided work item is listed as invalid and never hides the project
+ok 1 - a merge-collided work item is listed as invalid and never hides the project
+  ---
+  duration_ms: 2741.506402
+  type: 'test'
+  ...
+# Subtest: the exact Vult message: a ledger pinned to another registry version
+ok 2 - the exact Vult message: a ledger pinned to another registry version
+  ---
+  duration_ms: 1023.972713
+  type: 'test'
+  ...
+# Subtest: an unreadable meta.yaml is reported, not fatal
+ok 3 - an unreadable meta.yaml is reported, not fatal
+  ---
+  duration_ms: 1000.274643
+  type: 'test'
+  ...
+# Subtest: zero work items: no completion is claimed
+ok 4 - zero work items: no completion is claimed
+  ---
+  duration_ms: 696.582322
+  type: 'test'
+  ...
+# Subtest: console: an invalid item is a data warning in a 200 snapshot, not a failed project
+ok 5 - console: an invalid item is a data warning in a 200 snapshot, not a failed project
+  ---
+  duration_ms: 2168.011597
+  type: 'test'
+  ...
+# Subtest: console UI: the theme button is matched by its own attribute, never by <html data-theme>
+ok 6 - console UI: the theme button is matched by its own attribute, never by <html data-theme>
+  ---
+  duration_ms: 14.300449
+  type: 'test'
+  ...
+# Subtest: work-item actions run the canonical commands: same records as the CLI, Core refusals passed through
+ok 7 - work-item actions run the canonical commands: same records as the CLI, Core refusals passed through
+  ---
+  duration_ms: 4489.826624
+  type: 'test'
+  ...
+# Subtest: request edits use full text before work starts and refuse stale or invalid saves
+ok 8 - request edits use full text before work starts and refuse stale or invalid saves
+  ---
+  duration_ms: 2377.777101
+  type: 'test'
+  ...
+# Subtest: action input is validated and values never become options
+ok 9 - action input is validated and values never become options
+  ---
+  duration_ms: 786.182659
+  type: 'test'
+  ...
+# Subtest: security: token, Origin, content type and read-only consoles guard every action and decision
+ok 10 - security: token, Origin, content type and read-only consoles guard every action and decision
+  ---
+  duration_ms: 589.267707
+  type: 'test'
+  ...
+# Subtest: gate decisions: material shown first, exact confirmation, stale and duplicate protection, console provenance
+ok 11 - gate decisions: material shown first, exact confirmation, stale and duplicate protection, console provenance
+  ---
+  duration_ms: 4536.002616
+  type: 'test'
+  ...
+# Subtest: CLI decisions are recorded exactly as before (no provenance), and a bad provenance channel records nothing
+ok 12 - CLI decisions are recorded exactly as before (no provenance), and a bad provenance channel records nothing
+  ---
+  duration_ms: 3194.924903
+  type: 'test'
+  ...
+# Subtest: the Agent Workspace never reaches gate decisions, and agents never inherit the provenance channel
+ok 13 - the Agent Workspace never reaches gate decisions, and agents never inherit the provenance channel
+  ---
+  duration_ms: 4.616865
+  type: 'test'
+  ...
+# Subtest: review findings: re-deciding after "request changes", request ids per gate, malformed bodies, provenance limits, strict doctor
+ok 14 - review findings: re-deciding after "request changes", request ids per gate, malformed bodies, provenance limits, strict doctor
+  ---
+  duration_ms: 4269.369458
+  type: 'test'
+  ...
+# Subtest: revision attachments preserve bytes, deduplicate retries and respect request-edit and HTTP guards
+ok 15 - revision attachments preserve bytes, deduplicate retries and respect request-edit and HTTP guards
+  ---
+  duration_ms: 2846.731086
+  type: 'test'
+  ...
+# Subtest: revision upload rechecks eligibility in the CLI if work starts after its queued check
+ok 16 - revision upload rechecks eligibility in the CLI if work starts after its queued check
+  ---
+  duration_ms: 1021.773305
+  type: 'test'
+  ...
+# Subtest: gate decisions: a required gate that was never requested can be decided while the item waits on it
+ok 17 - gate decisions: a required gate that was never requested can be decided while the item waits on it
+  ---
+  duration_ms: 3294.798493
+  type: 'test'
+  ...
+# Subtest: security: loopback host, token, origin, read-only methods and ID-only paths
+ok 18 - security: loopback host, token, origin, read-only methods and ID-only paths
+  ---
+  duration_ms: 908.709734
+  type: 'test'
+  ...
+# Subtest: serves the snapshot, work detail and preserved sources by ID
+ok 19 - serves the snapshot, work detail and preserved sources by ID
+  ---
+  duration_ms: 1570.224767
+  type: 'test'
+  ...
+# Subtest: live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+ok 20 - live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+  ---
+  duration_ms: 1860.794159
+  type: 'test'
+  ...
+# Subtest: the console never writes: browsing every route leaves the workspace byte-identical
+ok 21 - the console never writes: browsing every route leaves the workspace byte-identical
+  ---
+  duration_ms: 1555.921895
+  type: 'test'
+  ...
+# Subtest: extracted text cannot be read outside its source directory; HEAD never opens the event stream
+ok 22 - extracted text cannot be read outside its source directory; HEAD never opens the event stream
+  ---
+  duration_ms: 1228.64823
+  type: 'test'
+  ...
+1..22
+# tests 22
+# suites 0
+# pass 22
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 27776.097203

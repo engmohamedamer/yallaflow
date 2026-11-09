@@ -1,0 +1,45 @@
+{
+  "id": "PF-0086",
+  "type": "feature",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "New project wizard: choose the agent (none, Codex, Claude Code) while creating the project; it is saved for the project and connected after creation, and the project opens on its first work item ready to start with the agent",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T09:08:23.309Z",
+  "updatedAt": "2026-11-09T09:21:53.310Z",
+  "title": "New project wizard: choose the agent (none, Codex, Claude Code) while creating the project; it is saved for the project and connected after creation, and the project opens on its first work item ready to start with the agent",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope bounded`.",
+  "routedAt": "2026-11-09T09:08:23.351Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "implement",
+    "verify",
+    "converge"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation",
+      "verification",
+      "delivery-convergence"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T09:21:53.310Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:39:21.941Z",
+      "completedAt": "2026-11-09T09:39:21.941Z",
+      "summary": "Tabs are built in resources/console/app.js header (line ~210): Overview, Flow, Work, Setup, Worktrees, Insights; the brand link and default view go to Flow (#/map). The Setup tab (ar 'التشغيل') opens a page titled 'إعداد المشروع' before services exist and 'تشغيل المشروع' after. No test asserts these labels.",
+      "evidence": [
+        "resources/console/app.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:39:22.314Z",
+      "completedAt": "2026-11-09T09:39:22.314Z",
+      "summary": "Owner approved (2026-11-09) the order Flow, Work, Setup, Overview, Insights, Worktrees and matching the Setup tab name with its page."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:39:22.873Z",
+      "completedAt": "2026-11-09T09:39:22.873Z",
+      "summary": "Reorder the tab() calls; tab and page title both 'الإعداد والتشغيل' / 'Setup & run'."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:39:59.867Z",
+      "completedAt": "2026-11-09T09:39:59.867Z",
+      "summary": "Tabs reordered to Flow, Work, Setup & run, Overview, Insights, Worktrees; the Setup tab and its page title are both 'الإعداد والتشغيل' / 'Setup & run'.",
+      "evidence": [
+        "resources/console/app.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:40:09.069Z",
+      "completedAt": "2026-11-09T09:40:09.069Z",
+      "summary": "Console tests pass (V-001). Browser: the header shows the new order and the Setup page title matches its tab; no console errors.",
+      "evidence": [
+        "verification:V-001",
+        "runtime:Playwright screenshot of the header on the Setup page, 2026-11-09"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-09T09:40:09.069Z"
+}

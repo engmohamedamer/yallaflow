@@ -1,0 +1,45 @@
+{
+  "id": "PF-0096",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console chat: while the agent works, the turn line says for how long and what its last step was and when (for example 'working for 4 min · last step: Run command, 1 min ago'), refreshed every 30 seconds",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T10:35:18.208Z",
+  "updatedAt": "2026-11-09T10:36:26.857Z",
+  "title": "Console chat: while the agent works, the turn line says for how long and what its last step was and when (for example 'working for 4 min · last step: Run command, 1 min ago'), refreshed every 30 seconds",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-09T10:35:18.255Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T10:36:26.857Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Every console write to .yallaflow state is the canonical CLI command run through the console runner (argv, no shell, --opt=value, one write at a time per project); Core keeps every rule and its refusal text is shown as-is. Outside .yallaflow the console writes only the user-level console project list (add and remove, the same registry as 'yallaflow console add/remove', serialized in-process) and runs 'git init --quiet' (fixed argv, refused inside an existing work tree) for an explicit Git init. Review-gate decisions in the console are local-user decisions: an explicit confirmation (the page's checkbox sends confirmed: true; a typed gate name is still accepted), a mandatory note, material and digest checked inside runner.exclusive, recorded by the unchanged approve/feedback with provenance {via:'console', identity:'not verified', host, claimedGitName}; never claim verified identity.",
+      "evidence": [
+        "src/console/actions.js",
+        "src/console/server.js",
+        "verification:V-001"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0117"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-09T10:51:27.442Z",
+      "factId": "CTX-0138",
+      "promotedAt": "2026-11-09T10:51:27.650Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-09T10:51:27.650Z",
+  "reviewedAt": "2026-11-09T10:51:27.650Z"
+}

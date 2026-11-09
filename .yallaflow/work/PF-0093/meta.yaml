@@ -1,0 +1,45 @@
+{
+  "id": "PF-0093",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console clarity on a work item: the stage-advance button is renamed and hidden while the current stage's work is not recorded, the 'paused' state reads as the agent's turn, chat suggestions look like suggestions with a 'your turn' line, and YallaFlow's blocker texts are shown in Arabic",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T10:13:35.823Z",
+  "updatedAt": "2026-11-09T10:17:00.350Z",
+  "title": "Console clarity on a work item: the stage-advance button is renamed and hidden while the current stage's work is not recorded, the 'paused' state reads as the agent's turn, chat suggestions look like suggestions with a 'your turn' line, and YallaFlow's blocker texts are shown in Arabic",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-09T10:13:35.871Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T10:17:00.350Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

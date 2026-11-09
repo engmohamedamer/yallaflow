@@ -28,6 +28,9 @@ const GENERATOR_TIMEOUT_MS = 15 * 60 * 1000;
 const PREREQ_TIMEOUT_MS = 5000;
 const RATIONALE_MAX = 2000;
 const DESCRIPTION_MAX = 4000;
+// PF-0087: a stack the developer names that is not in the catalog. Only with the empty
+// project: nothing runs for it; the first work item asks the agent to set it up.
+const CUSTOM_STACK_MAX = 120;
 const REQUIREMENTS_MAX = 16000;
 const ATTACHMENTS_MAX = 10;
 export const ENVIRONMENTS = Object.freeze(['docker', 'local', 'later']);
@@ -85,11 +88,14 @@ function scrubbedEnv(source = process.env) {
 // Validates the request and writes an immutable plan. Nothing is created or executed
 // except prerequisite `--version` probes.
 export async function createPlan(input, { catalog = CATALOG, env = process.env, now = new Date().toISOString() } = {}) {
-  const { name, parent, stack, install = false, allowNested = false, rationale = null, description = null, requirements = null, environment = null, git = false, attachments = [] } = input ?? {};
+  const { name, parent, stack, install = false, allowNested = false, rationale = null, description = null, requirements = null, environment = null, git = false, attachments = [], customStack = null } = input ?? {};
   if (typeof name !== 'string' || !PROJECT_NAME.test(name) || name === '.' || name === '..') throw new NewProjectError('NEW_PROJECT_NAME', 'The project name must be 1-64 characters: letters, digits, dot, dash or underscore, starting with a letter or digit.');
   const entry = catalogEntry(stack, catalog);
   if (!entry) throw new NewProjectError('NEW_PROJECT_STACK', `Unknown stack ${JSON.stringify(stack)}. See \`yallaflow new catalog\`.`);
   if (typeof parent !== 'string' || !parent.trim() || !path.isAbsolute(parent)) throw new NewProjectError('NEW_PROJECT_PARENT', 'The parent folder must be an absolute path.');
+  if (customStack !== null && (typeof customStack !== 'string' || !customStack.trim() || customStack.length > CUSTOM_STACK_MAX || /[\u0000-\u001f\u007f]/.test(customStack))) throw new NewProjectError('NEW_PROJECT_CUSTOM_STACK', `The stack you name must be one line of text up to ${CUSTOM_STACK_MAX} characters.`);
+  if (customStack !== null && entry.generator) throw new NewProjectError('NEW_PROJECT_CUSTOM_STACK', 'A stack you name yourself goes with the empty project (--stack empty): nothing is generated for it.');
+  const custom = customStack === null ? null : customStack.trim();
   if (install && !entry.install) throw new NewProjectError('NEW_PROJECT_INSTALL', `${entry.label} has no separate dependency install step${entry.installsDependencies ? ' (its generator installs dependencies itself)' : ''}.`);
   if (rationale !== null && (typeof rationale !== 'string' || rationale.length > RATIONALE_MAX)) throw new NewProjectError('NEW_PROJECT_RATIONALE', `The rationale must be text up to ${RATIONALE_MAX} characters.`);
   const intent = validateIntent(description, requirements);
@@ -132,8 +138,8 @@ export async function createPlan(input, { catalog = CATALOG, env = process.env, 
     parent: realParent,
     destination,
     stack: entry.id,
-    stackLabel: entry.label,
-    technologies: entry.stack,
+    stackLabel: custom ? `${custom} (${entry.label})` : entry.label,
+    technologies: custom ? [custom] : entry.stack,
     generator: entry.generator,
     install: Boolean(install && entry.install),
     allowNested: Boolean(allowNested && nested),
@@ -149,7 +155,8 @@ export async function createPlan(input, { catalog = CATALOG, env = process.env, 
     intent,
     environment,
     git,
-    attachments: planned
+    attachments: planned,
+    ...(custom ? { customStack: custom } : {})
   };
   const hash = planHash(body);
   const id = `NP-${now.replace(/[-:TZ.]/g, '').slice(0, 14)}-${randomBytes(3).toString('hex')}`;
@@ -373,15 +380,19 @@ export function firstWorkTitle(body) {
 }
 
 export function firstWorkRequest(body) {
-  const stack = body.generator ? `${body.stackLabel} (generated with ${body.generator.package}@${body.generator.version}; the generated code is not reviewed yet)` : 'an empty project (no code yet)';
+  const stack = body.generator ? `${body.stackLabel} (generated with ${body.generator.package}@${body.generator.version}; the generated code is not reviewed yet)`
+    : body.customStack ? `an empty project; the developer chose ${body.customStack} as the stack, and nothing is generated yet` : 'an empty project (no code yet)';
   const environment = { docker: 'Docker (planned; no Docker files were created yet)', local: 'local tools', later: 'to be decided' }[body.environment] ?? null;
   const lines = [];
   if (body.intent?.description) lines.push(body.intent.description.trim(), '');
   if (body.intent?.requirements) lines.push('Requirements from the developer:', body.intent.requirements.trim(), '');
   lines.push(`Project: ${body.name}, ${stack}.${environment ? ` Development environment: ${environment}.` : ''}`);
+  if (body.customStack) lines.push(`Set up ${body.customStack} in this project with the developer: propose the official way to create it, and run nothing they have not approved.`);
   lines.push(body.intent?.requirements
     ? 'Next: review these requirements with the developer, then confirm the local setup and the runtime profile.'
     : 'Next: define the first product requirements with the developer, then confirm the local setup and the runtime profile.');
+  // PF-0084: the choice is not project memory yet; this work item is where it becomes so.
+  lines.push('When this work item finishes, propose the chosen stack, the development environment and the product goal as project knowledge, citing the generated files and the developer\'s choice in the New Project wizard (recorded in .yallaflow/config.yaml under project.origin).');
   return lines.join('\n');
 }
 

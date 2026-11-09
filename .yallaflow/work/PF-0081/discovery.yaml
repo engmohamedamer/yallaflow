@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "testing",
+      "summary": "The new remove button and confirmation dialog on the All projects page were not checked in a browser",
+      "reason": "No Playwright or browser automation is installed on this machine; installing one needs the owner's approval",
+      "recordedAt": "2026-11-09T08:31:00.217Z"
+    }
+  ],
+  "updatedAt": "2026-11-09T08:31:00.217Z"
+}

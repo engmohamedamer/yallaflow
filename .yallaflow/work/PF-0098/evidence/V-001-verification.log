@@ -1,0 +1,142 @@
+TAP version 13
+# Subtest: a merge-collided work item is listed as invalid and never hides the project
+ok 1 - a merge-collided work item is listed as invalid and never hides the project
+  ---
+  duration_ms: 2629.200019
+  type: 'test'
+  ...
+# Subtest: the exact Vult message: a ledger pinned to another registry version
+ok 2 - the exact Vult message: a ledger pinned to another registry version
+  ---
+  duration_ms: 924.787325
+  type: 'test'
+  ...
+# Subtest: an unreadable meta.yaml is reported, not fatal
+ok 3 - an unreadable meta.yaml is reported, not fatal
+  ---
+  duration_ms: 904.33414
+  type: 'test'
+  ...
+# Subtest: zero work items: no completion is claimed
+ok 4 - zero work items: no completion is claimed
+  ---
+  duration_ms: 647.650301
+  type: 'test'
+  ...
+# Subtest: console: an invalid item is a data warning in a 200 snapshot, not a failed project
+ok 5 - console: an invalid item is a data warning in a 200 snapshot, not a failed project
+  ---
+  duration_ms: 2072.932182
+  type: 'test'
+  ...
+# Subtest: console UI: the theme button is matched by its own attribute, never by <html data-theme>
+ok 6 - console UI: the theme button is matched by its own attribute, never by <html data-theme>
+  ---
+  duration_ms: 15.744424
+  type: 'test'
+  ...
+# Subtest: work-item actions run the canonical commands: same records as the CLI, Core refusals passed through
+ok 7 - work-item actions run the canonical commands: same records as the CLI, Core refusals passed through
+  ---
+  duration_ms: 4160.881325
+  type: 'test'
+  ...
+# Subtest: request edits use full text before work starts and refuse stale or invalid saves
+ok 8 - request edits use full text before work starts and refuse stale or invalid saves
+  ---
+  duration_ms: 2201.021985
+  type: 'test'
+  ...
+# Subtest: action input is validated and values never become options
+ok 9 - action input is validated and values never become options
+  ---
+  duration_ms: 768.41243
+  type: 'test'
+  ...
+# Subtest: security: token, Origin, content type and read-only consoles guard every action and decision
+ok 10 - security: token, Origin, content type and read-only consoles guard every action and decision
+  ---
+  duration_ms: 622.23966
+  type: 'test'
+  ...
+# Subtest: gate decisions: material shown first, exact confirmation, stale and duplicate protection, console provenance
+ok 11 - gate decisions: material shown first, exact confirmation, stale and duplicate protection, console provenance
+  ---
+  duration_ms: 4686.565594
+  type: 'test'
+  ...
+# Subtest: CLI decisions are recorded exactly as before (no provenance), and a bad provenance channel records nothing
+ok 12 - CLI decisions are recorded exactly as before (no provenance), and a bad provenance channel records nothing
+  ---
+  duration_ms: 3230.207304
+  type: 'test'
+  ...
+# Subtest: the Agent Workspace never reaches gate decisions, and agents never inherit the provenance channel
+ok 13 - the Agent Workspace never reaches gate decisions, and agents never inherit the provenance channel
+  ---
+  duration_ms: 4.512955
+  type: 'test'
+  ...
+# Subtest: review findings: re-deciding after "request changes", request ids per gate, malformed bodies, provenance limits, strict doctor
+ok 14 - review findings: re-deciding after "request changes", request ids per gate, malformed bodies, provenance limits, strict doctor
+  ---
+  duration_ms: 4345.251657
+  type: 'test'
+  ...
+# Subtest: revision attachments preserve bytes, deduplicate retries and respect request-edit and HTTP guards
+ok 15 - revision attachments preserve bytes, deduplicate retries and respect request-edit and HTTP guards
+  ---
+  duration_ms: 2901.616834
+  type: 'test'
+  ...
+# Subtest: revision upload rechecks eligibility in the CLI if work starts after its queued check
+ok 16 - revision upload rechecks eligibility in the CLI if work starts after its queued check
+  ---
+  duration_ms: 1107.369506
+  type: 'test'
+  ...
+# Subtest: agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+ok 17 - agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+  ---
+  duration_ms: 8.483926
+  type: 'test'
+  ...
+# Subtest: paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+ok 18 - paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+  ---
+  duration_ms: 5.508124
+  type: 'test'
+  ...
+# Subtest: file selection and paste combine; unsupported, empty and oversized files are explained
+ok 19 - file selection and paste combine; unsupported, empty and oversized files are explained
+  ---
+  duration_ms: 3.054796
+  type: 'test'
+  ...
+# Subtest: revision partial failure keeps pending files and retries without duplicating text or successful uploads
+ok 20 - revision partial failure keeps pending files and retries without duplicating text or successful uploads
+  ---
+  duration_ms: 3.680692
+  type: 'test'
+  ...
+# Subtest: create uploads pasted files through the existing bound request endpoint
+ok 21 - create uploads pasted files through the existing bound request endpoint
+  ---
+  duration_ms: 6.675455
+  type: 'test'
+  ...
+# Subtest: overview previews keep full facts available under View more, including after redraw
+ok 22 - overview previews keep full facts available under View more, including after redraw
+  ---
+  duration_ms: 4.381387
+  type: 'test'
+  ...
+1..22
+# tests 22
+# suites 0
+# pass 22
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 24375.528349

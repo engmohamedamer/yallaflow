@@ -1,0 +1,44 @@
+{
+  "id": "PF-0102",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Messages sent from the console chat never reach a connected Claude Code session (they show as sent; the Claude transcript never receives them), while Claude's replies reach the console through the hooks",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T13:23:27.946Z",
+  "updatedAt": "2026-11-09T13:37:00.208Z",
+  "title": "Messages sent from the console chat never reach a connected Claude Code session (they show as sent; the Claude transcript never receives them), while Claude's replies reach the console through the hooks",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-11-09T13:23:28.797Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T13:37:00.208Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002"
+      ]
+    }
+  ]
+}

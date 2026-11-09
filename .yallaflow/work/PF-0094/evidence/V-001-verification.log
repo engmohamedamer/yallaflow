@@ -1,0 +1,88 @@
+TAP version 13
+# Subtest: plan: validated name, absent destination, no nesting, catalog-only stacks; nothing is created
+ok 1 - plan: validated name, absent destination, no nesting, catalog-only stacks; nothing is created
+  ---
+  duration_ms: 215.287966
+  type: 'test'
+  ...
+# Subtest: create: hash confirmation, staging, promotion, Core init with provenance → Greenfield, first work item
+ok 2 - create: hash confirmation, staging, promotion, Core init with provenance → Greenfield, first work item
+  ---
+  duration_ms: 807.686838
+  type: 'test'
+  ...
+# Subtest: existing projects keep the gate: no provenance, no Greenfield; a copied origin on a brownfield workspace is ignored
+ok 3 - existing projects keep the gate: no provenance, no Greenfield; a copied origin on a brownfield workspace is ignored
+  ---
+  duration_ms: 43.611728
+  type: 'test'
+  ...
+# Subtest: failures: generator error, missing marker, destination appearing; staging and diagnostics kept, nothing overwritten
+ok 4 - failures: generator error, missing marker, destination appearing; staging and diagnostics kept, nothing overwritten
+  ---
+  duration_ms: 150.135298
+  type: 'test'
+  ...
+# Subtest: a plan edited outside YallaFlow cannot run a different command
+ok 5 - a plan edited outside YallaFlow cannot run a different command
+  ---
+  duration_ms: 6.87337
+  type: 'test'
+  ...
+# Subtest: CLI: catalog, recommend, plan, create (empty stack), discard
+ok 6 - CLI: catalog, recommend, plan, create (empty stack), discard
+  ---
+  duration_ms: 1254.773249
+  type: 'test'
+  ...
+# Subtest: console: wizard routes are guarded, need the hash confirmation, and are refused read-only
+ok 7 - console: wizard routes are guarded, need the hash confirmation, and are refused read-only
+  ---
+  duration_ms: 934.97962
+  type: 'test'
+  ...
+# Subtest: review: staging is npm's project root, so a parent .npmrc or node_modules cannot shadow the generator
+ok 8 - review: staging is npm's project root, so a parent .npmrc or node_modules cannot shadow the generator
+  ---
+  duration_ms: 306.011909
+  type: 'test'
+  ...
+# Subtest: review: a retry never labels or installs into a folder that replaced the created one; failure text is redacted
+ok 9 - review: a retry never labels or installs into a folder that replaced the created one; failure text is redacted
+  ---
+  duration_ms: 147.899836
+  type: 'test'
+  ...
+# Subtest: review: a parent npm workspace that would capture staging stops the generator before it runs
+ok 10 - review: a parent npm workspace that would capture staging stops the generator before it runs
+  ---
+  duration_ms: 512.7823
+  type: 'test'
+  ...
+# Subtest: plan carries intent, environment, git and attachments; creation initializes Git and words the first work from the goal
+ok 11 - plan carries intent, environment, git and attachments; creation initializes Git and words the first work from the goal
+  ---
+  duration_ms: 81.625528
+  type: 'test'
+  ...
+# Subtest: custom stack (PF-0087): only with the empty project; recorded in the plan, origin and first work item; nothing runs
+ok 12 - custom stack (PF-0087): only with the empty project; recorded in the plan, origin and first work item; nothing runs
+  ---
+  duration_ms: 883.492607
+  type: 'test'
+  ...
+# Subtest: isolation (PF-0094): plans and registrations stay in this run's own config folder
+ok 13 - isolation (PF-0094): plans and registrations stay in this run's own config folder
+  ---
+  duration_ms: 0.482592
+  type: 'test'
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5668.280172

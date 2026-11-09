@@ -60,7 +60,7 @@ The safety rules do not change:
 - A service runs only after you trust its exact command by typing its id.
 - Opening the console starts nothing.
 - Start project starts trusted services in dependency order.
-- Stop project stops only what YallaFlow started and can still identify. It never stops shared infrastructure, which needs its own typed confirmation.
+- Stop project stops only what YallaFlow started and can still identify. It never stops shared infrastructure, which needs its own explicit confirmation (a ticked box).
 
 See [`runtime.md`](runtime.md).
 
@@ -94,7 +94,7 @@ YallaFlow groups every workflow's real stages into five stations: **Understand �
 - **Reopened work moves back.** A reopened or revised checkpoint brings its station back.
 - **Nothing short of Done shows 100%.**
 - **The overall percentage covers open recorded work only.** When all recorded work is done, the console says so ("All 12 recorded work items are done"). That is the work recorded in YallaFlow, not the whole software project. A project with no work yet shows a welcome instead of an empty board.
-- **Idle work** (routed, not active, not waiting on anyone) is shown in a neutral style. Only a review gate, an open question, or failing verification is shown as needing attention.
+- **Work that is the agent's turn** (routed, not active, not waiting on anyone; in Arabic «دور الوكيل») is shown in a neutral style. Only a review gate, an open question, or failing verification is shown as needing attention.
 
 Each station lists the real stage names inside it (for example `ROOT_CAUSE` inside *Decide*). The **bottleneck** marks the station where the most work waits on a person.
 
@@ -215,7 +215,7 @@ Unless the console was started with `--read-only`, a work item's page has an act
 - **Edit request loads the full text.** Save the revised text with a reason, or cancel to leave it unchanged. Earlier versions and attachments are preserved; the classified title and workflow stay the same. If work starts while the editor is open, saving is refused.
 - **The first hold or close** in a project shows Core's warning that the project will then require YallaFlow 1.4.0 or newer. It goes ahead only after you tick the confirmation.
 - **Drag and drop on the Flow proposes a move.**
-  - **On the next station:** the card runs **Advance**, one Core step, and Core may refuse with its reason.
+  - **On the next station:** the card runs **Move to the next stage**, one Core step, and Core may refuse with its reason. On the work item page this button is hidden while the current stage's work is not recorded yet; the line under the actions says why, in plain words (YallaFlow's blocker texts are shown in Arabic in the Arabic console). Moving the stage never makes the agent work: send the agent a message in the chat.
   - **On an earlier station (DONE work only):** Change, Verify or Remember offers **Reopen** to implementation, verification or review.
   - **Anywhere else:** the drop is not accepted. While you drag, the allowed stations are outlined and the others dimmed.
 
@@ -227,7 +227,8 @@ When a gate waits for review (for example the specification or the plan), the it
   - the latest verification;
   - open questions and other warnings;
   - the gate's history.
-- **How you decide:** choose **Approve** or **Request changes**, write a **mandatory note**, and **type the gate name exactly**. The button stays disabled until the name matches.
+- **Reading:** the material is shown as formatted text (headings, lists, criteria), with the template's headings in Arabic in the Arabic console, a contents row to jump between sections, and **Expand** for a full-screen view (remembered in this browser).
+- **How you decide:** choose **Approve** or **Request changes** (or a quick note that fills the note and picks the decision), write a **mandatory note**, and tick **I reviewed the … and this is my decision**. The button stays disabled until both are done. The server still refuses a decision on material that changed after it was shown.
 - **Recording:** YallaFlow's own `approve`/`feedback` command records it, with the provenance **`console, identity not verified`**: the console as the channel, the host, and your Git `user.name` as a *claimed* name.
 - **CLI decisions are unchanged:** they are recorded exactly as before, without provenance. `yallaflow work show` prints the provenance of console decisions.
 - **Refused, with nothing recorded,** when:
@@ -253,12 +254,12 @@ With `yallaflow console --agents`, a work item gets an **Agent** panel for worki
 - **Run the project**, in four steps (PF-0072):
   1. **Analyze project.** A read-only scan of the project and up to 3 parent folders inside your home folder: the Docker stack that mounts the project, its services, ports and `*.localhost` domains, and what is running now. It never opens `.env` and runs nothing it finds. What was not scanned, and why, is listed, and what could not be inspected is **unresolved**. **Ask the agent to complete the plan** prepares a request in the project chat; you press Send, and the agent can only propose.
   2. **Review and save.** Each proposed service shows its command, folder, ports, links, confidence, evidence, conflicts and **Shared** scope. **Save selected** writes untrusted definitions; anything outside the project goes to your personal file only.
-  3. **Trust each service.** **Review and trust** shows the effective configuration and the files the trust is bound to (and what it does not cover), then you type the service id. Anything blocking must be resolved first.
+  3. **Trust each service.** **Review and trust** shows the effective configuration and the files the trust is bound to (and what it does not cover), then you tick «I reviewed the command and files above, and I trust this service». Anything blocking must be resolved first.
   4. **Start project / Stop project.**
      - Start project starts trusted services only.
      - A stack already running outside YallaFlow is left alone.
      - A busy port is reported with its owner.
-     - **Stop project never stops shared services** (databases, a stack serving other projects); stopping one is a separate action with a typed confirmation that lists who else may be affected.
+     - **Stop project never stops shared services** (databases, a stack serving other projects); stopping one is a separate action with an explicit confirmation (a ticked box) that lists who else may be affected.
   - **Open** next to a running service opens its app (its `*.localhost` links, or its port) in a new tab. Other repository suggestions and **Add a service yourself** are folded below.
 - **Agents:**
   - Codex and Claude Code on this machine (version, subscription login, problems), and the agents you choose for this project.
@@ -268,6 +269,10 @@ With `yallaflow console --agents`, a work item gets an **Agent** panel for worki
 When you add an existing project for the first time, Setup opens as a short guide: scan the stack, choose services, choose agents. The scan and the steps you finished are kept in `.yallaflow/local/setup.json` (git-ignored). You can skip the guide, and it can be run again.
 
 The corner chat button is on every project page (Overview, Flow, Work, Setup, Worktrees, Insights), and the page decides what the chat is about. On a work item page it is that item's chat. On the other pages it is the **project chat** ("Agent · Project"): its session is not tied to a work item, its suggestions are project questions (where the project stands, what is waiting for you, what is stuck), and the agent routes any change you ask for there to a work item first. There is still one agent session per checkout: a session running on a work item shows on project pages as a link to that item, and a project session shows on an item page labelled as the project chat. When an agent stops in the middle of a work item, the item's chat offers to continue with another agent (see [`agents.md`](agents.md#when-an-agent-stops-in-the-middle-of-a-work-item)).
+
+**Switching agents (one agent per project folder).** Only one agent session works in a checkout at a time. From the work item that needs the agent:
+- an idle Codex session on another item shows **End the PF-x session and work here**: it ends that session (it stays under earlier sessions, to resume later) and shows the agent picker here; while Codex is working, the page says to wait;
+- with Claude Code connected, **Use Codex for this item** explains that Claude Code must close first: type `/exit` in its terminal. As soon as it disconnects, the chat switches to Codex with a prepared first message. The console never just unlinks Claude Code for this, because Claude Code would keep running and could still edit files.
 
 ## Security
 

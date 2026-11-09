@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:27:28.293Z",
+      "completedAt": "2026-11-09T10:27:28.293Z",
+      "summary": "agentDock() (resources/console/app.js) draws the chat window header with agentState(it).label once per full render; renderAgent() re-renders the panel and replaces only the floating .chatfab on session events, so the header label keeps the state from when the page was drawn. The 'your turn' line (PF-0093) shows only when the agent is idle after a reply; nothing in the body says when it is working or waiting for a permission.",
+      "evidence": [
+        "resources/console/app.js",
+        "runtime:owner screenshot, header 'الوكيل شغّال…' next to 'الوكيل خلّص الجزء ده ومستني ردّك', 2026-11-09"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:27:28.494Z",
+      "completedAt": "2026-11-09T10:27:28.494Z",
+      "summary": "Root cause: renderAgent replaces .chatfab from a fresh agentDock() but never the .chathead status span, so it stays stale; both read the same agent.session, so the body (idle → your-turn line) was right and the header wrong. Codex status is idle between turns (src/agents/codex.js), and turn.ended triggers loadAgent().then(renderAgent).",
+      "evidence": [
+        "resources/console/app.js",
+        "src/agents/codex.js"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:28:14.567Z",
+      "completedAt": "2026-11-09T10:28:14.567Z",
+      "summary": "renderAgent now refreshes the chat window header status (.chatstate) with the floating button; turnLine() shows one line in the chat: working (nothing needed from you), waiting for your approval, or finished and waiting for your reply. Harness test and CHANGELOG added.",
+      "evidence": [
+        "resources/console/app.js",
+        "resources/console/app.css",
+        "test/console-project-chat.test.js",
+        "CHANGELOG.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:28:24.978Z",
+      "completedAt": "2026-11-09T10:28:24.978Z",
+      "summary": "Console tests pass (V-001), including the new harness test for the working, approval and reply lines.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-09T10:28:24.978Z"
+}

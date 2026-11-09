@@ -266,4 +266,19 @@
   - research/site/make-og.py (repository @ 1b2899f)
   - site/og-image-ar.jpg (repository @ 1b2899f)
 
+<!-- yallaflow-fact:CTX-0137 -->
+### CTX-0137 — Tests that create New Project plans or register console projects must isolate the user-level console config: set YALLAFLOW_CONSOLE_CONFIG to a temporary file for the test process (child CLI processes inherit it), or give each test its own HOME as test/console-greenfield.test.js does with withHome. registryPath() and plansDir() otherwise write to the developer's real ~/.config/yallaflow.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0094
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-09T10:19:01.012Z
+- **Verified:** 2026-11-09T10:19:01.012Z (commit d3652e8)
+- **Evidence:**
+  - test/new-project.test.js (repository @ d3652e8)
+  - src/console/registry.js (repository @ d3652e8)
+  - rm -rf /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/leakhome4 && mkdir -p /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/leakhome4 && HOME=/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/leakhome4 node --test test/new-project.test.js && test ! -e /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/leakhome4/.config/yallaflow (passed) (runtime, PF-0094 V-001)
+
 <!-- yallaflow-context:end -->

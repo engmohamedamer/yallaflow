@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "On a work item page it is clear what the developer should do next.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T09:47:55.386Z",
+      "updatedAt": "2026-11-09T09:47:55.386Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "When the console agent is on, the next-step card has a primary button to continue with the agent in the console; the terminal phrase stays only as a secondary hint.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T09:47:55.386Z",
+      "updatedAt": "2026-11-09T09:47:55.386Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "Secondary actions (edit request, put on hold, close without delivery) sit under a More menu; the main actions stay visible.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T09:47:55.386Z",
+      "updatedAt": "2026-11-09T09:47:55.386Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-09T09:47:55.386Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-09T09:47:55.386Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-09T09:47:55.386Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-09T09:47:55.386Z"
+}

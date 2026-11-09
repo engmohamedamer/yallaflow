@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:10:31.904Z",
+      "completedAt": "2026-11-09T09:10:31.904Z",
+      "summary": "The catalog (src/newproject/catalog.js) is the security boundary: only its pinned argv runs. Plans are built by createPlan (src/newproject/project.js) from CLI 'new plan' flags (src/commands/new.js); the console builds those argv in src/console/newproject.js wizardPlan; origin and first work text come from the plan body. Stack cards show the English fit/tradeoffs (resources/console/app.js step 2). New generators (Nuxt, SvelteKit, Angular, Astro, Django, Flutter) could not be verified: running external packages was denied by the permission system, and reading create-nuxt 4.0.3 shows interactive prompts when options are missing.",
+      "evidence": [
+        "src/newproject/catalog.js",
+        "src/newproject/project.js",
+        "src/commands/new.js",
+        "src/console/newproject.js",
+        "resources/console/app.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:10:32.611Z",
+      "completedAt": "2026-11-09T09:10:32.611Z",
+      "summary": "Owner approved item 4 (Arabic, Something else, more stacks incl. Flutter). New generators are deferred until running them to verify is allowed (limitation)."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:16:15.999Z",
+      "completedAt": "2026-11-09T09:16:15.999Z",
+      "summary": "Arabic fit/trade-off texts for every stack card (console only; the CLI catalog stays English); a 'Something else' card where the developer names a stack: plan field customStack (only with --stack empty; one line up to 120 chars; CLI --custom-stack), recorded in the plan, origin and first work request, which asks the agent to set it up with approval; typing selects the card; fixed card highlighting across stack groups. New generators deferred (limitation). docs and tests updated.",
+      "evidence": [
+        "src/newproject/project.js",
+        "src/commands/new.js",
+        "src/commands/new-usage.js",
+        "src/console/newproject.js",
+        "resources/console/app.js",
+        "docs/new-project.md",
+        "test/new-project.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:22:11.982Z",
+      "completedAt": "2026-11-09T09:22:11.982Z",
+      "summary": "Full suite passes (V-001), including the CLI custom-stack test. Browser: Arabic texts on every stack card; typing Flutter selected 'Something else' (one card highlighted); review showed 'Flutter (Empty project (no generator))'; the created project's origin.stack was [Flutter] and its card showed it; no console errors.",
+      "evidence": [
+        "verification:V-001",
+        "runtime:Playwright walkthrough of the wizard on an isolated throwaway console, 2026-11-09"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:22:12.641Z",
+      "completedAt": "2026-11-09T09:22:12.641Z",
+      "summary": "All criteria satisfied; one accepted fix."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-09T09:22:12.641Z"
+}

@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Tests that create New Project plans or register console projects must isolate the user-level console config: set YALLAFLOW_CONSOLE_CONFIG to a temporary file for the test process (child CLI processes inherit it), or give each test its own HOME as test/console-greenfield.test.js does with withHome. registryPath() and plansDir() otherwise write to the developer's real ~/.config/yallaflow.",
+      "evidence": [
+        "test/new-project.test.js",
+        "src/console/registry.js",
+        "verification:V-001"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-09T10:19:00.822Z",
+      "factId": "CTX-0137",
+      "promotedAt": "2026-11-09T10:19:01.012Z",
+      "target": "context/conventions.md"
+    }
+  ],
+  "updatedAt": "2026-11-09T10:19:01.012Z",
+  "reviewedAt": "2026-11-09T10:19:01.012Z"
+}

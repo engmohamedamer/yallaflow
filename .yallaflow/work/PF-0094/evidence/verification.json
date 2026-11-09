@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "rm -rf /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/leakhome4 && mkdir -p /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/leakhome4 && HOME=/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/leakhome4 node --test test/new-project.test.js && test ! -e /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/leakhome4/.config/yallaflow",
+      "executionMode": "shell",
+      "executable": "rm -rf /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/leakhome4 && mkdir -p /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/leakhome4 && HOME=/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/leakhome4 node --test test/new-project.test.js && test ! -e /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/leakhome4/.config/yallaflow",
+      "args": [],
+      "displayCommand": "rm -rf /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/leakhome4 && mkdir -p /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/leakhome4 && HOME=/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/leakhome4 node --test test/new-project.test.js && test ! -e /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/leakhome4/.config/yallaflow",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-09T10:18:49.242Z",
+      "finishedAt": "2026-11-09T10:18:54.998Z",
+      "verifiedAt": "2026-11-09T10:18:54.998Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

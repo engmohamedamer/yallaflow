@@ -13,6 +13,7 @@ import { initWorkspace } from '../src/core/workspace.js';
 import { startConsoleServer } from '../src/console/server.js';
 import { loadRegistry, registryPath } from '../src/console/registry.js';
 import { runtimeAddArgs } from '../src/console/greenfield.js';
+import { AgentBridge } from '../src/agents/bridge.js';
 
 const SUPPORTED = process.platform !== 'win32';
 
@@ -160,6 +161,9 @@ test('stepper creation: full-hash confirmation, server-side registration, planne
     const listed = (await request(server, '/api/projects')).data.projects;
     assert.deepEqual(listed.map((p) => p.root), [root]);
     assert.ok(spawnSync('git', ['rev-parse', '--git-dir'], { cwd: root }).status === 0, 'Git initialized');
+    // PF-0084: the stack was scanned when the wizard added the project, so Setup does not ask again.
+    const setup = JSON.parse(await readFile(path.join(root, '.yallaflow', 'local', 'setup.json'), 'utf8'));
+    assert.equal(setup.steps.stack, true);
     // Retry registration by plan id: same project, never a second one.
     const retry = await post(server, '/api/projects', { planId: plan.data.id });
     assert.equal(retry.data.added, false);
@@ -179,14 +183,16 @@ test('stepper creation: full-hash confirmation, server-side registration, planne
   }
 }));
 
-test('a plan that installs dependencies needs the project name typed', { skip: !SUPPORTED }, () => withHome(async (home) => {
+test('a plan that installs dependencies needs an explicit acknowledgement (PF-0085)', { skip: !SUPPORTED }, () => withHome(async (home) => {
   const server = await startConsoleServer({ roots: [], port: 0 });
   try {
     const plan = await post(server, '/api/new/plan', { name: 'web', parent: home, stack: 'react-vite', install: true });
     assert.equal(plan.status, 200, plan.text);
     const refused = await post(server, '/api/new/create', { planId: plan.data.id, confirm: plan.data.hash });
     assert.equal(refused.status, 422);
-    assert.equal(refused.data.error.code, 'NEW_PROJECT_CONFIRM_NAME');
+    assert.equal(refused.data.error.code, 'NEW_PROJECT_ACKNOWLEDGE');
+    assert.equal((await post(server, '/api/new/create', { planId: plan.data.id, confirm: plan.data.hash, acknowledgeScripts: false })).status, 422);
+    assert.equal((await post(server, '/api/new/create', { planId: plan.data.id, confirm: plan.data.hash, acknowledgeScripts: 'yes' })).status, 422, 'only true acknowledges');
     assert.equal((await post(server, '/api/new/create', { planId: plan.data.id, confirm: plan.data.hash, confirmName: 'wrong' })).status, 422);
   } finally {
     await server.close();
@@ -320,13 +326,13 @@ test('review: hidden folders are refused even by path; read-only consoles probe 
   }
 }));
 
-test('review: plans that run package scripts need the name; control characters and NUL are refused', { skip: !SUPPORTED }, () => withHome(async (home) => {
+test('review: plans that run package scripts need an acknowledgement; control characters and NUL are refused', { skip: !SUPPORTED }, () => withHome(async (home) => {
   const server = await startConsoleServer({ roots: [], port: 0 });
   try {
     const laravel = await post(server, '/api/new/plan', { name: 'shop', parent: home, stack: 'laravel' });
     assert.equal(laravel.status, 200, laravel.text);
     const refused = await post(server, '/api/new/create', { planId: laravel.data.id, confirm: laravel.data.hash });
-    assert.equal(refused.data.error.code, 'NEW_PROJECT_CONFIRM_NAME', 'its generator runs Composer scripts');
+    assert.equal(refused.data.error.code, 'NEW_PROJECT_ACKNOWLEDGE', 'its generator runs Composer scripts');
     assert.equal((await post(server, '/api/new/plan', { name: 'x', parent: home, stack: 'empty', description: 'a\0b' })).status, 400);
     assert.equal((await post(server, '/api/new/plan', { name: 'x', parent: home, stack: 'empty', description: 'x'.repeat(4001) })).status, 400);
     const bell = await post(server, '/api/new/plan', { name: 'x', parent: home, stack: 'empty', files: [{ name: 'a\u001b[31m.md', size: 3, sha256: 'b'.repeat(64) }] });
@@ -394,4 +400,53 @@ test('Claude Code: off unless chosen explicitly when enabling agents; never read
   } finally {
     await readOnly.close();
   }
+});
+
+test('removal (PF-0081): a project leaves the running console and the saved list; its files stay', { skip: !SUPPORTED }, () => withHome(async (home) => {
+  const root = path.join(home, 'Work', 'shop');
+  await mkdir(root, { recursive: true });
+  await initWorkspace(root, 'shop', 'greenfield', 'adaptive');
+  const config = await readFile(path.join(root, '.yallaflow', 'config.yaml'), 'utf8');
+  const gone = path.join(home, 'gone');
+  const server = await startConsoleServer({ roots: [], port: 0, missing: [gone] });
+  try {
+    const added = await post(server, '/api/projects', { root });
+    assert.equal(added.status, 200, added.text);
+    assert.equal((await post(server, '/api/projects/remove', { id: added.data.id, extra: 1 })).status, 400);
+    assert.equal((await post(server, '/api/projects/remove', { id: added.data.id }, { origin: false })).status, 403, 'a write needs the console Origin');
+    assert.equal((await post(server, '/api/projects/remove', { id: 'ffffffffff' })).status, 404);
+    const removed = await post(server, '/api/projects/remove', { id: added.data.id });
+    assert.equal(removed.status, 200, removed.text);
+    assert.equal(removed.data.removed, true);
+    const listed = (await request(server, '/api/projects')).data;
+    assert.deepEqual(listed.projects, [], 'gone from the running console without a restart');
+    assert.equal((await request(server, `/api/p/${added.data.id}/snapshot`)).status, 404);
+    assert.equal((await loadRegistry(registryPath())).projects.some((p) => p.root === root), false, 'gone from the saved list');
+    assert.equal(await readFile(path.join(root, '.yallaflow', 'config.yaml'), 'utf8'), config, 'the project is untouched');
+    assert.equal((await post(server, '/api/projects/remove', { root: '/not/listed' })).status, 404, 'only an unavailable entry by folder');
+    assert.equal((await post(server, '/api/projects/remove', { root: gone })).status, 200);
+    assert.deepEqual((await request(server, '/api/projects')).data.unavailable, []);
+    const again = await post(server, '/api/projects', { root });
+    assert.equal(again.data.added, true, 'it can be added back');
+  } finally {
+    await server.close();
+  }
+  const readOnly = await startConsoleServer({ roots: [root], port: 0, readOnly: true });
+  try {
+    const id = (await request(readOnly, '/api/projects')).data.projects[0].id;
+    assert.equal((await post(readOnly, '/api/projects/remove', { id })).status, 405);
+  } finally {
+    await readOnly.close();
+  }
+}));
+
+test('removal (PF-0081): refused while an agent session is live in the project', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'yf-rm-'));
+  const bridge = new AgentBridge({ projects: [{ id: 'abcdef0123', root, name: 'shop' }], broadcast: () => {} });
+  bridge.projects.get('abcdef0123').session = { provider: 'codex' };
+  await assert.rejects(bridge.removeProject('abcdef0123'), (error) => error.status === 409 && error.code === 'SESSION_ACTIVE');
+  assert.equal(bridge.projects.has('abcdef0123'), true);
+  bridge.projects.get('abcdef0123').session = null;
+  await bridge.removeProject('abcdef0123');
+  assert.equal(bridge.projects.has('abcdef0123'), false);
 });

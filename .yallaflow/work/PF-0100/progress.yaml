@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T11:11:13.855Z",
+      "completedAt": "2026-11-09T11:11:13.855Z",
+      "summary": "submitGate() (resources/console/app.js) closes the dialog, toasts and refreshes; nothing tells the agent, which ended its turn before the decision (owner's lalaff PF-0001 waited for a reply after the specification was approved). suggestions() offers 'Prepare the specification' for every Decide-station state, including after approval when Core's next action is 'yallaflow advance'.",
+      "evidence": [
+        "resources/console/app.js",
+        "runtime:owner screenshot after approving the specification, 2026-11-09"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T11:11:14.244Z",
+      "completedAt": "2026-11-09T11:11:14.244Z",
+      "summary": "Owner approved both ('اعمل', 2026-11-09). The message is only prepared in the chat box; the developer sends it."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-09T11:11:14.824Z",
+      "completedAt": "2026-11-09T11:11:14.824Z",
+      "summary": "submitGate: after success, when agents are on, set agentDraft (approve: continue; request changes: revise with the note) and open the chat. suggestions(): when Core's next action is advance and nothing blocks, suggest moving on; stage-specific lines for DESIGN, SPECIFICATION and PLAN. Harness test."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T11:13:37.254Z",
+      "completedAt": "2026-11-09T11:13:37.254Z",
+      "summary": "submitGate opens the chat with a prepared message after a recorded decision when agents are on (approve: continue; request changes: the note and 'revise and bring it back'), never sending it; suggestions() moves on when Core's next action is advance and nothing blocks, with stage wording for DESIGN, SPECIFICATION and PLAN; nowText shows a finished stage in words instead of 'yallaflow advance'. Harness test and CHANGELOG.",
+      "evidence": [
+        "resources/console/app.js",
+        "test/console-project-chat.test.js",
+        "CHANGELOG.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T11:14:04.627Z",
+      "completedAt": "2026-11-09T11:14:04.627Z",
+      "summary": "Console tests pass (V-001), including stage-aware suggestions. Browser on the scratch copy of lalaff: approving the specification from the review dialog recorded it (via console) and opened the chat; the next-step card read 'المرحلة دي خلصت. قول للوكيل يكمّل للمرحلة الجاية.'; no console errors. The prepared text in a live session's box was not seen: no signed-in Codex in the test console (the panel showed the pending-message notice).",
+      "evidence": [
+        "verification:V-001",
+        "runtime:Playwright approval on the scratch copy of lalaff, 2026-11-09"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-09T11:14:04.627Z"
+}

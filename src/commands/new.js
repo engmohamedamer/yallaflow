@@ -80,9 +80,9 @@ async function run(rest, json) {
     return out(json, { request: RECOMMEND_REQUEST }, ['Give your coding agent this request:', '', RECOMMEND_REQUEST]);
   }
   if (action === 'plan') {
-    const { values, positionals } = parseArgs({ args, options: { name: { type: 'string' }, parent: { type: 'string' }, stack: { type: 'string' }, install: { type: 'boolean' }, 'allow-nested': { type: 'boolean' }, rationale: { type: 'string' }, description: { type: 'string' }, requirements: { type: 'string' }, environment: { type: 'string' }, git: { type: 'boolean' }, attachment: { type: 'string', multiple: true } }, allowPositionals: true, strict: true });
+    const { values, positionals } = parseArgs({ args, options: { name: { type: 'string' }, parent: { type: 'string' }, stack: { type: 'string' }, install: { type: 'boolean' }, 'allow-nested': { type: 'boolean' }, rationale: { type: 'string' }, description: { type: 'string' }, requirements: { type: 'string' }, environment: { type: 'string' }, git: { type: 'boolean' }, attachment: { type: 'string', multiple: true }, 'custom-stack': { type: 'string' } }, allowPositionals: true, strict: true });
     if (positionals.length || !values.name || !values.parent || !values.stack) throw usage();
-    const plan = await createPlan({ name: values.name, parent: path.resolve(values.parent), stack: values.stack, install: Boolean(values.install), allowNested: Boolean(values['allow-nested']), rationale: values.rationale ?? null, description: values.description ?? null, requirements: values.requirements ?? null, environment: values.environment ?? null, git: Boolean(values.git), attachments: (values.attachment ?? []).map(parseAttachment) });
+    const plan = await createPlan({ name: values.name, parent: path.resolve(values.parent), stack: values.stack, install: Boolean(values.install), allowNested: Boolean(values['allow-nested']), rationale: values.rationale ?? null, description: values.description ?? null, requirements: values.requirements ?? null, environment: values.environment ?? null, git: Boolean(values.git), attachments: (values.attachment ?? []).map(parseAttachment), customStack: values['custom-stack'] ?? null });
     return out(json, plan, [...describePlan(plan), '', `Nothing was created. After reviewing: yallaflow new create ${plan.id} --confirm ${plan.hash.slice(0, 8)}`]);
   }
   if (action === 'show') {

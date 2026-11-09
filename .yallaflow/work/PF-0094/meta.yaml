@@ -1,0 +1,43 @@
+{
+  "id": "PF-0094",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Tests write new-project plans and console registrations into the developer's real ~/.config/yallaflow (test/new-project.test.js is not isolated)",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T10:13:36.139Z",
+  "updatedAt": "2026-11-09T10:19:01.466Z",
+  "title": "Tests write new-project plans and console registrations into the developer's real ~/.config/yallaflow (test/new-project.test.js is not isolated)",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-11-09T10:13:36.189Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T10:19:01.466Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

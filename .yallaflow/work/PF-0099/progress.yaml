@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:58:28.186Z",
+      "completedAt": "2026-11-09T10:58:28.186Z",
+      "summary": "In lalaff, PF-0001 has no reviews.yaml; work show reports gates [] and item.waitingFor {kind: review, gate: specification}; Core's blocker maps not_requested to awaiting_review (src/core/transitions.js:423). decideGate (src/console/actions.js:188) accepts only gateStatus awaiting_review or changes_requested, so the console refuses with STALE 'not requested'.",
+      "evidence": [
+        "src/console/actions.js",
+        "src/core/transitions.js",
+        "src/reviews/store.js",
+        "runtime:owner screenshot of the refusal; work show PF-0001 in lalaff, 2026-11-09"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:58:28.386Z",
+      "completedAt": "2026-11-09T10:58:28.386Z",
+      "summary": "Reproduced on a scratch copy of lalaff: 'yallaflow approve PF-0001 --stage specification' succeeds from not_requested and writes reviews.yaml, while the console route refuses the same decision. Root cause: decideGate's status check assumes a gate is always formally requested before review, but in the adaptive mode Core blocks on an unrequested required gate and treats it as awaiting review.",
+      "evidence": [
+        "src/console/actions.js",
+        "runtime:approve on scratch copy succeeded, 2026-11-09"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:59:35.793Z",
+      "completedAt": "2026-11-09T10:59:35.793Z",
+      "summary": "gateMaterial adds waitingHere (work show item.waitingFor is a review of this gate); decideGate also accepts a gate with no status or not_requested when waitingHere is true, like 'yallaflow approve'; any other gate is still refused. Test for the never-requested specification gate (approved) and the plan gate (refused). CHANGELOG updated.",
+      "evidence": [
+        "src/console/actions.js",
+        "test/console-actions.test.js",
+        "CHANGELOG.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T11:00:04.331Z",
+      "completedAt": "2026-11-09T11:00:04.331Z",
+      "summary": "Console tests pass (V-001), including the new never-requested gate test.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-09T11:00:04.331Z"
+}

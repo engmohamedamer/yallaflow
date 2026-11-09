@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "testing",
+      "summary": "The working line was not watched during a live agent turn in a browser",
+      "reason": "It changes only during a live Codex session; the isolated test console has no signed-in Codex. Covered by a harness test with timed events.",
+      "recordedAt": "2026-11-09T10:36:26.243Z"
+    }
+  ],
+  "updatedAt": "2026-11-09T10:36:26.243Z"
+}

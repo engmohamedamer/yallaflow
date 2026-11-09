@@ -1,0 +1,45 @@
+{
+  "id": "PF-0101",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console: replace the last typed confirmations (trusting a service, stopping or restarting a shared service) with one explicit checkbox, so no console action asks the developer to type a name",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T12:02:19.532Z",
+  "updatedAt": "2026-11-09T12:06:50.586Z",
+  "title": "Console: replace the last typed confirmations (trusting a service, stopping or restarting a shared service) with one explicit checkbox, so no console action asks the developer to type a name",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-09T12:02:19.578Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T12:06:50.586Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

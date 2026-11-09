@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:08:36.600Z",
+      "completedAt": "2026-11-09T09:08:36.600Z",
+      "summary": "Agent choice per project is saved by POST /api/p/<id>/agents/settings {agents, claude} (src/console/server.js, src/agents/settings.js: .yallaflow/local/agents.json, git-ignored), which also turns agents on for the run and connects Claude Code; GET /api/agents reports Codex/Claude readiness. The wizard (resources/console/app.js viewNew/afterCreate) has no agent step; after creation it opens the Overview; the creation outcome carries workId of the first work item, whose page holds the agent panel (Start Codex session / Claude connect). Agent choice is personal local state, so it is not part of the CLI plan.",
+      "evidence": [
+        "src/console/server.js",
+        "src/agents/settings.js",
+        "resources/console/app.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:08:37.241Z",
+      "completedAt": "2026-11-09T09:08:37.241Z",
+      "summary": "Owner approved the agent step in the wizard (2026-11-09). Starting a session stays an explicit action (agent sessions never start on their own)."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:16:15.550Z",
+      "completedAt": "2026-11-09T09:16:15.550Z",
+      "summary": "Wizard step 3 adds an Agent choice (no agent, Codex, Claude Code when available) with readiness from /api/agents; the review shows it; after creation the page saves it with POST agents/settings, marks the Setup agents step, and opens the first work item; no session starts on its own. docs/new-project.md updated.",
+      "evidence": [
+        "resources/console/app.js",
+        "docs/new-project.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:21:52.358Z",
+      "completedAt": "2026-11-09T09:21:52.358Z",
+      "summary": "Console tests pass (V-001; no server change). Browser: step 3 showed No agent / Codex (ready on this machine) / Claude Code; the review showed Agent = Codex; after creation agents.json held agents true, claude false, setup steps.agents was true, and the page opened #/item/PF-0001 with the work-with-agent button; no session started; no console errors.",
+      "evidence": [
+        "verification:V-001",
+        "runtime:Playwright walkthrough of the wizard on an isolated throwaway console, 2026-11-09"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:21:52.913Z",
+      "completedAt": "2026-11-09T09:21:52.913Z",
+      "summary": "All criteria satisfied."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-09T09:21:52.913Z"
+}

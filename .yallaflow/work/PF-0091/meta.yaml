@@ -1,0 +1,45 @@
+{
+  "id": "PF-0091",
+  "type": "feature",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "New project landing: the project Overview opens with a 'Start here' card showing one clear next step (start with the agent on the first work item, or choose an agent), instead of the first work item page",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T09:47:03.716Z",
+  "updatedAt": "2026-11-09T09:54:16.044Z",
+  "title": "New project landing: the project Overview opens with a 'Start here' card showing one clear next step (start with the agent on the first work item, or choose an agent), instead of the first work item page",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope bounded`.",
+  "routedAt": "2026-11-09T09:47:03.774Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "implement",
+    "verify",
+    "converge"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation",
+      "verification",
+      "delivery-convergence"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T09:54:16.044Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

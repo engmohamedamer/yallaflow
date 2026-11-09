@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:06:09.964Z",
+      "completedAt": "2026-11-09T09:06:09.964Z",
+      "summary": "Creation records the choice in config.yaml project.origin (src/newproject/project.js initProject) and in the first work item's request (firstWorkRequest); project memory (context/index.yaml) changes only through work knowledge (knowledge propose/promote) or baseline approval, with no direct fact command. The overview JSON already returns project.origin. The setup stack step is marked by scanSetup (src/console/setup.js); the wizard registers the project in server.js via registerRoot after creation.",
+      "evidence": [
+        "src/newproject/project.js",
+        "src/console/setup.js",
+        "src/console/server.js",
+        "src/overview/collect.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:06:10.721Z",
+      "completedAt": "2026-11-09T09:06:10.721Z",
+      "summary": "Owner approved the plan; deviation recorded as a ruling (memory through the first work item, not a direct write)."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:16:15.102Z",
+      "completedAt": "2026-11-09T09:16:15.102Z",
+      "summary": "The console scans the stack right after the wizard registers a created project (registerCreated in src/console/server.js), so Setup's stack step is done; the projects card shows 'Chosen at creation' from config origin while memory is empty; the first work item request asks the agent to propose the stack, environment and goal as project knowledge when it finishes. Tests extended.",
+      "evidence": [
+        "src/console/server.js",
+        "src/newproject/project.js",
+        "resources/console/app.js",
+        "test/console-greenfield.test.js",
+        "test/new-project.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:21:41.140Z",
+      "completedAt": "2026-11-09T09:21:41.140Z",
+      "summary": "Tests pass (V-001), including setup.json steps.stack true after wizard creation and the first-work knowledge request. Browser: a created project's Setup record had stack and agents done; its card showed 'Chosen at creation: Flutter — it enters memory with the first work item'.",
+      "evidence": [
+        "verification:V-001",
+        "runtime:Playwright walkthrough of the wizard on an isolated throwaway console, 2026-11-09"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:21:41.686Z",
+      "completedAt": "2026-11-09T09:21:41.686Z",
+      "summary": "All criteria satisfied."
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Creation does not write project memory directly; the choice is shown from config origin, the stack scan runs at creation, and the first work item asks the agent to propose the stack, environment and goal as knowledge",
+      "reason": "The agent contract says Greenfield memory grows through ordinary work and knowledge; a direct write at creation would be a new canonical memory path outside review",
+      "costIfWrong": "Memory fills one work item later than the owner expected; a direct seed path could be added later as its own architectural change",
+      "createdAt": "2026-11-09T09:06:10.165Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-09T09:21:41.686Z"
+}

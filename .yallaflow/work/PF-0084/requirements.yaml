@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "A project made with the New Project wizard keeps what the developer chose (stack, environment, goal) and learns it into project memory.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T09:06:10.536Z",
+      "updatedAt": "2026-11-09T09:06:10.536Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "After creation, the Setup page does not ask to scan the stack again: the scan has already run on the generated files.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T09:06:10.536Z",
+      "updatedAt": "2026-11-09T09:06:10.536Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "While memory is still empty, the project card shows the stack and environment chosen at creation.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T09:06:10.536Z",
+      "updatedAt": "2026-11-09T09:06:10.536Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-001",
+      "statement": "The first work item asks the agent to propose the chosen stack, environment and product goal as project knowledge when it finishes.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T09:06:10.536Z",
+      "updatedAt": "2026-11-09T09:06:10.536Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-09T09:06:10.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-09T09:06:10.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-09T09:06:10.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-09T09:06:10.536Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-09T09:06:10.536Z"
+}

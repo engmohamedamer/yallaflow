@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "npm pack --dry-run --json | node -e 'let s=\"\";process.stdin.on(\"data\",d=>s+=d).on(\"end\",()=>{const p=JSON.parse(s)[0];if(!p.files.some(f=>f.path===\"CHANGELOG.md\"))process.exit(1);console.log(p.version,p.entryCount)})' && git diff --check",
+      "executionMode": "shell",
+      "executable": "npm pack --dry-run --json | node -e 'let s=\"\";process.stdin.on(\"data\",d=>s+=d).on(\"end\",()=>{const p=JSON.parse(s)[0];if(!p.files.some(f=>f.path===\"CHANGELOG.md\"))process.exit(1);console.log(p.version,p.entryCount)})' && git diff --check",
+      "args": [],
+      "displayCommand": "npm pack --dry-run --json | node -e 'let s=\"\";process.stdin.on(\"data\",d=>s+=d).on(\"end\",()=>{const p=JSON.parse(s)[0];if(!p.files.some(f=>f.path===\"CHANGELOG.md\"))process.exit(1);console.log(p.version,p.entryCount)})' && git diff --check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-09T09:22:59.635Z",
+      "finishedAt": "2026-11-09T09:23:01.171Z",
+      "verifiedAt": "2026-11-09T09:23:01.171Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --test test/console-presentation.test.js test/console-server.test.js test/console-acceptance.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--test",
+        "test/console-presentation.test.js",
+        "test/console-server.test.js",
+        "test/console-acceptance.test.js"
+      ],
+      "displayCommand": "node --test test/console-presentation.test.js test/console-server.test.js test/console-acceptance.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-09T09:40:00.296Z",
+      "finishedAt": "2026-11-09T09:40:08.851Z",
+      "verifiedAt": "2026-11-09T09:40:08.851Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

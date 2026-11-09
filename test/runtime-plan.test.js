@@ -435,7 +435,9 @@ test('R2: Stop project never stops shared infrastructure; stopping it needs a ty
       const wrong = await fetch(`${server.url}api/p/${projectId}/runtime/${id}/stop`, { method: 'POST', headers, body: JSON.stringify({ confirmShared: 'yes' }) });
       assert.equal(wrong.status, 400);
       assert.equal(alive(pid), true);
-      const confirmed = await fetch(`${server.url}api/p/${projectId}/runtime/${id}/stop`, { method: 'POST', headers, body: JSON.stringify({ confirmShared: id }) });
+      // PF-0101: an unticked box is refused; the ticked box (confirmedShared: true) is accepted.
+      assert.equal((await fetch(`${server.url}api/p/${projectId}/runtime/${id}/stop`, { method: 'POST', headers, body: JSON.stringify({ confirmedShared: false }) })).status, 400);
+      const confirmed = await fetch(`${server.url}api/p/${projectId}/runtime/${id}/stop`, { method: 'POST', headers, body: JSON.stringify({ confirmedShared: true }) });
       assert.equal(confirmed.status, 200, await confirmed.clone().text());
     } finally { await server.close(); }
     assert.equal(alive(pid), false, 'stopped only after the confirmation, and only YallaFlow\'s own process');

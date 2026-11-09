@@ -1,0 +1,202 @@
+TAP version 13
+# Subtest: a merge-collided work item is listed as invalid and never hides the project
+ok 1 - a merge-collided work item is listed as invalid and never hides the project
+  ---
+  duration_ms: 2561.628264
+  type: 'test'
+  ...
+# Subtest: the exact Vult message: a ledger pinned to another registry version
+ok 2 - the exact Vult message: a ledger pinned to another registry version
+  ---
+  duration_ms: 971.648514
+  type: 'test'
+  ...
+# Subtest: an unreadable meta.yaml is reported, not fatal
+ok 3 - an unreadable meta.yaml is reported, not fatal
+  ---
+  duration_ms: 959.268828
+  type: 'test'
+  ...
+# Subtest: zero work items: no completion is claimed
+ok 4 - zero work items: no completion is claimed
+  ---
+  duration_ms: 670.100875
+  type: 'test'
+  ...
+# Subtest: console: an invalid item is a data warning in a 200 snapshot, not a failed project
+ok 5 - console: an invalid item is a data warning in a 200 snapshot, not a failed project
+  ---
+  duration_ms: 2023.656922
+  type: 'test'
+  ...
+# Subtest: console UI: the theme button is matched by its own attribute, never by <html data-theme>
+ok 6 - console UI: the theme button is matched by its own attribute, never by <html data-theme>
+  ---
+  duration_ms: 12.423239
+  type: 'test'
+  ...
+# Subtest: folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+ok 7 - folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+  ---
+  duration_ms: 139.928941
+  type: 'test'
+  ...
+# Subtest: registration: an existing YallaFlow project inside home is added once, live; others are refused
+ok 8 - registration: an existing YallaFlow project inside home is added once, live; others are refused
+  ---
+  duration_ms: 306.694177
+  type: 'test'
+  ...
+# Subtest: stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+ok 9 - stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+  ---
+  duration_ms: 866.791641
+  type: 'test'
+  ...
+# Subtest: a plan that installs dependencies needs the project name typed
+ok 10 - a plan that installs dependencies needs the project name typed
+  ---
+  duration_ms: 403.922366
+  type: 'test'
+  ...
+# Subtest: Git init: explicit, once, never inside another repository; refused read-only
+ok 11 - Git init: explicit, once, never inside another repository; refused read-only
+  ---
+  duration_ms: 97.292137
+  type: 'test'
+  ...
+# Subtest: runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+ok 12 - runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+  ---
+  duration_ms: 780.163927
+  type: 'test'
+  ...
+# Subtest: agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+ok 13 - agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+  ---
+  duration_ms: 57.76134
+  type: 'test'
+  ...
+# Subtest: review: parallel registrations add a project once and lose none from the saved list
+ok 14 - review: parallel registrations add a project once and lose none from the saved list
+  ---
+  duration_ms: 78.429211
+  type: 'test'
+  ...
+# Subtest: review: hidden folders are refused even by path; read-only consoles probe no tools
+ok 15 - review: hidden folders are refused even by path; read-only consoles probe no tools
+  ---
+  duration_ms: 13.99386
+  type: 'test'
+  ...
+# Subtest: review: plans that run package scripts need the name; control characters and NUL are refused
+ok 16 - review: plans that run package scripts need the name; control characters and NUL are refused
+  ---
+  duration_ms: 578.774074
+  type: 'test'
+  ...
+# Subtest: review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+ok 17 - review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+  ---
+  duration_ms: 410.224749
+  type: 'test'
+  ...
+# Subtest: a registration failure after creation is reported as partial success, never as a failed creation
+ok 18 - a registration failure after creation is reported as partial success, never as a failed creation
+  ---
+  duration_ms: 499.104291
+  type: 'test'
+  ...
+# Subtest: Claude Code: off unless chosen explicitly when enabling agents; never read-only
+ok 19 - Claude Code: off unless chosen explicitly when enabling agents; never read-only
+  ---
+  duration_ms: 69.645844
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): a project leaves the running console and the saved list; its files stay
+ok 20 - removal (PF-0081): a project leaves the running console and the saved list; its files stay
+  ---
+  duration_ms: 68.315488
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): refused while an agent session is live in the project
+ok 21 - removal (PF-0081): refused while an agent session is live in the project
+  ---
+  duration_ms: 1.5837
+  type: 'test'
+  ...
+# Subtest: agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+ok 22 - agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+  ---
+  duration_ms: 8.847837
+  type: 'test'
+  ...
+# Subtest: paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+ok 23 - paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+  ---
+  duration_ms: 4.756595
+  type: 'test'
+  ...
+# Subtest: file selection and paste combine; unsupported, empty and oversized files are explained
+ok 24 - file selection and paste combine; unsupported, empty and oversized files are explained
+  ---
+  duration_ms: 3.248966
+  type: 'test'
+  ...
+# Subtest: revision partial failure keeps pending files and retries without duplicating text or successful uploads
+ok 25 - revision partial failure keeps pending files and retries without duplicating text or successful uploads
+  ---
+  duration_ms: 4.015391
+  type: 'test'
+  ...
+# Subtest: create uploads pasted files through the existing bound request endpoint
+ok 26 - create uploads pasted files through the existing bound request endpoint
+  ---
+  duration_ms: 6.856304
+  type: 'test'
+  ...
+# Subtest: overview previews keep full facts available under View more, including after redraw
+ok 27 - overview previews keep full facts available under View more, including after redraw
+  ---
+  duration_ms: 6.390036
+  type: 'test'
+  ...
+# Subtest: security: loopback host, token, origin, read-only methods and ID-only paths
+ok 28 - security: loopback host, token, origin, read-only methods and ID-only paths
+  ---
+  duration_ms: 934.391928
+  type: 'test'
+  ...
+# Subtest: serves the snapshot, work detail and preserved sources by ID
+ok 29 - serves the snapshot, work detail and preserved sources by ID
+  ---
+  duration_ms: 1527.485896
+  type: 'test'
+  ...
+# Subtest: live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+ok 30 - live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+  ---
+  duration_ms: 1811.557867
+  type: 'test'
+  ...
+# Subtest: the console never writes: browsing every route leaves the workspace byte-identical
+ok 31 - the console never writes: browsing every route leaves the workspace byte-identical
+  ---
+  duration_ms: 1270.152441
+  type: 'test'
+  ...
+# Subtest: extracted text cannot be read outside its source directory; HEAD never opens the event stream
+ok 32 - extracted text cannot be read outside its source directory; HEAD never opens the event stream
+  ---
+  duration_ms: 1040.471897
+  type: 'test'
+  ...
+1..32
+# tests 32
+# suites 0
+# pass 32
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9107.201641

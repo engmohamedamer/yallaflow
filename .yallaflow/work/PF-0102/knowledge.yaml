@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "integration",
+      "source": "implementation-runtime",
+      "summary": "Console chat messages reach Claude Code only as MCP channel notifications (notifications/claude/channel from resources/agents/claude-channel.mjs); replies and progress come back through Claude Code hooks (claude-hook.mjs). On Claude Team and Enterprise logins Claude Code drops channel notifications silently unless the organization enabled the managed setting channelsEnabled (default off; Claude Code 2.1.319). YallaFlow cannot read that setting: detectClaude warns when 'claude auth status' reports subscriptionType team or enterprise, and ClaudeLink reports a sent message that no hook answers within DELIVERY_TIMEOUT_MS (60 s, env YALLAFLOW_CLAUDE_DELIVERY_TIMEOUT_MS) as delivery.unconfirmed.",
+      "evidence": [
+        "src/agents/claude.js",
+        "src/agents/claude-detect.js",
+        "resources/agents/claude-channel.mjs",
+        "verification:V-002",
+        "runtime:claude auth status --json reported subscriptionType team; relay I/O grew on send, 2026-11-09"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-09T13:36:59.622Z",
+      "factId": "CTX-0139",
+      "promotedAt": "2026-11-09T13:36:59.784Z",
+      "target": "context/integrations.md"
+    }
+  ],
+  "updatedAt": "2026-11-09T13:36:59.784Z",
+  "reviewedAt": "2026-11-09T13:36:59.784Z"
+}

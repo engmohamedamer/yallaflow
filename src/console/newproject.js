@@ -42,16 +42,16 @@ export async function wizardCatalog(root, runner) {
 }
 
 export async function wizardPlan(root, body, runner) {
-  exactObject(body, ['name', 'parent', 'stack', 'install', 'allowNested', 'description', 'requirements', 'environment', 'git', 'files'], ['name', 'parent', 'stack']);
+  exactObject(body, ['name', 'parent', 'stack', 'install', 'allowNested', 'description', 'requirements', 'environment', 'git', 'files', 'customStack'], ['name', 'parent', 'stack']);
   for (const flag of ['install', 'allowNested', 'git']) if (flag in body && typeof body[flag] !== 'boolean') throw new HttpError(400, 'BAD_REQUEST', `${flag} must be true or false.`);
-  const LIMITS = { description: 4000, requirements: 16000, environment: 10 };
+  const LIMITS = { description: 4000, requirements: 16000, environment: 10, customStack: 120 };
   for (const [text, max] of Object.entries(LIMITS)) if (text in body && body[text] !== null && (typeof body[text] !== 'string' || body[text].length > max || body[text].includes('\0'))) throw new HttpError(400, 'BAD_REQUEST', `${text} must be text up to ${max} characters.`);
   for (const key of ['name', 'parent', 'stack']) if (body[key].includes('\0')) throw new HttpError(400, 'BAD_REQUEST', `${key} is invalid.`);
   const attachments = body.files ?? [];
   if (!Array.isArray(attachments) || attachments.length > 10 || attachments.some((a) => !a || typeof a !== 'object' || typeof a.name !== 'string' || !Number.isSafeInteger(a.size) || typeof a.sha256 !== 'string' || !/^[0-9a-f]{64}$/.test(a.sha256))) throw new HttpError(400, 'BAD_REQUEST', 'files must list up to 10 files as { name, size, sha256 }.');
   const opt = (flag, value) => (value === undefined || value === null || value === '' ? [] : [`--${flag}=${value}`]);
   const args = ['new', 'plan', `--name=${body.name}`, `--parent=${body.parent}`, `--stack=${body.stack}`, ...(body.install ? ['--install'] : []), ...(body.allowNested ? ['--allow-nested'] : []),
-    ...opt('description', body.description), ...opt('requirements', body.requirements), ...opt('environment', body.environment), ...(body.git ? ['--git'] : []),
+    ...opt('description', body.description), ...opt('requirements', body.requirements), ...opt('environment', body.environment), ...opt('custom-stack', body.customStack), ...(body.git ? ['--git'] : []),
     ...attachments.map((a) => `--attachment=${a.sha256}:${a.size}:${a.name}`), '--json'];
   const parsed = parseCli(await runner.runAside(root, args));
   if (parsed.error) throw new HttpError(422, parsed.error.code ?? 'NEW_PROJECT_REFUSED', parsed.error.message);
@@ -60,7 +60,7 @@ export async function wizardPlan(root, body, runner) {
 
 // Starts creation in the background after checking the confirmation synchronously.
 export async function wizardCreate(root, body, runner, { register = null } = {}) {
-  exactObject(body, ['planId', 'confirm', 'confirmName'], ['planId', 'confirm']);
+  exactObject(body, ['planId', 'confirm', 'acknowledgeScripts', 'confirmName'], ['planId', 'confirm']);
   let plan;
   try {
     plan = await loadPlan(body.planId);
@@ -70,8 +70,9 @@ export async function wizardCreate(root, body, runner, { register = null } = {})
   // The page sends the full hash of the plan it showed: any other plan, or this plan changed
   // since, is refused (a typed 8+ character prefix is still accepted, as on the command line).
   if (body.confirm.length < 8 || !plan.hash.startsWith(body.confirm.toLowerCase())) throw new HttpError(422, 'NEW_PROJECT_CONFIRM', 'The plan changed or is not the one you reviewed. Review it again, then create.');
-  // Higher risk: installing dependencies runs package scripts. Type the project name.
-  if (needsTypedName(plan) && body.confirmName !== plan.body.name) throw new HttpError(422, 'NEW_PROJECT_CONFIRM_NAME', `This plan installs dependencies or runs package scripts. Type the project name (${plan.body.name}) to confirm.`);
+  // Higher risk: installing dependencies runs package scripts. It needs one explicit
+  // acknowledgement (PF-0085: a ticked checkbox; the typed project name is still accepted).
+  if (needsTypedName(plan) && body.acknowledgeScripts !== true && body.confirmName !== plan.body.name) throw new HttpError(422, 'NEW_PROJECT_ACKNOWLEDGE', 'This plan installs dependencies or runs package scripts on this machine. Confirm that you accept this to create it.');
   const existing = jobs.get(plan.id);
   if (!existing || existing.done) {
     // One creation per plan at a time; a finished or failed one can be retried (it skips done steps).

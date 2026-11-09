@@ -1,0 +1,45 @@
+{
+  "id": "PF-0089",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console top menu: order tabs by daily use (Flow, Work, Setup & run, Overview, Insights, Worktrees) and give the Setup tab and its page the same name",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T09:39:15.643Z",
+  "updatedAt": "2026-11-09T09:40:09.442Z",
+  "title": "Console top menu: order tabs by daily use (Flow, Work, Setup & run, Overview, Insights, Worktrees) and give the Setup tab and its page the same name",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-09T09:39:15.691Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T09:40:09.442Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

@@ -95,24 +95,6 @@
   - src/core/integrity.js (repository @ 212579b)
   - test/doctor-integrity.test.js (repository @ 212579b)
 
-<!-- yallaflow-fact:CTX-0118 -->
-### CTX-0118 — Projects created by 'yallaflow new' (New Project Wizard, 1.4.0) record config project.origin {createdBy: 'yallaflow new', generator, template, stack, planHash, createdAt, optional environment docker|local|later and git: true} through Core initProject and are Greenfield: no baseline is required for generator boilerplate, but generated code is never treated as understood or approved (no context facts; label 'generated code not reviewed', or 'created empty' for the empty stack). The first work item is unrouted and not activated, titled '<name>: <goal>' or 'Set up <name>', with the developer's description and requirements kept verbatim and no invented criteria. Projects without valid wizard provenance, or with a recorded brownfield kind, keep the normal discovery and baseline rules.
-
-- **State:** current
-- **Confidence:** confirmed
-- **Provenance:** repository
-- **Source work:** PF-0057
-- **Knowledge ID:** K-003
-- **Promoted at:** 2026-11-07T19:18:47.384Z
-- **Supersedes:** CTX-0112
-- **Verified:** 2026-11-07T19:18:47.384Z (commit 9437b4c)
-- **Evidence:**
-  - src/newproject/project.js (repository @ 9437b4c)
-  - src/core/workspace.js (repository @ 9437b4c)
-  - src/baseline/understanding.js (repository @ 9437b4c)
-  - test/new-project.test.js (repository @ 9437b4c)
-  - npm run check (passed) (runtime, PF-0057 V-004)
-
 <!-- yallaflow-fact:CTX-0122 -->
 ### CTX-0122 — Request revisions are allowed only before work starts: pending routing or INTAKE with no checkpoint activity or revision history in the progress ledger. Core preserves request history, sources, classified title and workflow; held, closed and DONE work cannot be edited. Snapshot and work detail expose requestEditable from the same Core policy; console editing loads full raw text and saves through request revise. Files pasted or picked while editing are attached through 'intake add --before-start', which re-checks the same policy under the workspace lock before any source is persisted (console route work/<id>/revision-sources).
 
@@ -129,5 +111,22 @@
   - src/commands/intake.js (repository @ 9cfe4b5)
   - src/console/server.js (repository @ 9cfe4b5)
   - npm run check (passed) (runtime, PF-0061 V-005)
+
+<!-- yallaflow-fact:CTX-0136 -->
+### CTX-0136 — Projects created by 'yallaflow new' (New Project Wizard, 1.4.0) record config project.origin {createdBy: 'yallaflow new', generator, template, stack, planHash, createdAt, optional environment docker|local|later and git: true} through Core initProject and are Greenfield: no baseline is required for generator boilerplate, but generated code is never treated as understood or approved (no context facts at creation; label 'generated code not reviewed', or 'created empty' for the empty stack). A stack the developer names that is not in the catalog (plan field customStack, CLI --custom-stack, only with --stack empty, one line up to 120 characters) runs nothing: it is recorded as the plan's technologies and origin.stack, and the first work item asks the agent to set it up with the developer, running nothing they have not approved (PF-0087). Creation never writes project memory: the first work item's request asks the agent, when that work finishes, to propose the chosen stack, the development environment and the product goal as project knowledge (PF-0084). The first work item is unrouted and not activated, titled '<name>: <goal>' or 'Set up <name>', with the developer's description and requirements kept verbatim and no invented criteria. In the console, the server scans the stack right after registering a created project (Setup's stack step is then done), and a project card shows the creation choice from origin while memory is empty. Projects without valid wizard provenance, or with a recorded brownfield kind, keep the normal discovery and baseline rules.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0087
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-09T09:22:13.043Z
+- **Supersedes:** CTX-0135
+- **Verified:** 2026-11-09T09:22:13.043Z (commit d3652e8)
+- **Evidence:**
+  - src/newproject/project.js (repository @ d3652e8)
+  - src/commands/new.js (repository @ d3652e8)
+  - src/console/server.js (repository @ d3652e8)
+  - npm test (passed) (runtime, PF-0087 V-001)
 
 <!-- yallaflow-context:end -->

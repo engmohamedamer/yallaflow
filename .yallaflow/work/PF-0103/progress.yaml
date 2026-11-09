@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T13:37:55.083Z",
+      "completedAt": "2026-11-09T13:37:55.083Z",
+      "summary": "One agent session per checkout (src/agents/bridge.js: start refuses while a session is active or a Claude channel is connected). In resources/console/app.js agentPanel: a Codex session on another item shows only 'A Codex session is active for PF-x' with no action; with Claude Code connected every item shows the Claude panel (project chat), with no way to choose Codex; ending a Codex session is data-agent-end; Claude can only be closed in its terminal (the console's Unlink leaves Claude running, so it must not be used to free the checkout). After a disconnect or end, the panel shows the provider picker using agentProvider.",
+      "evidence": [
+        "src/agents/bridge.js",
+        "resources/console/app.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T13:37:55.621Z",
+      "completedAt": "2026-11-09T13:37:55.621Z",
+      "summary": "Owner approved 'switch agent in one click' (2026-11-09). Claude Code cannot be closed by the console; unlinking would leave it able to edit files, so the hand-over waits for Claude to close in its terminal."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T13:38:58.908Z",
+      "completedAt": "2026-11-09T13:38:58.908Z",
+      "summary": "switchHere(it, s) in the chat panel: idle Codex on another item → 'End the PF-x session and work here' (ends via the existing end action, then the picker shows); working Codex/Claude → wait message; Claude connected and idle with Codex ready → 'Use Codex for this item' sets switchWanted, shows '/exit in the Claude Code terminal', and on session.disconnected prepares the item's suggestion as the draft with Codex selected. No unlink is used. Harness test, docs/console.md and CHANGELOG.",
+      "evidence": [
+        "resources/console/app.js",
+        "resources/console/app.css",
+        "test/console-project-chat.test.js",
+        "docs/console.md",
+        "CHANGELOG.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T13:39:57.928Z",
+      "completedAt": "2026-11-09T13:39:57.928Z",
+      "summary": "Agent and console tests pass (V-001), including the switch-agent harness test for idle/working Codex elsewhere and idle/working Claude Code.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-09T13:39:58.466Z",
+      "completedAt": "2026-11-09T13:39:58.466Z",
+      "summary": "Both criteria satisfied."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-09T13:39:58.466Z"
+}

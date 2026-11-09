@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T13:29:13.926Z",
+      "completedAt": "2026-11-09T13:29:13.926Z",
+      "summary": "Path: console bridge.message → ClaudeLink.send (src/agents/claude.js) writes an SSE item to the attached channel stream; resources/agents/claude-channel.mjs turns it into notifications/claude/channel over MCP stdio; replies reach the console through hooks (claude-hook.mjs → onHook), not the channel. In the owner's lalaff session the transcript (~/.claude/projects/-home-engamer-Amasi-lalaff/*.jsonl) has no console message after the agent's first reply.",
+      "evidence": [
+        "src/agents/claude.js",
+        "resources/agents/claude-channel.mjs",
+        "resources/agents/claude-hook.mjs",
+        "runtime:lalaff Claude transcript without the console messages, 2026-11-09"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-09T13:29:14.087Z",
+      "completedAt": "2026-11-09T13:29:14.087Z",
+      "summary": "Reproduced with a test console (port 4799, this repo, --agents --experimental-claude) and this machine's Claude Code session as the channel client: after a simulated SessionStart hook the message POST returned ok and the relay's I/O grew by 166 bytes read (SSE from the console) and 203 bytes written (the MCP notification to Claude Code), so console and relay deliver. Claude Code 2.1.319 contains the managed setting channelsEnabled: 'Managed-org opt-in for channel notifications… claude.ai Teams/Enterprise: default off'. 'claude auth status --json' on this machine reports subscriptionType team (org Saudi AZM Projects, role user; ~/.claude.json organizationType claude_team). Root cause: the account is a Claude Team account whose organization has not opted in to channels, so Claude Code drops channel notifications silently; YallaFlow cannot enable it. Gap in YallaFlow: nothing tells the developer, and the chat shows the messages as sent.",
+      "evidence": [
+        "src/agents/claude-detect.js",
+        "runtime:relay /proc io before/after a console send, 2026-11-09",
+        "runtime:claude auth status --json subscriptionType team, 2026-11-09"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T13:32:17.581Z",
+      "completedAt": "2026-11-09T13:32:17.581Z",
+      "summary": "detectClaude adds a non-blocking warning for Team/Enterprise logins (subscriptionType), passed through the bridge providers and agent settings; the page shows it in Arabic in the chat provider area and Setup → Agents. ClaudeLink.send starts a delivery watchdog (DELIVERY_TIMEOUT_MS, default 60 s, env YALLAFLOW_CLAUDE_DELIVERY_TIMEOUT_MS): no hook from the bound session after a send emits delivery.unconfirmed and returns the status to connected; the chat shows it as a warning note. Docs and CHANGELOG updated; test added.",
+      "evidence": [
+        "src/agents/claude-detect.js",
+        "src/agents/claude.js",
+        "src/agents/bridge.js",
+        "src/console/server.js",
+        "resources/console/app.js",
+        "docs/agents-claude-experimental.md",
+        "test/agent-claude-experimental.test.js",
+        "CHANGELOG.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T13:36:59.474Z",
+      "completedAt": "2026-11-09T13:36:59.474Z",
+      "summary": "Agent and console tests pass (V-002), including the Team-warning and delivery-check test. V-001 failed first: the chat harness cut did not include the new claudeWarnings helper; moved inside the tested section. Browser on a test console with this machine's real Claude Team login: Setup → Agents showed the Arabic Team warning; the API returned the warning for the chat provider list. Live: the relay's I/O grew on send (console→relay delivery works); the drop is inside Claude Code (Team channels policy).",
+      "evidence": [
+        "verification:V-002",
+        "runtime:Setup → Agents warning on a test console, 2026-11-09"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-09T13:36:59.474Z"
+}

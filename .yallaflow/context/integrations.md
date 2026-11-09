@@ -42,4 +42,21 @@
   - test/shared-project.test.js (repository @ 9c38eec)
   - npm run check (passed) (runtime)
 
+<!-- yallaflow-fact:CTX-0139 -->
+### CTX-0139 — Console chat messages reach Claude Code only as MCP channel notifications (notifications/claude/channel from resources/agents/claude-channel.mjs); replies and progress come back through Claude Code hooks (claude-hook.mjs). On Claude Team and Enterprise logins Claude Code drops channel notifications silently unless the organization enabled the managed setting channelsEnabled (default off; Claude Code 2.1.319). YallaFlow cannot read that setting: detectClaude warns when 'claude auth status' reports subscriptionType team or enterprise, and ClaudeLink reports a sent message that no hook answers within DELIVERY_TIMEOUT_MS (60 s, env YALLAFLOW_CLAUDE_DELIVERY_TIMEOUT_MS) as delivery.unconfirmed.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0102
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-09T13:36:59.784Z
+- **Verified:** 2026-11-09T13:36:59.784Z (commit d3652e8)
+- **Evidence:**
+  - src/agents/claude.js (repository @ d3652e8)
+  - src/agents/claude-detect.js (repository @ d3652e8)
+  - resources/agents/claude-channel.mjs (repository @ d3652e8)
+  - node --test test/agent-claude-experimental.test.js test/agent-bridge.test.js test/agent-continue.test.js test/console-project-chat.test.js test/console-agent-errors.test.js test/console-greenfield.test.js test/runtime-plan.test.js (passed) (runtime, PF-0102 V-002)
+  - claude auth status --json reported subscriptionType team; relay I/O grew on send, 2026-11-09 (runtime)
+
 <!-- yallaflow-context:end -->

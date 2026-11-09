@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "Each project on the console's projects page shows the health of its project memory.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T08:37:25.184Z",
+      "updatedAt": "2026-11-09T08:37:25.184Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "A project card shows how many current facts its memory holds and how many need care (may be stale or evidence missing, disputed, unresolved), or that all are up to date.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T08:37:25.184Z",
+      "updatedAt": "2026-11-09T08:37:25.184Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "A project without project memory yet says why (understanding not approved, or a new project), and a project whose memory cannot be read does not break its card.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T08:37:25.184Z",
+      "updatedAt": "2026-11-09T08:37:25.184Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-09T08:37:25.184Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-09T08:37:25.184Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-09T08:37:25.184Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-09T08:37:25.184Z"
+}

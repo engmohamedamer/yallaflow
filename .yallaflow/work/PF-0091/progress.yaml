@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:47:41.262Z",
+      "completedAt": "2026-11-09T09:47:41.262Z",
+      "summary": "After creation with an agent the wizard opens the first work item (PF-0086); greenfieldOverview in resources/console/app.js shows a 7-row checklist where several rows are 'now' at once and no single next step. The 'data-chat-item' control opens a work item with the chat and a drafted question; the chat panel holds Start Codex session / Claude connection.",
+      "evidence": [
+        "resources/console/app.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:47:54.193Z",
+      "completedAt": "2026-11-09T09:47:54.193Z",
+      "summary": "Owner approved the plan (2026-11-09, 'اعتمد')."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:52:43.475Z",
+      "completedAt": "2026-11-09T09:52:43.475Z",
+      "summary": "Greenfield Overview starts with 'Start here': created ✓, one next step with one primary button (Start/Continue with the agent via data-chat-item with a drafted message, or Choose an agent → Setup with the terminal phrase as fallback), running optional. 'Open the project and start' on the ready screen opens this Overview. docs and CHANGELOG updated.",
+      "evidence": [
+        "resources/console/app.js",
+        "resources/console/app.css",
+        "docs/new-project.md",
+        "CHANGELOG.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:54:15.220Z",
+      "completedAt": "2026-11-09T09:54:15.220Z",
+      "summary": "Console tests pass (V-001); browser walkthrough on an isolated console with no console errors.",
+      "evidence": [
+        "verification:V-001",
+        "runtime:Playwright walkthrough on an isolated throwaway console, 2026-11-09"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:54:15.675Z",
+      "completedAt": "2026-11-09T09:54:15.675Z",
+      "summary": "All criteria satisfied."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-09T09:54:15.675Z"
+}

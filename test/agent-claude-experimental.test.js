@@ -319,3 +319,37 @@ test('review: Claude detection runs only after opt-in; a failed Claude enable le
     await two.close();
   }
 });
+
+// PF-0102: a Claude Team/Enterprise login gets a warning (channels are off unless the org
+// opts in), and a console message that no hook ever answers is reported as not delivered.
+test('Claude Team accounts get a channel warning; an unanswered console message is reported', { skip }, async () => {
+  const { writeFile, chmod } = await import('node:fs/promises');
+  const { detectClaude } = await import('../src/agents/claude-detect.js');
+  const bin = await mkdtemp(path.join(os.tmpdir(), 'yf-fake-claude-team-'));
+  const fake = (plan) => `#!/bin/sh\nif [ "$1" = "auth" ]; then echo '{"loggedIn":true,"authMethod":"claude.ai","subscriptionType":"${plan}"}'; else echo "2.1.319 (Claude Code)"; fi\n`;
+  await writeFile(path.join(bin, 'claude'), fake('team'));
+  await chmod(path.join(bin, 'claude'), 0o755);
+  const team = await detectClaude({ ...process.env, PATH: `${bin}:${process.env.PATH}` });
+  assert.equal(team.ready, true, 'a warning does not block');
+  assert.match(team.warnings.join(' '), /Claude Team account.*channels/);
+  await writeFile(path.join(bin, 'claude'), fake('max'));
+  const max = await detectClaude({ ...process.env, PATH: `${bin}:${process.env.PATH}` });
+  assert.deepEqual(max.warnings, [], 'personal plans get no warning');
+
+  const { ClaudeLink } = await import('../src/agents/claude.js');
+  const events = [];
+  const link = new ClaudeLink({ emit: (event) => events.push(event) });
+  link.deliveryTimeoutMs = 50;
+  link.stream = { write() {}, destroyed: false, writableEnded: false, end() {} };
+  link.connected = true;
+  link.send('hello', 'PF-0001');
+  await sleep(120);
+  assert.equal(events.at(-1).type, 'delivery.unconfirmed');
+  assert.equal(link.status, 'connected', 'no longer shown as working');
+  events.length = 0;
+  link.send('again', 'PF-0001');
+  link.onHook({ session_id: 'sess-12345678', hook_event_name: 'UserPromptSubmit' });
+  await sleep(120);
+  assert.equal(events.some((event) => event.type === 'delivery.unconfirmed'), false, 'a hook after sending confirms delivery');
+  link.detach();
+});

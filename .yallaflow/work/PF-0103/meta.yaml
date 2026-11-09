@@ -1,0 +1,45 @@
+{
+  "id": "PF-0103",
+  "type": "feature",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console: switch agents in one step: from a work item, end an idle Codex session that holds the project or hand over from Claude Code (close it in its terminal, then the chat continues with Codex), while a working agent is waited for",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T13:37:30.584Z",
+  "updatedAt": "2026-11-09T13:39:58.861Z",
+  "title": "Console: switch agents in one step: from a work item, end an idle Codex session that holds the project or hand over from Claude Code (close it in its terminal, then the chat continues with Codex), while a working agent is waited for",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope bounded`.",
+  "routedAt": "2026-11-09T13:37:30.630Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "implement",
+    "verify",
+    "converge"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation",
+      "verification",
+      "delivery-convergence"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T13:39:58.861Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

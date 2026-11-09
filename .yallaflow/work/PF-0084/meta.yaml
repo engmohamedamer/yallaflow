@@ -1,0 +1,45 @@
+{
+  "id": "PF-0084",
+  "type": "feature",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "New project wizard: what the developer chose (stack, environment, goal) is known after creation — the stack scan runs automatically, the projects card shows the creation choice, and the first work item asks the agent to record it as project knowledge",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T09:05:56.613Z",
+  "updatedAt": "2026-11-09T09:21:42.551Z",
+  "title": "New project wizard: what the developer chose (stack, environment, goal) is known after creation — the stack scan runs automatically, the projects card shows the creation choice, and the first work item asks the agent to record it as project knowledge",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope bounded`.",
+  "routedAt": "2026-11-09T09:05:56.660Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "implement",
+    "verify",
+    "converge"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation",
+      "verification",
+      "delivery-convergence"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T09:21:42.551Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

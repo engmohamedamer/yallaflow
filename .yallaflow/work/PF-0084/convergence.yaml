@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-09T09:21:41.334Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "Assessed after V-001 and a browser walkthrough.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "registerCreated scans the stack after the wizard registers the project; the test reads setup.json steps.stack = true, and the browser-created project had it too.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:b7cc975d65e7d844ce5dda0d161058212a033bd268e74cb51c64ebd7091409b3",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-greenfield.test.js",
+              "contentHash": "sha256:36205d9148e12b0d87fe56fcbad7b74897430b4bd406b222f38884ef461a342c",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --test test/console-greenfield.test.js test/new-project.test.js test/console-create.test.js test/console-server.test.js (passed)",
+              "workId": "PF-0084",
+              "verificationRunId": "V-001"
+            },
+            {
+              "type": "runtime",
+              "description": "setup.json of the browser-created project showed stack and agents done"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "With empty memory and wizard provenance the card shows the stack and environment chosen at creation; seen in the browser.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:91e417f17ee385e61444759ff1e7156f32306c2c7e8899b2d1be483e15742b29",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "projects card of the browser-created project showed 'Chosen at creation: Flutter'"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "firstWorkRequest adds the instruction to propose the stack, environment and goal as project knowledge; asserted in the test.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/newproject/project.js",
+              "contentHash": "sha256:f4a8e5428f692745c76026b6c26b836c6b34814566178771f06a1bcd919420da",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/new-project.test.js",
+              "contentHash": "sha256:eb52dbedf8bc431dbba8e8ad247bca1ea00c49233bf029e38feb7c4e35f9b9cb",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --test test/console-greenfield.test.js test/new-project.test.js test/console-create.test.js test/console-server.test.js (passed)",
+              "workId": "PF-0084",
+              "verificationRunId": "V-001"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-09T09:21:41.334Z"
+}

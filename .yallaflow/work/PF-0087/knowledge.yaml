@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "business-rule",
+      "source": "implementation-runtime",
+      "summary": "Projects created by 'yallaflow new' (New Project Wizard, 1.4.0) record config project.origin {createdBy: 'yallaflow new', generator, template, stack, planHash, createdAt, optional environment docker|local|later and git: true} through Core initProject and are Greenfield: no baseline is required for generator boilerplate, but generated code is never treated as understood or approved (no context facts at creation; label 'generated code not reviewed', or 'created empty' for the empty stack). A stack the developer names that is not in the catalog (plan field customStack, CLI --custom-stack, only with --stack empty, one line up to 120 characters) runs nothing: it is recorded as the plan's technologies and origin.stack, and the first work item asks the agent to set it up with the developer, running nothing they have not approved (PF-0087). Creation never writes project memory: the first work item's request asks the agent, when that work finishes, to propose the chosen stack, the development environment and the product goal as project knowledge (PF-0084). The first work item is unrouted and not activated, titled '<name>: <goal>' or 'Set up <name>', with the developer's description and requirements kept verbatim and no invented criteria. In the console, the server scans the stack right after registering a created project (Setup's stack step is then done), and a project card shows the creation choice from origin while memory is empty. Projects without valid wizard provenance, or with a recorded brownfield kind, keep the normal discovery and baseline rules.",
+      "evidence": [
+        "src/newproject/project.js",
+        "src/commands/new.js",
+        "src/console/server.js",
+        "verification:V-001"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0135"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-09T09:22:12.841Z",
+      "factId": "CTX-0136",
+      "promotedAt": "2026-11-09T09:22:13.043Z",
+      "target": "context/business-rules.md"
+    }
+  ],
+  "updatedAt": "2026-11-09T09:22:13.043Z",
+  "reviewedAt": "2026-11-09T09:22:13.043Z"
+}

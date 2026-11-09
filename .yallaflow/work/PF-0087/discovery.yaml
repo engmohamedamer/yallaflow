@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "tech-stack",
+      "summary": "New catalog generators (Nuxt, SvelteKit, Angular, Astro, Django, Flutter) were not added",
+      "reason": "Their non-interactive behaviour must be verified by running each generator; running external npm packages was denied by the permission system in this session, and Django and Flutter are not installed here",
+      "recordedAt": "2026-11-09T09:10:32.053Z"
+    }
+  ],
+  "updatedAt": "2026-11-09T09:10:32.053Z"
+}

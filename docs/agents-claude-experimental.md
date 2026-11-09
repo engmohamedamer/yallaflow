@@ -29,7 +29,7 @@ When it is on, the chat's agent picker offers **Codex** and **Claude Code (exper
 
 **Requirements:**
 - Claude Code 2.1.234 or later, logged in with your **Claude account** (claude.ai subscription);
-- on **Team/Enterprise** plans, an organization Owner must have enabled Channels.
+- on **Team/Enterprise** plans, an organization Owner must have enabled Channels (the managed setting `channelsEnabled`; it is off by default). Without it, Claude Code drops messages from the console without any error. YallaFlow cannot read that setting: when `claude auth status` reports a Team or Enterprise login, Setup → Agents and the chat show a warning, and a console message that no Claude Code hook answers within 60 seconds is reported in the chat as probably not received (`YALLAFLOW_CLAUDE_DELIVERY_TIMEOUT_MS` changes the wait). You can still type in the Claude Code terminal; the console keeps showing its work through the hooks.
 
 **Connecting:**
 1. Turn it on (above), open a work item's chat, choose **Claude Code**, and press **Connect Claude Code**.

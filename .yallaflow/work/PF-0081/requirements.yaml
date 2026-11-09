@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "From the console's All projects page, the developer can remove a previously added project from the console, instead of running yallaflow console remove.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T08:23:37.608Z",
+      "updatedAt": "2026-11-09T08:23:37.608Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "Each project on the All projects page has a remove action that, after confirmation, takes it off the running console and off the saved console list without a restart.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T08:23:37.608Z",
+      "updatedAt": "2026-11-09T08:23:37.608Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "Removing a project never changes the project's own files or its .yallaflow records; it can be added again later.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T08:23:37.608Z",
+      "updatedAt": "2026-11-09T08:23:37.608Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-001",
+      "statement": "A saved project whose folder is unavailable can also be removed from the page.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T08:23:37.608Z",
+      "updatedAt": "2026-11-09T08:23:37.608Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-09T08:23:37.608Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-09T08:23:37.608Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-09T08:23:37.608Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-09T08:23:37.608Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-09T08:23:37.608Z"
+}

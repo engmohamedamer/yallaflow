@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "The stack step is clear in Arabic and lets the developer choose a stack that is not in the list.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T09:10:32.428Z",
+      "updatedAt": "2026-11-09T09:10:32.428Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "In Arabic, each stack card shows its description and trade-offs in Arabic.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T09:10:32.428Z",
+      "updatedAt": "2026-11-09T09:10:32.428Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "A 'Something else' choice takes the stack the developer types; it creates an empty project (no command runs), records the typed stack in the plan, the project origin and the first work item, which asks the agent to set it up.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T09:10:32.428Z",
+      "updatedAt": "2026-11-09T09:10:32.428Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-001",
+      "statement": "The command line accepts the same choice (yallaflow new plan --stack empty --custom-stack TEXT) and refuses it with any other stack.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T09:10:32.428Z",
+      "updatedAt": "2026-11-09T09:10:32.428Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-09T09:10:32.428Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-09T09:10:32.428Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-09T09:10:32.428Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-09T09:10:32.428Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-09T09:10:32.428Z"
+}

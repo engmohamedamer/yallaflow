@@ -1,0 +1,45 @@
+{
+  "id": "PF-0087",
+  "type": "feature",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "New project wizard stack step: Arabic descriptions for each stack, and a 'Something else' choice where the developer types the stack they want (an empty project; the agent sets it up in the first work item)",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T09:10:31.439Z",
+  "updatedAt": "2026-11-09T09:22:13.602Z",
+  "title": "New project wizard stack step: Arabic descriptions for each stack, and a 'Something else' choice where the developer types the stack they want (an empty project; the agent sets it up in the first work item)",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope bounded`.",
+  "routedAt": "2026-11-09T09:10:31.485Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "implement",
+    "verify",
+    "converge"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation",
+      "verification",
+      "delivery-convergence"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T09:22:13.602Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

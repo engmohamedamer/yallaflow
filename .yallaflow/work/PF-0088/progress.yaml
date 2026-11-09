@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:22:28.300Z",
+      "completedAt": "2026-11-09T09:22:28.300Z",
+      "summary": "CHANGELOG.md opens with the [1.4.2] in-progress section (PF-0083); PF-0084..PF-0087 are DONE without entries there.",
+      "evidence": [
+        "CHANGELOG.md"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:22:28.698Z",
+      "completedAt": "2026-11-09T09:22:28.698Z",
+      "summary": "Owner collects all changes under 1.4.2."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:22:29.269Z",
+      "completedAt": "2026-11-09T09:22:29.269Z",
+      "summary": "Add Added/Changed entries for the four wizard items to the [1.4.2] section."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:22:59.212Z",
+      "completedAt": "2026-11-09T09:22:59.212Z",
+      "summary": "Added the PF-0084..PF-0087 entries (Added, Changed, Fixed) to the [1.4.2] section of CHANGELOG.md. Repacked and reinstalled 1.4.2 globally.",
+      "evidence": [
+        "CHANGELOG.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:23:01.360Z",
+      "completedAt": "2026-11-09T09:23:01.360Z",
+      "summary": "npm pack --dry-run includes CHANGELOG.md in 1.4.2; git diff --check clean; the installed global package contains the new features.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-09T09:23:01.360Z"
+}

@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:06:57.808Z",
+      "completedAt": "2026-11-09T09:06:57.808Z",
+      "summary": "The console requires confirmName === plan name when needsTypedName(plan) (installs dependencies or runs package scripts): server src/console/newproject.js wizardCreate, page resources/console/app.js typedName/wizardCreate. The CLI 'new create' only takes --confirm <hash>. Tests in test/console-greenfield.test.js and test/console-create.test.js may cover confirmName.",
+      "evidence": [
+        "src/console/newproject.js",
+        "resources/console/app.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:06:58.184Z",
+      "completedAt": "2026-11-09T09:06:58.184Z",
+      "summary": "Owner approved (2026-11-09) replacing the typed name with one checkbox; the server still requires an explicit acknowledgement and the full plan hash."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:06:58.739Z",
+      "completedAt": "2026-11-09T09:06:58.739Z",
+      "summary": "Server: accept { acknowledgeScripts: true } as the higher-risk confirmation (confirmName still accepted for older pages); page: a checkbox with the button disabled until ticked; update tests."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:08:12.095Z",
+      "completedAt": "2026-11-09T09:08:12.095Z",
+      "summary": "Server accepts { acknowledgeScripts: true } (a typed matching name is still accepted for older pages) and refuses otherwise with NEW_PROJECT_ACKNOWLEDGE; the page shows one checkbox with the tools it runs, and Create stays disabled until it is ticked; docs/new-project.md and tests updated.",
+      "evidence": [
+        "src/console/newproject.js",
+        "resources/console/app.js",
+        "docs/new-project.md",
+        "test/console-greenfield.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:21:17.323Z",
+      "completedAt": "2026-11-09T09:21:17.323Z",
+      "summary": "Wizard/console tests pass (V-001), including acknowledgement refusals (missing, false, non-boolean, wrong typed name). Browser: on a Laravel plan Create is disabled until the box is ticked, then enabled; no console errors.",
+      "evidence": [
+        "verification:V-001",
+        "runtime:Playwright walkthrough of the wizard on an isolated throwaway console, 2026-11-09"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-09T09:21:17.323Z"
+}

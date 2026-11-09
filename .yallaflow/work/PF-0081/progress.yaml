@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T08:23:26.962Z",
+      "completedAt": "2026-11-09T08:23:26.962Z",
+      "summary": "Projects page (resources/console/app.js viewProjects) lists projects; removal exists only as CLI 'yallaflow console remove' (src/console/registry.js removeProject). The running server keeps projects/byId/watchers in memory (src/console/server.js registerNow) and AgentBridge keeps one entry per project with session, checkout lock and Claude bridge file (src/agents/bridge.js). Removal must update registry, server lists, watcher and bridge, and refuse while an agent session or Claude channel is live.",
+      "evidence": [
+        "src/console/server.js",
+        "src/agents/bridge.js",
+        "src/console/registry.js",
+        "resources/console/app.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T08:23:37.999Z",
+      "completedAt": "2026-11-09T08:23:37.999Z",
+      "summary": "One requirement, three criteria; no business ambiguity. Ruling: refuse removal while an agent session is live."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T08:30:40.997Z",
+      "completedAt": "2026-11-09T08:30:40.997Z",
+      "summary": "POST /api/projects/remove ({id} or {root} for an unavailable entry) takes a project off the running console and the saved list, closes its watcher, and releases its agent checkout via AgentBridge.removeProject, refusing with 409 SESSION_ACTIVE while a session or Claude channel is live. Projects page: a remove button on each card and on unavailable entries, with a confirmation dialog; the open project moves to the next one. Tests added.",
+      "evidence": [
+        "src/console/server.js",
+        "src/agents/bridge.js",
+        "resources/console/app.js",
+        "resources/console/app.css",
+        "test/console-greenfield.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T08:31:00.409Z",
+      "completedAt": "2026-11-09T08:31:00.409Z",
+      "summary": "Console tests pass (V-001), including new removal tests: live removal, saved list, files untouched, unavailable entry, read-only refusal, refusal while a session is live. Browser rendering not checked (limitation).",
+      "evidence": [
+        "verification:V-001"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-09T08:31:13.837Z",
+      "completedAt": "2026-11-09T08:31:13.837Z",
+      "summary": "All three criteria satisfied; one accepted safety addition."
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Removal is refused while an agent session (Codex or a connected Claude Code channel) is live in that project; the developer ends it first",
+      "reason": "Removing a project mid-session would orphan agent processes and the checkout lock",
+      "costIfWrong": "Developer must end the session before removing; small friction only",
+      "createdAt": "2026-11-09T08:23:37.793Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-09T08:31:13.837Z"
+}

@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:47:19.549Z",
+      "completedAt": "2026-11-09T10:47:19.549Z",
+      "summary": "openGate() in resources/console/app.js shows each gate section as raw text in a <pre> box limited to 280 px (dialog.act .gsec), so Markdown headings and lists show as symbols; criteria show the English convergence status (not-assessed); the dialog is the narrow create dialog; the server (src/console/actions.js decideGate) requires confirmGate === gate and the page keeps Record disabled until the typed name matches. richText() already renders Markdown for chat replies.",
+      "evidence": [
+        "resources/console/app.js",
+        "resources/console/app.css",
+        "src/console/actions.js",
+        "runtime:owner screenshots of the specification review dialog, 2026-11-09"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:47:19.959Z",
+      "completedAt": "2026-11-09T10:47:19.959Z",
+      "summary": "Owner asked (2026-11-09) for organized, easy-to-read material, a larger or expandable dialog, and a simpler confirmation than typing the gate name. The decision stays explicit: a checkbox the developer ticks, plus the required note; the server still checks the material digest."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:47:20.568Z",
+      "completedAt": "2026-11-09T10:47:20.568Z",
+      "summary": "Server: accept { confirmed: true } as the confirmation (confirmGate still accepted). Page: render sections with richText, no inner scroll boxes, Arabic criteria status (hide not-assessed), wide dialog with an expand toggle, one checkbox, note quick-fill chips; tests and docs."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:51:02.655Z",
+      "completedAt": "2026-11-09T10:51:02.655Z",
+      "summary": "Review dialog: wide (min(1040px, viewport)) with an Expand toggle to full screen remembered per browser; opens at the top; sections rendered with richText and the work.md template headings shown in Arabic, no inner scroll boxes, a contents row; criteria as a numbered list with Arabic delivery status (not-assessed hidden); quick-note pills; one checkbox 'I reviewed the <gate>, and this is my decision' replaces typing the gate name. Server decideGate accepts confirmed: true (the typed name still works) and refuses anything else; digest check unchanged. Tests, docs/console.md and CHANGELOG updated.",
+      "evidence": [
+        "resources/console/app.js",
+        "resources/console/app.css",
+        "src/console/actions.js",
+        "test/console-actions.test.js",
+        "docs/console.md",
+        "CHANGELOG.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:51:27.271Z",
+      "completedAt": "2026-11-09T10:51:27.271Z",
+      "summary": "Console tests pass (V-001), including refusals for a missing, false or non-boolean confirmation and an approval with confirmed: true. Browser on a copy of the owner's lalaff project (no vendor, no agent state): the specification review opened at the top with Arabic headings, formatted lists, numbered criteria; Expand went full screen; the quick note filled the note; ticking the box enabled Record; no decision was recorded; no console errors.",
+      "evidence": [
+        "verification:V-001",
+        "runtime:Playwright check of the specification review on a scratch copy of lalaff, 2026-11-09"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-09T10:51:27.271Z"
+}

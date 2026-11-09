@@ -28,7 +28,7 @@ import { wizardCatalog, wizardCreate, wizardPlan, wizardProgress } from './newpr
 import { AgentBridge } from '../agents/bridge.js';
 import { detectProviders } from '../agents/detect.js';
 import { FolderError, listFolders } from './folders.js';
-import { addProject as saveToRegistry } from './registry.js';
+import { addProject as saveToRegistry, removeProject as forgetInRegistry } from './registry.js';
 import { addRuntimeService, attachPlannedFile, createdProjectRoot, gitInit, probeTools, workspaceRoot } from './greenfield.js';
 import { CLAUDE_NOT_INCLUDED, claudeIncluded, loadClaude } from '../agents/experimental.js';
 import { readAgentSettings, writeAgentSettings } from '../agents/settings.js';
@@ -49,7 +49,7 @@ const UI_FILES = Object.freeze({
 // 1.4.0: work-item actions and review-gate decisions (PF-0043) join Create Work.
 // 1.4.0 Greenfield journey (PF-0057): register a project, enable agents for this run, Git init,
 // add a runtime service, attach a planned file to a new project's first work item.
-const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|revision-sources|actions\/[a-z]+|gates\/[a-z]+\/decision))?|runtime\/[a-z][a-z0-9-]{0,31}\/(?:trust|start|stop|restart)|runtime\/services|runtime\/(?:start|stop)-all|runtime\/analyze|runtime\/plan\/save|agents\/(?:settings|launch-files)|setup\/(?:scan|step)|git\/init)$|^\/api\/new\/(?:plan|create|plans\/NP-\d{14}-[0-9a-f]{6}\/files)$|^\/api\/(?:projects|agents\/enable)$/;
+const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|revision-sources|actions\/[a-z]+|gates\/[a-z]+\/decision))?|runtime\/[a-z][a-z0-9-]{0,31}\/(?:trust|start|stop|restart)|runtime\/services|runtime\/(?:start|stop)-all|runtime\/analyze|runtime\/plan\/save|agents\/(?:settings|launch-files)|setup\/(?:scan|step)|git\/init)$|^\/api\/new\/(?:plan|create|plans\/NP-\d{14}-[0-9a-f]{6}\/files)$|^\/api\/(?:projects|projects\/remove|agents\/enable)$/;
 // Agent Interaction (v1.3.0, only with --agents): the Agent Workspace's actions.
 const AGENT_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/agent\/(start|message|permission|cancel|end|resume|connect|disconnect|activate)$/;
 // The Claude channel server and hook forwarder (bridge token, never a browser).
@@ -145,6 +145,52 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     for (const client of clients) client.write(message);
     return { id: entry.id, name: entry.name, root: entry.root, added: true, saved: saved.added };
   }
+  // A project the wizard just made: add it, then scan its stack once (PF-0084), so Setup
+  // starts from the generated files instead of asking for a scan the developer just chose.
+  // A failed scan only leaves the step open.
+  async function registerCreated(planId) {
+    const registration = await registerRoot((await createdProjectRoot(planId)).root);
+    if (!readOnly) await scanSetup(registration.root, runner).catch(() => {});
+    return registration;
+  }
+  // PF-0081: takes a project off this console and off the saved list. The project's own
+  // files and .yallaflow records are never touched; it can be added again later. Runs in
+  // the same queue as registration, so the saved list keeps one writer.
+  function unregister(target) {
+    const next = registering.then(() => unregisterNow(target));
+    registering = next.catch(() => {});
+    return next;
+  }
+  async function unregisterNow({ id, root }) {
+    if (root !== undefined) {
+      // An unavailable saved project: only an entry the console listed as unavailable.
+      const at = missing.indexOf(root);
+      if (at === -1) throw Object.assign(new Error('That folder is not in the unavailable list.'), { status: 404, code: 'NOT_FOUND' });
+      await forgetInRegistry(root);
+      missing.splice(at, 1);
+      broadcastProjects(null);
+      return { removed: true, root };
+    }
+    const entry = byId.get(id);
+    if (!entry) throw Object.assign(new Error('Unknown project.'), { status: 404, code: 'NOT_FOUND' });
+    await bridge?.removeProject(entry.id);
+    await forgetInRegistry(entry.root);
+    const at = projects.indexOf(entry);
+    if (at !== -1) {
+      projects.splice(at, 1);
+      watchers.splice(at, 1)[0]?.close();
+    }
+    byId.delete(entry.id);
+    savedChoices.delete(entry.id);
+    teamCache.delete(entry.id);
+    runner.invalidate(entry.root);
+    broadcastProjects(entry.id);
+    return { removed: true, id: entry.id, root: entry.root };
+  }
+  function broadcastProjects(projectId) {
+    const message = `data: ${JSON.stringify({ type: 'projects', project: projectId, at: new Date().toISOString() })}\n\n`;
+    for (const client of clients) client.write(message);
+  }
   async function agentSettingsView(project, scan) {
     // A read-only console runs no agent probes (security review, PF-0069).
     if (readOnly) return { readOnly: true, claudeAvailable: claudeIncluded(), saved: { chosen: false }, applied: { agents: false, claude: false }, codex: null, claude: null, checklist: null };
@@ -153,7 +199,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     const detected = await detectProviders({ env: agentEnv, claude: (scan || claudeOnHere || choice.claude) && claudeIncluded(), maxAgeMs: scan ? 0 : 30_000 });
     const claudeKit = claudeOnHere ? await loadClaude() : null;
     const launchFiles = claudeKit ? await claudeKit.launchFilesCurrent(project.root) : false;
-    const provider = (found) => (found ? { ready: Boolean(found.ready), problems: found.problems ?? [], version: found.claude?.version ?? found.codex?.version ?? null, auth: found.auth ? { loggedIn: Boolean(found.auth.loggedIn), method: found.auth.method ?? null, plan: found.auth.plan ?? null } : null } : null);
+    const provider = (found) => (found ? { ready: Boolean(found.ready), problems: found.problems ?? [], warnings: found.warnings ?? [], version: found.claude?.version ?? found.codex?.version ?? null, auth: found.auth ? { loggedIn: Boolean(found.auth.loggedIn), method: found.auth.method ?? null, plan: found.auth.plan ?? null } : null } : null);
     return {
       readOnly, claudeAvailable: claudeIncluded(),
       saved: choice,
@@ -305,6 +351,14 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
         throw error;
       }
     }
+    if (parts.length === 3 && parts[1] === 'projects' && parts[2] === 'remove') {
+      const type = String(request.headers['content-type'] ?? '').split(';')[0].trim().toLowerCase();
+      if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+      const body = await readJsonBody(request);
+      const keys = body && typeof body === 'object' && !Array.isArray(body) ? Object.keys(body) : [];
+      if (keys.length !== 1 || !['id', 'root'].includes(keys[0]) || typeof body[keys[0]] !== 'string' || !body[keys[0]]) return send(response, 400, { error: { code: 'BAD_REQUEST', message: 'Send { id } or { root }.' } });
+      return send(response, 200, await unregister(body));
+    }
     if (parts.length === 3 && parts[1] === 'agents' && parts[2] === 'enable') {
       const type = String(request.headers['content-type'] ?? '').split(';')[0].trim().toLowerCase();
       if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
@@ -325,7 +379,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
       const body = await readJsonBody(request);
       const cwd = projects[0]?.root ?? process.cwd();
-      return send(response, 200, parts[2] === 'plan' ? await wizardPlan(cwd, body, runner) : await wizardCreate(cwd, body, runner, { register: async (planId) => registerRoot((await createdProjectRoot(planId)).root) }));
+      return send(response, 200, parts[2] === 'plan' ? await wizardPlan(cwd, body, runner) : await wizardCreate(cwd, body, runner, { register: registerCreated }));
     }
     const project = parts[1] === 'p' ? byId.get(parts[2]) : null;
     if (!project) return send(response, 404, { error: { code: 'NOT_FOUND', message: 'Unknown project.' } });

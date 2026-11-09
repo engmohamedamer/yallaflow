@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-09T13:39:58.164Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "Assessed after V-001 (harness); live sessions not exercised (limitation).",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "switchHere shows the end-and-work-here button only for an idle Codex session on another item, and a wait line while it works; the button reuses the existing end action, after which the picker renders.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:0dc51227d66760b87e2767d5b9e9189b9ed89149f52e26a2500d9bb56509a979",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-project-chat.test.js",
+              "contentHash": "sha256:a53ca5dcecb69d7e92e553deb8e4c80ac8e1e396f75a70e73dd7ce27f6336fad",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --test test/console-project-chat.test.js test/agent-continue.test.js test/agent-bridge.test.js test/console-agent-errors.test.js test/console-presentation.test.js (passed)",
+              "workId": "PF-0103",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "With Claude connected and idle and Codex ready, 'Use Codex for this item' shows the /exit instruction; on session.disconnected the draft is prepared and Codex is selected; while Claude works the page says to wait.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:0dc51227d66760b87e2767d5b9e9189b9ed89149f52e26a2500d9bb56509a979",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-project-chat.test.js",
+              "contentHash": "sha256:a53ca5dcecb69d7e92e553deb8e4c80ac8e1e396f75a70e73dd7ce27f6336fad",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --test test/console-project-chat.test.js test/agent-continue.test.js test/agent-bridge.test.js test/console-agent-errors.test.js test/console-presentation.test.js (passed)",
+              "workId": "PF-0103",
+              "verificationRunId": "V-001"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-09T13:39:58.164Z"
+}

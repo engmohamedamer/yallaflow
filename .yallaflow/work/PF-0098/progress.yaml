@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:54:59.791Z",
+      "completedAt": "2026-11-09T10:54:59.791Z",
+      "summary": "PF-0097's full-screen review dialog keeps the material at max-width 80ch in one column (resources/console/app.css dialog.act.gate .gtext), leaving half the screen empty, and the decision stays at the bottom of the form (openGate in resources/console/app.js).",
+      "evidence": [
+        "resources/console/app.css",
+        "resources/console/app.js",
+        "runtime:owner screenshot of the expanded review dialog, 2026-11-09"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:55:00.237Z",
+      "completedAt": "2026-11-09T10:55:00.237Z",
+      "summary": "Owner: the expanded view should use the space better (2026-11-09)."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:55:00.888Z",
+      "completedAt": "2026-11-09T10:55:00.888Z",
+      "summary": "Wrap the material in .gmain and the contents plus decision in .gside; in .full use a two-column grid with a sticky side column; normal size stays one column."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:57:04.309Z",
+      "completedAt": "2026-11-09T10:57:04.309Z",
+      "summary": "The review form now wraps the material in .gmain and the decision in .gside inside .gbody; in full screen .gbody is a centered two-column grid (material up to 1100 px, side column 300-380 px) with the side column sticky, and the material text fills its column; below 900 px and in the normal size it stays one column. CHANGELOG updated.",
+      "evidence": [
+        "resources/console/app.js",
+        "resources/console/app.css",
+        "CHANGELOG.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:57:29.417Z",
+      "completedAt": "2026-11-09T10:57:29.417Z",
+      "summary": "Console tests pass (V-001). Browser at 1900x1000 on the scratch copy of lalaff: in full screen the specification fills a centered column with the decision column beside it; after scrolling to the acceptance criteria the decision column and header stay visible; no console errors.",
+      "evidence": [
+        "verification:V-001",
+        "runtime:Playwright screenshots of the expanded review dialog, top and scrolled, 2026-11-09"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-09T10:57:29.417Z"
+}

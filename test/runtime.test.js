@@ -294,7 +294,11 @@ test('console: runtime routes are token/Origin/JSON guarded, trust needs the typ
     const stale = await post('trust', { confirm: 'web', definitionHash: `sha256:${'0'.repeat(64)}` });
     assert.equal(stale.status, 422);
     assert.equal((await stale.json()).error.code, 'RUNTIME_TRUST_STALE', 'a definition other than the one reviewed is never trusted');
-    assert.equal((await post('trust', { confirm: 'web', definitionHash: hash })).status, 200);
+    // PF-0101: the page's checkbox; it must be exactly true.
+    assert.equal((await post('trust', { confirmed: false, definitionHash: hash })).status, 400);
+    assert.equal((await post('trust', { confirmed: 'yes', definitionHash: hash })).status, 400);
+    assert.equal((await post('trust', { confirmed: true })).status, 400, 'the reviewed definition must still be named');
+    assert.equal((await post('trust', { confirmed: true, definitionHash: hash })).status, 200);
     const started = await post('start', {});
     assert.equal(started.status, 200);
     const startedBody = await started.json();

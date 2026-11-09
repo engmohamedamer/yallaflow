@@ -1,0 +1,286 @@
+TAP version 13
+# Subtest: stopFrom: a usage limit is recognised with its retry time; other stops keep their reason
+ok 1 - stopFrom: a usage limit is recognised with its retry time; other stops keep their reason
+  ---
+  duration_ms: 4.975704
+  type: 'test'
+  ...
+# Subtest: codex: a usage-limit turn is a stop with its retry time, kept after End and across a console restart
+ok 2 - codex: a usage-limit turn is a stop with its retry time, kept after End and across a console restart
+  ---
+  duration_ms: 4741.698646
+  type: 'test'
+  ...
+# Subtest: codex: a crash and a plain End are recorded as such
+ok 3 - codex: a crash and a plain End are recorded as such
+  ---
+  duration_ms: 4715.986122
+  type: 'test'
+  ...
+# Subtest: UI: a live Codex usage limit offers Claude Code and a terminal message, not Codex again
+ok 4 - UI: a live Codex usage limit offers Claude Code and a terminal message, not Codex again
+  ---
+  duration_ms: 4.358187
+  type: 'test'
+  ...
+# Subtest: UI: a session started after the stop (the switch itself) clears the card
+ok 5 - UI: a session started after the stop (the switch itself) clears the card
+  ---
+  duration_ms: 2.861389
+  type: 'test'
+  ...
+# Subtest: UI: a message sent after the stop clears the card; another item never shows it
+ok 6 - UI: a message sent after the stop clears the card; another item never shows it
+  ---
+  duration_ms: 4.060268
+  type: 'test'
+  ...
+# Subtest: UI: with no session, the last recorded stop of this item is offered, including the same agent; Arabic too
+ok 7 - UI: with no session, the last recorded stop of this item is offered, including the same agent; Arabic too
+  ---
+  duration_ms: 5.310248
+  type: 'test'
+  ...
+# Subtest: UI: only ready providers are offered
+ok 8 - UI: only ready providers are offered
+  ---
+  duration_ms: 2.741746
+  type: 'test'
+  ...
+# Subtest: UI: switching ends Codex first, connects Claude, and prepares (never sends) the continue message
+ok 9 - UI: switching ends Codex first, connects Claude, and prepares (never sends) the continue message
+  ---
+  duration_ms: 5.510366
+  type: 'test'
+  ...
+# Subtest: UI: a failed End stops the switch; nothing else starts
+ok 10 - UI: a failed End stops the switch; nothing else starts
+  ---
+  duration_ms: 2.791018
+  type: 'test'
+  ...
+# Subtest: UI: the item lists which agent worked on it and how each session stopped
+ok 11 - UI: the item lists which agent worked on it and how each session stopped
+  ---
+  duration_ms: 2.017602
+  type: 'test'
+  ...
+# Subtest: a merge-collided work item is listed as invalid and never hides the project
+ok 12 - a merge-collided work item is listed as invalid and never hides the project
+  ---
+  duration_ms: 2856.529888
+  type: 'test'
+  ...
+# Subtest: the exact Vult message: a ledger pinned to another registry version
+ok 13 - the exact Vult message: a ledger pinned to another registry version
+  ---
+  duration_ms: 945.995089
+  type: 'test'
+  ...
+# Subtest: an unreadable meta.yaml is reported, not fatal
+ok 14 - an unreadable meta.yaml is reported, not fatal
+  ---
+  duration_ms: 917.668073
+  type: 'test'
+  ...
+# Subtest: zero work items: no completion is claimed
+ok 15 - zero work items: no completion is claimed
+  ---
+  duration_ms: 759.803581
+  type: 'test'
+  ...
+# Subtest: console: an invalid item is a data warning in a 200 snapshot, not a failed project
+ok 16 - console: an invalid item is a data warning in a 200 snapshot, not a failed project
+  ---
+  duration_ms: 2377.131191
+  type: 'test'
+  ...
+# Subtest: console UI: the theme button is matched by its own attribute, never by <html data-theme>
+ok 17 - console UI: the theme button is matched by its own attribute, never by <html data-theme>
+  ---
+  duration_ms: 14.903978
+  type: 'test'
+  ...
+# Subtest: work-item actions run the canonical commands: same records as the CLI, Core refusals passed through
+ok 18 - work-item actions run the canonical commands: same records as the CLI, Core refusals passed through
+  ---
+  duration_ms: 4422.768365
+  type: 'test'
+  ...
+# Subtest: request edits use full text before work starts and refuse stale or invalid saves
+ok 19 - request edits use full text before work starts and refuse stale or invalid saves
+  ---
+  duration_ms: 2636.740883
+  type: 'test'
+  ...
+# Subtest: action input is validated and values never become options
+ok 20 - action input is validated and values never become options
+  ---
+  duration_ms: 724.354221
+  type: 'test'
+  ...
+# Subtest: security: token, Origin, content type and read-only consoles guard every action and decision
+ok 21 - security: token, Origin, content type and read-only consoles guard every action and decision
+  ---
+  duration_ms: 575.115848
+  type: 'test'
+  ...
+# Subtest: gate decisions: material shown first, exact confirmation, stale and duplicate protection, console provenance
+ok 22 - gate decisions: material shown first, exact confirmation, stale and duplicate protection, console provenance
+  ---
+  duration_ms: 4330.931383
+  type: 'test'
+  ...
+# Subtest: CLI decisions are recorded exactly as before (no provenance), and a bad provenance channel records nothing
+ok 23 - CLI decisions are recorded exactly as before (no provenance), and a bad provenance channel records nothing
+  ---
+  duration_ms: 2985.007886
+  type: 'test'
+  ...
+# Subtest: the Agent Workspace never reaches gate decisions, and agents never inherit the provenance channel
+ok 24 - the Agent Workspace never reaches gate decisions, and agents never inherit the provenance channel
+  ---
+  duration_ms: 3.070456
+  type: 'test'
+  ...
+# Subtest: review findings: re-deciding after "request changes", request ids per gate, malformed bodies, provenance limits, strict doctor
+ok 25 - review findings: re-deciding after "request changes", request ids per gate, malformed bodies, provenance limits, strict doctor
+  ---
+  duration_ms: 4348.414503
+  type: 'test'
+  ...
+# Subtest: revision attachments preserve bytes, deduplicate retries and respect request-edit and HTTP guards
+ok 26 - revision attachments preserve bytes, deduplicate retries and respect request-edit and HTTP guards
+  ---
+  duration_ms: 2792.808581
+  type: 'test'
+  ...
+# Subtest: revision upload rechecks eligibility in the CLI if work starts after its queued check
+ok 27 - revision upload rechecks eligibility in the CLI if work starts after its queued check
+  ---
+  duration_ms: 966.079701
+  type: 'test'
+  ...
+# Subtest: agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+ok 28 - agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+  ---
+  duration_ms: 13.4526
+  type: 'test'
+  ...
+# Subtest: paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+ok 29 - paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+  ---
+  duration_ms: 8.390687
+  type: 'test'
+  ...
+# Subtest: file selection and paste combine; unsupported, empty and oversized files are explained
+ok 30 - file selection and paste combine; unsupported, empty and oversized files are explained
+  ---
+  duration_ms: 4.280419
+  type: 'test'
+  ...
+# Subtest: revision partial failure keeps pending files and retries without duplicating text or successful uploads
+ok 31 - revision partial failure keeps pending files and retries without duplicating text or successful uploads
+  ---
+  duration_ms: 6.271127
+  type: 'test'
+  ...
+# Subtest: create uploads pasted files through the existing bound request endpoint
+ok 32 - create uploads pasted files through the existing bound request endpoint
+  ---
+  duration_ms: 8.062557
+  type: 'test'
+  ...
+# Subtest: overview previews keep full facts available under View more, including after redraw
+ok 33 - overview previews keep full facts available under View more, including after redraw
+  ---
+  duration_ms: 6.467925
+  type: 'test'
+  ...
+# Subtest: every project page gets the project chat; a work item page gets its own; new-project pages get none
+ok 34 - every project page gets the project chat; a work item page gets its own; new-project pages get none
+  ---
+  duration_ms: 36.200547
+  type: 'test'
+  ...
+# Subtest: the project chat is labelled, starts no work item and suggests project questions
+ok 35 - the project chat is labelled, starts no work item and suggests project questions
+  ---
+  duration_ms: 12.649977
+  type: 'test'
+  ...
+# Subtest: a running item session shows on project pages as a link to that item
+ok 36 - a running item session shows on project pages as a link to that item
+  ---
+  duration_ms: 21.43517
+  type: 'test'
+  ...
+# Subtest: a project session shows on an item page labelled as the project chat
+ok 37 - a project session shows on an item page labelled as the project chat
+  ---
+  duration_ms: 4.564551
+  type: 'test'
+  ...
+# Subtest: with agents off the project chat explains how to turn them on without naming an item
+ok 38 - with agents off the project chat explains how to turn them on without naming an item
+  ---
+  duration_ms: 3.464003
+  type: 'test'
+  ...
+# Subtest: the item chat is unchanged
+ok 39 - the item chat is unchanged
+  ---
+  duration_ms: 3.132802
+  type: 'test'
+  ...
+# Subtest: the picker links to Setup → Agents when Claude Code is off for the project
+ok 40 - the picker links to Setup → Agents when Claude Code is off for the project
+  ---
+  duration_ms: 4.169242
+  type: 'test'
+  ...
+# Subtest: blocker texts read in Arabic; suggestions say they only fill the box; your turn after a reply
+ok 41 - blocker texts read in Arabic; suggestions say they only fill the box; your turn after a reply
+  ---
+  duration_ms: 11.269719
+  type: 'test'
+  ...
+# Subtest: security: loopback host, token, origin, read-only methods and ID-only paths
+ok 42 - security: loopback host, token, origin, read-only methods and ID-only paths
+  ---
+  duration_ms: 1031.205506
+  type: 'test'
+  ...
+# Subtest: serves the snapshot, work detail and preserved sources by ID
+ok 43 - serves the snapshot, work detail and preserved sources by ID
+  ---
+  duration_ms: 1495.329954
+  type: 'test'
+  ...
+# Subtest: live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+ok 44 - live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+  ---
+  duration_ms: 1733.07863
+  type: 'test'
+  ...
+# Subtest: the console never writes: browsing every route leaves the workspace byte-identical
+ok 45 - the console never writes: browsing every route leaves the workspace byte-identical
+  ---
+  duration_ms: 1653.362911
+  type: 'test'
+  ...
+# Subtest: extracted text cannot be read outside its source directory; HEAD never opens the event stream
+ok 46 - extracted text cannot be read outside its source directory; HEAD never opens the event stream
+  ---
+  duration_ms: 1377.174439
+  type: 'test'
+  ...
+1..46
+# tests 46
+# suites 0
+# pass 46
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 24208.555124

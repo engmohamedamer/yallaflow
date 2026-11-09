@@ -1,0 +1,514 @@
+TAP version 13
+# Subtest: versions, forbidden modes, ACP normalization, and API keys stripped from the adapter env
+ok 1 - versions, forbidden modes, ACP normalization, and API keys stripped from the adapter env
+  ---
+  duration_ms: 7.270534
+  type: 'test'
+  ...
+# Subtest: detection: adapter missing, unsupported version, and ready
+ok 2 - detection: adapter missing, unsupported version, and ready
+  ---
+  duration_ms: 57.368154
+  type: 'test'
+  ...
+# Subtest: codex: start, stream, follow-up, permissions (allow, deny, timeout), one session per checkout, no activation
+ok 3 - codex: start, stream, follow-up, permissions (allow, deny, timeout), one session per checkout, no activation
+  ---
+  duration_ms: 5460.803374
+  type: 'test'
+  ...
+# Subtest: codex: cancel, crash, resume after a console restart, explicit activation through Core
+ok 4 - codex: cancel, crash, resume after a console restart, explicit activation through Core
+  ---
+  duration_ms: 8968.499107
+  type: 'test'
+  ...
+# Subtest: codex: ending a session while a permission is pending denies it and never crashes the console
+ok 5 - codex: ending a session while a permission is pending denies it and never crashes the console
+  ---
+  duration_ms: 4656.592976
+  type: 'test'
+  ...
+# Subtest: codex: a non-subscription login is refused and no session starts
+ok 6 - codex: a non-subscription login is refused and no session starts
+  ---
+  duration_ms: 6502.495952
+  type: 'test'
+  ...
+# Subtest: security: opt-in, token, Origin, content type, read-only, unsupported controls
+ok 7 - security: opt-in, token, Origin, content type, read-only, unsupported controls
+  ---
+  duration_ms: 770.136804
+  type: 'test'
+  ...
+# Subtest: security review regressions: start race, modes, symlinks
+ok 8 - security review regressions: start race, modes, symlinks
+  ---
+  duration_ms: 8492.869506
+  type: 'test'
+  ...
+# Subtest: codex: an adapter that cannot be spawned fails the start promptly and frees the checkout
+ok 9 - codex: an adapter that cannot be spawned fails the start promptly and frees the checkout
+  ---
+  duration_ms: 4222.007728
+  type: 'test'
+  ...
+# Subtest: stabilization: Allow for session is session-scoped only; nothing persists or carries to another session
+ok 10 - stabilization: Allow for session is session-scoped only; nothing persists or carries to another session
+  ---
+  duration_ms: 4645.575233
+  type: 'test'
+  ...
+# Subtest: stabilization: ending a Codex session ends what it started, and an incomplete cleanup is never reported as a clean stop
+ok 11 - stabilization: ending a Codex session ends what it started, and an incomplete cleanup is never reported as a clean stop
+  ---
+  duration_ms: 8018.878618
+  type: 'test'
+  ...
+# Subtest: stabilization: one agent console per checkout across separate console processes
+ok 12 - stabilization: one agent console per checkout across separate console processes
+  ---
+  duration_ms: 4713.460751
+  type: 'test'
+  ...
+# Subtest: stabilization: a directory swapped for a link after the check cannot redirect a local write
+ok 13 - stabilization: a directory swapped for a link after the check cannot redirect a local write
+  ---
+  duration_ms: 9.405861
+  type: 'test'
+  ...
+# Subtest: stabilization review: hard links, End while starting, overlapping lock claims, crash cleanup
+ok 14 - stabilization review: hard links, End while starting, overlapping lock claims, crash cleanup
+  ---
+  duration_ms: 2717.411976
+  type: 'test'
+  ...
+# Subtest: CLI: agents detect is read-only; console flag combinations are validated
+ok 15 - CLI: agents detect is read-only; console flag combinations are validated
+  ---
+  duration_ms: 1344.496608
+  type: 'test'
+  ...
+# Subtest: claude (simulated): channel server registers, relays chat, replies, permissions, hooks; bridge token protected
+ok 16 - claude (simulated): channel server registers, relays chat, replies, permissions, hooks; bridge token protected
+  ---
+  duration_ms: 7257.025727
+  type: 'test'
+  ...
+# Subtest: claude (simulated): the channel waits for a console and reports undelivered replies honestly
+ok 17 - claude (simulated): the channel waits for a console and reports undelivered replies honestly
+  ---
+  duration_ms: 327.761224
+  type: 'test'
+  ...
+# Subtest: claude (simulated): bridge file, channel takeover, disconnect, bypass, nested workspaces
+ok 18 - claude (simulated): bridge file, channel takeover, disconnect, bypass, nested workspaces
+  ---
+  duration_ms: 6762.674239
+  type: 'test'
+  ...
+# Subtest: claude (simulated): agents claude-files writes git-ignored launch files
+ok 19 - claude (simulated): agents claude-files writes git-ignored launch files
+  ---
+  duration_ms: 367.539715
+  type: 'test'
+  ...
+# Subtest: review: a stale bridge file pointing at another listener receives no token and no data
+ok 20 - review: a stale bridge file pointing at another listener receives no token and no data
+  ---
+  duration_ms: 1447.052637
+  type: 'test'
+  ...
+# Subtest: review: Claude detection runs only after opt-in; a failed Claude enable leaves no lock or bridge file
+ok 21 - review: Claude detection runs only after opt-in; a failed Claude enable leaves no lock or bridge file
+  ---
+  duration_ms: 446.778826
+  type: 'test'
+  ...
+# Subtest: Claude Team accounts get a channel warning; an unanswered console message is reported
+ok 22 - Claude Team accounts get a channel warning; an unanswered console message is reported
+  ---
+  duration_ms: 259.930234
+  type: 'test'
+  ...
+# Subtest: stopFrom: a usage limit is recognised with its retry time; other stops keep their reason
+ok 23 - stopFrom: a usage limit is recognised with its retry time; other stops keep their reason
+  ---
+  duration_ms: 3.186442
+  type: 'test'
+  ...
+# Subtest: codex: a usage-limit turn is a stop with its retry time, kept after End and across a console restart
+ok 24 - codex: a usage-limit turn is a stop with its retry time, kept after End and across a console restart
+  ---
+  duration_ms: 4746.588154
+  type: 'test'
+  ...
+# Subtest: codex: a crash and a plain End are recorded as such
+ok 25 - codex: a crash and a plain End are recorded as such
+  ---
+  duration_ms: 4521.298924
+  type: 'test'
+  ...
+# Subtest: UI: a live Codex usage limit offers Claude Code and a terminal message, not Codex again
+ok 26 - UI: a live Codex usage limit offers Claude Code and a terminal message, not Codex again
+  ---
+  duration_ms: 3.574473
+  type: 'test'
+  ...
+# Subtest: UI: a session started after the stop (the switch itself) clears the card
+ok 27 - UI: a session started after the stop (the switch itself) clears the card
+  ---
+  duration_ms: 1.826932
+  type: 'test'
+  ...
+# Subtest: UI: a message sent after the stop clears the card; another item never shows it
+ok 28 - UI: a message sent after the stop clears the card; another item never shows it
+  ---
+  duration_ms: 3.24929
+  type: 'test'
+  ...
+# Subtest: UI: with no session, the last recorded stop of this item is offered, including the same agent; Arabic too
+ok 29 - UI: with no session, the last recorded stop of this item is offered, including the same agent; Arabic too
+  ---
+  duration_ms: 4.692632
+  type: 'test'
+  ...
+# Subtest: UI: only ready providers are offered
+ok 30 - UI: only ready providers are offered
+  ---
+  duration_ms: 1.685383
+  type: 'test'
+  ...
+# Subtest: UI: switching ends Codex first, connects Claude, and prepares (never sends) the continue message
+ok 31 - UI: switching ends Codex first, connects Claude, and prepares (never sends) the continue message
+  ---
+  duration_ms: 4.03041
+  type: 'test'
+  ...
+# Subtest: UI: a failed End stops the switch; nothing else starts
+ok 32 - UI: a failed End stops the switch; nothing else starts
+  ---
+  duration_ms: 2.389895
+  type: 'test'
+  ...
+# Subtest: UI: the item lists which agent worked on it and how each session stopped
+ok 33 - UI: the item lists which agent worked on it and how each session stopped
+  ---
+  duration_ms: 1.662069
+  type: 'test'
+  ...
+# Subtest: a refused send keeps its error after the agent state reloads
+ok 34 - a refused send keeps its error after the agent state reloads
+  ---
+  duration_ms: 7.213309
+  type: 'test'
+  ...
+# Subtest: a successful send reports success and leaves no error
+ok 35 - a successful send reports success and leaves no error
+  ---
+  duration_ms: 4.794192
+  type: 'test'
+  ...
+# Subtest: a connected Claude Code whose mode is unknown cannot be sent to and says why
+ok 36 - a connected Claude Code whose mode is unknown cannot be sent to and says why
+  ---
+  duration_ms: 11.135127
+  type: 'test'
+  ...
+# Subtest: once the mode is reported the panel offers Send
+ok 37 - once the mode is reported the panel offers Send
+  ---
+  duration_ms: 3.633025
+  type: 'test'
+  ...
+# Subtest: the Arabic panel explains the wait too
+ok 38 - the Arabic panel explains the wait too
+  ---
+  duration_ms: 6.364816
+  type: 'test'
+  ...
+# Subtest: a failed send puts the typed message back
+ok 39 - a failed send puts the typed message back
+  ---
+  duration_ms: 0.479887
+  type: 'test'
+  ...
+# Subtest: agent replies use formatted content while user messages stay literal
+ok 40 - agent replies use formatted content while user messages stay literal
+  ---
+  duration_ms: 3.780285
+  type: 'test'
+  ...
+# Subtest: folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+ok 41 - folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+  ---
+  duration_ms: 142.94979
+  type: 'test'
+  ...
+# Subtest: registration: an existing YallaFlow project inside home is added once, live; others are refused
+ok 42 - registration: an existing YallaFlow project inside home is added once, live; others are refused
+  ---
+  duration_ms: 419.35449
+  type: 'test'
+  ...
+# Subtest: stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+ok 43 - stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+  ---
+  duration_ms: 1059.586995
+  type: 'test'
+  ...
+# Subtest: a plan that installs dependencies needs an explicit acknowledgement (PF-0085)
+ok 44 - a plan that installs dependencies needs an explicit acknowledgement (PF-0085)
+  ---
+  duration_ms: 357.544821
+  type: 'test'
+  ...
+# Subtest: Git init: explicit, once, never inside another repository; refused read-only
+ok 45 - Git init: explicit, once, never inside another repository; refused read-only
+  ---
+  duration_ms: 93.018669
+  type: 'test'
+  ...
+# Subtest: runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+ok 46 - runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+  ---
+  duration_ms: 675.799884
+  type: 'test'
+  ...
+# Subtest: agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+ok 47 - agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+  ---
+  duration_ms: 33.813884
+  type: 'test'
+  ...
+# Subtest: review: parallel registrations add a project once and lose none from the saved list
+ok 48 - review: parallel registrations add a project once and lose none from the saved list
+  ---
+  duration_ms: 65.050721
+  type: 'test'
+  ...
+# Subtest: review: hidden folders are refused even by path; read-only consoles probe no tools
+ok 49 - review: hidden folders are refused even by path; read-only consoles probe no tools
+  ---
+  duration_ms: 11.793937
+  type: 'test'
+  ...
+# Subtest: review: plans that run package scripts need an acknowledgement; control characters and NUL are refused
+ok 50 - review: plans that run package scripts need an acknowledgement; control characters and NUL are refused
+  ---
+  duration_ms: 481.799876
+  type: 'test'
+  ...
+# Subtest: review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+ok 51 - review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+  ---
+  duration_ms: 321.401341
+  type: 'test'
+  ...
+# Subtest: a registration failure after creation is reported as partial success, never as a failed creation
+ok 52 - a registration failure after creation is reported as partial success, never as a failed creation
+  ---
+  duration_ms: 486.801917
+  type: 'test'
+  ...
+# Subtest: Claude Code: off unless chosen explicitly when enabling agents; never read-only
+ok 53 - Claude Code: off unless chosen explicitly when enabling agents; never read-only
+  ---
+  duration_ms: 51.820127
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): a project leaves the running console and the saved list; its files stay
+ok 54 - removal (PF-0081): a project leaves the running console and the saved list; its files stay
+  ---
+  duration_ms: 49.976814
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): refused while an agent session is live in the project
+ok 55 - removal (PF-0081): refused while an agent session is live in the project
+  ---
+  duration_ms: 1.682659
+  type: 'test'
+  ...
+# Subtest: every project page gets the project chat; a work item page gets its own; new-project pages get none
+ok 56 - every project page gets the project chat; a work item page gets its own; new-project pages get none
+  ---
+  duration_ms: 44.301136
+  type: 'test'
+  ...
+# Subtest: the project chat is labelled, starts no work item and suggests project questions
+ok 57 - the project chat is labelled, starts no work item and suggests project questions
+  ---
+  duration_ms: 9.20137
+  type: 'test'
+  ...
+# Subtest: a running item session shows on project pages as a link to that item
+ok 58 - a running item session shows on project pages as a link to that item
+  ---
+  duration_ms: 6.01813
+  type: 'test'
+  ...
+# Subtest: a project session shows on an item page labelled as the project chat
+ok 59 - a project session shows on an item page labelled as the project chat
+  ---
+  duration_ms: 5.168589
+  type: 'test'
+  ...
+# Subtest: with agents off the project chat explains how to turn them on without naming an item
+ok 60 - with agents off the project chat explains how to turn them on without naming an item
+  ---
+  duration_ms: 3.079916
+  type: 'test'
+  ...
+# Subtest: the item chat is unchanged
+ok 61 - the item chat is unchanged
+  ---
+  duration_ms: 4.642712
+  type: 'test'
+  ...
+# Subtest: the picker links to Setup → Agents when Claude Code is off for the project
+ok 62 - the picker links to Setup → Agents when Claude Code is off for the project
+  ---
+  duration_ms: 20.481924
+  type: 'test'
+  ...
+# Subtest: blocker texts read in Arabic; suggestions say they only fill the box; your turn after a reply
+ok 63 - blocker texts read in Arabic; suggestions say they only fill the box; your turn after a reply
+  ---
+  duration_ms: 14.546334
+  type: 'test'
+  ...
+# Subtest: the chat says when the agent is working, waiting for an approval, or waiting for a reply
+ok 64 - the chat says when the agent is working, waiting for an approval, or waiting for a reply
+  ---
+  duration_ms: 12.75505
+  type: 'test'
+  ...
+# Subtest: suggestions follow the stage: move on after an approval, plan and design wording
+ok 65 - suggestions follow the stage: move on after an approval, plan and design wording
+  ---
+  duration_ms: 16.159745
+  type: 'test'
+  ...
+# Subtest: Analyze finds the parent Compose stack, its vhost domains and its shared scope; reads no .env and keeps no environment values
+ok 66 - Analyze finds the parent Compose stack, its vhost domains and its shared scope; reads no .env and keeps no environment values
+  ---
+  duration_ms: 684.943536
+  type: 'test'
+  ...
+# Subtest: R5: what cannot be inspected is unresolved, never confirmed; an empty scan says where it looked
+ok 67 - R5: what cannot be inspected is unresolved, never confirmed; an empty scan says where it looked
+  ---
+  duration_ms: 711.96871
+  type: 'test'
+  ...
+# Subtest: the Compose reader fails closed on what it cannot read with certainty
+ok 68 - the Compose reader fails closed on what it cannot read with certainty
+  ---
+  duration_ms: 7.87047
+  type: 'test'
+  ...
+# Subtest: agent proposals are validated and stored beside the scan; they never touch the profile or trust
+ok 69 - agent proposals are validated and stored beside the scan; they never touch the profile or trust
+  ---
+  duration_ms: 1999.249094
+  type: 'test'
+  ...
+# Subtest: the agent request is prepared in the chat, never sent
+ok 70 - the agent request is prepared in the chat, never sent
+  ---
+  duration_ms: 10.372241
+  type: 'test'
+  ...
+# Subtest: R4: saving a plan grants no execution; only a person can save; outside folders go to the personal file only
+ok 71 - R4: saving a plan grants no execution; only a person can save; outside folders go to the personal file only
+  ---
+  duration_ms: 1749.503207
+  type: 'test'
+  ...
+# Subtest: AC-006: an outside folder is allowed only in the personal file and only inside home
+ok 72 - AC-006: an outside folder is allowed only in the personal file and only inside home
+  ---
+  duration_ms: 2200.067204
+  type: 'test'
+  ...
+# Subtest: R1: changing a trusted Compose file, override, Dockerfile, package script or shell script blocks execution
+ok 73 - R1: changing a trusted Compose file, override, Dockerfile, package script or shell script blocks execution
+  ---
+  duration_ms: 4177.938341
+  type: 'test'
+  ...
+# Subtest: R6: a change between review and trust is refused; console runtime writes cannot interleave
+ok 74 - R6: a change between review and trust is refused; console runtime writes cannot interleave
+  ---
+  duration_ms: 5692.78885
+  type: 'test'
+  ...
+# Subtest: R2: Stop project never stops shared infrastructure; stopping it needs a typed confirmation (S3: evidence, not the marker)
+ok 75 - R2: Stop project never stops shared infrastructure; stopping it needs a typed confirmation (S3: evidence, not the marker)
+  ---
+  duration_ms: 5831.630406
+  type: 'test'
+  ...
+# Subtest: R3: a stack already running outside YallaFlow is never started or stopped; a busy port is reported with its owner and nothing is killed
+ok 76 - R3: a stack already running outside YallaFlow is never started or stopped; a busy port is reported with its owner and nothing is killed
+  ---
+  duration_ms: 2739.523916
+  type: 'test'
+  ...
+# Subtest: without Docker the analysis says so and continues; a read-only console views the plan but changes nothing
+ok 77 - without Docker the analysis says so and continues; a read-only console views the plan but changes nothing
+  ---
+  duration_ms: 847.990234
+  type: 'test'
+  ...
+# Subtest: UI: the plan shows confidence, shared scope, unresolved items and coverage; Save starts disabled; the review shows what trust covers
+ok 78 - UI: the plan shows confidence, shared scope, unresolved items and coverage; Save starts disabled; the review shows what trust covers
+  ---
+  duration_ms: 50.612642
+  type: 'test'
+  ...
+# Subtest: review 1: escaped or unknown Compose keys block trust instead of hiding include/extends/build
+ok 79 - review 1: escaped or unknown Compose keys block trust instead of hiding include/extends/build
+  ---
+  duration_ms: 901.649479
+  type: 'test'
+  ...
+# Subtest: review 3/4: a parent Compose file that cannot be read is unresolved and blocking, never "nothing found"; a mounted .env is never opened
+ok 80 - review 3/4: a parent Compose file that cannot be read is unresolved and blocking, never "nothing found"; a mounted .env is never opened
+  ---
+  duration_ms: 402.099126
+  type: 'test'
+  ...
+# Subtest: review 5: shared and running-outside checks see override files and every -f/-p spelling
+ok 81 - review 5: shared and running-outside checks see override files and every -f/-p spelling
+  ---
+  duration_ms: 27.740875
+  type: 'test'
+  ...
+# Subtest: review 6/7: editing .env ends the trust (its content is never read); without docker ps, a Compose service is not started
+ok 82 - review 6/7: editing .env ends the trust (its content is never read); without docker ps, a Compose service is not started
+  ---
+  duration_ms: 1335.927513
+  type: 'test'
+  ...
+# Subtest: review 8/9: Replace never deletes a shared definition; shell -c, missing evidence and scan-only fields are refused
+ok 83 - review 8/9: Replace never deletes a shared definition; shell -c, missing evidence and scan-only fields are refused
+  ---
+  duration_ms: 605.481593
+  type: 'test'
+  ...
+# Subtest: an agent service matching the scanned one carries the scan's shared scope into Review and Save
+ok 84 - an agent service matching the scanned one carries the scan's shared scope into Review and Save
+  ---
+  duration_ms: 632.169325
+  type: 'test'
+  ...
+1..84
+# tests 84
+# suites 0
+# pass 84
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 61047.208012

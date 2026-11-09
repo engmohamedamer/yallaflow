@@ -182,7 +182,10 @@ test('gate decisions: material shown first, exact confirmation, stale and duplic
     const before = await reviews(root, id);
 
     // Incorrect confirmations and missing notes record nothing.
-    for (const [body, status] of [[{ ...base, confirmGate: 'Specification' }, 422], [{ ...base, confirmGate: 'plan' }, 422], [{ ...base, note: '   ' }, 422], [{ ...base, decision: 'maybe' }, 422]]) {
+    const { confirmGate: _typed, ...unconfirmed } = base;
+    for (const [body, status] of [[{ ...base, confirmGate: 'Specification' }, 422], [{ ...base, confirmGate: 'plan' }, 422], [{ ...base, note: '   ' }, 422], [{ ...base, decision: 'maybe' }, 422],
+      // PF-0097: the checkbox confirmation must be exactly true; nothing at all is refused.
+      [unconfirmed, 422], [{ ...unconfirmed, confirmed: 'yes' }, 422], [{ ...unconfirmed, confirmed: false }, 422]]) {
       assert.equal((await c.post(`work/${id}/gates/specification/decision`, { ...body, requestId: `req-${Math.random().toString(36).slice(2, 12)}` })).status, status);
     }
     assert.deepEqual(await reviews(root, id), before);
@@ -200,7 +203,7 @@ test('gate decisions: material shown first, exact confirmation, stale and duplic
     await writeFile(workMd, original);
 
     // The decision: recorded once by the unchanged CLI command, as a console decision.
-    const ok = await c.post(`work/${id}/gates/specification/decision`, { ...base, requestId: 'req-approve-01' });
+    const ok = await c.post(`work/${id}/gates/specification/decision`, { ...unconfirmed, confirmed: true, requestId: 'req-approve-01' });
     assert.equal(ok.status, 200, await ok.clone().text());
     assert.equal((await ok.json()).recorded, 'console, identity not verified');
     const after = await reviews(root, id);
@@ -355,4 +358,39 @@ test('revision upload rechecks eligibility in the CLI if work starts after its q
   }) };
   await assert.rejects(attachFile(root, id, request, runner, { revision: true }), /already started/);
   assert.equal((await meta(root, id)).sources?.length ?? 0, 0);
+});
+
+// PF-0099: in the adaptive mode Core waits on a required gate that nobody formally
+// requested (no reviews.yaml entry). The console decides it the way 'yallaflow approve' does,
+// but only for the gate the item is actually waiting on.
+test('gate decisions: a required gate that was never requested can be decided while the item waits on it', async () => {
+  const root = await freshProject('yf-gates-unrequested-');
+  const id = createdWork(run(root, ['start', 'Daily expenses']).stdout);
+  run(root, ['route', id, '--type', 'feature', '--scope', 'architectural', '--confidence', 'high', '--reason', 'Money totals.']);
+  const dir = await mkdtemp(path.join(os.tmpdir(), 'yf-actions-req-'));
+  run(root, ['requirement', 'record', id, '--file', await writeJsonFile(dir, 'req.json', {
+    requirements: [{ id: 'REQ-001', statement: 'Record expenses.', provenance: [{ type: 'request' }] }],
+    acceptanceCriteria: [{ id: 'AC-001', requirement: 'REQ-001', statement: 'An expense is saved.', provenance: [{ type: 'request' }] }]
+  })]);
+  for (const skill of ['context-discovery', 'requirement-clarification', 'design-exploration', 'specification']) {
+    run(root, ['checkpoint', id, '--skill', skill, '--complete', '--summary', `${skill} done`]);
+  }
+  const meta = async () => JSON.parse(await readFile(path.join(root, '.yallaflow', 'work', id, 'meta.yaml'), 'utf8'));
+  for (let index = 0; index < 6 && (await meta()).status !== 'SPECIFICATION'; index++) run(root, ['advance', id], { ok: false });
+  assert.equal((await meta()).status, 'SPECIFICATION');
+  const c = await consoleOn(root);
+  try {
+    const plan = await (await c.get(`work/${id}/gates/plan`)).json();
+    assert.equal(plan.waitingHere, false, 'the plan gate is not the one the item waits on');
+    const refusedPlan = await c.post(`work/${id}/gates/plan/decision`, { decision: 'approve', confirmed: true, note: 'Too early.', requestedAt: plan.requestedAt, digest: plan.digest, requestId: 'req-plan-early-1' });
+    assert.equal(refusedPlan.status, 409, 'a gate the item is not waiting on is still refused');
+    const shown = await (await c.get(`work/${id}/gates/specification`)).json();
+    assert.equal(shown.gateStatus, null, 'never requested');
+    assert.equal(shown.waitingHere, true);
+    const ok = await c.post(`work/${id}/gates/specification/decision`, { decision: 'approve', confirmed: true, note: 'Matches what I asked for.', requestedAt: shown.requestedAt, digest: shown.digest, requestId: 'req-unrequested-1' });
+    assert.equal(ok.status, 200, await ok.clone().text());
+    assert.equal((await reviews(root, id)).gates.specification.status, 'approved');
+  } finally {
+    await c.close();
+  }
 });

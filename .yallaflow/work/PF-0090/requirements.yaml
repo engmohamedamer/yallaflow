@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "While a project is being created the developer sees what is done and what remains, and the finish is clear instead of an abrupt jump.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T09:47:52.642Z",
+      "updatedAt": "2026-11-09T09:47:52.642Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "During creation a progress bar shows done of total steps with each step's state (done, running, waiting), and a long step says it can take minutes with the latest log line.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T09:47:52.642Z",
+      "updatedAt": "2026-11-09T09:47:52.642Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "When creation finishes the page stays and shows a 'project ready' screen with what was created and one primary action; it does not move to another page on its own.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T09:47:52.642Z",
+      "updatedAt": "2026-11-09T09:47:52.642Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-09T09:47:52.642Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-09T09:47:52.642Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-09T09:47:52.642Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-09T09:47:52.642Z"
+}

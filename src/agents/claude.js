@@ -15,6 +15,10 @@ import { agentEvent, isForbiddenMode } from './events.js';
 const short = (value, max = 300) => String(value ?? '').replace(/\s+/g, ' ').trim().slice(0, max);
 const REQUEST_ID = /^[a-km-z]{5}$/;
 
+// PF-0102: how long a sent message may go without any Claude Code hook before the console
+// says it was probably not received.
+export const DELIVERY_TIMEOUT_MS = Number(process.env.YALLAFLOW_CLAUDE_DELIVERY_TIMEOUT_MS) || 60_000;
+
 export class ClaudeLink {
   constructor({ emit, askPermission, settleElsewhere = () => false, onDisconnect = () => {} }) {
     this.emit = emit;
@@ -80,7 +84,22 @@ export class ClaudeLink {
     this.push({ type: 'message', content: text, meta: { chat_id: chatId, ...(workId ? { work_id: workId } : {}) } });
     this.emit(agentEvent('message.sent', { role: 'user', text, chatId }));
     this.status = 'working';
+    this.watchDelivery();
     return chatId;
+  }
+
+  // PF-0102: a delivered message starts a Claude Code turn, and a turn sends hooks. When none
+  // arrives in time, the message most likely never reached Claude Code (for example a Team or
+  // Enterprise account without channels): say so instead of showing "working" forever.
+  watchDelivery() {
+    const sentAt = Date.now();
+    clearTimeout(this.deliveryTimer);
+    this.deliveryTimer = setTimeout(() => {
+      if ((this.lastHookAt ?? 0) >= sentAt || !this.connected) return;
+      if (this.status === 'working') this.status = 'connected';
+      this.emit(agentEvent('delivery.unconfirmed', { provider: 'claude', detail: 'Claude Code has not started on this message. It most likely did not receive it: on Claude Team and Enterprise accounts, messages from the console are dropped unless the organization turned channels on. Type in the Claude Code terminal instead.' }));
+    }, this.deliveryTimeoutMs ?? DELIVERY_TIMEOUT_MS);
+    this.deliveryTimer.unref?.();
   }
 
   // From the channel server.
@@ -189,6 +208,7 @@ export class ClaudeLink {
   }
 
   detach() {
+    clearTimeout(this.deliveryTimer);
     if (this.stream) {
       try { this.stream.end(); } catch { /* closed */ }
     }

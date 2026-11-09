@@ -4,9 +4,38 @@ All notable changes to YallaFlow are documented here. The format loosely follows
 
 **1.0.0 is the first public release**, published to npm as `yallaflow`. From 1.0.0 the package follows Semantic Versioning with the compatibility promise in [`docs/releasing.md`](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise). Every earlier version below is an **internal prerelease**: git-tagged, never published to npm, and kept here as history.
 
-## [Unreleased]
+## [1.4.2] - Unreleased (in progress)
 
-Nothing yet.
+Work collected for 1.4.2. Not tagged or published yet.
+
+### Added
+- **Remove a project from the console's Projects page** (PF-0081). Each project card has a ✕ button, and so does each unavailable saved folder. After you confirm, the project leaves the running console and the saved list right away, with no restart. Its files and `.yallaflow` records are never touched, and you can add it back with **Add an existing project**. Removal is refused while an agent session or a Claude Code channel is live in that project. `yallaflow console remove` still works.
+- **Project memory health on each project card** (PF-0082). Each card shows how many facts the project's memory holds, how many need revalidation, and how many are disputed or unresolved. When nothing needs care, it says so. A project without memory yet says why: a new project, or project understanding not approved.
+- **Choose the agent while creating a project** (PF-0086). The New project wizard's Environment step offers no agent, Codex, or Claude Code when it is available, and shows whether each is ready on this machine. After creation the choice is saved for the project and the agent is connected. No session starts on its own.
+- **"Something else" in the wizard's stack step** (PF-0087). Name a stack that is not in the list, such as Flutter or Django. The project is created empty and no command runs; the stack you named is recorded, and the first work item asks your agent to set it up with you. On the command line: `yallaflow new plan --stack empty --custom-stack TEXT`.
+- **The stack step in Arabic** (PF-0087): each stack's description and trade-offs.
+
+- **A progress bar while a project is created** (PF-0090): how many steps are done and what is left, each step's state, and for a long step that it can take minutes, with the latest log line. At the end the page stays on **The project is ready**, with what was created and one button, instead of jumping to another page.
+- **Start here on a new project's Overview** (PF-0091): one next step with one button: **Start with the agent** (opens the first work item with the chat and a drafted first message), or **Choose an agent**.
+
+- **Switch agents from the work item that needs one** (PF-0103). An idle Codex session on another item can be ended with one button, and the agent picker appears here. With Claude Code connected, **Use Codex for this item** tells you to close Claude Code in its terminal and continues with Codex and a prepared first message as soon as it disconnects. A working agent is waited for, never interrupted.
+### Changed
+- **The console's top menu follows daily use** (PF-0089): Flow, Work, Setup & run, Overview, Insights, Worktrees. The Setup tab and its page now have the same name.
+- **A clearer work item page** (PF-0092). When the console agent is on, the next-step card has a **Continue with the agent here** button; the terminal phrase stays as a hint. Edit request, Put on hold and Close without delivery moved under **⋯ More**.
+- **The wizard remembers what you chose** (PF-0084). After creation the console scans the new project's stack, so Setup no longer asks for it. While project memory is still empty, the project card shows the stack and environment chosen at creation. The first work item asks the agent to record the stack, environment and goal as project knowledge when it finishes. Creation itself never writes project memory.
+- **One checkbox instead of typing the project name** (PF-0085). A plan that installs dependencies or runs package scripts now asks you to tick one box confirming that it downloads dependencies and runs scripts on this machine. Create stays disabled until you do. The server still requires this explicit confirmation and the plan's full hash.
+
+- **Clearer next steps on a work item** (PF-0093). The stage button is now **Move to the next stage** and is hidden while the current stage's work is not recorded, since moving a stage never makes the agent work. Work that is the agent's turn reads as such instead of «idle». YallaFlow's blocker texts are shown in plain Arabic in the Arabic console. In the chat, suggestions are labelled as filling the box, and a line says when the agent has finished and is waiting for you.
+
+- **An easier Review and decide window** (PF-0097). The material reads like a document: formatted headings and lists (the standard headings in Arabic), a contents row, acceptance criteria as a numbered list, and a wide window with **Expand** for full screen, where the material and a fixed side column with the decision sit next to each other (PF-0098). Instead of typing the gate name, you tick one box: «I reviewed the specification, and this is my decision». Quick notes fill the note for you. The last typed confirmations are gone too (PF-0101): trusting a service and stopping or restarting a shared service are each one ticked box. Trust is still bound to the exact definition you reviewed.
+
+- **After a review decision, the agent is one Send away** (PF-0100). Recording a decision opens the chat with a ready message: «I approved the specification. Continue with the next step.», or, for requested changes, your note and «Revise it and bring it back for review». Nothing is sent until you press Send. Chat suggestions now follow the real stage (design, specification, plan, or moving on after an approval), and a finished stage reads «This stage is finished. Tell the agent to continue» instead of a raw command.
+### Fixed
+- In the wizard's stack step, choosing a card in another group left the earlier card highlighted (PF-0087).
+- The status at the top of the agent chat stayed «working» after the agent's turn ended (PF-0095). It now follows the session, and a line in the chat says plainly whether the agent is working, waiting for your approval, or waiting for your reply. While it works, the line also says for how long and what its last step was, refreshed every 30 seconds (PF-0096).
+- **Review and decide** refused a required review that YallaFlow had never formally requested («not requested, so there is nothing to decide»), although the work item was waiting on it and `yallaflow approve` accepts it (PF-0099). The console now decides it too, but only for the review the item is actually waiting on.
+- **Messages from the console never reached Claude Code on a Claude Team account, without any error** (PF-0102). The cause is on Claude's side: Team and Enterprise organizations have channels off unless an Owner enables them, and Claude Code then drops the messages. YallaFlow now warns about a Team or Enterprise login in Setup → Agents and in the chat, and reports a message that Claude Code never started on (no hook within 60 seconds) instead of showing «working» forever.
+- The New Project tests wrote plans and console registrations into the developer's own `~/.config/yallaflow` (PF-0094). They now use a private folder for each run.
 
 ## [1.4.1] - 2026-11-08 — Project Setup and Run
 

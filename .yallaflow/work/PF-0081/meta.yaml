@@ -1,0 +1,45 @@
+{
+  "id": "PF-0081",
+  "type": "feature",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console: remove a saved project from the All projects page (forget it from the console list; its files untouched)",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T08:22:45.900Z",
+  "updatedAt": "2026-11-09T08:31:40.381Z",
+  "title": "Console: remove a saved project from the All projects page (forget it from the console list; its files untouched)",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope bounded`.",
+  "routedAt": "2026-11-09T08:22:45.946Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "implement",
+    "verify",
+    "converge"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation",
+      "verification",
+      "delivery-convergence"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T08:31:40.381Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

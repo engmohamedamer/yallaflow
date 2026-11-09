@@ -140,6 +140,8 @@ async function gateMaterial(root, workId, gate, read) {
   const material = {
     workId, gate, title: work.item?.title ?? workId, stage: work.item?.stage ?? null,
     gateStatus: entry?.status ?? null, requestedAt: entry?.requestedAt ?? null, history: entry?.history ?? [],
+    // PF-0099: Core may wait on a required gate that was never formally requested.
+    waitingHere: work.item?.waitingFor?.kind === 'review' && work.item.waitingFor.gate === gate,
     sections,
     requirements: (work.requirements ?? []).filter((item) => item.status === 'active').map((item) => ({ id: item.id, statement: item.statement })),
     criteria: (work.criteria ?? []).filter((item) => item.status === 'active').map((item) => ({ id: item.id, statement: item.statement, convergence: item.convergence })),
@@ -173,7 +175,9 @@ export async function decideGate(root, workId, gate, input, runner) {
   const decision = oneOf(body.decision, ['approve', 'request_changes'], 'The decision');
   const requestId = String(body.requestId ?? '');
   if (!/^[A-Za-z0-9-]{8,64}$/.test(requestId)) throw new HttpError(422, 'INVALID', 'A request id is required.');
-  if (body.confirmGate !== gate) throw new HttpError(422, 'CONFIRMATION', `Type the gate name exactly ("${gate}") to confirm.`);
+  // PF-0097: one explicit confirmation (the page's checkbox sends confirmed: true); the typed
+  // gate name is still accepted. The material digest below still has to match.
+  if (body.confirmed !== true && body.confirmGate !== gate) throw new HttpError(422, 'CONFIRMATION', 'Confirm that you reviewed the material and that this is your decision.');
   const note = text(body.note, 'A decision note');
   const digest = String(body.digest ?? '');
   const key = JSON.stringify([root, workId, gate, requestId]);
@@ -183,7 +187,8 @@ export async function decideGate(root, workId, gate, input, runner) {
     const current = await gateMaterial(root, workId, gate, exec);
     // A gate waiting for review, or one sent back with "request changes" (Core keeps that
     // status until it is decided again). requestedAt and the digest below guard staleness.
-    if (!['awaiting_review', 'changes_requested'].includes(current.gateStatus)) throw new HttpError(409, 'STALE', `The ${gate} gate is ${current.gateStatus ?? 'not requested'}, so there is nothing to decide. Reload to see its current state; nothing was recorded.`);
+    const decidable = ['awaiting_review', 'changes_requested'].includes(current.gateStatus) || ((current.gateStatus ?? 'not_requested') === 'not_requested' && current.waitingHere);
+    if (!decidable) throw new HttpError(409, 'STALE', `The ${gate} gate is ${current.gateStatus ?? 'not requested'}, so there is nothing to decide. Reload to see its current state; nothing was recorded.`);
     if (current.requestedAt !== (body.requestedAt ?? null) || current.digest !== digest) {
       throw new HttpError(409, 'STALE', `The ${gate} gate or its material changed since you reviewed it. Reload and review it again; nothing was recorded.`);
     }

@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:47:41.083Z",
+      "completedAt": "2026-11-09T09:47:41.083Z",
+      "summary": "Creation progress comes from GET /api/new/plans/<id> (plan.progress.steps[step] = {status running|done|failed, at}, last 60 log lines, outcome with registration and workId) polled every 1.2 s by resources/console/app.js pollWizard; the page lists the steps without totals and afterCreate switches to another page as soon as the outcome arrives.",
+      "evidence": [
+        "src/console/newproject.js",
+        "src/newproject/project.js",
+        "resources/console/app.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:47:52.829Z",
+      "completedAt": "2026-11-09T09:47:52.829Z",
+      "summary": "Owner approved the plan (2026-11-09, 'اعتمد')."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:52:43.301Z",
+      "completedAt": "2026-11-09T09:52:43.301Z",
+      "summary": "Creation shows a progress bar (done of total, percent, left), each step with done/running/stopped/waiting, 'can take minutes' and the start time on a slow running step, and the latest log line; the console's own finishing steps (add to console and scan, connect agent) are listed. At the end the page stays on 'The project is ready' with what was created and one primary button; no automatic navigation. docs and CHANGELOG updated.",
+      "evidence": [
+        "resources/console/app.js",
+        "resources/console/app.css",
+        "docs/new-project.md",
+        "CHANGELOG.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:54:12.526Z",
+      "completedAt": "2026-11-09T09:54:12.526Z",
+      "summary": "Console tests pass (V-001); browser walkthrough on an isolated console with no console errors.",
+      "evidence": [
+        "verification:V-001",
+        "runtime:Playwright walkthrough on an isolated throwaway console, 2026-11-09"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-09T09:54:13.000Z",
+      "completedAt": "2026-11-09T09:54:13.000Z",
+      "summary": "All criteria satisfied."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-09T09:54:13.000Z"
+}

@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T12:02:19.963Z",
+      "completedAt": "2026-11-09T12:02:19.963Z",
+      "summary": "Two console actions still require typing the service id: trust (runRuntimeAction in src/console/runtime.js checks body.confirm === serviceId plus the reviewed definitionHash; page input data-trust-input) and stop/restart of shared infrastructure (body.confirmShared === serviceId; data-shared-input). Other confirmations already use checkboxes (PF-0085, PF-0097).",
+      "evidence": [
+        "src/console/runtime.js",
+        "resources/console/app.js",
+        "runtime:owner screenshot of the trust panel, 2026-11-09"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T12:02:20.306Z",
+      "completedAt": "2026-11-09T12:02:20.306Z",
+      "summary": "Owner (2026-11-09): typing is annoying and not needed anywhere. Trust stays bound to the reviewed definition hash; the confirmation becomes a ticked box."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-09T12:02:20.794Z",
+      "completedAt": "2026-11-09T12:02:20.794Z",
+      "summary": "Server: trust accepts { confirmed: true, definitionHash }, shared stop/restart accepts { confirmedShared: true }; typed ids still accepted. Page: checkboxes with the button disabled until ticked. Tests and docs."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T12:06:14.916Z",
+      "completedAt": "2026-11-09T12:06:14.916Z",
+      "summary": "Trust and shared stop/restart now use checkboxes ('I reviewed the command and files above, and I trust this service'; 'I understand other projects may be affected'); buttons stay disabled until ticked, and the tick survives the Setup page's 3 s refresh. Server accepts confirmed: true (trust, still bound to definitionHash) and confirmedShared: true; typed ids still accepted for older pages. Tests, docs/runtime.md, docs/console.md and CHANGELOG updated.",
+      "evidence": [
+        "resources/console/app.js",
+        "src/console/runtime.js",
+        "test/runtime.test.js",
+        "test/runtime-plan.test.js",
+        "docs/runtime.md",
+        "docs/console.md",
+        "CHANGELOG.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T12:06:50.189Z",
+      "completedAt": "2026-11-09T12:06:50.189Z",
+      "summary": "Runtime and console tests pass (V-001), including refusals for unticked or non-boolean confirmations and trust without the reviewed definition. Browser on the scratch copy of lalaff: Trust disabled before the tick, enabled after, still ticked and enabled after the 3 s refresh; no console errors; nothing was trusted.",
+      "evidence": [
+        "verification:V-001",
+        "runtime:Playwright check of the trust panel on the scratch copy, 2026-11-09"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-09T12:06:50.189Z"
+}

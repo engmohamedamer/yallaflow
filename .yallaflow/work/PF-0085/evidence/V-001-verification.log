@@ -1,0 +1,370 @@
+TAP version 13
+# YallaFlow foundation CLI
+# Give AI your project, not just your prompt.
+# Usage:
+#   yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]
+#   yallaflow start [request]
+#   yallaflow start --keep-active -- <request>
+#   yallaflow activate <work-id>
+#   yallaflow request --help
+#   yallaflow intake <file> [<file> ...] [--title TITLE]
+#   yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT] [--before-start]
+#   yallaflow intake ticket <payload-file|ticket-ref> [--provider github|jira|azure-devops] [--work <work-id>] [--reason TEXT] [--fetch [--attachments]] [--attachment <file>]... [--title TITLE] [--max-comments N]
+#   yallaflow source --help
+#   yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]
+#   yallaflow baseline --help
+#   yallaflow guide [work-id]
+#   yallaflow ready [work-id]
+#   yallaflow skill <skill-id> [--work <work-id>]
+#   yallaflow checkpoint --help
+#   yallaflow question --help
+#   yallaflow knowledge --help
+#   yallaflow requirement --help
+#   yallaflow convergence --help
+#   yallaflow impact --help
+#   yallaflow context --help
+#   yallaflow upgrade status|plan
+#   yallaflow brief
+#   yallaflow inspect
+#   yallaflow limitation --help
+#   yallaflow agent --help
+#   yallaflow decompose --help
+#   yallaflow progress <parent-id>
+#   yallaflow next <parent-id>
+#   yallaflow approve <work-id> --stage GATE [--note TEXT]
+#   yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]
+#   yallaflow handoff [work-id]
+#   yallaflow feature <title> --scope SCOPE
+#   yallaflow bug <title> --scope SCOPE
+#   yallaflow investigate <title> --scope SCOPE
+#   yallaflow change <title> --scope SCOPE
+#   yallaflow refactor <title> --scope SCOPE
+#   yallaflow release <title> --scope SCOPE
+#   yallaflow purpose --help
+#   yallaflow finish [work-id] [--verbose]
+#   yallaflow qc --help
+#   yallaflow demo --help
+#   yallaflow shared --help
+#   yallaflow status
+#   yallaflow snapshot [--json]
+#   yallaflow overview [--json]
+#   yallaflow runtime --help
+#   yallaflow new --help
+#   yallaflow history --help
+#   yallaflow console [--port N] [--no-open] [--project DIR]... [--read-only] [--agents]
+#   yallaflow agents detect
+#   yallaflow work show <work-id> [--json]
+#   yallaflow work hold|resume|close <work-id> ...  (lifecycle: on hold, closed without delivery)
+#   yallaflow resume [work-id]
+#   yallaflow doctor [--clear-lock]
+#   yallaflow advance [work-id]
+#   yallaflow verify [work-id] -- <executable> [args...]
+#   yallaflow verify [work-id] --shell "<command>"
+#   yallaflow verify [work-id] --script <path>
+#   yallaflow verify list [work-id]
+#   yallaflow reopen <work-id> --to implementation|verification|review --reason REASON
+#   yallaflow reopen <work-id> --reason REASON   (closed work)
+#   yallaflow --version
+# Subtest: start without new options behaves exactly as before (focus moves to the new item)
+ok 1 - start without new options behaves exactly as before (focus moves to the new item)
+  ---
+  duration_ms: 1486.501553
+  type: 'test'
+  ...
+# Subtest: parseStartArgs: new options only as leading tokens; anything else is the legacy request
+ok 2 - parseStartArgs: new options only as leading tokens; anything else is the legacy request
+  ---
+  duration_ms: 5.194741
+  type: 'test'
+  ...
+# Subtest: --keep-active never replaces unfinished active work; routing and checkpoints never move focus; activate does
+ok 3 - --keep-active never replaces unfinished active work; routing and checkpoints never move focus; activate does
+  ---
+  duration_ms: 1628.004612
+  type: 'test'
+  ...
+# Subtest: --keep-active never activates, even when no work item is active (owner decision)
+ok 4 - --keep-active never activates, even when no work item is active (owner decision)
+  ---
+  duration_ms: 947.151402
+  type: 'test'
+  ...
+# Subtest: console create with nothing active leaves nothing active
+ok 5 - console create with nothing active leaves nothing active
+  ---
+  duration_ms: 776.341086
+  type: 'test'
+  ...
+# Subtest: attachments report what YallaFlow could actually do with each file
+ok 6 - attachments report what YallaFlow could actually do with each file
+  ---
+  duration_ms: 2223.968355
+  type: 'test'
+  ...
+# Subtest: request IDs: a retried or concurrent request creates exactly one item, with an unverified console attestation
+ok 7 - request IDs: a retried or concurrent request creates exactly one item, with an unverified console attestation
+  ---
+  duration_ms: 1138.18033
+  type: 'test'
+  ...
+# Subtest: helpers: titles come from the user's words; file names are reduced safely
+ok 8 - helpers: titles come from the user's words; file names are reduced safely
+  ---
+  duration_ms: 0.583828
+  type: 'test'
+  ...
+# Subtest: POST guards: token, Origin, Host, content type, size, read-only, unknown routes
+ok 9 - POST guards: token, Origin, Host, content type, size, read-only, unknown routes
+  ---
+  duration_ms: 75.519811
+  type: 'test'
+  ...
+# Subtest: create: unclassified and classified items through Core; shell text stored verbatim; focus kept
+ok 10 - create: unclassified and classified items through Core; shell text stored verbatim; focus kept
+  ---
+  duration_ms: 1849.606821
+  type: 'test'
+  ...
+# Subtest: create: concurrent requests get distinct IDs; repeated ones never duplicate
+ok 11 - create: concurrent requests get distinct IDs; repeated ones never duplicate
+  ---
+  duration_ms: 1715.291767
+  type: 'test'
+  ...
+# Subtest: brownfield without approved understanding: Core refuses and nothing is created
+ok 12 - brownfield without approved understanding: Core refuses and nothing is created
+  ---
+  duration_ms: 192.447808
+  type: 'test'
+  ...
+# Subtest: attachments: preserved through intake, deduplicated on retry, refused safely, temp files removed, item kept
+ok 13 - attachments: preserved through intake, deduplicated on retry, refused safely, temp files removed, item kept
+  ---
+  duration_ms: 1900.884936
+  type: 'test'
+  ...
+# Subtest: an oversized upload is refused before it is stored
+ok 14 - an oversized upload is refused before it is stored
+  ---
+  duration_ms: 3414.247254
+  type: 'test'
+  ...
+# Subtest: review: requests starting with "-" keep their classification; "--help" is plain text
+ok 15 - review: requests starting with "-" keep their classification; "--help" is plain text
+  ---
+  duration_ms: 1922.425367
+  type: 'test'
+  ...
+# Subtest: review: two identical uploads at once store one copy; a long non-ASCII name is shortened, not leaked
+ok 16 - review: two identical uploads at once store one copy; a long non-ASCII name is shortened, not leaked
+  ---
+  duration_ms: 921.334373
+  type: 'test'
+  ...
+# Subtest: resume on a deferred item says how to activate it, and changes nothing
+ok 17 - resume on a deferred item says how to activate it, and changes nothing
+  ---
+  duration_ms: 565.418881
+  type: 'test'
+  ...
+# Subtest: folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+ok 18 - folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+  ---
+  duration_ms: 132.33954
+  type: 'test'
+  ...
+# Subtest: registration: an existing YallaFlow project inside home is added once, live; others are refused
+ok 19 - registration: an existing YallaFlow project inside home is added once, live; others are refused
+  ---
+  duration_ms: 362.456637
+  type: 'test'
+  ...
+# Subtest: stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+ok 20 - stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+  ---
+  duration_ms: 1308.765917
+  type: 'test'
+  ...
+# Subtest: a plan that installs dependencies needs an explicit acknowledgement (PF-0085)
+ok 21 - a plan that installs dependencies needs an explicit acknowledgement (PF-0085)
+  ---
+  duration_ms: 502.056422
+  type: 'test'
+  ...
+# Subtest: Git init: explicit, once, never inside another repository; refused read-only
+ok 22 - Git init: explicit, once, never inside another repository; refused read-only
+  ---
+  duration_ms: 110.856854
+  type: 'test'
+  ...
+# Subtest: runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+ok 23 - runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+  ---
+  duration_ms: 812.018915
+  type: 'test'
+  ...
+# Subtest: agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+ok 24 - agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+  ---
+  duration_ms: 46.279901
+  type: 'test'
+  ...
+# Subtest: review: parallel registrations add a project once and lose none from the saved list
+ok 25 - review: parallel registrations add a project once and lose none from the saved list
+  ---
+  duration_ms: 88.699564
+  type: 'test'
+  ...
+# Subtest: review: hidden folders are refused even by path; read-only consoles probe no tools
+ok 26 - review: hidden folders are refused even by path; read-only consoles probe no tools
+  ---
+  duration_ms: 15.206379
+  type: 'test'
+  ...
+# Subtest: review: plans that run package scripts need an acknowledgement; control characters and NUL are refused
+ok 27 - review: plans that run package scripts need an acknowledgement; control characters and NUL are refused
+  ---
+  duration_ms: 600.879708
+  type: 'test'
+  ...
+# Subtest: review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+ok 28 - review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+  ---
+  duration_ms: 367.10108
+  type: 'test'
+  ...
+# Subtest: a registration failure after creation is reported as partial success, never as a failed creation
+ok 29 - a registration failure after creation is reported as partial success, never as a failed creation
+  ---
+  duration_ms: 654.02278
+  type: 'test'
+  ...
+# Subtest: Claude Code: off unless chosen explicitly when enabling agents; never read-only
+ok 30 - Claude Code: off unless chosen explicitly when enabling agents; never read-only
+  ---
+  duration_ms: 81.055294
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): a project leaves the running console and the saved list; its files stay
+ok 31 - removal (PF-0081): a project leaves the running console and the saved list; its files stay
+  ---
+  duration_ms: 76.054312
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): refused while an agent session is live in the project
+ok 32 - removal (PF-0081): refused while an agent session is live in the project
+  ---
+  duration_ms: 2.25862
+  type: 'test'
+  ...
+# Subtest: security: loopback host, token, origin, read-only methods and ID-only paths
+ok 33 - security: loopback host, token, origin, read-only methods and ID-only paths
+  ---
+  duration_ms: 1006.397194
+  type: 'test'
+  ...
+# Subtest: serves the snapshot, work detail and preserved sources by ID
+ok 34 - serves the snapshot, work detail and preserved sources by ID
+  ---
+  duration_ms: 1708.998497
+  type: 'test'
+  ...
+# Subtest: live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+ok 35 - live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+  ---
+  duration_ms: 1884.657548
+  type: 'test'
+  ...
+# Subtest: the console never writes: browsing every route leaves the workspace byte-identical
+ok 36 - the console never writes: browsing every route leaves the workspace byte-identical
+  ---
+  duration_ms: 1352.837644
+  type: 'test'
+  ...
+# Subtest: extracted text cannot be read outside its source directory; HEAD never opens the event stream
+ok 37 - extracted text cannot be read outside its source directory; HEAD never opens the event stream
+  ---
+  duration_ms: 1022.535316
+  type: 'test'
+  ...
+# Subtest: plan: validated name, absent destination, no nesting, catalog-only stacks; nothing is created
+ok 38 - plan: validated name, absent destination, no nesting, catalog-only stacks; nothing is created
+  ---
+  duration_ms: 257.509007
+  type: 'test'
+  ...
+# Subtest: create: hash confirmation, staging, promotion, Core init with provenance → Greenfield, first work item
+ok 39 - create: hash confirmation, staging, promotion, Core init with provenance → Greenfield, first work item
+  ---
+  duration_ms: 1110.483355
+  type: 'test'
+  ...
+# Subtest: existing projects keep the gate: no provenance, no Greenfield; a copied origin on a brownfield workspace is ignored
+ok 40 - existing projects keep the gate: no provenance, no Greenfield; a copied origin on a brownfield workspace is ignored
+  ---
+  duration_ms: 56.882126
+  type: 'test'
+  ...
+# Subtest: failures: generator error, missing marker, destination appearing; staging and diagnostics kept, nothing overwritten
+ok 41 - failures: generator error, missing marker, destination appearing; staging and diagnostics kept, nothing overwritten
+  ---
+  duration_ms: 222.618533
+  type: 'test'
+  ...
+# Subtest: a plan edited outside YallaFlow cannot run a different command
+ok 42 - a plan edited outside YallaFlow cannot run a different command
+  ---
+  duration_ms: 8.816155
+  type: 'test'
+  ...
+# Subtest: CLI: catalog, recommend, plan, create (empty stack), discard
+ok 43 - CLI: catalog, recommend, plan, create (empty stack), discard
+  ---
+  duration_ms: 1506.168554
+  type: 'test'
+  ...
+# Subtest: console: wizard routes are guarded, need the hash confirmation, and are refused read-only
+ok 44 - console: wizard routes are guarded, need the hash confirmation, and are refused read-only
+  ---
+  duration_ms: 1292.113835
+  type: 'test'
+  ...
+# Subtest: review: staging is npm's project root, so a parent .npmrc or node_modules cannot shadow the generator
+ok 45 - review: staging is npm's project root, so a parent .npmrc or node_modules cannot shadow the generator
+  ---
+  duration_ms: 417.508201
+  type: 'test'
+  ...
+# Subtest: review: a retry never labels or installs into a folder that replaced the created one; failure text is redacted
+ok 46 - review: a retry never labels or installs into a folder that replaced the created one; failure text is redacted
+  ---
+  duration_ms: 184.324479
+  type: 'test'
+  ...
+# Subtest: review: a parent npm workspace that would capture staging stops the generator before it runs
+ok 47 - review: a parent npm workspace that would capture staging stops the generator before it runs
+  ---
+  duration_ms: 281.781944
+  type: 'test'
+  ...
+# Subtest: plan carries intent, environment, git and attachments; creation initializes Git and words the first work from the goal
+ok 48 - plan carries intent, environment, git and attachments; creation initializes Git and words the first work from the goal
+  ---
+  duration_ms: 83.707301
+  type: 'test'
+  ...
+# Subtest: custom stack (PF-0087): only with the empty project; recorded in the plan, origin and first work item; nothing runs
+ok 49 - custom stack (PF-0087): only with the empty project; recorded in the plan, origin and first work item; nothing runs
+  ---
+  duration_ms: 989.418757
+  type: 'test'
+  ...
+1..49
+# tests 49
+# suites 0
+# pass 49
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 21157.249511

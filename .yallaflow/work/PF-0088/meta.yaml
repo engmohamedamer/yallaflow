@@ -1,0 +1,45 @@
+{
+  "id": "PF-0088",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "CHANGELOG 1.4.2: add the New Project wizard entries (PF-0084 to PF-0087)",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T09:22:22.789Z",
+  "updatedAt": "2026-11-09T09:23:01.767Z",
+  "title": "CHANGELOG 1.4.2: add the New Project wizard entries (PF-0084 to PF-0087)",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-09T09:22:22.839Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T09:23:01.767Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

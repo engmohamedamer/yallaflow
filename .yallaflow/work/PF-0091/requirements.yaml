@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "After creating a project the developer lands where the next step is obvious.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T09:47:54.015Z",
+      "updatedAt": "2026-11-09T09:47:54.015Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "The new project's Overview opens with a 'Start here' card that shows one next step with one primary button: start with the agent on the first work item, or choose an agent when none is chosen.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T09:47:54.015Z",
+      "updatedAt": "2026-11-09T09:47:54.015Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "The 'project ready' action opens that Overview, not the first work item page.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T09:47:54.015Z",
+      "updatedAt": "2026-11-09T09:47:54.015Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-09T09:47:54.015Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-09T09:47:54.015Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-09T09:47:54.015Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-09T09:47:54.015Z"
+}

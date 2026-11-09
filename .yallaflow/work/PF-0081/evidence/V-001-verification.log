@@ -1,0 +1,130 @@
+TAP version 13
+# Subtest: folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+ok 1 - folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+  ---
+  duration_ms: 118.753966
+  type: 'test'
+  ...
+# Subtest: registration: an existing YallaFlow project inside home is added once, live; others are refused
+ok 2 - registration: an existing YallaFlow project inside home is added once, live; others are refused
+  ---
+  duration_ms: 314.562842
+  type: 'test'
+  ...
+# Subtest: stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+ok 3 - stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+  ---
+  duration_ms: 921.164695
+  type: 'test'
+  ...
+# Subtest: a plan that installs dependencies needs the project name typed
+ok 4 - a plan that installs dependencies needs the project name typed
+  ---
+  duration_ms: 382.139881
+  type: 'test'
+  ...
+# Subtest: Git init: explicit, once, never inside another repository; refused read-only
+ok 5 - Git init: explicit, once, never inside another repository; refused read-only
+  ---
+  duration_ms: 95.354918
+  type: 'test'
+  ...
+# Subtest: runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+ok 6 - runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+  ---
+  duration_ms: 750.570788
+  type: 'test'
+  ...
+# Subtest: agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+ok 7 - agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+  ---
+  duration_ms: 50.830715
+  type: 'test'
+  ...
+# Subtest: review: parallel registrations add a project once and lose none from the saved list
+ok 8 - review: parallel registrations add a project once and lose none from the saved list
+  ---
+  duration_ms: 89.311063
+  type: 'test'
+  ...
+# Subtest: review: hidden folders are refused even by path; read-only consoles probe no tools
+ok 9 - review: hidden folders are refused even by path; read-only consoles probe no tools
+  ---
+  duration_ms: 12.563576
+  type: 'test'
+  ...
+# Subtest: review: plans that run package scripts need the name; control characters and NUL are refused
+ok 10 - review: plans that run package scripts need the name; control characters and NUL are refused
+  ---
+  duration_ms: 544.440923
+  type: 'test'
+  ...
+# Subtest: review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+ok 11 - review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+  ---
+  duration_ms: 328.731412
+  type: 'test'
+  ...
+# Subtest: a registration failure after creation is reported as partial success, never as a failed creation
+ok 12 - a registration failure after creation is reported as partial success, never as a failed creation
+  ---
+  duration_ms: 480.707748
+  type: 'test'
+  ...
+# Subtest: Claude Code: off unless chosen explicitly when enabling agents; never read-only
+ok 13 - Claude Code: off unless chosen explicitly when enabling agents; never read-only
+  ---
+  duration_ms: 60.92433
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): a project leaves the running console and the saved list; its files stay
+ok 14 - removal (PF-0081): a project leaves the running console and the saved list; its files stay
+  ---
+  duration_ms: 49.583943
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): refused while an agent session is live in the project
+ok 15 - removal (PF-0081): refused while an agent session is live in the project
+  ---
+  duration_ms: 1.50101
+  type: 'test'
+  ...
+# Subtest: security: loopback host, token, origin, read-only methods and ID-only paths
+ok 16 - security: loopback host, token, origin, read-only methods and ID-only paths
+  ---
+  duration_ms: 840.470979
+  type: 'test'
+  ...
+# Subtest: serves the snapshot, work detail and preserved sources by ID
+ok 17 - serves the snapshot, work detail and preserved sources by ID
+  ---
+  duration_ms: 1457.750991
+  type: 'test'
+  ...
+# Subtest: live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+ok 18 - live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+  ---
+  duration_ms: 1624.71639
+  type: 'test'
+  ...
+# Subtest: the console never writes: browsing every route leaves the workspace byte-identical
+ok 19 - the console never writes: browsing every route leaves the workspace byte-identical
+  ---
+  duration_ms: 1180.432166
+  type: 'test'
+  ...
+# Subtest: extracted text cannot be read outside its source directory; HEAD never opens the event stream
+ok 20 - extracted text cannot be read outside its source directory; HEAD never opens the event stream
+  ---
+  duration_ms: 956.6444
+  type: 'test'
+  ...
+1..20
+# tests 20
+# suites 0
+# pass 20
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8784.479013

@@ -573,43 +573,6 @@ print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_commo
   - src/runtime/supervisor.js (repository @ 24c8adc)
   - docs/runtime.md (repository @ 24c8adc)
 
-<!-- yallaflow-fact:CTX-0116 -->
-### CTX-0116 — Web console (v1.2.0, extended in 1.4.0): 'yallaflow console' is a local web UI inside the yallaflow package (no daemon, no new dependency, no build step). src/console/server.js (node:http on 127.0.0.1; per-run Bearer token; Host 421, Origin 403; GET/HEAD for reads; UI from a fixed file map; sources served by ID only, previews sandboxed) reads by spawning this package's CLI (snapshot/work show/overview/runtime status --json) and refreshes on a debounced .yallaflow watcher with polling fallback. POST is accepted only on WRITE_ROUTE: Create Work and its attach route, work-item actions and gate decisions, runtime trust/start/stop/restart and adding a service, the New Project Wizard (plan, create with the full plan hash, planned files), project registration, enabling agents for the run, and Git init; each needs the console Origin and exact content type, and '--read-only' refuses every POST. The project list can grow at runtime (registration serialized and deduplicated), and the console starts with no saved project unless read-only. GET /api/fs/dirs is the only filesystem listing: directories inside the real home folder, no hidden folders, no files, not in read-only.
-
-- **State:** current
-- **Confidence:** confirmed
-- **Provenance:** repository
-- **Source work:** PF-0057
-- **Knowledge ID:** K-001
-- **Promoted at:** 2026-11-07T19:18:46.674Z
-- **Supersedes:** CTX-0099
-- **Verified:** 2026-11-07T19:18:46.674Z (commit 9437b4c)
-- **Evidence:**
-  - src/console/server.js (repository @ 9437b4c)
-  - src/console/folders.js (repository @ 9437b4c)
-  - src/console/greenfield.js (repository @ 9437b4c)
-  - src/commands/console.js (repository @ 9437b4c)
-  - npm run check (passed) (runtime, PF-0057 V-004)
-  - test/console-greenfield.test.js (repository @ 9437b4c)
-
-<!-- yallaflow-fact:CTX-0117 -->
-### CTX-0117 — Every console write to .yallaflow state is the canonical CLI command run through the console runner (argv, no shell, --opt=value, one write at a time per project); Core keeps every rule and its refusal text is shown as-is. Outside .yallaflow the console writes only the user-level console project list (the same registry addProject as 'yallaflow console add', serialized in-process) and runs 'git init --quiet' (fixed argv, refused inside an existing work tree) for an explicit Git init. Review-gate decisions in the console are local-user decisions: typed gate name, mandatory note, material and digest checked inside runner.exclusive, recorded by the unchanged approve/feedback with provenance {via:'console', identity:'not verified', host, claimedGitName}; never claim verified identity.
-
-- **State:** current
-- **Confidence:** confirmed
-- **Provenance:** repository
-- **Source work:** PF-0057
-- **Knowledge ID:** K-002
-- **Promoted at:** 2026-11-07T19:18:47.030Z
-- **Supersedes:** CTX-0106
-- **Verified:** 2026-11-07T19:18:47.030Z (commit 9437b4c)
-- **Evidence:**
-  - src/console/actions.js (repository @ 9437b4c)
-  - src/console/greenfield.js (repository @ 9437b4c)
-  - src/console/server.js (repository @ 9437b4c)
-  - src/console/registry.js (repository @ 9437b4c)
-  - npm run check (passed) (runtime, PF-0057 V-004)
-
 <!-- yallaflow-fact:CTX-0123 -->
 ### CTX-0123 — Agent session records (.yallaflow/local/agent-sessions/<id>.json, git-ignored) keep lastStop {reason: usage_limit|error|crashed|ended|disconnected|unlinked, detail, retryAt, at}; the bridge emits session.stopped after saving it and returns the records as status().history. A Codex usage limit arrives as reply text followed by a generic error, so the bridge reads the turn's recent reply text with the error. The console offers to continue a stopped work item with another ready agent: the old session is ended or unlinked first, nothing switches automatically, and the 'Continue <id>' message is prepared, never sent for the developer.
 
@@ -708,5 +671,38 @@ print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_commo
   - resources/console/app.js (repository @ a8236e9)
   - resources/console/app.css (repository @ a8236e9)
   - npm test (passed) (runtime, PF-0073 V-002)
+
+<!-- yallaflow-fact:CTX-0134 -->
+### CTX-0134 — Web console (v1.2.0, extended in 1.4.0): 'yallaflow console' is a local web UI inside the yallaflow package (no daemon, no new dependency, no build step). src/console/server.js (node:http on 127.0.0.1; per-run Bearer token; Host 421, Origin 403; GET/HEAD for reads; UI from a fixed file map; sources served by ID only, previews sandboxed) reads by spawning this package's CLI (snapshot/work show/overview/runtime status --json) and refreshes on a debounced .yallaflow watcher with polling fallback. POST is accepted only on WRITE_ROUTE: Create Work and its attach route, work-item actions and gate decisions, runtime trust/start/stop/restart and adding a service, the New Project Wizard (plan, create with the full plan hash, planned files), project registration and removal, enabling agents for the run, and Git init; each needs the console Origin and exact content type, and '--read-only' refuses every POST. The project list can grow and shrink at runtime: registration and removal (POST /api/projects/remove with {id}, or {root} for an unavailable saved entry) run in one serialized queue; removal edits only the user-level console list, closes the project's watcher, and releases its agent checkout via AgentBridge.removeProject, refused with 409 SESSION_ACTIVE while an agent session or Claude Code channel is live. The console starts with no saved project unless read-only. GET /api/fs/dirs is the only filesystem listing: directories inside the real home folder, no hidden folders, no files, not in read-only.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0081
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-09T08:31:34.346Z
+- **Supersedes:** CTX-0116
+- **Verified:** 2026-11-09T08:31:34.346Z (commit d3652e8)
+- **Evidence:**
+  - src/console/server.js (repository @ d3652e8)
+  - src/agents/bridge.js (repository @ d3652e8)
+  - src/console/registry.js (repository @ d3652e8)
+  - node --test test/console-greenfield.test.js test/console-server.test.js (passed) (runtime, PF-0081 V-001)
+
+<!-- yallaflow-fact:CTX-0138 -->
+### CTX-0138 — Every console write to .yallaflow state is the canonical CLI command run through the console runner (argv, no shell, --opt=value, one write at a time per project); Core keeps every rule and its refusal text is shown as-is. Outside .yallaflow the console writes only the user-level console project list (add and remove, the same registry as 'yallaflow console add/remove', serialized in-process) and runs 'git init --quiet' (fixed argv, refused inside an existing work tree) for an explicit Git init. Review-gate decisions in the console are local-user decisions: an explicit confirmation (the page's checkbox sends confirmed: true; a typed gate name is still accepted), a mandatory note, material and digest checked inside runner.exclusive, recorded by the unchanged approve/feedback with provenance {via:'console', identity:'not verified', host, claimedGitName}; never claim verified identity.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0097
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-09T10:51:27.650Z
+- **Supersedes:** CTX-0117
+- **Verified:** 2026-11-09T10:51:27.650Z (commit d3652e8)
+- **Evidence:**
+  - src/console/actions.js (repository @ d3652e8)
+  - src/console/server.js (repository @ d3652e8)
+  - node --test test/console-actions.test.js test/console-presentation.test.js test/console-acceptance.test.js test/console-project-chat.test.js test/console-server.test.js (passed) (runtime, PF-0097 V-001)
 
 <!-- yallaflow-context:end -->

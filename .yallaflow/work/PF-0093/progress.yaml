@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:13:48.058Z",
+      "completedAt": "2026-11-09T10:13:48.058Z",
+      "summary": "In the owner's lalaff project the 'Advance' button (ar 'كمّل للمرحلة الجاية') moved PF-0001 from INTAKE to DISCOVERY and it then showed 'paused' (ar 'متوقف': routed, not active, not waiting on a person — src/flow/stations.js) with Core's English blocker 'context-discovery checkpoint is pending' (src/behavior/readiness.js) in nowText, the station card and the why line (resources/console/app.js). Chat suggestion chips (.asugg .sugg) look like sent messages and only fill the input.",
+      "evidence": [
+        "src/flow/stations.js",
+        "src/behavior/readiness.js",
+        "resources/console/app.js",
+        "runtime:owner screenshots of lalaff PF-0001, 2026-11-09"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:13:48.434Z",
+      "completedAt": "2026-11-09T10:13:48.434Z",
+      "summary": "Owner approved the four fixes ('صلح', 2026-11-09): rename and hide the advance button while blocked, the agent's-turn label, clear suggestions with a your-turn line, Arabic blocker texts."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:13:49.046Z",
+      "completedAt": "2026-11-09T10:13:49.046Z",
+      "summary": "app.js: ACTION_LABEL.advance rename; hide advance when blocked and show an Arabic why line; STATE.paused label; blockerText() for Core patterns used by nowText and the why line; suggestions header and a 'your turn' line after the agent's last reply; CSS for chips."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:16:34.912Z",
+      "completedAt": "2026-11-09T10:16:34.912Z",
+      "summary": "Advance renamed 'انقلها للمرحلة الجاية' / 'Move to the next stage' and hidden on the work item page while the stage is blocked; STATE.paused reads 'دور الوكيل' / \"agent's turn\"; blockerText() turns Core's checkpoint, review, knowledge, impact, question and understanding blockers into plain Arabic (English unchanged) in nowText, the next-step card and the why line, and duplicate lines are dropped; chat suggestions are labelled as filling the box, styled as dashed pills, and a 'your turn' line follows the agent's reply. docs/console.md and a harness test updated.",
+      "evidence": [
+        "resources/console/app.js",
+        "resources/console/app.css",
+        "docs/console.md",
+        "test/console-project-chat.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:16:59.975Z",
+      "completedAt": "2026-11-09T10:16:59.975Z",
+      "summary": "Console tests pass (V-001), including the new harness test for Arabic blockers, suggestions and the your-turn line. Browser on an isolated console (architectural item in DISCOVERY): 'افهم · دور الوكيل', the next-step card reads 'الوكيل لسه ما سجّلش «اكتشاف المشروع». ابعتله في الشات يكمّل.' with 'كمّل مع الوكيل هنا', no advance button, no English line, no duplicate why line; no console errors.",
+      "evidence": [
+        "verification:V-001",
+        "runtime:Playwright check of a DISCOVERY work item page on an isolated console, 2026-11-09"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-09T10:16:59.975Z"
+}

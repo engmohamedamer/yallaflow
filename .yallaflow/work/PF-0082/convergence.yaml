@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-09T08:39:25.874Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "Assessed after V-001 and a browser check.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "The card shows the fact count and chips for to-revalidate, disputed and unresolved, or 'nothing needs care'; seen in the browser for this repository (79 facts, 59 to revalidate, 1 unresolved).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:25a02fb91ada1ba77214a1ddfb0ee6a531b4f9226673415cc4b7a9d5ca92ff39",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "projects page screenshot on a throwaway console, YallaFlow card"
+            },
+            {
+              "type": "runtime",
+              "description": "node --test test/console-presentation.test.js test/console-server.test.js test/console-greenfield.test.js test/console-acceptance.test.js (passed)",
+              "workId": "PF-0082",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Projects with no memory show the reason (new project text seen for the Greenfield test projects; understanding state otherwise); a failed overview returns null and the card renders without the line.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:25a02fb91ada1ba77214a1ddfb0ee6a531b4f9226673415cc4b7a9d5ca92ff39",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "projects page screenshot, Shop and Clinic cards"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-09T08:39:25.874Z"
+}

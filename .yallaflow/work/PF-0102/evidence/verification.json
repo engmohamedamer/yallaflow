@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --test test/agent-claude-experimental.test.js test/agent-bridge.test.js test/agent-continue.test.js test/console-project-chat.test.js test/console-agent-errors.test.js test/console-greenfield.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--test",
+        "test/agent-claude-experimental.test.js",
+        "test/agent-bridge.test.js",
+        "test/agent-continue.test.js",
+        "test/console-project-chat.test.js",
+        "test/console-agent-errors.test.js",
+        "test/console-greenfield.test.js"
+      ],
+      "displayCommand": "node --test test/agent-claude-experimental.test.js test/agent-bridge.test.js test/agent-continue.test.js test/console-project-chat.test.js test/console-agent-errors.test.js test/console-greenfield.test.js",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-09T13:32:17.942Z",
+      "finishedAt": "2026-11-09T13:33:15.951Z",
+      "verifiedAt": "2026-11-09T13:33:15.951Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "node --test test/agent-claude-experimental.test.js test/agent-bridge.test.js test/agent-continue.test.js test/console-project-chat.test.js test/console-agent-errors.test.js test/console-greenfield.test.js test/runtime-plan.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--test",
+        "test/agent-claude-experimental.test.js",
+        "test/agent-bridge.test.js",
+        "test/agent-continue.test.js",
+        "test/console-project-chat.test.js",
+        "test/console-agent-errors.test.js",
+        "test/console-greenfield.test.js",
+        "test/runtime-plan.test.js"
+      ],
+      "displayCommand": "node --test test/agent-claude-experimental.test.js test/agent-bridge.test.js test/agent-continue.test.js test/console-project-chat.test.js test/console-agent-errors.test.js test/console-greenfield.test.js test/runtime-plan.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-09T13:35:58.163Z",
+      "finishedAt": "2026-11-09T13:36:59.304Z",
+      "verifiedAt": "2026-11-09T13:36:59.304Z",
+      "log": "V-002-verification.log"
+    }
+  ]
+}

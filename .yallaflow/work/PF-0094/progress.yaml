@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:18:02.254Z",
+      "completedAt": "2026-11-09T10:18:02.254Z",
+      "summary": "registryPath() (src/console/registry.js) defaults to $XDG_CONFIG_HOME or ~/.config/yallaflow/console.json unless YALLAFLOW_CONSOLE_CONFIG is set; plansDir() (src/newproject/project.js) sits next to it. test/new-project.test.js calls createPlan, the CLI and a console server with the default env. The owner's real config held 89 plans (85 under /tmp/yf-new-*) and 5 /tmp/yf-new-*/web registrations.",
+      "evidence": [
+        "src/console/registry.js",
+        "src/newproject/project.js",
+        "test/new-project.test.js"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:18:02.448Z",
+      "completedAt": "2026-11-09T10:18:02.448Z",
+      "summary": "Reproduced with HOME set to a temporary folder: one run of test/new-project.test.js wrote 17 plans and 1 console registration under that HOME's .config/yallaflow. The same check on console-greenfield, console-create, console-server, console-phase-d and console-acceptance wrote nothing (they isolate HOME per test or only test refusals). Root cause: new-project.test.js never sets YALLAFLOW_CONSOLE_CONFIG, so createPlan, the spawned CLI and the wizard registration use the developer's real config.",
+      "evidence": [
+        "test/new-project.test.js",
+        "runtime:HOME=<tmp> node --test test/new-project.test.js left 17 plans and 1 registration in <tmp>/.config/yallaflow, 2026-11-09"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:18:48.786Z",
+      "completedAt": "2026-11-09T10:18:48.786Z",
+      "summary": "test/new-project.test.js sets YALLAFLOW_CONSOLE_CONFIG to a fresh temporary folder before any test, so createPlan, the spawned CLI and the console registration stay isolated; a new test asserts registryPath and plansDir point there. The 5 leaked /tmp/yf-new-*/web registrations were removed from the owner's console list with 'yallaflow console remove' (files untouched). CHANGELOG updated.",
+      "evidence": [
+        "test/new-project.test.js",
+        "CHANGELOG.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T10:19:00.635Z",
+      "completedAt": "2026-11-09T10:19:00.635Z",
+      "summary": "With HOME set to a fresh temporary folder, test/new-project.test.js passes (13 tests, including the isolation test) and no .config/yallaflow is created there (V-001). The owner's console list no longer holds the leaked entries.",
+      "evidence": [
+        "verification:V-001",
+        "runtime:yallaflow console list shows only real projects, 2026-11-09"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-09T10:19:00.635Z"
+}

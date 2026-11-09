@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-09T08:31:13.407Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "Assessed after V-001 passed. The page's button and dialog were checked by reading the code, not in a browser (recorded limitation).",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "Each project card has a remove button that opens a confirmation dialog, then posts to /api/projects/remove; the server takes it off the running console and the saved list without a restart (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:c2f9d2195435330522d9809346f5a0e4cabd2480853179d516ac51a33e9a0e2b",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:ab238eeafb3058bf0c2c03b7622aa5647cd77b1e5ddaa3ef8cd3c31dfd82df87",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-greenfield.test.js",
+              "contentHash": "sha256:45fe796dd1588e49f25931426ffd0a3f826c0cadd5ea2e9416f817dd55f4325c",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --test test/console-greenfield.test.js test/console-server.test.js (passed)",
+              "workId": "PF-0081",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Removal edits only the user-level console list; the test checks the project's config is byte-identical and that it can be added back.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/registry.js",
+              "contentHash": "sha256:ef12d09cfc4e09b4e4b14276b17acfb4ef046220c17e2a10225b7aefabd3db70",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-greenfield.test.js",
+              "contentHash": "sha256:45fe796dd1588e49f25931426ffd0a3f826c0cadd5ea2e9416f817dd55f4325c",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --test test/console-greenfield.test.js test/console-server.test.js (passed)",
+              "workId": "PF-0081",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "Unavailable entries get a remove button that removes them by folder; the server accepts only folders it lists as unavailable (tested).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:c2f9d2195435330522d9809346f5a0e4cabd2480853179d516ac51a33e9a0e2b",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:ab238eeafb3058bf0c2c03b7622aa5647cd77b1e5ddaa3ef8cd3c31dfd82df87",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --test test/console-greenfield.test.js test/console-server.test.js (passed)",
+              "workId": "PF-0081",
+              "verificationRunId": "V-001"
+            }
+          ]
+        }
+      ],
+      "unrequested": [
+        {
+          "id": "UR-001",
+          "disposition": "accepted",
+          "summary": "Removal is refused while an agent session or Claude Code channel is live in the project.",
+          "reason": "Safety: removing mid-session would orphan agent processes and the checkout lock; recorded as a ruling.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/bridge.js",
+              "contentHash": "sha256:aaa906696d07c8572748a34870ccda545ac8223ea919140281d567fb3d5a485d",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "updatedAt": "2026-11-09T08:31:13.407Z"
+}

@@ -1,0 +1,45 @@
+{
+  "id": "PF-0085",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "New project wizard: replace typing the project name with one explicit checkbox before a plan that installs dependencies or runs package scripts",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T09:06:51.138Z",
+  "updatedAt": "2026-11-09T09:21:17.718Z",
+  "title": "New project wizard: replace typing the project name with one explicit checkbox before a plan that installs dependencies or runs package scripts",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-09T09:06:51.199Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T09:21:17.718Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

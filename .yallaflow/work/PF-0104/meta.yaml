@@ -1,0 +1,43 @@
+{
+  "id": "PF-0104",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "test/project-setup.test.js UI harness fails with 'claudeWarnings is not defined' after PF-0102 (Setup → Agents now calls the Claude warning helper, which the harness did not cut)",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T13:47:25.950Z",
+  "updatedAt": "2026-11-09T13:51:34.697Z",
+  "title": "test/project-setup.test.js UI harness fails with 'claudeWarnings is not defined' after PF-0102 (Setup → Agents now calls the Claude warning helper, which the harness did not cut)",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-11-09T13:47:25.996Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T13:51:34.697Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

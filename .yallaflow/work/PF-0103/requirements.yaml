@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "From a work item the developer can move the project's single agent slot to another agent easily, without risking two agents in the folder.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T13:37:55.445Z",
+      "updatedAt": "2026-11-09T13:37:55.445Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "When an idle Codex session holds another work item, the item page offers one button that ends it and then shows the agent picker here; a working session is shown as working with no button.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T13:37:55.445Z",
+      "updatedAt": "2026-11-09T13:37:55.445Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "When Claude Code is connected and idle, a work item page offers 'Use Codex for this item': it explains closing Claude Code in its terminal and, once it disconnects, the chat shows Codex ready with a prepared first message; while Claude is working it says to wait.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T13:37:55.445Z",
+      "updatedAt": "2026-11-09T13:37:55.445Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-09T13:37:55.445Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-09T13:37:55.445Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-09T13:37:55.445Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-09T13:37:55.445Z"
+}

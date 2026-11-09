@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-09T09:54:12.720Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+        "verificationRunIds": []
+      },
+      "summary": "Assessed after V-001 and a browser walkthrough.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "With faked progress for a Laravel plan the page showed the bar, '0 of 6 steps, 6 left', 'Generate the project — this can take a few minutes (started 1m ago)' as running, the others waiting, and the latest log line. The duplicated word was fixed after the screenshot.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:a9d10cb04ecf4b34699692bcbb2e394ce4d79e44c3ccf09566664c493bb5fa64",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "Playwright walkthrough on an isolated throwaway console, 2026-11-09: progress with a running step (faked responses)"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "After a real empty-project creation the page stayed on #/new at 7 of 7 steps with 'The project is ready', the created items and one button.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:a9d10cb04ecf4b34699692bcbb2e394ce4d79e44c3ccf09566664c493bb5fa64",
+              "gitCommit": "d3652e85f727984e46b2c542d2b730f58f2a3ff5",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "Playwright walkthrough on an isolated throwaway console, 2026-11-09: ready screen after creation"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-09T09:54:12.720Z"
+}
