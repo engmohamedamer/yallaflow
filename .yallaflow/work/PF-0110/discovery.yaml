@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "testing",
+      "summary": "The end-start-send sequence was not run against a live Codex session",
+      "reason": "It would start a session on the owner's subscription; each step reuses the existing end, start and message actions, and the panel states are covered by the harness test",
+      "recordedAt": "2026-11-09T14:53:51.812Z"
+    }
+  ],
+  "updatedAt": "2026-11-09T14:53:51.812Z"
+}

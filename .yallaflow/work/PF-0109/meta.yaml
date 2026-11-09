@@ -1,0 +1,45 @@
+{
+  "id": "PF-0109",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console: the card's agent button stays compact on narrow cards, and a work item whose chat is blocked by another item's session shows when that item waits for the developer, with a button to open it",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T14:39:02.654Z",
+  "updatedAt": "2026-11-09T14:40:45.439Z",
+  "title": "Console: the card's agent button stays compact on narrow cards, and a work item whose chat is blocked by another item's session shows when that item waits for the developer, with a button to open it",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-09T14:39:02.704Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T14:40:45.439Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

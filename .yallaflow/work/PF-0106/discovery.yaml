@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "testing",
+      "summary": "The card badge and the call-out were not seen with a live agent session",
+      "reason": "They need a running Codex or Claude session on the owner's subscription; covered by the chat harness test",
+      "recordedAt": "2026-11-09T14:18:58.534Z"
+    }
+  ],
+  "updatedAt": "2026-11-09T14:18:58.534Z"
+}

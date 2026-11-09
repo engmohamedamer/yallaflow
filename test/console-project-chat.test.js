@@ -107,10 +107,11 @@ test('blocker texts read in Arabic; suggestions say they only fill the box; your
   const h = harness({ hash: '#/item/PF-0001', session });
   h.agent.events = [{ type: 'message.sent', text: 'hi' }, { type: 'message.done', role: 'agent', text: 'Classified it.' }];
   const html = h.panel();
-  assert.match(html, /The agent finished this part and is waiting for your reply/);
+  // PF-0105: the Continue button replaces the generic "waiting for your reply" line.
+  assert.match(html, /data-agent-continue/);
   assert.match(html, /Suggestions \(they fill the box; you send\)/);
   const before = harness({ hash: '#/item/PF-0001', session }).panel();
-  assert.doesNotMatch(before, /waiting for your reply/, 'no "your turn" before the agent has replied');
+  assert.doesNotMatch(before, /data-agent-continue/, 'no Continue before the agent has replied');
 });
 
 // PF-0095: the chat says plainly whose turn it is.
@@ -125,7 +126,7 @@ test('the chat says when the agent is working, waiting for an approval, or waiti
   assert.match(approval.panel(), /waiting for your approval above/);
   const reply = harness({ hash: '#/item/PF-0001', session: { provider: 'codex', workId: 'PF-0001', status: 'idle' } });
   reply.agent.events = [{ type: 'message.sent', text: 'go' }, { type: 'message.done', role: 'agent', text: 'Local or hosted?' }];
-  assert.match(reply.panel(), /waiting for your reply/);
+  assert.match(reply.panel(), /data-agent-continue/);
   assert.doesNotMatch(reply.panel(), /The agent is working/);
 });
 
@@ -148,10 +149,70 @@ test('switch agent: end an idle Codex session elsewhere; hand over from Claude C
   const busy = harness({ hash: '#/item/PF-0002', items, session: { provider: 'codex', workId: 'PF-0001', status: 'working' } }).panel();
   assert.doesNotMatch(busy, /data-agent-switch-end/);
   assert.match(busy, /Codex is working on PF-0001\. Wait/);
+  // PF-0109: a pending approval on the other item is named, with a button to open it.
+  const waiting = harness({ hash: '#/item/PF-0002', items, session: { provider: 'codex', workId: 'PF-0001', status: 'working' } });
+  waiting.agent.pending = [{ requestId: 'r1', title: 'Run command', decisions: ['allow', 'deny'] }];
+  const w = waiting.panel();
+  assert.match(w, /PF-0001: the agent needs your approval/);
+  assert.match(w, /data-chat-item="PF-0001" data-chat-draft="">Open PF-0001/);
   const claude = harness({ hash: '#/item/PF-0002', items, session: { provider: 'claude', workId: null, status: 'connected', connected: true, mode: 'default' } });
   claude.agent.providers.push({ id: 'claude', ready: true, capabilities: { start: false, send: true, modes: [] } });
   assert.match(claude.panel(), /data-agent-switch-codex="PF-0002"/);
   const claudeBusy = harness({ hash: '#/item/PF-0002', items, session: { provider: 'claude', workId: null, status: 'working', connected: true, mode: 'default' } }).panel();
   assert.match(claudeBusy, /Claude Code is working\. Wait/);
   assert.doesNotMatch(claudeBusy, /data-agent-switch-codex/);
+});
+
+// PF-0105: the chat asks for the whole job and shows one action for what is needed.
+test('chat: whole-job first message, one action (review, answer, continue), steps grouped', () => {
+  const session = { provider: 'codex', workId: 'PF-0001', status: 'idle' };
+  const fresh = harness({ hash: '#/item/PF-0001', session });
+  const html = fresh.panel();
+  assert.match(html, /Work on PF-0001 to the end: classify it/, 'the box holds the whole-job instruction before the first message');
+  const review = harness({ hash: '#/item/PF-0001', session, items: [{ id: 'PF-0001', title: 'One', state: 'you', currentStation: 'decide', waitingFor: { kind: 'review', gate: 'specification' } }] });
+  review.agent.events = [{ type: 'message.sent', text: 'go' }, { type: 'message.done', role: 'agent', text: 'Spec ready.' }];
+  const r = review.panel();
+  assert.match(r, /data-gate="specification" data-gate-item="PF-0001"/);
+  assert.doesNotMatch(r, /data-agent-continue/, 'a review is the action, not Continue');
+  const question = harness({ hash: '#/item/PF-0001', session, items: [{ id: 'PF-0001', title: 'One', state: 'you', currentStation: 'understand', waitingFor: { kind: 'question', questions: ['Q-001'] } }] });
+  question.agent.events = [{ type: 'message.sent', text: 'go' }, { type: 'message.done', role: 'agent', text: 'Which currency?' }];
+  assert.match(question.panel(), /data-act="answer" data-act-item="PF-0001"/);
+  const steps = harness({ hash: '#/item/PF-0001', session });
+  steps.agent.events = [{ type: 'message.sent', text: 'go' }, ...['a', 'b', 'c'].map((id) => ({ type: 'tool.started', toolCallId: id, title: `yallaflow ${id}`, status: 'completed' })), { type: 'message.done', role: 'agent', text: 'Done.' }];
+  const stepsHtml = steps.panel();
+  assert.match(stepsHtml, /<details class="atools">/);
+  assert.match(stepsHtml, /3 steps/);
+  assert.match(stepsHtml, /<details class="asugg-more">/, 'other suggestions are folded');
+});
+
+// PF-0106: a call from the agent is visible from project pages and leads to the item's chat.
+test('attention: a pending permission or a finished turn on an item shows on project pages and opens that chat', () => {
+  const pending = harness({ hash: '#/map', session: { provider: 'codex', workId: 'PF-0001', status: 'working' } });
+  pending.agent.pending = [{ requestId: 'r1', title: 'Run command', decisions: ['allow', 'deny'] }];
+  const dock = pending.dock();
+  assert.match(dock, /class="chatcall" data-chat-item="PF-0001"/);
+  assert.match(dock, /PF-0001: the agent needs your approval/);
+  assert.match(dock, /class="chatfab[^"]*" data-chat-item="PF-0001"/, 'the corner button opens that item, not the project chat');
+  const reply = harness({ hash: '#/map', session: { provider: 'codex', workId: 'PF-0001', status: 'idle' } });
+  reply.agent.events = [{ type: 'message.sent', text: 'go' }, { type: 'message.done', role: 'agent', text: 'Done.' }];
+  assert.match(reply.dock(), /PF-0001: the agent finished and waits for you/);
+  const quiet = harness({ hash: '#/map', session: { provider: 'codex', workId: 'PF-0001', status: 'working' } });
+  quiet.agent.events = [{ type: 'message.sent', text: 'go' }];
+  assert.doesNotMatch(quiet.dock(), /chatcall/, 'nothing while it works');
+  assert.match(quiet.dock(), /data-chat-toggle/);
+});
+
+// PF-0110: a finished item's open session is handed over in one click, and asks nothing.
+test('a finished item holding the session: one Start button here, and no "waits for you" call-out', () => {
+  const items = [{ id: 'PF-0007', title: 'Done one', state: 'done', currentStation: 'remember' }, { id: 'PF-0005', title: 'Next', state: 'new', routing: 'pending' }];
+  const h = harness({ hash: '#/item/PF-0005', items, session: { provider: 'codex', workId: 'PF-0007', status: 'idle' } });
+  h.agent.events = [{ type: 'message.sent', text: 'go' }, { type: 'message.done', role: 'agent', text: 'Finished.' }];
+  const html = h.panel();
+  assert.match(html, /data-agent-switch-start="PF-0005"/);
+  assert.match(html, /Start PF-0005 with Codex/);
+  assert.match(html, /Work on PF-0005 to the end/, 'the button shows the message it sends');
+  assert.doesNotMatch(html, /data-agent-switch-end/);
+  const board = harness({ hash: '#/map', items, session: { provider: 'codex', workId: 'PF-0007', status: 'idle' } });
+  board.agent.events = h.agent.events;
+  assert.doesNotMatch(board.dock(), /chatcall/, 'a done item never waits for the developer');
 });

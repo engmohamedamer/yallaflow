@@ -1,0 +1,45 @@
+{
+  "id": "PF-0106",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console: the Created dialog can be closed, and when the agent waits on the developer for a work item (a permission, or its reply after a finished turn) the board and work list show it on that item's card and the corner chat button opens that item's chat",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T14:12:55.552Z",
+  "updatedAt": "2026-11-09T14:18:59.114Z",
+  "title": "Console: the Created dialog can be closed, and when the agent waits on the developer for a work item (a permission, or its reply after a finished turn) the board and work list show it on that item's card and the corner chat button opens that item's chat",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-09T14:12:55.604Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T14:18:59.114Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

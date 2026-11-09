@@ -1,0 +1,45 @@
+{
+  "id": "PF-0108",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Board card and call-out when the agent works on or waits for an item: the card shows the agent state clearly (highlighted card, a readable agent line, the action becomes 'See what it needs' instead of Start) and the corner call-out is solid and readable",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T14:24:20.421Z",
+  "updatedAt": "2026-11-09T14:26:36.429Z",
+  "title": "Board card and call-out when the agent works on or waits for an item: the card shows the agent state clearly (highlighted card, a readable agent line, the action becomes 'See what it needs' instead of Start) and the corner call-out is solid and readable",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-09T14:24:20.474Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T14:26:36.429Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

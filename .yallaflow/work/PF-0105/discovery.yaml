@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "testing",
+      "summary": "The action bar and grouped steps were not seen in a live agent session in a browser",
+      "reason": "They render only inside a running Codex or Claude session, which would use the owner's subscription; the chat harness test covers each state",
+      "recordedAt": "2026-11-09T14:02:14.543Z"
+    }
+  ],
+  "updatedAt": "2026-11-09T14:02:14.543Z"
+}

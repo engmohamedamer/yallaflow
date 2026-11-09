@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T15:44:46.034Z",
+      "completedAt": "2026-11-09T15:44:46.034Z",
+      "summary": "main = origin/main at 4215f71 (1.4.2 in progress, PF-0081..PF-0104). Uncommitted and belonging to 1.4.2: PF-0105..PF-0110 (resources/console/app.js, app.css, docs/console.md, CHANGELOG.md, test/console-project-chat.test.js, .yallaflow work records and state). Not part of the release: .playwright-cli/ (browser-check snapshots). package.json and src/version.js = 1.4.2; npm latest = 1.4.1; tags up to v1.4.1. release.yml publishes to npm only on a published GitHub Release, so a tag push alone publishes nothing. npm test preloads test-support/isolate-user-config.js (since 1.3.0), so the PF-0094 leak affects only direct 'node --test' runs; the CHANGELOG wording must say so.",
+      "evidence": [
+        "package.json",
+        ".github/workflows/release.yml",
+        "docs/releasing.md",
+        "test-support/isolate-user-config.js",
+        "CHANGELOG.md"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-09T15:44:46.584Z",
+      "completedAt": "2026-11-09T15:44:46.584Z",
+      "summary": "Date and title the CHANGELOG 1.4.2 section and correct the PF-0094 line; update README's version mentions (install example, What's new) to 1.4.2; run the checklist (npm ci && npm run check, doctor, npm audit, pack dry-run, pack + secret scan, isolated-prefix smoke test, browser smoke of the packed console, git diff --check); commit the release with PF-0105..PF-0111 records (not .playwright-cli/); create annotated tag v1.4.2; push main and the tag only after the owner confirms (Checkpoint A); verify the remote. No npm publish, no GitHub Release."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T15:45:46.275Z",
+      "completedAt": "2026-11-09T15:45:46.275Z",
+      "summary": "CHANGELOG 1.4.2 dated 2026-11-09 with its title and intro; the PF-0094 line corrected (leak only with direct node --test; npm test already isolated). README: install example, What's new in 1.4.2, Status line. No code changes in this step.",
+      "evidence": [
+        "CHANGELOG.md",
+        "README.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T15:53:36.368Z",
+      "completedAt": "2026-11-09T15:53:36.368Z",
+      "summary": "V-001 'npm ci && npm run check' FAILED: node_modules is read-only (dr-xr-sr-x since 2026-10-20), so npm ci could not remove it; nothing was removed and the owner's permissions were left as they are. V-002 npm run check PASSED (syntax + 1036 tests, 0 failures). V-003 doctor PASSED (Workspace healthy). npm audit: 2 moderate (file-type 16.5.4 via officeparser), the documented residual in docs/releasing.md, unchanged since 1.4.1. npm pack: 282 files, 1051801 bytes, shasum c37aa306…; secret scan of the tarball clean. Packed candidate in an isolated prefix (fresh install of 32 packages): --version 1.4.2, Greenfield doctor healthy, Brownfield gate PROJECT_UNDERSTANDING_REQUIRED, AGENTS.md and CLAUDE.md bootstraps, Shared clone allocates PF-NKPZ3WG6M9-0001, doctor healthy. Browser smoke of the packed console (8 pages): no console errors; the only error seen was the expected 404 for a work item that does not exist, shown as 'does not exist'.",
+      "evidence": [
+        "verification:V-002",
+        "verification:V-003",
+        "runtime:isolated-prefix smoke test and Playwright browser smoke of yallaflow-1.4.2.tgz, 2026-11-09"
+      ]
+    },
+    "code-review": {
+      "status": "completed",
+      "startedAt": "2026-11-09T15:53:36.711Z",
+      "completedAt": "2026-11-09T15:53:36.711Z",
+      "summary": "Uncommitted diff since 4215f71: 7 files, no src/ change; console UI (PF-0105..PF-0110) with values escaped (esc) or validated work ids; tests for each item; docs and CHANGELOG/README consistent with the code. Scope check: .playwright-cli/ is excluded from the release. No blocking findings.",
+      "evidence": [
+        "resources/console/app.js",
+        "CHANGELOG.md",
+        "README.md"
+      ]
+    }
+  },
+  "rulings": [
+    {
+      "decision": "PF-0094's CHANGELOG entry overstated the leak: under npm test the user config was already isolated (test-support/isolate-user-config.js since 1.3.0); the plans and registrations leaked only from direct 'node --test' runs. The 1.4.2 CHANGELOG is corrected; PF-0094's records stay as history and its fix (file-level isolation) remains valid",
+      "reason": "Found while preparing the 1.4.2 release; a release note must not claim more than happened",
+      "costIfWrong": "A misleading release note about tests touching user data",
+      "createdAt": "2026-11-09T15:44:46.200Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-09T15:53:36.711Z"
+}

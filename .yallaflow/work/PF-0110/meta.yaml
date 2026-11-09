@@ -1,0 +1,45 @@
+{
+  "id": "PF-0110",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console: when the item holding the agent session is finished, a work item offers one button that ends that session, starts Codex on this item and sends the whole-job message; a finished item never shows 'waits for you'",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T14:52:06.001Z",
+  "updatedAt": "2026-11-09T14:53:52.356Z",
+  "title": "Console: when the item holding the agent session is finished, a work item offers one button that ends that session, starts Codex on this item and sends the whole-job message; a finished item never shows 'waits for you'",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-09T14:52:06.058Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T14:53:52.356Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

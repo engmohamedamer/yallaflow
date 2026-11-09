@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "Starting the agent on a work item lets it run to the end, and the chat shows plainly the one thing needed from the developer, as a button.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T13:59:07.693Z",
+      "updatedAt": "2026-11-09T13:59:07.693Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "The message the console prepares to start or continue an item tells the agent to work it to the end and stop only for a decision only the developer can make.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T13:59:07.693Z",
+      "updatedAt": "2026-11-09T13:59:07.693Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "The bottom of the chat shows one action for the current situation: a review button when a review gate waits, an answer button for an open question, a Continue button that sends a continue message when the agent stopped with nothing pending, nothing while it works; other suggestions are collapsed.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T13:59:07.693Z",
+      "updatedAt": "2026-11-09T13:59:07.693Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-001",
+      "statement": "Consecutive agent steps show as one expandable line instead of one line each.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T13:59:07.693Z",
+      "updatedAt": "2026-11-09T13:59:07.693Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-09T13:59:07.693Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-09T13:59:07.693Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-09T13:59:07.693Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-09T13:59:07.693Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-09T13:59:07.693Z"
+}

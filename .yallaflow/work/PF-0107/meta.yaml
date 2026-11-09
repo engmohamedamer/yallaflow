@@ -1,0 +1,45 @@
+{
+  "id": "PF-0107",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Board cards: a new work item's card offers 'Start' (opens that item's chat with the whole-job message) instead of a plain 'Chat' link",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T14:14:39.532Z",
+  "updatedAt": "2026-11-09T14:19:01.529Z",
+  "title": "Board cards: a new work item's card offers 'Start' (opens that item's chat with the whole-job message) instead of a plain 'Chat' link",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-09T14:14:39.584Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T14:19:01.529Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

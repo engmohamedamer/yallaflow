@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-09T14:02:14.923Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "4215f71f0cccb00ab60ad6b98097660e5cc230ec",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "Assessed after V-001 (harness); live session not exercised (limitation).",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "goText is used for the chat-item default draft, Start here, the empty box before the first message, and the post-approval message asks to continue to the end.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:922cd37c0c2b305b8a057708473f6e96652b34ced859cbfdfc71deff2c0a411f",
+              "gitCommit": "4215f71f0cccb00ab60ad6b98097660e5cc230ec",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-project-chat.test.js",
+              "contentHash": "sha256:65179401f570274990aa029d6dbfcef720bc0fc37090b9576242047ecb46e579",
+              "gitCommit": "4215f71f0cccb00ab60ad6b98097660e5cc230ec",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --test test/console-project-chat.test.js test/agent-continue.test.js test/console-presentation.test.js test/project-setup.test.js test/console-actions.test.js test/agent-bridge.test.js (passed)",
+              "workId": "PF-0105",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "chatAction renders the review, answer or Continue action by state and nothing while working or waiting for a permission; other suggestions sit in a folded details.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:922cd37c0c2b305b8a057708473f6e96652b34ced859cbfdfc71deff2c0a411f",
+              "gitCommit": "4215f71f0cccb00ab60ad6b98097660e5cc230ec",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-project-chat.test.js",
+              "contentHash": "sha256:65179401f570274990aa029d6dbfcef720bc0fc37090b9576242047ecb46e579",
+              "gitCommit": "4215f71f0cccb00ab60ad6b98097660e5cc230ec",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --test test/console-project-chat.test.js test/agent-continue.test.js test/console-presentation.test.js test/project-setup.test.js test/console-actions.test.js test/agent-bridge.test.js (passed)",
+              "workId": "PF-0105",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "groupSteps folds consecutive tool entries into one details line with the step count.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:922cd37c0c2b305b8a057708473f6e96652b34ced859cbfdfc71deff2c0a411f",
+              "gitCommit": "4215f71f0cccb00ab60ad6b98097660e5cc230ec",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-project-chat.test.js",
+              "contentHash": "sha256:65179401f570274990aa029d6dbfcef720bc0fc37090b9576242047ecb46e579",
+              "gitCommit": "4215f71f0cccb00ab60ad6b98097660e5cc230ec",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --test test/console-project-chat.test.js test/agent-continue.test.js test/console-presentation.test.js test/project-setup.test.js test/console-actions.test.js test/agent-bridge.test.js (passed)",
+              "workId": "PF-0105",
+              "verificationRunId": "V-001"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-09T14:02:14.923Z"
+}

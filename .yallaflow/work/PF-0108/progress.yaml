@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T14:24:20.900Z",
+      "completedAt": "2026-11-09T14:24:20.900Z",
+      "summary": "Owner screenshot: the call-out (.chatcall, fixed above the corner button, white pill) overlaps card text; on PF-0006 the attention badge (.bdg.att inside .badges) overflows the narrow card and the card still shows 'new 0%' with the Start button although a Codex session works on it and waits for approval (pchip in resources/console/app.js; agentAttention from PF-0106).",
+      "evidence": [
+        "resources/console/app.js",
+        "resources/console/app.css",
+        "runtime:owner screenshot of the board with PF-0006 waiting, 2026-11-09"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T14:24:21.310Z",
+      "completedAt": "2026-11-09T14:24:21.310Z",
+      "summary": "Owner (2026-11-09): the call-out text is hard to read and the card does not show what is going on."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-09T14:24:22.410Z",
+      "completedAt": "2026-11-09T14:24:22.410Z",
+      "summary": "agentOnItem(it): working/approval/reply for the item holding the session; pchip adds a class (agent-working/agent-calls), an agent line under the title that wraps, and swaps Start/Chat for 'See what it needs' or 'Watch the agent'; call-out gets a solid amber or blue background, sits beside the button, and wraps."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T14:26:14.360Z",
+      "completedAt": "2026-11-09T14:26:14.360Z",
+      "summary": "agentOnItem(it) gives working/approval/reply for the item holding the session; pchip highlights the card (agent-approval amber, agent-reply blue, agent-working teal), adds a wrapping agent line under the title, and swaps Start/Chat for 'See what it needs' or 'Watch the agent' (opens the chat without adding a message: an explicit empty data-chat-draft now keeps the box). The call-out is a solid band beside the corner button that wraps. CHANGELOG updated.",
+      "evidence": [
+        "resources/console/app.js",
+        "resources/console/app.css",
+        "CHANGELOG.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T14:26:36.045Z",
+      "completedAt": "2026-11-09T14:26:36.045Z",
+      "summary": "Console tests pass (V-001). Browser with a faked agent response (Codex on PF-0004, one pending permission): amber-framed card with 'الوكيل مستني إذنك' and 'شوف المطلوب', the solid call-out 'PF-0004: الوكيل مستني إذنك' beside the chat button; 'شوف المطلوب' opened #/item/PF-0004 with the message box left empty; no console errors.",
+      "evidence": [
+        "verification:V-001",
+        "runtime:Playwright with a routed /agent response on an isolated test console, 2026-11-09"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-09T14:26:36.045Z"
+}

@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T14:39:03.145Z",
+      "completedAt": "2026-11-09T14:39:03.145Z",
+      "summary": "Owner screenshots: on narrow board cards the PF-0108 button text ('See what it needs', 'Watch the agent') wraps into a three-line pill; on PF-0005, with Codex on PF-0007 waiting for an approval, switchHere shows only 'Codex is working on PF-0007. Wait…' while the header counts the pending approval, with no way to reach PF-0007 from there.",
+      "evidence": [
+        "resources/console/app.js",
+        "resources/console/app.css",
+        "runtime:owner screenshots, 2026-11-09"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T14:39:03.518Z",
+      "completedAt": "2026-11-09T14:39:03.518Z",
+      "summary": "Owner (2026-11-09) asked to review these screens."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-09T14:39:04.558Z",
+      "completedAt": "2026-11-09T14:39:04.558Z",
+      "summary": "Short card labels ('See it' / 'Watch'), button radius and no wrapping; in switchHere for another item's session, show when it waits (approval/reply) with an 'Open PF-x' button; keep the wait line otherwise, also with a link button."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T14:40:27.757Z",
+      "completedAt": "2026-11-09T14:40:27.757Z",
+      "summary": "Card agent button labels shortened ('تابع/Watch', 'شوف/Open') and kept on one line; switchHere names a pending approval or reply on the item holding the session with an 'Open PF-x' button, and the working case gets a 'Watch PF-x' button. Harness test extended.",
+      "evidence": [
+        "resources/console/app.js",
+        "resources/console/app.css",
+        "test/console-project-chat.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T14:40:45.068Z",
+      "completedAt": "2026-11-09T14:40:45.068Z",
+      "summary": "Console tests pass (V-001). Browser with a faked agent (Codex on PF-0004, one pending permission): the card button reads 'شوف' on one line; PF-0003's chat says 'PF-0004: الوكيل مستني إذنك. علشان تبدأ PF-0003، خلّص اللي PF-0004 مستنياه الأول.' with 'افتح PF-0004'; no console errors.",
+      "evidence": [
+        "verification:V-001",
+        "runtime:Playwright with a routed /agent response, 2026-11-09"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-09T14:40:45.068Z"
+}

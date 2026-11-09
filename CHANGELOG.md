@@ -4,9 +4,9 @@ All notable changes to YallaFlow are documented here. The format loosely follows
 
 **1.0.0 is the first public release**, published to npm as `yallaflow`. From 1.0.0 the package follows Semantic Versioning with the compatibility promise in [`docs/releasing.md`](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise). Every earlier version below is an **internal prerelease**: git-tagged, never published to npm, and kept here as history.
 
-## [1.4.2] - Unreleased (in progress)
+## [1.4.2] - 2026-11-09 — A console that works with you
 
-Work collected for 1.4.2. Not tagged or published yet.
+Start a project and a task in a few clicks, let the agent run until it needs you, and see what it needs from any page. Reviews read like documents, confirmations are single ticks, and the console tells you plainly whose turn it is.
 
 ### Added
 - **Remove a project from the console's Projects page** (PF-0081). Each project card has a ✕ button, and so does each unavailable saved folder. After you confirm, the project leaves the running console and the saved list right away, with no restart. Its files and `.yallaflow` records are never touched, and you can add it back with **Add an existing project**. Removal is refused while an agent session or a Claude Code channel is live in that project. `yallaflow console remove` still works.
@@ -19,6 +19,10 @@ Work collected for 1.4.2. Not tagged or published yet.
 - **Start here on a new project's Overview** (PF-0091): one next step with one button: **Start with the agent** (opens the first work item with the chat and a drafted first message), or **Choose an agent**.
 
 - **Switch agents from the work item that needs one** (PF-0103). An idle Codex session on another item can be ended with one button, and the agent picker appears here. With Claude Code connected, **Use Codex for this item** tells you to close Claude Code in its terminal and continues with Codex and a prepared first message as soon as it disconnects. A working agent is waited for, never interrupted.
+- **The agent runs until it needs you** (PF-0105). Starting or continuing a work item now prepares one instruction for the whole job, stopping only for a decision only you can make, instead of «Where is … now?». The chat shows one action for what is needed: Review and decide, Answer the question, or Continue; other suggestions are folded, and the agent's steps are grouped into one line.
+- **The agent's call is visible from anywhere** (PF-0106). When the agent waits for your approval or your reply on a work item, that item's card says so plainly (a highlighted card, an agent line, and «See what it needs» or «Watch the agent» in place of Start; PF-0108), its work line shows a badge, and a solid call-out beside the corner chat button opens that item's chat directly. The «Created» window after Create work can now be closed.
+- **«Start» on new cards** (PF-0107): a new work item's card on the Flow board opens its chat with the whole-job message.
+- **Start the next item in one click** (PF-0110). When the item holding the Codex session is finished, another item's chat offers «Start PF-x with Codex»: it ends the old session, starts one here and sends the whole-job message shown on the button. A finished item no longer shows «waits for you».
 ### Changed
 - **The console's top menu follows daily use** (PF-0089): Flow, Work, Setup & run, Overview, Insights, Worktrees. The Setup tab and its page now have the same name.
 - **A clearer work item page** (PF-0092). When the console agent is on, the next-step card has a **Continue with the agent here** button; the terminal phrase stays as a hint. Edit request, Put on hold and Close without delivery moved under **⋯ More**.
@@ -35,7 +39,7 @@ Work collected for 1.4.2. Not tagged or published yet.
 - The status at the top of the agent chat stayed «working» after the agent's turn ended (PF-0095). It now follows the session, and a line in the chat says plainly whether the agent is working, waiting for your approval, or waiting for your reply. While it works, the line also says for how long and what its last step was, refreshed every 30 seconds (PF-0096).
 - **Review and decide** refused a required review that YallaFlow had never formally requested («not requested, so there is nothing to decide»), although the work item was waiting on it and `yallaflow approve` accepts it (PF-0099). The console now decides it too, but only for the review the item is actually waiting on.
 - **Messages from the console never reached Claude Code on a Claude Team account, without any error** (PF-0102). The cause is on Claude's side: Team and Enterprise organizations have channels off unless an Owner enables them, and Claude Code then drops the messages. YallaFlow now warns about a Team or Enterprise login in Setup → Agents and in the chat, and reports a message that Claude Code never started on (no hook within 60 seconds) instead of showing «working» forever.
-- The New Project tests wrote plans and console registrations into the developer's own `~/.config/yallaflow` (PF-0094). They now use a private folder for each run.
+- Running `test/new-project.test.js` directly with `node --test` wrote plans and console registrations into the developer's own `~/.config/yallaflow` (PF-0094). `npm test` already isolated the config (since 1.3.0); the file now isolates itself too.
 
 ## [1.4.1] - 2026-11-08 — Project Setup and Run
 

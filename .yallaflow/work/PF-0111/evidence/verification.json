@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "npm ci --no-audit --no-fund && npm run check",
+      "executionMode": "shell",
+      "executable": "npm ci --no-audit --no-fund && npm run check",
+      "args": [],
+      "displayCommand": "npm ci --no-audit --no-fund && npm run check",
+      "success": false,
+      "status": "failed",
+      "exitCode": 243,
+      "startedAt": "2026-11-09T15:45:46.678Z",
+      "finishedAt": "2026-11-09T15:45:47.214Z",
+      "verifiedAt": "2026-11-09T15:45:47.214Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-09T15:46:34.375Z",
+      "finishedAt": "2026-11-09T15:50:20.718Z",
+      "verifiedAt": "2026-11-09T15:50:20.718Z",
+      "log": "V-002-verification.log"
+    },
+    {
+      "id": "V-003",
+      "command": "node src/cli.js doctor",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "src/cli.js",
+        "doctor"
+      ],
+      "displayCommand": "node src/cli.js doctor",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-09T15:50:27.971Z",
+      "finishedAt": "2026-11-09T15:50:29.565Z",
+      "verifiedAt": "2026-11-09T15:50:29.565Z",
+      "log": "V-003-verification.log"
+    }
+  ]
+}

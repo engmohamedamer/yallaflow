@@ -1,0 +1,460 @@
+TAP version 13
+# Subtest: stopFrom: a usage limit is recognised with its retry time; other stops keep their reason
+ok 1 - stopFrom: a usage limit is recognised with its retry time; other stops keep their reason
+  ---
+  duration_ms: 4.909686
+  type: 'test'
+  ...
+# Subtest: codex: a usage-limit turn is a stop with its retry time, kept after End and across a console restart
+ok 2 - codex: a usage-limit turn is a stop with its retry time, kept after End and across a console restart
+  ---
+  duration_ms: 4650.21568
+  type: 'test'
+  ...
+# Subtest: codex: a crash and a plain End are recorded as such
+ok 3 - codex: a crash and a plain End are recorded as such
+  ---
+  duration_ms: 4599.856687
+  type: 'test'
+  ...
+# Subtest: UI: a live Codex usage limit offers Claude Code and a terminal message, not Codex again
+ok 4 - UI: a live Codex usage limit offers Claude Code and a terminal message, not Codex again
+  ---
+  duration_ms: 5.949863
+  type: 'test'
+  ...
+# Subtest: UI: a session started after the stop (the switch itself) clears the card
+ok 5 - UI: a session started after the stop (the switch itself) clears the card
+  ---
+  duration_ms: 2.746095
+  type: 'test'
+  ...
+# Subtest: UI: a message sent after the stop clears the card; another item never shows it
+ok 6 - UI: a message sent after the stop clears the card; another item never shows it
+  ---
+  duration_ms: 4.942594
+  type: 'test'
+  ...
+# Subtest: UI: with no session, the last recorded stop of this item is offered, including the same agent; Arabic too
+ok 7 - UI: with no session, the last recorded stop of this item is offered, including the same agent; Arabic too
+  ---
+  duration_ms: 7.63754
+  type: 'test'
+  ...
+# Subtest: UI: only ready providers are offered
+ok 8 - UI: only ready providers are offered
+  ---
+  duration_ms: 2.546266
+  type: 'test'
+  ...
+# Subtest: UI: switching ends Codex first, connects Claude, and prepares (never sends) the continue message
+ok 9 - UI: switching ends Codex first, connects Claude, and prepares (never sends) the continue message
+  ---
+  duration_ms: 6.570421
+  type: 'test'
+  ...
+# Subtest: UI: a failed End stops the switch; nothing else starts
+ok 10 - UI: a failed End stops the switch; nothing else starts
+  ---
+  duration_ms: 3.69838
+  type: 'test'
+  ...
+# Subtest: UI: the item lists which agent worked on it and how each session stopped
+ok 11 - UI: the item lists which agent worked on it and how each session stopped
+  ---
+  duration_ms: 3.05958
+  type: 'test'
+  ...
+# YallaFlow foundation CLI
+# Give AI your project, not just your prompt.
+# Usage:
+#   yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]
+#   yallaflow start [request]
+#   yallaflow start --keep-active -- <request>
+#   yallaflow activate <work-id>
+#   yallaflow request --help
+#   yallaflow intake <file> [<file> ...] [--title TITLE]
+#   yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT] [--before-start]
+#   yallaflow intake ticket <payload-file|ticket-ref> [--provider github|jira|azure-devops] [--work <work-id>] [--reason TEXT] [--fetch [--attachments]] [--attachment <file>]... [--title TITLE] [--max-comments N]
+#   yallaflow source --help
+#   yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]
+#   yallaflow baseline --help
+#   yallaflow guide [work-id]
+#   yallaflow ready [work-id]
+#   yallaflow skill <skill-id> [--work <work-id>]
+#   yallaflow checkpoint --help
+#   yallaflow question --help
+#   yallaflow knowledge --help
+#   yallaflow requirement --help
+#   yallaflow convergence --help
+#   yallaflow impact --help
+#   yallaflow context --help
+#   yallaflow upgrade status|plan
+#   yallaflow brief
+#   yallaflow inspect
+#   yallaflow limitation --help
+#   yallaflow agent --help
+#   yallaflow decompose --help
+#   yallaflow progress <parent-id>
+#   yallaflow next <parent-id>
+#   yallaflow approve <work-id> --stage GATE [--note TEXT]
+#   yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]
+#   yallaflow handoff [work-id]
+#   yallaflow feature <title> --scope SCOPE
+#   yallaflow bug <title> --scope SCOPE
+#   yallaflow investigate <title> --scope SCOPE
+#   yallaflow change <title> --scope SCOPE
+#   yallaflow refactor <title> --scope SCOPE
+#   yallaflow release <title> --scope SCOPE
+#   yallaflow purpose --help
+#   yallaflow finish [work-id] [--verbose]
+#   yallaflow qc --help
+#   yallaflow demo --help
+#   yallaflow shared --help
+#   yallaflow status
+#   yallaflow snapshot [--json]
+#   yallaflow overview [--json]
+#   yallaflow runtime --help
+#   yallaflow new --help
+#   yallaflow history --help
+#   yallaflow console [--port N] [--no-open] [--project DIR]... [--read-only] [--agents]
+#   yallaflow agents detect
+#   yallaflow work show <work-id> [--json]
+#   yallaflow work hold|resume|close <work-id> ...  (lifecycle: on hold, closed without delivery)
+#   yallaflow resume [work-id]
+#   yallaflow doctor [--clear-lock]
+#   yallaflow advance [work-id]
+#   yallaflow verify [work-id] -- <executable> [args...]
+#   yallaflow verify [work-id] --shell "<command>"
+#   yallaflow verify [work-id] --script <path>
+#   yallaflow verify list [work-id]
+#   yallaflow reopen <work-id> --to implementation|verification|review --reason REASON
+#   yallaflow reopen <work-id> --reason REASON   (closed work)
+#   yallaflow --version
+# Subtest: start without new options behaves exactly as before (focus moves to the new item)
+ok 12 - start without new options behaves exactly as before (focus moves to the new item)
+  ---
+  duration_ms: 1176.734091
+  type: 'test'
+  ...
+# Subtest: parseStartArgs: new options only as leading tokens; anything else is the legacy request
+ok 13 - parseStartArgs: new options only as leading tokens; anything else is the legacy request
+  ---
+  duration_ms: 3.576487
+  type: 'test'
+  ...
+# Subtest: --keep-active never replaces unfinished active work; routing and checkpoints never move focus; activate does
+ok 14 - --keep-active never replaces unfinished active work; routing and checkpoints never move focus; activate does
+  ---
+  duration_ms: 1423.299007
+  type: 'test'
+  ...
+# Subtest: --keep-active never activates, even when no work item is active (owner decision)
+ok 15 - --keep-active never activates, even when no work item is active (owner decision)
+  ---
+  duration_ms: 791.670925
+  type: 'test'
+  ...
+# Subtest: console create with nothing active leaves nothing active
+ok 16 - console create with nothing active leaves nothing active
+  ---
+  duration_ms: 702.885546
+  type: 'test'
+  ...
+# Subtest: attachments report what YallaFlow could actually do with each file
+ok 17 - attachments report what YallaFlow could actually do with each file
+  ---
+  duration_ms: 2152.303293
+  type: 'test'
+  ...
+# Subtest: request IDs: a retried or concurrent request creates exactly one item, with an unverified console attestation
+ok 18 - request IDs: a retried or concurrent request creates exactly one item, with an unverified console attestation
+  ---
+  duration_ms: 1151.718798
+  type: 'test'
+  ...
+# Subtest: helpers: titles come from the user's words; file names are reduced safely
+ok 19 - helpers: titles come from the user's words; file names are reduced safely
+  ---
+  duration_ms: 0.537036
+  type: 'test'
+  ...
+# Subtest: POST guards: token, Origin, Host, content type, size, read-only, unknown routes
+ok 20 - POST guards: token, Origin, Host, content type, size, read-only, unknown routes
+  ---
+  duration_ms: 81.334293
+  type: 'test'
+  ...
+# Subtest: create: unclassified and classified items through Core; shell text stored verbatim; focus kept
+ok 21 - create: unclassified and classified items through Core; shell text stored verbatim; focus kept
+  ---
+  duration_ms: 2113.796362
+  type: 'test'
+  ...
+# Subtest: create: concurrent requests get distinct IDs; repeated ones never duplicate
+ok 22 - create: concurrent requests get distinct IDs; repeated ones never duplicate
+  ---
+  duration_ms: 1877.54683
+  type: 'test'
+  ...
+# Subtest: brownfield without approved understanding: Core refuses and nothing is created
+ok 23 - brownfield without approved understanding: Core refuses and nothing is created
+  ---
+  duration_ms: 194.937853
+  type: 'test'
+  ...
+# Subtest: attachments: preserved through intake, deduplicated on retry, refused safely, temp files removed, item kept
+ok 24 - attachments: preserved through intake, deduplicated on retry, refused safely, temp files removed, item kept
+  ---
+  duration_ms: 1939.866541
+  type: 'test'
+  ...
+# Subtest: an oversized upload is refused before it is stored
+ok 25 - an oversized upload is refused before it is stored
+  ---
+  duration_ms: 3404.753086
+  type: 'test'
+  ...
+# Subtest: review: requests starting with "-" keep their classification; "--help" is plain text
+ok 26 - review: requests starting with "-" keep their classification; "--help" is plain text
+  ---
+  duration_ms: 1897.249919
+  type: 'test'
+  ...
+# Subtest: review: two identical uploads at once store one copy; a long non-ASCII name is shortened, not leaked
+ok 27 - review: two identical uploads at once store one copy; a long non-ASCII name is shortened, not leaked
+  ---
+  duration_ms: 981.226665
+  type: 'test'
+  ...
+# Subtest: resume on a deferred item says how to activate it, and changes nothing
+ok 28 - resume on a deferred item says how to activate it, and changes nothing
+  ---
+  duration_ms: 612.20806
+  type: 'test'
+  ...
+# Subtest: agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+ok 29 - agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+  ---
+  duration_ms: 11.364455
+  type: 'test'
+  ...
+# Subtest: paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+ok 30 - paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+  ---
+  duration_ms: 7.161569
+  type: 'test'
+  ...
+# Subtest: file selection and paste combine; unsupported, empty and oversized files are explained
+ok 31 - file selection and paste combine; unsupported, empty and oversized files are explained
+  ---
+  duration_ms: 3.724584
+  type: 'test'
+  ...
+# Subtest: revision partial failure keeps pending files and retries without duplicating text or successful uploads
+ok 32 - revision partial failure keeps pending files and retries without duplicating text or successful uploads
+  ---
+  duration_ms: 6.414236
+  type: 'test'
+  ...
+# Subtest: create uploads pasted files through the existing bound request endpoint
+ok 33 - create uploads pasted files through the existing bound request endpoint
+  ---
+  duration_ms: 8.969073
+  type: 'test'
+  ...
+# Subtest: overview previews keep full facts available under View more, including after redraw
+ok 34 - overview previews keep full facts available under View more, including after redraw
+  ---
+  duration_ms: 7.344979
+  type: 'test'
+  ...
+# Subtest: every project page gets the project chat; a work item page gets its own; new-project pages get none
+ok 35 - every project page gets the project chat; a work item page gets its own; new-project pages get none
+  ---
+  duration_ms: 43.611128
+  type: 'test'
+  ...
+# Subtest: the project chat is labelled, starts no work item and suggests project questions
+ok 36 - the project chat is labelled, starts no work item and suggests project questions
+  ---
+  duration_ms: 9.681911
+  type: 'test'
+  ...
+# Subtest: a running item session shows on project pages as a link to that item
+ok 37 - a running item session shows on project pages as a link to that item
+  ---
+  duration_ms: 5.875505
+  type: 'test'
+  ...
+# Subtest: a project session shows on an item page labelled as the project chat
+ok 38 - a project session shows on an item page labelled as the project chat
+  ---
+  duration_ms: 4.580323
+  type: 'test'
+  ...
+# Subtest: with agents off the project chat explains how to turn them on without naming an item
+ok 39 - with agents off the project chat explains how to turn them on without naming an item
+  ---
+  duration_ms: 4.260251
+  type: 'test'
+  ...
+# Subtest: the item chat is unchanged
+ok 40 - the item chat is unchanged
+  ---
+  duration_ms: 2.914324
+  type: 'test'
+  ...
+# Subtest: the picker links to Setup → Agents when Claude Code is off for the project
+ok 41 - the picker links to Setup → Agents when Claude Code is off for the project
+  ---
+  duration_ms: 2.971055
+  type: 'test'
+  ...
+# Subtest: blocker texts read in Arabic; suggestions say they only fill the box; your turn after a reply
+ok 42 - blocker texts read in Arabic; suggestions say they only fill the box; your turn after a reply
+  ---
+  duration_ms: 9.949707
+  type: 'test'
+  ...
+# Subtest: the chat says when the agent is working, waiting for an approval, or waiting for a reply
+ok 43 - the chat says when the agent is working, waiting for an approval, or waiting for a reply
+  ---
+  duration_ms: 13.876878
+  type: 'test'
+  ...
+# Subtest: suggestions follow the stage: move on after an approval, plan and design wording
+ok 44 - suggestions follow the stage: move on after an approval, plan and design wording
+  ---
+  duration_ms: 12.208063
+  type: 'test'
+  ...
+# Subtest: switch agent: end an idle Codex session elsewhere; hand over from Claude Code to Codex; wait while working
+ok 45 - switch agent: end an idle Codex session elsewhere; hand over from Claude Code to Codex; wait while working
+  ---
+  duration_ms: 10.07379
+  type: 'test'
+  ...
+# Subtest: chat: whole-job first message, one action (review, answer, continue), steps grouped
+ok 46 - chat: whole-job first message, one action (review, answer, continue), steps grouped
+  ---
+  duration_ms: 12.231159
+  type: 'test'
+  ...
+# Subtest: attention: a pending permission or a finished turn on an item shows on project pages and opens that chat
+ok 47 - attention: a pending permission or a finished turn on an item shows on project pages and opens that chat
+  ---
+  duration_ms: 10.062197
+  type: 'test'
+  ...
+# Subtest: agent choice: missing, saved, Claude needs agents, invalid and symlinked files are "nothing chosen"
+ok 48 - agent choice: missing, saved, Claude needs agents, invalid and symlinked files are "nothing chosen"
+  ---
+  duration_ms: 115.515234
+  type: 'test'
+  ...
+# Subtest: setup record: stack summary, what changed, steps, skip, and when the guide is offered
+ok 49 - setup record: stack summary, what changed, steps, skip, and when the guide is offered
+  ---
+  duration_ms: 102.412286
+  type: 'test'
+  ...
+# Subtest: start --all: trusted services in dependency order, untrusted chains skipped with what to review, stop --all reverses
+ok 50 - start --all: trusted services in dependency order, untrusted chains skipped with what to review, stop --all reverses
+  ---
+  duration_ms: 6583.344868
+  type: 'test'
+  ...
+# Subtest: start --all: a failure stops the sequence and nothing after it starts
+ok 51 - start --all: a failure stops the sequence and nothing after it starts
+  ---
+  duration_ms: 2197.234921
+  type: 'test'
+  ...
+# Subtest: profile: open is a path on the service port, never a URL
+ok 52 - profile: open is a path on the service port, never a URL
+  ---
+  duration_ms: 1374.708679
+  type: 'test'
+  ...
+# Subtest: console: a saved choice turns agents and Claude on for that project only; live off removes its bridge file
+ok 53 - console: a saved choice turns agents and Claude on for that project only; live off removes its bridge file
+  ---
+  duration_ms: 4829.461266
+  type: 'test'
+  ...
+# Subtest: console: settings and setup routes are guarded; read-only ignores the saved choice and refuses writes
+ok 54 - console: settings and setup routes are guarded; read-only ignores the saved choice and refuses writes
+  ---
+  duration_ms: 454.273444
+  type: 'test'
+  ...
+# Subtest: UI: the first-time guide shows the current step, and none once done, skipped or read-only
+ok 55 - UI: the first-time guide shows the current step, and none once done, skipped or read-only
+  ---
+  duration_ms: 15.206201
+  type: 'test'
+  ...
+# Subtest: UI: Stack lists the scan with what changed; Run links running services to their own port only
+ok 56 - UI: Stack lists the scan with what changed; Run links running services to their own port only
+  ---
+  duration_ms: 37.832424
+  type: 'test'
+  ...
+# Subtest: UI: the run message is re-rendered in the current language after a switch
+ok 57 - UI: the run message is re-rendered in the current language after a switch
+  ---
+  duration_ms: 6.591098
+  type: 'test'
+  ...
+# Subtest: UI: Agents shows detection, the saved choice and a checklist with fixes
+ok 58 - UI: Agents shows detection, the saved choice and a checklist with fixes
+  ---
+  duration_ms: 8.645878
+  type: 'test'
+  ...
+# Subtest: session fix: the stack shows a summary first, root manifests first, and the full table folded
+ok 59 - session fix: the stack shows a summary first, root manifests first, and the full table folded
+  ---
+  duration_ms: 3.306892
+  type: 'test'
+  ...
+# Subtest: session fix: the launch command shows once the files are current; Codex login is explained; notes in Arabic
+ok 60 - session fix: the launch command shows once the files are current; Codex login is explained; notes in Arabic
+  ---
+  duration_ms: 15.74297
+  type: 'test'
+  ...
+# Subtest: session fix: Rescan this machine keeps the Claude probe in the reload that follows
+ok 61 - session fix: Rescan this machine keeps the Claude probe in the reload that follows
+  ---
+  duration_ms: 2.128185
+  type: 'test'
+  ...
+# Subtest: review: an agents.json committed to the repository or readable by others is ignored
+ok 62 - review: an agents.json committed to the repository or readable by others is ignored
+  ---
+  duration_ms: 95.207419
+  type: 'test'
+  ...
+# Subtest: review: a read-only console runs no agent probes
+ok 63 - review: a read-only console runs no agent probes
+  ---
+  duration_ms: 51.45894
+  type: 'test'
+  ...
+# Subtest: review: turning Claude off cuts its token at once, releases the checkout, and planted launch files are not ticked
+ok 64 - review: turning Claude off cuts its token at once, releases the checkout, and planted launch files are not ticked
+  ---
+  duration_ms: 649.057527
+  type: 'test'
+  ...
+1..64
+# tests 64
+# suites 0
+# pass 64
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 20905.475488

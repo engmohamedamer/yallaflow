@@ -1,0 +1,45 @@
+{
+  "id": "PF-0105",
+  "type": "feature",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console agent chat that runs until it needs you: an autonomous first message, one action bar with the single thing needed from the developer (continue, review, answer, permission), other suggestions collapsed, and the agent's steps grouped",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T13:58:46.547Z",
+  "updatedAt": "2026-11-09T14:02:15.779Z",
+  "title": "Console agent chat that runs until it needs you: an autonomous first message, one action bar with the single thing needed from the developer (continue, review, answer, permission), other suggestions collapsed, and the agent's steps grouped",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope bounded`.",
+  "routedAt": "2026-11-09T13:58:46.597Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "implement",
+    "verify",
+    "converge"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation",
+      "verification",
+      "delivery-convergence"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T14:02:15.779Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

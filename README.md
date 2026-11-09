@@ -116,7 +116,7 @@ flowchart LR
 YallaFlow never updates itself and never checks the network for versions. You decide when to upgrade:
 
 ```bash
-npm install -g yallaflow@latest     # or an exact version: yallaflow@1.4.1
+npm install -g yallaflow@latest     # or an exact version: yallaflow@1.4.2
 yallaflow --version
 
 # in each project
@@ -171,6 +171,17 @@ flowchart TB
 ```
 
 The depth adapts to the work. A bounded bug fix goes from root-cause analysis straight to the fix, while architectural work gets a reviewed design, specification, or plan. Nothing is called done without fresh verification evidence, and work that carries acceptance criteria is checked against them before it closes. What was learned becomes reviewed project knowledge. [Workflows in detail →](docs/workflows.md)
+
+## What's new in 1.4.2
+
+**A console that works with you.** [Changelog →](CHANGELOG.md#142---2026-11-09--a-console-that-works-with-you)
+
+- **Start and let it run.** «Start» on a work item opens the chat with one instruction for the whole job; the agent stops only for a decision only you can make, and one button shows what is needed: review, answer, or continue.
+- **See the agent from anywhere.** A card and a call-out show when the agent needs your approval or reply; the chat says how long it has worked and its last step.
+- **Easier reviews and confirmations.** Reviews read like documents and expand to full screen; typing names is replaced by a single tick everywhere.
+- **New projects.** Progress while it is created, a «project ready» screen, the agent chosen in the wizard, a «Something else» stack, and a Start here card.
+- **Projects page.** Remove a saved project and see each project's memory health.
+- **Claude Code on Team or Enterprise.** The console warns that channels must be enabled by the organization, and reports messages Claude Code never started on.
 
 ## What's new in 1.4.1
 
@@ -298,7 +309,7 @@ The YallaFlow website, [engmohamedamer.github.io/yallaflow](https://engmohamedam
 
 ## Status
 
-**1.4.1** makes running your project part of the console: the agent proposes how it runs, you trust it once, then press Start. 1.0.0 was the first public, stable release. YallaFlow follows Semantic Versioning and keeps existing workspaces readable ([compatibility promise](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise)).
+**1.4.2** makes the console work with you: start a task in a few clicks, let the agent run until it needs you, and see what it needs from any page. 1.0.0 was the first public, stable release. YallaFlow follows Semantic Versioning and keeps existing workspaces readable ([compatibility promise](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise)).
 
 - **Local-first.** There is no YallaFlow server, account, or cloud service.
 - **Agent-agnostic**, with first-party setup for Claude Code and Codex.

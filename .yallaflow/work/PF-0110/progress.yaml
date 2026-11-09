@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T14:52:06.483Z",
+      "completedAt": "2026-11-09T14:52:06.483Z",
+      "summary": "Owner's lalaff: PF-0007 is DONE but its idle Codex session still holds the checkout; PF-0005 shows 'End the PF-0007 session and work here', after which the developer must pick the agent, start the session and send — three more clicks; the corner call-out says 'PF-0007: the agent finished and waits for you' although PF-0007 is done (agentAttention ignores the item state). agentAction(action, body, after) in resources/console/app.js runs one bridge action and reloads the agent.",
+      "evidence": [
+        "resources/console/app.js",
+        "runtime:owner screenshot; lalaff work show PF-0007 → DONE, 2026-11-09"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T14:52:06.859Z",
+      "completedAt": "2026-11-09T14:52:06.859Z",
+      "summary": "Owner (2026-11-09): a button press should be enough. Clicking the explicit 'Start PF-x with Codex' button is the developer's instruction to send the shown whole-job message."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-09T14:52:08.016Z",
+      "completedAt": "2026-11-09T14:52:08.016Z",
+      "summary": "agentAttention returns nothing for a done or closed item; switchHere: when the held item is done/closed (or the session is idle and Codex is the provider) and the held item is finished, show 'Start PF-x with Codex' (end → start with the current mode → send goText), showing the text it sends; keep the plain end button for unfinished items."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T14:52:51.983Z",
+      "completedAt": "2026-11-09T14:52:51.983Z",
+      "summary": "agentAttention ignores a done or closed item without a pending permission; switchHere offers 'Start PF-x with Codex' when the held item is finished and Codex is idle, showing the message it sends; the click ends the old session, starts Codex on this item with the current mode and sends goText (the developer's explicit click). Harness test and CHANGELOG.",
+      "evidence": [
+        "resources/console/app.js",
+        "test/console-project-chat.test.js",
+        "CHANGELOG.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T14:53:51.995Z",
+      "completedAt": "2026-11-09T14:53:51.995Z",
+      "summary": "Agent and console tests pass (V-001), including the finished-item hand-over test.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-09T14:53:51.995Z"
+}

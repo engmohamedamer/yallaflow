@@ -271,10 +271,12 @@
 
   function pchip(it) {
     const old = isOld(it);
-    return `<article class="pchip ${it.state} ${old ? 'old' : ''}" data-w="${esc(it.id)}" ${readOnly ? '' : 'draggable="true"'}><a class="pbody" href="#/item/${encodeURIComponent(it.id)}" draggable="false"><span class="pid ltr">${esc(it.id)}</span><div class="tt">${esc(it.title)}</div>
+    const ag = agentOnItem(it);
+    const agLine = ag ? `<div class="pagent ${ag}">${ag === 'approval' ? `✋ ${A('الوكيل مستني إذنك', 'The agent needs your approval')}` : ag === 'reply' ? `💬 ${A('الوكيل خلّص ومستني ردّك', 'The agent finished; your turn')}` : `<i></i> ${A('الوكيل شغّال عليها', 'The agent is working on it')}`}</div>` : '';
+    return `<article class="pchip ${it.state} ${old ? 'old' : ''} ${ag ? `agent-${ag}` : ''}" data-w="${esc(it.id)}" ${readOnly ? '' : 'draggable="true"'}><a class="pbody" href="#/item/${encodeURIComponent(it.id)}" draggable="false"><span class="pid ltr">${esc(it.id)}</span><div class="tt">${esc(it.title)}</div>${agLine}
       <div class="meta">${chip(it.state)}<span class="grow"></span><b>${it.completion}%</b></div><div class="mini"><i style="width:${it.completion}%"></i></div>
       <div class="badges">${it.lastActivityAt && it.state !== 'done' ? `<span class="bdg ${old ? 'old' : ''}">⏱ ${ago(it.lastActivityAt)}</span>` : ''}${it.sourceCount ? `<span class="bdg">📎 ${it.sourceCount}</span>` : ''}</div></a>
-      <div class="pactions"><button type="button" class="pchat" data-chat-item="${esc(it.id)}" aria-label="${A('افتح الشات للطلب', 'Open chat for')} ${esc(it.id)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-6 4V6a2 2 0 0 1 2-2Z"/><path d="M7 9h10M7 13h6"/></svg><span>${A('الشات', 'Chat')}</span></button>${readOnly || !itemActions(it).length ? '' : `<button type="button" class="pmenu" data-menu="${esc(it.id)}" aria-label="${A('أفعال', 'Actions')} ${esc(it.id)}" title="${A('أفعال الطلب', 'Work item actions')}">⋯</button>`}</div></article>`;
+      <div class="pactions">${ag && !readOnly ? `<button type="button" class="pchat pstart ${ag}" data-chat-item="${esc(it.id)}" data-chat-draft=""><span>${ag === 'working' ? A('تابع', 'Watch') : A('شوف', 'Open')}</span></button>` : it.state === 'new' && !readOnly ? `<button type="button" class="pchat pstart" data-chat-item="${esc(it.id)}" aria-label="${A('ابدأ مع الوكيل على', 'Start with the agent on')} ${esc(it.id)}" title="${A('بيفتح الشات بالرسالة اللي بتطلب الشغل كله، وانت اللي بتبعت.', 'Opens the chat with the whole-job message; you send it.')}"><span aria-hidden="true">▶</span><span>${A('ابدأ', 'Start')}</span></button>` : `<button type="button" class="pchat" data-chat-item="${esc(it.id)}" aria-label="${A('افتح الشات للطلب', 'Open chat for')} ${esc(it.id)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-6 4V6a2 2 0 0 1 2-2Z"/><path d="M7 9h10M7 13h6"/></svg><span>${A('الشات', 'Chat')}</span></button>`}${readOnly || !itemActions(it).length ? '' : `<button type="button" class="pmenu" data-menu="${esc(it.id)}" aria-label="${A('أفعال', 'Actions')} ${esc(it.id)}" title="${A('أفعال الطلب', 'Work item actions')}">⋯</button>`}</div></article>`;
   }
 
   function viewMap() {
@@ -307,7 +309,7 @@
     const order = { you: 0, fail: 1, active: 2, paused: 3, held: 4, new: 5, done: 6, closed: 7 };
     const list = items().filter(vis).sort((a, b) => order[a.state] - order[b.state] || b.id.localeCompare(a.id));
     if (!items().length) return onboarding() + integrityPanel();
-    return hero() + integrityPanel() + filterBar() + `<section class="lines">${list.map((it) => `<a class="line" href="#/item/${encodeURIComponent(it.id)}" data-w="${esc(it.id)}"><div><div class="row tiny muted"><span class="ltr">${esc(it.id)}</span><span>· ${L(TYPE[it.type] ?? { ar: '—', en: '—' })}</span>${it.stage ? `<span class="ltr">· ${esc(it.stage)}</span>` : ''}</div><div class="tt">${esc(it.title)}</div><div class="nx">${iso(nowText(it))}</div></div>${relay(it)}<div class="row">${chip(it.state)}${ring(it.completion, 62, 7)}</div></a>`).join('') || `<p class="muted">${A('مفيش شغل.', 'No work.')}</p>`}</section>`;
+    return hero() + integrityPanel() + filterBar() + `<section class="lines">${list.map((it) => `<a class="line" href="#/item/${encodeURIComponent(it.id)}" data-w="${esc(it.id)}"><div><div class="row tiny muted"><span class="ltr">${esc(it.id)}</span>${attentionBadge(it)}<span>· ${L(TYPE[it.type] ?? { ar: '—', en: '—' })}</span>${it.stage ? `<span class="ltr">· ${esc(it.stage)}</span>` : ''}</div><div class="tt">${esc(it.title)}</div><div class="nx">${iso(nowText(it))}</div></div>${relay(it)}<div class="row">${chip(it.state)}${ring(it.completion, 62, 7)}</div></a>`).join('') || `<p class="muted">${A('مفيش شغل.', 'No work.')}</p>`}</section>`;
   }
 
   function nowText(it) {
@@ -427,9 +429,11 @@
       switchWanted = null;
     }
     if (['session.started', 'session.ended', 'session.stopped', 'session.connected', 'session.disconnected', 'turn.started', 'turn.ended', 'mode.changed', 'work.activated', 'error'].includes(event.type)) {
-      loadAgent().then(renderAgent);
+      // PF-0106: the board and work list show the agent's call on the item's card.
+      loadAgent().then(() => (['map', 'lines'].includes(route().v) ? render() : renderAgent()));
       return;
     }
+    if (['permission.requested', 'permission.resolved'].includes(event.type) && ['map', 'lines'].includes(route().v)) { render(); return; }
     renderAgent(event.type === 'message.delta');
   }
   // The chat window body is what scrolls (PF-0070). It follows the newest message unless the
@@ -529,6 +533,28 @@
   // The agent chat as a floating window (owner choice, PF-0059): a corner button shows the
   // session state and opens the chat over the page. Open/closed is remembered per browser.
   let chatOpen = store.get('chatOpen', false);
+  // PF-0106: what the agent waits for from the developer on a work item, seen from any page.
+  function agentAttention() {
+    if (!agentsOn || agent?.pid !== pid) return null;
+    const s = agent.session;
+    if (!s?.workId) return null;
+    // PF-0110: a finished item asks nothing more, even if its session is still open.
+    const held = byId(s.workId);
+    if (held && (held.state === 'done' || held.lifecycle?.state === 'closed') && !(agent.pending ?? []).length) return null;
+    if ((agent.pending ?? []).length) return { workId: s.workId, kind: 'approval', label: A(`${s.workId}: الوكيل مستني إذنك`, `${s.workId}: the agent needs your approval`) };
+    const idle = s.provider === 'codex' ? s.status === 'idle' : s.connected && s.status !== 'working';
+    if (idle && agentEntries(agent.events).at(-1)?.kind === 'agent') return { workId: s.workId, kind: 'reply', label: A(`${s.workId}: الوكيل خلّص ومستني ردّك`, `${s.workId}: the agent finished and waits for you`) };
+    return null;
+  }
+  // PF-0108: the agent's relation to one item: working on it, or waiting for the developer.
+  function agentOnItem(it) {
+    const a = agentAttention();
+    if (a && a.workId === it.id) return a.kind;
+    const s = agentsOn && agent?.pid === pid ? agent.session : null;
+    if (s?.workId === it.id && (s.status === 'working' || (s.provider === 'claude' && s.connected))) return 'working';
+    return null;
+  }
+  const attentionBadge = (it) => { const a = agentAttention(); return a && a.workId === it.id ? `<span class="bdg att ${a.kind}">${a.kind === 'approval' ? '✋' : '💬'} ${a.kind === 'approval' ? A('الوكيل مستني إذنك', 'agent needs approval') : A('الوكيل مستني ردّك', 'agent waits for you')}</span>` : ''; };
   function agentState(it) {
     if (!agentsOn) return { tone: 'off', label: A('الوكيل مقفول', 'Agent off') };
     const s = agent?.pid === pid ? agent.session : null;
@@ -546,7 +572,8 @@
         <div class="chathead"><b class="grow">${A('الوكيل', 'Agent')} · ${it.project ? A('المشروع', 'Project') : `<span class="ltr">${esc(it.id)}</span>`}</b><span class="tiny muted chatstate">${esc(st.label)}</span><button type="button" class="ibtn sm" data-chat-toggle aria-label="${A('صغّر', 'Minimize')}">—</button></div>
         <div class="chatbody">${chatOpen ? agentPanel(it) : ''}</div>
       </section>
-      <button type="button" class="chatfab ${st.tone}" data-chat-toggle aria-controls="chatwin" aria-expanded="${chatOpen}" aria-label="${esc(st.label)}" title="${esc(st.label)}"><span aria-hidden="true">${chatOpen ? '✕' : '💬'}</span><i class="dot"></i>${st.badge ? `<b class="badge">${st.badge}</b>` : ''}</button>
+      ${(() => { const a = agentAttention(); return a && a.workId !== it.id ? `<button type="button" class="chatcall" data-chat-item="${esc(a.workId)}" data-chat-draft="">${a.kind === 'approval' ? '✋' : '💬'} ${esc(a.label)}</button>` : ''; })()}
+      <button type="button" class="chatfab ${st.tone}" ${(() => { const a = agentAttention(); return a && a.workId !== it.id ? `data-chat-item="${esc(a.workId)}" data-chat-draft=""` : 'data-chat-toggle'; })()} aria-controls="chatwin" aria-expanded="${chatOpen}" aria-label="${esc(st.label)}" title="${esc(st.label)}"><span aria-hidden="true">${chatOpen ? '✕' : '💬'}</span><i class="dot"></i>${st.badge ? `<b class="badge">${st.badge}</b>` : ''}</button>
     </div>`;
   }
   // Suggested requests for the item's current place in the flow (PF-0059). A suggestion only
@@ -608,9 +635,44 @@
     if (state === 'reply') return `<p class="aturn" role="status">✓ ${A('الوكيل خلّص الجزء ده ومستني ردّك.', 'The agent finished this part and is waiting for your reply.')}</p>`;
     return '';
   }
+  // PF-0105: consecutive agent steps read as one line that opens to the details.
+  function groupSteps(entries) {
+    const out = [];
+    for (const e of entries) {
+      const last = out.at(-1);
+      if (e.kind === 'tool' && last?.kind === 'steps') last.steps.push(e);
+      else if (e.kind === 'tool' && last?.kind === 'tool') out[out.length - 1] = { kind: 'steps', steps: [last, e] };
+      else out.push(e);
+    }
+    return out;
+  }
+  function stepsLine(steps, line) {
+    const running = steps.some((x) => x.status !== 'completed' && x.status !== 'failed');
+    const failed = steps.filter((x) => x.status === 'failed').length;
+    const names = [...new Set(steps.map((x) => String(x.title ?? '').split(/[:\s]/)[0]).filter(Boolean))].slice(0, 3).join('، ');
+    return `<details class="atools"><summary><span>${running ? '●' : failed ? '✕' : '✓'}</span> ${A(`${steps.length} خطوات`, `${steps.length} steps`)}${failed ? ` · ${A(`${failed} فشلت`, `${failed} failed`)}` : ''} <span class="tiny muted ltr">${esc(names)}</span></summary>${steps.map(line).join('')}</details>`;
+  }
+  // PF-0105: the message that starts or continues an item asks for the whole job, stopping only
+  // for a decision the developer alone can make.
+  function goText(it) {
+    return A(`اشتغل على ${it.id} لحد الآخر: صنّفها، افهمها، خطّط، نفّذ، اتحقق، وقفّلها بـ yallaflow finish. ما تقفش علشان تديني تقرير عن الحالة. اقف بس لما تحتاج قرار مقدرش غيري آخده (موافقة على مراجعة، أو سؤال بيزنس مش واضح من المشروع)، واسألني ساعتها.`,
+      `Work on ${it.id} to the end: classify it, understand it, plan, implement, verify, and close it with yallaflow finish. Do not stop to give me a status update. Stop only when you need a decision only I can make (approving a review, or a business question the project does not answer), and ask me then.`);
+  }
+  const goOnText = (it) => A(`كمّل ${it.id} لحد الآخر، واقف بس لو محتاج قرار مني.`, `Continue ${it.id} to the end; stop only if you need a decision from me.`);
+  // PF-0105: one action for what is needed from the developer now; other suggestions folded.
+  function chatAction(it, turnState) {
+    if (it.project || turnState === 'working' || turnState === 'approval') return '';
+    const gateName = (g) => (typeof GATE_AR === 'object' && GATE_AR[g] ? L(GATE_AR[g]) : g);
+    if (it.waitingFor?.kind === 'review') return `<div class="aaction"><p class="aturn approval" role="status">✋ ${A(`مستني مراجعتك: ${gateName(it.waitingFor.gate)}.`, `Waiting for your review: ${gateName(it.waitingFor.gate)}.`)}</p><button class="btn go" data-gate="${esc(it.waitingFor.gate)}" data-gate-item="${esc(it.id)}">${A(`راجع وقرّر: ${gateName(it.waitingFor.gate)}`, `Review and decide: ${gateName(it.waitingFor.gate)}`)}</button></div>`;
+    if (it.waitingFor?.kind === 'question') return `<div class="aaction"><p class="aturn approval" role="status">✋ ${A('الوكيل سألك سؤال ومستني إجابتك.', 'The agent asked you a question and waits for your answer.')}</p><button class="btn go" data-act="answer" data-act-item="${esc(it.id)}">${A('جاوب السؤال', 'Answer the question')}</button></div>`;
+    if (turnState === 'reply' && it.state !== 'done') return `<div class="aaction"><button class="btn go" data-agent-continue>${A('كمّل', 'Continue')}</button><span class="tiny muted">${A('بيبعت: «', 'Sends: “')}${esc(goOnText(it))}${A('»', '”')}</span></div>`;
+    return '';
+  }
   function suggestionChips(it, turnState = null) {
-    const turn = turnLine(turnState === true ? 'reply' : turnState || null, turnState === 'working' ? workingInfo(agent?.events) : null);
-    return `${turn}<div class="asugg" role="group" aria-label="${A('اقتراحات', 'Suggestions')}"><span class="tiny muted">${A('اقتراحات (بتتكتب في الخانة، وانت اللي بتبعت):', 'Suggestions (they fill the box; you send):')}</span>${suggestions(it).map((text) => `<button type="button" class="sugg" data-suggest="${esc(text)}"><span aria-hidden="true">↳</span> ${esc(text)}</button>`).join('')}</div>`;
+    const action = chatAction(it, turnState === true ? 'reply' : turnState);
+    // With an action shown, its own line replaces the generic "waiting for your reply".
+    const turn = action && (it.waitingFor || turnState === 'reply') ? '' : turnLine(turnState === true ? 'reply' : turnState || null, turnState === 'working' ? workingInfo(agent?.events) : null);
+    return `${turn}${action}<details class="asugg-more"><summary class="tiny muted">${A('اقتراحات تانية', 'Other suggestions')}</summary><div class="asugg" role="group" aria-label="${A('اقتراحات', 'Suggestions')}"><span class="tiny muted">${A('اقتراحات (بتتكتب في الخانة، وانت اللي بتبعت):', 'Suggestions (they fill the box; you send):')}</span>${suggestions(it).map((text) => `<button type="button" class="sugg" data-suggest="${esc(text)}"><span aria-hidden="true">↳</span> ${esc(text)}</button>`).join('')}</div></details>`;
   }
   function useSuggestion(text) {
     agentDraft = text;
@@ -630,8 +692,18 @@
   function switchHere(it, s) {
     if (readOnly || it.project) return '';
     const codexReady = (agent?.providers ?? []).some((p) => p.id === 'codex' && p.ready);
+    // PF-0109: when the other item waits for the developer, say so and lead there.
+    const other = s.workId && s.workId !== it.id ? agentAttention() : null;
+    if (other && other.workId === s.workId) return `<div class="aswitch"><p class="small"><b>${other.kind === 'approval' ? '✋' : '💬'} ${esc(other.label)}.</b> ${A(`علشان تبدأ ${it.id}، خلّص اللي ${s.workId} مستنياه الأول.`, `To start ${it.id}, first handle what ${s.workId} is waiting for.`)}</p><button class="btn sm go" data-chat-item="${esc(s.workId)}" data-chat-draft="">${A(`افتح ${s.workId}`, `Open ${s.workId}`)}</button></div>`;
+    // PF-0110: the session's item is finished: one click ends it, starts Codex here and sends
+    // the whole-job message shown on the button.
+    const heldItem = s.workId && s.workId !== it.id ? byId(s.workId) : null;
+    const heldDone = heldItem && (heldItem.state === 'done' || heldItem.lifecycle?.state === 'closed');
+    if (heldDone && s.provider === 'codex' && s.status !== 'working' && !(agent.pending ?? []).length) {
+      return `<div class="aswitch"><p class="small">✓ ${A(`${s.workId} خلصت، وجلستها لسه مفتوحة.`, `${s.workId} is finished; its session is still open.`)}</p><button class="btn go" data-agent-switch-start="${esc(it.id)}">${A(`ابدأ ${it.id} بـ Codex`, `Start ${it.id} with Codex`)}</button><span class="tiny muted">${A('بيقفل جلسة', 'Ends the')} ${esc(s.workId)} ${A('، يبدأ جلسة جديدة هنا، ويبعت:', ' session, starts a new one here and sends:')} «${esc(goText(it))}»</span></div>`;
+    }
     if (s.provider === 'codex') {
-      if (s.status === 'working') return `<p class="tiny muted">⏳ ${A(`Codex شغّال دلوقتي على ${s.workId}. استنى لما يخلص، وبعدها تقدر تبدّل.`, `Codex is working on ${s.workId}. Wait for it to finish, then you can switch.`)}</p>`;
+      if (s.status === 'working') return `<div class="aswitch"><p class="small">⏳ ${A(`Codex شغّال دلوقتي على ${s.workId}. استنى لما يخلص، وبعدها تقدر تبدأ ${it.id}.`, `Codex is working on ${s.workId}. Wait for it to finish, then you can start ${it.id}.`)}</p><button class="btn sm ghost" data-chat-item="${esc(s.workId)}" data-chat-draft="">${A(`تابع ${s.workId}`, `Watch ${s.workId}`)}</button></div>`;
       return `<div class="aswitch"><p class="small">${A(`Codex واقف على ${s.workId}. تقدر تقفل جلسته (بتفضل في «الجلسات السابقة» وترجعلها بعدين) وتشتغل على ${it.id} هنا.`, `Codex is idle on ${s.workId}. You can end its session (it stays under earlier sessions to resume later) and work on ${it.id} here.`)}</p><button class="btn sm go" data-agent-switch-end>${A(`اقفل جلسة ${s.workId} واشتغل هنا`, `End the ${s.workId} session and work here`)}</button></div>`;
     }
     if (s.provider === 'claude' && codexReady) {
@@ -755,8 +827,11 @@
       s.provider === 'claude' ? `<button class="btn sm ghost" data-agent-disconnect>${A('افصل من YallaFlow', 'Unlink')}</button>` : ''
     ].join('');
     const launch = s.provider === 'claude' && !s.connected && agentLaunch ? `<div class="alaunch"><p class="small">${A('شغّل Claude Code بنفسك في فولدر المشروع بالأمر ده. Claude Code هيعرض تحذير القناة التجريبية والقرار ليك.', 'Start Claude Code yourself in the project folder with this command. Claude Code shows its own development-channel warning; the decision is yours.')}</p><pre class="cli" dir="ltr">${esc(agentLaunch)}</pre><button class="btn sm ghost" data-copy="${esc(agentLaunch)}">${A('انسخ', 'Copy')}</button></div>` : '';
-    const entries = agentEntries(agent.events).map((e) => e.kind === 'user' ? `<div class="amsg me"><p>${esc(e.text)}</p></div>` : e.kind === 'agent' ? `<div class="amsg richtext">${richText(e.text)}</div>` : e.kind === 'tool' ? `<div class="atool ${e.status === 'failed' ? 'fail' : e.status === 'completed' ? 'done' : ''}"><span>${e.status === 'completed' ? '✓' : e.status === 'failed' ? '✕' : '●'}</span> ${esc(e.title)}</div>` : e.kind === 'perm' ? permCard(e) : `<div class="anote ${e.warn ? 'warn' : ''}">${esc(e.text)}</div>`).join('');
+    const toolLine = (e) => `<div class="atool ${e.status === 'failed' ? 'fail' : e.status === 'completed' ? 'done' : ''}"><span>${e.status === 'completed' ? '✓' : e.status === 'failed' ? '✕' : '●'}</span> ${esc(e.title)}</div>`;
+    const entries = groupSteps(agentEntries(agent.events)).map((e) => e.kind === 'user' ? `<div class="amsg me"><p>${esc(e.text)}</p></div>` : e.kind === 'agent' ? `<div class="amsg richtext">${richText(e.text)}</div>` : e.kind === 'steps' ? stepsLine(e.steps, toolLine) : e.kind === 'tool' ? toolLine(e) : e.kind === 'perm' ? permCard(e) : `<div class="anote ${e.warn ? 'warn' : ''}">${esc(e.text)}</div>`).join('');
     const canSend = cap.send && (s.provider === 'codex' ? s.status === 'idle' : s.connected && !modePending);
+    // PF-0105: before the first message on an item, the box holds the whole-job instruction.
+    if (canSend && !it.project && it.state !== 'done' && !agentDraft && !agentEntries(agent.events).some((e) => e.kind === 'user')) agentDraft = goText(it);
     const modeHint = modePending ? `<div class="awarn" role="status">${A('Claude Code متوصّل، بس لسه ما بلّغش بوضع الأذونات بتاعه، فالرسايل مش هتتبعت لحد ما يبلّغ. بيبلّغ لما تكتب حاجة في Claude Code أو لما يستخدم أداة.', 'Claude Code is connected but has not reported its permission mode yet, so messages cannot be sent until it does. It reports it when you type in Claude Code or when it uses a tool.')}</div>` : '';
     return `<section class="panel agent" id="agent">${head}${err}
       <div class="abar"><b>${PROVIDER[s.provider]}</b>${s.provider === 'claude' ? ` <i class="exp">${A('تجريبي', 'experimental')}</i>` : ''}<span class="chip active"><i></i>${esc(state)}</span>${s.auth ? `<span class="chip todo">${esc(s.auth)}</span>` : ''}${modeChip}<span class="grow"></span>${controls}</div>
@@ -976,7 +1051,7 @@
       if (agentsOn && !readOnly) {
         const gateName = L(GATE_AR[body.gate] ?? { ar: body.gate, en: body.gate });
         agentDraft = body.decision === 'approve'
-          ? A(`اعتمدت ${gateName}. كمّل الخطوة الجاية.`, `I approved the ${body.gate}. Continue with the next step.`)
+          ? A(`اعتمدت ${gateName}. كمّل لحد الآخر، واقف بس لو محتاج قرار مني.`, `I approved the ${body.gate}. Continue to the end; stop only if you need a decision from me.`)
           : A(`طلبت تعديلات في ${gateName}: ${body.note.trim()}\nعدّلها وارجعلي للمراجعة.`, `I requested changes to the ${body.gate}: ${body.note.trim()}\nRevise it and bring it back for review.`);
         toggleChat(true);
         const box = document.querySelector('[data-agent-input]');
@@ -1310,7 +1385,7 @@
   function startHere(first, services) {
     if (readOnly || !first || first.state === 'done') return '';
     const begun = first.state !== 'new';
-    const draft = begun ? A(`${first.id} وصلت لفين، وإيه الخطوة الجاية؟`, `Where is ${first.id} now, and what is the next step?`) : A(`راجع معايا طلب ${first.id}، صنّفه، وقولّي الخطوة الجاية.`, `Review the request in ${first.id} with me, classify it, and tell me the next step.`);
+    const draft = goText(first);
     const primary = agentsOn
       ? `<button class="btn go" data-chat-item="${esc(first.id)}" data-chat-draft="${esc(draft)}">${begun ? A('كمّل مع الوكيل', 'Continue with the agent') : A('ابدأ مع الوكيل', 'Start with the agent')}</button><span class="tiny muted">${A('بيفتح أول شغلانة والشات، وانت اللي بتبدأ الجلسة.', 'Opens the first work item with the chat; you start the session.')}</span>`
       : `<a class="btn go" href="#/setup">${A('اختار وكيل', 'Choose an agent')}</a><span class="tiny muted">${A('من «الإعداد والتشغيل» ← الوكلاء. أو كمّل من Claude Code أو Codex في الترمينال:', 'In Setup & run → Agents. Or continue from Claude Code or Codex in a terminal:')} <b dir="ltr">continue ${esc(first.id)}</b></span>`;
@@ -2546,7 +2621,7 @@
       ${cw.classifyError ? `<p class="small">⚠ ${A('التصنيف اترفض، والوكيل يقدر يصنّفها:', 'The classification was refused; your agent can classify it:')} <span class="muted">${esc(cw.classifyError)}</span></p>` : ''}
       <ul class="aclist">${cw.attached.map((f) => `<li><span class="ltr tag">${esc(f.file.name)}</span><span class="grow small">${f.duplicate ? A('كان متضاف قبل كده', 'was already attached') : A('اتضاف', 'attached')} <span class="ltr muted">${esc(f.source ?? '')}</span>${f.availabilityNote ? `<br><span class="tiny muted">${esc(f.availabilityNote)}</span>` : ''}</span>${availChip(f.contentAvailability, f.availabilityNote)}</li>`).join('')}${cw.failed.map((f) => `<li><span class="ltr tag">${esc(f.file.name)}</span><span class="grow small">${esc(f.message)}</span><span class="chip fail"><i></i>${A('ماتضافش', 'not attached')}</span></li>`).join('')}</ul>
       <div class="formerr" role="alert"></div>
-      <div class="row end">${cw.failed.some((f) => f.retry) ? `<button type="button" class="btn ghost" data-cw-retry>${A('جرّب الملفات تاني', 'Try the files again')}</button>` : ''}<button type="button" class="btn go" data-cw-open>${A('افتح الشغلانة', 'Open the work item')}</button></div>`;
+      <div class="row end">${cw.failed.some((f) => f.retry) ? `<button type="button" class="btn ghost" data-cw-retry>${A('جرّب الملفات تاني', 'Try the files again')}</button>` : ''}<button type="button" class="btn ghost" data-cw-close>${A('اقفل', 'Close')}</button><button type="button" class="btn go" data-cw-open>${A('افتح الشغلانة', 'Open the work item')}</button></div>`;
     d.querySelector('[data-cw-open]').focus();
   }
   async function uploadAll(d, files) {
@@ -2705,7 +2780,7 @@
     const v = route().v;
     if (!pid && !['new', 'projects'].includes(v)) return;
     // Project pages load the agent state only while the chat is open (PF-0067).
-    if (v === 'item' || (chatOpen && PROJECT_CHAT_VIEWS.includes(v))) { if (agentsOn) await loadAgent(); else await loadAgentInfo(); }
+    if (v === 'item' || ((chatOpen || ['map', 'lines'].includes(v)) && PROJECT_CHAT_VIEWS.includes(v))) { if (agentsOn) await loadAgent(); else await loadAgentInfo(); }
     if (v === 'team') await loadTeam();
     else if (v === 'projects') await loadOverview();
     else if (pid && (v === 'overview' || ((v === 'map' || v === 'lines') && projectOverview?.pid !== pid))) { await loadProjectOverview(); if (v === 'overview' && projectOverview?.data?.project?.kind === 'greenfield') { await loadRuntime(); if (!agentsOn) await loadAgentInfo(); } }
@@ -2852,7 +2927,9 @@
       // From a card: open the item with the chat and a question about where it stands.
       e.preventDefault(); e.stopPropagation();
       const id = ask.dataset.chatItem;
-      agentDraft = ask.dataset.chatDraft || A(`${id} وصلت لفين، وإيه الخطوة الجاية؟`, `Where is ${id} now, and what is the next step?`);
+      // PF-0105: open with the whole job, not a status question.
+      // An explicit empty draft (a call-out, 'See what it needs') keeps the box as it is.
+      agentDraft = ask.hasAttribute('data-chat-draft') ? (ask.dataset.chatDraft || agentDraft) : goText(byId(id) ?? { id });
       const target = `#/item/${encodeURIComponent(id)}`;
       // Already on that item (the next-step button, PF-0092): open the chat in place.
       if (location.hash === target) { toggleChat(true); return; }
@@ -2923,6 +3000,21 @@
       openAction(kind, id);
       return;
     }
+    // PF-0105: one click sends the continue message; the developer pressed it.
+    if (e.target.closest('[data-agent-continue]')) { const it = chatCtx(); if (it && !it.project) { chatForceEnd = true; agentAction('message', { text: goOnText(it) }); } return; }
+    // PF-0110: end the finished item's session, start Codex here, send the whole-job message.
+    const startHere = e.target.closest('[data-agent-switch-start]');
+    if (startHere) {
+      const it = byId(startHere.dataset.agentSwitchStart);
+      if (!it) return;
+      (async () => {
+        if (!(await agentAction('end', {}))) return;
+        if (!(await agentAction('start', { provider: 'codex', workId: it.id, mode: agentMode }))) return;
+        chatForceEnd = true;
+        await agentAction('message', { text: goText(it) });
+      })();
+      return;
+    }
     // PF-0103: switching the project's one agent slot.
     if (e.target.closest('[data-agent-switch-end]')) { agentProvider = null; agentAction('end', {}); return; }
     const toCodex = e.target.closest('[data-agent-switch-codex]');
@@ -2943,9 +3035,11 @@
       else if (ag.dataset.agentResume) agentAction('resume', { recordId: ag.dataset.agentResume, mode: agentMode });
       return;
     }
-    const cwx = e.target.closest('[data-create],[data-cw-cancel],[data-cw-open],[data-cw-retry]');
+    const cwx = e.target.closest('[data-create],[data-cw-cancel],[data-cw-open],[data-cw-retry],[data-cw-close]');
     if (cwx) {
       if (cwx.hasAttribute('data-create')) openCreate();
+      // PF-0106: close the "Created" dialog and stay on this page, refreshed.
+      else if (cwx.hasAttribute('data-cw-close')) { cwx.closest('dialog')?.close(); refresh(); }
       else if (cwx.hasAttribute('data-cw-cancel')) cwx.closest('dialog')?.close();
       else if (cwx.hasAttribute('data-cw-open')) finishCreate(cwx.closest('dialog'));
       else if (cwx.hasAttribute('data-cw-retry')) {

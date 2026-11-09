@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T14:14:40.017Z",
+      "completedAt": "2026-11-09T14:14:40.017Z",
+      "summary": "pchip in resources/console/app.js renders a 'Chat' button (data-chat-item) on every card; since PF-0105 that opens the item's chat with the whole-job message (goText), but the card gives no cue that this is how a new item starts.",
+      "evidence": [
+        "resources/console/app.js",
+        "runtime:owner screenshot of the New column, 2026-11-09"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T14:14:40.397Z",
+      "completedAt": "2026-11-09T14:14:40.397Z",
+      "summary": "Owner (2026-11-09): new cards need the Start action from the item page."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-09T14:14:41.422Z",
+      "completedAt": "2026-11-09T14:14:41.422Z",
+      "summary": "In pchip, for state new and not read-only, render the chat button as a primary 'Start' (same data-chat-item, whole-job draft); keep 'Chat' for other states."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-09T14:18:20.502Z",
+      "completedAt": "2026-11-09T14:18:20.502Z",
+      "summary": "pchip shows a primary Start (▶) for new items instead of Chat; it opens the item chat with the whole-job message. Docs and CHANGELOG.",
+      "evidence": [
+        "resources/console/app.js",
+        "resources/console/app.css",
+        "docs/console.md",
+        "CHANGELOG.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T14:19:01.169Z",
+      "completedAt": "2026-11-09T14:19:01.169Z",
+      "summary": "Console tests pass (V-001). Browser: new cards on the Flow board showed '▶ ابدأ'; clicking it on PF-0004 opened #/item/PF-0004 with the prepared message waiting; no console errors.",
+      "evidence": [
+        "verification:V-001",
+        "runtime:Playwright on an isolated test console, 2026-11-09"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-09T14:19:01.169Z"
+}

@@ -1,0 +1,442 @@
+TAP version 13
+# Subtest: versions, forbidden modes, ACP normalization, and API keys stripped from the adapter env
+ok 1 - versions, forbidden modes, ACP normalization, and API keys stripped from the adapter env
+  ---
+  duration_ms: 7.731506
+  type: 'test'
+  ...
+# Subtest: detection: adapter missing, unsupported version, and ready
+ok 2 - detection: adapter missing, unsupported version, and ready
+  ---
+  duration_ms: 61.687864
+  type: 'test'
+  ...
+# Subtest: codex: start, stream, follow-up, permissions (allow, deny, timeout), one session per checkout, no activation
+ok 3 - codex: start, stream, follow-up, permissions (allow, deny, timeout), one session per checkout, no activation
+  ---
+  duration_ms: 5474.9022
+  type: 'test'
+  ...
+# Subtest: codex: cancel, crash, resume after a console restart, explicit activation through Core
+ok 4 - codex: cancel, crash, resume after a console restart, explicit activation through Core
+  ---
+  duration_ms: 9216.630902
+  type: 'test'
+  ...
+# Subtest: codex: ending a session while a permission is pending denies it and never crashes the console
+ok 5 - codex: ending a session while a permission is pending denies it and never crashes the console
+  ---
+  duration_ms: 4701.48456
+  type: 'test'
+  ...
+# Subtest: codex: a non-subscription login is refused and no session starts
+ok 6 - codex: a non-subscription login is refused and no session starts
+  ---
+  duration_ms: 4345.203274
+  type: 'test'
+  ...
+# Subtest: security: opt-in, token, Origin, content type, read-only, unsupported controls
+ok 7 - security: opt-in, token, Origin, content type, read-only, unsupported controls
+  ---
+  duration_ms: 288.73955
+  type: 'test'
+  ...
+# Subtest: security review regressions: start race, modes, symlinks
+ok 8 - security review regressions: start race, modes, symlinks
+  ---
+  duration_ms: 8522.714993
+  type: 'test'
+  ...
+# Subtest: codex: an adapter that cannot be spawned fails the start promptly and frees the checkout
+ok 9 - codex: an adapter that cannot be spawned fails the start promptly and frees the checkout
+  ---
+  duration_ms: 4292.498109
+  type: 'test'
+  ...
+# Subtest: stabilization: Allow for session is session-scoped only; nothing persists or carries to another session
+ok 10 - stabilization: Allow for session is session-scoped only; nothing persists or carries to another session
+  ---
+  duration_ms: 4671.439802
+  type: 'test'
+  ...
+# Subtest: stabilization: ending a Codex session ends what it started, and an incomplete cleanup is never reported as a clean stop
+ok 11 - stabilization: ending a Codex session ends what it started, and an incomplete cleanup is never reported as a clean stop
+  ---
+  duration_ms: 8093.64985
+  type: 'test'
+  ...
+# Subtest: stabilization: one agent console per checkout across separate console processes
+ok 12 - stabilization: one agent console per checkout across separate console processes
+  ---
+  duration_ms: 4851.179699
+  type: 'test'
+  ...
+# Subtest: stabilization: a directory swapped for a link after the check cannot redirect a local write
+ok 13 - stabilization: a directory swapped for a link after the check cannot redirect a local write
+  ---
+  duration_ms: 6.799678
+  type: 'test'
+  ...
+# Subtest: stabilization review: hard links, End while starting, overlapping lock claims, crash cleanup
+ok 14 - stabilization review: hard links, End while starting, overlapping lock claims, crash cleanup
+  ---
+  duration_ms: 2717.284398
+  type: 'test'
+  ...
+# Subtest: CLI: agents detect is read-only; console flag combinations are validated
+ok 15 - CLI: agents detect is read-only; console flag combinations are validated
+  ---
+  duration_ms: 1558.622644
+  type: 'test'
+  ...
+# Subtest: stopFrom: a usage limit is recognised with its retry time; other stops keep their reason
+ok 16 - stopFrom: a usage limit is recognised with its retry time; other stops keep their reason
+  ---
+  duration_ms: 4.869868
+  type: 'test'
+  ...
+# Subtest: codex: a usage-limit turn is a stop with its retry time, kept after End and across a console restart
+ok 17 - codex: a usage-limit turn is a stop with its retry time, kept after End and across a console restart
+  ---
+  duration_ms: 4778.58098
+  type: 'test'
+  ...
+# Subtest: codex: a crash and a plain End are recorded as such
+ok 18 - codex: a crash and a plain End are recorded as such
+  ---
+  duration_ms: 4589.749616
+  type: 'test'
+  ...
+# Subtest: UI: a live Codex usage limit offers Claude Code and a terminal message, not Codex again
+ok 19 - UI: a live Codex usage limit offers Claude Code and a terminal message, not Codex again
+  ---
+  duration_ms: 5.245832
+  type: 'test'
+  ...
+# Subtest: UI: a session started after the stop (the switch itself) clears the card
+ok 20 - UI: a session started after the stop (the switch itself) clears the card
+  ---
+  duration_ms: 2.320642
+  type: 'test'
+  ...
+# Subtest: UI: a message sent after the stop clears the card; another item never shows it
+ok 21 - UI: a message sent after the stop clears the card; another item never shows it
+  ---
+  duration_ms: 4.758607
+  type: 'test'
+  ...
+# Subtest: UI: with no session, the last recorded stop of this item is offered, including the same agent; Arabic too
+ok 22 - UI: with no session, the last recorded stop of this item is offered, including the same agent; Arabic too
+  ---
+  duration_ms: 7.366778
+  type: 'test'
+  ...
+# Subtest: UI: only ready providers are offered
+ok 23 - UI: only ready providers are offered
+  ---
+  duration_ms: 2.724164
+  type: 'test'
+  ...
+# Subtest: UI: switching ends Codex first, connects Claude, and prepares (never sends) the continue message
+ok 24 - UI: switching ends Codex first, connects Claude, and prepares (never sends) the continue message
+  ---
+  duration_ms: 6.434118
+  type: 'test'
+  ...
+# Subtest: UI: a failed End stops the switch; nothing else starts
+ok 25 - UI: a failed End stops the switch; nothing else starts
+  ---
+  duration_ms: 3.053419
+  type: 'test'
+  ...
+# Subtest: UI: the item lists which agent worked on it and how each session stopped
+ok 26 - UI: the item lists which agent worked on it and how each session stopped
+  ---
+  duration_ms: 3.029696
+  type: 'test'
+  ...
+# Subtest: work-item actions run the canonical commands: same records as the CLI, Core refusals passed through
+ok 27 - work-item actions run the canonical commands: same records as the CLI, Core refusals passed through
+  ---
+  duration_ms: 4338.701367
+  type: 'test'
+  ...
+# Subtest: request edits use full text before work starts and refuse stale or invalid saves
+ok 28 - request edits use full text before work starts and refuse stale or invalid saves
+  ---
+  duration_ms: 2030.523126
+  type: 'test'
+  ...
+# Subtest: action input is validated and values never become options
+ok 29 - action input is validated and values never become options
+  ---
+  duration_ms: 708.752086
+  type: 'test'
+  ...
+# Subtest: security: token, Origin, content type and read-only consoles guard every action and decision
+ok 30 - security: token, Origin, content type and read-only consoles guard every action and decision
+  ---
+  duration_ms: 564.393305
+  type: 'test'
+  ...
+# Subtest: gate decisions: material shown first, exact confirmation, stale and duplicate protection, console provenance
+ok 31 - gate decisions: material shown first, exact confirmation, stale and duplicate protection, console provenance
+  ---
+  duration_ms: 4680.355547
+  type: 'test'
+  ...
+# Subtest: CLI decisions are recorded exactly as before (no provenance), and a bad provenance channel records nothing
+ok 32 - CLI decisions are recorded exactly as before (no provenance), and a bad provenance channel records nothing
+  ---
+  duration_ms: 2972.172241
+  type: 'test'
+  ...
+# Subtest: the Agent Workspace never reaches gate decisions, and agents never inherit the provenance channel
+ok 33 - the Agent Workspace never reaches gate decisions, and agents never inherit the provenance channel
+  ---
+  duration_ms: 3.51715
+  type: 'test'
+  ...
+# Subtest: review findings: re-deciding after "request changes", request ids per gate, malformed bodies, provenance limits, strict doctor
+ok 34 - review findings: re-deciding after "request changes", request ids per gate, malformed bodies, provenance limits, strict doctor
+  ---
+  duration_ms: 4337.675184
+  type: 'test'
+  ...
+# Subtest: revision attachments preserve bytes, deduplicate retries and respect request-edit and HTTP guards
+ok 35 - revision attachments preserve bytes, deduplicate retries and respect request-edit and HTTP guards
+  ---
+  duration_ms: 2722.735653
+  type: 'test'
+  ...
+# Subtest: revision upload rechecks eligibility in the CLI if work starts after its queued check
+ok 36 - revision upload rechecks eligibility in the CLI if work starts after its queued check
+  ---
+  duration_ms: 965.172325
+  type: 'test'
+  ...
+# Subtest: gate decisions: a required gate that was never requested can be decided while the item waits on it
+ok 37 - gate decisions: a required gate that was never requested can be decided while the item waits on it
+  ---
+  duration_ms: 3176.222542
+  type: 'test'
+  ...
+# Subtest: agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+ok 38 - agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+  ---
+  duration_ms: 12.239435
+  type: 'test'
+  ...
+# Subtest: paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+ok 39 - paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+  ---
+  duration_ms: 7.228287
+  type: 'test'
+  ...
+# Subtest: file selection and paste combine; unsupported, empty and oversized files are explained
+ok 40 - file selection and paste combine; unsupported, empty and oversized files are explained
+  ---
+  duration_ms: 4.148025
+  type: 'test'
+  ...
+# Subtest: revision partial failure keeps pending files and retries without duplicating text or successful uploads
+ok 41 - revision partial failure keeps pending files and retries without duplicating text or successful uploads
+  ---
+  duration_ms: 5.856239
+  type: 'test'
+  ...
+# Subtest: create uploads pasted files through the existing bound request endpoint
+ok 42 - create uploads pasted files through the existing bound request endpoint
+  ---
+  duration_ms: 9.485185
+  type: 'test'
+  ...
+# Subtest: overview previews keep full facts available under View more, including after redraw
+ok 43 - overview previews keep full facts available under View more, including after redraw
+  ---
+  duration_ms: 6.889242
+  type: 'test'
+  ...
+# Subtest: every project page gets the project chat; a work item page gets its own; new-project pages get none
+ok 44 - every project page gets the project chat; a work item page gets its own; new-project pages get none
+  ---
+  duration_ms: 72.721519
+  type: 'test'
+  ...
+# Subtest: the project chat is labelled, starts no work item and suggests project questions
+ok 45 - the project chat is labelled, starts no work item and suggests project questions
+  ---
+  duration_ms: 10.740739
+  type: 'test'
+  ...
+# Subtest: a running item session shows on project pages as a link to that item
+ok 46 - a running item session shows on project pages as a link to that item
+  ---
+  duration_ms: 7.192663
+  type: 'test'
+  ...
+# Subtest: a project session shows on an item page labelled as the project chat
+ok 47 - a project session shows on an item page labelled as the project chat
+  ---
+  duration_ms: 6.854921
+  type: 'test'
+  ...
+# Subtest: with agents off the project chat explains how to turn them on without naming an item
+ok 48 - with agents off the project chat explains how to turn them on without naming an item
+  ---
+  duration_ms: 3.856646
+  type: 'test'
+  ...
+# Subtest: the item chat is unchanged
+ok 49 - the item chat is unchanged
+  ---
+  duration_ms: 4.796877
+  type: 'test'
+  ...
+# Subtest: the picker links to Setup → Agents when Claude Code is off for the project
+ok 50 - the picker links to Setup → Agents when Claude Code is off for the project
+  ---
+  duration_ms: 4.08198
+  type: 'test'
+  ...
+# Subtest: blocker texts read in Arabic; suggestions say they only fill the box; your turn after a reply
+ok 51 - blocker texts read in Arabic; suggestions say they only fill the box; your turn after a reply
+  ---
+  duration_ms: 14.84462
+  type: 'test'
+  ...
+# Subtest: the chat says when the agent is working, waiting for an approval, or waiting for a reply
+ok 52 - the chat says when the agent is working, waiting for an approval, or waiting for a reply
+  ---
+  duration_ms: 13.678311
+  type: 'test'
+  ...
+# Subtest: suggestions follow the stage: move on after an approval, plan and design wording
+ok 53 - suggestions follow the stage: move on after an approval, plan and design wording
+  ---
+  duration_ms: 17.866874
+  type: 'test'
+  ...
+# Subtest: switch agent: end an idle Codex session elsewhere; hand over from Claude Code to Codex; wait while working
+ok 54 - switch agent: end an idle Codex session elsewhere; hand over from Claude Code to Codex; wait while working
+  ---
+  duration_ms: 11.243858
+  type: 'test'
+  ...
+# Subtest: chat: whole-job first message, one action (review, answer, continue), steps grouped
+ok 55 - chat: whole-job first message, one action (review, answer, continue), steps grouped
+  ---
+  duration_ms: 13.036352
+  type: 'test'
+  ...
+# Subtest: agent choice: missing, saved, Claude needs agents, invalid and symlinked files are "nothing chosen"
+ok 56 - agent choice: missing, saved, Claude needs agents, invalid and symlinked files are "nothing chosen"
+  ---
+  duration_ms: 139.50164
+  type: 'test'
+  ...
+# Subtest: setup record: stack summary, what changed, steps, skip, and when the guide is offered
+ok 57 - setup record: stack summary, what changed, steps, skip, and when the guide is offered
+  ---
+  duration_ms: 111.267146
+  type: 'test'
+  ...
+# Subtest: start --all: trusted services in dependency order, untrusted chains skipped with what to review, stop --all reverses
+ok 58 - start --all: trusted services in dependency order, untrusted chains skipped with what to review, stop --all reverses
+  ---
+  duration_ms: 6847.042543
+  type: 'test'
+  ...
+# Subtest: start --all: a failure stops the sequence and nothing after it starts
+ok 59 - start --all: a failure stops the sequence and nothing after it starts
+  ---
+  duration_ms: 2046.631753
+  type: 'test'
+  ...
+# Subtest: profile: open is a path on the service port, never a URL
+ok 60 - profile: open is a path on the service port, never a URL
+  ---
+  duration_ms: 1306.113389
+  type: 'test'
+  ...
+# Subtest: console: a saved choice turns agents and Claude on for that project only; live off removes its bridge file
+ok 61 - console: a saved choice turns agents and Claude on for that project only; live off removes its bridge file
+  ---
+  duration_ms: 4837.893889
+  type: 'test'
+  ...
+# Subtest: console: settings and setup routes are guarded; read-only ignores the saved choice and refuses writes
+ok 62 - console: settings and setup routes are guarded; read-only ignores the saved choice and refuses writes
+  ---
+  duration_ms: 498.619063
+  type: 'test'
+  ...
+# Subtest: UI: the first-time guide shows the current step, and none once done, skipped or read-only
+ok 63 - UI: the first-time guide shows the current step, and none once done, skipped or read-only
+  ---
+  duration_ms: 20.434731
+  type: 'test'
+  ...
+# Subtest: UI: Stack lists the scan with what changed; Run links running services to their own port only
+ok 64 - UI: Stack lists the scan with what changed; Run links running services to their own port only
+  ---
+  duration_ms: 48.33584
+  type: 'test'
+  ...
+# Subtest: UI: the run message is re-rendered in the current language after a switch
+ok 65 - UI: the run message is re-rendered in the current language after a switch
+  ---
+  duration_ms: 7.41114
+  type: 'test'
+  ...
+# Subtest: UI: Agents shows detection, the saved choice and a checklist with fixes
+ok 66 - UI: Agents shows detection, the saved choice and a checklist with fixes
+  ---
+  duration_ms: 8.28872
+  type: 'test'
+  ...
+# Subtest: session fix: the stack shows a summary first, root manifests first, and the full table folded
+ok 67 - session fix: the stack shows a summary first, root manifests first, and the full table folded
+  ---
+  duration_ms: 3.718654
+  type: 'test'
+  ...
+# Subtest: session fix: the launch command shows once the files are current; Codex login is explained; notes in Arabic
+ok 68 - session fix: the launch command shows once the files are current; Codex login is explained; notes in Arabic
+  ---
+  duration_ms: 14.218693
+  type: 'test'
+  ...
+# Subtest: session fix: Rescan this machine keeps the Claude probe in the reload that follows
+ok 69 - session fix: Rescan this machine keeps the Claude probe in the reload that follows
+  ---
+  duration_ms: 2.375476
+  type: 'test'
+  ...
+# Subtest: review: an agents.json committed to the repository or readable by others is ignored
+ok 70 - review: an agents.json committed to the repository or readable by others is ignored
+  ---
+  duration_ms: 72.699628
+  type: 'test'
+  ...
+# Subtest: review: a read-only console runs no agent probes
+ok 71 - review: a read-only console runs no agent probes
+  ---
+  duration_ms: 36.981199
+  type: 'test'
+  ...
+# Subtest: review: turning Claude off cuts its token at once, releases the checkout, and planted launch files are not ticked
+ok 72 - review: turning Claude off cuts its token at once, releases the checkout, and planted launch files are not ticked
+  ---
+  duration_ms: 743.640727
+  type: 'test'
+  ...
+1..72
+# tests 72
+# suites 0
+# pass 72
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 59304.578939

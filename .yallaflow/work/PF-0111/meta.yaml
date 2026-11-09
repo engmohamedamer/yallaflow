@@ -1,0 +1,37 @@
+{
+  "id": "PF-0111",
+  "type": "release",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Release 1.4.2 (stable, Git only): finish the 1.4.2 section of CHANGELOG with its date and title, run the release checklist, commit, create the annotated tag v1.4.2 and push main and the tag after the owner's confirmation; no npm publish and no GitHub Release in this step",
+  "status": "VERIFICATION",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T15:44:21.649Z",
+  "updatedAt": "2026-11-09T15:45:46.503Z",
+  "title": "Release 1.4.2 (stable, Git only): finish the 1.4.2 section of CHANGELOG with its date and title, run the release checklist, commit, create the annotated tag v1.4.2 and push main and the tag after the owner's confirmation; no npm publish and no GitHub Release in this step",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow release --scope bounded`.",
+  "routedAt": "2026-11-09T15:44:21.693Z",
+  "workflow": "release",
+  "requiredCapabilities": [
+    "discover",
+    "plan",
+    "implement",
+    "verify",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "code-review"
+    ]
+  }
+}
