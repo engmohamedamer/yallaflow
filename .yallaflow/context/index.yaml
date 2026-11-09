@@ -13141,23 +13141,29 @@
           "type": "repository",
           "path": "docs/releasing.md",
           "contentHash": "sha256:df89cdb2dcf769757353e53cba8dff02d82dfe4273f3ba53ffd75557bfb33234",
-          "gitCommit": "8e4eac3beaa5519c8e560153ad647fb59dc9df03",
+          "gitCommit": "f15645969a6f0b7f7b177c44969470469bf680e7",
           "workingTree": "head"
         },
         {
           "type": "repository",
           "path": ".github/workflows/release.yml",
           "contentHash": "sha256:125e655925cfe9cd2902494aa63101ef3c50ef127308fa4815d37aab2d424cf7",
-          "gitCommit": "8e4eac3beaa5519c8e560153ad647fb59dc9df03",
+          "gitCommit": "f15645969a6f0b7f7b177c44969470469bf680e7",
           "workingTree": "head"
         },
         {
           "type": "runtime",
-          "description": "gh release create as altantawi2050 failed; as engmohamedamer via GH_TOKEN succeeded; Release run 42516773427 all jobs success; npm view yallaflow@latest = 1.4.1 with SLSA provenance"
+          "description": "1.4.2: gh release create as engmohamedamer via GH_TOKEN succeeded; Release run 42652219082 all jobs success; npm view right after showed 404 for about a minute, then latest = 1.4.2 with SLSA provenance"
+        },
+        {
+          "type": "runtime",
+          "description": "npm view yallaflow@1.4.2 version dist.shasum dist.attestations.provenance.predicateType --prefer-online (passed)",
+          "workId": "PF-0111",
+          "verificationRunId": "V-004"
         }
       ],
-      "verifiedAt": "2026-11-08T19:54:28.164Z",
-      "verifiedAtCommit": "8e4eac3beaa5519c8e560153ad647fb59dc9df03",
+      "verifiedAt": "2026-11-09T16:20:19.058Z",
+      "verifiedAtCommit": "f15645969a6f0b7f7b177c44969470469bf680e7",
       "supersedes": [],
       "supersededBy": null,
       "history": [
@@ -13166,10 +13172,38 @@
           "at": "2026-11-08T19:54:28.164Z",
           "workId": "PF-0078",
           "candidateId": "K-001"
+        },
+        {
+          "action": "reconfirmed",
+          "at": "2026-11-09T16:20:19.058Z",
+          "workId": "PF-0111",
+          "candidateId": "K-001",
+          "previousEvidence": [
+            {
+              "type": "repository",
+              "path": "docs/releasing.md",
+              "contentHash": "sha256:df89cdb2dcf769757353e53cba8dff02d82dfe4273f3ba53ffd75557bfb33234",
+              "gitCommit": "8e4eac3beaa5519c8e560153ad647fb59dc9df03",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": ".github/workflows/release.yml",
+              "contentHash": "sha256:125e655925cfe9cd2902494aa63101ef3c50ef127308fa4815d37aab2d424cf7",
+              "gitCommit": "8e4eac3beaa5519c8e560153ad647fb59dc9df03",
+              "workingTree": "head"
+            },
+            {
+              "type": "runtime",
+              "description": "gh release create as altantawi2050 failed; as engmohamedamer via GH_TOKEN succeeded; Release run 42516773427 all jobs success; npm view yallaflow@latest = 1.4.1 with SLSA provenance"
+            }
+          ],
+          "previousVerifiedAt": "2026-11-08T19:54:28.164Z",
+          "previousVerifiedAtCommit": "8e4eac3beaa5519c8e560153ad647fb59dc9df03"
         }
       ],
       "createdAt": "2026-11-08T19:54:28.164Z",
-      "updatedAt": "2026-11-08T19:54:28.164Z"
+      "updatedAt": "2026-11-09T16:20:19.058Z"
     },
     {
       "id": "CTX-0133",
@@ -13553,5 +13587,5 @@
       "updatedAt": "2026-11-09T13:36:59.784Z"
     }
   ],
-  "updatedAt": "2026-11-09T13:36:59.784Z"
+  "updatedAt": "2026-11-09T16:20:19.058Z"
 }

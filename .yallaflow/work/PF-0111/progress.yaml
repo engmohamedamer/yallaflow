@@ -62,8 +62,14 @@
       "reason": "Found while preparing the 1.4.2 release; a release note must not claim more than happened",
       "costIfWrong": "A misleading release note about tests touching user data",
       "createdAt": "2026-11-09T15:44:46.200Z"
+    },
+    {
+      "decision": "Scope widened by the owner after the tag push: v1.4.2 is a full public release — GitHub Release created and npm published only via the existing trusted-publishing release.yml (OIDC, no tokens)",
+      "reason": "Owner's later message replaced 'no npm publish and no GitHub Release in this step'",
+      "costIfWrong": "A public npm version cannot be unpublished cleanly; mitigated by identical shasum to the verified local pack",
+      "createdAt": "2026-11-09T16:19:55.002Z"
     }
   ],
   "history": [],
-  "updatedAt": "2026-11-09T15:53:36.711Z"
+  "updatedAt": "2026-11-09T16:19:55.002Z"
 }

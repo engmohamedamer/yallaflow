@@ -1,0 +1,3 @@
+version = '1.4.2'
+dist.shasum = 'c37aa30649bcf9a0b704ef30c360f393edc2b9ad'
+dist.attestations.provenance.predicateType = 'https://slsa.dev/provenance/v1'

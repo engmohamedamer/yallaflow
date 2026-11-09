@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "environment",
+      "source": "implementation-runtime",
+      "summary": "Releasing YallaFlow: publishing the GitHub Release must use the repository owner's gh account (engmohamedamer). Another logged-in gh account (altantawi2050) is the default and is refused ('workflow scope may be required'); GH_TOKEN=$(gh auth token -u engmohamedamer) works for one command without switching accounts. The dev checkout's node_modules is read-only, so the checklist's npm ci runs in a clean clone. npm can take about a minute to show a new version after the Release workflow's publish job succeeds.",
+      "evidence": [
+        "docs/releasing.md",
+        ".github/workflows/release.yml",
+        "runtime:1.4.2: gh release create as engmohamedamer via GH_TOKEN succeeded; Release run 42652219082 all jobs success; npm view right after showed 404 for about a minute, then latest = 1.4.2 with SLSA provenance",
+        "verification:V-004"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0132"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-09T16:20:08.929Z",
+      "factId": "CTX-0132",
+      "promotedAt": "2026-11-09T16:20:19.058Z",
+      "target": "context/environments.md"
+    }
+  ],
+  "updatedAt": "2026-11-09T16:20:19.058Z",
+  "reviewedAt": "2026-11-09T16:20:19.058Z"
+}

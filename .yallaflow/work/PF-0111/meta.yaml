@@ -4,14 +4,14 @@
   "scope": "bounded",
   "routingStatus": "routed",
   "rawRequest": "Release 1.4.2 (stable, Git only): finish the 1.4.2 section of CHANGELOG with its date and title, run the release checklist, commit, create the annotated tag v1.4.2 and push main and the tag after the owner's confirmation; no npm publish and no GitHub Release in this step",
-  "status": "VERIFICATION",
+  "status": "DONE",
   "readOnly": false,
   "knowledgePolicy": {
     "version": 1,
     "reviewRequired": true
   },
   "createdAt": "2026-11-09T15:44:21.649Z",
-  "updatedAt": "2026-11-09T15:45:46.503Z",
+  "updatedAt": "2026-11-09T16:20:19.461Z",
   "title": "Release 1.4.2 (stable, Git only): finish the 1.4.2 section of CHANGELOG with its date and title, run the release checklist, commit, create the annotated tag v1.4.2 and push main and the tag after the owner's confirmation; no npm publish and no GitHub Release in this step",
   "routingConfidence": "high",
   "routingReason": "Explicitly classified by the user: `yallaflow release --scope bounded`.",
@@ -33,5 +33,16 @@
       "verification",
       "code-review"
     ]
-  }
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-09T16:20:19.461Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004"
+      ]
+    }
+  ]
 }

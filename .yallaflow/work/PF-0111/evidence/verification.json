@@ -51,6 +51,28 @@
       "finishedAt": "2026-11-09T15:50:29.565Z",
       "verifiedAt": "2026-11-09T15:50:29.565Z",
       "log": "V-003-verification.log"
+    },
+    {
+      "id": "V-004",
+      "command": "npm view yallaflow@1.4.2 version dist.shasum dist.attestations.provenance.predicateType --prefer-online",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "view",
+        "yallaflow@1.4.2",
+        "version",
+        "dist.shasum",
+        "dist.attestations.provenance.predicateType",
+        "--prefer-online"
+      ],
+      "displayCommand": "npm view yallaflow@1.4.2 version dist.shasum dist.attestations.provenance.predicateType --prefer-online",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-09T16:19:55.162Z",
+      "finishedAt": "2026-11-09T16:19:56.051Z",
+      "verifiedAt": "2026-11-09T16:19:56.051Z",
+      "log": "V-004-verification.log"
     }
   ]
 }

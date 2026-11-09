@@ -59,10 +59,11 @@
 - **Source work:** PF-0078
 - **Knowledge ID:** K-001
 - **Promoted at:** 2026-11-08T19:54:28.164Z
-- **Verified:** 2026-11-08T19:54:28.164Z (commit 8e4eac3)
+- **Verified:** 2026-11-09T16:20:19.058Z (commit f156459)
 - **Evidence:**
-  - docs/releasing.md (repository @ 8e4eac3)
-  - .github/workflows/release.yml (repository @ 8e4eac3)
-  - gh release create as altantawi2050 failed; as engmohamedamer via GH_TOKEN succeeded; Release run 42516773427 all jobs success; npm view yallaflow@latest = 1.4.1 with SLSA provenance (runtime)
+  - docs/releasing.md (repository @ f156459)
+  - .github/workflows/release.yml (repository @ f156459)
+  - 1.4.2: gh release create as engmohamedamer via GH_TOKEN succeeded; Release run 42652219082 all jobs success; npm view right after showed 404 for about a minute, then latest = 1.4.2 with SLSA provenance (runtime)
+  - npm view yallaflow@1.4.2 version dist.shasum dist.attestations.provenance.predicateType --prefer-online (passed) (runtime, PF-0111 V-004)
 
 <!-- yallaflow-context:end -->
