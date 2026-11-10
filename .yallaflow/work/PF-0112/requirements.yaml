@@ -1,0 +1,2453 @@
+{
+  "schemaVersion": 1,
+  "revision": 7,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "Run Now executes one task immediately and preserves v1.4.2 behaviour for existing projects.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0052",
+          "locator": "mode 1"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0053",
+          "locator": "additional 1"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "Queue executes multiple tasks sequentially with durable state, approvals, recovery and cancellation.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0052",
+          "locator": "mode 2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "The queue advances automatically only after verified DONE and a fully stopped session; any required review, question, approval, failure or usage limit blocks progression.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-007"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "REQ-004",
+      "statement": "Queue persistence and recovery never cause duplicate task execution.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0053",
+          "locator": "additional 4"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "REQ-005",
+      "statement": "Parallel runs multiple agents simultaneously in isolated Git worktrees on the existing subscription integrations; default 2 agents, maximum 4, more than 2 marked experimental until tested.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0052",
+          "locator": "mode 3"
+        },
+        {
+          "type": "question",
+          "question": "Q-005"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "REQ-006",
+      "statement": "Parallel requires Shared Project Mode, enabled only with explicit confirmation and migration safety checks.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "REQ-007",
+      "statement": "All non-read-only Git runs through one restricted, validated layer (src/execution/git-ops.js) limited to the Checkpoint C allowlist, with hooks and fsmonitor disabled; commit and merge run only after explicit approval; no force, push, pull, fetch, rebase, reset, revert, automatic conflict resolution or destructive cleanup.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-002"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "items 4-5, Checkpoint C allowlist"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "REQ-008",
+      "statement": "Lanes live in the sibling <repo>.lanes/<slug> directory with strict path validation.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-003"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "REQ-009",
+      "statement": "Worktrees are retained by default and never removed automatically; a separate explicit Cleanup action is offered only after MERGED & VERIFIED and every safety check, and never deletes uncommitted or otherwise unpreserved data.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0053",
+          "locator": "additional 5"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "item 9"
+        },
+        {
+          "type": "question",
+          "question": "Q-012"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:28:03.626Z"
+    },
+    {
+      "id": "REQ-010",
+      "statement": "Permissions are never auto-approved; the unattended approval timeout is not raised above today's default until Codex ACP timeout behaviour is verified.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-004"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "REQ-011",
+      "statement": "An interactive Agents view centralizes approvals and session controls across projects and lanes.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0053",
+          "locator": "additional 3"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0052",
+          "locator": "dashboard and approvals inbox"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "REQ-012",
+      "statement": "Existing tasks, knowledge, uncommitted changes and historical evidence are never lost.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0053",
+          "locator": "additional 2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "REQ-013",
+      "statement": "Claude Team limitations are stated explicitly; no unsupported Claude automation is promised.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0053",
+          "locator": "additional 6"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "REQ-014",
+      "statement": "Conflicts are detected per lane and across lanes and feed the Review & Merge workflow; knowledge integrates through the existing Shared Project flow after the merge.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0052",
+          "locator": "Git review, conflict detection, knowledge integration"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "items 2, 6"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "REQ-015",
+      "statement": "Negative tests cover Git safety, concurrency and crash recovery.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0053",
+          "locator": "additional 7"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "REQ-016",
+      "statement": "No API keys, new paid services or unnecessary infrastructure are introduced; the default workflow stays simple for small projects.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0052",
+          "locator": "design requirements"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "REQ-017",
+      "statement": "The Web Console provides a complete Review & Merge workflow for parallel lanes so users do not run Git commands by hand when a task finishes.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "item 1"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "REQ-018",
+      "statement": "Automated pre-merge checks cover task completion, tests, Git changes, conflicts and Shared Project integrity.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "item 2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "REQ-019",
+      "statement": "A review screen shows changed files, verification evidence and merge readiness.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "item 3"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "REQ-020",
+      "statement": "An explicit user approval precedes any commit or merge; it is bound to the material content (reviewed diff, resulting tree, merge commit content, verification scope, integration outcome) and any change requires a fresh approval; commit and merge never include unrelated files or disturb existing uncommitted changes.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "items 4-5"
+        },
+        {
+          "type": "question",
+          "question": "Q-008"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:28:03.626Z"
+    },
+    {
+      "id": "REQ-021",
+      "statement": "After a merge, YallaFlow verifies the result and integrates Shared Project knowledge.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "item 6"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "REQ-022",
+      "statement": "Concurrent merge requests, conflicts, failures and recovery are handled safely.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "item 7"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "REQ-023",
+      "statement": "Task DONE and Changes MERGED & VERIFIED are clearly separate states.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "item 8"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "REQ-024",
+      "statement": "The full lifecycle Start → Execute → Review → Approve → Merge → Verify works end to end with minimal manual Git operations.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "goal"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "REQ-025",
+      "statement": "Hooks may be disabled for YallaFlow's controlled Git operations only if the project's required equivalent checks are identified and executed; task tests are not assumed to replace hooks or CI, and merging is blocked when mandatory verification cannot be satisfied.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-009"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:28:03.626Z",
+      "updatedAt": "2026-11-09T18:28:03.626Z"
+    },
+    {
+      "id": "REQ-026",
+      "statement": "A durable, team-visible integration record is updated atomically and recoverably, handled safely in Shared Projects, and reflects the final verified state accurately.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-010"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:28:03.626Z",
+      "updatedAt": "2026-11-09T18:28:03.626Z"
+    },
+    {
+      "id": "REQ-027",
+      "statement": "Each lane integrates with one merge commit by default, preserving task history, with no squash, rebase or history rewriting.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-013"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:28:03.626Z",
+      "updatedAt": "2026-11-09T18:28:03.626Z"
+    },
+    {
+      "id": "REQ-028",
+      "statement": "The Git transaction design is validated, and any safety guarantee not proven by execution is treated and reported as an open risk until proven.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0055",
+          "locator": "validate the complete Git transaction design"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:28:03.626Z",
+      "updatedAt": "2026-11-09T18:28:03.626Z"
+    },
+    {
+      "id": "REQ-029",
+      "statement": "Run Now and Queue keep their existing Git behaviour; Review & Merge applies to parallel worktrees in v1.5.0.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-011"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:28:03.626Z",
+      "updatedAt": "2026-11-09T18:28:03.626Z"
+    },
+    {
+      "id": "REQ-030",
+      "statement": "Automated Git mutation runs only on a verified platform and Git configuration (initially Linux with Git versions on which the Git transaction suite has passed); anywhere else YallaFlow fails closed and offers the manual operations.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0058",
+          "locator": "A2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:57:42.475Z",
+      "updatedAt": "2026-11-09T18:57:42.475Z"
+    },
+    {
+      "id": "REQ-031",
+      "statement": "Project-defined external Git filters and custom merge drivers are never executed by automated YallaFlow Git operations in v1.5.0; repositories that require them are blocked from automated lanes and merge and offered a manual alternative.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0058",
+          "locator": "A4"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:57:42.475Z",
+      "updatedAt": "2026-11-09T18:57:42.475Z"
+    },
+    {
+      "id": "REQ-032",
+      "statement": "Automated GPG-signed commits are enabled only with permanent GPG signing test coverage; otherwise that signing path is blocked.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0058",
+          "locator": "A5"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:57:42.475Z",
+      "updatedAt": "2026-11-09T18:57:42.475Z"
+    },
+    {
+      "id": "REQ-033",
+      "statement": "Cleanup never deletes ignored files unless they are positively identified as reproducible dependencies, shows the exact deletion scope, and requires explicit confirmation.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0058",
+          "locator": "A6"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:57:42.475Z",
+      "updatedAt": "2026-11-09T18:57:42.475Z"
+    },
+    {
+      "id": "REQ-034",
+      "statement": "An interrupted Git operation or any detected inconsistent repository state stops integration immediately, with no automatic reset, repair, lock removal or retried mutation, and clear manual recovery guidance.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0058",
+          "locator": "A1, additional 6"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:57:42.475Z",
+      "updatedAt": "2026-11-09T18:57:42.475Z"
+    },
+    {
+      "id": "REQ-035",
+      "statement": "The Git execution layer validates every command and every argument against fixed shapes, not merely the executable or subcommand name.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0058",
+          "locator": "additional 1"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:57:42.475Z",
+      "updatedAt": "2026-11-09T18:57:42.475Z"
+    },
+    {
+      "id": "REQ-036",
+      "statement": "Before automated merge is enabled on a real project, the complete implementation and its safety tests are demonstrated in disposable repositories, and any newly discovered safety issue is reported before the affected operation proceeds.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0058",
+          "locator": "closing requirements"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:57:42.475Z",
+      "updatedAt": "2026-11-09T18:57:42.475Z"
+    },
+    {
+      "id": "REQ-037",
+      "statement": "YallaFlow serialises its own Git operations and validates repository state before and after every mutation, stopping safely on unexpected concurrent changes without claiming that external Git processes can be prevented.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0058",
+          "locator": "A3"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:57:42.475Z",
+      "updatedAt": "2026-11-09T18:57:42.475Z"
+    },
+    {
+      "id": "REQ-038",
+      "statement": "The Agent Contract moves to v12 and names work/<id>/integration.yaml as CLI-owned state, without weakening test 54; existing projects get a clear agent refresh requirement, and user-customized instructions are preserved or explicitly reviewed before replacement.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0059",
+          "locator": "D14"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T23:16:05.892Z",
+      "updatedAt": "2026-11-09T23:16:05.892Z"
+    },
+    {
+      "id": "REQ-039",
+      "statement": "Projects can set the approval wait to 5, 15, 30 or 60 minutes (default 5); an expired approval is always denied, never approved, and existing projects keep today's behaviour.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0059",
+          "locator": "D15"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T23:16:05.892Z",
+      "updatedAt": "2026-11-09T23:16:05.892Z"
+    },
+    {
+      "id": "REQ-040",
+      "statement": "The v1.5.0 release is accepted on a full green test suite, an English/Arabic/mobile console review from a non-technical user's view, and an end-to-end run with two real subscription Codex agents in disposable repositories covering Run Now, a three-task queue, two parallel agents with an intentional conflict resolved by its agent and freshly re-approved, preserved user data and knowledge, and restart recovery without duplicates.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0059",
+          "locator": "M4 acceptance 1-10"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T23:16:05.892Z",
+      "updatedAt": "2026-11-09T23:16:05.892Z"
+    },
+    {
+      "id": "REQ-041",
+      "statement": "Before release, the execution feature passes an independent, adversarial code and security review (separate review context, not the author's assertions) covering git-ops, merge, review, the Execution Manager with queue persistence and restart recovery, Shared Project integration and integration records, Git allowlist enforcement, agent approval and session lifecycle, and v1.4.2 backward compatibility; confirmed findings are fixed and the relevant tests rerun.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0060",
+          "locator": "Phase 1"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-10T08:37:05.549Z",
+      "updatedAt": "2026-11-10T08:37:05.549Z"
+    },
+    {
+      "id": "REQ-042",
+      "statement": "Release preparation: the Arabic console shows no mixed-language server messages, the README describes Run Now, Queue, Parallel, Review & Merge and the upgrade path, existing CLI and project workflows stay backward compatible, the installed npm package is verified with agents enabled and disabled, and the complete test suite passes after the final changes.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0060",
+          "locator": "Phase 2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-10T08:37:05.549Z",
+      "updatedAt": "2026-11-10T08:37:05.549Z"
+    },
+    {
+      "id": "REQ-043",
+      "statement": "YallaFlow never executes agent-controlled scripts, ignored executables or dependencies with the developer's console privileges: only declared merge checks run, only in a lane holding exactly the merge commit with no ignored files; otherwise Automated Merge is off for that task with a clear explanation and manual Git steps (fail closed). Agent Contract rules against commits, merges, Git configuration and shared Git metadata changes in managed lanes are behavioral guidance only.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0061",
+          "locator": "1-8"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-10T11:32:37.212Z",
+      "updatedAt": "2026-11-10T11:32:37.212Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "All existing agent and console tests pass unchanged, and Start on a work item issues the same API call sequence and chat as v1.4.2.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0053",
+          "locator": "additional 1"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "A project that never uses Queue or Parallel gets no new files beyond a Run Now record under .yallaflow/local and no new visible steps.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0052",
+          "locator": "keep the default workflow simple"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-002",
+      "statement": "A queue of three items runs strictly one at a time in the main lane, each in a fresh session, and ends finished with three done tasks.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0052",
+          "locator": "mode 2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-002",
+      "statement": "Cancel after current, cancel now, remove, reorder and skip work as specified and never change a work item's lifecycle.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0052",
+          "locator": "cancellation"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "AC-005",
+      "requirement": "REQ-003",
+      "statement": "The next task starts only when the snapshot shows DONE and the previous session's process cleanup reports complete; an incomplete cleanup blocks the lane as failed.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-007"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "AC-006",
+      "requirement": "REQ-003",
+      "statement": "A review gate, open question, pending approval, failure or usage limit keeps the queue blocked until the developer acts; the manager never decides any of them.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-007"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "AC-007",
+      "requirement": "REQ-004",
+      "statement": "Negative tests: crash between claim and start, crash mid-task, restart, two consoles, and double-clicked Resume never produce two sessions for one task or one work item.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0053",
+          "locator": "additional 4"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "AC-008",
+      "requirement": "REQ-005",
+      "statement": "Two lanes run concurrently with independent approvals and distinct branch-safe IDs; values above 2 are labelled experimental and values above 4 are refused.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-005"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "AC-009",
+      "requirement": "REQ-006",
+      "statement": "Enabling Shared Project Mode from the console shows the shared enable dry-run preview, requires a confirmation tick, refuses while an agent session is active or off the integration branch, keeps existing PF-#### items valid, and Parallel refuses a base commit whose config lacks shared.enabled.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-001"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "AC-010",
+      "requirement": "REQ-007",
+      "statement": "Test 51 allows only the allowlisted shapes G1-G10, only in src/execution/git-ops.js, and still forbids push, pull, fetch, rebase, reset, revert, cherry-pick, stash, clean, checkout, switch, restore, branch, tag, update-ref, gc, prune, any --force/-f, merge without --ff-only <oid>, commit -a and unscoped add on a real index everywhere.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-002"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "Checkpoint C allowlist"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "AC-011",
+      "requirement": "REQ-007",
+      "statement": "A planted post-checkout hook and a planted core.hooksPath do not run during lane creation.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "AC-012",
+      "requirement": "REQ-008",
+      "statement": "Lane creation refuses paths outside <repo-parent>/<repo>.lanes, symlinked components, existing paths, invalid slugs and existing branches.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-003"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "AC-013",
+      "requirement": "REQ-009",
+      "statement": "No code path removes a worktree without the developer's explicit Clean up action; Clean up is offered only after verified integration (or ancestry-verified manual integration) and is refused with an active session, Claude link or foreign lock, any staged, unstaged or untracked change, non-dependency ignored files, an unmerged branch, or a missing marker; the branch always remains.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-012"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0053",
+          "locator": "additional 5"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:28:03.626Z"
+    },
+    {
+      "id": "AC-014",
+      "requirement": "REQ-010",
+      "statement": "No code path answers a permission without a developer click; the default timeout stays 5 minutes until a recorded Codex ACP timeout experiment justifies other choices.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-004"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "AC-015",
+      "requirement": "REQ-011",
+      "statement": "The Agents view lists every lane across projects with live state and lets the developer answer approvals, open gates, send continue, pause, stop and end sessions from one place, resolving the same requests as the chat.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0053",
+          "locator": "additional 3"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "AC-016",
+      "requirement": "REQ-012",
+      "statement": "No execution or lane operation deletes or rewrites work items, project memory, sources, evidence or uncommitted files; verified by before/after tree hashes in tests.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0053",
+          "locator": "additional 2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "AC-017",
+      "requirement": "REQ-013",
+      "statement": "Claude lanes are shown as assisted, with the Team/Enterprise channel limitation stated in the UI and docs; no automatic Claude start or queue advance is offered.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0053",
+          "locator": "additional 6"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "AC-018",
+      "requirement": "REQ-014",
+      "statement": "Overlapping edits across lanes are reported, a deliberate conflict is reported by the preview and blocks the merge, disjoint work previews clean, and two lanes merged in sequence integrate their memory deltas with shared check PASS.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0052",
+          "locator": "conflict detection"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "items 2, 6"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "AC-019",
+      "requirement": "REQ-015",
+      "statement": "Negative test suites for Git safety, commit scope, merge, concurrency, crash recovery (including after every merge journal step) and preservation run in npm run check.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0053",
+          "locator": "additional 7"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "item 7"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "AC-020",
+      "requirement": "REQ-016",
+      "statement": "No new runtime dependency, network call or API-key path is added (test 51 and package.json unchanged in dependencies), and Queue/Parallel stay hidden until the developer selects two or more items.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0052",
+          "locator": "design requirements"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:07:08.536Z",
+      "updatedAt": "2026-11-09T18:07:08.536Z"
+    },
+    {
+      "id": "AC-021",
+      "requirement": "REQ-018",
+      "statement": "Preparing a review reports each readiness check (task DONE with passing verification and convergence, session stopped, change set, repository config unchanged, conflicts via object-only preview, home checkout state, shared check, tests to run) without changing any ref, index or working tree.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "item 2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "AC-022",
+      "requirement": "REQ-019",
+      "statement": "The review screen lists every changed file with status and diff, secret-flagged files excluded by default, the verification evidence, readiness, and the exact plan; Approve stays disabled while a blocking check fails.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "item 3"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "AC-023",
+      "requirement": "REQ-020",
+      "statement": "No commit, merge commit or ref move happens without an approval whose plan hash matches; when main moves or the reviewed diff, merged tree, merge commit content, check scope or expected integration outcome differs, the merge returns to ready and requires a fresh approval, showing what changed.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-008"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:28:03.626Z"
+    },
+    {
+      "id": "AC-024",
+      "requirement": "REQ-020",
+      "statement": "Before each commit the index tree equals the approved tree (lane) or HEAD plus the YallaFlow-owned paths (home), and after it HEAD's tree equals the same; any mismatch blocks or stops with nothing further changed; unticked, secret-flagged and agent-staged extra files never reach a commit.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0055",
+          "locator": "guarantee that no unrelated file is committed"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:28:03.626Z"
+    },
+    {
+      "id": "AC-025",
+      "requirement": "REQ-020",
+      "statement": "Staged changes in the home checkout block the merge before any step; unstaged and untracked unrelated files are byte-identical before and after the fast-forward and the knowledge commit; overlapping, ignored-at-added-path, assume-unchanged and skip-worktree cases are refused before any step.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0055",
+          "locator": "fast-forwarding main and unrelated local changes"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:28:03.626Z"
+    },
+    {
+      "id": "AC-026",
+      "requirement": "REQ-020",
+      "statement": "No working tree is ever left in a conflicted or half-merged state: three-way merges happen only in objects and checkouts only fast-forward.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "item 5"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "AC-027",
+      "requirement": "REQ-025",
+      "statement": "The approved required checks run on the exact merge commit tree in the lane before the integration branch moves; a failure or a check that cannot run blocks the merge and leaves the integration branch unchanged.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-009"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:28:03.626Z"
+    },
+    {
+      "id": "AC-028",
+      "requirement": "REQ-021",
+      "statement": "After the fast-forward, YallaFlow checks HEAD and tree equal the tested merge commit, runs doctor and shared check, runs shared integrate, writes the integration record, and commits only the YallaFlow-written paths.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "item 6"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "AC-029",
+      "requirement": "REQ-023",
+      "statement": "Cards, the item page, the Agents view and lane review show Task DONE and integration state as separate badges, and MERGED & VERIFIED appears only after every post-merge step succeeded.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "item 8"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "AC-030",
+      "requirement": "REQ-022",
+      "statement": "Two approved merges into the same branch execute one at a time; the second is re-previewed against the moved target and stops on any conflict or test failure.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "item 7 concurrent"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "AC-031",
+      "requirement": "REQ-022",
+      "statement": "A conflict is never resolved by YallaFlow; it blocks the merge with the paths and offers sending the work back to the agent (reopen) or manual integration.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "item 7 conflicts"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "AC-032",
+      "requirement": "REQ-022",
+      "statement": "A failure at any step stops the merge without reset, revert or ref rewinds and states exactly what has changed so far.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "item 7 failures"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "AC-033",
+      "requirement": "REQ-022",
+      "statement": "Killing the console after any journal step and continuing completes the merge with no step executed twice (asserted by commit counts and ref values); abandoning changes nothing.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "item 7 recovery"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "AC-034",
+      "requirement": "REQ-009",
+      "statement": "After MERGED & VERIFIED the lane remains on disk and a separate Clean up action is shown; nothing is removed until the developer confirms it and all guards pass.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-012"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:28:03.626Z"
+    },
+    {
+      "id": "AC-035",
+      "requirement": "REQ-007",
+      "statement": "Planted hooks never run during lane creation, commit or fast-forward, and a repository config or attributes change made after lane creation blocks the merge.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "threat model"
+        },
+        {
+          "type": "question",
+          "question": "Q-002"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "AC-036",
+      "requirement": "REQ-024",
+      "statement": "On a disposable repository with real subscriptions, two parallel lanes go Start → Execute → Review → Approve → Merge → Verify to MERGED & VERIFIED without the user typing a Git command, including one deliberate conflict sent back to the agent.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "goal"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "AC-037",
+      "requirement": "REQ-017",
+      "statement": "Every Review & Merge action (prepare, approve, continue, abandon, cancel, send back) is available from the lane review screen and the Agents view without a terminal.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "locator": "item 1"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:19:53.554Z",
+      "updatedAt": "2026-11-09T18:19:53.554Z"
+    },
+    {
+      "id": "AC-038",
+      "requirement": "REQ-025",
+      "statement": "Detected hooks and CI workflows are listed on the review screen; if any exist and the project has declared no required merge checks, Review is blocked; declared checks are stored only through the CLI and recorded in the integration record with the note that CI was not run.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-009"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:28:03.626Z",
+      "updatedAt": "2026-11-09T18:28:03.626Z"
+    },
+    {
+      "id": "AC-039",
+      "requirement": "REQ-026",
+      "statement": "integration.yaml is written atomically only after the fast-forward and knowledge integration succeeded, is committed on the integration branch in the lane work's own directory, and when missing the console shows merged, not verified, never verified.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-010"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:28:03.626Z",
+      "updatedAt": "2026-11-09T18:28:03.626Z"
+    },
+    {
+      "id": "AC-040",
+      "requirement": "REQ-027",
+      "statement": "Each merged lane appears on the integration branch as exactly one merge commit whose second parent is the lane commit; all earlier lane commits remain ancestors; no command that rewrites history exists in the allowlist.",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-013"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:28:03.626Z",
+      "updatedAt": "2026-11-09T18:28:03.626Z"
+    },
+    {
+      "id": "AC-041",
+      "requirement": "REQ-022",
+      "statement": "Killing the console after main moved but before the integration record exists shows merged, not verified after restart, and Continue completes knowledge integration, record and knowledge commit exactly once.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0055",
+          "locator": "crash after updating main"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:28:03.626Z",
+      "updatedAt": "2026-11-09T18:28:03.626Z"
+    },
+    {
+      "id": "AC-042",
+      "requirement": "REQ-020",
+      "statement": "Files named with pathspec magic or glob characters are staged and committed only as themselves (literal pathspecs).",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0055",
+          "locator": "unrelated file guarantee"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:28:03.626Z",
+      "updatedAt": "2026-11-09T18:28:03.626Z"
+    },
+    {
+      "id": "AC-043",
+      "requirement": "REQ-028",
+      "statement": "Open risks R1-R10 are each recorded on PF-0112 as verified by an M3a experiment plus a permanent test, or the dependent guarantee is withdrawn and the design returned to the owner; release documentation lists any risk still open.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0055",
+          "locator": "treat unverified guarantees as open risks"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:28:03.626Z",
+      "updatedAt": "2026-11-09T18:28:03.626Z"
+    },
+    {
+      "id": "AC-044",
+      "requirement": "REQ-029",
+      "statement": "Run Now and Queue tasks never trigger a YallaFlow commit or merge; their Git behaviour matches v1.4.2 (asserted by test).",
+      "provenance": [
+        {
+          "type": "question",
+          "question": "Q-011"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:28:03.626Z",
+      "updatedAt": "2026-11-09T18:28:03.626Z"
+    },
+    {
+      "id": "AC-045",
+      "requirement": "REQ-030",
+      "statement": "On a non-Linux platform or a Git version outside the verified set, lane creation, commit, merge and cleanup are refused with a fail-closed message and the manual operations are shown; tests simulate both cases.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0058",
+          "locator": "A2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:57:42.475Z",
+      "updatedAt": "2026-11-09T18:57:42.475Z"
+    },
+    {
+      "id": "AC-046",
+      "requirement": "REQ-031",
+      "statement": "A repository whose effective config defines a clean/smudge/process filter or a merge driver referenced by its attributes is blocked from automated lanes and merge before any Git mutation, there is no trust override, and no driver marker is ever written by YallaFlow operations in tests.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0058",
+          "locator": "A4"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:57:42.475Z",
+      "updatedAt": "2026-11-09T18:57:42.475Z"
+    },
+    {
+      "id": "AC-047",
+      "requirement": "REQ-032",
+      "statement": "A permanent test signs and verifies a commit and a commit-tree -S object with a throwaway GPG key in an isolated GNUPGHOME; if GPG signing is configured and that coverage is absent from the shipped suite, automated commits are blocked with a manual alternative.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0058",
+          "locator": "A5"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:57:42.475Z",
+      "updatedAt": "2026-11-09T18:57:42.475Z"
+    },
+    {
+      "id": "AC-048",
+      "requirement": "REQ-033",
+      "statement": "Cleanup lists every ignored path it would delete; only paths matching positively identified reproducible dependency directories from the stack scan are allowed; any other ignored file blocks cleanup; the developer confirms the exact list.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0058",
+          "locator": "A6"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:57:42.475Z",
+      "updatedAt": "2026-11-09T18:57:42.475Z"
+    },
+    {
+      "id": "AC-049",
+      "requirement": "REQ-034",
+      "statement": "For an index.lock, a partial fast-forward, HEAD/index/tree mismatch or any unexpected state, integration stops in a non-verified state; tests assert no reset, checkout, lock removal or second mutation follows, and manual recovery text is shown.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0058",
+          "locator": "A1"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:57:42.475Z",
+      "updatedAt": "2026-11-09T18:57:42.475Z"
+    },
+    {
+      "id": "AC-050",
+      "requirement": "REQ-035",
+      "statement": "git-ops exposes only named operations whose argv is built from validated arguments (slug, absolute path under the lanes root, object id, private temp files); a table test rejects malformed, option-like, relative, out-of-root and extra arguments for every operation.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0058",
+          "locator": "additional 1"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:57:42.475Z",
+      "updatedAt": "2026-11-09T18:57:42.475Z"
+    },
+    {
+      "id": "AC-051",
+      "requirement": "REQ-036",
+      "statement": "A recorded disposable-repository demonstration of the complete Review & Merge implementation, with its safety test results, precedes any enablement of automated merge on a real project.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0058",
+          "locator": "closing requirements"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:57:42.475Z",
+      "updatedAt": "2026-11-09T18:57:42.475Z"
+    },
+    {
+      "id": "AC-052",
+      "requirement": "REQ-037",
+      "statement": "A change to HEAD, the index, the target branch or the approved files made by another process between steps is detected by the before/after validation and stops the integration.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0058",
+          "locator": "A3"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:57:42.475Z",
+      "updatedAt": "2026-11-09T18:57:42.475Z"
+    },
+    {
+      "id": "AC-053",
+      "requirement": "REQ-012",
+      "statement": "Existing staged, unstaged, ignored and untracked user data in every checkout YallaFlow touches is byte-identical before and after each execution, lane and merge operation, verified by hashes in tests.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0058",
+          "locator": "additional 2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T18:57:42.475Z",
+      "updatedAt": "2026-11-09T18:57:42.475Z"
+    },
+    {
+      "id": "AC-054",
+      "requirement": "REQ-038",
+      "statement": "AGENT_CONTRACT_VERSION is 12, the contract names work/<id>/integration.yaml, test 54 passes unchanged, brief/doctor tell existing v11 projects to run agent refresh, and agent refresh keeps content outside the managed block (or stops for review).",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0059",
+          "locator": "D14"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T23:16:05.892Z",
+      "updatedAt": "2026-11-09T23:16:05.892Z"
+    },
+    {
+      "id": "AC-055",
+      "requirement": "REQ-039",
+      "statement": "The approval wait is selectable per project among 5, 15, 30 and 60 minutes, defaults to 5 when unset, rejects other values, and a request that reaches its wait is denied with by=timeout.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0059",
+          "locator": "D15"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T23:16:05.892Z",
+      "updatedAt": "2026-11-09T23:16:05.892Z"
+    },
+    {
+      "id": "AC-056",
+      "requirement": "REQ-040",
+      "statement": "The release readiness report shows npm run check green, screenshots of the console in English, Arabic and phone width, and the recorded real two-Codex end-to-end evidence for items 3-9 of SRC-0059.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0059",
+          "locator": "M4 acceptance"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-09T23:16:05.892Z",
+      "updatedAt": "2026-11-09T23:16:05.892Z"
+    },
+    {
+      "id": "AC-057",
+      "requirement": "REQ-041",
+      "statement": "A review report lists findings by severity with file/line references, reproduction steps and recommended fixes, produced by reviewers working on isolated repository copies; every confirmed finding is fixed with a test or explicitly accepted by the owner, and the relevant tests pass afterwards.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0060",
+          "locator": "Phase 1"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-10T08:37:05.549Z",
+      "updatedAt": "2026-11-10T08:37:05.549Z"
+    },
+    {
+      "id": "AC-058",
+      "requirement": "REQ-042",
+      "statement": "Execution server messages shown in the Arabic console are Arabic; the README covers the four execution modes and the 1.5.0 upgrade; a packed install is exercised with agents off and on; the full suite passes on the final tree.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0060",
+          "locator": "Phase 2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-10T08:37:05.549Z",
+      "updatedAt": "2026-11-10T08:37:05.549Z"
+    },
+    {
+      "id": "AC-059",
+      "requirement": "REQ-043",
+      "statement": "Agent-recorded commands are never run (even when a request names them); a lane with ignored files blocks Automated Merge with manual steps shown; ignored files appearing before the checks stop the merge before main moves; the Agent Contract v12 names the lane rules as guidance; the real Codex E2E records whether a lane agent can write the home repository's shared Git metadata.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0061",
+          "locator": "2-6"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-10T11:32:37.212Z",
+      "updatedAt": "2026-11-10T11:32:37.212Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-004",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-005",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-006",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-007",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-008",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-009",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-010",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-011",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-012",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-013",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-014",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-015",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-016",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-005",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-006",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-007",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-008",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-009",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-010",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-011",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-012",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-013",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-014",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-015",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-016",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-017",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-018",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-019",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-020",
+      "at": "2026-11-09T18:07:08.536Z",
+      "revision": 1
+    },
+    {
+      "action": "revised",
+      "id": "REQ-007",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2,
+      "reason": "Scope revision SRC-0054: Review & Merge adds approved commit and merge",
+      "previous": {
+        "id": "REQ-007",
+        "statement": "Only worktree add -b, worktree remove (no --force) and merge-tree --write-tree --name-only are added, through one restricted validated layer with hook isolation; no force, merge, commit, push or destructive cleanup.",
+        "provenance": [
+          {
+            "type": "question",
+            "question": "Q-002"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "REQ-009",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2,
+      "reason": "Scope revision SRC-0054 item 9",
+      "previous": {
+        "id": "REQ-009",
+        "statement": "A worktree is never deleted while an agent is active or its work is uncommitted, unmerged, or otherwise not safely preserved.",
+        "provenance": [
+          {
+            "type": "source",
+            "source": "SRC-0053",
+            "locator": "additional 5"
+          },
+          {
+            "type": "question",
+            "question": "Q-002"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "REQ-014",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2,
+      "reason": "Scope revision SRC-0054: integration is performed by YallaFlow after approval",
+      "previous": {
+        "id": "REQ-014",
+        "statement": "Git review and conflict detection are provided per lane, and knowledge integrates through the existing Shared Project flow.",
+        "provenance": [
+          {
+            "type": "source",
+            "source": "SRC-0052",
+            "locator": "Git review, conflict detection, knowledge integration"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "added",
+      "id": "REQ-017",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "REQ-018",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "REQ-019",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "REQ-020",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "REQ-021",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "REQ-022",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "REQ-023",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "REQ-024",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "revised",
+      "id": "AC-010",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2,
+      "reason": "Allowlist revised for Review & Merge",
+      "previous": {
+        "id": "AC-010",
+        "requirement": "REQ-007",
+        "statement": "Test 51 allows worktree add, worktree remove and merge-tree only in src/execution/git-worktree.js with asserted argv shapes and still forbids force, commit, merge, push, pull, fetch, rebase, reset, stash and branch deletion everywhere.",
+        "provenance": [
+          {
+            "type": "question",
+            "question": "Q-002"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "AC-013",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2,
+      "reason": "Cleanup only after successful integration",
+      "previous": {
+        "id": "AC-013",
+        "requirement": "REQ-009",
+        "statement": "Lane removal is refused while a session, Claude link or another console lock is active, with uncommitted or untracked changes, with non-dependency ignored files, with an unmerged branch, or without the YallaFlow ownership marker; a clean merged lane is removed and its branch remains.",
+        "provenance": [
+          {
+            "type": "source",
+            "source": "SRC-0053",
+            "locator": "additional 5"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "AC-018",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2,
+      "reason": "Conflicts feed Review & Merge",
+      "previous": {
+        "id": "AC-018",
+        "requirement": "REQ-014",
+        "statement": "Overlapping edits across lanes are reported, a deliberate conflict is reported by the merge check, disjoint work reports clean, and two lanes' memory deltas integrate with shared integrate and shared check PASS.",
+        "provenance": [
+          {
+            "type": "source",
+            "source": "SRC-0052",
+            "locator": "Git review, conflict detection, knowledge integration"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "AC-019",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2,
+      "reason": "Negative tests extended to Review & Merge",
+      "previous": {
+        "id": "AC-019",
+        "requirement": "REQ-015",
+        "statement": "Negative test suites exist for Git safety, concurrency and crash recovery and run in npm run check.",
+        "provenance": [
+          {
+            "type": "source",
+            "source": "SRC-0053",
+            "locator": "additional 7"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "added",
+      "id": "AC-021",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-022",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-023",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-024",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-025",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-026",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-027",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-028",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-029",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-030",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-031",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-032",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-033",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-034",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-035",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-036",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-037",
+      "at": "2026-11-09T18:19:53.554Z",
+      "revision": 2
+    },
+    {
+      "action": "revised",
+      "id": "REQ-009",
+      "at": "2026-11-09T18:28:03.626Z",
+      "revision": 3,
+      "reason": "D12 modified by the owner (SRC-0055)",
+      "previous": {
+        "id": "REQ-009",
+        "statement": "A worktree is removed only after its changes are MERGED & VERIFIED and every safety check passes; never while an agent is active or work is uncommitted, unmerged, or otherwise not safely preserved.",
+        "provenance": [
+          {
+            "type": "source",
+            "source": "SRC-0053",
+            "locator": "additional 5"
+          },
+          {
+            "type": "source",
+            "source": "SRC-0054",
+            "locator": "item 9"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "REQ-020",
+      "at": "2026-11-09T18:28:03.626Z",
+      "revision": 3,
+      "reason": "D8 conditional approval (SRC-0055)",
+      "previous": {
+        "id": "REQ-020",
+        "statement": "An explicit user approval precedes any commit or merge, and commit and merge execute safely and only as approved, never committing unrelated files or disturbing existing uncommitted changes.",
+        "provenance": [
+          {
+            "type": "source",
+            "source": "SRC-0054",
+            "locator": "items 4-5, investigate uncommitted changes"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "added",
+      "id": "REQ-025",
+      "at": "2026-11-09T18:28:03.626Z",
+      "revision": 3
+    },
+    {
+      "action": "added",
+      "id": "REQ-026",
+      "at": "2026-11-09T18:28:03.626Z",
+      "revision": 3
+    },
+    {
+      "action": "added",
+      "id": "REQ-027",
+      "at": "2026-11-09T18:28:03.626Z",
+      "revision": 3
+    },
+    {
+      "action": "added",
+      "id": "REQ-028",
+      "at": "2026-11-09T18:28:03.626Z",
+      "revision": 3
+    },
+    {
+      "action": "added",
+      "id": "REQ-029",
+      "at": "2026-11-09T18:28:03.626Z",
+      "revision": 3
+    },
+    {
+      "action": "revised",
+      "id": "AC-013",
+      "at": "2026-11-09T18:28:03.626Z",
+      "revision": 3,
+      "reason": "D12: no automatic deletion",
+      "previous": {
+        "id": "AC-013",
+        "requirement": "REQ-009",
+        "statement": "Lane removal is refused unless the integration state is verified (or a manual integration was verified by ancestry) and no session, Claude link or foreign lock is active, no staged, unstaged or untracked change exists, no non-dependency ignored file exists, the branch is merged, and the ownership marker matches; the branch always remains.",
+        "provenance": [
+          {
+            "type": "source",
+            "source": "SRC-0053",
+            "locator": "additional 5"
+          },
+          {
+            "type": "source",
+            "source": "SRC-0054",
+            "locator": "item 9"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "AC-023",
+      "at": "2026-11-09T18:28:03.626Z",
+      "revision": 3,
+      "reason": "D8: fresh approval on any material change",
+      "previous": {
+        "id": "AC-023",
+        "requirement": "REQ-020",
+        "statement": "No commit, merge commit or ref move happens without an approval record whose plan hash matches the current state; a changed file or plan after approval requires a new approval.",
+        "provenance": [
+          {
+            "type": "source",
+            "source": "SRC-0054",
+            "locator": "item 4"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "AC-024",
+      "at": "2026-11-09T18:28:03.626Z",
+      "revision": 3,
+      "reason": "Verify-before-commit replaces commit --only",
+      "previous": {
+        "id": "AC-024",
+        "requirement": "REQ-020",
+        "statement": "The lane commit contains exactly the approved paths with the approved blob ids, verified after commit; unticked, secret-flagged and agent-staged extra files are not committed.",
+        "provenance": [
+          {
+            "type": "source",
+            "source": "SRC-0054",
+            "locator": "avoid committing unrelated files"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "AC-025",
+      "at": "2026-11-09T18:28:03.626Z",
+      "revision": 3,
+      "reason": "Validation findings T15/T16 and the staged-index rule",
+      "previous": {
+        "id": "AC-025",
+        "requirement": "REQ-020",
+        "statement": "The developer's uncommitted, staged and untracked files in the home checkout are byte-identical before and after a merge and the knowledge commit; a merge that would overwrite one is refused before any step runs.",
+        "provenance": [
+          {
+            "type": "source",
+            "source": "SRC-0054",
+            "locator": "existing uncommitted changes"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "AC-027",
+      "at": "2026-11-09T18:28:03.626Z",
+      "revision": 3,
+      "reason": "D9: required checks, not only task tests",
+      "previous": {
+        "id": "AC-027",
+        "requirement": "REQ-018",
+        "statement": "The approved test commands run on the exact merge commit tree in the lane before the integration branch moves; a failure leaves the integration branch unchanged.",
+        "provenance": [
+          {
+            "type": "source",
+            "source": "SRC-0054",
+            "locator": "item 2 tests"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "revised",
+      "id": "AC-034",
+      "at": "2026-11-09T18:28:03.626Z",
+      "revision": 3,
+      "reason": "D12 modified",
+      "previous": {
+        "id": "AC-034",
+        "requirement": "REQ-009",
+        "statement": "Lane cleanup after a merge runs only when the integration state is verified and all removal guards pass.",
+        "provenance": [
+          {
+            "type": "source",
+            "source": "SRC-0054",
+            "locator": "item 9"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "added",
+      "id": "AC-038",
+      "at": "2026-11-09T18:28:03.626Z",
+      "revision": 3
+    },
+    {
+      "action": "added",
+      "id": "AC-039",
+      "at": "2026-11-09T18:28:03.626Z",
+      "revision": 3
+    },
+    {
+      "action": "added",
+      "id": "AC-040",
+      "at": "2026-11-09T18:28:03.626Z",
+      "revision": 3
+    },
+    {
+      "action": "added",
+      "id": "AC-041",
+      "at": "2026-11-09T18:28:03.626Z",
+      "revision": 3
+    },
+    {
+      "action": "added",
+      "id": "AC-042",
+      "at": "2026-11-09T18:28:03.626Z",
+      "revision": 3
+    },
+    {
+      "action": "added",
+      "id": "AC-043",
+      "at": "2026-11-09T18:28:03.626Z",
+      "revision": 3
+    },
+    {
+      "action": "added",
+      "id": "AC-044",
+      "at": "2026-11-09T18:28:03.626Z",
+      "revision": 3
+    },
+    {
+      "action": "added",
+      "id": "REQ-030",
+      "at": "2026-11-09T18:57:42.475Z",
+      "revision": 4
+    },
+    {
+      "action": "added",
+      "id": "REQ-031",
+      "at": "2026-11-09T18:57:42.475Z",
+      "revision": 4
+    },
+    {
+      "action": "added",
+      "id": "REQ-032",
+      "at": "2026-11-09T18:57:42.475Z",
+      "revision": 4
+    },
+    {
+      "action": "added",
+      "id": "REQ-033",
+      "at": "2026-11-09T18:57:42.475Z",
+      "revision": 4
+    },
+    {
+      "action": "added",
+      "id": "REQ-034",
+      "at": "2026-11-09T18:57:42.475Z",
+      "revision": 4
+    },
+    {
+      "action": "added",
+      "id": "REQ-035",
+      "at": "2026-11-09T18:57:42.475Z",
+      "revision": 4
+    },
+    {
+      "action": "added",
+      "id": "REQ-036",
+      "at": "2026-11-09T18:57:42.475Z",
+      "revision": 4
+    },
+    {
+      "action": "added",
+      "id": "REQ-037",
+      "at": "2026-11-09T18:57:42.475Z",
+      "revision": 4
+    },
+    {
+      "action": "added",
+      "id": "AC-045",
+      "at": "2026-11-09T18:57:42.475Z",
+      "revision": 4
+    },
+    {
+      "action": "added",
+      "id": "AC-046",
+      "at": "2026-11-09T18:57:42.475Z",
+      "revision": 4
+    },
+    {
+      "action": "added",
+      "id": "AC-047",
+      "at": "2026-11-09T18:57:42.475Z",
+      "revision": 4
+    },
+    {
+      "action": "added",
+      "id": "AC-048",
+      "at": "2026-11-09T18:57:42.475Z",
+      "revision": 4
+    },
+    {
+      "action": "added",
+      "id": "AC-049",
+      "at": "2026-11-09T18:57:42.475Z",
+      "revision": 4
+    },
+    {
+      "action": "added",
+      "id": "AC-050",
+      "at": "2026-11-09T18:57:42.475Z",
+      "revision": 4
+    },
+    {
+      "action": "added",
+      "id": "AC-051",
+      "at": "2026-11-09T18:57:42.475Z",
+      "revision": 4
+    },
+    {
+      "action": "added",
+      "id": "AC-052",
+      "at": "2026-11-09T18:57:42.475Z",
+      "revision": 4
+    },
+    {
+      "action": "added",
+      "id": "AC-053",
+      "at": "2026-11-09T18:57:42.475Z",
+      "revision": 4
+    },
+    {
+      "action": "added",
+      "id": "REQ-038",
+      "at": "2026-11-09T23:16:05.892Z",
+      "revision": 5
+    },
+    {
+      "action": "added",
+      "id": "REQ-039",
+      "at": "2026-11-09T23:16:05.892Z",
+      "revision": 5
+    },
+    {
+      "action": "added",
+      "id": "REQ-040",
+      "at": "2026-11-09T23:16:05.892Z",
+      "revision": 5
+    },
+    {
+      "action": "added",
+      "id": "AC-054",
+      "at": "2026-11-09T23:16:05.892Z",
+      "revision": 5
+    },
+    {
+      "action": "added",
+      "id": "AC-055",
+      "at": "2026-11-09T23:16:05.892Z",
+      "revision": 5
+    },
+    {
+      "action": "added",
+      "id": "AC-056",
+      "at": "2026-11-09T23:16:05.892Z",
+      "revision": 5
+    },
+    {
+      "action": "added",
+      "id": "REQ-041",
+      "at": "2026-11-10T08:37:05.549Z",
+      "revision": 6
+    },
+    {
+      "action": "added",
+      "id": "REQ-042",
+      "at": "2026-11-10T08:37:05.549Z",
+      "revision": 6
+    },
+    {
+      "action": "added",
+      "id": "AC-057",
+      "at": "2026-11-10T08:37:05.549Z",
+      "revision": 6
+    },
+    {
+      "action": "added",
+      "id": "AC-058",
+      "at": "2026-11-10T08:37:05.549Z",
+      "revision": 6
+    },
+    {
+      "action": "added",
+      "id": "REQ-043",
+      "at": "2026-11-10T11:32:37.212Z",
+      "revision": 7
+    },
+    {
+      "action": "added",
+      "id": "AC-059",
+      "at": "2026-11-10T11:32:37.212Z",
+      "revision": 7
+    }
+  ],
+  "updatedAt": "2026-11-10T11:32:37.212Z"
+}

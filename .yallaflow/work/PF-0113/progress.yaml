@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-10T11:52:15.446Z",
+      "completedAt": "2026-11-10T11:52:15.446Z",
+      "summary": "Overview proxies CLI overview --json (server.js:357) with no branch/shared data; Shared enable exists only in the lanes form (app.js:477-523, server.js:384-387 preview, 671-679 enable with session/dirty guards); doctor runs diagnoseCollisions only after failures (doctor.js:45); no duplicate CTX check.",
+      "evidence": [
+        "src/console/server.js",
+        "resources/console/app.js",
+        "src/commands/doctor.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-10T11:52:16.014Z",
+      "completedAt": "2026-11-10T11:52:16.014Z",
+      "summary": "Owner-approved scope: Overview status line (branch, Shared On/Off, integration branch, Turn on via existing lanes panel/endpoint); git info added in server overview route only; New Work recommendation only when integration branch known and differs; no ID changes; doctor always diagnoses collisions + duplicate CTX detection; title-first IDs with copyable canonical ID; focused tests incl. lane projects.",
+      "evidence": [
+        "user:owner approved minimal Console Shared Mode plan in the agent session 2026-11-10"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-10T11:54:22.036Z",
+      "completedAt": "2026-11-10T11:54:22.036Z",
+      "summary": "server.js: overview route adds console-only git {branch, shared, integrationBranch, integrationBranchSource, lane, canEnable} next to unchanged CLI JSON; lanes refused for shared preview/enable (NOT_HOME). app.js: Overview status line; shared enable panel extracted and reused by lanes sheet and Overview Turn on; New Work hint only when integration branch known and current branch differs; work IDs rendered via one helper (title stays primary, full ID in title attr, copy on item page). doctor: collision diagnosis always runs; read-only duplicate CTX ID detection. Tests: new focused console+doctor test file."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-10T11:59:12.816Z",
+      "completedAt": "2026-11-10T11:59:12.816Z",
+      "summary": "Overview route adds console-only git position (branch, sharedMode, integrationBranch + source, lane, canEnableShared); shared preview/enable refused for lanes (NOT_HOME); app.js: gitLine on Overview, sharedPanel/openSharedSheet reuse one enable flow, New Work hint only with known integration branch, wid() keeps full IDs beside titles + copy on item page; doctor always diagnoses, adds duplicate CTX ID diagnosis; new test file + presentation harness stub.",
+      "evidence": [
+        "src/console/server.js",
+        "resources/console/app.js",
+        "src/commands/doctor.js",
+        "src/core/collisions.js",
+        "test/console-shared-status.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-10T12:00:31.667Z",
+      "completedAt": "2026-11-10T12:00:31.667Z",
+      "summary": "Focused suites pass (V-001: 7 files incl. new console-shared-status, lanes, overview, collisions); app.js syntax check (V-002).",
+      "evidence": [
+        "verification:V-001",
+        "verification:V-002"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-10T12:00:31.667Z"
+}

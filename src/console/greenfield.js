@@ -19,6 +19,7 @@ import { isServiceId } from './runtime.js';
 import { loadRuntimeProfiles } from '../runtime/profile.js';
 import { loadPlan } from '../newproject/project.js';
 import { ENVIRONMENTS, GIT_INIT_ARGV } from '../newproject/project.js';
+import { SAFE_GIT } from '../utils/git-safety.js';
 
 const TOOL_TIMEOUT_MS = 5000;
 const SAFE_ENV = ['PATH', 'HOME', 'LANG', 'LC_ALL', 'USER', 'LOGNAME', 'TMPDIR', 'TZ'];
@@ -92,7 +93,7 @@ export async function createdProjectRoot(planId) {
 }
 
 export async function gitInit(root) {
-  const inside = await runQuiet('git', ['rev-parse', '--is-inside-work-tree'], { cwd: root });
+  const inside = await runQuiet('git', [...SAFE_GIT, 'rev-parse', '--is-inside-work-tree'], { cwd: root });
   if (inside.ok && inside.stdout.trim() === 'true') throw new HttpError(409, 'GIT_EXISTS', 'This project is already inside a Git repository; nothing was changed.');
   const present = await lstat(path.join(root, '.git')).catch(() => null);
   if (present) throw new HttpError(409, 'GIT_EXISTS', 'This project already has a .git entry; nothing was changed.');

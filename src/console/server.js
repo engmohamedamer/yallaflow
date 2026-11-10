@@ -10,7 +10,7 @@
 // - Reads come from `snapshot --json` / `work show --json` (runner.js) and preserved
 //   source originals read by ID. Create Work runs the CLI's own start/route/intake add
 //   (create.js), never writing .yallaflow itself.
-import { decideGate, gateReview, runAction } from './actions.js';
+import { claimedGitName, decideGate, gateReview, runAction } from './actions.js';
 import http from 'node:http';
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { readFile, realpath, stat } from 'node:fs/promises';
@@ -26,13 +26,21 @@ import { HttpError, MAX_JSON_BYTES, attachFile, createWork, validateCreateBody }
 import { isServiceId, runRuntimeAction, runRuntimePlanAction, runRuntimeProjectAction } from './runtime.js';
 import { wizardCatalog, wizardCreate, wizardPlan, wizardProgress } from './newproject.js';
 import { AgentBridge } from '../agents/bridge.js';
+import { ExecutionManager } from '../execution/manager.js';
+import { cleanupCheck, cleanupLane, createLane, laneIdentity, lanePreconditions, readLanes } from '../execution/lanes.js';
+import * as gitops from '../execution/git-ops.js';
+import { withArabic } from '../execution/arabic.js';
+import { MergeService, listJournals } from '../execution/merge.js';
+import { conflictText } from '../execution/messages.js';
 import { detectProviders } from '../agents/detect.js';
 import { FolderError, listFolders } from './folders.js';
 import { addProject as saveToRegistry, removeProject as forgetInRegistry } from './registry.js';
 import { addRuntimeService, attachPlannedFile, createdProjectRoot, gitInit, probeTools, workspaceRoot } from './greenfield.js';
 import { CLAUDE_NOT_INCLUDED, claudeIncluded, loadClaude } from '../agents/experimental.js';
-import { readAgentSettings, writeAgentSettings } from '../agents/settings.js';
+import { readAgentSettings, readApprovalWait, writeAgentSettings, writeApprovalWait } from '../agents/settings.js';
 import { markSetup, readSetup, scanSetup, setupPending } from './setup.js';
+import { defaultIntegrationBranch } from '../shared/git.js';
+import { readYaml } from '../core/yaml.js';
 
 const UI_DIR = fileURLToPath(new URL('../../resources/console/', import.meta.url));
 const UI_FILES = Object.freeze({
@@ -49,9 +57,11 @@ const UI_FILES = Object.freeze({
 // 1.4.0: work-item actions and review-gate decisions (PF-0043) join Create Work.
 // 1.4.0 Greenfield journey (PF-0057): register a project, enable agents for this run, Git init,
 // add a runtime service, attach a planned file to a new project's first work item.
-const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|revision-sources|actions\/[a-z]+|gates\/[a-z]+\/decision))?|runtime\/[a-z][a-z0-9-]{0,31}\/(?:trust|start|stop|restart)|runtime\/services|runtime\/(?:start|stop)-all|runtime\/analyze|runtime\/plan\/save|agents\/(?:settings|launch-files)|setup\/(?:scan|step)|git\/init)$|^\/api\/new\/(?:plan|create|plans\/NP-\d{14}-[0-9a-f]{6}\/files)$|^\/api\/(?:projects|projects\/remove|agents\/enable)$/;
+const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|revision-sources|actions\/[a-z]+|gates\/[a-z]+\/decision))?|runtime\/[a-z][a-z0-9-]{0,31}\/(?:trust|start|stop|restart)|runtime\/services|runtime\/(?:start|stop)-all|runtime\/analyze|runtime\/plan\/save|agents\/(?:settings|launch-files|approval-wait)|setup\/(?:scan|step)|git\/init)$|^\/api\/new\/(?:plan|create|plans\/NP-\d{14}-[0-9a-f]{6}\/files)$|^\/api\/(?:projects|projects\/remove|agents\/enable)$/;
 // Agent Interaction (v1.3.0, only with --agents): the Agent Workspace's actions.
 const AGENT_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/agent\/(start|message|permission|cancel|end|resume|connect|disconnect|activate)$/;
+// PF-0112: execution actions (queues): create a run and the developer's run/task controls.
+const EXEC_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/execution\/(run|pause|next|resume|retry|skip|switch|reorder|cancel|parallel|lane-cleanup|shared-enable|merge-approve|merge-continue|merge-abandon|merge-sendback)$/;
 // The Claude channel server and hook forwarder (bridge token, never a browser).
 const BRIDGE_ROUTE = /^\/api\/agent-bridge\/claude\/(stream|event|hook|hello)$/;
 
@@ -85,6 +95,20 @@ export function projectId(root) {
   return createHash('sha256').update(root).digest('hex').slice(0, 10);
 }
 
+// PF-0112: a lane (a YallaFlow-created worktree) is named after its home project and lane,
+// never as a same-named copy; identity comes from the lane's own marker.
+async function projectEntry(root) {
+  const name = (await projectName(root)) ?? path.basename(root);
+  const marker = await laneIdentity(root);
+  if (marker?.createdBy === 'yallaflow' && typeof marker.home === 'string' && typeof marker.slug === 'string') {
+    return { id: projectId(root), root, name: `${name} · ${marker.slug}`, kind: 'lane', parent: projectId(marker.home), parentRoot: marker.home, laneId: marker.id, slug: marker.slug };
+  }
+  return { id: projectId(root), root, name, kind: 'main' };
+}
+
+const PARALLEL_OFF = 'Parallel is turned off in YallaFlow 1.5.0 until a real-agent test confirms that a lane\'s agent cannot change your repository\'s shared Git settings or the agent settings the console loads. Run tasks one after another with a queue instead.';
+const parallelOn = () => process.env.YALLAFLOW_EXPERIMENTAL_PARALLEL === '1';
+
 export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', token = randomBytes(24).toString('hex'), poll = false, missing = [], readOnly = false, agents = false, experimentalClaude = false, agentEnv = process.env } = {}) {
   // Agent Interaction needs writes; --read-only keeps the console genuinely read-only.
   // Agents start on with --agents, or later for this run only by an explicit, confirmed
@@ -94,8 +118,20 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
   // choice when enabling agents in the console; never by default, never read-only.
   let claudeOn = agentsOn && Boolean(experimentalClaude);
   let bridge = null;
+  // PF-0112: the Execution Manager above the bridge (runs, the Agents view); exists with the bridge.
+  let execution = null;
+  let merges = null; // PF-0112 M3 Review & Merge service (created with the console)
   const runner = createRunner();
-  const projects = await Promise.all(roots.map(async (root) => ({ id: projectId(root), root, name: (await projectName(root)) ?? path.basename(root) })));
+  // PF-0112 review: nothing runs in a lane that is no longer a worktree of its home repository.
+  // A lane is recognised from where it is and its home's lane list (never from files inside it),
+  // whether or not it is open in this console; its Git directory is pinned for the child.
+  runner.guard = async (root) => {
+    const identity = await laneIdentity(root);
+    if (!identity) return null;
+    const gitDir = await gitops.assertLaneOf(identity.home, root);
+    return { env: { GIT_DIR: gitDir, GIT_WORK_TREE: root } };
+  };
+  const projects = await Promise.all(roots.map((root) => projectEntry(root)));
   const byId = new Map(projects.map((entry) => [entry.id, entry]));
   // PF-0069: each project's saved agent choice (.yallaflow/local/agents.json) applies when
   // the console opens. A read-only console ignores it.
@@ -108,6 +144,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
 
   const watch = (project) => watchWorkspace(project.root, () => {
     runner.invalidate(project.root);
+    execution?.onWorkspaceChange(project.id).catch(() => {});
     const message = `data: ${JSON.stringify({ type: 'change', project: project.id, at: new Date().toISOString() })}\n\n`;
     for (const client of clients) client.write(message);
   }, { poll });
@@ -127,10 +164,11 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     const known = [];
     for (const entry of projects) known.push([entry, await realpath(entry.root).catch(() => entry.root)]);
     const already = known.find(([, existing]) => existing === real)?.[0];
-    const saved = await saveToRegistry(real);
+    const marker = await laneIdentity(real);
+    const saved = await saveToRegistry(real, undefined, marker?.createdBy === 'yallaflow' ? { parent: marker.home, lane: marker.slug } : {});
     if (already) return { id: already.id, name: already.name, root: already.root, added: false, saved: saved.added };
     if (byId.has(projectId(real))) { const same = byId.get(projectId(real)); return { id: same.id, name: same.name, root: same.root, added: false, saved: saved.added }; }
-    const entry = { id: projectId(real), root: real, name: (await projectName(real)) ?? path.basename(real) };
+    const entry = await projectEntry(real);
     projects.push(entry);
     byId.set(entry.id, entry);
     watchers.push(watch(entry));
@@ -140,6 +178,8 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       if (choice.chosen && choice.agents && !agentsOn) await enableAgents();
     }
     await bridge?.addProject(entry);
+    if (bridge && !readOnly) bridge.setApprovalWait(entry.id, (await readApprovalWait(entry.root)).minutes);
+    await execution?.addProject(entry);
     if (bridge && savedChoices.get(entry.id)?.claude && claudeIncluded()) await bridge.enableClaude(entry.id);
     const message = `data: ${JSON.stringify({ type: 'projects', project: entry.id, at: new Date().toISOString() })}\n\n`;
     for (const client of clients) client.write(message);
@@ -174,6 +214,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     const entry = byId.get(id);
     if (!entry) throw Object.assign(new Error('Unknown project.'), { status: 404, code: 'NOT_FOUND' });
     await bridge?.removeProject(entry.id);
+    execution?.removeProject(entry.id);
     await forgetInRegistry(entry.root);
     const at = projects.indexOf(entry);
     if (at !== -1) {
@@ -207,6 +248,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       codex: provider(detected.codex),
       claude: detected.claude ? provider(detected.claude) : null,
       checklist: claudeOnHere ? { ...bridge.claudeChecklist(project.id), launchFiles } : null,
+      approvalWait: await readApprovalWait(project.root),
       // The command to run, once the launch files on disk are current (never before).
       launchCommand: launchFiles ? claudeKit.launchCommand(project.root) : null
     };
@@ -235,6 +277,11 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       if (!origin) return send(response, 403, { error: { code: 'FORBIDDEN_ORIGIN', message: 'An agent action needs the console page as its Origin.' } });
       return handleAgent(request, response, url);
     }
+    if (request.method === 'POST' && agentsOn && !readOnly && EXEC_ROUTE.test(url.pathname)) {
+      if (!authorized(request)) return send(response, 401, { error: { code: 'UNAUTHORIZED', message: 'Missing or wrong console token. Open the link printed by `yallaflow console`.' } });
+      if (!origin) return send(response, 403, { error: { code: 'FORBIDDEN_ORIGIN', message: 'An execution action needs the console page as its Origin.' } });
+      return handleExecution(request, response, url);
+    }
     if (request.method === 'POST') {
       // Writes: only the Create Work routes, only with the token, our own Origin and the exact type.
       if (readOnly || !WRITE_ROUTE.test(url.pathname)) return send(response, 405, { error: { code: 'READ_ONLY', message: readOnly ? 'This console was started with --read-only.' : 'Only Create Work, work-item actions, gate decisions, runtime actions, project registration, agent enablement, Git init and the New Project Wizard accept POST.' } }, { Allow: 'GET, HEAD' });
@@ -249,7 +296,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
 
     const parts = url.pathname.split('/').filter(Boolean); // ['api', ...]
     if (parts.length === 2 && parts[1] === 'projects') {
-      return send(response, 200, { projects: projects.map(({ id, name, root }) => ({ id, name, root })), unavailable: missing, readOnly, agents: { enabled: agentsOn, claude: claudeOn, canEnable: !readOnly && !agentsOn, claudeAvailable: claudeIncluded() } });
+      return send(response, 200, { projects: projects.map(({ id, name, root, kind, parent, laneId }) => ({ id, name, root, kind: kind ?? 'main', ...(kind === 'lane' ? { parent, laneId } : {}) })), unavailable: missing, readOnly, agents: { enabled: agentsOn, claude: claudeOn, canEnable: !readOnly && !agentsOn, claudeAvailable: claudeIncluded() } });
     }
     // 1.4.0 (PF-0057) reads: folders inside home, tool availability, agent readiness.
     if (parts.length === 3 && parts[1] === 'fs' && parts[2] === 'dirs') {
@@ -267,6 +314,11 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       if (readOnly) return send(response, 200, { enabled: false, canEnable: false, readOnly: true, claude: false, codex: null });
       const found = await detectProviders({ env: agentEnv, claude: claudeOn });
       return send(response, 200, { enabled: agentsOn, canEnable: !readOnly && !agentsOn, readOnly, claude: claudeOn, claudeAvailable: claudeIncluded(), codex: { ready: Boolean(found.codex?.ready), problems: found.codex?.problems ?? [] }, ...(found.claude ? { claudeCode: { ready: Boolean(found.claude.ready), problems: found.claude.problems ?? [] } } : {}) });
+    }
+    // PF-0112: every lane of every project in this console, with one inbox of open requests. Read-only.
+    if (parts.length === 2 && parts[1] === 'execution') {
+      if (!agentsOn || !execution) return send(response, 200, { enabled: false, lanes: [], inbox: [] });
+      return send(response, 200, { enabled: true, ...execution.view() });
     }
     if (parts.length === 2 && parts[1] === 'events') {
       if (request.method !== 'GET') return send(response, 405, { error: { code: 'METHOD', message: 'The event stream is GET only.' } }, { Allow: 'GET' });
@@ -308,7 +360,8 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     }
     // 1.4.0: the project itself — memory, evidence-based stack, onboarding status. Read-only.
     if (rest.length === 1 && rest[0] === 'overview') {
-      return send(response, 200, await runner.readFresh(project.root, ['overview', '--json']));
+      // PF-0113: the CLI document stays as it is; the console adds this checkout's Git position.
+      return send(response, 200, { ...await runner.readFresh(project.root, ['overview', '--json']), git: await gitPosition(project) });
     }
     if (rest.length === 2 && rest[0] === 'work' && isWorkId(rest[1])) {
       return send(response, 200, await runner.get(project.root, `work:${rest[1]}`, ['work', 'show', rest[1], '--json']));
@@ -320,6 +373,26 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     if (rest.length === 1 && rest[0] === 'agent') {
       if (!agentsOn) return send(response, 200, { enabled: false });
       return send(response, 200, await bridge.status(project.id));
+    }
+    // PF-0112 M2: this home project's lanes with their Clean up checks, and the Shared preview. Read-only.
+    if (project.kind === 'lane' && ['lanes', 'merges', 'shared'].includes(rest[0])) return send(response, 409, { error: { code: 'NOT_HOME', message: 'Use the home project for this, not a lane.' } });
+    if (rest.length === 1 && rest[0] === 'lanes') {
+      if (!agentsOn) return send(response, 200, { lanes: [], preconditions: null });
+      return send(response, 200, await laneList(project));
+    }
+    if (rest.length === 3 && rest[0] === 'lanes' && /^l-[0-9a-f]{8}$/.test(rest[1]) && rest[2] === 'review') {
+      if (!agentsOn || !merges) return send(response, 409, { error: { code: 'AGENTS_OFF', message: 'Turn agents on first.' } });
+      const list = (name) => (url.searchParams.get(name) ?? '').split('\n').filter(Boolean);
+      return send(response, 200, await merges.prepare(project.root, rest[1], { exclude: list('exclude'), include: list('include'), checksInclude: list('checks') }));
+    }
+    if (rest.length === 1 && rest[0] === 'merges') {
+      return send(response, 200, { merges: (await listJournals(project.root)).slice(0, 20).map(({ id, state, reason, undo, createdAt, verifiedAt, plan, steps, results, approval }) => ({ id, state, reason: reason ?? null, undo: undo ?? null, createdAt, verifiedAt: verifiedAt ?? null, lane: plan ? { id: plan.lane.id, branch: plan.lane.branch } : null, target: plan?.target?.branch ?? null, workIds: plan?.workIds ?? [], steps: (steps ?? []).map((step) => ({ name: step.name, state: step.state, detail: typeof step.detail === 'string' ? step.detail.slice(0, 300) : null })), merge: results?.merge ?? null, knowledgeCommit: results?.knowledgeCommit ?? null, approvedBy: approval?.by ?? null })) });
+    }
+    if (rest.length === 2 && rest[0] === 'shared' && rest[1] === 'preview') {
+      let preview = await runner.runAside(project.root, ['shared', 'enable', '--dry-run']);
+      const branch = gitops.currentBranch(project.root);
+      if (preview.status !== 0 && branch && /integration branch/i.test(`${preview.stderr}${preview.stdout}`)) preview = await runner.runAside(project.root, ['shared', 'enable', '--dry-run', '--integration-branch', branch]);
+      return send(response, 200, { ok: preview.status === 0, text: String(preview.stdout ?? '').trim(), error: preview.status === 0 ? null : String(preview.stderr || preview.stdout).trim().split('\n').slice(-2).join(' ') });
     }
     if (rest.length === 1 && rest[0] === 'worktrees') {
       return send(response, 200, await teamView(project));
@@ -413,9 +486,15 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       return send(response, 200, await gitInit(project.root));
     }
     // PF-0069: save the project's agent choice and apply it now; write the launch files.
-    if (rest.length === 2 && rest[0] === 'agents' && ['settings', 'launch-files'].includes(rest[1])) {
+    if (rest.length === 2 && rest[0] === 'agents' && ['settings', 'launch-files', 'approval-wait'].includes(rest[1])) {
       if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
       const body = await readJsonBody(request);
+      // PF-0112 D15: the project's approval wait (5, 15, 30 or 60 minutes); applies to new requests.
+      if (rest[1] === 'approval-wait') {
+        const saved = await writeApprovalWait(project.root, Number(body?.minutes));
+        if (bridge) bridge.setApprovalWait(project.id, saved.minutes);
+        return send(response, 200, saved);
+      }
       if (rest[1] === 'launch-files') {
         if (!body || typeof body !== 'object' || Array.isArray(body) || Object.keys(body).length) return send(response, 400, { error: { code: 'BAD_REQUEST', message: 'Send an empty JSON object.' } });
         if (!bridge?.claudeOnFor(project.id)) return send(response, 409, { error: { code: 'CLAUDE_OFF', message: 'Turn Claude Code on for this project first.' } });
@@ -468,6 +547,176 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       return send(response, result.duplicate ? 200 : 201, result);
     }
     return send(response, 404, { error: { code: 'NOT_FOUND', message: 'Not found.' } });
+  }
+
+  // ----- PF-0112 execution actions (browser token + Origin, JSON only) -----
+  async function handleExecution(request, response, url) {
+    const type = String(request.headers['content-type'] ?? '').split(';')[0].trim().toLowerCase();
+    if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+    const parts = url.pathname.split('/').filter(Boolean);
+    const project = byId.get(parts[2]);
+    if (!project || !execution) return send(response, 404, { error: { code: 'NOT_FOUND', message: 'Unknown project.' } });
+    const body = await readJsonBody(request);
+    const action = parts[4];
+    // A lane is never the home project of these actions (final review, Low): its own lane list and
+    // config are written by its agent.
+    if (project.kind === 'lane' && (action.startsWith('merge-') || ['lane-cleanup', 'parallel', 'shared-enable'].includes(action))) return send(response, 409, { error: { code: 'NOT_HOME', message: 'Use the home project for this action, not a lane.' } });
+    // PF-0112 M3: Review & Merge. Approval needs the tick and the plan hash the developer reviewed.
+    if (action.startsWith('merge-') && !merges) return send(response, 503, { error: { code: 'NOT_READY', message: 'The console is still starting.' } });
+    if (action === 'merge-approve') {
+      if (body.confirmed !== true) return send(response, 400, { error: { code: 'CONFIRMATION_REQUIRED', message: 'Tick the confirmation: it approves the commit, the merge and running the listed checks.' } });
+      return send(response, 202, await merges.approve(project.root, String(body.laneId ?? ''), { planHash: String(body.planHash ?? ''), exclude: Array.isArray(body.exclude) ? body.exclude.map(String) : [], include: Array.isArray(body.include) ? body.include.map(String) : [], checksInclude: Array.isArray(body.checksInclude) ? body.checksInclude.map(String) : [], message: typeof body.message === 'string' ? body.message : null, consentScripts: true, acceptMinimumVersion: body.acceptMinimumVersion === '1.5.0' ? '1.5.0' : null }));
+    }
+    // FR25: a conflict goes back to the lane's agent — the item is reopened through YallaFlow and the
+    // agent is started with the developer's instruction to integrate the target and resolve.
+    if (action === 'merge-sendback') {
+      // Review L1: it reopens work and starts an agent, so it needs the developer's tick too.
+      if (body.confirmed !== true) return send(response, 400, { error: { code: 'CONFIRMATION_REQUIRED', message: 'Confirm sending the conflict back to the lane\'s agent.' } });
+      const record = (await readLanes(project.root)).find((lane) => lane.id === String(body.laneId ?? '') && lane.state !== 'removed');
+      if (!record) return send(response, 404, { error: { code: 'NOT_FOUND', message: 'Unknown lane.' } });
+      const review = await merges.prepare(project.root, record.id);
+      if (!review.conflicts.length) return send(response, 409, { error: { code: 'NO_CONFLICT', message: 'This lane has no conflict to send back.' } });
+      const laneEntry = projects.find((entry) => entry.root === record.path);
+      if (!laneEntry) return send(response, 409, { error: { code: 'LANE_NOT_OPEN', message: 'Open the lane in this console first.' } });
+      const workIds = execution.workIdsOf(laneEntry.id);
+      // Review L1/M7: everything that could refuse is checked before the first reopen.
+      const lang = body.lang === 'ar' ? 'ar' : 'en';
+      const message = conflictText(workIds.join(', '), lang, { target: record.integrationBranch, files: review.conflicts });
+      if (bridge?.glance(laneEntry.id)?.session) return send(response, 409, { error: { code: 'SESSION_ACTIVE', message: 'An agent session is running in the lane. End it first.' } });
+      for (const workId of workIds) {
+        const reason = `Conflicts with ${record.integrationBranch} in ${review.conflicts.length} file(s); see Review & Merge.`;
+        let reopened = await runner.write(record.path, ['reopen', workId, '--to', 'implementation', '--reason', reason]);
+        // A workflow without an implementation stage reopens into verification or review; one with
+        // none of them (an investigation) cannot take code changes back: integrate it by hand.
+        for (const to of ['verification', 'review']) {
+          if (reopened.status === 0 || !/no \w+ stage to reopen into/.test(`${reopened.stderr}${reopened.stdout}`)) break;
+          reopened = await runner.write(record.path, ['reopen', workId, '--to', to, '--reason', reason]);
+        }
+        if (reopened.status !== 0) return send(response, /no \w+ stage to reopen into/.test(`${reopened.stderr}${reopened.stdout}`) ? 409 : 422, { error: { code: 'REOPEN_REFUSED', message: `${(reopened.stderr || reopened.stdout).trim().split('\n')[0]} Integrate this lane by hand instead.` } });
+      }
+      const run = await execution.createRun(laneEntry.id, { workIds, lang, message });
+      return send(response, 202, { sentBack: workIds, conflicts: review.conflicts, run: run.run.id });
+    }
+    if (action === 'merge-continue') return send(response, 202, await merges.continue(project.root, String(body.mergeId ?? '')));
+    if (action === 'merge-abandon') return send(response, 200, await merges.abandon(project.root, String(body.mergeId ?? '')));
+    if (['parallel', 'lane-cleanup', 'shared-enable'].includes(action)) {
+      if (body.confirmed !== true) return send(response, 400, { error: { code: 'CONFIRMATION_REQUIRED', message: 'Tick the confirmation first.' } });
+      if (action === 'parallel') {
+        // Parallel is off in 1.5.0 until the real-agent E2E verifies that a lane agent cannot write
+        // the home repository's shared Git metadata or a Codex configuration the console loads
+        // (owner release rule, 2026-11-10). YALLAFLOW_EXPERIMENTAL_PARALLEL=1 turns it on, for that test only.
+        if (!parallelOn()) return send(response, 409, { error: { code: 'PARALLEL_OFF', message: PARALLEL_OFF } });
+        return send(response, 201, await startParallel(project, body));
+      }
+      if (action === 'lane-cleanup') return send(response, 200, await cleanUpLane(project, body));
+      return send(response, 200, await enableShared(project));
+    }
+    if (action === 'run') {
+      if (body.confirmed !== true) return send(response, 400, { error: { code: 'CONFIRMATION_REQUIRED', message: 'Tick the confirmation to start the run.' } });
+      return send(response, 201, await execution.createRun(project.id, { workIds: body.workIds, provider: body.provider, mode: body.mode, pauseBetween: body.pauseBetween === true, lang: body.lang }));
+    }
+    return send(response, 200, await execution.act(project.id, action, body));
+  }
+
+  // ----- PF-0112 M2: lanes (parallel work in Git worktrees) -----
+  const slugFor = (text, taken) => {
+    const base = String(text).toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'lane';
+    let slug = base;
+    for (let index = 2; taken.has(slug); index++) slug = `${base}-${index}`.slice(0, 48);
+    taken.add(slug);
+    return slug;
+  };
+  // Lanes: each item (already committed at the base) or each request (created inside the lane)
+  // gets its own lane and a one-task queue there. Preconditions are checked for all lanes first.
+  async function startParallel(project, body) {
+    if (project.kind === 'lane') throw Object.assign(new Error('Create lanes from the home project, not from a lane.'), { status: 409, code: 'NOT_HOME' });
+    const items = Array.isArray(body.workIds) ? body.workIds.map(String) : [];
+    const requests = Array.isArray(body.requests) ? body.requests.map((text) => String(text).trim()).filter(Boolean) : [];
+    if ((items.length ? 1 : 0) + (requests.length ? 1 : 0) !== 1) throw Object.assign(new Error('Send work items or requests.'), { status: 400, code: 'BAD_TASKS' });
+    const count = items.length || requests.length;
+    const pre = await lanePreconditions(project.root, { count, maxLanes: body.maxLanes });
+    if (!pre.ok) throw Object.assign(new Error(pre.blockers.map((entry) => entry.message).join(' ')), { status: 409, code: pre.blockers[0].code, extra: { blockers: pre.blockers } });
+    for (const workId of items) {
+      if (!isWorkId(workId) || !gitops.showFile(project.root, pre.base, `.yallaflow/work/${workId}/meta.yaml`)) throw Object.assign(new Error(`${workId} is not in the last commit; commit it first (a lane starts from that commit), or run it here with Start or a queue.`), { status: 409, code: 'NOT_COMMITTED' });
+    }
+    const taken = new Set((await readLanes(project.root)).map((lane) => lane.slug));
+    // Lanes are named after the item's title (readable folders and branches), else the request.
+    const titles = new Map(items.length ? ((await runner.get(project.root, 'snapshot', ['snapshot', '--json']))?.items ?? []).map((item) => [item.id, item.title]) : []);
+    const started = [];
+    for (const source of items.length ? items : requests) {
+      const lane = await createLane(project.root, { slug: slugFor(titles.get(source) ?? source, taken), maxLanes: body.maxLanes });
+      const registered = await registerRoot(lane.path);
+      let workId = items.length ? source : null;
+      if (!workId) {
+        // The documented form: options closed by `--` (a bare `start -- text` keeps the `--` in the title).
+        const created = await runner.write(lane.path, ['start', '--keep-active', '--', source]);
+        workId = /Created (PF-[A-Za-z0-9-]+)/.exec(created.stdout ?? '')?.[1] ?? null;
+        if (!workId) throw Object.assign(new Error(`The lane ${lane.slug} was created, but the request could not be recorded there: ${(created.stderr || created.stdout).trim().split('\n')[0]}`), { status: 422, code: 'REQUEST_FAILED' });
+      }
+      await execution.createRun(registered.id, { workIds: [workId], provider: body.provider, mode: body.mode, lang: body.lang });
+      started.push({ lane: lane.slug, path: lane.path, branch: lane.branch, project: registered.id, workId });
+    }
+    return { lanes: started, experimental: pre.experimental };
+  }
+  // The guards a lane must pass before Clean up, for the lane's console project.
+  function laneSession(laneRoot) {
+    const entry = projects.find((candidate) => candidate.root === laneRoot);
+    const glance = entry ? bridge?.glance(entry.id) : null;
+    return { session: glance?.session ?? null, pending: glance?.pending.length ?? 0, entry };
+  }
+  async function cleanUpLane(project, body) {
+    const lanes = await readLanes(project.root);
+    const record = lanes.find((lane) => lane.id === String(body.laneId ?? '') && lane.state !== 'removed');
+    if (!record) throw Object.assign(new Error('Unknown lane.'), { status: 404, code: 'NOT_FOUND' });
+    const { session, pending, entry } = laneSession(record.path);
+    const result = await cleanupLane(project.root, record.id, { confirmedDeletions: body.deletions, session, pending });
+    if (entry) await unregister({ id: entry.id }).catch(() => {});
+    return result;
+  }
+  async function laneList(project) {
+    const lanes = (await readLanes(project.root)).filter((lane) => lane.state !== 'removed');
+    const checks = [];
+    for (const lane of lanes) {
+      const { session, pending, entry } = laneSession(lane.path);
+      checks.push({ ...lane, project: entry?.id ?? null, cleanup: await cleanupCheck(project.root, lane, { session, pending }) });
+    }
+    const preconditions = await lanePreconditions(project.root, { count: 1 });
+    if (!parallelOn()) preconditions.blockers = [{ code: 'PARALLEL_OFF', message: PARALLEL_OFF }, ...preconditions.blockers], preconditions.ok = false;
+    return { lanes: checks, preconditions };
+  }
+  // FR13a: Shared Project Mode from the console — the CLI's own preview and command, refused
+  // while an agent works here or while tracked .yallaflow files have uncommitted changes.
+  async function enableShared(project) {
+    if (project.kind === 'lane') throw Object.assign(new Error('Use the home project for this, not a lane.'), { status: 409, code: 'NOT_HOME' });
+    if (bridge?.glance(project.id)?.session) throw Object.assign(new Error('An agent session is running in this project. End it first.'), { status: 409, code: 'SESSION_ACTIVE' });
+    const dirty = gitops.statusEntries(project.root).filter((entry) => entry.path.startsWith('.yallaflow/') && !entry.path.startsWith('.yallaflow/local/'));
+    if (dirty.length) throw Object.assign(new Error(`Commit or set aside the uncommitted YallaFlow changes first (${dirty.slice(0, 3).map((entry) => entry.path).join(', ')}${dirty.length > 3 ? ', …' : ''}).`), { status: 409, code: 'YALLAFLOW_DIRTY' });
+    // Review L5: when Git names no default branch, the current branch (shown in the preview) is used.
+    const branch = gitops.currentBranch(project.root);
+    let result = await runner.write(project.root, ['shared', 'enable']);
+    if (result.status !== 0 && branch && /integration branch/i.test(`${result.stderr}${result.stdout}`)) result = await runner.write(project.root, ['shared', 'enable', '--integration-branch', branch]);
+    if (result.status !== 0) throw Object.assign(new Error((result.stderr || result.stdout).trim().split('\n').slice(-3).join(' ') || 'shared enable failed'), { status: 422, code: 'SHARED_ENABLE_REFUSED' });
+    runner.invalidate(project.root);
+    return { enabled: true, output: result.stdout, next: 'Commit .yallaflow/ to share the setting; lanes start from that commit.' };
+  }
+
+  // PF-0113: the selected checkout's branch and Shared Project Mode, read-only. The integration
+  // branch is the configured one when Shared Mode is on, otherwise what local Git configuration
+  // names (origin/HEAD, init.defaultBranch) — null when unknown, so nothing compares against a guess.
+  async function gitPosition(project) {
+    let shared = null;
+    try { shared = (await readYaml(path.join(project.root, '.yallaflow', 'config.yaml')))?.shared ?? null; } catch { shared = null; }
+    const enabled = shared?.enabled === true;
+    const detected = enabled ? null : defaultIntegrationBranch(project.root);
+    const integrationBranch = enabled ? (shared.integrationBranch ?? null) : (detected?.branch ?? null);
+    return {
+      branch: gitops.currentBranch(project.root),
+      sharedMode: enabled,
+      integrationBranch,
+      integrationBranchSource: integrationBranch ? (enabled ? 'configured' : 'detected') : null,
+      lane: project.kind === 'lane',
+      canEnableShared: !enabled && project.kind !== 'lane' && agentsOn // the enable action is an agents-on route
+    };
   }
 
   // ----- Agent Workspace actions (browser token + Origin, JSON only) -----
@@ -557,12 +806,14 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
   async function teamView(project) {
     const cached = teamCache.get(project.id);
     if (cached && Date.now() - cached.at < 5000) return cached.value;
-    const listed = await listWorktrees(project.root);
+    // A lane's Team view lists the worktrees of its home repository, never what the lane's own
+    // .git file points at (re-verification round 3).
+    const listed = await listWorktrees(project.kind === 'lane' && project.parentRoot ? project.parentRoot : project.root);
     const worktrees = [];
     for (const entry of listed.worktrees) {
       const item = { path: entry.path, branch: entry.branch, main: entry.main, exists: entry.exists, yallaflow: false, changed: null, ...(entry.unverified ? { unverified: true } : {}) };
       if (entry.exists) {
-        item.changed = await changedFiles(entry.path);
+        item.changed = await changedFiles(entry.path, { gitDir: entry.admin ?? null });
         if (await exists(path.join(entry.path, '.yallaflow'))) {
           item.yallaflow = true;
           runner.invalidate(entry.path);
@@ -624,6 +875,32 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     }
   });
   bridge = agentsOn ? makeBridge() : null;
+  const broadcastExecution = (projectId) => {
+    const message = `data: ${JSON.stringify({ type: 'execution', project: projectId, at: new Date().toISOString() })}\n\n`;
+    for (const client of clients) client.write(message);
+  };
+  const makeExecution = (forBridge) => new ExecutionManager({ bridge: forBridge, runner, projects, broadcast: broadcastExecution });
+  execution = bridge ? makeExecution(bridge) : null;
+  // PF-0112 D15: each project's saved approval wait (missing → today's 5 minutes).
+  const applyApprovalWait = async (forBridge, entry) => { if (!readOnly && forBridge) forBridge.setApprovalWait(entry.id, (await readApprovalWait(entry.root)).minutes); };
+  for (const entry of projects) await applyApprovalWait(bridge, entry);
+  // PF-0112 M3: Review & Merge for lanes. Context comes from the bridge (sessions) and the
+  // manager (which work items the lane's runs drove), and the lane's own YallaFlow snapshot.
+  merges = new MergeService({
+    cli: (root, args) => runner.runAside(root, args),
+    broadcast: (home) => broadcastExecution(projects.find((entry) => entry.root === home)?.id ?? null),
+    approverName: (home) => claimedGitName(home) ?? 'console user',
+    context: async (home, record) => {
+      const entry = projects.find((candidate) => candidate.root === record.path);
+      const glance = entry ? bridge?.glance(entry.id) : null;
+      const workIds = entry && execution ? execution.workIdsOf(entry.id) : [];
+      runner.invalidate(record.path);
+      const snapshot = await runner.get(record.path, 'snapshot', ['snapshot', '--json']).catch(() => ({ items: [] }));
+      return { session: glance?.session ?? null, pending: glance?.pending.length ?? 0, items: (snapshot.items ?? []).filter((item) => workIds.includes(item.id)) };
+    }
+  });
+  // Review M2: a read-only console never rewrites merge records.
+  if (!readOnly) for (const entry of projects) if (entry.kind !== 'lane') await merges.recover(entry.root).catch(() => {});
   // Enabling agents for this run: builds the bridge the --agents flag would have built. It
   // starts no session, claims no checkout and activates nothing.
   let enabling = null;
@@ -654,6 +931,9 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       bridge = next;
       // A project registered while the bridge was being built is added now.
       for (const project of projects) await next.addProject(project);
+      for (const project of projects) await applyApprovalWait(next, project);
+      execution = makeExecution(next);
+      await execution.open();
       agentsOn = true;
       claudeOn = claude;
       api.agents = { enabled: true, claude };
@@ -673,6 +953,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     // Resolves to the agent sessions whose processes could not all be ended (empty when
     // everything stopped), so the caller can say so instead of claiming a clean stop.
     async close() {
+      execution?.close();
       const incomplete = (await bridge?.close()) ?? [];
       clearInterval(heartbeat);
       for (const watcher of watchers) watcher.close();
@@ -683,6 +964,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
   };
   try {
     await bridge?.open();
+    await execution?.open();
   } catch (error) {
     // For example a symbolic link where the bridge file goes: nothing is left listening.
     await api.close().catch(() => {});
@@ -737,7 +1019,8 @@ async function serveSource(root, sourceId, kind, response) {
 function send(response, status, body, headers = {}) {
   if (response.headersSent) return response.end();
   response.writeHead(status, { ...BASE_HEADERS, 'Content-Type': 'application/json; charset=utf-8', ...headers });
-  response.end(JSON.stringify(body));
+  // PF-0112 Phase 2: an Arabic copy next to each execution message (the Arabic console shows it).
+  response.end(JSON.stringify(withArabic(body)));
 }
 
 async function readJsonBody(request) {
@@ -750,9 +1033,13 @@ async function readJsonBody(request) {
     if (size > MAX_JSON_BYTES) throw new HttpError(413, 'TOO_LARGE', 'The request is too large.');
     chunks.push(chunk);
   }
+  let value;
   try {
-    return JSON.parse(Buffer.concat(chunks).toString('utf8'));
+    value = JSON.parse(Buffer.concat(chunks).toString('utf8'));
   } catch {
     throw new HttpError(400, 'BAD_REQUEST', 'The body is not valid JSON.');
   }
+  // Review L3: every write takes one JSON object.
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new HttpError(400, 'BAD_REQUEST', 'The body must be a JSON object.');
+  return value;
 }

@@ -10,6 +10,7 @@
 import { spawn } from 'node:child_process';
 import { readFile, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
+import { SAFE_GIT } from '../utils/git-safety.js';
 
 async function readTrim(file) {
   try {
@@ -67,17 +68,18 @@ export async function listWorktrees(root) {
       entries.push({ path: dir, branch: null, main: false, exists: false, unverified: true });
       continue;
     }
-    entries.push({ path: dir, branch: branchOf(await readTrim(path.join(admin, 'HEAD'))), main: false, exists: await isDir(dir) });
+    entries.push({ path: dir, admin, branch: branchOf(await readTrim(path.join(admin, 'HEAD'))), main: false, exists: await isDir(dir) });
   }
   return { git: true, worktrees: entries.map((entry) => ({ exists: true, ...entry })) };
 }
 
 // Changed paths in one worktree (working tree + index vs HEAD, plus untracked), without
 // YallaFlow's own state.
-export function changedFiles(dir) {
+// `gitDir`: a linked worktree's admin directory, pinned so the worktree's own .git file is not read.
+export function changedFiles(dir, { gitDir = null } = {}) {
   return new Promise((resolve) => {
     // No fsmonitor hook and no optional locks: reading changes never runs repository-configured programs or writes the index.
-    const child = spawn('git', ['--no-optional-locks', '-c', 'core.fsmonitor=false', '-c', 'core.untrackedCache=false', 'status', '--porcelain=v1', '-z', '--untracked-files=normal'], { cwd: dir, env: { ...process.env, GIT_OPTIONAL_LOCKS: '0' } });
+    const child = spawn('git', [...SAFE_GIT, '--no-optional-locks', '-c', 'core.fsmonitor=false', '-c', 'core.untrackedCache=false', 'status', '--porcelain=v1', '-z', '--untracked-files=normal', '--ignore-submodules=all'], { cwd: dir, env: { ...process.env, GIT_OPTIONAL_LOCKS: '0', ...(gitDir ? { GIT_DIR: gitDir, GIT_WORK_TREE: dir } : {}) } });
     let out = '';
     const timer = setTimeout(() => child.kill('SIGKILL'), 15_000);
     child.stdout.on('data', (chunk) => { out += chunk; });

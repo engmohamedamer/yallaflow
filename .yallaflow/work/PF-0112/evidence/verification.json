@@ -1,0 +1,311 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/m3a/run.sh final",
+      "executionMode": "argv",
+      "executable": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/m3a/run.sh",
+      "args": [
+        "final"
+      ],
+      "displayCommand": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/m3a/run.sh final",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-09T18:46:31.005Z",
+      "finishedAt": "2026-11-09T18:46:54.595Z",
+      "verifiedAt": "2026-11-09T18:46:54.595Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-09T18:49:42.951Z",
+      "finishedAt": "2026-11-09T18:53:43.515Z",
+      "verifiedAt": "2026-11-09T18:53:43.515Z",
+      "log": "V-002-verification.log"
+    },
+    {
+      "id": "V-003",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-09T19:21:37.009Z",
+      "finishedAt": "2026-11-09T19:25:53.131Z",
+      "verifiedAt": "2026-11-09T19:25:53.131Z",
+      "log": "V-003-verification.log"
+    },
+    {
+      "id": "V-004",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-09T19:56:08.259Z",
+      "finishedAt": "2026-11-09T19:59:55.156Z",
+      "verifiedAt": "2026-11-09T19:59:55.156Z",
+      "log": "V-004-verification.log"
+    },
+    {
+      "id": "V-005",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-09T23:25:23.381Z",
+      "finishedAt": "2026-11-09T23:29:40.720Z",
+      "verifiedAt": "2026-11-09T23:29:40.720Z",
+      "log": "V-005-verification.log"
+    },
+    {
+      "id": "V-006",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-09T23:38:22.337Z",
+      "finishedAt": "2026-11-09T23:42:25.039Z",
+      "verifiedAt": "2026-11-09T23:42:25.039Z",
+      "log": "V-006-verification.log"
+    },
+    {
+      "id": "V-007",
+      "command": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/pack-smoke.sh /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad",
+      "executionMode": "argv",
+      "executable": "bash",
+      "args": [
+        "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/pack-smoke.sh",
+        "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad"
+      ],
+      "displayCommand": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/pack-smoke.sh /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-09T23:44:07.421Z",
+      "finishedAt": "2026-11-09T23:44:28.225Z",
+      "verifiedAt": "2026-11-09T23:44:28.225Z",
+      "log": "V-007-verification.log"
+    },
+    {
+      "id": "V-008",
+      "command": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/compat-smoke.sh /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad /home/engamer/.nvm/versions/node/v22.23.4/lib/node_modules/yallaflow/src/cli.js",
+      "executionMode": "argv",
+      "executable": "bash",
+      "args": [
+        "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/compat-smoke.sh",
+        "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad",
+        "/home/engamer/.nvm/versions/node/v22.23.4/lib/node_modules/yallaflow/src/cli.js"
+      ],
+      "displayCommand": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/compat-smoke.sh /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad /home/engamer/.nvm/versions/node/v22.23.4/lib/node_modules/yallaflow/src/cli.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-10T09:23:15.908Z",
+      "finishedAt": "2026-11-10T09:23:36.449Z",
+      "verifiedAt": "2026-11-10T09:23:36.449Z",
+      "log": "V-008-verification.log"
+    },
+    {
+      "id": "V-009",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-10T09:27:02.155Z",
+      "finishedAt": "2026-11-10T09:31:34.682Z",
+      "verifiedAt": "2026-11-10T09:31:34.682Z",
+      "log": "V-009-verification.log"
+    },
+    {
+      "id": "V-010",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-10T09:53:22.085Z",
+      "finishedAt": "2026-11-10T09:58:06.193Z",
+      "verifiedAt": "2026-11-10T09:58:06.193Z",
+      "log": "V-010-verification.log"
+    },
+    {
+      "id": "V-011",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-10T09:58:52.163Z",
+      "finishedAt": "2026-11-10T10:04:14.995Z",
+      "verifiedAt": "2026-11-10T10:04:14.995Z",
+      "log": "V-011-verification.log"
+    },
+    {
+      "id": "V-012",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-10T10:27:28.692Z",
+      "finishedAt": "2026-11-10T10:32:25.495Z",
+      "verifiedAt": "2026-11-10T10:32:25.495Z",
+      "log": "V-012-verification.log"
+    },
+    {
+      "id": "V-013",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-10T10:49:21.417Z",
+      "finishedAt": "2026-11-10T10:54:43.047Z",
+      "verifiedAt": "2026-11-10T10:54:43.047Z",
+      "log": "V-013-verification.log"
+    },
+    {
+      "id": "V-014",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-10T11:27:03.197Z",
+      "finishedAt": "2026-11-10T11:31:58.535Z",
+      "verifiedAt": "2026-11-10T11:31:58.535Z",
+      "log": "V-014-verification.log"
+    },
+    {
+      "id": "V-015",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-10T11:49:06.263Z",
+      "finishedAt": "2026-11-10T11:54:19.781Z",
+      "verifiedAt": "2026-11-10T11:54:19.781Z",
+      "log": "V-015-verification.log"
+    },
+    {
+      "id": "V-016",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-10T12:11:43.252Z",
+      "finishedAt": "2026-11-10T12:16:43.920Z",
+      "verifiedAt": "2026-11-10T12:16:43.920Z",
+      "log": "V-016-verification.log"
+    },
+    {
+      "id": "V-017",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-10T12:17:34.805Z",
+      "finishedAt": "2026-11-10T12:23:48.136Z",
+      "verifiedAt": "2026-11-10T12:23:48.136Z",
+      "log": "V-017-verification.log"
+    }
+  ]
+}

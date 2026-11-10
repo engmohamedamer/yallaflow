@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0059",
+  "sourceType": "file",
+  "sourceName": "execution-modes-d14-d15-m4.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-11-09T23:16:05.657Z",
+  "original": {
+    "path": "sources/SRC-0059/execution-modes-d14-d15-m4.md",
+    "sha256": "28affeb5705487d4a745b602dc4692b7a2916b204f29acca3e2235d09211376d",
+    "sizeBytes": 2187
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0112"
+  ],
+  "rawText": "# Owner decisions D14, D15 and M4 acceptance requirements (2026-11-10)\n\nApproved. Please record these two decisions in PF-0112.\n\nD14 — Agent Contract v12: Approved.\nUpdate the agent contract to v12 to support the new tracked integration record. Do not weaken test 54 or introduce exceptions.\nEnsure existing projects receive a clear `agent refresh` requirement, and preserve user-customized instructions or require explicit review before replacing them.\n\nD15 — Approval Timeout: Approved.\nSupport project-level approval timeout settings of 5, 15, 30, and 60 minutes, with 5 minutes as the default.\nExpired approvals must be rejected safely, never automatically approved. Preserve the current behavior for existing projects.\n\nYou may proceed with M4.\n\nAdditional M4 acceptance requirements:\n1. Run the full test suite and resolve all failures, including test 54.\n2. Verify the complete Web Console UX in English, Arabic, and mobile layouts.\n3. Run the end-to-end scenario with two real Codex subscription-based agents in disposable repositories only.\n4. Demonstrate Run Now, a three-task Queue, and two parallel agents.\n5. Intentionally create a conflict between parallel tasks.\n6. Merge the first task successfully, return the second to its agent for conflict resolution, then perform a fresh review and explicit approval.\n7. Verify that both agents' intended changes exist in the final integrated result.\n8. Confirm that no unrelated user files, uncommitted changes, or project knowledge are lost.\n9. Test restart/recovery and confirm that interrupted operations cannot duplicate sessions or commits.\n10. Review the UI from a nontechnical user's perspective. Keep the workflow simple and avoid exposing unnecessary Git complexity.\n\nUse only my existing subscription-based Codex integration. No API keys, paid API calls, or new services.\nDo not perform destructive operations in existing projects.\nAfter M4, present a complete evidence-based release readiness report for v1.5.0, including test results, browser screenshots, limitations, known issues, and any remaining risks.\nStop at Checkpoint D. Do not commit, push, tag, or publish until I explicitly approve the release actions.\n"
+}

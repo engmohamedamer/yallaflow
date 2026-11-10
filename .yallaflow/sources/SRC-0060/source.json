@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0060",
+  "sourceType": "file",
+  "sourceName": "execution-modes-checkpoint-d.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-11-10T08:36:26.333Z",
+  "original": {
+    "path": "sources/SRC-0060/execution-modes-checkpoint-d.md",
+    "sha256": "78c754ce44ded2b43103aec43dd3a28c0129f2e9e61cc0df2593d72abe5ff62e",
+    "sizeBytes": 2732
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0112"
+  ],
+  "rawText": "# PF-0112 — Checkpoint D decision (owner, 2026-11-10)\n\nCheckpoint D decision: **v1.5.0 is not yet approved for public release.**\n\nThe reported 1094/1094 passing tests and completed implementation are encouraging, but two release blockers remain:\n\n1. Independent code and security review.\n2. Real end-to-end validation with two subscription-based Codex agents.\n\n### Phase 1 — Independent review\n\nPerform an independent, adversarial review of the entire execution feature, prioritizing:\n\n- `src/execution/git-ops.js`\n- `src/execution/merge.js`\n- `src/execution/review.js`\n- Execution Manager, queue persistence, and restart recovery\n- Shared Project integration and integration records\n- Git safety enforcement and command allowlist\n- Agent approval and session lifecycle\n- Backward compatibility with v1.4.2\n\nUse a separate review context or independent reviewer where available. Do not treat the implementation author's own assertions as independent verification.\n\nReview for data loss, TOCTOU races, unsafe Git behavior, incorrect commit contents, duplicated execution, security bypasses, and false VERIFIED states.\n\nReport findings by severity, with file/line references, reproduction steps, and recommended fixes.\n\nFix confirmed issues and rerun all relevant tests.\n\n### Phase 2 — UX and release preparation\n\n- Resolve remaining mixed-language server messages in the Arabic UI.\n- Update README for v1.5.0, including Run Now, Queue, Parallel, Review & Merge, and the upgrade path.\n- Confirm existing CLI and project workflows remain backward compatible.\n- Verify the installed npm package behaves correctly with agents enabled and disabled.\n- Run the complete test suite after final changes.\n\n### Phase 3 — Real E2E\n\nWhen Codex subscription access becomes available, run the approved real-agent scenario in disposable repositories only.\n\nVerify:\n\n- Run Now.\n- A sequential three-task Queue.\n- Two concurrent Codex agents.\n- A deliberate merge conflict.\n- Conflict resolution by the agent.\n- Fresh review and explicit merge approval.\n- Final integrated code containing both agents' intended changes.\n- No loss of uncommitted files or project knowledge.\n- Recovery without duplicate sessions or commits.\n\nDo not bypass subscription limits, use API keys, or incur separate API charges.\n\n### Release boundaries\n\nYou may prepare and validate changes on `feature/execution-modes`.\n\nDo not merge into main, tag, create a GitHub Release, or publish to npm.\n\nBefore any commit or push, present the final review findings, fixes, and test results for approval.\n\nAfter both release blockers are cleared, return to Checkpoint D with an evidence-based release recommendation.\n\nDo not treat this message as public release authorization.\n"
+}

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0057",
+  "sourceType": "file",
+  "sourceName": "execution-modes-plan-approval.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-11-09T18:36:51.893Z",
+  "original": {
+    "path": "sources/SRC-0057/execution-modes-plan-approval.md",
+    "sha256": "17ee32f7c1d1246a63cc82313343af11c5a58b84be04ed2decff0de26ce4fe85",
+    "sizeBytes": 1640
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0112"
+  ],
+  "rawText": "# Owner plan approval and M3a boundaries (2026-11-09)\n\nI approve the Implementation Plan Gate for PF-0112 / YallaFlow v1.5.0.\n\nYou may now proceed with M3a — Git Transaction Safety Experiments, strictly within isolated, disposable test repositories.\n\nApproval boundaries:\n1. You may create temporary repositories and execute Git commit, merge, worktree, and related commands inside those repositories only.\n2. Do not execute Git-mutating experiments in YallaFlow itself or any existing user project.\n3. Ensure Git configuration, hooks, credentials, signing, environment variables, and external helpers are isolated from my real environment.\n4. Record evidence for all 15 experiments (E1–E15), including failures and unexpected behavior.\n5. Convert proven safety properties into permanent regression tests.\n6. If an assumption fails, stop the affected design path, document the result, and propose a correction rather than weakening the safety requirements.\n7. Do not modify the production Git allowlist or implement the new Git execution engine before Checkpoint C.\n8. Do not commit, push, tag, publish, or change existing project repositories.\n\nAfter M3a, present Checkpoint C with:\n- Experiment results and supporting evidence.\n- Confirmed versus unresolved Git safety properties.\n- Final proposed Git command allowlist.\n- Required changes to the implementation design.\n- Any remaining risks requiring explicit acceptance.\n\nDo not treat this approval as authorization to bypass Checkpoint C.\n\nOnce Checkpoint C is approved, continue with the implementation milestones and preserve the existing specification, plan, and release gates.\n"
+}

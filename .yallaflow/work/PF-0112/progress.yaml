@@ -1,0 +1,236 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-09T18:20:26.830Z",
+      "completedAt": "2026-11-09T18:20:26.830Z",
+      "summary": "Revision discovery for SRC-0054: shared integrate is integration-branch only (memory.js:290); containsSecret reusable for commit scanning; Git 2.43 supports merge-tree --write-tree and pathspec files; Git commit/merge semantics captured as test obligations; no commit/merge/reset/rebase/push/delete executed during research."
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-10T11:32:37.642Z",
+      "completedAt": "2026-11-10T11:32:37.642Z",
+      "summary": "REQ-043/AC-059 from the owner's security decision (SRC-0061)."
+    },
+    "design-exploration": {
+      "status": "completed",
+      "startedAt": "2026-11-09T18:59:18.700Z",
+      "completedAt": "2026-11-09T18:59:18.700Z",
+      "summary": "Per-project trust for filters/merge drivers rejected (A4) in favour of blocking with a manual alternative; fail-closed verified-platform gate added (A2); C1-C10 approved."
+    },
+    "specification": {
+      "status": "completed",
+      "startedAt": "2026-11-09T23:16:29.301Z",
+      "completedAt": "2026-11-09T23:16:29.301Z",
+      "summary": "Specification revised for D14 (contract v12 supersedes P6 'stays v11'; refresh keeps customizations) and D15 (per-project approval wait 5/15/30/60, default 5, expiry denies)."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-10T11:32:38.408Z",
+      "completedAt": "2026-11-10T11:32:38.408Z",
+      "summary": "M5 extended (SRC-0061): declared checks only; Automated Merge off with manual steps when ignored files are in the lane; contract lane rules (guidance); one final focused review; shared-metadata check in the real E2E."
+    },
+    "implementation": {
+      "status": "pending",
+      "summary": "Independent review: 4 reviewers + 3 re-verification rounds; every reproduced finding fixed with a regression test (V-013 1132/1132). Open owner questions: worktree common-dir write access of lane agents (verify in real E2E), ignored-file content in merge checks. Real E2E pending Codex limit reset."
+    },
+    "verification": {
+      "status": "pending"
+    },
+    "delivery-convergence": {
+      "status": "pending"
+    },
+    "code-review": {
+      "status": "pending"
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Specification gate re-requested in the agent session after the SRC-0054/SRC-0055 revisions; the reviews ledger still shows changes_requested because YallaFlow has no command to return a gate from changes_requested to awaiting_review (requestGateReview is used only by reconciliation). The gate remains decidable by the owner (approve or feedback); reviews.yaml was not edited by hand.",
+      "reason": "State must change only through yallaflow commands; the owner asked for the gate to be requested again",
+      "costIfWrong": "Low: the console or CLI might present the gate as changes_requested instead of awaiting review; the decision itself is unaffected. Candidate follow-up: a 'review request' command.",
+      "createdAt": "2026-11-09T18:28:53.874Z"
+    },
+    {
+      "decision": "M3a complete (V-001: 13 PASS, 2 OBSERVED, 0 FAIL). Proposed design corrections C1-C10 (idempotent staging, merge-tree pre-validation and classification, gc/maintenance off, post-step consistency check, explicit -S for commit-tree, verbatim cleanup, filter/merge-driver trust, plan/applied vocabulary mapping, guided manual recovery for a crash inside a fast-forward, strengthened test 51 including an explicit read-only 'log') and the final allowlist G1-G10 await the owner's Checkpoint C decision; no git-ops code and no test 51 change before it.",
+      "reason": "SRC-0057 rule 6: when an assumption fails, stop that path, document it and propose a correction without weakening requirements; rule 7: no allowlist or engine before Checkpoint C",
+      "costIfWrong": "If C is approved without these corrections, observed Git behaviours (ignored-file overwrite, merge-tree exit-code ambiguity, concurrent-process inconsistency) could reach users; with them, the remaining risks A1-A6 need explicit acceptance.",
+      "createdAt": "2026-11-09T18:51:46.599Z"
+    },
+    {
+      "decision": "Impact IM-004 revised clarification, design, specification and planning for the owner's Checkpoint C decision (SRC-0058), but YallaFlow's impact-assessment path left the specification and plan gates 'approved' (only checkpoint revise invalidates gates, src/core/transitions.js:270). No approval was recorded on the owner's behalf; work continues under the owner's explicit instruction in SRC-0058 ('You may proceed with M0 and M1...'), because the revisions are exactly the owner's decisions. Gap reported to the owner as a YallaFlow follow-up candidate.",
+      "reason": "Gate state must change only through commands and human decisions; the owner explicitly authorised proceeding with these decisions",
+      "costIfWrong": "If the owner wanted to re-review the revised FR33-FR37 text first, implementation would have started early; mitigated by reporting it immediately and stopping on request.",
+      "createdAt": "2026-11-09T18:59:44.902Z"
+    },
+    {
+      "decision": "OPEN DECISION for the owner (not applied): the approved D10 record work/<id>/integration.yaml is CLI-owned, and test 54 (state-ownership) requires the Agent Contract to name every CLI-owned file. Naming it changes the contract text (v11 -> v12, agent refresh for projects), which conflicts with plan P6 'Agent Contract stays v11'. Options: (1) recommended: contract v12 adds integration.yaml to the CLI-owned list (additive, existing refresh flow); (2) keep v11 with an explicit test-54 exception for a console-written file (weakens a guard; not recommended). Until the owner decides, test 54 stays red and nothing is changed in the contract.",
+      "reason": "Plan deviation discovered during M3; the owner decides approved-plan changes; guards are not weakened to pass tests",
+      "costIfWrong": "If unresolved, the release cannot pass npm run check; no runtime risk meanwhile.",
+      "createdAt": "2026-11-09T19:39:39.656Z"
+    },
+    {
+      "decision": "M0 experiment D4 result (real codex 0.167.0 / codex-acp 2.5.0, ChatGPT subscription, disposable repo): an edit-permission request (with its file path) stayed open 65 minutes; codex-acp never timed out or cancelled it, and the session stayed 'working' throughout; ending the session denied it cleanly (cleanup complete, no survivors). Proposal for the owner: offer 5 / 15 / 30 / 60 minute approval waits as a per-project setting, default still 5; a timeout always denies.",
+      "reason": "Plan FR16/D4: longer choices only after the Codex ACP behaviour is verified; evidence in the scratchpad m0timeout/events.jsonl",
+      "costIfWrong": "Low: other Codex versions might behave differently; the setting is bounded to 60 minutes and denies on timeout.",
+      "createdAt": "2026-11-09T22:51:46.044Z"
+    },
+    {
+      "decision": "git-ops GIT_PREFIX gains -c diff.ignoreSubmodules=all and every other YallaFlow Git call carries SAFE_GIT (fsmonitor off, hooks off, no submodule recursion)",
+      "reason": "Independent re-verification reproduced code execution through submodule recursion and repository-configured programs in a lane; the Checkpoint C prefix is only made stricter, no Git operation is added",
+      "costIfWrong": "Submodule changes are hidden from YallaFlow's own status reads; repositories with submodules cannot use automated lanes (manual path remains)",
+      "createdAt": "2026-11-10T10:04:34.035Z"
+    },
+    {
+      "decision": "Merge checks are the project's declared checks only; commands recorded in the lane's verification ledger are never run, and Automated Merge is off while the lane has ignored files",
+      "reason": "Owner decision SRC-0061 (no agent-controlled scripts, ignored executables or dependencies with console privileges); this narrows D9's 'task verification commands also run'",
+      "costIfWrong": "Projects whose checks need dependencies in the lane merge by hand with the shown steps",
+      "createdAt": "2026-11-10T11:32:38.851Z"
+    },
+    {
+      "decision": "Automated Merge ships off (MergeService automatedMerge=false); Review and manual merge stay",
+      "reason": "Final focused review found H1 (High): checks ran next to agent files invisible to Git (.yallaflow/local, nested .git) and reached verified; owner rule SRC-0061: stop the affected functionality on a High finding",
+      "costIfWrong": "Developers merge lanes by hand with the shown steps until a later release runs checks safely",
+      "createdAt": "2026-11-10T11:54:35.184Z"
+    },
+    {
+      "decision": "Parallel ships off in 1.5.0 (PARALLEL_OFF; YALLAFLOW_EXPERIMENTAL_PARALLEL=1 for the real-agent E2E only); Automated Merge off on all paths including the integration record CLI",
+      "reason": "Owner release rule: keep a capability disabled when its boundary (lane agent writing shared Git metadata / Codex project config loaded by the console) cannot be verified without real Codex",
+      "costIfWrong": "Users run tasks with Run Now or a queue; parallel work waits for 1.5.1",
+      "createdAt": "2026-11-10T12:25:44.662Z"
+    }
+  ],
+  "history": [
+    {
+      "skill": "context-discovery",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-001: Review & Merge needed new discovery: shared integrate refuses off the integration branch (src/shared/memory.js:290), containsSecret in src/security/redact.js for commit scanning, Git 2.43 supports merge-tree --write-tree and --pathspec-from-file, and Git's documented fast-forward/--only behaviour for uncommitted changes.",
+      "changedAt": "2026-11-09T18:20:10.222Z"
+    },
+    {
+      "skill": "requirement-clarification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-001: SRC-0054 adds REQ-017..REQ-024 and revises REQ-007/009/014; new owner decisions D8-D13 (Q-008..Q-013) must be answered.",
+      "changedAt": "2026-11-09T18:20:10.222Z"
+    },
+    {
+      "skill": "design-exploration",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-001: Merge strategy alternatives (in-developer-checkout merge, rebase/squash, update-ref, temporary worktree, in-memory merge with fast-forward) had to be explored; in-memory merge chosen (A10).",
+      "changedAt": "2026-11-09T18:20:10.222Z"
+    },
+    {
+      "skill": "specification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-001: Specification revised: Review & Merge FR20-FR31, Git safety threat model T1-T14, integration states, screens S6/S9/S10, revised Checkpoint C allowlist G1-G10, acceptance criteria AC-021..AC-037.",
+      "changedAt": "2026-11-09T18:20:10.222Z"
+    },
+    {
+      "skill": "requirement-clarification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-004: The owner's Checkpoint C decision adds REQ-030..REQ-037 and AC-045..AC-053 (verified platform gate, no external filters/merge drivers, GPG coverage gate, cleanup scope, stop-on-inconsistency, strict argument validation, disposable demonstration, serialisation).",
+      "changedAt": "2026-11-09T18:59:11.544Z"
+    },
+    {
+      "skill": "design-exploration",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-004: The per-project trust option for filters and merge drivers (C7) is rejected by the owner (A4) in favour of blocking; a fail-closed platform gate (A2) is added.",
+      "changedAt": "2026-11-09T18:59:11.544Z"
+    },
+    {
+      "skill": "specification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-004: Specification revised: FR13 cleanup scope, FR33-FR37, P2 rows, stop conditions S14-S16, Checkpoint C decision and risk register A1-A6.",
+      "changedAt": "2026-11-09T18:59:11.544Z"
+    },
+    {
+      "skill": "implementation-planning",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-004: Plan revised: M3a marked done (V-001), permanent GPG/platform/filter/argument-validation tests added, M3b disposable demonstration before any real-project enablement.",
+      "changedAt": "2026-11-09T18:59:11.544Z"
+    },
+    {
+      "skill": "requirement-clarification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-005: REQ-038..REQ-040 and AC-054..AC-056 added from the owner's decisions D14, D15 and the M4 acceptance list.",
+      "changedAt": "2026-11-09T23:16:15.624Z"
+    },
+    {
+      "skill": "specification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-005: Specification revised: Agent Contract v12 replaces plan P6's 'stays v11' (D14); FR16 approval wait becomes a per-project 5/15/30/60 setting (D15).",
+      "changedAt": "2026-11-09T23:16:15.624Z"
+    },
+    {
+      "skill": "implementation-planning",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-005: M4 gains the owner's ten acceptance requirements (real two-Codex E2E with conflict, recovery, EN/AR/mobile review) and the contract v12 work.",
+      "changedAt": "2026-11-09T23:16:15.624Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "in_progress",
+      "to": "pending",
+      "reason": "Impact IM-005: The contract v12 change and the timeout setting are new implementation work in progress.",
+      "changedAt": "2026-11-09T23:16:15.624Z"
+    },
+    {
+      "skill": "requirement-clarification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-006: REQ-041/REQ-042 and AC-057/AC-058 added: independent review and release preparation are release conditions.",
+      "changedAt": "2026-11-10T08:37:05.736Z"
+    },
+    {
+      "skill": "implementation-planning",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-006: M4 gains Phase 1 (independent review and fixes) and Phase 2 (Arabic server messages, README, compatibility, package checks) before the real E2E.",
+      "changedAt": "2026-11-10T08:37:05.736Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "in_progress",
+      "to": "pending",
+      "reason": "Impact IM-006: Review fixes, translation and README are new implementation work.",
+      "changedAt": "2026-11-10T08:37:05.736Z"
+    },
+    {
+      "skill": "requirement-clarification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-007: REQ-043 and AC-059 added from the owner's decision.",
+      "changedAt": "2026-11-10T11:32:37.421Z"
+    },
+    {
+      "skill": "implementation-planning",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-007: M5 gains the targeted changes, one final focused review, and the shared-metadata E2E check.",
+      "changedAt": "2026-11-10T11:32:37.421Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "in_progress",
+      "to": "pending",
+      "reason": "Impact IM-007: Targeted code, contract text and test changes.",
+      "changedAt": "2026-11-10T11:32:37.421Z"
+    }
+  ],
+  "updatedAt": "2026-11-10T12:25:44.662Z"
+}

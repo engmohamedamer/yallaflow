@@ -1,0 +1,53 @@
+E1 PASS     Temp index vs real index (R1) — 8/8 checks, 2 observations
+    • plain: re-staging the full approved list after a deletion was staged: exit 128 (fatal: pathspec 'del.txt' did not match any files)
+    • autocrlf: re-staging the full approved list after a deletion was staged: exit 128 (fatal: pathspec 'del.txt' did not match any files)
+    ⇒ Staging is not idempotent for deletions: git-ops must stage only approved paths present in the work tree or the index, and rely on the tree-equality check (recovery re-runs step 2 safely).
+    ⇒ Staging is not idempotent for deletions: git-ops must stage only approved paths present in the work tree or the index, and rely on the tree-equality check (recovery re-runs step 2 safely).
+E2 PASS     Agent-staged extra entries (R2) — 3/3 checks, 0 observations
+E3 PASS     Fast-forward and unrelated local changes (R3) — 4/4 checks, 5 observations
+    • c: untracked file at a path M adds: exit 1; HEAD unchanged; file kept
+    • d: ignored file at a path M adds: exit 0; HEAD moved; file OVERWRITTEN (data loss without a pre-check)
+    • e: assume-unchanged + local edit on a changed path: exit 1; HEAD unchanged; local edit kept
+    • f: skip-worktree + local edit on a changed path: exit 1; HEAD unchanged; local edit kept
+    • g: staged unrelated change in home: exit 0; HEAD moved to M; still staged: u1.txt
+    ⇒ Git overwrites ignored files on fast-forward: the lstat pre-check for every added path (T15) is mandatory, not optional.
+    ⇒ Design keeps the conservative rule: staged changes in home block Review & Merge (FR20.6) whatever Git does here.
+E4 PASS     Deterministic knowledge integration (R4) — 4/4 checks, 1 observations
+    • B: blocked reasons: CTX-0004 changed after this work related to it — superseded by CTX-0008
+E5 PASS     Hook isolation (R5) — 3/3 checks, 0 observations
+E6 PASS     Signing (R6) — 5/5 checks, 1 observations
+    • ssh: commit-tree WITHOUT -S under commit.gpgSign=true: UNSIGNED (config not honoured)
+    ⇒ commit-tree ignores commit.gpgSign: git-ops must pass -S explicitly when the developer signs commits.
+E7 OBSERVED Kill during fast-forward (R7) — 0/0 checks, 1 observations
+    • kill -9 during ff of 20,000 added files (delay ms → state): [{"delay":5,"head":"base","indexLock":true,"sampledFilesPresent":"0/400","statusLines":0},{"delay":20,"head":"base","indexLock":true,"sampledFilesPresent":"0/400","statusLines":0},{"delay":50,"head":"base","indexLock":true,"sampledFilesPresent":"177/400","statusLines":1},{"delay":100,"head":"base","indexLock":true,"sampledFilesPresent":"200/400","statusLines":1},{"delay":200,"head":"base","indexLock":true,"sampledFilesPresent":"200/400","statusLines":1},{"delay":400,"head":"base","indexLock":true,"sampledFilesPresent":"200/400","statusLines":1}]
+    ⇒ A killed fast-forward can leave HEAD at base with files written and/or index.lock present: recovery must detect (HEAD≠M + files on M paths / index.lock) and stop (S7) with manual recovery text; never auto-delete locks.
+E8 PASS     Literal pathspecs (R9) — 1/1 checks, 1 observations
+    • control (no --literal-pathspecs): staged set: exit 0: ["*.js","-n","[x]","a?b","new\nline","with space","y"]
+    ⇒ Without --literal-pathspecs a file name is read as pathspec magic: ":(top)y" staged the unrelated file "y" and not itself. --literal-pathspecs on every git-ops call is mandatory.
+E9 PASS     Git version gate and merge-tree exit codes (R10) — 6/6 checks, 1 observations
+    • merge-tree with a non-existent commit (manual says error → exit ∉ {0,1}): exit 1; stdout EMPTY; stderr "merge-tree: deadbeefdeadbeefdeadbeefdeadbeefdeadbeef - not something we can merg"
+    ⇒ Git 2.43 returns exit 1 for an invalid commit, the same code as a conflict (manual mismatch). git-ops must pre-validate both commits (cat-file -e <oid>^{commit}) and classify: exit 0 + tree id = clean; exit 1 + valid tree id on stdout = conflict; anything else = error (S1).
+E10 OBSERVED Filters (R11) — 0/0 checks, 2 observations
+    • which operations ran the clean/smudge filter: {"worktree add":"smudge","status":"-","temp-index add + write-tree":"clean+clean","real add + write-tree + commit":"clean+clean+clean+clean+clean","merge-tree + commit-tree":"-","merge --ff-only (home)":"clean+smudge","worktree remove":"clean"}
+    • required filter with a missing program during worktree add: exit 128; dir absent; admin entry absent; m3a-missing-filter smudge 'a.bin': 1: m3a-missing-filter: not found
+    ⇒ Filters run during worktree add, add/commit and fast-forward: repository-configured filter commands execute inside YallaFlow operations, so block-by-default with explicit per-project trust (P2) is required.
+E11 PASS     Merge drivers and diff helpers (R12) — 3/3 checks, 1 observations
+    • merge-tree with a custom merge driver (non-overlapping edits to a merge=mark file): exit 1; driver RAN; conflicts ["x.mrg"]
+    ⇒ merge-tree executes repository-configured merge drivers: block-by-default with explicit per-project trust (P2) is required for merge drivers.
+E12 PASS     Hostile environment, external helpers, config fingerprint (R13) — 4/4 checks, 1 observations
+    • control: raw git with the hostile environment resolves to: /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/m3a/run-final/repos/e12-o
+E13 PASS     Commit content (R2) — 3/3 checks, 1 observations
+    • default cleanup with -F: keeps # lines
+E14 PASS     Concurrency at Git level (-) — 3/3 checks, 4 observations
+    • trial 0 stderr: fatal: update_ref failed for ref 'HEAD': cannot lock ref 'HEAD': is at 14e7b7d0fa0557d374f5a24e4f9402fed8bb6791 but expected 8787cfd19a7851131f2f03fd0f9b82a1167bef32
+    • trial 1 stderr: fatal: update_ref failed for ref 'HEAD': cannot lock ref 'HEAD': is at 14e7b7d0fa0557d374f5a24e4f9402fed8bb6791 but expected 8787cfd19a7851131f2f03fd0f9b82a1167bef32
+    • trial 2 stderr: fatal: update_ref failed for ref 'HEAD': cannot lock ref 'HEAD': is at 14e7b7d0fa0557d374f5a24e4f9402fed8bb6791 but expected 8787cfd19a7851131f2f03fd0f9b82a1167bef32
+    • 10× two concurrent ff-only in one checkout: 3/10 fully consistent (0/128→c1 dirty, 0/128→c1 dirty, 0/128→c1 dirty, 0/128→c1 dirty, 0/128→c1 dirty, 0/1→c1, 0/128→c1 dirty, 0/128→c1 dirty, 0/0→c2, 0/0→c2)
+    ⇒ Two concurrent Git operations in one checkout can leave HEAD at one target while the index and work tree carry the other (staged, uncommitted). YallaFlow serialises its own operations (merge lock), but another program may run Git concurrently: after every fast-forward git-ops must verify HEAD, HEAD^{tree} and index tree (write-tree == HEAD^{tree}) and stop otherwise.
+E15 PASS     Worktree remove (-) — 3/3 checks, 2 observations
+    • ignored .env only: exit 0; folder REMOVED; branch kept
+    • ignored node_modules only: exit 0; folder REMOVED; branch kept
+    ⇒ worktree remove deletes ignored .env files: the FR13 ignored-file guard is mandatory before Clean up.
+    ⇒ worktree remove deletes ignored node_modules files: the FR13 ignored-file guard is mandatory before Clean up.
+
+Summary: 13 PASS, 2 OBSERVED, 0 FAIL, 0 ERROR

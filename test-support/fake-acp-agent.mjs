@@ -7,7 +7,8 @@
 // ESCALATE (the agent switches itself to its full-access mode), PERSISTONLY (a permission
 // request whose only "always" options persist beyond the session, as codex-acp offers when
 // Codex proposes an exec-policy rule), SPAWN (starts a command that ignores SIGTERM, in the
-// agent's process group), ESCAPE (starts one in a new session, outside the group).
+// agent's process group), ESCAPE (starts one in a new session, outside the group), SCOPE
+// (the permission request names files and a command, PF-0112).
 // Permission option ids are the real codex-acp 2.5.0 ids.
 import { appendFileSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { spawn } from 'node:child_process';
@@ -76,7 +77,9 @@ async function handle(message) {
         const options = text.includes('PERSISTONLY')
           ? [{ optionId: 'allow_once', kind: 'allow_once', name: 'Yes, proceed' }, { optionId: 'accept_execpolicy_amendment', kind: 'allow_always', name: "Yes, and don't ask again for commands that start with `touch`" }, { optionId: 'apply_network_policy_amendment:0', kind: 'reject_always', name: 'No, and block this host in the future' }]
           : [{ optionId: 'allow_once', kind: 'allow_once', name: 'Yes, proceed' }, { optionId: 'accept_execpolicy_amendment', kind: 'allow_always', name: "Yes, and don't ask again for commands that start with `touch`" }, { optionId: 'allow_for_session', kind: 'allow_always', name: "Yes, and don't ask again for this command in this session" }, { optionId: 'apply_network_policy_amendment:0', kind: 'reject_always', name: 'No, and block this host in the future' }, { optionId: 'decline', kind: 'reject_once', name: 'No, continue without running it' }];
-        const answer = await request('session/request_permission', { sessionId: sid, toolCall: { toolCallId: 't1', title: 'touch file.txt', kind: 'execute' }, options });
+        // SCOPE (PF-0112): the request names its files and command, as ACP allows.
+        const scope = text.includes('SCOPE') ? { locations: [{ path: 'src/file.txt', line: 1 }], rawInput: { command: ['touch', 'src/file.txt'] }, content: [{ type: 'diff', path: 'src/other.txt', oldText: '', newText: 'x' }] } : {};
+        const answer = await request('session/request_permission', { sessionId: sid, toolCall: { toolCallId: 't1', title: 'touch file.txt', kind: 'execute', ...scope }, options });
         if (STATE) appendFileSync(STATE, `${JSON.stringify({ permission: answer?.outcome ?? null })}\n`);
         const allowed = answer?.outcome?.outcome === 'selected' && options.find((option) => option.optionId === answer.outcome.optionId)?.kind.startsWith('allow');
         update(sid, { sessionUpdate: 'tool_call_update', toolCallId: 't1', status: allowed ? 'completed' : 'failed' });

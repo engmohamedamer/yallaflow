@@ -890,3 +890,46 @@ table.stack th { font-size: 12px; color: var(--muted); font-weight: 600; }
   .runbtns, .runbtns .btn { width: 100%; }
   .svcacts { width: 100%; }
 }
+
+/* PF-0112: Agents view */
+.tabcount { display: inline-block; min-width: 1.4em; padding: 0 .35em; border-radius: 999px; background: var(--clay, #d9822b); color: #fff; font-size: .75em; line-height: 1.4; text-align: center; }
+.xlanes { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; margin-top: 12px; }
+.xlane .row { gap: 8px; flex-wrap: wrap; }
+.xtasks { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 4px; }
+.xperm { margin-top: 8px; }
+.pfiles { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0; }
+.pfiles code { padding: 1px 6px; border-radius: 6px; background: color-mix(in srgb, currentColor 8%, transparent); }
+/* PF-0112 M1: queue selection, run sheet, run controls */
+.selbar { position: sticky; bottom: 12px; z-index: 5; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 10px 0; padding: 10px 14px; border-radius: 14px; background: var(--card, #fff); box-shadow: 0 6px 24px rgba(0, 0, 0, .12); }
+.lines.selecting .line { cursor: pointer; }
+.lines.selecting .line.nosel { opacity: .5; }
+.lines.selecting .line.sel { outline: 2px solid var(--teal, #0fae9d); outline-offset: -2px; }
+.selbox { font-size: 1.2em; margin-inline-end: 8px; }
+.qlist { display: grid; gap: 6px; padding-inline-start: 20px; }
+.qlist li { display: flex; align-items: center; gap: 6px; }
+.xrun { margin-top: 10px; padding-top: 10px; border-top: 1px dashed color-mix(in srgb, currentColor 18%, transparent); }
+.xrun .row { gap: 6px; flex-wrap: wrap; }
+.xacts { display: inline-flex; gap: 4px; margin-inline-start: 6px; }
+.qline { margin: 8px 0; }
+.ibtn[disabled] { opacity: .35; cursor: default; }
+/* PF-0112 M2: lanes */
+.xlane.islane { border-inline-start: 4px solid var(--teal, #0fae9d); }
+.checklist { list-style: none; padding: 0; margin: 6px 0; display: grid; gap: 2px; }
+.panel.sub { margin: 8px 0; padding: 10px; }
+/* PF-0112 M3: Review & Merge */
+dialog.panel.wide { width: min(860px, 96vw); }
+.xmerge { margin-top: 10px; padding-top: 8px; border-top: 1px dashed color-mix(in srgb, currentColor 18%, transparent); display: grid; gap: 6px; }
+.xsteps { list-style: none; padding: 0; margin: 0; display: grid; gap: 2px; font-size: .85em; }
+.xsteps li.stopped { color: var(--clay, #c0392b); }
+.xsteps li.todo { opacity: .55; }
+.xfiles { list-style: none; padding: 0; display: grid; gap: 4px; max-height: 240px; overflow: auto; }
+.checklist li.block { color: var(--clay, #c0392b); }
+.checklist li.warn { color: #9a6a00; }
+/* PF-0112 M4: dialogs readable on phones (long paths and commands wrap) */
+dialog.panel { max-width: calc(100vw - 16px); box-sizing: border-box; }
+dialog.panel code, dialog.panel li, dialog.panel p, dialog.panel label { overflow-wrap: anywhere; }
+.conflictbox { border: 1px solid var(--clay, #c0392b); }
+/* PF-0113: long scoped work IDs never push the title aside; the full ID stays in the DOM and on hover. */
+.wid { display: inline-block; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
+.pchip .pid.wid { display: block; overflow-wrap: normal; }
+.gitline { flex-wrap: wrap; gap: 8px; align-items: center; margin: 4px 0 12px; }

@@ -8,6 +8,7 @@ import { renderAgentContractFile } from '../agent/contract.js';
 import { classifyProject, inventoryRepository } from '../inventory/inventory.js';
 import { isWorkId, nextScopedId } from './ids.js';
 import { allocateCheckoutId, localDirPath } from '../shared/identity.js';
+import { SAFE_GIT } from '../utils/git-safety.js';
 
 export const WORKSPACE_DIR = '.yallaflow';
 // Directories `init` creates empty and fills lazily. Git does not store empty
@@ -44,7 +45,7 @@ export async function detectProjectKind(root) {
 function trackedYallaflowPaths(root) {
   const seen = new Set();
   for (const args of [['ls-files', '--', WORKSPACE_DIR], ['ls-tree', '-r', '--name-only', 'HEAD', '--', WORKSPACE_DIR]]) {
-    const result = spawnSync('git', args, { cwd: root, encoding: 'utf8' });
+    const result = spawnSync('git', [...SAFE_GIT, ...args], { cwd: root, encoding: 'utf8' });
     if (result.status === 0) {
       for (const line of result.stdout.split('\n')) if (line.trim()) seen.add(line.trim());
     }

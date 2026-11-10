@@ -1,0 +1,46 @@
+{
+  "id": "PF-0113",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console: show current branch and Shared Project Mode status on Overview with Turn on (reusing the lanes enable flow), recommend Shared Mode on New Work from feature branches, title-first work display with copyable canonical IDs; doctor: always run collision diagnostics and detect duplicate CTX IDs",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-10T11:52:02.250Z",
+  "updatedAt": "2026-11-10T12:00:32.002Z",
+  "title": "Console: show current branch and Shared Project Mode status on Overview with Turn on (reusing the lanes enable flow), recommend Shared Mode on New Work from feature branches, title-first work display with copyable canonical IDs; doctor: always run collision diagnostics and detect duplicate CTX IDs",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-10T11:52:02.392Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-10T12:00:32.002Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002"
+      ]
+    }
+  ]
+}

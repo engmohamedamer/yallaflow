@@ -34,6 +34,7 @@ Your coding agent writes code fast. Then the next session forgets your project, 
 - **The right workflow.** A bug, a feature, and an investigation each get a lifecycle sized to the work.
 - **Evidence.** "Done" means verified and checked against what was asked, not just "the agent said so".
 - **Your app, one button.** The agent works out how your project runs. You trust it once, then press **Start project**.
+- **Run work your way.** Start one task now, or queue several to run one after another. You stay in control of every approval.
 
 It runs locally, sends no telemetry, and keeps everything in your repository.
 
@@ -116,7 +117,7 @@ flowchart LR
 YallaFlow never updates itself and never checks the network for versions. You decide when to upgrade:
 
 ```bash
-npm install -g yallaflow@latest     # or an exact version: yallaflow@1.4.2
+npm install -g yallaflow@latest     # or an exact version: yallaflow@1.5.0
 yallaflow --version
 
 # in each project
@@ -129,7 +130,7 @@ yallaflow doctor
 - **Restart the console** after upgrading, so the browser loads the new version (`Ctrl-C`, then `yallaflow console`).
 - **Teams:** upgrade every machine and CI job that works on a Shared Project together.
 
-[Updating in detail →](docs/installation.md#updating-yallaflow) · [Upgrading to 1.4.0 →](docs/upgrading-to-v1.4.0.md) · [1.2.0 →](docs/upgrading-to-v1.2.0.md) · [from 1.0.x: 1.1.0 →](docs/upgrading-to-v1.1.0.md)
+[Updating in detail →](docs/installation.md#updating-yallaflow) · [Upgrading to 1.5.0 →](docs/upgrading-to-v1.5.0.md) · [1.4.0 →](docs/upgrading-to-v1.4.0.md) · [1.2.0 →](docs/upgrading-to-v1.2.0.md) · [from 1.0.x: 1.1.0 →](docs/upgrading-to-v1.1.0.md)
 
 ## How it works
 
@@ -171,6 +172,18 @@ flowchart TB
 ```
 
 The depth adapts to the work. A bounded bug fix goes from root-cause analysis straight to the fix, while architectural work gets a reviewed design, specification, or plan. Nothing is called done without fresh verification evidence, and work that carries acceptance criteria is checked against them before it closes. What was learned becomes reviewed project knowledge. [Workflows in detail →](docs/workflows.md)
+
+## What's new in 1.5.0
+
+**Queue your work, and stay in control of every approval.** [Changelog →](CHANGELOG.md#150---2026-11-10--queue-your-work) · [Execution modes →](docs/execution-modes.md)
+
+- **Run Now.** One work item, one agent, right now. This is **Start**, as before.
+- **Queue.** Pick several work items and they run one after another, each in a new agent session. The next one starts only when the current one is DONE and its session has ended. Anything that needs you pauses the queue, and the Agents tab controls it all.
+- **Parallel** (off in 1.5.0). Each work item runs in its own lane, a Git worktree and branch beside your project, with its own agent. It stays off until a real-agent test confirms its security boundary.
+- **Review, then merge by hand.** A finished lane shows readiness, the files it changed, conflicts, secret-looking content anywhere in its commits, and the exact Git steps to merge it yourself. A conflict is never resolved for you; you can send it back to the lane's agent. Automated Merge is off in 1.5.0 for security reasons and stays off until its checks can run safely.
+- **Safe by default.** YallaFlow never pushes, rebases, resets or deletes branches, and in 1.5.0 it commits and merges nothing itself. Every Git command it starts turns off repository-configured fsmonitor, hooks and submodule recursion. [Security →](docs/security.md#review--merge-and-git)
+- **Approval wait.** Choose how long a tool request waits for you: 5, 15, 30 or 60 minutes. When the wait runs out, the request is denied.
+- **Overview: your branch and Shared Project Mode.** See the current branch and whether Shared Project Mode is on, and turn it on from there. Work items show their title first, with copyable IDs.
 
 ## What's new in 1.4.2
 
@@ -267,7 +280,7 @@ Record a short demo of booking a pitch for the club owner.
 
 ## Teams
 
-A maintainer runs `yallaflow init`, approves the project understanding, runs `yallaflow shared enable`, and commits `.yallaflow/`. Teammates just `git pull` and open their agent. They need no YallaFlow commands and no join step, only a compatible `yallaflow` CLI. Knowledge learned on a branch travels with that branch, and YallaFlow never commits, pushes, or merges for you. [Shared Projects →](docs/shared-projects.md)
+A maintainer runs `yallaflow init`, approves the project understanding, runs `yallaflow shared enable`, and commits `.yallaflow/`. Teammates just `git pull` and open their agent. They need no YallaFlow commands and no join step, only a compatible `yallaflow` CLI. Knowledge learned on a branch travels with that branch. YallaFlow never pushes. It commits or merges only when you approve a Review & Merge in the console. [Shared Projects →](docs/shared-projects.md)
 
 > **Developers work with Git. Agents work with YallaFlow.**
 
@@ -299,6 +312,7 @@ The YallaFlow website, [engmohamedamer.github.io/yallaflow](https://engmohamedam
 | [Canonical workflows](docs/workflows.md) | Greenfield, Brownfield, bugs, features, investigations, teams |
 | [Project memory](docs/project-memory.md) | durable context, evidence and freshness |
 | [Console](docs/console.md) | the local browser view, Create Work, New project, Setup |
+| [Execution modes](docs/execution-modes.md) | Run Now, Queue, Parallel, Review & Merge |
 | [Development runtime](docs/runtime.md) | analyze, review, trust, start and stop your app's services |
 | [CLI reference](docs/cli.md) | every command and flag |
 | [Architecture](docs/architecture.md) | internal concepts and design |
@@ -309,12 +323,12 @@ The YallaFlow website, [engmohamedamer.github.io/yallaflow](https://engmohamedam
 
 ## Status
 
-**1.4.2** makes the console work with you: start a task in a few clicks, let the agent run until it needs you, and see what it needs from any page. 1.0.0 was the first public, stable release. YallaFlow follows Semantic Versioning and keeps existing workspaces readable ([compatibility promise](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise)).
+**1.5.0** runs work your way: one task now, or a queue of tasks one after another, with review and manual merge for lanes. Parallel execution and Automated Merge are disabled in this release. 1.0.0 was the first public, stable release. YallaFlow follows Semantic Versioning and keeps existing workspaces readable ([compatibility promise](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise)).
 
 - **Local-first.** There is no YallaFlow server, account, or cloud service.
 - **Agent-agnostic**, with first-party setup for Claude Code and Codex.
 - **No AI calls and no telemetry.** YallaFlow touches the network only when you explicitly fetch a tracker ticket.
-- **Not a project-management tool**, and not a bot that commits or pushes for you.
+- **Not a project-management tool**, and not a bot that commits or pushes for you. It commits and merges only what you approve in Review & Merge, and it never pushes.
 
 See [Limitations](docs/limitations.md) for current boundaries, for example that Windows is not yet verified.
 

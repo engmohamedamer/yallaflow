@@ -123,7 +123,7 @@ test('overview previews keep full facts available under View more, including aft
     areas: { project: { total: 4, facts: [1, 2, 3, 4].map((id) => ({ id: `CTX-${id}`, summary: id === 1 ? 'Long detail. '.repeat(30) + 'END' : `Fact ${id}`, freshness: 'fresh', confidence: 'confirmed' })) } },
     stack: { entries: [], unread: [] }, modules: [], coverage: { available: true, scannedEntries: 0, sourceFiles: 0, manifests: 0 }
   } };
-  c.FRESH_TEXT = { fresh: 'Fresh' }; c.understandingCard = () => ''; c.devPanel = () => '';
+  c.FRESH_TEXT = { fresh: 'Fresh' }; c.understandingCard = () => ''; c.devPanel = () => ''; c.gitLine = () => '';
   vm.runInContext(cut('  function viewOverview()', '  // ---------- new-project Overview'), c);
   const html = c.viewOverview();
   assert.match(html, /data-overview="project:CTX-1" ><summary>/);

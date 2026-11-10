@@ -18,6 +18,14 @@ Known gaps and deliberate boundaries. Planned work is tracked in [`roadmap.md`](
   - **No agent sessions.** It never starts, stops, or observes agents. A worktree is shown as a Git checkout with its recorded YallaFlow state, never as a live agent session.
   - **Insights are partial.** They cover only recorded data (creation and completion times, verification runs). YallaFlow does not record time per station or waiting time.
   - **Browser coverage.** It is tested in Chromium, Firefox and WebKit through Playwright on Linux. It has not been tested in desktop Safari, on Windows or macOS hosts, or with screen readers.
+- **Execution modes (1.5.0).** See [`execution-modes.md`](execution-modes.md).
+  - **Parallel and Review & Merge run only on Linux with Git 2.43**, the configuration their Git transaction was validated on. On other platforms and Git versions they refuse, and you integrate by hand. Run Now and Queue still work.
+  - **No Git filters, merge drivers or submodules.** Repositories that use external filters or merge drivers (for example Git LFS), or submodules, are blocked from automated lanes and merges.
+  - **Automated Merge needs a lane without ignored files.** Checks never run next to agent-controlled ignored files (for example `node_modules/`). Projects whose checks need dependencies installed in the lane merge by hand, with the steps the review shows.
+  - **Three or four lanes are experimental**; two is the default.
+  - **Claude Code is assisted.** The console can't start Claude Code, so a Claude Code task waits for you to start and link it.
+  - **Concurrent Git use from outside.** A Git command you run in the same repository during a merge is detected and stops the merge. It is not prevented.
+  - **CI is not run.** The checks that run on the merged result are the task's verification commands and the merge checks you declared. `integration.yaml` says that CI was not run.
 - **Agent Workspace (1.3.0).**
   - **Codex** needs the separately installed `@agentclientprotocol/codex-acp` 2.x adapter, a third-party package. The adapter wraps Codex's App Server, which OpenAI labels experimental; its behavior can change between Codex versions.
   - **Claude Code is experimental (1.4.0).** The connection joins a Claude Code session you start yourself, needs the development-channel flag (Claude shows a warning), has no Stop from the console and delivers whole-message replies. It is off by default and turned on per console run only by your explicit choice, until Anthropic confirms that a third-party tool may distribute it.

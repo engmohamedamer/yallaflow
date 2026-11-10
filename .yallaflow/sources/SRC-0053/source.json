@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0053",
+  "sourceType": "file",
+  "sourceName": "execution-modes-decisions.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-11-09T18:06:33.395Z",
+  "original": {
+    "path": "sources/SRC-0053/execution-modes-decisions.md",
+    "sha256": "363eaceae6a114a0ab798d9fea22d85ada9948b3c8a1ca6d92fa88ec6a301a91",
+    "sizeBytes": 1913
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0112"
+  ],
+  "rawText": "# Owner decisions — Checkpoint B (2026-11-09)\n\nI approve the proposed Lane + Run architecture and the overall v1.5.0 direction, covering Run Now, Queue, and Parallel in one release.\n\nDecisions:\n- D1: Approved. Shared Project Mode is required for Parallel, with explicit confirmation and migration safety checks.\n- D2: Conditionally approved. Allow the three proposed Git operations only through a restricted, validated execution layer. No force operations, automatic merge, commit, push, or destructive cleanup. Verify hook isolation and safe worktree deletion.\n- D3: Approved. Use the sibling <repo>.lanes/<slug> directory structure, with strict path validation.\n- D4: Conditional. Do not hardcode 30 minutes until Codex ACP timeout behavior is verified. Never auto-approve.\n- D5: Approved. Default 2 agents, maximum 4. Treat concurrency beyond 2 as experimental until tested.\n- D6: Approved. Target v1.5.0.\n- D7: Approved. Queue advances automatically only after verified DONE and a fully stopped session. Any required review, question, approval, failure, or usage limit must block progression.\n\nAdditional requirements:\n1. Preserve v1.4.2 behavior for existing projects.\n2. Do not lose existing tasks, knowledge, uncommitted changes, or historical evidence.\n3. Make the Agents view interactive, with centralized approvals and session controls.\n4. Ensure queue persistence and recovery never cause duplicate task execution.\n5. Prevent worktree deletion while an agent is active or work is uncommitted, unmerged, or otherwise not safely preserved.\n6. Keep Claude Team limitations explicit rather than promising unsupported automation.\n7. Include negative tests for Git safety, concurrency, and crash recovery.\n\nRecord these decisions in PF-0112 and proceed with the final specifications and implementation plan.\nDo not start coding yet. Present the specification and plan approval gates before implementation.\n"
+}

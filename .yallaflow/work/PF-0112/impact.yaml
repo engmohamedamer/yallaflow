@@ -1,0 +1,689 @@
+{
+  "schemaVersion": 1,
+  "impacts": [
+    {
+      "id": "IM-001",
+      "status": "assessed",
+      "raisedAt": "2026-11-09T18:14:34.058Z",
+      "stageAtRaise": "SPECIFICATION",
+      "triggers": [
+        {
+          "type": "source",
+          "source": "SRC-0054",
+          "at": "2026-11-09T18:14:34.058Z"
+        },
+        {
+          "type": "requirements",
+          "changes": [
+            {
+              "id": "REQ-007",
+              "action": "revised",
+              "from": "active",
+              "to": "active"
+            },
+            {
+              "id": "REQ-009",
+              "action": "revised",
+              "from": "active",
+              "to": "active"
+            },
+            {
+              "id": "REQ-014",
+              "action": "revised",
+              "from": "active",
+              "to": "active"
+            },
+            {
+              "id": "REQ-017",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "REQ-018",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "REQ-019",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "REQ-020",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "REQ-021",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "REQ-022",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "REQ-023",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "REQ-024",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-010",
+              "action": "revised",
+              "from": "active",
+              "to": "active"
+            },
+            {
+              "id": "AC-013",
+              "action": "revised",
+              "from": "active",
+              "to": "active"
+            },
+            {
+              "id": "AC-018",
+              "action": "revised",
+              "from": "active",
+              "to": "active"
+            },
+            {
+              "id": "AC-019",
+              "action": "revised",
+              "from": "active",
+              "to": "active"
+            },
+            {
+              "id": "AC-021",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-022",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-023",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-024",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-025",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-026",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-027",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-028",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-029",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-030",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-031",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-032",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-033",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-034",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-035",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-036",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-037",
+              "action": "added",
+              "to": "active"
+            }
+          ],
+          "at": "2026-11-09T18:19:53.554Z"
+        }
+      ],
+      "assessment": {
+        "assessedAt": "2026-11-09T18:20:10.222Z",
+        "stages": {
+          "context-discovery": {
+            "verdict": "affected",
+            "reason": "Review & Merge needed new discovery: shared integrate refuses off the integration branch (src/shared/memory.js:290), containsSecret in src/security/redact.js for commit scanning, Git 2.43 supports merge-tree --write-tree and --pathspec-from-file, and Git's documented fast-forward/--only behaviour for uncommitted changes."
+          },
+          "requirement-clarification": {
+            "verdict": "affected",
+            "reason": "SRC-0054 adds REQ-017..REQ-024 and revises REQ-007/009/014; new owner decisions D8-D13 (Q-008..Q-013) must be answered."
+          },
+          "design-exploration": {
+            "verdict": "affected",
+            "reason": "Merge strategy alternatives (in-developer-checkout merge, rebase/squash, update-ref, temporary worktree, in-memory merge with fast-forward) had to be explored; in-memory merge chosen (A10)."
+          },
+          "specification": {
+            "verdict": "affected",
+            "reason": "Specification revised: Review & Merge FR20-FR31, Git safety threat model T1-T14, integration states, screens S6/S9/S10, revised Checkpoint C allowlist G1-G10, acceptance criteria AC-021..AC-037."
+          }
+        },
+        "applied": {
+          "revised": [
+            "context-discovery",
+            "requirement-clarification",
+            "design-exploration",
+            "specification"
+          ],
+          "stage": {
+            "from": "SPECIFICATION",
+            "to": "DISCOVERY"
+          },
+          "convergenceInvalidated": false
+        }
+      }
+    },
+    {
+      "id": "IM-002",
+      "status": "assessed",
+      "raisedAt": "2026-11-09T18:30:08.295Z",
+      "stageAtRaise": "SPECIFICATION",
+      "triggers": [
+        {
+          "type": "source",
+          "source": "SRC-0056",
+          "at": "2026-11-09T18:30:08.295Z"
+        }
+      ],
+      "assessment": {
+        "assessedAt": "2026-11-09T18:30:19.753Z",
+        "stages": {
+          "context-discovery": {
+            "verdict": "unaffected",
+            "reason": "SRC-0056 is the owner's explicit approval of the revised specification plus requirements for the implementation plan (M3a experiments, Git config/filters/helpers/signing/hooks handling, ordering, crash recovery, stop conditions, v1.4.2 compatibility, two-Codex E2E with a conflict); all of these are already specified (FR20-FR32, R1-R10, AC-036, AC-041, AC-043, AC-044) and it adds no new or changed intent."
+          },
+          "requirement-clarification": {
+            "verdict": "unaffected",
+            "reason": "SRC-0056 is the owner's explicit approval of the revised specification plus requirements for the implementation plan (M3a experiments, Git config/filters/helpers/signing/hooks handling, ordering, crash recovery, stop conditions, v1.4.2 compatibility, two-Codex E2E with a conflict); all of these are already specified (FR20-FR32, R1-R10, AC-036, AC-041, AC-043, AC-044) and it adds no new or changed intent."
+          },
+          "design-exploration": {
+            "verdict": "unaffected",
+            "reason": "SRC-0056 is the owner's explicit approval of the revised specification plus requirements for the implementation plan (M3a experiments, Git config/filters/helpers/signing/hooks handling, ordering, crash recovery, stop conditions, v1.4.2 compatibility, two-Codex E2E with a conflict); all of these are already specified (FR20-FR32, R1-R10, AC-036, AC-041, AC-043, AC-044) and it adds no new or changed intent."
+          },
+          "specification": {
+            "verdict": "unaffected",
+            "reason": "SRC-0056 is the owner's explicit approval of the revised specification plus requirements for the implementation plan (M3a experiments, Git config/filters/helpers/signing/hooks handling, ordering, crash recovery, stop conditions, v1.4.2 compatibility, two-Codex E2E with a conflict); all of these are already specified (FR20-FR32, R1-R10, AC-036, AC-041, AC-043, AC-044) and it adds no new or changed intent; the specification it approves is unchanged."
+          }
+        },
+        "applied": {
+          "revised": [],
+          "convergenceInvalidated": false
+        }
+      }
+    },
+    {
+      "id": "IM-003",
+      "status": "assessed",
+      "raisedAt": "2026-11-09T18:36:51.934Z",
+      "stageAtRaise": "PLAN",
+      "triggers": [
+        {
+          "type": "source",
+          "source": "SRC-0057",
+          "at": "2026-11-09T18:36:51.934Z"
+        }
+      ],
+      "assessment": {
+        "assessedAt": "2026-11-09T18:37:00.419Z",
+        "stages": {
+          "context-discovery": {
+            "verdict": "unaffected",
+            "reason": "SRC-0057 is the owner's explicit approval of the implementation plan with M3a boundaries that restate the approved plan (disposable repositories only, isolated Git environment, evidence for E1-E15, permanent tests, stop-and-correct rule, no allowlist change before Checkpoint C, no commit/push/publish); it adds no new or changed intent."
+          },
+          "requirement-clarification": {
+            "verdict": "unaffected",
+            "reason": "SRC-0057 is the owner's explicit approval of the implementation plan with M3a boundaries that restate the approved plan (disposable repositories only, isolated Git environment, evidence for E1-E15, permanent tests, stop-and-correct rule, no allowlist change before Checkpoint C, no commit/push/publish); it adds no new or changed intent."
+          },
+          "design-exploration": {
+            "verdict": "unaffected",
+            "reason": "SRC-0057 is the owner's explicit approval of the implementation plan with M3a boundaries that restate the approved plan (disposable repositories only, isolated Git environment, evidence for E1-E15, permanent tests, stop-and-correct rule, no allowlist change before Checkpoint C, no commit/push/publish); it adds no new or changed intent."
+          },
+          "specification": {
+            "verdict": "unaffected",
+            "reason": "SRC-0057 is the owner's explicit approval of the implementation plan with M3a boundaries that restate the approved plan (disposable repositories only, isolated Git environment, evidence for E1-E15, permanent tests, stop-and-correct rule, no allowlist change before Checkpoint C, no commit/push/publish); it adds no new or changed intent."
+          },
+          "implementation-planning": {
+            "verdict": "unaffected",
+            "reason": "SRC-0057 is the owner's explicit approval of the implementation plan with M3a boundaries that restate the approved plan (disposable repositories only, isolated Git environment, evidence for E1-E15, permanent tests, stop-and-correct rule, no allowlist change before Checkpoint C, no commit/push/publish); it adds no new or changed intent; the plan it approves is unchanged."
+          }
+        },
+        "applied": {
+          "revised": [],
+          "convergenceInvalidated": false
+        }
+      }
+    },
+    {
+      "id": "IM-004",
+      "status": "assessed",
+      "raisedAt": "2026-11-09T18:56:57.975Z",
+      "stageAtRaise": "IMPLEMENTATION",
+      "triggers": [
+        {
+          "type": "source",
+          "source": "SRC-0058",
+          "at": "2026-11-09T18:56:57.975Z"
+        },
+        {
+          "type": "requirements",
+          "changes": [
+            {
+              "id": "REQ-030",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "REQ-031",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "REQ-032",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "REQ-033",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "REQ-034",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "REQ-035",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "REQ-036",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "REQ-037",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-045",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-046",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-047",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-048",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-049",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-050",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-051",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-052",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-053",
+              "action": "added",
+              "to": "active"
+            }
+          ],
+          "at": "2026-11-09T18:57:42.475Z"
+        }
+      ],
+      "assessment": {
+        "assessedAt": "2026-11-09T18:59:11.544Z",
+        "stages": {
+          "context-discovery": {
+            "verdict": "unaffected",
+            "reason": "SRC-0058 decides risks and adds safety rules; the repository facts established by discovery and the M3a evidence (V-001) are unchanged."
+          },
+          "requirement-clarification": {
+            "verdict": "affected",
+            "reason": "The owner's Checkpoint C decision adds REQ-030..REQ-037 and AC-045..AC-053 (verified platform gate, no external filters/merge drivers, GPG coverage gate, cleanup scope, stop-on-inconsistency, strict argument validation, disposable demonstration, serialisation)."
+          },
+          "design-exploration": {
+            "verdict": "affected",
+            "reason": "The per-project trust option for filters and merge drivers (C7) is rejected by the owner (A4) in favour of blocking; a fail-closed platform gate (A2) is added."
+          },
+          "specification": {
+            "verdict": "affected",
+            "reason": "Specification revised: FR13 cleanup scope, FR33-FR37, P2 rows, stop conditions S14-S16, Checkpoint C decision and risk register A1-A6."
+          },
+          "implementation-planning": {
+            "verdict": "affected",
+            "reason": "Plan revised: M3a marked done (V-001), permanent GPG/platform/filter/argument-validation tests added, M3b disposable demonstration before any real-project enablement."
+          }
+        },
+        "applied": {
+          "revised": [
+            "requirement-clarification",
+            "design-exploration",
+            "specification",
+            "implementation-planning"
+          ],
+          "stage": {
+            "from": "IMPLEMENTATION",
+            "to": "CLARIFICATION"
+          },
+          "convergenceInvalidated": false
+        }
+      }
+    },
+    {
+      "id": "IM-005",
+      "status": "assessed",
+      "raisedAt": "2026-11-09T23:16:05.707Z",
+      "stageAtRaise": "IMPLEMENTATION",
+      "triggers": [
+        {
+          "type": "source",
+          "source": "SRC-0059",
+          "at": "2026-11-09T23:16:05.707Z"
+        },
+        {
+          "type": "requirements",
+          "changes": [
+            {
+              "id": "REQ-038",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "REQ-039",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "REQ-040",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-054",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-055",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-056",
+              "action": "added",
+              "to": "active"
+            }
+          ],
+          "at": "2026-11-09T23:16:05.892Z"
+        }
+      ],
+      "assessment": {
+        "assessedAt": "2026-11-09T23:16:15.624Z",
+        "stages": {
+          "context-discovery": {
+            "verdict": "unaffected",
+            "reason": "SRC-0059 records owner decisions D14/D15 and M4 acceptance; repository facts are unchanged."
+          },
+          "requirement-clarification": {
+            "verdict": "affected",
+            "reason": "REQ-038..REQ-040 and AC-054..AC-056 added from the owner's decisions D14, D15 and the M4 acceptance list."
+          },
+          "design-exploration": {
+            "verdict": "unaffected",
+            "reason": "No design alternative changes; D14 resolves the recorded open decision and D15 confirms the proposed bounded timeout."
+          },
+          "specification": {
+            "verdict": "affected",
+            "reason": "Specification revised: Agent Contract v12 replaces plan P6's 'stays v11' (D14); FR16 approval wait becomes a per-project 5/15/30/60 setting (D15)."
+          },
+          "implementation-planning": {
+            "verdict": "affected",
+            "reason": "M4 gains the owner's ten acceptance requirements (real two-Codex E2E with conflict, recovery, EN/AR/mobile review) and the contract v12 work."
+          },
+          "implementation": {
+            "verdict": "affected",
+            "reason": "The contract v12 change and the timeout setting are new implementation work in progress."
+          }
+        },
+        "applied": {
+          "revised": [
+            "requirement-clarification",
+            "specification",
+            "implementation-planning",
+            "implementation"
+          ],
+          "stage": {
+            "from": "IMPLEMENTATION",
+            "to": "CLARIFICATION"
+          },
+          "convergenceInvalidated": false
+        }
+      }
+    },
+    {
+      "id": "IM-006",
+      "status": "assessed",
+      "raisedAt": "2026-11-10T08:36:26.380Z",
+      "stageAtRaise": "IMPLEMENTATION",
+      "triggers": [
+        {
+          "type": "source",
+          "source": "SRC-0060",
+          "at": "2026-11-10T08:36:26.380Z"
+        },
+        {
+          "type": "requirements",
+          "changes": [
+            {
+              "id": "REQ-041",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "REQ-042",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-057",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-058",
+              "action": "added",
+              "to": "active"
+            }
+          ],
+          "at": "2026-11-10T08:37:05.549Z"
+        }
+      ],
+      "assessment": {
+        "assessedAt": "2026-11-10T08:37:05.736Z",
+        "stages": {
+          "context-discovery": {
+            "verdict": "unaffected",
+            "reason": "SRC-0060 is the owner's Checkpoint D decision; repository facts are unchanged."
+          },
+          "requirement-clarification": {
+            "verdict": "affected",
+            "reason": "REQ-041/REQ-042 and AC-057/AC-058 added: independent review and release preparation are release conditions."
+          },
+          "design-exploration": {
+            "verdict": "unaffected",
+            "reason": "No design alternative changes."
+          },
+          "specification": {
+            "verdict": "unaffected",
+            "reason": "No functional requirement or safety rule changes; review fixes stay within the approved specification, and translation and README are presentation."
+          },
+          "implementation-planning": {
+            "verdict": "affected",
+            "reason": "M4 gains Phase 1 (independent review and fixes) and Phase 2 (Arabic server messages, README, compatibility, package checks) before the real E2E."
+          },
+          "implementation": {
+            "verdict": "affected",
+            "reason": "Review fixes, translation and README are new implementation work."
+          }
+        },
+        "applied": {
+          "revised": [
+            "requirement-clarification",
+            "implementation-planning",
+            "implementation"
+          ],
+          "stage": {
+            "from": "IMPLEMENTATION",
+            "to": "CLARIFICATION"
+          },
+          "convergenceInvalidated": false
+        }
+      }
+    },
+    {
+      "id": "IM-007",
+      "status": "assessed",
+      "raisedAt": "2026-11-10T11:32:23.323Z",
+      "stageAtRaise": "IMPLEMENTATION",
+      "triggers": [
+        {
+          "type": "source",
+          "source": "SRC-0061",
+          "at": "2026-11-10T11:32:23.323Z"
+        },
+        {
+          "type": "requirements",
+          "changes": [
+            {
+              "id": "REQ-043",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-059",
+              "action": "added",
+              "to": "active"
+            }
+          ],
+          "at": "2026-11-10T11:32:37.212Z"
+        }
+      ],
+      "assessment": {
+        "assessedAt": "2026-11-10T11:32:37.421Z",
+        "stages": {
+          "context-discovery": {
+            "verdict": "unaffected",
+            "reason": "SRC-0061 is an owner security decision; repository facts are unchanged."
+          },
+          "requirement-clarification": {
+            "verdict": "affected",
+            "reason": "REQ-043 and AC-059 added from the owner's decision."
+          },
+          "design-exploration": {
+            "verdict": "unaffected",
+            "reason": "Option A with restricted C keeps the existing architecture; no new design."
+          },
+          "specification": {
+            "verdict": "unaffected",
+            "reason": "The owner's decision itself narrows FR checks (declared checks only, fail-closed Automated Merge); recorded as a ruling against D9's task-verification checks."
+          },
+          "implementation-planning": {
+            "verdict": "affected",
+            "reason": "M5 gains the targeted changes, one final focused review, and the shared-metadata E2E check."
+          },
+          "implementation": {
+            "verdict": "affected",
+            "reason": "Targeted code, contract text and test changes."
+          }
+        },
+        "applied": {
+          "revised": [
+            "requirement-clarification",
+            "implementation-planning",
+            "implementation"
+          ],
+          "stage": {
+            "from": "IMPLEMENTATION",
+            "to": "CLARIFICATION"
+          },
+          "convergenceInvalidated": false
+        }
+      }
+    }
+  ],
+  "updatedAt": "2026-11-10T11:32:37.421Z"
+}

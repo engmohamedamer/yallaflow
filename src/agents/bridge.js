@@ -27,6 +27,38 @@ export function stopFrom(reason, detail = '') {
   }
   return { reason, detail: text, retryAt: null, at: new Date().toISOString() };
 }
+// PF-0112: what a permission request touches, when the provider says so (file paths, the
+// command), bounded in size. Shown on approval cards; never used to decide anything.
+export function permissionScope(request, root = null) {
+  // Paths inside the checkout are shown relative to it (real codex-acp sends absolute paths).
+  const relative = (entry) => (root && entry.startsWith(`${root}${path.sep}`) ? entry.slice(root.length + 1) : entry);
+  // Review L9: whatever does not fit is counted and said, never silently dropped.
+  const all = Array.isArray(request.paths) ? [...new Set(request.paths.filter((entry) => typeof entry === 'string' && entry.trim()).map((entry) => relative(entry).slice(0, 300)))] : [];
+  const paths = all.slice(0, 50);
+  const full = typeof request.command === 'string' && request.command.trim() ? request.command.trim() : null;
+  const command = full ? full.slice(0, 4000) : null;
+  return { ...(paths.length ? { paths } : {}), ...(all.length > paths.length ? { morePaths: all.length - paths.length } : {}), ...(command ? { command } : {}), ...(full && full.length > command.length ? { commandCut: full.length - command.length } : {}) };
+}
+// PF-0112 release rule (owner, 2026-11-10): Codex loads a project's .codex/config.toml (sandbox,
+// MCP servers, hooks) for trusted folders. A fingerprint of that folder (every entry's path, type
+// and content, links not followed; 'none' when absent) lets a queue refuse to start the next
+// session after an earlier one changed it.
+export async function projectConfigFingerprint(root) {
+  const { createHash } = await import('node:crypto');
+  const { lstat, readdir, readFile, readlink } = await import('node:fs/promises');
+  const base = path.join(root, '.codex');
+  if (!(await lstat(base).catch(() => null))) return 'none';
+  const hash = createHash('sha256');
+  const walk = async (entry) => {
+    const info = await lstat(entry);
+    hash.update(`\0${path.relative(base, entry)}\0${info.isDirectory() ? 'd' : info.isSymbolicLink() ? 'l' : 'f'}\0`);
+    if (info.isSymbolicLink()) hash.update(await readlink(entry));
+    else if (info.isDirectory()) for (const name of (await readdir(entry)).sort()) await walk(path.join(entry, name));
+    else hash.update(await readFile(entry));
+  };
+  await walk(base);
+  return hash.digest('hex');
+}
 const MAX_EVENTS = 400;
 export const DEFAULT_PERMISSION_TIMEOUT_MS = 5 * 60_000;
 
@@ -69,6 +101,8 @@ export class AgentBridge {
     this.runActivate = runActivate;
     this.port = port;
     this.timeoutMs = permissionTimeoutMs ?? (Number(env.YALLAFLOW_AGENT_PERMISSION_TIMEOUT_MS) || DEFAULT_PERMISSION_TIMEOUT_MS);
+    // An explicit override (option or environment) wins over a project's saved wait (D15).
+    this.timeoutOverride = permissionTimeoutMs !== undefined || Boolean(Number(env.YALLAFLOW_AGENT_PERMISSION_TIMEOUT_MS));
     this.projects = new Map(projects.map((project) => [project.id, this.entry(project)]));
   }
 
@@ -81,6 +115,7 @@ export class AgentBridge {
       claude: null,
       claudeOn: false,
       bridgeToken: null,
+      approvalWaitMs: null, // PF-0112 D15: this project's saved approval wait (null: the default)
       owner: null, // the checkout lock while this console holds it
       holder: null // who holds it when another console does
     };
@@ -285,6 +320,98 @@ export class AgentBridge {
     project.events.push(event);
     if (project.events.length > MAX_EVENTS) project.events.splice(0, project.events.length - MAX_EVENTS);
     this.broadcast(project.id, event);
+    // PF-0112: the Execution Manager observes the same events; a listener never affects the session.
+    for (const listener of this.listeners ?? []) {
+      try {
+        listener(project.id, event);
+      } catch {
+        // an observer's failure is its own
+      }
+    }
+  }
+
+  // PF-0112: observers of agent events (the Execution Manager). Returns an unsubscribe function.
+  subscribe(listener) {
+    (this.listeners ??= new Set()).add(listener);
+    return () => this.listeners.delete(listener);
+  }
+
+  // PF-0112 D15: the approval wait for one project (5, 15, 30 or 60 minutes; default 5).
+  timeoutFor(project) {
+    return this.timeoutOverride || !project.approvalWaitMs ? this.timeoutMs : project.approvalWaitMs;
+  }
+  setApprovalWait(projectId, minutes) {
+    const project = this.project(projectId);
+    project.approvalWaitMs = [5, 15, 30, 60].includes(minutes) ? minutes * 60_000 : null;
+  }
+
+  // PF-0112: whether this console owns the checkout (the agent-console lock). Read-only.
+  // The project-level agent configuration fingerprint of a checkout (see projectConfigFingerprint).
+  projectConfigFingerprint(root) {
+    return projectConfigFingerprint(root);
+  }
+
+  ownsCheckout(projectId) {
+    return Boolean(this.projects.get(projectId)?.owner);
+  }
+
+  // PF-0112: claims the checkout for this console (the same claim a session start makes);
+  // throws CHECKOUT_LOCKED when another live console owns it.
+  async claimFor(projectId) {
+    await this.ensureOwner(this.project(projectId));
+  }
+
+  // ----- PF-0112: a provider-neutral face for the Execution Manager -----
+  // Provider knowledge stays here (AC-108): the manager asks what a provider can do instead
+  // of naming one. A provider the console can start (`start`) runs queued tasks by itself;
+  // one it cannot (Claude Code, a user session) is assisted.
+  providers() {
+    return Object.keys(CAPABILITIES);
+  }
+  defaultProvider() {
+    return Object.keys(CAPABILITIES).find((provider) => CAPABILITIES[provider].start) ?? null;
+  }
+  providerCapabilities(provider) {
+    return CAPABILITIES[provider] ?? null;
+  }
+  providerLabel(provider) {
+    return { codex: 'Codex', claude: 'Claude Code' }[provider] ?? String(provider);
+  }
+  checkMode(provider, mode) {
+    if (provider === 'codex') this.checkCodexMode(mode);
+  }
+  async startManaged(projectId, provider, { workId, mode }) {
+    if (provider !== 'codex') throw Object.assign(new Error(`${this.providerLabel(provider)} sessions are started by you, not by the console.`), { status: 409, code: 'ASSISTED' });
+    return this.startCodex(projectId, { workId, mode });
+  }
+  async resumeManaged(projectId, provider, recordId, { mode }) {
+    if (provider !== 'codex') throw Object.assign(new Error(`${this.providerLabel(provider)} sessions are resumed by you, not by the console.`), { status: 409, code: 'ASSISTED' });
+    return this.resumeCodex(projectId, recordId, { mode });
+  }
+
+  // PF-0112: a cheap, synchronous look at one checkout for the Agents view and inbox:
+  // the session, its open requests, the agent's last step and since when it works.
+  glance(projectId) {
+    const project = this.projects.get(projectId);
+    if (!project) return null;
+    const session = this.sessionSummary(project);
+    let lastStep = null;
+    let workingSince = null;
+    for (let index = project.events.length - 1; index >= 0; index--) {
+      const event = project.events[index];
+      if (!lastStep && ['tool.started', 'tool.updated', 'permission.requested'].includes(event.type) && event.title) lastStep = { title: event.title, at: event.at };
+      if (!workingSince && ['turn.started', 'message.sent'].includes(event.type)) workingSince = event.at;
+      if (event.type === 'turn.ended' && !workingSince) break;
+      if (lastStep && workingSince) break;
+    }
+    return {
+      session,
+      pending: [...project.pending.values()].map((entry) => entry.request),
+      lockedBy: project.holder && !project.owner ? lockedError(project.holder).message : null,
+      userSessions: Boolean(project.claudeOn), // Claude Code (a user-started session) is on for this project
+      lastStep,
+      workingSince: session?.status === 'working' ? workingSince : null
+    };
   }
 
   // ----- permissions -----
@@ -295,7 +422,7 @@ export class AgentBridge {
     const decisions = [...(request.allow ?? ['allow']).filter((decision) => ['allow', 'allow_session'].includes(decision)), 'deny'];
     return new Promise((resolve) => {
       const entry = {
-        request: { requestId, title: request.title, detail: request.detail ?? null, kind: request.kind, decisions, provider: request.provider ?? project.session?.provider ?? null },
+        request: { requestId, title: request.title, detail: request.detail ?? null, kind: request.kind, decisions, provider: request.provider ?? project.session?.provider ?? null, ...permissionScope(request, project.root) },
         externalKey: request.externalKey ?? null,
         decide: (decision, by) => {
           if (!project.pending.has(requestId)) return false;
@@ -307,11 +434,13 @@ export class AgentBridge {
           return true;
         }
       };
-      entry.timer = setTimeout(() => entry.decide('deny', 'timeout'), this.timeoutMs);
+      // A request that reaches its wait is DENIED, never approved (D15).
+      const waitMs = this.timeoutFor(project);
+      entry.timer = setTimeout(() => entry.decide('deny', 'timeout'), waitMs);
       entry.timer.unref?.();
       project.pending.set(requestId, entry);
       request.onOpened?.(requestId);
-      this.emit(project, agentEvent('permission.requested', { ...entry.request, expiresAt: new Date(Date.now() + this.timeoutMs).toISOString() }));
+      this.emit(project, agentEvent('permission.requested', { ...entry.request, expiresAt: new Date(Date.now() + waitMs).toISOString() }));
     });
   }
 
@@ -394,7 +523,7 @@ export class AgentBridge {
       enabled: true,
       lockedBy: foreign ? { message: lockedError(holder).message } : null,
       claudeExperimental: project.claudeOn,
-      permissionTimeoutMs: this.timeoutMs,
+      permissionTimeoutMs: this.timeoutFor(project),
       providers,
       session: this.sessionSummary(project),
       pending: [...project.pending.values()].map((entry) => entry.request),

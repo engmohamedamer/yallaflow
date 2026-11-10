@@ -1,0 +1,148 @@
+{
+  "id": "PF-0112",
+  "type": "feature",
+  "scope": "architectural",
+  "routingStatus": "routed",
+  "rawRequest": "Unified Execution Modes: Run Now, Queue and Parallel (isolated Git worktrees) in one execution manager, agents dashboard and approvals inbox, on existing subscription agent integrations",
+  "status": "IMPLEMENTATION",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-09T17:52:58.235Z",
+  "updatedAt": "2026-11-10T11:32:38.654Z",
+  "title": "Unified Execution Modes: Run Now, Queue and Parallel (isolated Git worktrees) in one execution manager, agents dashboard and approvals inbox, on existing subscription agent integrations",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope architectural`.",
+  "routedAt": "2026-11-09T17:52:58.285Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "brainstorm",
+    "specify",
+    "plan",
+    "implement",
+    "verify",
+    "converge",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "design-exploration",
+      "specification",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "delivery-convergence",
+      "code-review"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0052",
+      "type": "file",
+      "name": "execution-modes-request.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-09T17:56:35.303Z",
+      "workStatusAtLink": "DISCOVERY",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0053",
+      "type": "file",
+      "name": "execution-modes-decisions.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-09T18:06:33.443Z",
+      "workStatusAtLink": "CLARIFICATION",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0054",
+      "type": "file",
+      "name": "execution-modes-review-merge.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-09T18:14:34.058Z",
+      "workStatusAtLink": "SPECIFICATION",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0055",
+      "type": "file",
+      "name": "execution-modes-d8-d13.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-09T18:22:45.322Z",
+      "workStatusAtLink": "SPECIFICATION",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0056",
+      "type": "file",
+      "name": "execution-modes-spec-approval.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-09T18:30:08.295Z",
+      "workStatusAtLink": "SPECIFICATION",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0057",
+      "type": "file",
+      "name": "execution-modes-plan-approval.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-09T18:36:51.934Z",
+      "workStatusAtLink": "PLAN",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0058",
+      "type": "file",
+      "name": "execution-modes-checkpoint-c.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-09T18:56:57.975Z",
+      "workStatusAtLink": "IMPLEMENTATION",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0059",
+      "type": "file",
+      "name": "execution-modes-d14-d15-m4.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-09T23:16:05.707Z",
+      "workStatusAtLink": "IMPLEMENTATION",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0060",
+      "type": "file",
+      "name": "execution-modes-checkpoint-d.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-10T08:36:26.380Z",
+      "workStatusAtLink": "IMPLEMENTATION",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0061",
+      "type": "file",
+      "name": "execution-modes-security-decision.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-10T11:32:23.323Z",
+      "workStatusAtLink": "IMPLEMENTATION",
+      "relationship": "work-input"
+    }
+  ],
+  "lastInvalidationAt": "2026-11-10T11:32:37.421Z"
+}

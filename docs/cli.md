@@ -215,6 +215,17 @@ On request only; independent of each other; usable on any routed work item at an
 
 `finish` adds quality lines only for work that used QC or a demo; they never change readiness.
 
+## Execution and integration (1.5.0)
+
+Review & Merge in the console uses these commands; you rarely run them by hand. See [`execution-modes.md`](execution-modes.md).
+
+| Command | Purpose |
+|---|---|
+| `yallaflow execution checks set --file <checks.json> [--accept-minimum-version 1.5.0]` | Declare the project's required merge checks (`[{ "name": "tests", "argv": ["npm", "test"] }]`, argv only, no shell) in `config.yaml` `execution.mergeChecks`. They run on every merged result before the target branch moves. Required when the project has Git hooks or CI. The first write raises the project's minimum version to 1.5.0, with your confirmation. |
+| `yallaflow execution checks show` | Read-only: the declared merge checks. |
+| `yallaflow integration record <work-id> --file <record.json> [--accept-minimum-version 1.5.0]` | Append a MERGED & VERIFIED record to `work/<id>/integration.yaml` (target branch and commits, approved tree, checks run, knowledge integration). Written by Review & Merge after the post-merge checks and knowledge integration succeed; agents never write it. The merge commit must exist, carry the recorded tree, and be contained in the target branch. |
+| `yallaflow integration show <work-id> [--json]` | Read-only: the work item's integration records. |
+
 ## Agent contract
 
 | Command | Purpose |

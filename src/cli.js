@@ -102,6 +102,8 @@ const qcPlanCommand = lazy('./commands/quality.js', 'qcPlanCommand');
 const qcRecordCommand = lazy('./commands/quality.js', 'qcRecordCommand');
 const qcStatusCommand = lazy('./commands/quality.js', 'qcStatusCommand');
 const purposeCommand = lazy('./commands/purpose.js', 'purposeCommand');
+const integrationCommand = lazy('./commands/integration.js', 'integrationCommand');
+const executionChecksCommand = lazy('./commands/integration.js', 'executionChecksCommand');
 import { findProjectRoot, getCurrentState, loadWorkMetaOrThrow } from './core/workspace.js';
 import { assertWorkProgressAllowed, lifecycleOf } from './core/lifecycle.js';
 const reopenClosedCommand = lazy('./commands/lifecycle.js', 'reopenClosedCommand');
@@ -270,6 +272,14 @@ const NAMESPACE_ACTIONS = {
   purpose: {
     set: 'yallaflow purpose set [work-id] --objective TEXT [--mode bootstrap|intent|freshness] [--preserve TEXT]... [--focus TEXT]...',
     show: 'yallaflow purpose show [work-id]'
+  },
+  integration: {
+    record: 'yallaflow integration record <work-id> --file <record.json> [--accept-minimum-version 1.5.0]',
+    show: 'yallaflow integration show <work-id>'
+  },
+  execution: {
+    'checks set': 'yallaflow execution checks set --file <checks.json> [--accept-minimum-version 1.5.0]',
+    'checks show': 'yallaflow execution checks show'
   },
   baseline: {
     start: 'yallaflow baseline start [--objective TEXT] [--preserve TEXT]... [--focus TEXT]...',
@@ -1124,6 +1134,25 @@ async function dispatch(command, rest) {
       return sharedIntegrateCommand({ dryRun: values['dry-run'], verbose: values.verbose });
     }
     throw new Error(`Unknown shared action: ${action}. Use enable, status, check, or integrate.`);
+  }
+  // PF-0112 (1.5.0): Review & Merge records, written by the console after a verified merge.
+  if (command === 'integration') {
+    const [action, ...actionArgs] = rest;
+    if (action === 'record' || action === 'show') {
+      const { values, positionals } = parseOptions(actionArgs, action === 'record' ? { file: { type: 'string' }, 'accept-minimum-version': { type: 'string' } } : {});
+      if (positionals.length !== 1) throw new Error(`Usage: ${NAMESPACE_ACTIONS.integration[action]}`);
+      return integrationCommand(action, positionals[0], values);
+    }
+    throw new Error(`Usage: ${NAMESPACE_ACTIONS.integration.record}\n       ${NAMESPACE_ACTIONS.integration.show}`);
+  }
+  if (command === 'execution') {
+    const [group, action, ...actionArgs] = rest;
+    if (group === 'checks' && (action === 'set' || action === 'show')) {
+      const { values, positionals } = parseOptions(actionArgs, action === 'set' ? { file: { type: 'string' }, 'accept-minimum-version': { type: 'string' } } : {});
+      if (positionals.length) throw new Error(`Usage: ${NAMESPACE_ACTIONS.execution[`checks ${action}`]}`);
+      return executionChecksCommand(action, values);
+    }
+    throw new Error(`Usage: ${NAMESPACE_ACTIONS.execution['checks set']}\n       ${NAMESPACE_ACTIONS.execution['checks show']}`);
   }
   if (command === 'purpose') {
     const [action, ...actionArgs] = rest;

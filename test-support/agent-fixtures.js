@@ -73,7 +73,7 @@ export async function consoleWith(root, options = {}) {
   })();
   const post = (action, body, headers = {}) => fetch(`${server.url}api/p/${pid}/agent/${action}`, { method: 'POST', headers: { Authorization: `Bearer ${server.token}`, Origin: origin, 'Content-Type': 'application/json', ...headers }, body: JSON.stringify(body ?? {}) });
   const status = async () => (await fetch(`${server.url}api/p/${pid}/agent`, { headers: { Authorization: `Bearer ${server.token}` } })).json();
-  const waitFor = async (predicate, ms = 5000) => {
+  const waitFor = async (predicate, ms = 20000) => {
     const end = Date.now() + ms;
     while (Date.now() < end) { const hit = events.find(predicate); if (hit) return hit; await sleep(20); }
     throw new Error(`event not seen; got ${events.map((e) => e.type).join(',')}`);

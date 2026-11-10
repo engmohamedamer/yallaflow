@@ -273,6 +273,17 @@ After merges land on the integration branch, someone with a checkout of it (typi
 
 It never claims to see branches that are not fetched or merged here. It is not a dashboard, a Kanban board, or a live server.
 
+## Parallel work and Review & Merge (1.5.0)
+
+Parallel work in the console requires Shared Project Mode, because each lane allocates work and source IDs on its own branch. The branch-safe IDs keep two lanes from colliding.
+
+- **Lanes stage knowledge.** A lane is a feature branch. Knowledge promoted there is staged as the work's memory delta, as on any feature branch.
+- **Canonical integration happens at merge time.** Review & Merge runs it on the integration branch, after the merge and the post-merge checks.
+- **Blocked integrations stop the merge.** The integration is previewed on the merged result before the target branch moves. A blocked update stops the merge with the target unchanged; one example is a referenced fact that changed in parallel. You reconcile the update as described above, then review again. If memory changes between the preview and the integration, the merge stops after the fast-forward, and the lane shows **merged, not verified** until you reconcile and continue.
+- **The record is committed.** `work/<id>/integration.yaml` and the integrated memory are committed in one YallaFlow records commit on top of the merge. Teammates can then see which work is MERGED & VERIFIED.
+
+The parallel sheet can enable Shared Project Mode for you. It shows the `shared enable --dry-run` preview, needs your tick, and leaves the commit of `.yallaflow/` to you. See [`execution-modes.md`](execution-modes.md).
+
 ## Versions
 
 A Shared Project records `yallaflow.minimumVersion` in `config.yaml`. An older CLI stops before any project-state change:

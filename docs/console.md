@@ -140,6 +140,7 @@ It warns when the same file is changed in more than one worktree.
 
 - **A worktree is a checkout, not an agent session.** The console cannot tell who, if anyone, is working in it, and does not claim to.
 - **Git is read without writes.** The worktrees come from Git's own files, and changed files from `git --no-optional-locks status`. Reading them never touches `.git/index`.
+- **Lanes (1.5.0)** created by Parallel work are worktrees too. They appear here and in the Agents tab as "Project · lane"; see [`execution-modes.md`](execution-modes.md).
 
 To run several agents safely, give each one its own worktree and a different work item. See [Concurrency](#several-agents-and-the-workspace-lock).
 
@@ -278,10 +279,24 @@ The corner chat button is on every project page (Overview, Flow, Work, Setup, Wo
 - an idle Codex session on another item shows **End the PF-x session and work here**: it ends that session (it stays under earlier sessions, to resume later) and shows the agent picker here; while Codex is working, the page says to wait;
 - with Claude Code connected, **Use Codex for this item** explains that Claude Code must close first: type `/exit` in its terminal. As soon as it disconnects, the chat switches to Codex with a prepared first message. The console never just unlinks Claude Code for this, because Claude Code would keep running and could still edit files.
 
+## Running work: Queue, Parallel, Review & Merge (1.5.0)
+
+With agents enabled, the **Work** page can run several work items:
+
+- **Queue:** one agent, one item after another, each in a new session.
+- **Parallel:** each item in its own lane, a Git worktree beside the project with its own agent.
+
+The **Agents** tab lists every running and queued task across projects, with its controls:
+- pause, continue, skip, retry, reorder;
+- cancel after the current item or right away;
+- move the remaining items to the other agent.
+
+A finished lane offers **Review & merge**: readiness checks, the files to commit (each with a tick), the merge plan, and one confirmation. After the merge, the card shows **MERGED & VERIFIED** and offers **Clean up**. Nothing is approved, merged or deleted without your click. See [`execution-modes.md`](execution-modes.md).
+
 ## Security
 
 - **Listening and requests.** The server listens on `127.0.0.1` only and requires the per-run token (401). It refuses a foreign `Host` (421) and a foreign `Origin` (403). Reads are `GET`/`HEAD`.
-- **Writes.** `POST` is accepted only on fixed routes: Create Work (and attaching a file to the item that request created), work-item actions and gate decisions, runtime trust/start/stop/restart and adding a service, the New Project Wizard (plan, create, attaching a planned file), registering a project, enabling agents for the run, and Git init. A write also needs:
+- **Writes.** `POST` is accepted only on fixed routes: Create Work (and attaching a file to the item that request created), work-item actions and gate decisions, runtime trust/start/stop/restart and adding a service, the New Project Wizard (plan, create, attaching a planned file), registering a project, enabling agents for the run, Git init, and (1.5.0) the execution actions: run, queue and lane controls, enabling Shared Project Mode from the parallel sheet, Review & Merge (approve, continue, abandon, send back) and lane Clean up. Every action that commits, merges, enables Shared Project Mode or deletes a lane folder requires an explicit confirmation in the request. A write also needs:
   - the console's own `Origin` (a missing one is refused);
   - the exact content type (415);
   - a size limit: 64 KB of JSON, and 50 MB per file (413).

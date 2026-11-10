@@ -17,6 +17,7 @@ import { hashFile } from '../context/evidence.js';
 import { loadSource, sourceChecksum, sourceOriginalPath } from './sources.js';
 import { validateLimitation } from '../limitations/store.js';
 import { BASELINE_AREAS, BASELINE_FACT_SOURCES, BASELINE_FACT_STATUSES } from '../baseline/constants.js';
+import { SAFE_GIT } from '../utils/git-safety.js';
 
 // The single place that answers "does this work item's durable state contradict
 // itself" — consumed by `doctor` today. advance/guide/resume/ready already share the
@@ -314,10 +315,10 @@ async function checkVerificationMetadataIntegrity(root, meta) {
 // only, never repaired, and skipped entirely outside a Git repository.
 export function checkWorkspaceIntegrity(root) {
   const issues = [];
-  const insideRepo = spawnSync('git', ['rev-parse', '--is-inside-work-tree'], { cwd: root, encoding: 'utf8' });
+  const insideRepo = spawnSync('git', [...SAFE_GIT, 'rev-parse', '--is-inside-work-tree'], { cwd: root, encoding: 'utf8' });
   if (insideRepo.status !== 0) return issues;
-  const tracked = spawnSync('git', ['ls-files', '--', WORKSPACE_DIR], { cwd: root, encoding: 'utf8' });
-  const ignored = spawnSync('git', ['check-ignore', '-q', WORKSPACE_DIR], { cwd: root });
+  const tracked = spawnSync('git', [...SAFE_GIT, 'ls-files', '--', WORKSPACE_DIR], { cwd: root, encoding: 'utf8' });
+  const ignored = spawnSync('git', [...SAFE_GIT, 'check-ignore', '-q', WORKSPACE_DIR], { cwd: root });
   const isTracked = tracked.status === 0 && tracked.stdout.trim().length > 0;
   const isIgnored = ignored.status === 0;
   if (!isTracked && !isIgnored) {

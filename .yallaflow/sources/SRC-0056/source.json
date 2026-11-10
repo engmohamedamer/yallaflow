@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0056",
+  "sourceType": "file",
+  "sourceName": "execution-modes-spec-approval.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-11-09T18:30:08.256Z",
+  "original": {
+    "path": "sources/SRC-0056/execution-modes-spec-approval.md",
+    "sha256": "2843a13121b0301bf492163b52227242e7212817f86a55c93ac3709f875cfc9e",
+    "sizeBytes": 1509
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0112"
+  ],
+  "rawText": "# Owner specification approval and plan requirements (2026-11-09)\n\nI approve the revised Specification Gate for PF-0112.\n\nThe v1.5.0 scope is now confirmed:\n- Run Now\n- Queue\n- Parallel Execution\n- Review & Merge\n- Unified Agents Dashboard and Approvals\n- Safe recovery, Git isolation, and Shared Project integration\n\nPlease record my explicit specification approval through the normal YallaFlow workflow.\n\nNext, finalize the Implementation Plan and present its separate approval gate.\n\nBefore requesting Plan approval, ensure the plan explicitly covers:\n1. M3a Git transaction experiments in isolated disposable repositories, with permanent regression tests for every verified safety property.\n2. Safe handling of Git filters, external helpers, signing, hooks, and repository configuration.\n3. Correct ordering of merge, post-merge verification, Shared Project knowledge integration, and durable integration records.\n4. Crash recovery and idempotency across every Git transaction boundary.\n5. Clear stop conditions whenever a safety assumption fails.\n6. Backward compatibility with v1.4.2.\n7. A complete end-to-end acceptance test with two real subscription-based Codex agents, including a deliberate conflict.\n\nM3a may propose commit and merge experiments in disposable repositories, but do not run them until the implementation plan is explicitly approved.\n\nDo not implement application code, modify Git permissions, commit, push, or publish yet.\n\nPresent the final Implementation Plan Gate for my review.\n"
+}

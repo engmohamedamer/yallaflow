@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "integration",
+      "summary": "Claude Code was not exercised in parallel lanes; on the owner's Claude Team login channel messages are off (channelsEnabled), so console-driven Claude lanes cannot be verified on this machine",
+      "reason": "Outside what the read-only discovery and the disposable PoC could exercise",
+      "recordedAt": "2026-11-09T17:56:35.567Z"
+    },
+    {
+      "id": "DL-002",
+      "type": "not-inspected",
+      "area": "environment",
+      "summary": "Windows and macOS worktree behaviour (paths, file locks, hooks) not inspected; development machine is Linux",
+      "reason": "Outside what the read-only discovery and the disposable PoC could exercise",
+      "recordedAt": "2026-11-09T17:56:35.687Z"
+    },
+    {
+      "id": "DL-003",
+      "type": "not-inspected",
+      "area": "integration",
+      "summary": "Codex ACP toolCall.locations/rawInput fields for permission requests were not captured in the PoC; their exact presence in codex-acp must be confirmed during implementation",
+      "reason": "Outside what the read-only discovery and the disposable PoC could exercise",
+      "recordedAt": "2026-11-09T17:56:35.803Z"
+    },
+    {
+      "id": "DL-004",
+      "type": "not-inspected",
+      "area": "testing",
+      "summary": "Only two concurrent Codex sessions (ChatGPT Plus, one console, two worktrees) were exercised in the PoC; three or more lanes, sustained runs and usage-limit behaviour under parallel load are untested",
+      "reason": "Outside what the disposable PoC exercised",
+      "recordedAt": "2026-11-09T17:56:40.870Z"
+    },
+    {
+      "id": "DL-005",
+      "type": "unavailable",
+      "area": "testing",
+      "summary": "The real two-Codex end-to-end acceptance (SRC-0059 items 3-9) is blocked: the owner's ChatGPT subscription reached its Codex usage limit; codex-acp reports 'try again at Nov 14th, 2026 2:42 AM'. YallaFlow paused the Run Now task as usage-limit and started nothing else (correct behaviour, evidence in the scratchpad e2e/evidence.jsonl). No paid credits or API keys will be used.",
+      "reason": "Owner rule: subscription-only, no paid services; the limit resets on 2026-11-14 02:42",
+      "recordedAt": "2026-11-09T23:28:29.869Z"
+    }
+  ],
+  "updatedAt": "2026-11-09T23:28:29.869Z"
+}

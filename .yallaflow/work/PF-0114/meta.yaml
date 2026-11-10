@@ -1,0 +1,37 @@
+{
+  "id": "PF-0114",
+  "type": "release",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Release v1.5.0: Run Now, Queue, Review and Manual Merge, Shared Project Mode console improvements; Parallel and Automated Merge disabled",
+  "status": "EXECUTION",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-10T12:34:23.817Z",
+  "updatedAt": "2026-11-10T12:34:35.077Z",
+  "title": "Release v1.5.0: Run Now, Queue, Review and Manual Merge, Shared Project Mode console improvements; Parallel and Automated Merge disabled",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow release --scope bounded`.",
+  "routedAt": "2026-11-10T12:34:23.902Z",
+  "workflow": "release",
+  "requiredCapabilities": [
+    "discover",
+    "plan",
+    "implement",
+    "verify",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "code-review"
+    ]
+  }
+}

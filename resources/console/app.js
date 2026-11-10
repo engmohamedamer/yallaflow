@@ -110,7 +110,7 @@
     held: { ar: 'متوقفة مؤقتًا', en: 'on hold' }, closed: { ar: 'مقفولة من غير تسليم', en: 'closed, not delivered' }
   };
   const TYPE = { feature: { ar: 'ميزة', en: 'feature' }, bug: { ar: 'مشكلة', en: 'bug' }, investigation: { ar: 'بحث', en: 'investigation' }, change: { ar: 'تعديل', en: 'change' }, refactor: { ar: 'إعادة هيكلة', en: 'refactor' }, release: { ar: 'إصدار', en: 'release' } };
-  const chip = (s) => `<span class="chip ${s === 'na' ? 'todo' : s === 'paused' ? 'idle' : s}">${s === 'na' ? '' : '<i></i>'}${L(STATE[s] ?? { ar: s, en: s })}</span>`;
+  const chip = (s) => `<span class="chip ${s === 'na' ? 'todo' : s === 'paused' ? 'idle' : s}">${s === 'na' ? '' : '<i></i>'}${L(STATE[s] ?? { ar: esc(s), en: esc(s) })}</span>`;
   const fwd = () => (lang === 'ar' ? '←' : '→');
   const icon = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[k]}</svg>`;
   const ago = (iso8601) => {
@@ -144,6 +144,7 @@
       let body = null;
       try { body = await response.json(); } catch { /* not json */ }
       const failure = new Error(body?.error?.message ?? `HTTP ${response.status}`);
+      failure.messageAr = body?.error?.messageAr ?? null;
       failure.status = response.status;
       failure.command = body?.error?.command;
       throw failure;
@@ -207,7 +208,7 @@
       : `<b class="projname">${esc(snap?.project?.name ?? projects[0]?.name ?? '')}</b>`;
     const count = snap ? needs().length : 0;
     return `<header class="top"><a class="brand" href="#/map">${logo} YallaFlow</a><div class="projpick">${picker}<a class="tiny muted" href="#/projects">${A('كل المشاريع', 'All projects')}</a></div>
-      <nav class="tabs" aria-label="views">${tab('#/map', A('التدفق', 'Flow'), r.v === 'map')}${tab('#/lines', A('الشغل', 'Work'), r.v === 'lines' || r.v === 'item')}${tab('#/setup', A('الإعداد والتشغيل', 'Setup & run'), r.v === 'setup')}${tab('#/overview', A('المشروع', 'Overview'), r.v === 'overview')}${tab('#/insights', A('الأرقام', 'Insights'), r.v === 'insights')}${tab('#/team', A('نسخ الشغل', 'Worktrees'), r.v === 'team')}</nav>
+      <nav class="tabs" aria-label="views">${tab('#/map', A('التدفق', 'Flow'), r.v === 'map')}${tab('#/lines', A('الشغل', 'Work'), r.v === 'lines' || r.v === 'item')}${tab('#/agents', A('الوكلاء', 'Agents') + (execView?.inbox?.length ? ` <b class="tabcount">${execView.inbox.length}</b>` : ''), r.v === 'agents')}${tab('#/setup', A('الإعداد والتشغيل', 'Setup & run'), r.v === 'setup')}${tab('#/overview', A('المشروع', 'Overview'), r.v === 'overview')}${tab('#/insights', A('الأرقام', 'Insights'), r.v === 'insights')}${tab('#/team', A('نسخ الشغل', 'Worktrees'), r.v === 'team')}</nav>
       <span class="grow"></span>${!readOnly && projects.length ? `<button class="btn sm go create" data-create aria-label="${A('شغل جديد', 'Create work')}">＋<span class="lbl"> ${A('شغل جديد', 'Create work')}</span></button>` : ''}<span class="chip ${offline() ? 'fail' : 'active'}"><i></i>${offline() ? A('مفيش اتصال', 'offline') : A('مباشر', 'Live')}</span>
       <button class="ibtn bell" data-bell aria-expanded="${bellOpen}" aria-label="${A('محتاج انتباهك', 'Needs your attention')}">🔔${count ? `<b>${count}</b>` : ''}</button>
       <button class="ibtn" data-lang aria-label="language">${lang === 'ar' ? 'EN' : 'ع'}</button><button class="ibtn" data-theme-toggle aria-label="theme">◐</button>${bellOpen ? notesPanel() : ''}</header>`;
@@ -266,14 +267,14 @@
     return `<section class="fbar" aria-label="${A('فلترة', 'Filter')}"><input type="search" data-q value="${esc(flt.q)}" placeholder="${A('دوّر بالاسم أو الرقم…', 'Search by title or ID…')}" aria-label="${A('بحث', 'Search')}">
       ${c('all', A('الكل', 'All'))}${c('you', '◆ ' + L(STATE.you))}${c('fail', '✕ ' + L(STATE.fail))}${c('active', '● ' + L(STATE.active))}${c('paused', L(STATE.paused))}
       <select data-ftype aria-label="${A('النوع', 'Type')}"><option value="all">${A('كل الأنواع', 'All types')}</option>${Object.keys(TYPE).map((k) => `<option value="${k}" ${flt.type === k ? 'selected' : ''}>${L(TYPE[k])}</option>`).join('')}</select>
-      <span class="grow"></span><span class="tiny muted">${A(`${shown} من ${items().length}`, `${shown} of ${items().length}`)}</span></section>`;
+      <span class="grow"></span>${agentsOn && !readOnly && route().v === 'lines' ? `<button class="fchip ${selecting ? 'on' : ''}" data-select-toggle>${A('اختار لطابور', 'Select for a queue')}</button>` : ''}<span class="tiny muted">${A(`${shown} من ${items().length}`, `${shown} of ${items().length}`)}</span></section>`;
   }
 
   function pchip(it) {
     const old = isOld(it);
     const ag = agentOnItem(it);
     const agLine = ag ? `<div class="pagent ${ag}">${ag === 'approval' ? `✋ ${A('الوكيل مستني إذنك', 'The agent needs your approval')}` : ag === 'reply' ? `💬 ${A('الوكيل خلّص ومستني ردّك', 'The agent finished; your turn')}` : `<i></i> ${A('الوكيل شغّال عليها', 'The agent is working on it')}`}</div>` : '';
-    return `<article class="pchip ${it.state} ${old ? 'old' : ''} ${ag ? `agent-${ag}` : ''}" data-w="${esc(it.id)}" ${readOnly ? '' : 'draggable="true"'}><a class="pbody" href="#/item/${encodeURIComponent(it.id)}" draggable="false"><span class="pid ltr">${esc(it.id)}</span><div class="tt">${esc(it.title)}</div>${agLine}
+    return `<article class="pchip ${it.state} ${old ? 'old' : ''} ${ag ? `agent-${ag}` : ''}" data-w="${esc(it.id)}" ${readOnly ? '' : 'draggable="true"'}><a class="pbody" href="#/item/${encodeURIComponent(it.id)}" draggable="false"><span class="pid ltr wid" title="${esc(it.id)}">${esc(it.id)}</span><div class="tt">${esc(it.title)}</div>${agLine}
       <div class="meta">${chip(it.state)}<span class="grow"></span><b>${it.completion}%</b></div><div class="mini"><i style="width:${it.completion}%"></i></div>
       <div class="badges">${it.lastActivityAt && it.state !== 'done' ? `<span class="bdg ${old ? 'old' : ''}">⏱ ${ago(it.lastActivityAt)}</span>` : ''}${it.sourceCount ? `<span class="bdg">📎 ${it.sourceCount}</span>` : ''}</div></a>
       <div class="pactions">${ag && !readOnly ? `<button type="button" class="pchat pstart ${ag}" data-chat-item="${esc(it.id)}" data-chat-draft=""><span>${ag === 'working' ? A('تابع', 'Watch') : A('شوف', 'Open')}</span></button>` : it.state === 'new' && !readOnly ? `<button type="button" class="pchat pstart" data-chat-item="${esc(it.id)}" aria-label="${A('ابدأ مع الوكيل على', 'Start with the agent on')} ${esc(it.id)}" title="${A('بيفتح الشات بالرسالة اللي بتطلب الشغل كله، وانت اللي بتبعت.', 'Opens the chat with the whole-job message; you send it.')}"><span aria-hidden="true">▶</span><span>${A('ابدأ', 'Start')}</span></button>` : `<button type="button" class="pchat" data-chat-item="${esc(it.id)}" aria-label="${A('افتح الشات للطلب', 'Open chat for')} ${esc(it.id)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-6 4V6a2 2 0 0 1 2-2Z"/><path d="M7 9h10M7 13h6"/></svg><span>${A('الشات', 'Chat')}</span></button>`}${readOnly || !itemActions(it).length ? '' : `<button type="button" class="pmenu" data-menu="${esc(it.id)}" aria-label="${A('أفعال', 'Actions')} ${esc(it.id)}" title="${A('أفعال الطلب', 'Work item actions')}">⋯</button>`}</div></article>`;
@@ -309,9 +310,15 @@
     const order = { you: 0, fail: 1, active: 2, paused: 3, held: 4, new: 5, done: 6, closed: 7 };
     const list = items().filter(vis).sort((a, b) => order[a.state] - order[b.state] || b.id.localeCompare(a.id));
     if (!items().length) return onboarding() + integrityPanel();
-    return hero() + integrityPanel() + filterBar() + `<section class="lines">${list.map((it) => `<a class="line" href="#/item/${encodeURIComponent(it.id)}" data-w="${esc(it.id)}"><div><div class="row tiny muted"><span class="ltr">${esc(it.id)}</span>${attentionBadge(it)}<span>· ${L(TYPE[it.type] ?? { ar: '—', en: '—' })}</span>${it.stage ? `<span class="ltr">· ${esc(it.stage)}</span>` : ''}</div><div class="tt">${esc(it.title)}</div><div class="nx">${iso(nowText(it))}</div></div>${relay(it)}<div class="row">${chip(it.state)}${ring(it.completion, 62, 7)}</div></a>`).join('') || `<p class="muted">${A('مفيش شغل.', 'No work.')}</p>`}</section>`;
+    return hero() + integrityPanel() + filterBar() + `<section class="lines ${selecting ? 'selecting' : ''}">${list.map((it) => `<a class="line ${selecting && selected.includes(it.id) ? 'sel' : ''} ${selecting && !selectable(it) ? 'nosel' : ''}" href="#/item/${encodeURIComponent(it.id)}" data-w="${esc(it.id)}" ${selecting && selectable(it) ? `data-sel="${esc(it.id)}" aria-pressed="${selected.includes(it.id)}"` : ''}>${selecting && selectable(it) ? `<span class="selbox" aria-hidden="true">${selected.includes(it.id) ? '☑' : '☐'}</span>` : ''}<div><div class="row tiny muted">${wid(it.id)}${attentionBadge(it)}<span>· ${L(TYPE[it.type] ?? { ar: '—', en: '—' })}</span>${it.stage ? `<span class="ltr">· ${esc(it.stage)}</span>` : ''}</div><div class="tt">${esc(it.title)}</div><div class="nx">${iso(nowText(it))}</div></div>${relay(it)}<div class="row">${chip(it.state)}${ring(it.completion, 62, 7)}</div></a>`).join('') || `<p class="muted">${A('مفيش شغل.', 'No work.')}</p>`}</section>` + selectionBar();
   }
 
+  // PF-0112: where this item stands in a queue, if it is in one.
+  function queueLine(it) {
+    const q = it ? queueOf(it.id) : null;
+    if (!q) return '';
+    return `<p class="qline small">${A(`في طابور · ${q.position} من ${q.total}`, `In a queue · ${q.position} of ${q.total}`)} · <a href="#/agents">${A('شوف الطابور', 'See the queue')}</a></p>`;
+  }
   function nowText(it) {
     if (it.state === 'done') return A('خلص واتأكد.', 'Done and verified.');
     if (it.routing === 'pending') return A('الوكيل هيصنّف الطلب ده (النوع والحجم) ويكمّل.', 'Your agent classifies this request (type and size) and takes it from there.');
@@ -359,9 +366,9 @@
     const knowledgeOut = () => { const k = d?.knowledge; if (!k) return null; const promoted = k.candidates.filter((c) => c.status === 'promoted'); return k.reviewStatus === 'reviewed' ? { summary: promoted.length ? A(`${promoted.length} معرفة اتحفظت للمشروع`, `${promoted.length} fact(s) saved to project memory`) : A('اتراجع ومفيش معرفة جديدة', 'Reviewed; no new knowledge'), completedAt: null } : null; };
     const actionCmd = it.waitingFor?.action ?? it.nextAction;
     return `<div class="row" style="margin-bottom:14px"><a class="btn ghost sm" href="#/lines">${lang === 'ar' ? '→' : '←'} ${A('كل الشغل', 'All work')}</a></div>
-      <section class="ihead">${ring(it.completion, 132, 13)}<div><div class="row tiny muted"><span class="ltr">${esc(it.id)}</span><span>· ${L(TYPE[it.type] ?? { ar: 'لسه متصنفش', en: 'unrouted' })}</span>${it.scope ? `<span class="ltr">· ${esc(it.scope)}</span>` : ''}${it.stage ? `<span class="ltr">· ${esc(it.stage)}</span>` : ''}</div><h1>${esc(it.title)}</h1><p style="font-size:18px;color:var(--ink-2);margin-top:4px">${headline}</p><p class="tiny muted" style="margin-top:4px">${formula()}</p></div>
+      <section class="ihead">${ring(it.completion, 132, 13)}<div><div class="row tiny muted"><span class="ltr">${esc(it.id)}</span><button type="button" class="ibtn" data-copy="${esc(it.id)}" title="${A('انسخ رقم الشغلانة', 'Copy the work item ID')}" aria-label="${A('انسخ رقم الشغلانة', 'Copy the work item ID')}">⧉</button><span>· ${L(TYPE[it.type] ?? { ar: 'لسه متصنفش', en: 'unrouted' })}</span>${it.scope ? `<span class="ltr">· ${esc(it.scope)}</span>` : ''}${it.stage ? `<span class="ltr">· ${esc(it.stage)}</span>` : ''}</div><h1>${esc(it.title)}</h1><p style="font-size:18px;color:var(--ink-2);margin-top:4px">${headline}</p><p class="tiny muted" style="margin-top:4px">${formula()}</p></div>
 </section>
-      ${nextCard(it)}
+      ${queueLine(it)}${nextCard(it)}
       ${actionBar(it)}
       ${agentsOn && !readOnly && it.state !== 'done' && !it.lifecycle ? '' : `<div class="row chatcue"><button class="btn sm" data-chat-toggle aria-controls="chatwin">💬 ${A('اشتغل على الشغلانة دي مع الوكيل', 'Work on this item with the agent')}</button></div>`}
       <section class="chain" id="chain"><article class="node start ${it.state === 'new' ? 'active' : 'done'}" data-st="-1" style="--hue:var(--ink-2)"><div class="st-head"><span class="st-ico" aria-hidden="true">＋</span><div class="st-name">${A('الطلب', 'Request')}</div></div><div class="st-out">${it.state === 'new' ? A('جديد', 'new') : A('اتسلّم لـ «افهم»', 'handed to Understand')}</div>
@@ -409,6 +416,265 @@
   const autoApproves = (mode) => ['workspace-write', 'auto', 'acceptEdits'].includes(mode);
   async function agentPost(action, body) {
     return post(`/api/p/${pid}/agent/${action}`, JSON.stringify(body ?? {}), { 'Content-Type': 'application/json' });
+  }
+  // PF-0112: every lane of every project in this console (the Agents view and its inbox).
+  let execView = null;
+  let execError = null;
+  async function loadExecution() {
+    if (!agentsOn) { execView = null; return; }
+    try { execView = await api('/api/execution'); execError = null; await loadMerges(); } catch (e) { execError = e.message; }
+  }
+  // PF-0112 M1: choosing work for a queue (Work page) and the run sheet.
+  let selecting = false;
+  let selected = [];
+  const selectable = (it) => it && !['done', 'closed', 'held'].includes(it.state);
+  function queueOf(workId) {
+    for (const lane of execView?.lanes ?? []) {
+      if (lane.project !== pid) continue;
+      for (const run of lane.runs) {
+        if (run.mode === 'now' || ['finished', 'cancelled'].includes(run.state)) continue;
+        const list = run.lanes[0].tasks;
+        const index = list.findIndex((task) => task.workId === workId && !['done', 'failed', 'skipped', 'cancelled'].includes(task.state));
+        if (index !== -1) return { run, task: list[index], position: index + 1, total: list.length };
+      }
+    }
+    return null;
+  }
+  function selectionBar() {
+    if (!selecting) return '';
+    const n = selected.length;
+    return `<div class="selbar" role="region" aria-label="${A('الشغل المختار', 'Selected work')}"><b>${A(`${n} مختار`, `${n} selected`)}</b><span class="tiny muted">${A('دوس على شغلانة عشان تختارها.', 'Click work items to select them.')}</span><span class="grow"></span>
+      ${n >= 1 ? `<button class="btn sm go" data-queue-open>${n === 1 ? A('شغّلها في طابور', 'Run in a queue') : A(`طابور من ${n}`, `Queue ${n}`)}</button>` : ''}${n >= 1 && n <= 4 && projects.find((pr) => pr.id === pid)?.kind !== 'lane' ? `<button class="btn sm" data-parallel-open>${A(`توازي (${n})`, `Parallel (${n})`)}</button>` : ''}<button class="btn sm ghost" data-select-off>${A('إلغاء', 'Cancel')}</button></div>`;
+  }
+  function openQueueSheet() {
+    let d = document.getElementById('queuedlg');
+    if (!d) { d = document.createElement('dialog'); d.id = 'queuedlg'; d.className = 'panel'; document.body.appendChild(d); }
+    const list = selected.map(byId).filter(Boolean);
+    d.innerHTML = `<form method="dialog" data-queue-form class="wizform"><h2 style="font-size:18px">${A(`طابور من ${list.length}`, `Queue of ${list.length}`)}</h2>
+      <p class="small">${A('الوكيل هيشتغل عليهم واحدة ورا التانية، كل واحدة في جلسة جديدة. المهمة اللي بعدها بتبدأ بس لما اللي قبلها تبقى DONE والجلسة تقفل. أي موافقة أو مراجعة أو سؤال بيوقف الطابور لحد ما ترد.', 'The agent works on them one after another, each in a new session. The next starts only when the previous one is DONE and its session has closed. Any approval, review or question stops the queue until you answer.')}</p>
+      <ol class="qlist">${list.map((it, i) => `<li><span dir="auto">${esc(it.title)}</span> ${wid(it.id)}<span class="grow"></span><button type="button" class="ibtn" data-q-up="${i}" ${i === 0 ? 'disabled' : ''} aria-label="${A('لفوق', 'Up')}">↑</button><button type="button" class="ibtn" data-q-down="${i}" ${i === list.length - 1 ? 'disabled' : ''} aria-label="${A('لتحت', 'Down')}">↓</button></li>`).join('')}</ol>
+      <fieldset><legend class="small">${A('الوكيل', 'Agent')}</legend>
+        <label class="small"><input type="radio" name="provider" value="codex" checked> Codex</label>
+        ${execView?.lanes?.find((lane) => lane.project === pid)?.userSessions ? `<label class="small"><input type="radio" name="provider" value="claude"> Claude Code <span class="tiny muted">(${A('بمساعدتك: الكونسول مبيقدرش يشغّل Claude Code، فإنت بتبدأ كل مهمة فيه وتربطها. على حسابات Team/Enterprise رسايل الكونسول ممكن تكون مقفولة.', 'assisted: the console cannot start Claude Code, so you start and link each task there. On Team/Enterprise logins console messages may be off.')})</span></label>` : ''}</fieldset>
+      <label class="small"><input type="checkbox" name="pauseBetween"> ${A('وقّف بعد كل مهمة لحد ما أقول كمّل', 'Pause after each task until I say continue')}</label>
+      <p class="tiny muted">${A(`طلبات الموافقة بتستنى ${approvalMinutes()} دقيقة وبعدين بتترفض تلقائي (تقدر تغيّرها من «الإعداد والتشغيل»).`, `Approval requests wait ${approvalMinutes()} minutes, then are denied automatically (change it in Setup & run).`)}</p>
+      <label class="small"><input type="checkbox" name="confirmed" data-queue-confirm> ${A('فاهم إن الوكيل هيشتغل عليهم بالترتيب ده', 'I understand the agent works through them in this order')}</label>
+      <div class="row"><button type="button" class="btn ghost" data-queue-cancel>${A('إلغاء', 'Cancel')}</button><span class="grow"></span><button class="btn go" type="submit" data-queue-start disabled>${A('ابدأ الطابور', 'Start queue')}</button></div></form>`;
+    if (!d.open) d.showModal();
+  }
+  const approvalMinutes = () => (agentSetup?.pid === pid ? agentSetup.data?.approvalWait?.minutes : null) ?? Math.round((agent?.permissionTimeoutMs ?? 300000) / 60000);
+  async function startQueue(form) {
+    const body = { workIds: selected, provider: form.elements.provider?.value ?? 'codex', pauseBetween: form.elements.pauseBetween.checked, confirmed: form.elements.confirmed.checked, lang, mode: 'workspace-write' };
+    try {
+      await post(`/api/p/${pid}/execution/run`, JSON.stringify(body), { 'Content-Type': 'application/json' });
+      document.getElementById('queuedlg')?.close();
+      selecting = false; selected = [];
+      location.hash = '#/agents';
+      await loadExecution();
+      render();
+    } catch (err) { toast(esc(why(err))); }
+  }
+  // PF-0112 M2: parallel lanes (S4), Shared Project Mode from the console, and Clean up.
+  async function openParallelSheet() {
+    let d = document.getElementById('paralleldlg');
+    if (!d) { d = document.createElement('dialog'); d.id = 'paralleldlg'; d.className = 'panel'; document.body.appendChild(d); }
+    d.innerHTML = `<p class="small">${A('بيحمّل…', 'Loading…')}</p>`;
+    if (!d.open) d.showModal();
+    let info;
+    try { info = await api(`/api/p/${pid}/lanes`); } catch (err) { d.innerHTML = `<p class="small">${esc(why(err))}</p><button class="btn ghost" data-parallel-cancel>${A('قفل', 'Close')}</button>`; return; }
+    const pre = info.preconditions ?? { blockers: [] };
+    const needShared = pre.blockers.some((b) => b.code === 'SHARED_REQUIRED');
+    let preview = null;
+    if (needShared) { try { preview = await api(`/api/p/${pid}/shared/preview`); } catch { preview = null; } }
+    const list = selected.map(byId).filter(Boolean);
+    const ok = (good, text) => `<li>${good ? '✓' : '✗'} ${text}</li>`;
+    d.innerHTML = `<form method="dialog" data-parallel-form class="wizform"><h2 style="font-size:18px">${A(`شغل متوازي: ${list.length} مسار`, `Parallel work: ${list.length} lane${list.length === 1 ? '' : 's'}`)}</h2>
+      <p class="small">${A('كل مهمة بتاخد فولدر وbranch خاصين بيها (Git worktree)، ووكيل لوحدها. ملفاتك في المشروع الأساسي مبتتلمسش.', 'Each task gets its own folder and branch (a Git worktree) and its own agent. Your files in the main project are not touched.')}</p>
+      <ul class="checklist small">
+        ${ok(!pre.blockers.some((b) => b.code === 'GIT_UNVERIFIED_PLATFORM'), A(`Git متجرّب على الجهاز ده${pre.platform ? ` (${esc(pre.platform)})` : ''}`, `Git verified on this machine${pre.platform ? ` (${esc(pre.platform)})` : ''}`))}
+        ${ok(!needShared, A('Shared Project Mode متفعّل ومتعمله commit', 'Shared Project Mode enabled and committed'))}
+        ${ok(!pre.blockers.some((b) => b.code === 'NOT_ON_INTEGRATION_BRANCH'), A(`على فرع الدمج${pre.integrationBranch ? ` (${esc(pre.integrationBranch)})` : ''}${pre.base ? ` @ ${esc(pre.base.slice(0, 7))}` : ''}`, `On the integration branch${pre.integrationBranch ? ` (${esc(pre.integrationBranch)})` : ''}${pre.base ? ` @ ${esc(pre.base.slice(0, 7))}` : ''}`))}
+        ${ok(!pre.blockers.some((b) => b.code === 'GIT_EXTERNAL_DRIVERS'), A('مفيش filters أو merge drivers خارجية في الريبو', 'No external Git filters or merge drivers'))}
+      </ul>
+      ${pre.blockers.filter((b) => b.code !== 'SHARED_REQUIRED').map((b) => `<p class="tiny fail"${trDir(b, 'message')}>${trHtml(b, 'message')}</p>`).join('')}
+      ${needShared ? sharedPanel(preview, A('محتاج Shared Project Mode', 'Shared Project Mode is needed'), A('علشان أرقام الشغل متتكررش بين المسارات.', 'So work ids never collide between lanes.')) : ''}
+      <p class="tiny muted">${A('فولدر المسارات', 'Lanes folder')}: <span class="ltr">${esc(pre.lanesRoot ?? '')}</span></p>
+      <ol class="qlist">${list.map((it) => `<li><span dir="auto">${esc(it.title)}</span> ${wid(it.id)}</li>`).join('')}</ol>
+      <label class="small">${A('أقصى عدد وكلاء في نفس الوقت', 'Most agents at once')} <select name="maxLanes"><option value="2">2</option><option value="3">3 (${A('تجريبي', 'experimental')})</option><option value="4">4 (${A('تجريبي', 'experimental')})</option></select></label>
+      <p class="tiny muted">${A('كل مسار بيستخدم اشتراكك. الشغلانة لازم تكون متعملها commit في الفرع الأساسي.', 'Each lane uses your subscription. Each work item must already be committed on the integration branch.')}</p>
+      <label class="small"><input type="checkbox" name="confirmed" data-parallel-confirm> ${A('أنشئ الفولدرات والفروع yf/… ليا وابدأ الوكلاء', 'Create the folders and yf/… branches for me and start the agents')}</label>
+      <div class="row"><button type="button" class="btn ghost" data-parallel-cancel>${A('إلغاء', 'Cancel')}</button><span class="grow"></span><button class="btn go" type="submit" data-parallel-start disabled ${pre.ok || (needShared && pre.blockers.length === 1) ? '' : 'data-blocked'}>${A('ابدأ', 'Start')}</button></div></form>`;
+  }
+  async function startParallelRun(form) {
+    try {
+      await post(`/api/p/${pid}/execution/parallel`, JSON.stringify({ workIds: selected, maxLanes: Number(form.elements.maxLanes.value), confirmed: form.elements.confirmed.checked, lang }), { 'Content-Type': 'application/json' });
+      document.getElementById('paralleldlg')?.close();
+      selecting = false; selected = [];
+      await reloadProjects().catch(() => {});
+      location.hash = '#/agents';
+      await loadExecution();
+      render();
+    } catch (err) { toast(esc(why(err))); }
+  }
+  // PF-0113: the one Shared Project Mode panel — the CLI's own dry-run preview, a confirmation, and
+  // the existing enable endpoint (its guards stay on the server). Used by Parallel lanes and Overview.
+  function sharedPanel(preview, title, reason) {
+    return `<div class="panel sub" data-shared-panel><b class="small">${title}</b><p class="tiny muted">${reason} ${A('ده هيشغّل yallaflow shared enable؛ بعدها اعمل commit لـ .yallaflow/. أرقام الشغل والمصادر الموجودة مبتتغيرش؛ الجديدة بس بتاخد شكل PF-<tag>-####.', 'This runs yallaflow shared enable; then commit .yallaflow/. Existing work and source IDs never change; only new ones take the PF-<tag>-#### form.')}</p>${preview?.text ? `<pre class="pdetail" dir="ltr">${esc(preview.text)}</pre>` : preview?.error ? `<p class="tiny fail" dir="ltr">${esc(preview.error)}</p>` : ''}
+        <label class="small"><input type="checkbox" data-shared-confirm> ${A('فاهم وموافق على التغيير ده', 'I understand and accept this change')}</label> <button type="button" class="btn sm" data-shared-enable disabled>${A('فعّل Shared Project Mode', 'Enable Shared Project Mode')}</button></div>`;
+  }
+  async function openSharedSheet() {
+    let d = document.getElementById('shareddlg');
+    if (!d) { d = document.createElement('dialog'); d.id = 'shareddlg'; d.className = 'panel'; document.body.appendChild(d); }
+    d.innerHTML = `<p class="small">${A('بيحمّل…', 'Loading…')}</p>`;
+    if (!d.open) d.showModal();
+    let preview = null;
+    try { preview = await api(`/api/p/${pid}/shared/preview`); } catch (err) { preview = { error: why(err) }; }
+    d.innerHTML = `<div class="wizform"><h2 style="font-size:18px">Shared Project Mode</h2>${sharedPanel(preview, A('شغّل Shared Project Mode', 'Turn on Shared Project Mode'), A('علشان الشغل اللي بيتعمل على فروع مختلفة ميخدش نفس الرقم.', 'So work created on different branches never gets the same ID.'))}<div class="row"><span class="grow"></span><button type="button" class="btn ghost" data-shared-cancel>${A('إلغاء', 'Cancel')}</button></div></div>`;
+  }
+  async function enableSharedNow() {
+    try {
+      await post(`/api/p/${pid}/execution/shared-enable`, JSON.stringify({ confirmed: true }), { 'Content-Type': 'application/json' });
+      const fromLanes = document.getElementById('paralleldlg')?.open;
+      toast(fromLanes ? A('Shared Project Mode اتفعّل. اعمل commit لـ .yallaflow/ وبعدين ابدأ المسارات.', 'Shared Project Mode is on. Commit .yallaflow/, then start the lanes.') : A('Shared Project Mode اتفعّل. اعمل commit لـ .yallaflow/ علشان الفريق ياخده.', 'Shared Project Mode is on. Commit .yallaflow/ to share it with the team.'));
+      if (fromLanes) { openParallelSheet(); return; }
+      document.getElementById('shareddlg')?.close();
+      document.querySelector('dialog.create [data-shared-hint]')?.replaceChildren();
+      await loadProjectOverview();
+      render();
+    } catch (err) { toast(esc(why(err))); }
+  }
+  async function openCleanup(homePid, laneId) {
+    let d = document.getElementById('cleanupdlg');
+    if (!d) { d = document.createElement('dialog'); d.id = 'cleanupdlg'; d.className = 'panel'; document.body.appendChild(d); }
+    let info;
+    try { info = await api(`/api/p/${homePid}/lanes`); } catch (err) { toast(esc(why(err))); return; }
+    const lane = info.lanes.find((l) => l.id === laneId);
+    if (!lane) { toast(A('المسار ده مش موجود.', 'This lane no longer exists.')); return; }
+    const c = lane.cleanup;
+    d.innerHTML = `<form method="dialog" data-cleanup-form data-home="${esc(homePid)}" data-lane="${esc(laneId)}" class="wizform"><h2 style="font-size:18px">${A('تنظيف المسار', 'Clean up lane')} <span class="ltr">${esc(lane.slug)}</span></h2>
+      <p class="tiny muted ltr">${esc(lane.path)} · ${esc(lane.branch)}</p>
+      ${c.ok ? `<p class="small">${A('الفولدر هيتشال. الفرع', 'The folder will be removed. The branch')} <span class="ltr">${esc(lane.branch)}</span> ${A('هيفضل موجود. سجلات YallaFlow بتاعة المسار هتتنسخ للمشروع الأساسي الأول.', 'stays. The lane’s YallaFlow records are copied into the main project first.')}</p>
+        <p class="small"><b>${A('اللي هيتمسح', 'What will be deleted')}:</b> ${c.deletions.length ? c.deletions.map((f) => `<code class="ltr">${esc(f)}</code>`).join(' ') : A('مفيش ملفات متجاهلة', 'no ignored files')}</p>
+        <label class="small"><input type="checkbox" name="confirmed" data-cleanup-confirm> ${A('اتأكدت من القايمة دي', 'I checked this list')}</label>`
+      : `<p class="small fail">${A('مينفعش ينضف دلوقتي', 'It cannot be cleaned up now')}:</p><ul class="small">${c.blockers.map((b) => `<li${trDir(b, 'message')}>${trHtml(b, 'message')}</li>`).join('')}</ul>`}
+      <input type="hidden" name="deletions" value="${esc(JSON.stringify(c.deletions))}">
+      <div class="row"><button type="button" class="btn ghost" data-cleanup-cancel>${A('إلغاء', 'Cancel')}</button><span class="grow"></span>${c.ok ? `<button class="btn go" type="submit" data-cleanup-start disabled>${A('نضّف', 'Clean up')}</button>` : ''}</div></form>`;
+    if (!d.open) d.showModal();
+  }
+  async function runCleanup(form) {
+    try {
+      const result = await post(`/api/p/${form.dataset.home}/execution/lane-cleanup`, JSON.stringify({ laneId: form.dataset.lane, deletions: JSON.parse(form.elements.deletions.value), confirmed: form.elements.confirmed.checked }), { 'Content-Type': 'application/json' });
+      document.getElementById('cleanupdlg')?.close();
+      toast(A(`المسار اتشال. الفرع ${result.branch} لسه موجود.`, `Lane removed. The branch ${result.branch} stays.`));
+      await reloadProjects().catch(() => {});
+      await loadExecution();
+      render();
+    } catch (err) { toast(esc(why(err))); }
+  }
+  // PF-0112 M3: Review & Merge (S6 review, S9 progress, S10 outcomes) per lane.
+  let mergesByHome = {};
+  async function loadMerges() {
+    const homes = [...new Set((execView?.lanes ?? []).filter((lane) => lane.kind === 'lane' && lane.parent).map((lane) => lane.parent))];
+    const next = {};
+    for (const home of homes) { try { next[home] = (await api(`/api/p/${home}/merges`)).merges; } catch { next[home] = []; } }
+    mergesByHome = next;
+  }
+  const latestMerge = (lane) => (mergesByHome[lane.parent] ?? []).find((m) => m.lane?.id === lane.laneId) ?? null;
+  const STEP_LABEL = {
+    revalidate: { ar: 'إعادة فحص اللي وافقت عليه', en: 'Re-check what you approved' }, 'lane-commit': { ar: 'commit في المسار', en: 'Commit in the lane' },
+    'merge-commit': { ar: 'تجهيز commit الدمج (في الذاكرة)', en: 'Prepare the merge commit (in memory)' }, 'lane-ff': { ar: 'نقل المسار للدمج', en: 'Move the lane to the merge' },
+    checks: { ar: 'تشغيل الفحوص على النتيجة', en: 'Run the checks on the result' }, 'integration-preview': { ar: 'معاينة دمج المعرفة', en: 'Preview knowledge integration' },
+    'target-ff': { ar: 'نقل الفرع الأساسي', en: 'Move the main branch' }, 'post-merge': { ar: 'فحص بعد الدمج', en: 'Check after the merge' },
+    knowledge: { ar: 'دمج المعرفة', en: 'Integrate knowledge' }, record: { ar: 'تسجيل الدمج', en: 'Record the integration' }, 'knowledge-commit': { ar: 'commit المعرفة', en: 'Knowledge commit' }
+  };
+  const MERGE_STATE = {
+    queued: { ar: 'في الدور', en: 'queued' }, merging: { ar: 'بيدمج…', en: 'merging…' }, merged: { ar: 'اتدمج، لسه بيتحقق', en: 'merged, verifying' },
+    verified: { ar: 'MERGED & VERIFIED', en: 'MERGED & VERIFIED' }, blocked: { ar: 'واقف', en: 'blocked' }, failed: { ar: 'فشل', en: 'failed' },
+    'needs-approval': { ar: 'محتاج موافقة جديدة', en: 'needs a fresh approval' }, 'merged-not-verified': { ar: 'اتدمج ومش متأكَّد', en: 'merged, not verified' },
+    'knowledge-needs-approval': { ar: 'اتدمج · المعرفة محتاجة مراجعة', en: 'merged · knowledge needs review' }, interrupted: { ar: 'اتقطع', en: 'interrupted' }, abandoned: { ar: 'متساب', en: 'abandoned' }
+  };
+  function mergeBlock(lane) {
+    const m = latestMerge(lane);
+    const btn = (attr, label, cls = 'ghost') => `<button class="btn sm ${cls}" ${attr}>${label}</button>`;
+    const review = btn(`data-review-open="${esc(lane.laneId)}" data-home="${esc(lane.parent)}"`, A('راجع وادمج', 'Review & merge'), 'go');
+    if (!m || m.state === 'abandoned') return lane.session ? '' : `<div class="xmerge"><span class="chip"><i></i>${A('مش متدمج', 'Not merged')}</span>${review}</div>`;
+    const tone = { verified: 'done', merging: 'active', queued: 'active', merged: 'active', blocked: 'fail', failed: 'fail', 'merged-not-verified': 'fail', 'knowledge-needs-approval': 'you', 'needs-approval': 'you', interrupted: 'paused' }[m.state] ?? '';
+    const steps = ['merging', 'queued', 'merged', 'interrupted', 'failed', 'blocked', 'merged-not-verified', 'needs-approval', 'knowledge-needs-approval'].includes(m.state)
+      ? `<ol class="xsteps">${m.steps.map((s) => `<li class="${s.state}">${{ done: '✓', running: '●', stopped: '⛔', todo: '○' }[s.state] ?? '○'} ${L(STEP_LABEL[s.name] ?? { ar: esc(s.name), en: esc(s.name) })}</li>`).join('')}</ol>` : '';
+    const acts = [
+      ['interrupted', 'failed', 'merged-not-verified'].includes(m.state) ? btn(`data-merge-act="continue" data-merge="${esc(m.id)}" data-home="${esc(lane.parent)}"`, A('كمّل الدمج', 'Continue merge'), 'go') : '',
+      ['needs-approval', 'blocked'].includes(m.state) ? review : '',
+      ['interrupted', 'failed', 'blocked', 'needs-approval', 'merged-not-verified', 'knowledge-needs-approval'].includes(m.state) ? btn(`data-merge-act="abandon" data-merge="${esc(m.id)}" data-home="${esc(lane.parent)}"`, A('سيبه زي ما هو', 'Abandon (change nothing)')) : ''
+    ].join('');
+    return `<div class="xmerge"><div class="row"><span class="chip ${tone}"><i></i>${L(MERGE_STATE[m.state] ?? { ar: esc(m.state), en: esc(m.state) })}</span>${m.state === 'verified' && m.merge ? `<span class="tiny muted ltr">${esc(m.target ?? '')} @ ${esc(m.merge.slice(0, 7))}</span>` : ''}</div>${steps}${m.reason ? `<p class="tiny"${trDir(m, 'reason')}>${trHtml(m, 'reason')}</p>` : ''}${m.undo ? `<p class="tiny muted ltr">${esc(m.undo)}</p>` : ''}${acts ? `<div class="row">${acts}</div>` : ''}</div>`;
+  }
+  // Arabic headings for the server's readiness checks (the detail stays as YallaFlow wrote it).
+  const READY_AR = { task: 'المهمة', session: 'الوكيل', platform: 'المنصة', signing: 'التوقيع', drivers: 'filters وmerge drivers', config: 'إعدادات Git', busy: 'Git مشغول', target: 'الفرع الأساسي', changes: 'التغييرات', secrets: 'ملفات شكلها أسرار', conflicts: 'التعارضات', unticked: 'ملفات مش متعلّم عليها', ignored: 'ملفات Git متجاهلها', 'checks-safety': 'الدمج الآلي', home: 'ملفاتك في المشروع الأساسي', checks: 'الفحوص' };
+  let reviewState = null;
+  async function openReview(home, laneId, { exclude = [], include = [], checks = [] } = {}) {
+    let d = document.getElementById('reviewdlg');
+    if (!d) { d = document.createElement('dialog'); d.id = 'reviewdlg'; d.className = 'panel wide'; document.body.appendChild(d); }
+    if (!d.open) { d.innerHTML = `<p class="small">${A('بيجهّز المراجعة… (بيحسب الدمج في الذاكرة من غير ما يلمس ملفاتك)', 'Preparing the review… (computing the merge in memory, without touching your files)')}</p>`; d.showModal(); }
+    let r;
+    try { r = await api(`/api/p/${home}/lanes/${laneId}/review?exclude=${encodeURIComponent(exclude.join('\n'))}&include=${encodeURIComponent(include.join('\n'))}&checks=${encodeURIComponent(checks.join('\n'))}`); } catch (err) { d.innerHTML = `<p class="small fail">${esc(why(err))}</p><button class="btn ghost" data-review-cancel>${A('قفل', 'Close')}</button>`; return; }
+    reviewState = { home, laneId, exclude, include, checks, planHash: r.planHash, ok: r.ok };
+    const mark = { ok: '✓', warn: '⚠', block: '✗' };
+    // For a non-technical reader: the code first; YallaFlow's own records of the task folded into one line.
+    const isRecord = (c) => c.path.startsWith('.yallaflow/');
+    const uncommitted = r.changes.filter((c) => !c.committed && !isRecord(c));
+    const records = r.changes.filter((c) => !c.committed && isRecord(c));
+    // Review H1: a check is shown in full (program path and every argument), never shortened.
+    const shown = (argv) => argv.map((part) => (/^[A-Za-z0-9_./=:@%+,-]+$/.test(part) ? part : JSON.stringify(part))).join(' ');
+    const agentChecks = r.agentChecks ?? [];
+    const committedList = r.changes.filter((c) => c.committed);
+    const laneName = r.plan.lane.branch.replace(/^yf\//, '');
+    d.innerHTML = `<form method="dialog" data-review-form class="wizform"><h2 style="font-size:18px">${A('مراجعة ودمج', 'Review & merge')}: <span dir="auto">${esc(laneName)}</span> ${lang === 'ar' ? '←' : '→'} <span class="ltr">${esc(r.plan.target.branch ?? '')}</span></h2>
+      <p class="small"><b>${A('المهمة', 'Task')}:</b> ${r.plan.workIds.map((id) => `<span class="ltr">${esc(id)}</span>`).join(', ')} · ${A('DONE ✓ · التغييرات لسه متدمجتش', 'DONE ✓ · changes NOT MERGED yet')}</p>
+      <h3 class="small">${A('الجاهزية', 'Readiness')}</h3><ul class="checklist small">${r.readiness.map((x) => `<li class="${x.level}">${mark[x.level]} ${lang === 'ar' && READY_AR[x.id] ? `<b>${READY_AR[x.id]}</b> <span class="tiny muted"${trDir(x)}>${trHtml(x)}</span>` : trHtml(x)}</li>`).join('')}</ul>
+      ${r.conflicts?.length ? `<div class="panel sub conflictbox"><p class="small"><b>${A('فيه تعارض', 'There is a conflict')}:</b> ${r.conflicts.map((f) => `<code class="ltr">${esc(f)}</code>`).join(' ')}</p><p class="tiny muted">${A('YallaFlow مبيحلش التعارض بنفسه. رجّع المهمة لوكيلها: هيدمج الفرع الأساسي في المسار ويحل التعارض ويتحقق تاني، وبعدها تراجع وتوافق من جديد.', 'YallaFlow never resolves a conflict itself. Send the task back to its agent: it brings the main branch into the lane, resolves, and verifies again; then you review and approve afresh.')}</p><button type="button" class="btn sm go" data-sendback="${esc(laneId)}" data-home="${esc(home)}">${A('رجّعها لوكيلها', 'Send back to its agent')}</button></div>` : ''}
+      <h3 class="small">${A('التغييرات', 'Changes')}</h3>
+      <ul class="xfiles small">${uncommitted.map((c) => `<li><label><input type="checkbox" data-review-file="${esc(c.path)}" data-secret="${c.secret ? '1' : ''}" ${c.approved ? 'checked' : ''}> <code class="ltr">${esc(c.path)}</code></label>${c.secret ? ` <span class="tiny fail">⚠ ${A('شكله فيه أسرار؛ مش متضاف إلا لو علّمت عليه', 'looks like a secret; not included unless ticked')}</span>` : ''}${c.large ? ` <span class="tiny muted">${A('كبير', 'large')}</span>` : ''}${c.binary ? ` <span class="tiny muted">${A('ثنائي', 'binary')}</span>` : ''}${c.status === 'deleted' ? ` <span class="tiny muted">${A('اتمسح', 'deleted')}</span>` : ''}</li>`).join('') || `<li class="tiny muted">${A('مفيش تغييرات في الكود لسه متحفظتش', 'No unsaved code changes')}</li>`}${records.length ? `<li class="tiny muted">✓ ${A(`سجلات YallaFlow للمهمة (${records.length} ملف) — بتتحفظ مع الكود`, `YallaFlow’s records of the task (${records.length} files) — saved with the code`)}</li>` : ''}</ul>
+      ${committedList.length ? `<p class="tiny muted">${A('متعملها commit في المسار بالفعل', 'Already committed in the lane')}: ${committedList.filter((c) => !c.secret).map((c) => `<code class="ltr">${esc(c.path)}</code>`).join(' ')}</p>` : ''}
+      ${committedList.filter((c) => c.secret).map((c) => `<p class="small"><label><input type="checkbox" data-review-file="${esc(c.path)}" data-secret="1" ${c.secretAccepted ? 'checked' : ''}> <code class="ltr">${esc(c.path)}</code></label> <span class="tiny fail">⚠ ${A('الوكيل عمله commit وشكله فيه أسرار؛ مش هيتدمج إلا لو علّمت عليه', 'the agent committed it and it looks like a secret; it is not merged unless you tick it')}</span></p>`).join('')}
+      ${(r.historySecrets ?? []).map((c) => `<p class="small"><label><input type="checkbox" data-review-file="${esc(c.path)}" data-secret="1" ${c.accepted ? 'checked' : ''}> <code class="ltr">${esc(c.path)}</code></label> <span class="tiny fail">⚠ ${A('commit في المسار ضاف حاجة شكلها سر واتشالت بعدين، بس هتفضل في تاريخ الفرع؛ مش هيتدمج إلا لو علّمت عليه', 'a lane commit added something that looks like a secret and later removed it, but it stays in the branch history; it is not merged unless you tick it')}</span></p>`).join('')}
+      ${agentChecks.length ? `<details class="small"><summary>${A('أوامر شغّلها الوكيل في جلسته (YallaFlow مبيشغّلهاش)', 'Commands the agent ran in its own session (YallaFlow does not run them)')}</summary><ul class="xfiles small">${agentChecks.map((c) => `<li><code class="ltr" style="white-space:pre-wrap;word-break:break-all">${esc(c.shown)}</code></li>`).join('')}</ul></details>` : ''}
+      ${!r.ok && r.manual?.length ? `<details class="small"${r.readiness.some((x) => x.id === 'checks-safety' && !x.ok) ? ' open' : ''}><summary>${A('ادمج بإيدك', 'Merge by hand')}</summary><p class="tiny muted">${A('أوامر Git عادية تشغّلها انت وتراجع كل خطوة. YallaFlow مبيشغّلش أي حاجة منها.', 'Ordinary Git commands you run, reviewing each step. YallaFlow runs none of them.')}</p><pre class="pdetail" dir="ltr">${r.manual.map(esc).join('\n')}</pre></details>` : ''}
+      <h3 class="small">${A('الخطة', 'Plan')}</h3><ol class="small">
+        <li>${A('commit في المسار', 'Commit in the lane')}: <code class="ltr">${esc(r.plan.laneMessage.split('\n')[0])}</code></li>
+        <li>${A('commit دمج واحد في الذاكرة (من غير ما يلمس أي ملفات)', 'One merge commit, made in memory (no files touched)')}</li>
+        <li>${A('تشغيل الفحوص على النتيجة في المسار', 'Run the checks on the result in the lane')}: ${r.plan.checks.map((c) => `<code class="ltr" style="white-space:pre-wrap;word-break:break-all">${esc(shown(c.argv))}</code>`).join(' ') || '—'}</li>
+        <li>${A('نقل', 'Fast-forward')} <span class="ltr">${esc(r.plan.target.branch ?? '')}</span> · ${A('فحص · دمج المعرفة · تسجيل · commit المعرفة', 'verify · integrate knowledge · record · knowledge commit')}${r.plan.expectedKnowledge.length ? ` (${r.plan.expectedKnowledge.length})` : ''}</li>
+        <li>${A('المسار بيفضل موجود؛ التنظيف خطوة منفصلة', 'The lane stays; Clean up is a separate step')}</li></ol>
+      ${r.plan.hooks.length ? `<p class="tiny muted">${A('hooks/CI الخاصة بالمشروع مش هتشتغل مع الـ commit والدمج؛ الفحوص اللي فوق هي اللي هتشتغل.', 'The project’s hooks/CI will not run during the commit and merge; the checks above run instead.')} (${r.plan.hooks.map(esc).join(', ')})</p>` : ''}
+      <label class="small"><input type="checkbox" name="confirmed" data-review-confirm ${r.ok ? '' : 'disabled'}> ${A(`موافق على commit لـ ${r.plan.approved.length} ملف في ${esc(r.plan.lane.branch)}، والدمج في ${esc(r.plan.target.branch ?? '')}، وتشغيل الفحوص دي، وتسجيل الدمج (المشروع هيتطلب YallaFlow 1.5.0 أو أحدث)`, `I approve committing ${r.plan.approved.length} file(s) to ${esc(r.plan.lane.branch)}, merging into ${esc(r.plan.target.branch ?? '')}, running these checks, and recording the integration (this project will require YallaFlow 1.5.0 or newer)`)}</label>
+      <div class="row"><button type="button" class="btn ghost" data-review-cancel>${A('إلغاء', 'Cancel')}</button><span class="grow"></span><button class="btn go" type="submit" data-review-start disabled>${A('وافق وادمج', 'Approve & merge')}</button></div></form>`;
+  }
+  async function approveMerge() {
+    const s = reviewState;
+    try {
+      await post(`/api/p/${s.home}/execution/merge-approve`, JSON.stringify({ laneId: s.laneId, planHash: s.planHash, exclude: s.exclude, include: s.include, checksInclude: s.checks, confirmed: true, acceptMinimumVersion: '1.5.0' }), { 'Content-Type': 'application/json' });
+      document.getElementById('reviewdlg')?.close();
+      await loadExecution(); await loadMerges(); render();
+    } catch (err) {
+      toast(esc(why(err)));
+      if (err.code === 'PLAN_CHANGED') openReview(s.home, s.laneId, { exclude: s.exclude, include: s.include, checks: s.checks });
+    }
+  }
+  async function execAct(projectId, action, body) {
+    try {
+      await post(`/api/p/${projectId}/execution/${action}`, JSON.stringify(body), { 'Content-Type': 'application/json' });
+      scheduleExecution();
+    } catch (err) { toast(esc(why(err))); }
+  }
+  let execTimer = null;
+  function scheduleExecution() {
+    if (!agentsOn) return;
+    clearTimeout(execTimer);
+    execTimer = setTimeout(async () => { await loadExecution(); if (route().v === 'agents' || bellOpen) render(); else renderBellCount(); }, 250);
+  }
+  function renderBellCount() {
+    const bell = document.querySelector('[data-bell]');
+    if (bell) { const n = snap ? needs().length : 0; bell.innerHTML = `🔔${n ? `<b>${n}</b>` : ''}`; }
   }
   async function loadAgent() {
     if (!agentsOn || !chatCtx()) return;
@@ -522,12 +788,18 @@
     }
     return out.slice(-80);
   }
+  // PF-0112: what the request touches, when the provider names it (files, the command).
+  function permScope(p) {
+    const cmd = p.command ? `<pre class="pdetail" dir="ltr" style="white-space:pre-wrap;word-break:break-all">$ ${esc(p.command)}</pre>${p.commandCut ? `<p class="tiny fail">${A(`⚠ الأمر أطول من كده بـ ${Number(p.commandCut)} حرف مش ظاهرين. ارفض لو مش متأكد.`, `⚠ The command continues for ${Number(p.commandCut)} more characters not shown. Deny if unsure.`)}</p>` : ''}` : '';
+    const files = p.paths?.length ? `<div class="tiny pfiles" dir="ltr">${p.paths.map((f) => `<code>${esc(f)}</code>`).join(' ')}${p.morePaths ? ` <b>+${Number(p.morePaths)}</b>` : ''}</div>` : '';
+    return cmd + files;
+  }
   function permCard(p) {
     const open = !p.decision;
     const label = { allow: A('اتسمح', 'Allowed'), allow_session: A('اتسمح للجلسة', 'Allowed for this session'), deny: A('اترفض', 'Denied'), elsewhere: A('اتجاوب عليه في Claude Code', 'Answered in Claude Code') }[p.decision] ?? '';
     const by = p.by === 'timeout' ? A('(محدش ردّ، فاترفض تلقائي)', '(no answer, denied automatically)') : p.by && p.by !== 'user' && p.decision !== 'elsewhere' ? `(${esc(p.by)})` : '';
     const sentNote = p.provider === 'claude' && p.decision ? `<span class="tiny muted">${A('Claude Code بيطبّق أول رد يوصله (الكونسول أو الترمينال).', 'Claude Code applies the first answer it receives (console or terminal).')}</span>` : '';
-    return `<div class="aperm ${open ? 'open' : ''}"><div class="row"><span class="ptag">${A('إذن للأداة', 'Tool permission')}</span><b class="grow">${esc(p.title)}</b></div>${p.detail ? `<pre class="pdetail" dir="ltr">${esc(p.detail)}</pre>` : ''}
+    return `<div class="aperm ${open ? 'open' : ''}"><div class="row"><span class="ptag">${A('إذن للأداة', 'Tool permission')}</span><b class="grow">${esc(p.title)}</b></div>${permScope(p)}${p.detail ? `<pre class="pdetail" dir="ltr">${esc(p.detail)}</pre>` : ''}
       ${open ? `<div class="row">${p.decisions.map((d) => `<button class="btn sm ${d === 'deny' ? 'ghost' : 'go'}" data-agent-perm="${esc(p.requestId)}" data-decision="${d}">${{ allow: A('اسمح مرة', 'Allow once'), allow_session: A('اسمح للجلسة', 'Allow for session'), deny: A('ارفض', 'Deny') }[d]}</button>`).join('')}<span class="tiny muted">${A('لو محدش ردّ هيترفض تلقائي.', 'Unanswered requests are denied automatically.')}</span></div>` : `<div class="tiny ${p.overridden ? 'warn' : 'muted'}">${label} ${by}</div>${sentNote}`}</div>`;
   }
   // The agent chat as a floating window (owner choice, PF-0059): a corner button shows the
@@ -816,7 +1088,7 @@
       return `<section class="panel agent" id="agent">${head}${err}${stopCard(it)}${waiting}<div class="apicks">${picks}</div>${problems}${action}${setupHint()}<p class="tiny muted">${A('الوكيل بيستخدم اشتراكك الموجود بس، من غير مفاتيح API. أذونات الأدوات مش موافقات YallaFlow.', 'Agents use only your existing subscription, never API keys. Tool permissions are not YallaFlow approvals.')}</p></section>`;
     }
     const cap = provider(s.provider)?.capabilities ?? {};
-    const modeChip = s.mode ? `<span class="chip ${autoApproves(s.mode) ? 'wait' : 'todo'}" title="${esc(L(MODE_LABEL[s.mode] ?? { ar: s.mode, en: s.mode }))}">${esc(s.mode)}</span>` : '';
+    const modeChip = s.mode ? `<span class="chip ${autoApproves(s.mode) ? 'wait' : 'todo'}" title="${esc(L(MODE_LABEL[s.mode] ?? { ar: esc(s.mode), en: esc(s.mode) }))}">${esc(s.mode)}</span>` : '';
     const warn = isForbidden(s.mode) ? `<div class="awarn" role="alert">⛔ ${esc(L(MODE_LABEL.bypassPermissions))}. ${A('غيّر الوضع من Claude Code.', 'Change the mode in Claude Code.')}</div>` : autoApproves(s.mode) ? `<div class="awarn">⚠ ${esc(L(MODE_LABEL[s.mode]))}. ${A('مش كل فعل هيظهر هنا كطلب إذن.', 'Not every action will appear here as a permission request.')}</div>` : '';
     // Claude Code takes messages only once a hook has reported its permission mode (PF-0065).
     const modePending = s.provider === 'claude' && s.connected && !s.mode;
@@ -1010,7 +1282,7 @@
       return;
     }
     d.innerHTML = `<form data-gate-form data-gate-item="${esc(id)}" data-gate-name="${esc(gate)}" data-requested="${esc(m.requestedAt ?? '')}" data-digest="${esc(m.digest)}" data-request="${esc(newRequestId())}" novalidate>
-      <div class="row gatehead"><h2 id="gate-h" class="grow">${A('راجع وقرّر', 'Review and decide')}: ${esc(L(GATE_AR[gate] ?? { ar: gate, en: gate }))} <span class="ltr tiny muted">${esc(gate)}</span></h2><button type="button" class="btn ghost sm" data-gate-wide aria-pressed="${d.classList.contains('full')}">${d.classList.contains('full') ? A('⤡ صغّر', '⤡ Smaller') : A('⤢ كبّر', '⤢ Expand')}</button><button type="button" class="btn ghost sm" data-act-cancel>${A('إلغاء', 'Cancel')}</button></div>
+      <div class="row gatehead"><h2 id="gate-h" class="grow">${A('راجع وقرّر', 'Review and decide')}: ${esc(L(GATE_AR[gate] ?? { ar: esc(gate), en: esc(gate) }))} <span class="ltr tiny muted">${esc(gate)}</span></h2><button type="button" class="btn ghost sm" data-gate-wide aria-pressed="${d.classList.contains('full')}">${d.classList.contains('full') ? A('⤡ صغّر', '⤡ Smaller') : A('⤢ كبّر', '⤢ Expand')}</button><button type="button" class="btn ghost sm" data-act-cancel>${A('إلغاء', 'Cancel')}</button></div>
       <p class="tiny muted"><span class="ltr">${esc(id)}</span> — ${esc(m.title)}</p>
       ${m.warnings.length ? `<div class="awarn small">${m.warnings.map((w) => `⚠ ${esc(w)}`).join('<br>')}</div>` : ''}
       <div class="gbody"><div class="gmain">
@@ -1021,8 +1293,8 @@
       </div><aside class="gside" aria-label="${A('القرار', 'Decision')}">
       <fieldset class="fld"><legend>${A('القرار', 'Decision')}</legend><label class="small"><input type="radio" name="decision" value="approve" checked> ${A('موافقة', 'Approve')}</label> <label class="small"><input type="radio" name="decision" value="request_changes"> ${A('محتاج تعديلات', 'Request changes')}</label></fieldset>
       <label class="fld">${A('ملاحظة القرار (مطلوبة)', 'Decision note (required)')}<textarea name="note" rows="3" maxlength="10000" required></textarea></label>
-      <div class="row gnotes"><span class="tiny muted">${A('ملاحظة سريعة:', 'Quick note:')}</span><button type="button" class="sugg" data-gate-note="${esc(A(`موافق على ${L(GATE_AR[gate] ?? { ar: gate, en: gate })} زي ما هي.`, `I approve the ${gate} as written.`))}">${A('موافق زي ما هي', 'Approve as written')}</button><button type="button" class="sugg" data-gate-note="${esc(A('محتاج تعديل: ', 'Changes needed: '))}" data-gate-changes>${A('محتاج تعديل…', 'Changes needed…')}</button></div>
-      <label class="small optin"><input type="checkbox" name="confirmed"> <b>${A(`راجعت ${L(GATE_AR[gate] ?? { ar: gate, en: gate })}، والقرار ده قراري أنا`, `I reviewed the ${gate}, and this is my decision`)}</b></label>
+      <div class="row gnotes"><span class="tiny muted">${A('ملاحظة سريعة:', 'Quick note:')}</span><button type="button" class="sugg" data-gate-note="${esc(A(`موافق على ${L(GATE_AR[gate] ?? { ar: esc(gate), en: esc(gate) })} زي ما هي.`, `I approve the ${gate} as written.`))}">${A('موافق زي ما هي', 'Approve as written')}</button><button type="button" class="sugg" data-gate-note="${esc(A('محتاج تعديل: ', 'Changes needed: '))}" data-gate-changes>${A('محتاج تعديل…', 'Changes needed…')}</button></div>
+      <label class="small optin"><input type="checkbox" name="confirmed"> <b>${A(`راجعت ${L(GATE_AR[gate] ?? { ar: esc(gate), en: esc(gate) })}، والقرار ده قراري أنا`, `I reviewed the ${gate}, and this is my decision`)}</b></label>
       <p class="tiny muted">${A('هيتسجّل كقرار من الكونسول: الهوية مش متحقق منها. ده قرار مستخدم محلي، مش توقيع موثّق.', 'Recorded as a console decision: identity not verified. This is a local-user decision, not a verified signature.')}</p>
       <div class="errbar small" role="alert" hidden></div>
       <div class="row"><span class="grow"></span><button class="btn go" type="submit" disabled>${A('سجّل القرار', 'Record decision')}</button></div></aside></div></form>`;
@@ -1049,7 +1321,7 @@
       // PF-0100: the agent ended its turn before this decision; open the chat with a ready
       // message so the developer tells it to go on. Nothing is sent until they press Send.
       if (agentsOn && !readOnly) {
-        const gateName = L(GATE_AR[body.gate] ?? { ar: body.gate, en: body.gate });
+        const gateName = L(GATE_AR[body.gate] ?? { ar: esc(body.gate), en: esc(body.gate) });
         agentDraft = body.decision === 'approve'
           ? A(`اعتمدت ${gateName}. كمّل لحد الآخر، واقف بس لو محتاج قرار مني.`, `I approved the ${body.gate}. Continue to the end; stop only if you need a decision from me.`)
           : A(`طلبت تعديلات في ${gateName}: ${body.note.trim()}\nعدّلها وارجعلي للمراجعة.`, `I requested changes to the ${body.gate}: ${body.note.trim()}\nRevise it and bring it back for review.`);
@@ -1191,6 +1463,9 @@
       <p class="tiny muted" style="margin-top:10px">${A('من ملخصات الـ checkpoints والأدلة المسجلة.', 'From checkpoint summaries and recorded evidence.')}</p>`);
   }
 
+  // PF-0113: a work ID beside its title. The title leads; the canonical ID is shown whole and
+  // never shortened into a second identifier — only clipped by width, with the full ID on hover.
+  function wid(id) { return `<span class="ltr wid" title="${esc(id)}">${esc(id)}</span>`; }
   function copy(text) {
     const done = () => toast(A('اتنسخ ✓ شغّله في الترمينال أو ادّيه للوكيل.', 'Copied ✓ Run it in your terminal or give it to your agent.'));
     if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(done, () => toast(esc(text)));
@@ -1200,7 +1475,7 @@
   function celebrate() { if (reduced) return; const c = document.createElement('div'); c.className = 'celebrate'; const cols = ['#3d8bfd', '#8a63e8', '#0fae9d', '#f1a131', '#1d9a5a']; c.innerHTML = Array.from({ length: 40 }, (_, k) => `<i style="left:${Math.random() * 100}%;background:${cols[k % 5]};animation-delay:${Math.random() * 0.4}s"></i>`).join(''); document.body.appendChild(c); setTimeout(() => c.remove(), 2200); }
 
   // ---------- attention: what needs a person (from Core's state; nothing is inferred) ----------
-  const needs = () => [...(agent?.pid === pid ? agent.pending.map((p) => ({ it: byId(route().id) ?? { id: '', title: '' }, agentPerm: true, reason: A(`إذن للوكيل: ${p.title}`, `Agent permission: ${p.title}`) })) : []), ...items().filter((it) => it.state === 'you' || it.state === 'fail').map((it) => ({
+  const needs = () => [...(agent?.pid === pid ? agent.pending.map((p) => ({ it: byId(route().id) ?? { id: '', title: '' }, agentPerm: true, reason: A(`إذن للوكيل: ${p.title}`, `Agent permission: ${p.title}`) })) : []), ...(execView?.inbox ?? []).filter((p) => p.project !== pid || agent?.pid !== pid).map((p) => ({ it: { id: p.workId ?? '', title: p.name ?? '' }, agentPerm: true, elsewhere: true, reason: A(`إذن للوكيل: ${p.title}`, `Agent permission: ${p.title}`) })), ...items().filter((it) => it.state === 'you' || it.state === 'fail').map((it) => ({
     it,
     reason: it.state === 'fail'
       ? A('آخر تحقق فشل', 'the latest verification failed')
@@ -1213,7 +1488,7 @@
   function notesPanel() {
     const list = needs();
     return `<div class="notes" role="dialog" aria-label="${A('محتاج انتباهك', 'Needs your attention')}"><b>${A('محتاج انتباهك', 'Needs your attention')}</b>
-      <ul>${list.map(({ it, reason }) => `<li class="unread"><span class="dg-ic">${it.state === 'fail' ? '✕' : '◆'}</span><a href="#/item/${encodeURIComponent(it.id)}"><span class="ltr">${esc(it.id)}</span> ${esc(it.title)}<br><span class="tiny muted">${esc(reason)}</span></a></li>`).join('') || `<li class="muted">${A('مفيش حاجة مستنياك دلوقتي.', 'Nothing needs you right now.')}</li>`}</ul>
+      <ul>${list.map(({ it, reason, elsewhere }) => `<li class="unread"><span class="dg-ic">${it.state === 'fail' ? '✕' : '◆'}</span><a href="${elsewhere ? '#/agents' : `#/item/${encodeURIComponent(it.id)}`}"><span class="ltr">${esc(it.id)}</span> ${esc(it.title)}<br><span class="tiny muted">${esc(reason)}</span></a></li>`).join('') || `<li class="muted">${A('مفيش حاجة مستنياك دلوقتي.', 'Nothing needs you right now.')}</li>`}</ul>
       <label class="tiny"><input type="checkbox" data-alerts ${browserAlerts ? 'checked' : ''}> ${A('نبّهني من المتصفح لما حاجة جديدة تستناني', 'Alert me in the browser when something new needs me')}</label></div>`;
   }
   function alertNew(previous) {
@@ -1297,11 +1572,27 @@
     if (!u || u.state === 'PROJECT_UNDERSTANDING_ESTABLISHED') return '';
     return understandingCard(u, true);
   }
+  // PF-0113: where this checkout stands — branch, Shared Project Mode, integration branch.
+  function gitLine(g) {
+    if (!g) return '';
+    const branch = g.branch ? `<span class="ltr" data-git-branch>⑂ ${esc(g.branch)}</span>` : `<span class="muted">${A('مش على فرع (detached HEAD أو مفيش Git)', 'Not on a branch (detached HEAD or no Git)')}</span>`;
+    const mode = `<span class="chip ${g.sharedMode ? 'done' : ''}" data-shared-mode="${g.sharedMode ? 'on' : 'off'}"><i></i>Shared Project Mode: ${g.sharedMode ? A('شغّال', 'On') : A('مقفول', 'Off')}</span>`;
+    const integration = g.integrationBranch ? `<span class="tiny muted">${A('فرع الدمج', 'Integration branch')}: <span class="ltr">${esc(g.integrationBranch)}</span>${g.integrationBranchSource === 'detected' ? ` (${A('من إعدادات Git', 'from Git settings')})` : ''}</span>` : '';
+    const turnOn = g.canEnableShared && !readOnly ? `<button type="button" class="btn sm ghost" data-shared-open>${A('شغّله…', 'Turn on…')}</button>` : !g.sharedMode && !g.lane ? `<span class="tiny muted">${A('شغّله بـ', 'Turn it on with')} <code class="ltr">yallaflow shared enable</code></span>` : '';
+    return `<section class="row gitline small" data-git-line>${branch}${mode}${integration}${turnOn}</section>`;
+  }
+  // New work on a feature branch without Shared Project Mode: recommend it. Only when the
+  // integration branch is known — never a comparison against a guessed "main".
+  function sharedHint() {
+    const g = projectOverview?.pid === pid ? projectOverview.data?.git : null;
+    if (!g || g.sharedMode || g.lane || !g.branch || !g.integrationBranch || g.branch === g.integrationBranch) return '';
+    return `<div class="awarn" role="note"><p class="small">${A(`انت على <span class="ltr">${esc(g.branch)}</span> مش على فرع الدمج <span class="ltr">${esc(g.integrationBranch)}</span>. من غير Shared Project Mode، الشغلانة اللي تتعمل هنا ممكن تاخد نفس رقم شغلانة زميلك على فرع تاني.`, `You are on <span class="ltr">${esc(g.branch)}</span>, not the integration branch <span class="ltr">${esc(g.integrationBranch)}</span>. Without Shared Project Mode, work created here can get the same ID as a teammate's on another branch.`)}</p>${g.canEnableShared && !readOnly ? `<button type="button" class="btn sm ghost" data-shared-open>${A('شغّل Shared Project Mode…', 'Turn on Shared Project Mode…')}</button>` : `<p class="tiny">${A('شغّله بـ', 'Turn it on with')} <code class="ltr">yallaflow shared enable</code></p>`}</div>`;
+  }
   function viewOverview() {
     if (!projectOverview || projectOverview.pid !== pid) return `<p class="muted" style="margin-top:30px">${A('بيقرا المشروع…', 'Reading the project…')}</p>`;
     if (projectOverview.error) return `<section class="errbar data" role="alert"><b>${A('مقدرناش نقرا نظرة المشروع', 'The project overview could not be read')}</b><p class="small">${esc(projectOverview.error)}</p></section>`;
     const o = projectOverview.data;
-    if (o.project.kind === 'greenfield' && !(o.memory?.current > 0)) return greenfieldOverview(o);
+    if (o.project.kind === 'greenfield' && !(o.memory?.current > 0)) return gitLine(o.git) + greenfieldOverview(o);
     const m = o.memory;
     const facts = (area) => (o.areas[area]?.facts ?? []);
     const factList = (area, empty) => {
@@ -1334,7 +1625,7 @@
       : `${A('الجرد مش متاح:', 'Inventory unavailable:')} ${esc(cov.error ?? '')}`;
     const unread = o.stack.unread.length ? `<p class="tiny" style="margin-top:6px">${A('ماتقراش:', 'Not read:')} ${o.stack.unread.map((u) => `<span class="ltr">${esc(u.path)}</span> (${esc(u.reason)})`).join(' · ')}</p>` : '';
     const cmds = [o.understanding.command, 'yallaflow overview', 'yallaflow context status', 'yallaflow inspect'].filter(Boolean);
-    return `<section class="pagehead"><h1 style="font-size:26px">${esc(o.project.name)}</h1><p class="muted">${A('نظرة على المشروع: إيه هو، معمول بإيه، وفهمه متسجّل لحد فين. القراءة بس — مفيش حاجة بتتغيّر من هنا.', 'The project at a glance: what it is, what it is built with, and how far its understanding is recorded. Read-only — nothing changes from here.')}</p></section>
+    return gitLine(o.git) + `<section class="pagehead"><h1 style="font-size:26px">${esc(o.project.name)}</h1><p class="muted">${A('نظرة على المشروع: إيه هو، معمول بإيه، وفهمه متسجّل لحد فين. القراءة بس — مفيش حاجة بتتغيّر من هنا.', 'The project at a glance: what it is, what it is built with, and how far its understanding is recorded. Read-only — nothing changes from here.')}</p></section>
       ${understandingCard(o.understanding)}
       <div class="ovgrid">
         <section class="panel"><h2>${A('المشروع', 'Purpose')}</h2>${factList('project', A('لسه مفيش وصف معتمد للمشروع.', 'No approved project description yet.'))}</section>
@@ -1818,7 +2109,13 @@
       ${d.saved?.error ? `<p class="tiny warn">${esc(d.saved.error)}</p>` : ''}</form>`;
     return `<section class="panel setupsec" id="setup-agents"><div class="row"><h2 style="font-size:18px" class="grow">${A('الوكلاء', 'Agents')}</h2><button class="btn sm ghost" data-agents-rescan ${setupBusy ? 'disabled' : ''}>${setupBusy === 'rescan' ? A('بيفحص…', 'Checking…') : A('افحص الجهاز تاني', 'Rescan this machine')}</button></div>
       <div class="tablewrap"><table><thead><tr><th>${A('الوكيل', 'Agent')}</th><th>${A('الإصدار', 'Version')}</th><th>${A('تسجيل الدخول', 'Login')}</th><th>${A('الحالة', 'State')}</th></tr></thead><tbody>${prov('Codex', d.codex)}${d.claude ? prov(A('Claude Code (تجريبي)', 'Claude Code (experimental)'), d.claude) : d.claudeAvailable ? `<tr><td><b>${A('Claude Code (تجريبي)', 'Claude Code (experimental)')}</b></td><td colspan="3" class="tiny muted">${A('ماتفحصش لسه. دوس «افحص الجهاز تاني» أو اختاره تحت.', 'Not checked yet. Press Rescan this machine, or choose it below.')}</td></tr>` : ''}</tbody></table></div>
-      <p class="tiny muted">${A('اشتراكك بس، من غير مفاتيح API. YallaFlow مابيقراش أي بيانات دخول.', 'Your subscription only, never API keys. YallaFlow reads no credentials.')}</p>${form}${checklist}</section>`;
+      <p class="tiny muted">${A('اشتراكك بس، من غير مفاتيح API. YallaFlow مابيقراش أي بيانات دخول.', 'Your subscription only, never API keys. YallaFlow reads no credentials.')}</p>${form}${approvalWaitForm(d)}${checklist}</section>`;
+  }
+  // PF-0112 D15: how long an agent's approval request waits for you in this project.
+  function approvalWaitForm(d) {
+    if (readOnly || !d.approvalWait) return '';
+    const current = d.approvalWait.minutes;
+    return `<div class="row" style="margin-top:10px;gap:8px;flex-wrap:wrap"><label class="small">${A('طلب الموافقة يستنى', 'An approval request waits')} <select data-approval-wait>${[5, 15, 30, 60].map((m) => `<option value="${m}" ${m === current ? 'selected' : ''}>${A(`${m} دقيقة`, `${m} minutes`)}</option>`).join('')}</select></label><span class="tiny muted">${A('بعدها بيترفض تلقائي، عمره ما بيتوافق عليه لوحده.', 'Then it is denied automatically — never approved on its own.')}</span>${d.approvalWait.error ? `<span class="tiny warn">${esc(d.approvalWait.error)}</span>` : ''}</div>`;
   }
 
   function viewSetup() {
@@ -2429,6 +2726,80 @@
     try { team = await api(`/api/p/${pid}/worktrees`); } catch (e) { team = { error: e.message }; }
   }
   const baseName = (p) => String(p).split(/[\\/]/).filter(Boolean).at(-1) ?? p;
+  // PF-0112: the Agents view — every lane across this console's projects, one inbox of open
+  // requests, and the session controls. Every button calls the same endpoint as the chat.
+  const TASK_LABEL = {
+    queued: { ar: 'في الطابور', en: 'Queued' }, starting: { ar: 'بيبدأ', en: 'Starting' }, working: { ar: 'شغّال', en: 'Working' },
+    'needs-you': { ar: 'محتاجك', en: 'Needs you' }, paused: { ar: 'واقف', en: 'Paused' }, interrupted: { ar: 'اتقطع', en: 'Interrupted' },
+    done: { ar: 'خلص', en: 'Done' }, failed: { ar: 'فشل', en: 'Failed' }, skipped: { ar: 'اتخطّى', en: 'Skipped' }, cancelled: { ar: 'اتلغى', en: 'Cancelled' }
+  };
+  const REASON_LABEL = {
+    approval: { ar: 'مستني موافقتك على أداة', en: 'waiting for your approval' }, review: { ar: 'مستني مراجعتك', en: 'waiting for your review' },
+    question: { ar: 'مستني إجابتك', en: 'waiting for your answer' }, reply: { ar: 'مستني ردك', en: 'waiting for your reply' },
+    'usage-limit': { ar: 'وصل لحد الاستخدام', en: 'usage limit reached' }, 'agent-config': { ar: 'إعدادات الوكيل في المشروع (.codex/) اتغيرت؛ بص عليها وابدأها بنفسك', en: 'the project’s agent settings (.codex/) changed; look at them and start it yourself' }, 'session-ended': { ar: 'الجلسة خلصت قبل ما الشغل يخلص', en: 'the session ended before the work was done' },
+    'console-restart': { ar: 'الكونسول اتقفل وهو شغّال', en: 'the console stopped while it worked' }, cleanup: { ar: 'فيه عمليات للوكيل لسه شغّالة', en: 'agent processes are still running' },
+    crashed: { ar: 'الوكيل وقع', en: 'the agent crashed' }, developer: { ar: 'إنت وقفته', en: 'you stopped it' }
+  };
+  const taskTone = (s) => ({ working: 'active', starting: 'active', 'needs-you': 'you', done: 'done', failed: 'fail', interrupted: 'paused', paused: 'paused', queued: 'todo', skipped: 'closed', cancelled: 'closed' }[s] ?? '');
+  function xPermCard(p) {
+    const left = p.expiresAt ? Math.max(0, Math.round((Date.parse(p.expiresAt) - Date.now()) / 60000)) : null;
+    return `<div class="aperm open xperm"><div class="row"><span class="ptag">${esc(p.name ?? '')}${p.workId ? ` · <span class="ltr">${esc(p.workId)}</span>` : ''}</span><b class="grow">${esc(p.title)}</b>${left !== null ? `<span class="tiny muted">${A(`فاضل ${left} د`, `${left} min left`)}</span>` : ''}</div>${permScope(p)}${p.detail ? `<pre class="pdetail" dir="ltr">${esc(p.detail)}</pre>` : ''}
+      <div class="row">${(p.decisions ?? []).map((d) => `<button class="btn sm ${d === 'deny' ? 'ghost' : 'go'}" data-x-perm="${esc(p.requestId)}" data-x-pid="${esc(p.project)}" data-decision="${d}">${{ allow: A('اسمح مرة', 'Allow once'), allow_session: A('اسمح للجلسة', 'Allow for session'), deny: A('ارفض', 'Deny') }[d]}</button>`).join('')}${p.workId ? `<button class="btn sm ghost" data-x-open="${esc(p.project)}" data-x-work="${esc(p.workId)}">${A('افتح الشات', 'Open chat')}</button>` : ''}<span class="tiny muted">${A('لو محدش ردّ هيترفض تلقائي.', 'Unanswered requests are denied automatically.')}</span></div></div>`;
+  }
+  function xLane(lane) {
+    const s = lane.session;
+    const prov = s ? (s.provider === 'claude' ? 'Claude Code' : 'Codex') : '';
+    const status = !s ? A('مفيش وكيل شغّال', 'No agent running') : lane.pending.length ? A('محتاج موافقتك', 'needs your approval') : s.status === 'working' ? A('شغّال', 'working') : s.status === 'starting' ? A('بيبدأ', 'starting') : s.status === 'connected' ? A('متوصّل', 'connected') : A('مستنيك', 'idle, waiting for you');
+    const workedMin = lane.workingSince ? Math.floor((Date.now() - Date.parse(lane.workingSince)) / 60000) : null;
+    const since = workedMin !== null ? ` · ${A(`بقاله ${mins(workedMin)}`, `for ${mins(workedMin)}`)}` : '';
+    const step = lane.lastStep ? `<div class="tiny muted">${A('آخر خطوة', 'Last step')}: ${esc(lane.lastStep.title)}</div>` : '';
+    const nowTasks = lane.runs.filter((run) => run.mode === 'now').flatMap((run) => run.lanes[0].tasks).slice(0, 3);
+    const queues = lane.runs.filter((run) => run.mode !== 'now').slice(0, 3);
+    const tasks = nowTasks;
+    const controls = s && s.provider === 'codex' ? `${s.status === 'working' ? `<button class="btn sm ghost" data-x-act="cancel" data-x-pid="${esc(lane.project)}">${A('وقّف الدور', 'Stop turn')}</button>` : ''}<button class="btn sm ghost" data-x-act="end" data-x-pid="${esc(lane.project)}">${A('أنهِ الجلسة', 'End session')}</button>` : '';
+    const laneBits = lane.kind === 'lane' ? `<span class="chip"><i></i>${A('مسار', 'Lane')}</span>` : '';
+    const cleanupBtn = lane.kind === 'lane' && !s && latestMerge(lane)?.state === 'verified' ? `<button class="btn sm ghost" data-cleanup-open="${esc(lane.laneId ?? '')}" data-home="${esc(lane.parent ?? '')}">${A('تنظيف', 'Clean up')}</button>` : '';
+    return `<section class="panel xlane ${lane.kind === 'lane' ? 'islane' : ''}"><div class="row"><b class="grow">${esc(lane.name)}</b>${laneBits}${s ? `<span class="chip ${lane.pending.length ? 'you' : s.status === 'working' ? 'active' : 'wait'}"><i></i>${esc(prov)} · ${status}</span>` : `<span class="chip"><i></i>${status}</span>`}</div>
+      ${lane.lockedBy ? `<p class="tiny muted">${esc(lane.lockedBy)}</p>` : ''}${lane.store === 'unreadable' ? `<p class="tiny fail">${A('ملف التشغيل مش مقروء ومش هيتكتب فوقه', 'The runs file is unreadable and will not be overwritten')}: <span${trDir(lane, 'storeError')}>${trHtml(lane, 'storeError')}</span></p>` : lane.storeError ? `<p class="tiny fail"${trDir(lane, 'storeError')}>${trHtml(lane, 'storeError')}</p>` : ''}
+      ${s?.workId ? `<div class="small">${A('على', 'On')} <a href="#" data-x-open="${esc(lane.project)}" data-x-work="${esc(s.workId)}" class="ltr">${esc(s.workId)}</a>${since}</div>` : ''}${step}
+      ${tasks.length ? `<ul class="xtasks">${tasks.map((task) => `<li><span class="chip ${taskTone(task.state)}"><i></i>${L(TASK_LABEL[task.state] ?? { ar: esc(task.state), en: esc(task.state) })}</span> <a href="#" data-x-open="${esc(lane.project)}" data-x-work="${esc(task.workId)}" class="ltr">${esc(task.workId)}</a>${task.reason && REASON_LABEL[task.reason] ? ` <span class="tiny muted">${L(REASON_LABEL[task.reason])}${task.retryAt ? ` · ${A('يرجع', 'retry')} ${esc(task.retryAt)}` : ''}</span>` : ''}${task.itemDone && task.state !== 'done' ? ` <span class="tiny muted">${A('الشغل خلص؛ الجلسة لسه مفتوحة', 'work DONE; the session is still open')}</span>` : ''}</li>`).join('')}</ul>` : ''}
+      ${queues.map((run) => xRun(lane, run)).join('')}
+      ${lane.kind === 'lane' ? mergeBlock(lane) : ''}
+      ${controls || cleanupBtn ? `<div class="row">${controls}${cleanupBtn}</div>` : ''}</section>`;
+  }
+  const RUN_LABEL = { running: { ar: 'شغّال', en: 'running' }, paused: { ar: 'واقف', en: 'paused' }, finished: { ar: 'خلص', en: 'finished' }, cancelled: { ar: 'اتلغى', en: 'cancelled' } };
+  function xRun(lane, run) {
+    const list = run.lanes[0].tasks;
+    const live = ['finished', 'cancelled'].includes(run.state) ? false : true;
+    const btn = (act, label, extra = '', cls = 'ghost') => `<button class="btn sm ${cls}" data-run-act="${act}" data-x-pid="${esc(lane.project)}" data-run="${esc(run.id)}" ${extra}>${label}</button>`;
+    const queuedIds = list.filter((task) => task.state === 'queued').map((task) => task.id);
+    const head = list.find((task) => task.state === 'queued');
+    const assisted = live && head && head.provider === 'claude' && !list.some((task) => ['starting', 'working', 'needs-you'].includes(task.state));
+    return `<div class="xrun"><div class="row"><b>${A('طابور', 'Queue')}</b><span class="chip ${run.state === 'running' ? 'active' : run.state === 'finished' ? 'done' : run.state === 'cancelled' ? 'closed' : 'paused'}"><i></i>${L(RUN_LABEL[run.state] ?? { ar: esc(run.state), en: esc(run.state) })}</span>${run.awaitNext ? `<span class="tiny muted">${A('مستني «كمّل»', 'waiting for Continue')}</span>` : ''}${run.held ? `<span class="tiny muted">${A('موقوف مؤقتاً', 'paused by you')}</span>` : ''}${run.cancelAfter ? `<span class="tiny muted">${A('هيتلغى بعد المهمة الحالية', 'cancels after the current task')}</span>` : ''}</div>
+      <ol class="xtasks">${list.map((task) => {
+        const qi = queuedIds.indexOf(task.id);
+        const acts = [
+          ['interrupted', 'paused'].includes(task.state) && task.provider === 'codex' ? btn('resume', A('كمّل', 'Resume'), `data-task="${esc(task.id)}"`, 'go') : '',
+          ['failed', 'paused', 'interrupted'].includes(task.state) ? btn('retry', A('من الأول', 'Retry'), `data-task="${esc(task.id)}"`) : '',
+          ['queued', 'paused', 'failed', 'interrupted'].includes(task.state) ? btn('skip', A('تخطّى', 'Skip'), `data-task="${esc(task.id)}"`) : '',
+          qi > 0 ? btn('up', '↑', `data-task="${esc(task.id)}" aria-label="${A('لفوق', 'Up')}"`) : '',
+          qi !== -1 && qi < queuedIds.length - 1 ? btn('down', '↓', `data-task="${esc(task.id)}" aria-label="${A('لتحت', 'Down')}"`) : ''
+        ].join('');
+        return `<li><span class="chip ${taskTone(task.state)}"><i></i>${L(TASK_LABEL[task.state] ?? { ar: esc(task.state), en: esc(task.state) })}</span> <a href="#" data-x-open="${esc(lane.project)}" data-x-work="${esc(task.workId)}" class="ltr">${esc(task.workId)}</a>${task.provider === 'claude' ? ' <span class="tiny muted">Claude Code</span>' : ''}${task.reason && REASON_LABEL[task.reason] ? ` <span class="tiny muted">${L(REASON_LABEL[task.reason])}${task.retryAt ? ` · ${A('يرجع', 'retry')} ${esc(task.retryAt)}` : ''}</span>` : ''}${acts ? `<span class="xacts">${acts}</span>` : ''}</li>`;
+      }).join('')}</ol>
+      ${assisted ? `<p class="tiny">${A(`ابدأ ${esc(head.workId)} في Claude Code واربطه من الشات. الكونسول مبيقدرش يشغّل Claude Code بنفسه.`, `Start ${esc(head.workId)} in Claude Code and link it from the chat. The console cannot start Claude Code itself.`)}</p>` : ''}
+      ${live ? `<div class="row">${run.held || run.awaitNext ? btn('next', A('كمّل الطابور', 'Continue queue'), '', 'go') : btn('pause', A('وقّف بعد الحالية', 'Pause after current'))}${run.cancelAfter ? '' : btn('cancel-after', A('ألغي بعد الحالية', 'Cancel after current'))}${btn('cancel-now', A('ألغي دلوقتي', 'Cancel now'))}${run.options?.provider !== 'claude' && lane.userSessions ? btn('switch', A('كمّل الباقي بـ Claude Code', 'Continue the rest with Claude Code'), 'data-provider="claude"') : ''}${run.options?.provider === 'claude' ? btn('switch', A('كمّل الباقي بـ Codex', 'Continue the rest with Codex'), 'data-provider="codex"') : ''}</div>` : ''}</div>`;
+  }
+  function viewAgents() {
+    if (!agentsOn) return `<section class="hero calm"><span class="hico" aria-hidden="true">◎</span><div><h1>${A('الوكلاء', 'Agents')}</h1><p class="small">${A('الوكلاء مش مفعّلين في الكونسول ده. فعّلهم من «الإعداد والتشغيل».', 'Agents are not enabled in this console. Turn them on in Setup & run.')}</p></div></section>`;
+    if (!execView) return `<p class="muted" style="margin-top:40px;text-align:center">${execError ? esc(execError) : A('بيحمّل…', 'Loading…')}</p>`;
+    const inbox = execView.inbox ?? [];
+    return `<section class="hero calm"><span class="hico" aria-hidden="true">◎</span><div><h1>${A('الوكلاء', 'Agents')}</h1><p class="small">${A('كل الوكلاء في المشاريع المفتوحة هنا، واللي محتاجك في مكان واحد. كل زرار هنا بيعمل نفس اللي في الشات.', 'Every agent in this console’s projects, and everything that needs you, in one place. Each button here does the same as in the chat.')}</p></div></section>
+      ${(execView.limits ?? []).map((limit) => `<section class="errbar" role="status"><b>${A(`${limit.provider === 'codex' ? 'Codex' : 'Claude Code'} وصل لحد الاستخدام${limit.retryAt ? ` (يرجع ${esc(limit.retryAt)})` : ''}. الطوابير اللي عليه واقفة.`, `${limit.provider === 'codex' ? 'Codex' : 'Claude Code'} reached its usage limit${limit.retryAt ? ` (try again at ${esc(limit.retryAt)})` : ''}. Queues on it are paused.`)}</b><p class="small">${A('كمّل المهمة الواقفة لما الحد يرجع، أو كمّل الباقي بالوكيل التاني من كارت الطابور.', 'Resume the paused task when the limit resets, or continue the rest with the other agent from the queue card.')}</p></section>`).join('')}
+      <section class="panel"><b>${A('محتاجينك', 'Needs you')}${inbox.length ? ` (${inbox.length})` : ''}</b>${inbox.length ? inbox.map(xPermCard).join('') : `<p class="tiny muted">${A('مفيش طلبات مستنية دلوقتي.', 'Nothing is waiting for you right now.')}</p>`}</section>
+      <div class="xlanes">${(execView.lanes ?? []).filter((lane) => lane.kind !== 'lane').map((home) => xLane(home) + (execView.lanes ?? []).filter((lane) => lane.kind === 'lane' && lane.parent === home.project).map(xLane).join('')).join('')}${(execView.lanes ?? []).filter((lane) => lane.kind === 'lane' && !(execView.lanes ?? []).some((h) => h.project === lane.parent)).map(xLane).join('')}</div>`;
+  }
+
   function viewTeam() {
     if (!team) return `<p class="muted" style="margin-top:30px">${A('بيحمّل…', 'Loading…')}</p>`;
     if (team.error) return `<section class="errbar">${esc(team.error)}</section>`;
@@ -2486,7 +2857,7 @@
     const response = await fetch(pathname, { method: 'POST', headers: { Authorization: `Bearer ${token}`, ...headers }, body, cache: 'no-store' });
     let data = null;
     try { data = await response.json(); } catch { /* not json */ }
-    if (!response.ok) throw Object.assign(new Error(data?.error?.message ?? `HTTP ${response.status}`), { status: response.status, code: data?.error?.code, data });
+    if (!response.ok) throw Object.assign(new Error(data?.error?.message ?? `HTTP ${response.status}`), { status: response.status, code: data?.error?.code, data, messageAr: data?.error?.messageAr ?? null });
     return data;
   }
   // The server's reason in the reader's language for the common cases; Core's own text otherwise.
@@ -2499,8 +2870,17 @@
       WORKSPACE_BUSY: A('أمر YallaFlow تاني شغّال في المشروع دلوقتي. جرّب تاني بعد شوية.', 'Another YallaFlow command is busy in this project. Try again in a moment.')
     };
     if (!e.status) return A('الكونسول مش متاح. اتأكد إنه لسه شغّال وجرّب تاني.', 'The console is not reachable. Check that it is still running and try again.');
-    return known[e.code] ?? e.message;
+    return known[e.code] ?? (lang === 'ar' && e.messageAr ? e.messageAr : e.message);
   }
+  // PF-0112 Phase 2: the server's Arabic copy of an execution message, in the Arabic console.
+  const tr = (item, key = 'text') => (lang === 'ar' && item?.[`${key}Ar`] ? item[`${key}Ar`] : item?.[key] ?? '');
+  const trDir = (item, key = 'text') => (lang === 'ar' && !item?.[`${key}Ar`] ? ' dir="ltr"' : '');
+  // Escaped HTML of a message; in an Arabic sentence, each run of Latin text (a path, a command,
+  // a branch) is isolated left-to-right, so it is never reordered by the Arabic around it.
+  const trHtml = (item, key = 'text') => {
+    const html = esc(tr(item, key));
+    return lang === 'ar' && item?.[`${key}Ar`] ? html.replace(/[A-Za-z0-9_\/.\-"'@:=(),%+&;#~*[\]{}<>!?]+(?:\s+[A-Za-z0-9_\/.\-"'@:=(),%+&;#~*[\]{}<>!?]+)*/g, (run) => `<bdi dir="ltr">${run}</bdi>`) : html;
+  };
   const retryable = (e) => !e.status || e.status === 503;
   const fileQueues = new WeakMap();
   function attachmentFields() {
@@ -2592,11 +2972,13 @@
     d.addEventListener('close', () => { d.remove(); });
     d.showModal();
     d.querySelector('textarea').focus();
+    if (projectOverview?.pid !== pid) loadProjectOverview().then(() => { const h = d.querySelector('[data-shared-hint]'); if (h && d.isConnected && cw.pid === pid) h.innerHTML = sharedHint(); });
   }
   function createForm() {
     const pick = projects.length > 1 ? `<label class="fld"><span>${A('المشروع', 'Project')}</span><select name="project">${projects.map((p) => `<option value="${p.id}" ${p.id === pid ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></label>` : '';
     return `<form data-create-form novalidate><div class="row"><h2 id="cw-h" class="grow">＋ ${A('شغل جديد', 'Create work')}</h2><button type="button" class="ibtn" data-cw-cancel aria-label="${A('إغلاق', 'Close')}">✕</button></div>
       ${pick}
+      <div data-shared-hint>${sharedHint()}</div>
       <label class="fld"><span>${A('محتاج إيه؟', 'What do you need?')}</span><textarea name="request" rows="5" maxlength="20000" required placeholder="${A('مثلاً: العملاء يقدروا يصدّروا طلباتهم CSV من صفحة الطلبات…', 'For example: customers can export their orders to CSV from the orders page…')}"></textarea></label>
       <fieldset class="seg"><legend>${A('نوع الشغل', 'What kind of work?')}</legend>${KINDS.map(([v, l], i) => `<label><input type="radio" name="type" value="${v}" ${i === 0 ? 'checked' : ''}><span>${L(l)}</span></label>`).join('')}</fieldset>
       <fieldset class="seg" data-size hidden><legend>${A('الحجم', 'Size')}</legend>${SIZES.map(([v, l, tech]) => `<label><input type="radio" name="scope" value="${v}"><span>${L(l)} <i class="ltr">${tech}</i></span></label>`).join('')}</fieldset>
@@ -2697,7 +3079,7 @@
     chatForceEnd = false;
     document.title = (snap?.counts?.you ? `(${snap.counts.you}) ` : '') + 'YallaFlow' + (snap?.project?.name ? ` · ${snap.project.name}` : '');
     if (!projects.length && snap && !['new', 'projects'].includes(r.v)) { location.hash = '#/projects'; return; }
-    const views = { new: viewNew, setup: viewSetup, overview: viewOverview, item: () => viewItem(r.id), lines: viewLines, team: viewTeam, insights: viewInsights, projects: viewProjects, map: viewMap };
+    const views = { new: viewNew, setup: viewSetup, overview: viewOverview, item: () => viewItem(r.id), lines: viewLines, agents: viewAgents, team: viewTeam, insights: viewInsights, projects: viewProjects, map: viewMap };
     const body = !snap ? `<p class="muted" style="margin-top:40px;text-align:center">${error ? '' : A('بيحمّل…', 'Loading…')}</p>` : (views[r.v] ?? viewMap)();
     // Forms marked data-keep survive a redraw: typed values and focus are carried over (PF-0057).
     const kept = [...document.querySelectorAll('form[data-keep]')].map((form) => ({ key: form.dataset.keep, values: [...form.elements].filter((el) => el.name && el.type !== 'file' && (el.type === 'checkbox' || el.type === 'radio' ? el.checked !== el.defaultChecked : el.value !== el.defaultValue)).map((el) => [el.name, el.type === 'checkbox' || el.type === 'radio' ? (el.type === 'radio' ? (el.checked ? el.value : null) : el.checked) : el.value, el.type]), focus: form.contains(document.activeElement) ? document.activeElement.name : null, caret: document.activeElement?.selectionStart ?? null }));
@@ -2741,6 +3123,32 @@
     }
   }
   addEventListener('resize', () => requestAnimationFrame(placeConnectors));
+  // PF-0112: the queue sheet's confirmation tick and submit.
+  document.addEventListener('change', (e) => {
+    if (e.target.matches?.('[data-approval-wait]')) {
+      setupPost('agents/approval-wait', { minutes: Number(e.target.value) }).then(() => toast(A('اتحفظ. بيتطبّق على الطلبات الجاية.', 'Saved. It applies to new requests.'))).catch((err) => toast(esc(why(err))));
+      return;
+    }
+    if (e.target.matches?.('[data-queue-confirm]')) { const b = document.querySelector('[data-queue-start]'); if (b) b.disabled = !e.target.checked; }
+    if (e.target.matches?.('[data-parallel-confirm]')) { const b = document.querySelector('[data-parallel-start]'); if (b) b.disabled = !e.target.checked || b.hasAttribute('data-blocked'); }
+    if (e.target.matches?.('[data-shared-confirm]')) { const b = e.target.closest('[data-shared-panel]')?.querySelector('[data-shared-enable]'); if (b) b.disabled = !e.target.checked; }
+    if (e.target.matches?.('[data-cleanup-confirm]')) { const b = document.querySelector('[data-cleanup-start]'); if (b) b.disabled = !e.target.checked; }
+    if (e.target.matches?.('[data-review-confirm]')) { const b = document.querySelector('[data-review-start]'); if (b) b.disabled = !e.target.checked || !reviewState?.ok; }
+    if (e.target.matches?.('[data-review-file],[data-review-check]') && reviewState) {
+      // A changed tick changes what would be committed or run: the review (and its plan hash) is prepared again.
+      const files = [...document.querySelectorAll('[data-review-file]')];
+      const exclude = files.filter((box) => !box.checked && !box.dataset.secret).map((box) => box.dataset.reviewFile);
+      const include = files.filter((box) => box.checked && box.dataset.secret).map((box) => box.dataset.reviewFile);
+      const checks = [...document.querySelectorAll('[data-review-check]')].filter((box) => box.checked).map((box) => box.dataset.reviewCheck);
+      openReview(reviewState.home, reviewState.laneId, { exclude, include, checks });
+    }
+  });
+  document.addEventListener('submit', (e) => {
+    if (e.target.matches?.('[data-queue-form]')) { e.preventDefault(); startQueue(e.target); }
+    if (e.target.matches?.('[data-parallel-form]')) { e.preventDefault(); startParallelRun(e.target); }
+    if (e.target.matches?.('[data-cleanup-form]')) { e.preventDefault(); runCleanup(e.target); }
+    if (e.target.matches?.('[data-review-form]')) { e.preventDefault(); approveMerge(); }
+  });
 
   // ---------- live: re-read on change, animate what moved ----------
   async function refresh() {
@@ -2781,6 +3189,7 @@
     if (!pid && !['new', 'projects'].includes(v)) return;
     // Project pages load the agent state only while the chat is open (PF-0067).
     if (v === 'item' || ((chatOpen || ['map', 'lines'].includes(v)) && PROJECT_CHAT_VIEWS.includes(v))) { if (agentsOn) await loadAgent(); else await loadAgentInfo(); }
+    if (agentsOn && (v === 'agents' || !execView)) await loadExecution();
     if (v === 'team') await loadTeam();
     else if (v === 'projects') await loadOverview();
     else if (pid && (v === 'overview' || ((v === 'map' || v === 'lines') && projectOverview?.pid !== pid))) { await loadProjectOverview(); if (v === 'overview' && projectOverview?.data?.project?.kind === 'greenfield') { await loadRuntime(); if (!agentsOn) await loadAgentInfo(); } }
@@ -2852,7 +3261,8 @@
             if (!line) continue;
             const event = JSON.parse(line.slice(6));
             if (event.type === 'change' && event.project === pid) await refresh();
-            else if (event.type === 'agent') onAgentEvent(event.project, event.event);
+            else if (event.type === 'agent') { onAgentEvent(event.project, event.event); if (['permission.requested', 'permission.resolved', 'session.started', 'session.ended', 'session.stopped', 'turn.started', 'turn.ended', 'session.connected', 'session.disconnected'].includes(event.event?.type)) scheduleExecution(); }
+            else if (event.type === 'execution') scheduleExecution();
             // 1.4.0 (PF-0057): a project was added, or agents were enabled, in this console.
             else if (event.type === 'projects') { await reloadProjects().catch(() => {}); await leaveRemovedProject().catch(() => {}); if (route().v === 'projects') await loadOverview(); render(); }
             else if (event.type === 'agents') { agentsOn = true; agentsCanEnable = false; render(); }
@@ -2877,7 +3287,7 @@
       render(); await load(); await buildDigest(); render(); listen();
       return;
     }
-    closeDrawer(); bellOpen = false; dtab = null; const v = route().v; if (v === 'item') { detail = null; render(); await load(); await loadForView(); } else if (['team', 'projects', 'overview', 'map', 'lines', 'setup', 'new'].includes(v)) { render(); await loadForView(); } else syncRuntimePolling(); render(); scrollTo(0, 0); });
+    closeDrawer(); bellOpen = false; dtab = null; const v = route().v; if (v === 'item') { detail = null; render(); await load(); await loadForView(); } else if (['team', 'projects', 'overview', 'map', 'lines', 'setup', 'new', 'agents'].includes(v)) { render(); await loadForView(); } else syncRuntimePolling(); render(); scrollTo(0, 0); });
   document.addEventListener('submit', (e) => {
     const step = e.target.closest('[data-wiz-step]');
     if (step) { e.preventDefault(); wizardNext(step); return; }
@@ -3052,6 +3462,77 @@
     }
     // data-theme-toggle, not data-theme: <html data-theme> holds the chosen theme, and
     // closest() would match it for every click on the page.
+    const ma = e.target.closest('[data-review-open],[data-review-cancel],[data-merge-act],[data-sendback]');
+    if (ma) {
+      e.preventDefault();
+      if (ma.dataset.sendback) {
+        if (!confirm(A('ترجّع المهمة لوكيلها؟ هتتفتح تاني والوكيل هيبدأ يدمج الفرع الأساسي في المسار ويحل التعارض.', 'Send the task back to its agent? It is reopened and the agent starts bringing the main branch into the lane to resolve the conflict.'))) return;
+        post(`/api/p/${ma.dataset.home}/execution/merge-sendback`, JSON.stringify({ laneId: ma.dataset.sendback, lang, confirmed: true }), { 'Content-Type': 'application/json' })
+          .then(() => { document.getElementById('reviewdlg')?.close(); toast(A('المهمة رجعت لوكيلها.', 'The task went back to its agent.')); scheduleExecution(); })
+          .catch((err) => { const box = document.querySelector('#reviewdlg .conflictbox'); if (box) box.insertAdjacentHTML('beforeend', `<p class="small fail" role="alert">${esc(why(err))}</p>`); else toast(esc(why(err))); });
+        return;
+      }
+      if (ma.dataset.reviewOpen) openReview(ma.dataset.home, ma.dataset.reviewOpen);
+      else if (ma.dataset.reviewCancel !== undefined) document.getElementById('reviewdlg')?.close();
+      else if (ma.dataset.mergeAct) {
+        if (ma.dataset.mergeAct === 'abandon' && !confirm(A('تسيب الدمج ده زي ما هو؟ مفيش حاجة هتترجع لورا؛ اللي اتعمل هيفضل.', 'Abandon this merge as it is? Nothing is undone; what was done stays.'))) return;
+        post(`/api/p/${ma.dataset.home}/execution/merge-${ma.dataset.mergeAct}`, JSON.stringify({ mergeId: ma.dataset.merge }), { 'Content-Type': 'application/json' }).then(() => scheduleExecution()).catch((err) => toast(esc(why(err))));
+      }
+      return;
+    }
+    const pa = e.target.closest('[data-parallel-open],[data-parallel-cancel],[data-shared-enable],[data-shared-open],[data-shared-cancel],[data-cleanup-open],[data-cleanup-cancel]');
+    if (pa) {
+      e.preventDefault();
+      if (pa.dataset.parallelOpen !== undefined) openParallelSheet();
+      else if (pa.dataset.parallelCancel !== undefined) document.getElementById('paralleldlg')?.close();
+      else if (pa.dataset.sharedEnable !== undefined) enableSharedNow();
+      else if (pa.dataset.sharedOpen !== undefined) openSharedSheet();
+      else if (pa.dataset.sharedCancel !== undefined) document.getElementById('shareddlg')?.close();
+      else if (pa.dataset.cleanupOpen !== undefined) openCleanup(pa.dataset.home, pa.dataset.cleanupOpen);
+      else if (pa.dataset.cleanupCancel !== undefined) document.getElementById('cleanupdlg')?.close();
+      return;
+    }
+    const qa = e.target.closest('[data-select-toggle],[data-select-off],[data-sel],[data-queue-open],[data-queue-cancel],[data-q-up],[data-q-down],[data-run-act]');
+    if (qa) {
+      e.preventDefault();
+      if (qa.dataset.selectToggle !== undefined) { selecting = !selecting; selected = []; render(); return; }
+      if (qa.dataset.selectOff !== undefined) { selecting = false; selected = []; render(); return; }
+      if (qa.dataset.sel) { const id = qa.dataset.sel; selected = selected.includes(id) ? selected.filter((x) => x !== id) : [...selected, id]; render(); return; }
+      if (qa.dataset.queueOpen !== undefined) { openQueueSheet(); return; }
+      if (qa.dataset.queueCancel !== undefined) { document.getElementById('queuedlg')?.close(); return; }
+      if (qa.dataset.qUp !== undefined || qa.dataset.qDown !== undefined) {
+        const i = Number(qa.dataset.qUp ?? qa.dataset.qDown); const j = qa.dataset.qUp !== undefined ? i - 1 : i + 1;
+        [selected[i], selected[j]] = [selected[j], selected[i]]; openQueueSheet(); return;
+      }
+      if (qa.dataset.runAct) {
+        const act = qa.dataset.runAct;
+        if (act === 'cancel-now' && !confirm(A('توقف الطابور دلوقتي؟ الجلسة الحالية هتقفل، والشغل اللي اتعمل هيفضل زي ما هو.', 'Stop the queue now? The current session ends; work already done stays as it is.'))) return;
+        const body = { runId: qa.dataset.run, taskId: qa.dataset.task, provider: qa.dataset.provider, ...(act === 'cancel-now' ? { scope: 'now', confirmed: true } : act === 'cancel-after' ? { scope: 'after-current' } : {}) };
+        if (act === 'up' || act === 'down') {
+          const run = execView.lanes.find((l) => l.project === qa.dataset.xPid)?.runs.find((r) => r.id === qa.dataset.run);
+          const queued = run.lanes[0].tasks.filter((task) => task.state === 'queued').map((task) => task.id);
+          const i = queued.indexOf(qa.dataset.task); const j = act === 'up' ? i - 1 : i + 1;
+          if (j < 0 || j >= queued.length) return;
+          [queued[i], queued[j]] = [queued[j], queued[i]];
+          execAct(qa.dataset.xPid, 'reorder', { runId: qa.dataset.run, taskIds: queued });
+          return;
+        }
+        execAct(qa.dataset.xPid, act.startsWith('cancel') ? 'cancel' : act, body);
+      }
+      return;
+    }
+    const xa = e.target.closest('[data-x-perm],[data-x-act],[data-x-open]');
+    if (xa) {
+      e.preventDefault();
+      const xpid = xa.dataset.xPid ?? xa.dataset.xOpen;
+      if (xa.dataset.xOpen) { const target = `item/${encodeURIComponent(xa.dataset.xWork)}`; if (xpid === pid) location.hash = `#/${target}`; else switchProject(xpid, target); return; }
+      xa.disabled = true;
+      const body = xa.dataset.xPerm ? { requestId: xa.dataset.xPerm, decision: xa.dataset.decision } : {};
+      post(`/api/p/${xpid}/agent/${xa.dataset.xPerm ? 'permission' : xa.dataset.xAct}`, JSON.stringify(body), { 'Content-Type': 'application/json' })
+        .then(() => scheduleExecution())
+        .catch((err) => { toast(esc(why(err))); xa.disabled = false; });
+      return;
+    }
     const x = e.target.closest('[data-lang],[data-theme-toggle],[data-bell],[data-digest],[data-open-project],[data-dev],[data-f],[data-more-st],[data-dtab],[data-file],[data-art],[data-more],[data-copy]');
     if (!x) { if (bellOpen && !e.target.closest('.notes')) { bellOpen = false; render(); } return; }
     if (x.hasAttribute('data-lang')) { lang = lang === 'ar' ? 'en' : 'ar'; store.set('lang', lang); render(); }

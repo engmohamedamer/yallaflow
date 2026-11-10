@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0054",
+  "sourceType": "file",
+  "sourceName": "execution-modes-review-merge.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-11-09T18:14:34.005Z",
+  "original": {
+    "path": "sources/SRC-0054/execution-modes-review-merge.md",
+    "sha256": "c91cf145cbc8f7559d2d42753e477d72095b14e68467480574bc14da49eaeb5d",
+    "sizeBytes": 2199
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0112"
+  ],
+  "rawText": "# Owner scope revision — Review & Merge in v1.5.0 (2026-11-09)\n\nBefore approving the Specification Gate for PF-0112, I need one important scope revision.\n\nI approve the overall Lane + Run architecture and the seven recorded decisions, but the specification is not approved yet.\n\nWe have decided that Review & Merge must be part of YallaFlow v1.5.0, alongside Run Now, Queue, and Parallel.\n\nI don't want users to manually execute Git commands every time a parallel task finishes.\n\nPlease revise the existing PF-0112 specification, requirements, acceptance criteria, architecture, and implementation plan to include:\n1. A complete Review & Merge workflow in the Web Console.\n2. Automated pre-merge checks: task completion, tests, Git changes, conflicts, and Shared Project integrity.\n3. A clear review screen with changed files, verification evidence, and merge readiness.\n4. An explicit user approval step before any commit or merge.\n5. Safe, controlled Git commit and merge execution after approval.\n6. Post-merge verification and Shared Project knowledge integration.\n7. Safe handling of concurrent merge requests, conflicts, failures, and recovery.\n8. Clear separation between Task DONE and Changes MERGED & VERIFIED.\n9. Worktree cleanup only after successful integration and all safety checks.\n\nInvestigate the safest approach to Git commit and merge permissions, including how to handle existing uncommitted changes and avoid accidentally committing unrelated files.\n\nUpdate the Git safety threat model and prepare the exact proposed command allowlist for Checkpoint C.\n\nDo not automatically commit, merge, resolve conflicts, reset, rebase, push, or delete anything during this research.\n\nKeep the existing YallaFlow specification workflow intact:\n- Record this as a new user decision/source in PF-0112.\n- Revise the existing specification and acceptance criteria.\n- Preserve the previous decisions and history.\n- Request the Specification Gate again after revision.\n- Do not approve the gate on my behalf.\n- Do not proceed to implementation.\n\nThe goal is a complete, safe execution lifecycle: Start → Execute → Review → Approve → Merge → Verify, with minimal manual Git operations.\n"
+}

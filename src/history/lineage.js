@@ -414,7 +414,7 @@ export async function verifyMerge(root, plan) {
     const actualIndex = select(index);
     for (const [p, entry] of expectedIndex) if (actualIndex.get(p) !== entry) problems.push(`${p} index mode/object differs from the selected commit`);
     for (const p of actualIndex.keys()) if (!expectedIndex.has(p)) problems.push(`${p} is extra in the index`);
-    try { git(root, ['diff', '--quiet', '--no-ext-diff', '--', r.path]); }
+    try { git(root, ['diff', '--quiet', '--no-ext-diff', '--ignore-submodules=all', '--', r.path]); }
     catch { problems.push(`${r.path} has unstaged changes or could not be checked`); }
   }
   if (problems.length) throw Object.assign(fail('HISTORY_MERGE_MIXED', `The merge mixes records: ${problems.join('; ')}. Run the plan's restore commands.`), { problems });

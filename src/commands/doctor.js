@@ -21,7 +21,7 @@ import { loadRuntimeProfiles } from '../runtime/profile.js';
 import { listLineages, verifyLineage } from '../history/lineage.js';
 
 import { clearStaleLock, readLock } from '../utils/lock.js';
-import { diagnoseCollisions } from '../core/collisions.js';
+import { diagnoseCollisions, duplicateFactIds } from '../core/collisions.js';
 
 export async function doctorCommand({ clearLock = false } = {}) {
   const root = await findProjectRoot();
@@ -42,7 +42,7 @@ export async function doctorCommand({ clearLock = false } = {}) {
   const failed = checks.filter(([, ok]) => !ok);
   for (const [name, ok] of checks) console.log(`${ok ? 'PASS' : 'FAIL'} ${name}`);
   for (const warning of warnings) console.log(`WARN ${warning}`);
-  if (failed.length) await printCollisionDiagnosis(root);
+  await printCollisionDiagnosis(root); // PF-0113: independent of the checks above
   if (failed.length) {
     process.exitCode = 1;
     console.log(`\n${failed.length} check(s) failed.`);
@@ -55,10 +55,22 @@ export async function doctorCommand({ clearLock = false } = {}) {
 // Names probable merge-related work-ID collisions behind the failures above (read-only).
 async function printCollisionDiagnosis(root) {
   let found = [];
+  let facts = [];
   try {
     found = await diagnoseCollisions(root, await listWork(root));
   } catch {
-    return; // the failures above already describe what could not be read
+    found = []; // the checks above already describe what could not be read
+  }
+  try {
+    facts = await duplicateFactIds(root);
+  } catch {
+    facts = [];
+  }
+  if (facts.length) {
+    console.log(`\nDuplicate project-memory fact IDs (${facts.length}) — read-only diagnosis; nothing was changed:`);
+    for (const entry of facts) console.log(`  ${entry.id} appears ${entry.count} times in .yallaflow/context/index.yaml`);
+    console.log('  Likely cause: two branches each promoted knowledge with the same next fact number, and a Git merge kept both.');
+    console.log('  Do not renumber or edit them by hand; a repair is a separate, reviewed step. Shared Project mode writes facts only on the integration branch.');
   }
   if (!found.length) return;
   console.log(`\nProbable work-ID collisions (${found.length}) — read-only diagnosis; nothing was changed:`);

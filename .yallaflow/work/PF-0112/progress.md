@@ -1,0 +1,66 @@
+# Work Ledger — PF-0112
+
+Created: 2026-11-09T17:52:58.235Z
+
+- 2026-11-09T17:52:58.235Z Routing: pending
+- 2026-11-09T17:52:58.285Z Routing: routed as feature + architectural (high)
+- 2026-11-09T17:53:02.669Z Discovery purpose recorded (intent): Deliver Run Now, Queue and Parallel execution in one feature release with one architecture and UX
+- 2026-11-09T17:53:09.248Z Stage: INTAKE → DISCOVERY
+- 2026-11-09T17:56:35.303Z Source attached: SRC-0052 (execution-modes-request.md)
+- 2026-11-09T17:59:26.086Z Stage: DISCOVERY → CLARIFICATION
+- 2026-11-09T18:06:33.443Z Source attached: SRC-0053 (execution-modes-decisions.md)
+- 2026-11-09T18:08:43.325Z Stage: CLARIFICATION → DESIGN
+- 2026-11-09T18:08:43.677Z Stage: DESIGN → SPECIFICATION
+- 2026-11-09T18:14:34.058Z Impact IM-001 pending: source SRC-0054 attached changed approved intent after it was fixed
+- 2026-11-09T18:14:34.058Z Source attached: SRC-0054 (execution-modes-review-merge.md)
+- 2026-11-09T18:19:53.554Z Impact IM-001 pending: requirements REQ-007 revised, REQ-009 revised, REQ-014 revised, REQ-017 added, REQ-018 added, REQ-019 added, REQ-020 added, REQ-021 added, REQ-022 added, REQ-023 added, REQ-024 added, AC-010 revised, AC-013 revised, AC-018 revised, AC-019 revised, AC-021 added, AC-022 added, AC-023 added, AC-024 added, AC-025 added, AC-026 added, AC-027 added, AC-028 added, AC-029 added, AC-030 added, AC-031 added, AC-032 added, AC-033 added, AC-034 added, AC-035 added, AC-036 added, AC-037 added changed approved intent after it was fixed
+- 2026-11-09T18:20:10.222Z Stage corrected: SPECIFICATION → DISCOVERY
+- 2026-11-09T18:20:10.222Z Impact IM-001 assessed: affected context-discovery, requirement-clarification, design-exploration, specification; unaffected none
+- 2026-11-09T18:20:27.019Z Stage: DISCOVERY → CLARIFICATION
+- 2026-11-09T18:20:35.318Z Stage: CLARIFICATION → DESIGN
+- 2026-11-09T18:20:35.687Z Stage: DESIGN → SPECIFICATION
+- 2026-11-09T18:22:45.322Z Source attached: SRC-0055 (execution-modes-d8-d13.md)
+- 2026-11-09T18:30:08.295Z Impact IM-002 pending: source SRC-0056 attached changed approved intent after it was fixed
+- 2026-11-09T18:30:08.295Z Source attached: SRC-0056 (execution-modes-spec-approval.md)
+- 2026-11-09T18:30:19.753Z Impact IM-002 assessed: affected none; unaffected context-discovery, requirement-clarification, design-exploration, specification
+- 2026-11-09T18:30:19.939Z Stage: SPECIFICATION → PLAN
+- 2026-11-09T18:36:51.934Z Impact IM-003 pending: source SRC-0057 attached changed approved intent after it was fixed
+- 2026-11-09T18:36:51.934Z Source attached: SRC-0057 (execution-modes-plan-approval.md)
+- 2026-11-09T18:37:00.419Z Impact IM-003 assessed: affected none; unaffected context-discovery, requirement-clarification, design-exploration, specification, implementation-planning
+- 2026-11-09T18:37:00.789Z Stage: PLAN → IMPLEMENTATION
+- 2026-11-09T18:56:57.975Z Impact IM-004 pending: source SRC-0058 attached changed approved intent after it was fixed
+- 2026-11-09T18:56:57.975Z Source attached: SRC-0058 (execution-modes-checkpoint-c.md)
+- 2026-11-09T18:57:42.475Z Impact IM-004 pending: requirements REQ-030 added, REQ-031 added, REQ-032 added, REQ-033 added, REQ-034 added, REQ-035 added, REQ-036 added, REQ-037 added, AC-045 added, AC-046 added, AC-047 added, AC-048 added, AC-049 added, AC-050 added, AC-051 added, AC-052 added, AC-053 added changed approved intent after it was fixed
+- 2026-11-09T18:59:11.544Z Stage corrected: IMPLEMENTATION → CLARIFICATION
+- 2026-11-09T18:59:11.544Z Impact IM-004 assessed: affected requirement-clarification, design-exploration, specification, implementation-planning; unaffected context-discovery
+- 2026-11-09T18:59:18.495Z Stage: CLARIFICATION → DESIGN
+- 2026-11-09T18:59:18.917Z Stage: DESIGN → SPECIFICATION
+- 2026-11-09T18:59:19.371Z Stage: SPECIFICATION → PLAN
+- 2026-11-09T18:59:45.388Z Stage: PLAN → IMPLEMENTATION
+- 2026-11-09T23:16:05.707Z Impact IM-005 pending: source SRC-0059 attached changed approved intent after it was fixed
+- 2026-11-09T23:16:05.707Z Source attached: SRC-0059 (execution-modes-d14-d15-m4.md)
+- 2026-11-09T23:16:05.892Z Impact IM-005 pending: requirements REQ-038 added, REQ-039 added, REQ-040 added, AC-054 added, AC-055 added, AC-056 added changed approved intent after it was fixed
+- 2026-11-09T23:16:15.624Z Stage corrected: IMPLEMENTATION → CLARIFICATION
+- 2026-11-09T23:16:15.624Z Impact IM-005 assessed: affected requirement-clarification, specification, implementation-planning, implementation; unaffected context-discovery, design-exploration
+- 2026-11-09T23:16:28.889Z Stage: CLARIFICATION → DESIGN
+- 2026-11-09T23:16:29.107Z Stage: DESIGN → SPECIFICATION
+- 2026-11-09T23:16:29.525Z Stage: SPECIFICATION → PLAN
+- 2026-11-09T23:16:30.092Z Stage: PLAN → IMPLEMENTATION
+- 2026-11-10T08:36:26.380Z Impact IM-006 pending: source SRC-0060 attached changed approved intent after it was fixed
+- 2026-11-10T08:36:26.380Z Source attached: SRC-0060 (execution-modes-checkpoint-d.md)
+- 2026-11-10T08:37:05.549Z Impact IM-006 pending: requirements REQ-041 added, REQ-042 added, AC-057 added, AC-058 added changed approved intent after it was fixed
+- 2026-11-10T08:37:05.736Z Stage corrected: IMPLEMENTATION → CLARIFICATION
+- 2026-11-10T08:37:05.736Z Impact IM-006 assessed: affected requirement-clarification, implementation-planning, implementation; unaffected context-discovery, design-exploration, specification
+- 2026-11-10T08:37:16.321Z Stage: CLARIFICATION → DESIGN
+- 2026-11-10T08:37:21.658Z Stage: DESIGN → SPECIFICATION
+- 2026-11-10T08:37:21.842Z Stage: SPECIFICATION → PLAN
+- 2026-11-10T08:37:41.840Z Stage: PLAN → IMPLEMENTATION
+- 2026-11-10T11:32:23.323Z Impact IM-007 pending: source SRC-0061 attached changed approved intent after it was fixed
+- 2026-11-10T11:32:23.323Z Source attached: SRC-0061 (execution-modes-security-decision.md)
+- 2026-11-10T11:32:37.212Z Impact IM-007 pending: requirements REQ-043 added, AC-059 added changed approved intent after it was fixed
+- 2026-11-10T11:32:37.421Z Stage corrected: IMPLEMENTATION → CLARIFICATION
+- 2026-11-10T11:32:37.421Z Impact IM-007 assessed: affected requirement-clarification, implementation-planning, implementation; unaffected context-discovery, design-exploration, specification
+- 2026-11-10T11:32:37.834Z Stage: CLARIFICATION → DESIGN
+- 2026-11-10T11:32:38.018Z Stage: DESIGN → SPECIFICATION
+- 2026-11-10T11:32:38.192Z Stage: SPECIFICATION → PLAN
+- 2026-11-10T11:32:38.654Z Stage: PLAN → IMPLEMENTATION

@@ -16,6 +16,7 @@ import { spawnSync } from 'node:child_process';
 import { HttpError } from './create.js';
 import { isWorkId } from '../core/ids.js';
 import { DECISION_PROVENANCE_ENV } from '../reviews/store.js';
+import { SAFE_GIT } from '../utils/git-safety.js';
 
 export const MAX_TEXT = 10_000;
 const REOPEN_TARGETS = ['implementation', 'verification', 'review'];
@@ -161,8 +162,8 @@ export async function gateReview(root, workId, gate, runner) {
 
 const decided = new Map(); // requestId -> result (this console run)
 
-function claimedGitName(root) {
-  const result = spawnSync('git', ['config', 'user.name'], { cwd: root, encoding: 'utf8', timeout: 5000 });
+export function claimedGitName(root) {
+  const result = spawnSync('git', [...SAFE_GIT, 'config', 'user.name'], { cwd: root, encoding: 'utf8', timeout: 5000 });
   return result.status === 0 && result.stdout.trim() ? result.stdout.trim().slice(0, 200) : null;
 }
 

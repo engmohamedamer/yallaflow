@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "gates": {
+    "specification": {
+      "status": "approved",
+      "respondedAt": "2026-11-09T18:30:08.439Z",
+      "note": "Approved by Mohamed Amer (owner) in the agent session, 2026-11-09: 'I approve the revised Specification Gate for PF-0112.' (SRC-0056)",
+      "history": [
+        {
+          "status": "awaiting_review",
+          "at": "2026-11-09T18:08:49.057Z"
+        },
+        {
+          "status": "changes_requested",
+          "at": "2026-11-09T18:14:34.233Z",
+          "note": "Changes requested by the owner (Mohamed Amer) in the agent session, 2026-11-09: 'I approve the overall Lane + Run architecture and the seven recorded decisions, but the specification is not approved yet. Review & Merge must be part of YallaFlow v1.5.0' (SRC-0054)."
+        },
+        {
+          "status": "approved",
+          "at": "2026-11-09T18:30:08.439Z",
+          "note": "Approved by Mohamed Amer (owner) in the agent session, 2026-11-09: 'I approve the revised Specification Gate for PF-0112.' (SRC-0056)"
+        }
+      ]
+    },
+    "plan": {
+      "status": "approved",
+      "respondedAt": "2026-11-09T18:37:00.562Z",
+      "note": "Approved by Mohamed Amer (owner) in the agent session, 2026-11-09: 'I approve the Implementation Plan Gate for PF-0112 / YallaFlow v1.5.0.' with M3a boundaries (SRC-0057); Checkpoint C remains required before the Git allowlist or execution engine changes.",
+      "history": [
+        {
+          "status": "awaiting_review",
+          "at": "2026-11-09T18:33:04.920Z"
+        },
+        {
+          "status": "approved",
+          "at": "2026-11-09T18:37:00.562Z",
+          "note": "Approved by Mohamed Amer (owner) in the agent session, 2026-11-09: 'I approve the Implementation Plan Gate for PF-0112 / YallaFlow v1.5.0.' with M3a boundaries (SRC-0057); Checkpoint C remains required before the Git allowlist or execution engine changes."
+        }
+      ]
+    }
+  },
+  "updatedAt": "2026-11-09T18:37:00.562Z"
+}

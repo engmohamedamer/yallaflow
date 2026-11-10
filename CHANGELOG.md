@@ -4,6 +4,62 @@ All notable changes to YallaFlow are documented here. The format loosely follows
 
 **1.0.0 is the first public release**, published to npm as `yallaflow`. From 1.0.0 the package follows Semantic Versioning with the compatibility promise in [`docs/releasing.md`](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise). Every earlier version below is an **internal prerelease**: git-tagged, never published to npm, and kept here as history.
 
+## [1.5.0] - 2026-11-10 — Queue your work
+
+Run one task now, or queue several and let them run one after another, while you stay in control of every approval. Review a finished parallel task and merge it by hand with the exact steps. The Overview shows your branch and Shared Project Mode (PF-0112, PF-0113).
+
+**Enabled:**
+- Run Now
+- Queue
+- Review and manual merge
+- Shared Project Mode console improvements
+
+**Disabled in this release:**
+- **Parallel execution.** It stays off until a real-agent test confirms that a lane's agent cannot change your repository's shared Git settings or the Codex settings the console loads.
+- **Automated Merge.** It stays off until its checks can run on exactly the merged content apart from files a lane's agent controls.
+
+### Added
+- **Queue.** Select work items on the Work page and run them one after another with one agent, each in a new session.
+  - The next item starts only when the current one is DONE in YallaFlow and its session has fully ended.
+  - A tool approval, a review gate, a question, a stop, a failure or a usage limit pauses the queue until you act.
+  - If the project's agent configuration (`.codex/`) changed since the queue began, the next session does not start on its own.
+  - **The Agents tab** lists every running and queued task, with these controls: pause, continue, skip, retry, reorder, cancel, and move the rest to the other agent.
+- **Review and manual merge** for a lane's finished task. Review shows:
+  - readiness;
+  - the changed files;
+  - conflicts;
+  - secret-looking content anywhere in the lane's commits;
+  - the commands the agent ran (never run by YallaFlow);
+  - the exact Git steps to merge by hand.
+
+  YallaFlow commits and merges nothing itself in this release.
+- **Approval wait per project.** Choose 5, 15, 30 or 60 minutes in Setup → Agents. The default is 5. When the wait expires, the request is denied.
+- **Overview: branch and Shared Project Mode** (PF-0113). The current branch and Shared Project Mode status are shown, and Shared Project Mode can be turned on with the same preview and confirmation.
+  - **New Work** recommends Shared Project Mode when you work from a feature branch.
+  - **Work items** are shown title first, with copyable canonical IDs.
+- **`yallaflow doctor`** always runs collision diagnostics and detects duplicate project-memory IDs (PF-0113).
+- **CLI:** `yallaflow execution checks set|show` (declared merge checks, for when Automated Merge is enabled) and `yallaflow integration show`.
+- **Docs:** [`execution-modes.md`](docs/execution-modes.md), [`upgrading-to-v1.5.0.md`](docs/upgrading-to-v1.5.0.md), and a Git operations section in [`security.md`](docs/security.md#review--merge-and-git).
+
+### Changed
+- **Agent Contract v12.** It names `integration.yaml` as YallaFlow-owned state. It also adds rules against commits, merges and Git configuration changes in managed lanes; these rules are behavioral guidance only. Run `yallaflow agent refresh`.
+- **Minimum version.** Declaring merge checks (`yallaflow execution checks set`) raises the project's minimum version to 1.5.0, after your confirmation.
+- **Every Git command YallaFlow starts** turns off repository-configured fsmonitor and hooks, and recursion into submodules.
+
+### Security
+- **Independent review before release.** Reviewers working on isolated copies checked the execution layer:
+  - four reviewers in the first round;
+  - three re-verification passes;
+  - one final focused review.
+
+  Every reproduced finding was fixed with a regression test, or its feature was turned off for this release. That is why Parallel and Automated Merge are disabled.
+- YallaFlow never pushes, pulls, fetches, rebases, resets, reverts, stashes, cleans, checks out or deletes branches.
+- **`yallaflow integration record` is turned off** with Automated Merge: nothing records MERGED & VERIFIED in 1.5.0.
+
+### Known limitations
+- **The real two-agent Codex end-to-end test is still pending**; it gates Parallel. Run Now and Queue use the same Codex integration as 1.4.2.
+- **Claude Code is assisted:** the console cannot start it, and Claude Team or Enterprise logins have console channels off unless the organization enables them.
+
 ## [1.4.2] - 2026-11-09 — A console that works with you
 
 Start a project and a task in a few clicks, let the agent run until it needs you, and see what it needs from any page. Reviews read like documents, confirmations are single ticks, and the console tells you plainly whose turn it is.

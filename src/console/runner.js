@@ -11,7 +11,10 @@ const CONCURRENCY = 2;
 // Above the workspace lock's own 60 s wait, so a busy workspace reports WORKSPACE_BUSY itself.
 const WRITE_TIMEOUT_MS = 120_000;
 
-export function createRunner({ cli = CLI } = {}) {
+// `guard(root)`: checked before every child process (PF-0112 review): for a lane, that it is still
+// a worktree of its home repository, so no Git command runs against a repository a lane's agent
+// put in its place.
+export function createRunner({ cli = CLI, guard = null } = {}) {
   const caches = new Map(); // root -> Map(key -> Promise<result>)
   const writeChains = new Map(); // root -> Promise of the last write
   const queue = [];
@@ -32,9 +35,12 @@ export function createRunner({ cli = CLI } = {}) {
   // user text is one element after `--`, never seen by a shell.
   // extraEnv: variables for this one child process only (1.4.0: the console's decision
   // provenance). Never set on the console process, so no other child inherits them.
-  function executeRaw(root, args, timeoutMs = WRITE_TIMEOUT_MS, extraEnv = null) {
+  // The guard may pin a lane's Git directory (GIT_DIR, GIT_WORK_TREE): the child's Git commands
+  // then never read the lane's own .git file, which the lane's agent can change at any time.
+  async function executeRaw(root, args, timeoutMs = WRITE_TIMEOUT_MS, extraEnv = null) {
+    const pinned = runner.guard ? (await runner.guard(root))?.env ?? {} : {};
     return new Promise((resolve, reject) => {
-      const child = spawn(process.execPath, [cli, ...args], { cwd: root, env: { ...process.env, NO_COLOR: '1', ...(extraEnv ?? {}) }, shell: false });
+      const child = spawn(process.execPath, [cli, ...args], { cwd: root, env: { ...process.env, NO_COLOR: '1', ...(extraEnv ?? {}), ...pinned }, shell: false });
       let stdout = '';
       let stderr = '';
       const timer = setTimeout(() => child.kill('SIGKILL'), timeoutMs);
@@ -45,9 +51,10 @@ export function createRunner({ cli = CLI } = {}) {
     });
   }
 
-  function execute(root, args) {
+  async function execute(root, args) {
+    const pinned = runner.guard ? (await runner.guard(root))?.env ?? {} : {};
     return new Promise((resolve, reject) => {
-      const child = spawn(process.execPath, [cli, ...args], { cwd: root, env: { ...process.env, NO_COLOR: '1' } });
+      const child = spawn(process.execPath, [cli, ...args], { cwd: root, env: { ...process.env, NO_COLOR: '1', ...pinned } });
       let stdout = '';
       let stderr = '';
       const timer = setTimeout(() => child.kill('SIGKILL'), TIMEOUT_MS);
@@ -80,7 +87,8 @@ export function createRunner({ cli = CLI } = {}) {
     });
   }
 
-  return {
+  const runner = {
+    guard,
     get(root, key, args) {
       if (!caches.has(root)) caches.set(root, new Map());
       const cache = caches.get(root);
@@ -121,4 +129,5 @@ export function createRunner({ cli = CLI } = {}) {
       return next;
     }
   };
+  return runner;
 }

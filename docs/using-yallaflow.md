@@ -236,7 +236,7 @@ Implemented and verified. The project knowledge is up to date.
 Ready to push.
 ```
 
-YallaFlow never commits or pushes for you. Committing and pushing stay your decision.
+YallaFlow never pushes for you, and commits only what you approve in a Review & Merge (1.5.0, [execution modes](execution-modes.md)). Committing and pushing otherwise stay your decision.
 
 ---
 
@@ -439,7 +439,7 @@ git add .yallaflow CLAUDE.md AGENTS.md
 git commit -m "Update YallaFlow project state"
 ```
 
-YallaFlow never commits or pushes for you.
+YallaFlow never pushes for you, and commits only what you approve in a Review & Merge.
 
 ---
 

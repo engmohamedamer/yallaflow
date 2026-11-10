@@ -24,6 +24,23 @@ export function optionFor(decision, options) {
   return options.find((option) => option.kind === 'reject_once') ?? null;
 }
 
+// PF-0112: the files and the command an ACP tool call names, when the adapter sends them
+// (`locations`, diff `content`, `rawInput`). Shown on the approval card only.
+export function toolScope(toolCall = {}) {
+  const paths = [];
+  for (const location of Array.isArray(toolCall?.locations) ? toolCall.locations : []) if (typeof location?.path === 'string') paths.push(location.path);
+  for (const item of Array.isArray(toolCall?.content) ? toolCall.content : []) if (item?.type === 'diff' && typeof item.path === 'string') paths.push(item.path);
+  const input = toolCall?.rawInput;
+  let command = null;
+  if (input && typeof input === 'object') {
+    // Each argument stays recognisable: quoted when it holds spaces or shell characters (review L9).
+    if (Array.isArray(input.command)) command = input.command.filter((part) => typeof part === 'string').map((part) => (/^[A-Za-z0-9_./=:@%+,-]+$/.test(part) ? part : JSON.stringify(part))).join(' ');
+    else if (typeof input.command === 'string') command = input.command;
+    for (const key of ['path', 'file_path', 'filePath']) if (typeof input[key] === 'string') paths.push(input[key]);
+  }
+  return { ...(paths.length ? { paths } : {}), ...(command ? { command } : {}) };
+}
+
 export function adapterEnvironment(env, codexPath) {
   const clean = { ...env };
   for (const name of STRIPPED_ENV) delete clean[name];
@@ -102,7 +119,8 @@ export class CodexSession {
       detail: described && described !== title ? described : null,
       kind: params.toolCall?.kind ?? 'other',
       toolCallId: String(params.toolCall?.toolCallId ?? ''),
-      allow: offered
+      allow: offered,
+      ...toolScope(params.toolCall)
     });
     const option = optionFor(decision, options);
     return option ? { outcome: { outcome: 'selected', optionId: option.id } } : { outcome: { outcome: 'cancelled' } };

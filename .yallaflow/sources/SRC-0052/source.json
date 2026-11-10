@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0052",
+  "sourceType": "file",
+  "sourceName": "execution-modes-request.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-11-09T17:56:35.256Z",
+  "original": {
+    "path": "sources/SRC-0052/execution-modes-request.md",
+    "sha256": "9cd26d8830f8f309775149b16cba139d9b75e786675d394278d10653ce747e22",
+    "sizeBytes": 2315
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0112"
+  ],
+  "rawText": "# Owner request — Checkpoint B (2026-11-09)\n\nApproved. Proceed with Checkpoint B — Architecture & Implementation Planning on feature/execution-modes.\n\nWe are building one unified execution experience supporting:\n1. Run Now: Simple, immediate task execution, preserving existing behavior.\n2. Queue: Multiple tasks executed sequentially with durable state, approvals, recovery, and cancellation.\n3. Parallel: Multiple agents working simultaneously in isolated Git worktrees, using our existing subscription-based integrations.\n\nPrepare a complete, code-grounded architecture and implementation plan covering:\n- Unified Execution Manager and task/session lifecycle.\n- Reuse of existing AgentBridge, Shared Project Mode, checkout locks, and session recovery.\n- Queue persistence, scheduling, and restart recovery.\n- Worktree creation, identity, task ownership, setup, and safe cleanup.\n- Unified Agents Dashboard and approvals inbox.\n- Task completion detection, error handling, and usage limits.\n- Git review, conflict detection, and knowledge integration.\n- Backward compatibility with v1.4.2.\n- UI/UX flows for both small and large projects.\n- Security boundaries, permission handling, and testing strategy.\n\nDesign requirements:\n- Keep the default workflow simple for small projects.\n- The three modes must share one coherent architecture and user experience.\n- Do not duplicate existing YallaFlow functionality.\n- Do not introduce API keys, new paid services, or unnecessary infrastructure.\n- Preserve the existing Git safety guarantees.\n- Explicitly identify any Git command permissions requiring my approval.\n- Use the successful two-Codex-session PoC as evidence, while acknowledging its untested limitations.\n- Include UI mockups or clear screen flows showing how users will actually interact with the system.\n- Provide a phased development plan, but target all three modes in the same feature release.\n- Define measurable acceptance criteria for each mode and the overall release.\n\nYou may inspect the repository and prepare planning documents on the feature branch, following existing YallaFlow conventions.\nDo not implement features, change Git safety rules, commit, or push yet.\nPresent the architecture, UI proposal, affected files, risks, and implementation milestones for my approval before coding.\n"
+}

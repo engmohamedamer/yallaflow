@@ -63,6 +63,12 @@ YallaFlow never selects Codex's full-access mode.
   - the checkout frees up when the first console stops, or when its process is gone.
 - **Gates stay human decisions, by command.** An agent that may run shell commands could also run `yallaflow approve`. The Agent Contract forbids that, but the Agent Workspace does not add a technical lock against it, just as the terminal doesn't. Check the approval notes and the progress ledger.
 
+## Queues, lanes and the approval wait (1.5.0)
+- **Queue and Parallel** start sessions for you, one per task, with the same whole-job message as **Start**. Nothing else is automatic: a tool approval, a review gate, a question or a stop pauses that task until you act. See [`execution-modes.md`](execution-modes.md).
+- **Usage limits** pause every queued task on that agent. The Agents tab shows when it can try again; you resume, or move the rest to the other agent.
+- **Approval wait.** A tool request waits 5 minutes for your answer by default, then it is **denied**. **Setup → Agents** offers 5, 15, 30 or 60 minutes for this project, saved in `.yallaflow/local/approval.json` (git-ignored). A timeout never approves anything.
+- **Lane sessions** work only inside their lane folder. Tool requests show paths relative to the lane.
+
 ## Choose the agents for a project
 Open **Setup → Agents** in the console:
 - **Detection:** it shows Codex and Claude Code on this machine (version, subscription login, problems), with **Rescan this machine**.

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0055",
+  "sourceType": "file",
+  "sourceName": "execution-modes-d8-d13.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-11-09T18:22:45.281Z",
+  "original": {
+    "path": "sources/SRC-0055/execution-modes-d8-d13.md",
+    "sha256": "63388ae46b03d20dc20fc0fb45670292ccbffe49ab3d92f755d3abe6663b5352",
+    "sizeBytes": 2301
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0112"
+  ],
+  "rawText": "# Owner decisions D8–D13 and Git transaction validation request (2026-11-09)\n\nI have reviewed D8–D13. Please record the following decisions in PF-0112.\n\nD8 — Conditional approval. If main moves after my approval, revalidate everything. If the reviewed diff, resulting tree, merge commit, verification scope, or integration outcome changes, require a fresh explicit approval. Never silently extend an earlier approval to materially different content.\n\nD9 — Conditional approval. Git hooks may be disabled for controlled YallaFlow operations, but required equivalent checks must be identified and executed. Do not assume task tests replace all hooks or CI checks. Block merging when mandatory verification cannot be satisfied.\n\nD10 — Approved. Use a durable, team-visible integration record, with atomic/recoverable updates and safe Shared Project handling. Ensure the integration record accurately reflects the final verified state.\n\nD11 — Approved. Review & Merge applies to parallel worktrees in v1.5.0. Preserve existing Run Now and Queue Git behavior.\n\nD12 — Modified. Do not automatically delete worktrees. Retain them by default. Offer a separate explicit Cleanup action after MERGED & VERIFIED, subject to all safety checks. Never delete uncommitted or otherwise unpreserved data.\n\nD13 — Approved with conditions. Use one merge commit per lane as the default strategy, preserving existing task history. No squash, rebase, or history rewriting.\n\nBefore requesting Specification Gate approval, also validate the complete Git transaction design:\n- How temporary indexes, commit-tree, and merge-tree interact.\n- How commit --only behaves with staged and unstaged changes.\n- Whether fast-forwarding main can preserve unrelated local changes safely.\n- How shared integrate and integration.yaml are incorporated without changing already-approved content.\n- What happens if the console crashes after updating main but before recording verification.\n- Whether the implementation can truthfully guarantee that no unrelated file is committed.\n\nTreat any unverified safety guarantee as an open risk, not as proven behavior.\n\nRecord the decisions, update requirements and acceptance criteria, and request the Specification Gate again.\n\nDo not implement code or approve the gate on my behalf.\n"
+}

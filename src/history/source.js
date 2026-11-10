@@ -12,13 +12,14 @@ import { createHash } from 'node:crypto';
 import { constants } from 'node:fs';
 import { lstat, open, readdir, realpath } from 'node:fs/promises';
 import path from 'node:path';
+import { SAFE_GIT } from '../utils/git-safety.js';
 
 const SKIP = (relative) => relative.startsWith('.yallaflow/local/') || relative.startsWith('.yallaflow/lineages/');
 const MAX_BUFFER = 256 * 1024 * 1024;
 export const sha256 = (bytes) => `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
 
 export function git(cwd, args, { binary = false } = {}) {
-  const result = spawnSync('git', args, { cwd, encoding: binary ? null : 'utf8', maxBuffer: MAX_BUFFER, shell: false });
+  const result = spawnSync('git', [...SAFE_GIT, ...args], { cwd, encoding: binary ? null : 'utf8', maxBuffer: MAX_BUFFER, shell: false });
   if (result.status !== 0) {
     const message = binary ? String(result.stderr) : result.stderr;
     throw Object.assign(new Error(`git ${args[0]} failed: ${message.trim().split('\n')[0] || 'unknown error'}`), { code: 'HISTORY_GIT' });

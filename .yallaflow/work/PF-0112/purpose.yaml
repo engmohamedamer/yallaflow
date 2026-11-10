@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "workId": "PF-0112",
+  "mode": "intent",
+  "objective": "Deliver Run Now, Queue and Parallel execution in one feature release with one architecture and UX",
+  "preservation": [
+    "v1.4.2 single-agent console behavior (Start, chat, approvals, switch agent, checkout lock)",
+    "Git safety: allowlisted read-only git commands; YallaFlow never commits, pushes, merges or rebases on its own",
+    "Subscription-only agent sessions (Claude Code, Codex); no API keys or paid services"
+  ],
+  "focus": [],
+  "history": [
+    {
+      "action": "recorded",
+      "at": "2026-11-09T17:53:02.669Z"
+    }
+  ],
+  "recordedAt": "2026-11-09T17:53:02.669Z",
+  "updatedAt": "2026-11-09T17:53:02.669Z"
+}

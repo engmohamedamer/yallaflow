@@ -13,6 +13,7 @@ import { exists } from '../utils/fs.js';
 import { readYaml } from './yaml.js';
 import { workspacePath } from './workspace.js';
 import { loadSource } from './sources.js';
+import { SAFE_GIT } from '../utils/git-safety.js';
 
 const MAX_GIT_LOOKUPS = 40;
 
@@ -70,7 +71,7 @@ export async function collisionSignals(root, meta) {
 // (no optional locks); null when Git is unavailable.
 function addedIn(root, relative) {
   try {
-    const out = execFileSync('git', ['--no-optional-locks', 'log', '--diff-filter=A', '--format=%h %ad %s', '--date=short', '--', relative], {
+    const out = execFileSync('git', [...SAFE_GIT, '--no-optional-locks', 'log', '--diff-filter=A', '--format=%h %ad %s', '--date=short', '--', relative], {
       cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 10_000, env: { ...process.env, GIT_OPTIONAL_LOCKS: '0' }
     });
     return out.split('\n').map((line) => line.trim()).filter(Boolean).slice(0, 4);
@@ -95,4 +96,17 @@ export async function diagnoseCollisions(root, metas) {
     found.push(entry);
   }
   return found;
+}
+
+// Fact IDs (CTX-####) that appear more than once in context/index.yaml — the shape two
+// branches leave when each promoted knowledge outside a Shared Project and the merge kept
+// both. Read from the raw file, so it works even when the ledger itself fails to load.
+export async function duplicateFactIds(root) {
+  const ledger = await readOptional(path.join(workspacePath(root), 'context', 'index.yaml'));
+  const seen = new Map();
+  for (const fact of Array.isArray(ledger?.facts) ? ledger.facts : []) {
+    if (typeof fact?.id !== 'string') continue;
+    seen.set(fact.id, (seen.get(fact.id) ?? 0) + 1);
+  }
+  return [...seen].filter(([, count]) => count > 1).map(([id, count]) => ({ id, count }));
 }

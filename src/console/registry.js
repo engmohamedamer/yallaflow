@@ -34,12 +34,14 @@ async function saveRegistry(registry, file) {
   await rename(temp, file);
 }
 
-export async function addProject(dir, file = registryPath()) {
+// PF-0112: a lane (a YallaFlow-created worktree) is saved with its home checkout (`parent`)
+// and its lane name; consoles before 1.5.0 ignore both fields.
+export async function addProject(dir, file = registryPath(), { parent = null, lane = null } = {}) {
   const root = await findProjectRoot(path.resolve(dir));
   if (!root) throw new Error(`No .yallaflow workspace found at ${dir}. Run \`yallaflow init\` there first.`);
   const registry = await loadRegistry(file);
   if (registry.projects.some((entry) => entry.root === root)) return { root, added: false };
-  registry.projects.push({ root, addedAt: new Date().toISOString() });
+  registry.projects.push({ root, addedAt: new Date().toISOString(), ...(parent ? { parent, lane } : {}) });
   await saveRegistry(registry, file);
   return { root, added: true };
 }

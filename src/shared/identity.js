@@ -5,6 +5,7 @@ import { spawnSync } from 'node:child_process';
 import { exists, ensureDir } from '../utils/fs.js';
 import { readYaml, writeYaml } from '../core/yaml.js';
 import { CLONE_TAG_ALPHABET, CLONE_TAG_LENGTH, CLONE_TAG_PATTERN, parseScopedId } from '../core/ids.js';
+import { SAFE_GIT } from '../utils/git-safety.js';
 
 // Personal, machine-local runtime state for Shared Project Mode (v0.3.10). Everything
 // under .yallaflow/local/ is gitignored by .yallaflow/.gitignore (written by `shared
@@ -98,7 +99,7 @@ export async function writeLocalIdentity(root, cloneTag, now = new Date().toISOS
 // registration, no roles. null when Git or the values are unavailable.
 export function gitActor(root) {
   const read = (key) => {
-    const result = spawnSync('git', ['config', '--get', key], { cwd: root, encoding: 'utf8' });
+    const result = spawnSync('git', [...SAFE_GIT, 'config', '--get', key], { cwd: root, encoding: 'utf8' });
     return result.status === 0 ? result.stdout.trim() : '';
   };
   const name = read('user.name');

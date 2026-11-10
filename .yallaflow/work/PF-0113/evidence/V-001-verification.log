@@ -1,0 +1,376 @@
+TAP version 13
+# Subtest: a merge-collided work item is listed as invalid and never hides the project
+ok 1 - a merge-collided work item is listed as invalid and never hides the project
+  ---
+  duration_ms: 4272.740573
+  type: 'test'
+  ...
+# Subtest: the exact Vult message: a ledger pinned to another registry version
+ok 2 - the exact Vult message: a ledger pinned to another registry version
+  ---
+  duration_ms: 1024.037947
+  type: 'test'
+  ...
+# Subtest: an unreadable meta.yaml is reported, not fatal
+ok 3 - an unreadable meta.yaml is reported, not fatal
+  ---
+  duration_ms: 1032.922749
+  type: 'test'
+  ...
+# Subtest: zero work items: no completion is claimed
+ok 4 - zero work items: no completion is claimed
+  ---
+  duration_ms: 654.525361
+  type: 'test'
+  ...
+# Subtest: console: an invalid item is a data warning in a 200 snapshot, not a failed project
+ok 5 - console: an invalid item is a data warning in a 200 snapshot, not a failed project
+  ---
+  duration_ms: 2089.238306
+  type: 'test'
+  ...
+# Subtest: console UI: the theme button is matched by its own attribute, never by <html data-theme>
+ok 6 - console UI: the theme button is matched by its own attribute, never by <html data-theme>
+  ---
+  duration_ms: 13.277414
+  type: 'test'
+  ...
+# Subtest: Run Now: Start keeps its v1.4.2 calls; the manager records a one-task run; the inbox shows paths and the command; answering resolves the same request
+ok 7 - Run Now: Start keeps its v1.4.2 calls; the manager records a one-task run; the inbox shows paths and the command; answering resolves the same request
+  ---
+  duration_ms: 5308.11506
+  type: 'test'
+  ...
+# Subtest: restart: a task that was live becomes interrupted and nothing starts by itself; an unreadable store is reported and left alone
+ok 8 - restart: a task that was live becomes interrupted and nothing starts by itself; an unreadable store is reported and left alone
+  ---
+  duration_ms: 329.26573
+  type: 'test'
+  ...
+# Subtest: the Agents view is read-only and needs the token; without agents it reports disabled
+ok 9 - the Agents view is read-only and needs the token; without agents it reports disabled
+  ---
+  duration_ms: 249.800825
+  type: 'test'
+  ...
+# Subtest: Queue end to end: two items run one after the other through the real bridge; each ends its session only after YallaFlow shows DONE
+ok 10 - Queue end to end: two items run one after the other through the real bridge; each ends its session only after YallaFlow shows DONE
+  ---
+  duration_ms: 7496.243192
+  type: 'test'
+  ...
+# Subtest: execution routes: token, Origin and JSON are required; a read-only console refuses them
+ok 11 - execution routes: token, Origin and JSON are required; a read-only console refuses them
+  ---
+  duration_ms: 235.043968
+  type: 'test'
+  ...
+# Subtest: Parallel: two requests become two lanes (named after the project and lane) with their own agents running at the same time; a third lane is refused; Clean up refuses unmerged lanes
+ok 12 - Parallel: two requests become two lanes (named after the project and lane) with their own agents running at the same time; a third lane is refused; Clean up refuses unmerged lanes
+  ---
+  duration_ms: 8410.47903
+  type: 'test'
+  ...
+# Subtest: Review & Merge in the console: the first lane merges to MERGED & VERIFIED; the second conflicts and is sent back to its agent (reopened, started with the conflict instruction)
+ok 13 - Review & Merge in the console: the first lane merges to MERGED & VERIFIED; the second conflicts and is sent back to its agent (reopened, started with the conflict instruction)
+  ---
+  duration_ms: 26990.391378
+  type: 'test'
+  ...
+# Subtest: agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+ok 14 - agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+  ---
+  duration_ms: 20.951457
+  type: 'test'
+  ...
+# Subtest: paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+ok 15 - paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+  ---
+  duration_ms: 8.675697
+  type: 'test'
+  ...
+# Subtest: file selection and paste combine; unsupported, empty and oversized files are explained
+ok 16 - file selection and paste combine; unsupported, empty and oversized files are explained
+  ---
+  duration_ms: 3.774194
+  type: 'test'
+  ...
+# Subtest: revision partial failure keeps pending files and retries without duplicating text or successful uploads
+ok 17 - revision partial failure keeps pending files and retries without duplicating text or successful uploads
+  ---
+  duration_ms: 6.381542
+  type: 'test'
+  ...
+# Subtest: create uploads pasted files through the existing bound request endpoint
+ok 18 - create uploads pasted files through the existing bound request endpoint
+  ---
+  duration_ms: 9.598077
+  type: 'test'
+  ...
+# Subtest: overview previews keep full facts available under View more, including after redraw
+ok 19 - overview previews keep full facts available under View more, including after redraw
+  ---
+  duration_ms: 6.070617
+  type: 'test'
+  ...
+# Subtest: security: loopback host, token, origin, read-only methods and ID-only paths
+ok 20 - security: loopback host, token, origin, read-only methods and ID-only paths
+  ---
+  duration_ms: 2719.214117
+  type: 'test'
+  ...
+# Subtest: serves the snapshot, work detail and preserved sources by ID
+ok 21 - serves the snapshot, work detail and preserved sources by ID
+  ---
+  duration_ms: 1666.274615
+  type: 'test'
+  ...
+# Subtest: live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+ok 22 - live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+  ---
+  duration_ms: 1903.259448
+  type: 'test'
+  ...
+# Subtest: the console never writes: browsing every route leaves the workspace byte-identical
+ok 23 - the console never writes: browsing every route leaves the workspace byte-identical
+  ---
+  duration_ms: 1448.683136
+  type: 'test'
+  ...
+# Subtest: extracted text cannot be read outside its source directory; HEAD never opens the event stream
+ok 24 - extracted text cannot be read outside its source directory; HEAD never opens the event stream
+  ---
+  duration_ms: 1238.844189
+  type: 'test'
+  ...
+# Subtest: overview: feature branch without Shared Mode — branch, detected integration branch, Turn on; CLI JSON unchanged
+ok 25 - overview: feature branch without Shared Mode — branch, detected integration branch, Turn on; CLI JSON unchanged
+  ---
+  duration_ms: 3779.999229
+  type: 'test'
+  ...
+# Subtest: overview: a lane project reports its own branch, is never offered Turn on, and cannot enable or preview
+ok 26 - overview: a lane project reports its own branch, is never offered Turn on, and cannot enable or preview
+  ---
+  duration_ms: 1224.279802
+  type: 'test'
+  ...
+# Subtest: ui: Overview line and New Work hint compare only against a known integration branch
+ok 27 - ui: Overview line and New Work hint compare only against a known integration branch
+  ---
+  duration_ms: 58.398545
+  type: 'test'
+  ...
+# Subtest: ui: one Shared enable panel, and work IDs stay whole beside their titles
+ok 28 - ui: one Shared enable panel, and work IDs stay whole beside their titles
+  ---
+  duration_ms: 7.331669
+  type: 'test'
+  ...
+# Subtest: doctor: duplicate fact IDs are diagnosed read-only; a healthy workspace prints no diagnosis
+ok 29 - doctor: duplicate fact IDs are diagnosed read-only; a healthy workspace prints no diagnosis
+  ---
+  duration_ms: 680.969874
+  type: 'test'
+  ...
+# Subtest: overview: evidence-based stack with declared / detected / inferred kept apart; no secret is read
+ok 30 - overview: evidence-based stack with declared / detected / inferred kept apart; no secret is read
+  ---
+  duration_ms: 449.330195
+  type: 'test'
+  ...
+# Subtest: overview: greenfield intent, a legacy workspace and a damaged ledger all yield a valid document
+ok 31 - overview: greenfield intent, a legacy workspace and a damaged ledger all yield a valid document
+  ---
+  duration_ms: 919.568766
+  type: 'test'
+  ...
+# Subtest: overview: memory facts come with confidence and mechanical freshness
+ok 32 - overview: memory facts come with confidence and mechanical freshness
+  ---
+  duration_ms: 191.403967
+  type: 'test'
+  ...
+# Subtest: composeImages: tags, digests, quotes and variables
+ok 33 - composeImages: tags, digests, quotes and variables
+  ---
+  duration_ms: 1.027594
+  type: 'test'
+  ...
+# Subtest: console: GET overview is token-protected, read-only and returns the contract
+ok 34 - console: GET overview is token-protected, read-only and returns the contract
+  ---
+  duration_ms: 341.33408
+  type: 'test'
+  ...
+# Subtest: 8/9/11. shared enable is explicit, records policy and version, never commits or pushes
+ok 35 - 8/9/11. shared enable is explicit, records policy and version, never commits or pushes
+  ---
+  duration_ms: 4132.866322
+  type: 'test'
+  ...
+# Subtest: 10. an unhealthy or non-Git workspace cannot enable sharing, and nothing changes
+ok 36 - 10. an unhealthy or non-Git workspace cannot enable sharing, and nothing changes
+  ---
+  duration_ms: 987.909325
+  type: 'test'
+  ...
+# Subtest: 11. an incompatible YallaFlow stops before any project-state mutation; read-only orientation still explains why
+ok 37 - 11. an incompatible YallaFlow stops before any project-state mutation; read-only orientation still explains why
+  ---
+  duration_ms: 3175.315518
+  type: 'test'
+  ...
+# Subtest: 12/52. a single-user workspace is unchanged until sharing is enabled: same IDs, no memory records, reads write nothing
+ok 38 - 12/52. a single-user workspace is unchanged until sharing is enabled: same IDs, no memory records, reads write nothing
+  ---
+  duration_ms: 3192.835334
+  type: 'test'
+  ...
+# Subtest: 13/14/16. two branches from the same base create work and sources without ID or path collision, and merge cleanly
+ok 39 - 13/14/16. two branches from the same base create work and sources without ID or path collision, and merge cleanly
+  ---
+  duration_ms: 2754.920249
+  type: 'test'
+  ...
+# Subtest: 15. legacy PF-\#\#\#\# and SRC-\#\#\#\# stay readable and keep allocating in single-user mode; both forms coexist
+ok 40 - 15. legacy PF-\#\#\#\# and SRC-\#\#\#\# stay readable and keep allocating in single-user mode; both forms coexist
+  ---
+  duration_ms: 1131.662815
+  type: 'test'
+  ...
+# Subtest: checkout tags: 10 Crockford-base32 characters, an unbiased byte mapping, drawn from crypto.randomBytes
+ok 41 - checkout tags: 10 Crockford-base32 characters, an unbiased byte mapping, drawn from crypto.randomBytes
+  ---
+  duration_ms: 6.8306
+  type: 'test'
+  ...
+# Subtest: high-volume deterministic non-reuse: one checkout allocating thousands of IDs across branch switches never repeats a number
+ok 42 - high-volume deterministic non-reuse: one checkout allocating thousands of IDs across branch switches never repeats a number
+  ---
+  duration_ms: 3799.766906
+  type: 'test'
+  ...
+# Subtest: a copied checkout gets a fresh clone tag; the identity is local, gitignored, and needs no join command
+ok 43 - a copied checkout gets a fresh clone tag; the identity is local, gitignored, and needs no join command
+  ---
+  duration_ms: 2239.578611
+  type: 'test'
+  ...
+# Subtest: one checkout never reuses an ID across branch switches or stashes
+ok 44 - one checkout never reuses an ID across branch switches or stashes
+  ---
+  duration_ms: 1529.586645
+  type: 'test'
+  ...
+# Subtest: 17. every global namespace is branch-safe after a multi-branch merge; work-scoped IDs are safe by scope
+ok 45 - 17. every global namespace is branch-safe after a multi-branch merge; work-scoped IDs are safe by scope
+  ---
+  duration_ms: 2878.20198
+  type: 'test'
+  ...
+# Subtest: 18/19/20/21. work captures its memory base; unchanged, unrelated, and referenced changes are told apart
+ok 46 - 18/19/20/21. work captures its memory base; unchanged, unrelated, and referenced changes are told apart
+  ---
+  duration_ms: 1418.641378
+  type: 'test'
+  ...
+# Subtest: 22. without Git the memory base is still a deterministic content fingerprint
+ok 47 - 22. without Git the memory base is still a deterministic content fingerprint
+  ---
+  duration_ms: 152.082838
+  type: 'test'
+  ...
+# Subtest: 23/24/25/26. on a feature branch knowledge is staged work-locally; canonical memory is untouched; DONE and handoff stay coherent
+ok 48 - 23/24/25/26. on a feature branch knowledge is staged work-locally; canonical memory is untouched; DONE and handoff stay coherent
+  ---
+  duration_ms: 2919.576578
+  type: 'test'
+  ...
+# Subtest: a relation proposed against a fact that changes before promotion is refused at staging (revalidate first)
+ok 49 - a relation proposed against a fact that changes before promotion is refused at staging (revalidate first)
+  ---
+  duration_ms: 1298.956609
+  type: 'test'
+  ...
+# Subtest: 27/28/29/30/35. safe new facts, reconfirmations, supersessions, and exact duplicates integrate with full provenance
+ok 50 - 27/28/29/30/35. safe new facts, reconfirmations, supersessions, and exact duplicates integrate with full provenance
+  ---
+  duration_ms: 5283.540864
+  type: 'test'
+  ...
+# Subtest: 31/40. conflicting parallel supersessions block, never overwrite, and memory stays healthy until reconciled
+ok 51 - 31/40. conflicting parallel supersessions block, never overwrite, and memory stays healthy until reconciled
+  ---
+  duration_ms: 5649.769771
+  type: 'test'
+  ...
+# Subtest: 32. a stale base on a feature branch is detected before push, with developer-facing guidance
+ok 52 - 32. a stale base on a feature branch is detected before push, with developer-facing guidance
+  ---
+  duration_ms: 4109.685538
+  type: 'test'
+  ...
+# Subtest: 33/34. integration retry is idempotent and an interrupted or failed integration is never half-applied
+ok 53 - 33/34. integration retry is idempotent and an interrupted or failed integration is never half-applied
+  ---
+  duration_ms: 4134.242919
+  type: 'test'
+  ...
+# Subtest: integration is deterministic: two maintainers integrating the same merge produce identical files
+ok 54 - integration is deterministic: two maintainers integrating the same merge produce identical files
+  ---
+  duration_ms: 2863.37006
+  type: 'test'
+  ...
+# Subtest: doctor detects unsafe shared state: legacy IDs after sharing, local state committed or misplaced, bad metadata, missing CTX, missing provenance
+ok 55 - doctor detects unsafe shared state: legacy IDs after sharing, local state committed or misplaced, bad metadata, missing CTX, missing provenance
+  ---
+  duration_ms: 2968.221877
+  type: 'test'
+  ...
+# Subtest: 47/48/49/50/51. shared check is read-only, provider-neutral, passes a safe branch, and fails a stale one with actionable output
+ok 56 - 47/48/49/50/51. shared check is read-only, provider-neutral, passes a safe branch, and fails a stale one with actionable output
+  ---
+  duration_ms: 2798.405817
+  type: 'test'
+  ...
+# Subtest: 51b/git-scan: the Git scan catches every invocation form, every forbidden subcommand, and git-ops shapes outside the approved set
+ok 57 - 51b/git-scan: the Git scan catches every invocation form, every forbidden subcommand, and git-ops shapes outside the approved set
+  ---
+  duration_ms: 10.844467
+  type: 'test'
+  ...
+# Subtest: 51/no-network: YallaFlow source never invokes mutating or network Git subcommands and calls no LLM provider
+ok 58 - 51/no-network: YallaFlow source never invokes mutating or network Git subcommands and calls no LLM provider
+  ---
+  duration_ms: 244.159088
+  type: 'test'
+  ...
+# Subtest: 42/43/44/45. the adapter orients automatically; finish speaks outcome language and keeps the audit in --verbose
+ok 59 - 42/43/44/45. the adapter orients automatically; finish speaks outcome language and keeps the audit in --verbose
+  ---
+  duration_ms: 2659.935398
+  type: 'test'
+  ...
+# Subtest: 53/54. single-user baseline, freshness, reconciliation helpers and durable sources behave as before
+ok 60 - 53/54. single-user baseline, freshness, reconciliation helpers and durable sources behave as before
+  ---
+  duration_ms: 1149.327359
+  type: 'test'
+  ...
+# Subtest: read commands never write in a Shared Project — not even a fresh clone's local identity
+ok 61 - read commands never write in a Shared Project — not even a fresh clone's local identity
+  ---
+  duration_ms: 9063.712017
+  type: 'test'
+  ...
+1..61
+# tests 61
+# suites 0
+# pass 61
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 72940.27277

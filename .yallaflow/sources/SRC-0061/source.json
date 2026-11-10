@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0061",
+  "sourceType": "file",
+  "sourceName": "execution-modes-security-decision.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-11-10T11:32:23.274Z",
+  "original": {
+    "path": "sources/SRC-0061/execution-modes-security-decision.md",
+    "sha256": "680976f495c3860c9914478117daad4b1ab7b05598ddd059a6f636726e8cdda1",
+    "sizeBytes": 1665
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0112"
+  ],
+  "rawText": "# PF-0112 — Security decision after Checkpoint D (owner, 2026-11-10)\n\nDecision: proceed with a minimal-change approach for v1.5.0. Option A with a restricted version of Option C.\nKeep the existing architecture and implemented protections. Do not build Option B or redesign the execution system for this release.\n\n1. Keep Run Now, Queue, Parallel, Review, and manual merge available.\n2. Verify Codex sandbox restrictions on shared Git metadata during the approved real-agent E2E.\n3. Do not allow YallaFlow to execute agent-controlled scripts, ignored executables, or dependencies with my console privileges.\n4. If required merge verification cannot be performed safely, disable Automated Merge for that task and show a clear explanation with a manual fallback.\n5. Automated Merge must remain fail-closed and only become available when all required security checks are satisfied.\n6. Add Agent Contract rules against modifying shared Git metadata, Git configuration, or performing commits/merges in managed lanes. Treat these as behavioral guidance only.\n7. Preserve the current UX wherever possible.\n8. Do not silently weaken required checks or mark an unverified task as MERGED & VERIFIED.\n\nMake only targeted changes, with focused regression tests. After these changes, perform one final focused independent review of the previously identified high-risk boundaries. No broad multi-agent review. If the final review finds a critical or high-severity issue, stop the affected functionality and report it. Do not enter another open-ended review cycle. Keep the release blocked until the real Codex E2E and security checks pass. Do not commit, push, tag, or publish.\n"
+}

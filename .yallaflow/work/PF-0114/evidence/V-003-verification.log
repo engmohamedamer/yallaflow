@@ -1,0 +1,3 @@
+agents off: execution view enabled=false, run without confirmation -> 405 READ_ONLY
+agents on: execution view enabled=true, run without confirmation -> 400 CONFIRMATION_REQUIRED
+COMPAT SMOKE PASS: <redacted>

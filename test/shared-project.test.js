@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import os from 'node:os';
 import path from 'node:path';
 import { initWorkspace, nextWorkId, workspacePath } from '../src/core/workspace.js';
+import { scanGitCalls } from '../test-support/git-scan.js';
 import { CLONE_TAG_ALPHABET, CLONE_TAG_LENGTH, nextScopedId, parseScopedId } from '../src/core/ids.js';
 import { exists } from '../src/utils/fs.js';
 import { contextLedgerPath, loadContextLedger, mutateContextLedger } from '../src/context/ledger.js';
@@ -698,19 +699,74 @@ test('47/48/49/50/51. shared check is read-only, provider-neutral, passes a safe
   assert.match(fail.stdout, /Result: FAIL/);
 });
 
+test('51b/git-scan: the Git scan catches every invocation form, every forbidden subcommand, and git-ops shapes outside the approved set', () => {
+  const bad = (relative, text) => scanGitCalls(relative, text);
+  // Every invocation form is seen, with options before the subcommand and -c pairs skipped.
+  assert.deepEqual(bad('core/a.js', "spawnSync('git', ['push', 'origin'])"), ['a.js: git push (spawn)']);
+  assert.deepEqual(bad('core/a.js', "execFileSync('git', ['--no-optional-locks', 'reset', '--hard'])"), ['a.js: git reset (spawn)']);
+  assert.deepEqual(bad('core/a.js', "spawn('git', ['-c', 'core.x=1', 'checkout', 'main'])"), ['a.js: git -c core.x=1 (spawn): only the known safe settings may be passed', 'a.js: git checkout (spawn)']);
+  assert.deepEqual(bad('core/a.js', "execFile('git', ['fetch'])"), ['a.js: git fetch (spawn)']);
+  assert.deepEqual(bad('core/a.js', "git(root, ['stash'])"), ['a.js: git stash (wrapper)']);
+  assert.deepEqual(bad('core/a.js', "git(cwd, ['commit', '-m', 'x'])"), ['a.js: git commit (wrapper)']);
+  assert.deepEqual(bad('core/a.js', "const argv = ['git', 'clean', '-fd'];"), ['a.js: git clean (argv)']);
+  assert.deepEqual(bad('core/a.js', "spawnSync('git', args, {})"), ['a.js: git with a computed argument list outside the known wrappers']);
+  assert.deepEqual(bad('core/a.js', "spawnSync('git', [...prefix, ...args])"), ['a.js: git with a computed argument list outside the known wrappers']);
+  assert.deepEqual(bad('core/a.js', "const x = ['git', 'init', '--quiet'];"), ['a.js: git init outside the approved GIT_INIT_ARGV']);
+  assert.deepEqual(bad('core/a.js', "runQuiet(GIT_INIT_ARGV[0], GIT_INIT_ARGV.slice(1))"), ['a.js: uses GIT_INIT_ARGV']);
+  // Review M9 (2026-11-10): the bypasses an independent reviewer found are all seen now.
+  assert.deepEqual(bad('core/a.js', 'spawnSync("git", ["reset", "--hard"])'), ['a.js: git reset (spawn)']);
+  assert.deepEqual(bad('core/a.js', "spawnSync(`git`, [`push`])"), ['a.js: git push (spawn)']);
+  assert.deepEqual(bad('core/a.js', "runQuiet('git', ['checkout', 'x'])"), ['a.js: git checkout (spawn)']);
+  assert.deepEqual(bad('core/a.js', "spawnSync('git', ['-c', key, 'reset'])"), ['a.js: git -c key (spawn): only the known safe settings may be passed', 'a.js: git reset (spawn)']);
+  assert.deepEqual(bad('core/a.js', "git(this.root, ['reset'])"), ['a.js: git reset (wrapper)']);
+  assert.deepEqual(bad('core/a.js', "git(worktree, ['stash'])"), ['a.js: git stash (wrapper)']);
+  assert.deepEqual(bad('core/a.js', "git(root, argsVar)"), ['a.js: git wrapper with a computed argument list (argsVar)']);
+  assert.deepEqual(bad('core/a.js', "import { execSync } from 'node:child_process'; execSync('git reset --hard');"), ['a.js: runs a shell command (child_process exec/execSync)']);
+  assert.deepEqual(bad('core/a.js', "spawn('sh', ['-c', 'git reset --hard'])"), ['a.js: starts a shell']);
+  assert.deepEqual(bad('core/a.js', "spawnSync(bin, ['reset'])"), ['a.js: starts a program chosen at run time; review it and add it to DYNAMIC_PROGRAMS']);
+  assert.deepEqual(bad('core/a.js', "spawnSync('git', ['config', '--global', 'core.hooksPath', 'x'])"), ['a.js: git config (write option) (spawn)']);
+  assert.deepEqual(bad('core/a.js', "spawnSync('git', ['config', 'user.name', 'x'])"), ['a.js: git config <key> <value> (spawn)']);
+  assert.deepEqual(bad('core/a.js', "spawnSync('git', ['symbolic-ref', 'HEAD', 'refs/heads/x'])"), ['a.js: git symbolic-ref <ref> <target> (spawn)']);
+  assert.deepEqual(bad('core/a.js', "spawnSync('git', ['log', '--output=/tmp/x'])"), ['a.js: git log --output (spawn)']);
+  assert.deepEqual(bad('core/a.js', "spawnSync('git', ['config', '--get', 'user.name'])"), []);
+  assert.deepEqual(bad('core/a.js', "const m = /x/.exec(text); await exec(args);"), [], 'RegExp#exec and a local exec callback are not a shell');
+  // Re-verification: Git and shells by path, exec by name, and unsafe -c values.
+  assert.deepEqual(bad('core/a.js', "spawnSync('/usr/bin/git', ['push'])"), ['a.js: starts Git by path']);
+  assert.deepEqual(bad('core/a.js', "spawnSync('/bin/sh', ['-c', 'git push'])"), ['a.js: starts a shell by path']);
+  assert.deepEqual(bad('core/a.js', "cp['execSync']('git push')"), ['a.js: reaches child_process exec by name']);
+  assert.deepEqual(bad('core/a.js', "spawnSync('git', ['-c', 'core.fsmonitor=./x.sh', 'status', '--ignore-submodules=all'])"), ['a.js: git -c core.fsmonitor=./x.sh (spawn): only the known safe settings may be passed']);
+  assert.deepEqual(bad('core/a.js', "spawnSync('git', [...SAFE_GIT, 'diff', '--quiet', 'HEAD'])"), ['a.js: git diff without --ignore-submodules=all (spawn)']);
+  assert.deepEqual(bad('core/a.js', "spawnSync('git', [...SAFE_GIT, '-c', 'core.fsmonitor=false', 'status', '--ignore-submodules=all'])"), []);
+  // Mutating subcommands are refused outside git-ops even when git-ops may use them.
+  assert.deepEqual(bad('console/a.js', "spawnSync('git', ['worktree', 'add', '-b', 'x'])"), ['a.js: git worktree (spawn)']);
+  assert.deepEqual(bad('console/a.js', "git(root, ['merge', '--ff-only', oid])"), ['a.js: git merge (wrapper)']);
+  // Read-only calls and word lists pass; log is read-only.
+  assert.deepEqual(bad('core/a.js', "execFileSync('git', ['--no-optional-locks', 'log', '--format=%h'])"), []);
+  assert.deepEqual(bad('core/a.js', "const POLICIES = ['git', 'external'];"), []);
+  // Inside git-ops: approved shapes only.
+  const prefix = "export const GIT_PREFIX = Object.freeze(['-c', 'core.hooksPath=/dev/null', '-c', 'core.fsmonitor=false', '-c', 'core.untrackedCache=false', '-c', 'gc.auto=0', '-c', 'maintenance.auto=false', '-c', 'diff.ignoreSubmodules=all', '--literal-pathspecs', '--no-pager']);\nspawnSync('git', [...GIT_PREFIX, 'config', '-z', '--name-only', '--get-regexp', 'x']); spawnSync('git', [...GIT_PREFIX, ...args]); spawnSync('git', ['--version']);\n";
+  assert.deepEqual(bad('execution/git-ops.js', `${prefix}git(home, ['worktree', 'add', '-q'])`), []);
+  assert.deepEqual(bad('execution/git-ops.js', `${prefix}git(home, ['worktree', 'prune'])`), ["git-ops.js: forbidden literal 'prune'", 'git-ops.js: git worktree prune']);
+  assert.deepEqual(bad('execution/git-ops.js', `${prefix}git(home, ['merge', '--no-ff', oid])`), ['git-ops.js: git merge --no-ff']);
+  assert.deepEqual(bad('execution/git-ops.js', `${prefix}git(home, ['config', 'user.name', 'x'])`), ['git-ops.js: git config <key> <value> (wrapper)', 'git-ops.js: git config user.name']);
+  assert.deepEqual(bad('execution/git-ops.js', `${prefix}git(home, ['push'])`), ['git-ops.js: git push (wrapper)', "git-ops.js: forbidden literal 'push'"]);
+  assert.deepEqual(bad('execution/git-ops.js', `${prefix}const x = '--force';`), ["git-ops.js: forbidden literal '--force'"]);
+  assert.deepEqual(bad('execution/git-ops.js', prefix.replace('gc.auto=0', 'gc.auto=1')), ['git-ops.js: GIT_PREFIX is not the approved prefix']);
+  assert.deepEqual(bad('execution/git-ops.js', `${prefix}spawnSync('git', ['status'])`), ['git-ops.js: git status without --ignore-submodules=all (spawn)', 'git-ops.js: Git must be started only by git(), the driver-name read and the version probe']);
+});
+
 test('51/no-network: YallaFlow source never invokes mutating or network Git subcommands and calls no LLM provider', async () => {
   const srcDir = fileURLToPath(new URL('../src/', import.meta.url));
   const offenders = [];
   // 1.4.0 history (PF-0052) reads another branch with read-only plumbing: cat-file and merge-base.
-  const allowed = new Set(['status', 'rev-parse', 'diff', 'ls-files', 'ls-tree', 'check-ignore', 'symbolic-ref', 'config', 'cat-file', 'merge-base']);
+  // 1.5.0 (PF-0112, owner Checkpoint C, SRC-0058): the scan covers every way Git is started; see test-support/git-scan.js.
   async function walk(dir) {
     for (const entry of await readdir(dir, { withFileTypes: true })) {
       const full = path.join(dir, entry.name);
       if (entry.isDirectory()) await walk(full);
       else if (entry.name.endsWith('.js')) {
         const text = await readFile(full, 'utf8');
-        for (const match of text.matchAll(/spawnSync\('git', \[\s*'([a-z-]+)'/g)) if (!allowed.has(match[1])) offenders.push(`${entry.name}: git ${match[1]}`);
-        for (const match of text.matchAll(/git\(root, \['([a-z-]+)'/g)) if (!allowed.has(match[1])) offenders.push(`${entry.name}: git ${match[1]}`);
+        offenders.push(...scanGitCalls(path.relative(srcDir, full), text));
         // v1.1.0: the only network client is the explicit, opt-in `intake ticket --fetch`
         // provider layer (src/intake/providers/); it is guarded separately below.
         const providerLayer = path.relative(srcDir, full).startsWith(`intake${path.sep}providers${path.sep}`);

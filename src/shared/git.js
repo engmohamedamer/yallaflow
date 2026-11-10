@@ -1,11 +1,12 @@
 import { spawnSync } from 'node:child_process';
+import { SAFE_GIT } from '../utils/git-safety.js';
 
 // Read-only, local Git probes for Shared Project Mode. None of these touches the
 // network, the index, refs, or history: YallaFlow never commits, pushes, pulls,
 // rebases, merges, or fetches. Every helper degrades to null/false outside Git.
 
 function git(root, args) {
-  const result = spawnSync('git', args, { cwd: root, encoding: 'utf8' });
+  const result = spawnSync('git', [...SAFE_GIT, ...args], { cwd: root, encoding: 'utf8' });
   return result.status === 0 ? result.stdout.trim() : null;
 }
 
@@ -35,11 +36,11 @@ export function trackedPaths(root, pathspec) {
 }
 
 export function isGitIgnored(root, relativePath) {
-  return spawnSync('git', ['check-ignore', '-q', '--no-index', relativePath], { cwd: root }).status === 0;
+  return spawnSync('git', [...SAFE_GIT, 'check-ignore', '-q', '--no-index', relativePath], { cwd: root }).status === 0;
 }
 
 export function uncommittedPaths(root) {
-  const out = spawnSync('git', ['status', '--porcelain'], { cwd: root, encoding: 'utf8' });
+  const out = spawnSync('git', [...SAFE_GIT, 'status', '--porcelain', '--ignore-submodules=all'], { cwd: root, encoding: 'utf8' });
   if (out.status !== 0) return null;
   return out.stdout.split('\n').filter(Boolean);
 }
