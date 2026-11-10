@@ -17,16 +17,31 @@
       "summary": "Release scope frozen by the owner (Run Now, Queue, Review and Manual Merge, Shared Project Mode console; Parallel and Automated Merge disabled). Plan: verify guards and package, update CHANGELOG/README/release notes, final checks, release commit on main (fast-forward), annotated tag, push, GitHub Release triggering release.yml (Trusted Publisher), verify."
     },
     "implementation": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-10T12:52:35.186Z",
+      "completedAt": "2026-11-10T12:52:35.186Z",
+      "summary": "Release v1.5.0: commit 865c39a on main (fast-forward from 3b34fa9), annotated tag v1.5.0, pushed; GitHub Release https://github.com/engmohamedamer/yallaflow/releases/tag/v1.5.0; release.yml run 42818242665 (guard, tests on Node 20/22/24, publish) green; npm latest 1.5.0 with SLSA provenance (sigstore log 3786047238), shasum 4aaeced identical to the local pack."
     },
     "verification": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-10T12:52:36.280Z",
+      "completedAt": "2026-11-10T12:52:36.280Z",
+      "summary": "Release checks V-001..V-003 passed (suite 1141/1141, pack smoke, compatibility and agents on/off smoke); scope matches the owner's freeze: Parallel and Automated Merge disabled; published artifact verified (npm audit signatures, provenance, shasum).",
+      "evidence": [
+        "verification:V-001"
+      ]
     },
     "code-review": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-10T12:52:36.765Z",
+      "completedAt": "2026-11-10T12:52:36.765Z",
+      "summary": "Release checks V-001..V-003 passed (suite 1141/1141, pack smoke, compatibility and agents on/off smoke); scope matches the owner's freeze: Parallel and Automated Merge disabled; published artifact verified (npm audit signatures, provenance, shasum).",
+      "evidence": [
+        "verification:V-001"
+      ]
     }
   },
   "rulings": [],
   "history": [],
-  "updatedAt": "2026-11-10T12:34:34.413Z"
+  "updatedAt": "2026-11-10T12:52:36.765Z"
 }
