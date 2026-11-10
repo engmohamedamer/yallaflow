@@ -1,0 +1,40 @@
+TAP version 13
+# Subtest: overview: feature branch without Shared Mode — branch, detected integration branch, Turn on; CLI JSON unchanged
+ok 1 - overview: feature branch without Shared Mode — branch, detected integration branch, Turn on; CLI JSON unchanged
+  ---
+  duration_ms: 2433.356833
+  type: 'test'
+  ...
+# Subtest: overview: a lane project reports its own branch, is never offered Turn on, and cannot enable or preview
+ok 2 - overview: a lane project reports its own branch, is never offered Turn on, and cannot enable or preview
+  ---
+  duration_ms: 1341.678397
+  type: 'test'
+  ...
+# Subtest: ui: Overview line and New Work hint compare only against a known integration branch
+ok 3 - ui: Overview line and New Work hint compare only against a known integration branch
+  ---
+  duration_ms: 58.26094
+  type: 'test'
+  ...
+# Subtest: ui: one Shared enable panel, and work IDs stay whole beside their titles
+ok 4 - ui: one Shared enable panel, and work IDs stay whole beside their titles
+  ---
+  duration_ms: 7.14362
+  type: 'test'
+  ...
+# Subtest: doctor: duplicate fact IDs are diagnosed read-only; a healthy workspace prints no diagnosis
+ok 5 - doctor: duplicate fact IDs are diagnosed read-only; a healthy workspace prints no diagnosis
+  ---
+  duration_ms: 626.80799
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4846.033618

@@ -4,6 +4,24 @@ All notable changes to YallaFlow are documented here. The format loosely follows
 
 **1.0.0 is the first public release**, published to npm as `yallaflow`. From 1.0.0 the package follows Semantic Versioning with the compatibility promise in [`docs/releasing.md`](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise). Every earlier version below is an **internal prerelease**: git-tagged, never published to npm, and kept here as history.
 
+## [1.5.1] - 2026-11-10 — Steadier console
+
+### Fixed
+- **The console no longer re-renders every second** after an agent finishes a task while its session stays open (PF-0115). The finished task was recorded again on every check, and each write triggered the next refresh. It is now recorded once. The task shows as finished with the session still open until that session ends.
+
+### Changed
+- **A larger chat window.** A button in the agent chat's header (⤢ / ⤡) enlarges the chat for following long conversations, and restores it (PF-0116). The browser remembers the choice. On a phone, the chat stays full width.
+- **Team mode on the Overview is a clear card** (PF-0118). It shows:
+  - what Shared Project Mode means, in plain words;
+  - whether it is on;
+  - the current and integration branches;
+  - one clear button. **Turn on team mode…** shows what changes before you confirm.
+
+### Internal
+- A console test that sometimes failed under load now waits for both the request and the task state (PF-0117).
+
+Parallel execution and Automated Merge stay disabled, as in 1.5.0.
+
 ## [1.5.0] - 2026-11-10 — Queue your work
 
 Run one task now, or queue several and let them run one after another, while you stay in control of every approval. Review a finished parallel task and merge it by hand with the exact steps. The Overview shows your branch and Shared Project Mode (PF-0112, PF-0113).

@@ -1,0 +1,43 @@
+{
+  "id": "PF-0115",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console page re-renders every second: a Run Now task whose item is DONE while its session stays open rewrites runs.json on every snapshot (item-done not idempotent), and the write triggers the next change event",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-10T13:17:46.880Z",
+  "updatedAt": "2026-11-10T13:20:46.472Z",
+  "title": "Console page re-renders every second: a Run Now task whose item is DONE while its session stays open rewrites runs.json on every snapshot (item-done not idempotent), and the write triggers the next change event",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-11-10T13:17:46.977Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-10T13:20:46.472Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

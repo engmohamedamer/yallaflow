@@ -32,7 +32,9 @@ test('Run Now: Start keeps its v1.4.2 calls; the manager records a one-task run;
     assert.equal(recorded.mode, 'now');
     assert.equal(recorded.state, 'working');
     assert.equal((await c.post('message', { text: 'PERMISSION SCOPE please' })).status, 202);
-    const data = await until(async () => { const value = await view(c); return value.inbox.length ? value : null; });
+    // The inbox (the bridge's open request) and the task's state (the manager's queue) update
+    // separately: wait for both (PF-0117).
+    const data = await until(async () => { const value = await view(c); return value.inbox.length && tasksOf(value).find((task) => task.workId === workId)?.state === 'needs-you' ? value : null; });
     const [request] = data.inbox;
     assert.equal(request.project, c.pid);
     assert.equal(request.workId, workId);

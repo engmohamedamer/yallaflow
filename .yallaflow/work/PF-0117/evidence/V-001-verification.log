@@ -1,0 +1,52 @@
+TAP version 13
+# Subtest: Run Now: Start keeps its v1.4.2 calls; the manager records a one-task run; the inbox shows paths and the command; answering resolves the same request
+ok 1 - Run Now: Start keeps its v1.4.2 calls; the manager records a one-task run; the inbox shows paths and the command; answering resolves the same request
+  ---
+  duration_ms: 4989.859046
+  type: 'test'
+  ...
+# Subtest: restart: a task that was live becomes interrupted and nothing starts by itself; an unreadable store is reported and left alone
+ok 2 - restart: a task that was live becomes interrupted and nothing starts by itself; an unreadable store is reported and left alone
+  ---
+  duration_ms: 306.394355
+  type: 'test'
+  ...
+# Subtest: the Agents view is read-only and needs the token; without agents it reports disabled
+ok 3 - the Agents view is read-only and needs the token; without agents it reports disabled
+  ---
+  duration_ms: 239.060754
+  type: 'test'
+  ...
+# Subtest: Queue end to end: two items run one after the other through the real bridge; each ends its session only after YallaFlow shows DONE
+ok 4 - Queue end to end: two items run one after the other through the real bridge; each ends its session only after YallaFlow shows DONE
+  ---
+  duration_ms: 7060.078298
+  type: 'test'
+  ...
+# Subtest: execution routes: token, Origin and JSON are required; a read-only console refuses them
+ok 5 - execution routes: token, Origin and JSON are required; a read-only console refuses them
+  ---
+  duration_ms: 311.063371
+  type: 'test'
+  ...
+# Subtest: Parallel: two requests become two lanes (named after the project and lane) with their own agents running at the same time; a third lane is refused; Clean up refuses unmerged lanes
+ok 6 - Parallel: two requests become two lanes (named after the project and lane) with their own agents running at the same time; a third lane is refused; Clean up refuses unmerged lanes
+  ---
+  duration_ms: 9069.280341
+  type: 'test'
+  ...
+# Subtest: Review & Merge in the console: the first lane merges to MERGED & VERIFIED; the second conflicts and is sent back to its agent (reopened, started with the conflict instruction)
+ok 7 - Review & Merge in the console: the first lane merges to MERGED & VERIFIED; the second conflicts and is sent back to its agent (reopened, started with the conflict instruction)
+  ---
+  duration_ms: 28484.421649
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 50790.834394

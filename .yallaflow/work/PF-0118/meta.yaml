@@ -1,0 +1,57 @@
+{
+  "id": "PF-0118",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console Overview: present Shared Project Mode (team mode) as a clear card — what it means, its status, the current and integration branches, and one clear button — instead of a cramped one-line strip",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-10T13:59:44.178Z",
+  "updatedAt": "2026-11-10T14:10:30.845Z",
+  "title": "Console Overview: present Shared Project Mode (team mode) as a clear card — what it means, its status, the current and integration branches, and one clear button — instead of a cramped one-line strip",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-10T13:59:44.250Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0063",
+      "type": "file",
+      "name": "Screenshot from 2026-11-10 15-41-21.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-10T13:59:44.624Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ],
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-10T14:10:30.845Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

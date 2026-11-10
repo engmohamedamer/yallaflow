@@ -159,3 +159,12 @@ test('D15: approval wait per project — 5/15/30/60 minutes, default 5 for exist
   assert.equal(decision, 'deny', 'an expired request is denied, never approved');
   assert.ok(project.events.some((event) => event.type === 'permission.resolved' && event.decision === 'deny' && event.by === 'timeout'));
 });
+
+test('PF-0115: item-done is applied once; a DONE item whose session stays open is not rewritten on every snapshot', async () => {
+  const { applySignal, newTask } = await import('../src/execution/model.js');
+  let task = applySignal(applySignal(newTask({ id: 't-aaaaaa', workId: 'PF-0001', provider: 'claude', now: 't0' }), { type: 'claim' }, 't1'), { type: 'started' }, 't2');
+  const first = applySignal(task, { type: 'item-done' }, 't3');
+  assert.equal(first.itemDone, true);
+  assert.equal(applySignal(first, { type: 'item-done' }, 't4'), first, 'the same object: nothing to save, no change event');
+  assert.equal(applySignal(first, { type: 'session-ended', cleanup: { complete: true } }, 't5').state, 'done');
+});

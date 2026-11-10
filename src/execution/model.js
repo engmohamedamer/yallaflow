@@ -96,7 +96,9 @@ export function applySignal(task, signal, now) {
       return set(task, 'working', null, now);
     case 'item-done':
       // DONE alone is not completion: the session must also end with every process gone.
-      if (task.state === 'done') return task;
+      // Already known: unchanged, so a DONE item whose session stays open is not rewritten on
+      // every snapshot (PF-0115: each rewrite triggered the next change event, a loop).
+      if (task.state === 'done' || task.itemDone) return task;
       return task.sessionEnded ? set(task, 'done', null, now, { itemDone: true, endedAt: now }) : { ...task, itemDone: true, updatedAt: now };
     case 'session-ended': {
       if (!isLive(task) && task.state !== 'interrupted') return task;

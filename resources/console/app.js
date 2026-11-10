@@ -805,6 +805,8 @@
   // The agent chat as a floating window (owner choice, PF-0059): a corner button shows the
   // session state and opens the chat over the page. Open/closed is remembered per browser.
   let chatOpen = store.get('chatOpen', false);
+  // PF-0116: an enlarged chat window for following long conversations (remembered per browser).
+  let chatWide = store.get('chatWide', false);
   // PF-0106: what the agent waits for from the developer on a work item, seen from any page.
   function agentAttention() {
     if (!agentsOn || agent?.pid !== pid) return null;
@@ -840,8 +842,8 @@
   function agentDock(it) {
     const st = agentState(it);
     return `<div class="chatdock ${chatOpen ? 'open' : ''}">
-      <section class="chatwin" id="chatwin" role="dialog" aria-modal="false" aria-label="${A('الوكيل', 'Agent')}" ${chatOpen ? '' : 'hidden'}>
-        <div class="chathead"><b class="grow">${A('الوكيل', 'Agent')} · ${it.project ? A('المشروع', 'Project') : `<span class="ltr">${esc(it.id)}</span>`}</b><span class="tiny muted chatstate">${esc(st.label)}</span><button type="button" class="ibtn sm" data-chat-toggle aria-label="${A('صغّر', 'Minimize')}">—</button></div>
+      <section class="chatwin${chatWide ? ' wide' : ''}" id="chatwin" role="dialog" aria-modal="false" aria-label="${A('الوكيل', 'Agent')}" ${chatOpen ? '' : 'hidden'}>
+        <div class="chathead"><b class="grow">${A('الوكيل', 'Agent')} · ${it.project ? A('المشروع', 'Project') : `<span class="ltr">${esc(it.id)}</span>`}</b><span class="tiny muted chatstate">${esc(st.label)}</span><button type="button" class="ibtn sm" data-chat-wide aria-pressed="${chatWide}" aria-label="${chatWide ? A('رجّعها لحجمها', 'Restore size') : A('كبّر الشات', 'Enlarge the chat')}" title="${chatWide ? A('رجّعها لحجمها', 'Restore size') : A('كبّر الشات', 'Enlarge the chat')}">${chatWide ? '⤡' : '⤢'}</button><button type="button" class="ibtn sm" data-chat-toggle aria-label="${A('صغّر', 'Minimize')}">—</button></div>
         <div class="chatbody">${chatOpen ? agentPanel(it) : ''}</div>
       </section>
       ${(() => { const a = agentAttention(); return a && a.workId !== it.id ? `<button type="button" class="chatcall" data-chat-item="${esc(a.workId)}" data-chat-draft="">${a.kind === 'approval' ? '✋' : '💬'} ${esc(a.label)}</button>` : ''; })()}
@@ -1573,13 +1575,23 @@
     return understandingCard(u, true);
   }
   // PF-0113: where this checkout stands — branch, Shared Project Mode, integration branch.
+  // PF-0118: shown as a card that says, in plain words, what team mode means and what to do.
   function gitLine(g) {
     if (!g) return '';
     const branch = g.branch ? `<span class="ltr" data-git-branch>⑂ ${esc(g.branch)}</span>` : `<span class="muted">${A('مش على فرع (detached HEAD أو مفيش Git)', 'Not on a branch (detached HEAD or no Git)')}</span>`;
-    const mode = `<span class="chip ${g.sharedMode ? 'done' : ''}" data-shared-mode="${g.sharedMode ? 'on' : 'off'}"><i></i>Shared Project Mode: ${g.sharedMode ? A('شغّال', 'On') : A('مقفول', 'Off')}</span>`;
-    const integration = g.integrationBranch ? `<span class="tiny muted">${A('فرع الدمج', 'Integration branch')}: <span class="ltr">${esc(g.integrationBranch)}</span>${g.integrationBranchSource === 'detected' ? ` (${A('من إعدادات Git', 'from Git settings')})` : ''}</span>` : '';
-    const turnOn = g.canEnableShared && !readOnly ? `<button type="button" class="btn sm ghost" data-shared-open>${A('شغّله…', 'Turn on…')}</button>` : !g.sharedMode && !g.lane ? `<span class="tiny muted">${A('شغّله بـ', 'Turn it on with')} <code class="ltr">yallaflow shared enable</code></span>` : '';
-    return `<section class="row gitline small" data-git-line>${branch}${mode}${integration}${turnOn}</section>`;
+    const mode = `<span class="chip ${g.sharedMode ? 'done' : ''}" data-shared-mode="${g.sharedMode ? 'on' : 'off'}"><i></i>${g.sharedMode ? A('شغّال', 'On') : A('مقفول', 'Off')}</span>`;
+    const integration = g.integrationBranch ? `<span>${A('فرع الدمج', 'Integration branch')}: <span class="ltr">${esc(g.integrationBranch)}</span>${g.integrationBranchSource === 'detected' ? ` <span class="tiny muted">(${A('من إعدادات Git', 'from Git settings')})</span>` : ''}</span>` : '';
+    const what = g.sharedMode
+      ? A('أرقام الشغل مبتتكررش بين الفروع، ومعرفة المشروع بتتجمّع على فرع الدمج لما الشغل يتدمج.', 'Work IDs never collide across branches, and project knowledge is combined on the integration branch when work is merged.')
+      : A('كل نسخة من المشروع بترقّم الشغل لوحدها. لو زمايلك شغالين على فروع تانية، الأرقام ممكن تتكرر ومعرفة المشروع متتجمّعش.', 'Each checkout numbers its work on its own. When teammates work on other branches, work IDs can collide and project knowledge is not combined.');
+    const action = g.canEnableShared && !readOnly
+      ? `<div class="row teamact"><button type="button" class="btn sm go" data-shared-open>${A('شغّل شغل الفريق…', 'Turn on team mode…')}</button><span class="tiny muted">${A('هتشوف اللي هيتغيّر وتأكد قبل أي حاجة.', 'You see what changes and confirm before anything happens.')}</span></div>`
+      : !g.sharedMode && !g.lane ? `<p class="tiny muted teamact">${A('شغّله بـ', 'Turn it on with')} <code class="ltr">yallaflow shared enable</code></p>` : '';
+    return `<section class="teamcard ${g.sharedMode ? 'on' : ''}" data-git-line>
+      <div class="teamhead"><span class="teamicon" aria-hidden="true">👥</span><div class="grow"><b>${A('شغل الفريق', 'Team mode')} <span class="tiny muted ltr">Shared Project Mode</span></b><p class="small muted">${what}</p></div>${mode}</div>
+      <div class="teamfacts small"><span>${A('الفرع الحالي', 'Current branch')}: ${branch}</span>${integration}</div>
+      ${action}
+    </section>`;
   }
   // New work on a feature branch without Shared Project Mode: recommend it. Only when the
   // integration branch is known — never a comparison against a guessed "main".
@@ -3596,6 +3608,21 @@
   document.addEventListener('dragover', (e) => { const st = e.target.closest?.('.station.drop-ok'); if (st) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; } });
   document.addEventListener('drop', (e) => { const st = e.target.closest?.('.station[data-st]'); if (st && dragged) { e.preventDefault(); dropOn(Number(st.dataset.st)); } });
   document.addEventListener('input', (e) => { if (e.target.matches('[data-q]')) { flt.q = e.target.value; render(); } else if (e.target.matches('[data-agent-input]')) agentDraft = e.target.value; });
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest?.('[data-chat-wide]')) return;
+    e.preventDefault();
+    chatWide = !chatWide;
+    store.set('chatWide', chatWide);
+    const win = document.getElementById('chatwin');
+    win?.classList.toggle('wide', chatWide);
+    const button = e.target.closest('[data-chat-wide]');
+    const label = chatWide ? A('رجّعها لحجمها', 'Restore size') : A('كبّر الشات', 'Enlarge the chat');
+    button.setAttribute('aria-pressed', String(chatWide));
+    button.setAttribute('aria-label', label);
+    button.title = label;
+    button.textContent = chatWide ? '⤡' : '⤢';
+    win?.querySelector('.chatbody')?.lastElementChild?.scrollIntoView?.({ block: 'end' });
+  });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && chatOpen && document.getElementById('chatwin')?.contains(e.target) && !document.querySelector('dialog[open]')) { e.preventDefault(); toggleChat(false); } });
   document.addEventListener('keydown', (e) => { if (e.target.matches?.('[data-agent-input]') && e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); e.target.form.requestSubmit(); } });
   document.addEventListener('submit', (e) => {

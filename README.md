@@ -117,7 +117,7 @@ flowchart LR
 YallaFlow never updates itself and never checks the network for versions. You decide when to upgrade:
 
 ```bash
-npm install -g yallaflow@latest     # or an exact version: yallaflow@1.5.0
+npm install -g yallaflow@latest     # or an exact version: yallaflow@1.5.1
 yallaflow --version
 
 # in each project
@@ -172,6 +172,14 @@ flowchart TB
 ```
 
 The depth adapts to the work. A bounded bug fix goes from root-cause analysis straight to the fix, while architectural work gets a reviewed design, specification, or plan. Nothing is called done without fresh verification evidence, and work that carries acceptance criteria is checked against them before it closes. What was learned becomes reviewed project knowledge. [Workflows in detail →](docs/workflows.md)
+
+## What's new in 1.5.1
+
+**A steadier console.** [Changelog →](CHANGELOG.md#151---2026-11-10--steadier-console)
+
+- The console no longer re-renders every second after an agent finishes a task while its session stays open.
+- A button in the agent chat's header enlarges the chat for following long conversations.
+- Team mode (Shared Project Mode) on the Overview is a clear card: what it means, its status, the branches, and one button.
 
 ## What's new in 1.5.0
 
@@ -323,7 +331,7 @@ The YallaFlow website, [engmohamedamer.github.io/yallaflow](https://engmohamedam
 
 ## Status
 
-**1.5.0** runs work your way: one task now, or a queue of tasks one after another, with review and manual merge for lanes. Parallel execution and Automated Merge are disabled in this release. 1.0.0 was the first public, stable release. YallaFlow follows Semantic Versioning and keeps existing workspaces readable ([compatibility promise](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise)).
+**1.5.1** steadies the console of 1.5.0, which runs work your way: one task now, or a queue of tasks one after another, with review and manual merge for lanes. Parallel execution and Automated Merge are disabled in this release. 1.0.0 was the first public, stable release. YallaFlow follows Semantic Versioning and keeps existing workspaces readable ([compatibility promise](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise)).
 
 - **Local-first.** There is no YallaFlow server, account, or cloud service.
 - **Agent-agnostic**, with first-party setup for Claude Code and Codex.

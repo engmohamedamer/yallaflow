@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --test test/console-presentation.test.js test/console-project-chat.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--test",
+        "test/console-presentation.test.js",
+        "test/console-project-chat.test.js"
+      ],
+      "displayCommand": "node --test test/console-presentation.test.js test/console-project-chat.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-10T14:09:19.906Z",
+      "finishedAt": "2026-11-10T14:09:20.293Z",
+      "verifiedAt": "2026-11-10T14:09:20.293Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

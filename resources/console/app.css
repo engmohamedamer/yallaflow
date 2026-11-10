@@ -691,6 +691,8 @@ table.stack th { font-size: 12px; color: var(--muted); font-weight: 600; }
 .chatfab .badge { position: absolute; inset-block-start: -4px; inset-inline-start: -4px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--clay); color: #fff; font-size: 12px; display: grid; place-items: center; }
 .chatwin { position: fixed; z-index: 59; inset-block-end: 92px; inset-inline-end: 22px; width: min(460px, calc(100vw - 32px)); height: min(72vh, 680px); display: flex; flex-direction: column; background: var(--card); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 24px 60px rgb(0 0 0 / .25); overflow: hidden; }
 .chatwin[hidden] { display: none; }
+/* PF-0116: the enlarged chat leaves room for the page's corner button and header. */
+.chatwin.wide { width: min(1000px, calc(100vw - 48px)); height: calc(100vh - 180px); }
 .chathead { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--line); background: var(--bg-2); }
 .chatbody { flex: 1; min-height: 0; overflow: auto; }
 .chatbody .panel.agent { border: 0; box-shadow: none; border-radius: 0; margin: 0; min-height: 100%; display: flex; flex-direction: column; }
@@ -728,7 +730,7 @@ table.stack th { font-size: 12px; color: var(--muted); font-weight: 600; }
 .pchat svg { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .pchat:hover, .pchat:focus-visible { background: var(--nile-soft); }
 @media (max-width: 560px) {
-  .chatwin { inset: auto 0 0 0; width: 100vw; height: 86vh; border-radius: 18px 18px 0 0; }
+  .chatwin, .chatwin.wide { inset: auto 0 0 0; width: 100vw; height: 86vh; border-radius: 18px 18px 0 0; }
   .chatdock.open .chatfab, .chatdock.open .chatcall { display: none; }
 }
 
@@ -933,3 +935,12 @@ dialog.panel code, dialog.panel li, dialog.panel p, dialog.panel label { overflo
 .wid { display: inline-block; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
 .pchip .pid.wid { display: block; overflow-wrap: normal; }
 .gitline { flex-wrap: wrap; gap: 8px; align-items: center; margin: 4px 0 12px; }
+/* PF-0118: team mode (Shared Project Mode) as a clear card on the Overview. */
+.teamcard { display: grid; gap: 10px; margin: 4px 0 16px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); }
+.teamcard.on { border-color: color-mix(in srgb, var(--nile) 45%, var(--line)); }
+.teamhead { display: flex; gap: 12px; align-items: flex-start; }
+.teamhead b { display: block; font-size: 15px; }
+.teamhead p { margin: 4px 0 0; }
+.teamicon { font-size: 22px; line-height: 1.2; }
+.teamfacts { display: flex; flex-wrap: wrap; gap: 6px 22px; }
+.teamact { flex-wrap: wrap; gap: 10px; align-items: center; margin: 0; }

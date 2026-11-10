@@ -1,0 +1,196 @@
+TAP version 13
+# Subtest: Run Now: Start keeps its v1.4.2 calls; the manager records a one-task run; the inbox shows paths and the command; answering resolves the same request
+ok 1 - Run Now: Start keeps its v1.4.2 calls; the manager records a one-task run; the inbox shows paths and the command; answering resolves the same request
+  ---
+  duration_ms: 5541.402187
+  type: 'test'
+  ...
+# Subtest: restart: a task that was live becomes interrupted and nothing starts by itself; an unreadable store is reported and left alone
+ok 2 - restart: a task that was live becomes interrupted and nothing starts by itself; an unreadable store is reported and left alone
+  ---
+  duration_ms: 384.869552
+  type: 'test'
+  ...
+# Subtest: the Agents view is read-only and needs the token; without agents it reports disabled
+ok 3 - the Agents view is read-only and needs the token; without agents it reports disabled
+  ---
+  duration_ms: 335.514826
+  type: 'test'
+  ...
+# Subtest: Queue end to end: two items run one after the other through the real bridge; each ends its session only after YallaFlow shows DONE
+ok 4 - Queue end to end: two items run one after the other through the real bridge; each ends its session only after YallaFlow shows DONE
+  ---
+  duration_ms: 9357.430323
+  type: 'test'
+  ...
+# Subtest: execution routes: token, Origin and JSON are required; a read-only console refuses them
+ok 5 - execution routes: token, Origin and JSON are required; a read-only console refuses them
+  ---
+  duration_ms: 349.980162
+  type: 'test'
+  ...
+# Subtest: Parallel: two requests become two lanes (named after the project and lane) with their own agents running at the same time; a third lane is refused; Clean up refuses unmerged lanes
+ok 6 - Parallel: two requests become two lanes (named after the project and lane) with their own agents running at the same time; a third lane is refused; Clean up refuses unmerged lanes
+  ---
+  duration_ms: 9990.075223
+  type: 'test'
+  ...
+# Subtest: Review & Merge in the console: the first lane merges to MERGED & VERIFIED; the second conflicts and is sent back to its agent (reopened, started with the conflict instruction)
+ok 7 - Review & Merge in the console: the first lane merges to MERGED & VERIFIED; the second conflicts and is sent back to its agent (reopened, started with the conflict instruction)
+  ---
+  duration_ms: 34805.975286
+  type: 'test'
+  ...
+# Subtest: model: a task becomes done only when the item is DONE and the session ended with every process gone (D7)
+ok 8 - model: a task becomes done only when the item is DONE and the session ended with every process gone (D7)
+  ---
+  duration_ms: 4.164573
+  type: 'test'
+  ...
+# Subtest: model: approvals, reviews, questions and replies block; nothing in the model answers them
+ok 9 - model: approvals, reviews, questions and replies block; nothing in the model answers them
+  ---
+  duration_ms: 4.372689
+  type: 'test'
+  ...
+# Subtest: model: usage limits pause, crashes fail, held or closed items are skipped
+ok 10 - model: usage limits pause, crashes fail, held or closed items are skipped
+  ---
+  duration_ms: 0.677728
+  type: 'test'
+  ...
+# Subtest: model: a restart interrupts live tasks and starts nothing; a claim is write-ahead with an attempt count
+ok 11 - model: a restart interrupts live tasks and starts nothing; a claim is write-ahead with an attempt count
+  ---
+  duration_ms: 1.701493
+  type: 'test'
+  ...
+# Subtest: model: one live task per lane; ownership is unique across runs (FR4); final states stay final
+ok 12 - model: one live task per lane; ownership is unique across runs (FR4); final states stay final
+  ---
+  duration_ms: 2.724821
+  type: 'test'
+  ...
+# Subtest: store: atomic save and load; a missing store is empty; an unreadable store is reported and never overwritten
+ok 13 - store: atomic save and load; a missing store is empty; an unreadable store is reported and never overwritten
+  ---
+  duration_ms: 67.09165
+  type: 'test'
+  ...
+# Subtest: store: a symbolic link in place of the execution folder is refused
+ok 14 - store: a symbolic link in place of the execution folder is refused
+  ---
+  duration_ms: 14.814164
+  type: 'test'
+  ...
+# Subtest: permission scope: Codex tool calls name their files and command; paths inside the checkout become relative; sizes are bounded
+ok 15 - permission scope: Codex tool calls name their files and command; paths inside the checkout become relative; sizes are bounded
+  ---
+  duration_ms: 5.121015
+  type: 'test'
+  ...
+# Subtest: D15: approval wait per project — 5/15/30/60 minutes, default 5 for existing projects, other values refused, a committed file ignored, an expired request DENIED
+ok 16 - D15: approval wait per project — 5/15/30/60 minutes, default 5 for existing projects, other values refused, a committed file ignored, an expired request DENIED
+  ---
+  duration_ms: 92.919064
+  type: 'test'
+  ...
+# Subtest: PF-0115: item-done is applied once; a DONE item whose session stays open is not rewritten on every snapshot
+ok 17 - PF-0115: item-done is applied once; a DONE item whose session stays open is not rewritten on every snapshot
+  ---
+  duration_ms: 4.428334
+  type: 'test'
+  ...
+# Subtest: queue: strictly one task at a time, each in a fresh session; the next starts only after DONE and a fully ended session
+ok 18 - queue: strictly one task at a time, each in a fresh session; the next starts only after DONE and a fully ended session
+  ---
+  duration_ms: 250.796594
+  type: 'test'
+  ...
+# Subtest: queue: an incomplete process cleanup fails the task and blocks the queue (D7)
+ok 19 - queue: an incomplete process cleanup fails the task and blocks the queue (D7)
+  ---
+  duration_ms: 44.874258
+  type: 'test'
+  ...
+# Subtest: queue: a review gate, a question and an open approval each block until the developer acts; nothing is answered
+ok 20 - queue: a review gate, a question and an open approval each block until the developer acts; nothing is answered
+  ---
+  duration_ms: 92.22523
+  type: 'test'
+  ...
+# Subtest: queue: a usage limit pauses that provider in every project; Resume clears it and continues the same session
+ok 21 - queue: a usage limit pauses that provider in every project; Resume clears it and continues the same session
+  ---
+  duration_ms: 60.70952
+  type: 'test'
+  ...
+# Subtest: restart: live tasks become interrupted, nothing starts by itself, and a double Resume starts exactly one session
+ok 22 - restart: live tasks become interrupted, nothing starts by itself, and a double Resume starts exactly one session
+  ---
+  duration_ms: 33.636847
+  type: 'test'
+  ...
+# Subtest: queue controls: pause and next, pause after each task, cancel after current and now, skip, retry, reorder, switch agent
+ok 23 - queue controls: pause and next, pause after each task, cancel after current and now, skip, retry, reorder, switch agent
+  ---
+  duration_ms: 191.337171
+  type: 'test'
+  ...
+# Subtest: queue: Claude Code tasks are assisted — the manager never starts Claude Code
+ok 24 - queue: Claude Code tasks are assisted — the manager never starts Claude Code
+  ---
+  duration_ms: 13.414527
+  type: 'test'
+  ...
+# Subtest: createRun refuses: duplicates, items already queued, DONE, held or closed items, a running item, bad modes, another console
+ok 25 - createRun refuses: duplicates, items already queued, DONE, held or closed items, a running item, bad modes, another console
+  ---
+  duration_ms: 23.483927
+  type: 'test'
+  ...
+# Subtest: review M3: a queued task whose item became DONE, closed or held is never started; the queue moves on
+ok 26 - review M3: a queued task whose item became DONE, closed or held is never started; the queue moves on
+  ---
+  duration_ms: 84.359556
+  type: 'test'
+  ...
+# Subtest: review M4: when the write-ahead claim cannot be saved, no session starts
+ok 27 - review M4: when the write-ahead claim cannot be saved, no session starts
+  ---
+  duration_ms: 58.673318
+  type: 'test'
+  ...
+# Subtest: review M6: a usage limit is derived from the tasks — it survives a restart and ends when the limited task is skipped
+ok 28 - review M6: a usage limit is derived from the tasks — it survives a restart and ends when the limited task is skipped
+  ---
+  duration_ms: 161.328974
+  type: 'test'
+  ...
+# Subtest: review H7: a runs.json YallaFlow could not have written (tracked, readable by others, odd shapes) is never trusted
+ok 29 - review H7: a runs.json YallaFlow could not have written (tracked, readable by others, odd shapes) is never trusted
+  ---
+  duration_ms: 63.527047
+  type: 'test'
+  ...
+# Subtest: review H7: a lane's runs are kept in its home checkout, out of the lane agent's reach
+ok 30 - review H7: a lane's runs are kept in its home checkout, out of the lane agent's reach
+  ---
+  duration_ms: 61.788221
+  type: 'test'
+  ...
+# Subtest: release rule: a queued session never starts after the project's Codex configuration (.codex/) changed since the queue began
+ok 31 - release rule: a queued session never starts after the project's Codex configuration (.codex/) changed since the queue began
+  ---
+  duration_ms: 121.833622
+  type: 'test'
+  ...
+1..31
+# tests 31
+# suites 0
+# pass 31
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 61278.512624

@@ -135,7 +135,8 @@ test('ui: Overview line and New Work hint compare only against a known integrati
   const line = off.gitLine(git());
   assert.match(line, /⑂ feature\/csv/);
   assert.match(line, /data-shared-mode="off"/);
-  assert.match(line, /Integration branch: <span class="ltr">main<\/span> \(from Git settings\)/);
+  assert.match(line, /Integration branch: <span class="ltr">main<\/span> <span class="tiny muted">\(from Git settings\)<\/span>/);
+  assert.match(line, /Each checkout numbers its work on its own/, 'the card says what team mode means (PF-0118)');
   assert.match(line, /data-shared-open/);
   assert.match(off.sharedHint(), /not the integration branch <span class="ltr">main<\/span>/);
 

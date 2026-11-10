@@ -1,0 +1,130 @@
+TAP version 13
+# Subtest: agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+ok 1 - agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+  ---
+  duration_ms: 11.321741
+  type: 'test'
+  ...
+# Subtest: paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+ok 2 - paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+  ---
+  duration_ms: 6.416367
+  type: 'test'
+  ...
+# Subtest: file selection and paste combine; unsupported, empty and oversized files are explained
+ok 3 - file selection and paste combine; unsupported, empty and oversized files are explained
+  ---
+  duration_ms: 2.967641
+  type: 'test'
+  ...
+# Subtest: revision partial failure keeps pending files and retries without duplicating text or successful uploads
+ok 4 - revision partial failure keeps pending files and retries without duplicating text or successful uploads
+  ---
+  duration_ms: 4.96731
+  type: 'test'
+  ...
+# Subtest: create uploads pasted files through the existing bound request endpoint
+ok 5 - create uploads pasted files through the existing bound request endpoint
+  ---
+  duration_ms: 3.903926
+  type: 'test'
+  ...
+# Subtest: overview previews keep full facts available under View more, including after redraw
+ok 6 - overview previews keep full facts available under View more, including after redraw
+  ---
+  duration_ms: 4.552037
+  type: 'test'
+  ...
+# Subtest: every project page gets the project chat; a work item page gets its own; new-project pages get none
+ok 7 - every project page gets the project chat; a work item page gets its own; new-project pages get none
+  ---
+  duration_ms: 33.442607
+  type: 'test'
+  ...
+# Subtest: the project chat is labelled, starts no work item and suggests project questions
+ok 8 - the project chat is labelled, starts no work item and suggests project questions
+  ---
+  duration_ms: 8.391189
+  type: 'test'
+  ...
+# Subtest: a running item session shows on project pages as a link to that item
+ok 9 - a running item session shows on project pages as a link to that item
+  ---
+  duration_ms: 5.209701
+  type: 'test'
+  ...
+# Subtest: a project session shows on an item page labelled as the project chat
+ok 10 - a project session shows on an item page labelled as the project chat
+  ---
+  duration_ms: 4.132099
+  type: 'test'
+  ...
+# Subtest: with agents off the project chat explains how to turn them on without naming an item
+ok 11 - with agents off the project chat explains how to turn them on without naming an item
+  ---
+  duration_ms: 2.659499
+  type: 'test'
+  ...
+# Subtest: the item chat is unchanged
+ok 12 - the item chat is unchanged
+  ---
+  duration_ms: 2.989013
+  type: 'test'
+  ...
+# Subtest: the picker links to Setup → Agents when Claude Code is off for the project
+ok 13 - the picker links to Setup → Agents when Claude Code is off for the project
+  ---
+  duration_ms: 4.411594
+  type: 'test'
+  ...
+# Subtest: blocker texts read in Arabic; suggestions say they only fill the box; your turn after a reply
+ok 14 - blocker texts read in Arabic; suggestions say they only fill the box; your turn after a reply
+  ---
+  duration_ms: 11.897801
+  type: 'test'
+  ...
+# Subtest: the chat says when the agent is working, waiting for an approval, or waiting for a reply
+ok 15 - the chat says when the agent is working, waiting for an approval, or waiting for a reply
+  ---
+  duration_ms: 11.909499
+  type: 'test'
+  ...
+# Subtest: suggestions follow the stage: move on after an approval, plan and design wording
+ok 16 - suggestions follow the stage: move on after an approval, plan and design wording
+  ---
+  duration_ms: 14.940406
+  type: 'test'
+  ...
+# Subtest: switch agent: end an idle Codex session elsewhere; hand over from Claude Code to Codex; wait while working
+ok 17 - switch agent: end an idle Codex session elsewhere; hand over from Claude Code to Codex; wait while working
+  ---
+  duration_ms: 13.089244
+  type: 'test'
+  ...
+# Subtest: chat: whole-job first message, one action (review, answer, continue), steps grouped
+ok 18 - chat: whole-job first message, one action (review, answer, continue), steps grouped
+  ---
+  duration_ms: 10.973623
+  type: 'test'
+  ...
+# Subtest: attention: a pending permission or a finished turn on an item shows on project pages and opens that chat
+ok 19 - attention: a pending permission or a finished turn on an item shows on project pages and opens that chat
+  ---
+  duration_ms: 8.326667
+  type: 'test'
+  ...
+# Subtest: a finished item holding the session: one Start button here, and no "waits for you" call-out
+ok 20 - a finished item holding the session: one Start button here, and no "waits for you" call-out
+  ---
+  duration_ms: 6.382097
+  type: 'test'
+  ...
+1..20
+# tests 20
+# suites 0
+# pass 20
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 305.668102

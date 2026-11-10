@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-10T13:17:59.239Z",
+      "completedAt": "2026-11-10T13:17:59.239Z",
+      "summary": "Root cause from lalaff's live state (read-only): Run Now task PF-0010 on Claude Code has itemDone=true, sessionEnded=false; applySignal('item-done') returns a new task object (updatedAt) each time, so apply() reports a change, persist() writes runs.json and events.jsonl (584 lines), the watcher emits a change, the page refreshes and the manager re-checks: a ~0.7 s loop. Fix: item-done is a no-op once itemDone is set; regression test."
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-10T13:18:09.855Z",
+      "completedAt": "2026-11-10T13:18:09.855Z",
+      "summary": "Root cause: applySignal('item-done') returns a new task object (updatedAt) even when itemDone is already set, so a DONE item with an open session is re-applied on every snapshot; each apply persists runs.json and events.jsonl, which emits a change event and triggers the next snapshot (~0.7 s loop). Observed in lalaff: 584 item-done events for PF-0010, runs.json rewritten every second.",
+      "evidence": [
+        "src/execution/model.js:97-100",
+        "runtime:lalaff .yallaflow/local/execution/events.jsonl repeats signal item-done for PF-0010 about every 0.7 s while the Claude Code session stays open"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-10T13:20:43.579Z",
+      "completedAt": "2026-11-10T13:20:43.579Z",
+      "summary": "item-done is idempotent; updateTask then returns the same run, so nothing is saved and no change event is sent. Regression test PF-0115 in test/execution-model.test.js; execution suites pass.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-10T13:20:45.099Z",
+      "completedAt": "2026-11-10T13:20:45.099Z",
+      "summary": "item-done is idempotent; updateTask then returns the same run, so nothing is saved and no change event is sent. Regression test PF-0115 in test/execution-model.test.js; execution suites pass.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-10T13:20:45.099Z"
+}

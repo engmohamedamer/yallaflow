@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --test test/execution-model.test.js test/execution-queue.test.js test/console-execution.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--test",
+        "test/execution-model.test.js",
+        "test/execution-queue.test.js",
+        "test/console-execution.test.js"
+      ],
+      "displayCommand": "node --test test/execution-model.test.js test/execution-queue.test.js test/console-execution.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-10T13:19:41.372Z",
+      "finishedAt": "2026-11-10T13:20:42.764Z",
+      "verifiedAt": "2026-11-10T13:20:42.764Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

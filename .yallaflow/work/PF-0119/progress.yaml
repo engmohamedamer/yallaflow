@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-10T14:15:00.896Z",
+      "completedAt": "2026-11-10T14:15:00.896Z",
+      "summary": "Owner asked to release 1.5.1 (to test with someone else). Scope: PF-0115..PF-0118 on release/1.5.1. Plan: bump package and CLI version to 1.5.1, CHANGELOG and README, release checks, commit, fast-forward main, annotated tag, push, GitHub Release (release.yml, Trusted Publisher), verify npm and provenance. Parallel and Automated Merge stay disabled."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-10T14:15:01.415Z",
+      "completedAt": "2026-11-10T14:15:01.415Z",
+      "summary": "Owner asked to release 1.5.1 (to test with someone else). Scope: PF-0115..PF-0118 on release/1.5.1. Plan: bump package and CLI version to 1.5.1, CHANGELOG and README, release checks, commit, fast-forward main, annotated tag, push, GitHub Release (release.yml, Trusted Publisher), verify npm and provenance. Parallel and Automated Merge stay disabled."
+    },
+    "implementation": {
+      "status": "pending"
+    },
+    "verification": {
+      "status": "pending"
+    },
+    "code-review": {
+      "status": "pending"
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-10T14:15:01.415Z"
+}

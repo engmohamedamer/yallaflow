@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --test test/console-execution.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--test",
+        "test/console-execution.test.js"
+      ],
+      "displayCommand": "node --test test/console-execution.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-10T14:09:25.624Z",
+      "finishedAt": "2026-11-10T14:10:16.495Z",
+      "verifiedAt": "2026-11-10T14:10:16.495Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}
