@@ -29,9 +29,30 @@ yallaflow console --agents                       # Agent Workspace with Codex
 
 **Requirements:**
 - the Codex CLI (`codex`), logged in with your ChatGPT account (`codex login`);
-- the Codex ACP adapter, installed by you: `npm install -g @agentclientprotocol/codex-acp`, version 2.x from 2.5.0.
+- the Codex ACP adapter, version 2.x from 2.5.0.
   - YallaFlow finds it on `PATH`, or through `YALLAFLOW_CODEX_ACP`.
   - `YALLAFLOW_CODEX_BIN` selects a specific `codex`.
+
+The console can install both for you: **Setup & run → Agents → On this machine**. It shows the exact command and waits for your approval, and it never uses sudo.
+
+### Tested Codex versions
+
+The console installs exact versions, never a range or "latest": the ones this YallaFlow release was tested with.
+
+| Package | Version |
+|---|---|
+| `@openai/codex` | 0.167.0 |
+| `@agentclientprotocol/codex-acp` | 2.5.0 |
+
+The pins are `TESTED_CODEX` in `src/agents/detect.js`.
+- **Before an install is offered,** the console checks that the pinned adapter is inside the supported range (`REQUIREMENTS.codexAcp`) and that your Node.js is supported. It also shows when the installed versions differ from the tested ones. Different versions are not blocked if they are in the supported range; they just aren't the tested pair.
+
+**Updating the pins** (maintainers, before a release):
+1. Install the candidate versions in a disposable environment: `npm install -g --prefix <tmp> @openai/codex@<v> @agentclientprotocol/codex-acp@<v>`.
+2. Run the agent tests (`node --test test/agent-*.test.js test/console-machine.test.js`).
+3. Run a real connection test with those binaries, using your own ChatGPT login: the console's **Test the connection** (handshake only, no session). If the release changes agent behaviour, also run a short real session.
+4. Update `TESTED_CODEX` (versions and `testedAt`). If the adapter's major version changes, update `REQUIREMENTS.codexAcp` and the bridge first.
+5. The test `tested Codex versions: exact pins …` fails if a pin is a range or falls outside `REQUIREMENTS`.
 
 **In the panel:**
 1. **Choose permissions and start.** Codex runs in the project folder. The options:

@@ -4,6 +4,63 @@ All notable changes to YallaFlow are documented here. The format loosely follows
 
 **1.0.0 is the first public release**, published to npm as `yallaflow`. From 1.0.0 the package follows Semantic Versioning with the compatibility promise in [`docs/releasing.md`](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise). Every earlier version below is an **internal prerelease**: git-tagged, never published to npm, and kept here as history.
 
+## [1.5.2] - unreleased — An easier first hour
+
+The same console, smoother and easier to set up. Everything below is in the existing design; no new framework.
+
+### Added
+- **Connect an existing project from the console** (PF-0123). **Add an existing project** now also accepts a folder without YallaFlow, such as an existing Laravel codebase:
+  - a preview lists exactly what `yallaflow init` would create or change (`.yallaflow/`, a managed block in `CLAUDE.md`/`AGENTS.md` with your text kept), plus the detected stack;
+  - after you confirm, the console runs the same `yallaflow init`, with its rollback;
+  - the project opens with project understanding as its next step;
+  - uncommitted work is never touched.
+- **A better folder picker** (PF-0123). It has:
+  - a breadcrumb with Up (Backspace);
+  - a path field (`~/…` works);
+  - recent locations and a filter;
+  - a label on each folder: YallaFlow project, existing code with a hint such as Laravel or Node.js, or empty;
+  - one clear action for the selected folder;
+  - **New folder** when choosing a new project's location.
+
+  Browsing stays inside your home folder and never shows hidden folders.
+- **Agent setup on this machine** (PF-0123, PF-0124). **Setup & run → Agents** shows Codex (CLI, adapter, ChatGPT sign-in, connection) and offers one step at a time:
+  - **Install** shows the exact command, pinned to the tested versions (`@openai/codex` 0.167.0, `@agentclientprotocol/codex-acp` 2.5.0). It waits for your approval and never uses sudo.
+  - **Sign in with ChatGPT** uses Codex's own device code.
+  - **Test the connection** runs a handshake only: no session, nothing in a project.
+
+  Claude Code is shown as experimental. When Codex is not ready, the Workspace shows one dismissible line.
+- **Project readiness** (PF-0123). While something a project needs is missing, the Workspace and Project pages show what it is and the next step. The server enforces the same rule as the CLI:
+  - an existing codebase needs an approved project understanding before new work (the same `PROJECT_UNDERSTANDING_REQUIRED`);
+  - queue runs also need a ready agent;
+  - new (Greenfield) projects, setup, agent sessions and read-only use are never blocked.
+
+### Changed
+- **Simpler navigation.** The header is now:
+  - **Workspace:** the Flow and the List, with a switch that remembers your choice;
+  - **Agents**, **Setup & run**, **Project**;
+  - **More:** Insights, Worktrees.
+
+  Every older link still opens the same page.
+- **The ＋ in the Flow's New column** opens Create work, from the keyboard too.
+- **Setup & run:**
+  - the agent comes first, and running the app is marked optional;
+  - advanced parts are collapsed;
+  - a failed service shows its last log lines with Restart, Full log and Ask the agent.
+- **Station names fit** on common screen widths, and arrows follow the reading direction in Arabic.
+
+### Fixed
+- **Clicks, typing and scrolling survive live updates.** The console no longer rebuilds an unchanged page, and it waits while you are clicking.
+- **Copy says "copied" only when it really copied.** When the browser refuses, the console tries a second method, then shows the text selected for ⌘C or Ctrl+C.
+- **Setup's services step** now sees saved services. It always said "No services for now".
+
+### Internal
+- **Tailwind CSS v4** utilities (prefix `tw:`, no reset) are built during development into the committed `resources/console/tw.css`, which ships as-is. CI requires the stylesheet freshness test and checks the packed file.
+- **Tests:**
+  - new ones for readiness, connect, agent setup, redraws and copy;
+  - the Node engines test checks the shipped dependency tree; development tools are checked against their own build floor (Node 20.19).
+
+Parallel execution and Automated Merge stay disabled, as in 1.5.0.
+
 ## [1.5.1] - 2026-11-10 — Steadier console
 
 ### Fixed

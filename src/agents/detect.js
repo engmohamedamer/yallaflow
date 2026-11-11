@@ -10,6 +10,15 @@ export const REQUIREMENTS = Object.freeze({
   codexAcp: { min: [2, 5, 0], maxMajor: 2 }
 });
 
+// PF-0124: the exact versions the console offers to install, because they were tested together
+// with this YallaFlow release (a real handshake-only connection test plus the agent test suite).
+// Updating them: docs/agents.md "Tested Codex versions". A test keeps them inside REQUIREMENTS.
+export const TESTED_CODEX = Object.freeze({
+  cli: Object.freeze({ package: '@openai/codex', version: '0.167.0' }),
+  adapter: Object.freeze({ package: '@agentclientprotocol/codex-acp', version: '2.5.0' }),
+  testedAt: '2026-11-11'
+});
+
 export function parseVersion(text) {
   const match = /(\d+)\.(\d+)\.(\d+)/.exec(String(text ?? ''));
   return match ? match.slice(1, 4).map(Number) : null;
@@ -35,7 +44,8 @@ async function isExecutable(file) {
 // PATH lookup without a shell.
 export async function which(name, env = process.env) {
   if (name.includes('/')) return (await isExecutable(name)) ? name : null;
-  for (const dir of String(env.PATH ?? '').split(path.delimiter).filter(Boolean)) {
+  // PF-0123: only absolute PATH entries (a relative one like `.` would pick up a repository's own program).
+  for (const dir of String(env.PATH ?? '').split(path.delimiter).filter((entry) => entry && path.isAbsolute(entry))) {
     const candidate = path.join(dir, name);
     if (await isExecutable(candidate)) return candidate;
   }
@@ -74,11 +84,14 @@ export async function detectCodex(env = process.env) {
   const adapter = env.YALLAFLOW_CODEX_ACP || (await which('codex-acp', env));
   const result = { provider: 'codex', codex: null, adapter: null, ready: false, problems: [] };
   if (!codex) result.problems.push('Codex CLI (`codex`) is not installed or not on PATH.');
+  // PF-0123: an override that names a missing file is not an installed Codex.
+  else if (!(await isExecutable(codex))) result.problems.push(`Codex CLI was not found at ${codex}.`);
   else {
     const version = await run(codex, ['--version'], { env });
     result.codex = { path: codex, version: (parseVersion(version.stdout) ?? []).join('.') || null };
   }
   if (!adapter) result.problems.push('The Codex ACP adapter (`codex-acp`, npm @agentclientprotocol/codex-acp) is not installed.');
+  else if (!(await isExecutable(adapter))) result.problems.push(`The Codex ACP adapter was not found at ${adapter}.`);
   else {
     const version = await adapterPackageVersion(adapter);
     const parsed = parseVersion(version);

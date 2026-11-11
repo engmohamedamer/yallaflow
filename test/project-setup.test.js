@@ -251,10 +251,14 @@ function ui({ setupInfo = null, agentSetup = null, readOnly = false, lang = 'en'
 }
 
 test('UI: the first-time guide shows the current step, and none once done, skipped or read-only', () => {
-  assert.match(ui({ setupInfo: { pid: 'p', record: null } }).guide(), /First-time project setup[\s\S]*Scan now/);
-  const services = ui({ setupInfo: { pid: 'p', record: { stack: [], steps: { stack: true } } } }).guide();
+  // PF-0123: agents first (the stack and services steps can ask the agent), services optional.
+  const first = ui({ setupInfo: { pid: 'p', record: null } }).guide();
+  assert.match(first, /First-time project setup[\s\S]*1\. Set up the agent[\s\S]*Go to Agents[\s\S]*2\. Scan the stack[\s\S]*3\. Choose services \(optional\)/);
+  assert.match(ui({ setupInfo: { pid: 'p', record: { stack: [], steps: { agents: true } } } }).guide(), /Scan now/);
+  const services = ui({ setupInfo: { pid: 'p', record: { stack: [], steps: { agents: true, stack: true } } } }).guide();
   assert.match(services, /No services for now/, 'with no services the step says so instead of "done choosing"');
-  assert.match(ui({ runtime: { pid: 'p', services: [{ id: 'web' }] }, setupInfo: { pid: 'p', record: { stack: [], steps: { stack: true } } } }).guide(), /Done choosing services/);
+  // The console keeps the runtime document under .data (loadRuntime).
+  assert.match(ui({ runtime: { pid: 'p', data: { services: [{ id: 'web' }] } }, setupInfo: { pid: 'p', record: { stack: [], steps: { agents: true, stack: true } } } }).guide(), /Done choosing services/);
   assert.equal(ui({ setupInfo: { pid: 'p', record: { stack: [], steps: { stack: true, services: true, agents: true } } } }).guide(), '');
   assert.equal(ui({ setupInfo: { pid: 'p', record: { stack: [], steps: { skipped: true } } } }).guide(), '');
   assert.equal(ui({ readOnly: true, setupInfo: { pid: 'p', record: null } }).guide(), '');

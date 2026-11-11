@@ -53,7 +53,18 @@ function satisfiesDeclaredMinimum(range, declaredMinimum) {
   });
 }
 
-async function installedPackagesWithEngines() {
+// PF-0124: the engines contract is about what users install. Development-only tools (the
+// Tailwind CLI and its platform builds, marked "dev" in package-lock.json) never ship in the
+// package, so they are checked separately against the Node versions CI builds with.
+const lock = JSON.parse(await readFile(new URL('../package-lock.json', import.meta.url), 'utf8'));
+const devOnly = new Set(Object.entries(lock.packages ?? {}).filter(([key, entry]) => key && entry.dev).map(([key]) => key.replace(/^node_modules\//, '')));
+
+async function installedPackagesWithEngines({ includeDev = false } = {}) {
+  const all = await installedPackagesAll();
+  return all.filter((p) => includeDev || !devOnly.has(p.name));
+}
+
+async function installedPackagesAll() {
   const results = [];
   const dirs = await readdir(nodeModules, { withFileTypes: true });
   for (const dir of dirs) {
@@ -86,7 +97,7 @@ test('pdfjs-dist is pinned to a version that officially declares Node >=20 suppo
   assert.equal(pdfjsPkg.engines.node, '>=20.16.0 || >=22.3.0');
 });
 
-test('every installed dependency officially supports YallaFlow\'s declared Node floor — no engines mismatch anywhere in the tree', async () => {
+test('every installed runtime dependency officially supports YallaFlow\'s declared Node floor — no engines mismatch anywhere in the shipped tree', async () => {
   const declaredFloor = pkg.engines.node.replace(/^>=\s*/, '');
   const withEngines = await installedPackagesWithEngines();
   assert.ok(withEngines.length > 0, 'expected at least one installed package to declare engines.node');
@@ -102,4 +113,16 @@ test('PDF extraction actually works on this Node runtime with the pinned pdfjs-d
   const normalized = await prepareFileIntake(fixture);
   assert.equal(normalized.contentAvailability, 'extracted');
   assert.ok(normalized.rawText.length > 0);
+});
+
+test('development-only tools stay out of the runtime tree and run on the Node versions used to build the package', async () => {
+  // Every dev-only package in the lockfile is really dev-only (nothing users install depends on it).
+  for (const name of ['tailwindcss', '@tailwindcss/cli']) assert.ok(devOnly.has(name), `${name} is a devDependency only`);
+  assert.equal(pkg.dependencies?.tailwindcss, undefined);
+  // Rebuilding the console CSS needs Node >= 20.19 (the Tailwind toolchain's own floor); CI's
+  // Node 20 job uses the latest 20.x. Where the dev tools are installed, check their floors.
+  const dev = (await installedPackagesWithEngines({ includeDev: true })).filter((p) => devOnly.has(p.name));
+  const BUILD_FLOOR = '20.19.0';
+  const tooNew = dev.filter((p) => !p.engines.node.split('||').some((clause) => satisfiesDeclaredMinimum(clause.trim().replace(/^\^/, '>='), BUILD_FLOOR)));
+  assert.deepEqual(tooNew.map((p) => `${p.name}@${p.version}: ${p.engines.node}`), [], 'a development tool needs a newer Node than the documented build floor (20.19.0)');
 });

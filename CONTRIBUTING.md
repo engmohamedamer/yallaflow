@@ -33,6 +33,14 @@ npm install
 npm run check
 ```
 
+### Console styles (Tailwind)
+
+The console's `resources/console/tw.css` is generated from `resources/console/tailwind.input.css` and the classes used in `resources/console/app.js`. After changing either, run `npm run build:css` and commit the updated `tw.css`. The package ships that committed file as it is: nothing rebuilds it on pack or publish.
+
+The build tools are development dependencies, installed by `npm ci`, and need Node.js 20.19 or newer. YallaFlow itself still runs on Node.js 20.16+.
+
+`npm run check` fails when `tw.css` is stale. In CI (`YALLAFLOW_REQUIRE_CSS_CHECK=1`) that check must run; it is never skipped.
+
 ## Documentation and CHANGELOG
 
 Update `README.md`, the relevant `docs/` page (`guide.md`, `workflows.md`, `cli.md`, `project-memory.md`, `architecture.md`, `limitations.md`, `roadmap.md`), and — for agent-facing behavior — the generated agent contract (`src/agent/contract.js`, bumping `AGENT_CONTRACT_VERSION`) alongside any behavior change they describe. Add a corresponding entry to [`CHANGELOG.md`](CHANGELOG.md) under `[Unreleased]`. See [`docs/releasing.md`](docs/releasing.md) for how package, Skill Registry, knowledge-policy, and workspace-schema versions relate, and for the maintainer release checklist.

@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { lstat, readFile, realpath, rm, writeFile } from 'node:fs/promises';
+import { lstat, readFile, readlink, realpath, rm, writeFile } from 'node:fs/promises';
 import { exists, readText, writeText } from '../utils/fs.js';
 
 // First-party agent bootstrap (v0.3.8). A provider's own session-start file in the
@@ -219,6 +219,36 @@ export function bootstrapFileNames() {
 }
 
 const UNSAFE_BOOTSTRAP_STATES = Object.freeze(['modified', 'newer', 'broken']);
+
+// PF-0123 (console connect preview): what init's bootstrap step would do to each agent file —
+// the same providers and states as installAllBootstraps, read-only. Unsafe states are problems.
+export async function bootstrapInitPlan(root) {
+  const plan = [];
+  const problems = [];
+  const realRoot = await realpath(root);
+  const inside = (target) => target === realRoot || target.startsWith(`${realRoot}${path.sep}`);
+  for (const provider of onboardingProviders()) {
+    // A symbolic link (even a dangling one) would make init write wherever it points: the
+    // console refuses one that leaves the project folder (a link to the other agent file stays fine).
+    const file = providerFile(root, provider);
+    const info = await lstat(file).catch(() => null);
+    if (info?.isSymbolicLink()) {
+      const target = await realpath(file).catch(async () => path.resolve(path.dirname(file), await readlink(file)));
+      if (!inside(target)) {
+        problems.push({ code: 'BOOTSTRAP_LINK_OUTSIDE', file: provider.file, message: `${provider.file} is a link to a file outside this folder; YallaFlow will not write through it. Replace the link with a regular file, then try again.` });
+        continue;
+      }
+    }
+    const status = await inspectBootstrap(root, provider);
+    if (UNSAFE_BOOTSTRAP_STATES.includes(status.state)) {
+      problems.push({ code: 'BOOTSTRAP_UNSAFE', file: provider.file, message: `${provider.file}: ${describeBootstrapState(status)}` });
+      continue;
+    }
+    const op = status.state === 'not-installed' ? (status.fileExists ? 'append-block' : 'create') : status.state === 'outdated' ? 'update-block' : 'unchanged';
+    plan.push({ path: provider.file, op });
+  }
+  return { plan, problems };
+}
 
 export async function assertAllBootstrapsInstallable(root) {
   const problems = [];

@@ -103,7 +103,10 @@ jobs:
           git config --global init.defaultBranch main
 
       - run: npm ci
+      # The console stylesheet freshness test must run here, never skip (PF-0124).
       - run: npm run check
+        env:
+          YALLAFLOW_REQUIRE_CSS_CHECK: '1'
 
   publish:
     needs: [guard, test]
@@ -134,6 +137,8 @@ jobs:
       - name: Pack and smoke-test the artifact
         run: |
           tarball="$(npm pack --silent)"
+          # The package ships the committed, tested console stylesheet byte for byte (PF-0124).
+          tar -xzOf "$tarball" package/resources/console/tw.css | cmp - resources/console/tw.css
           prefix="$(mktemp -d)"
           npm install --prefix "$prefix" "./$tarball"
           version="$(node -p "require('./package.json').version")"

@@ -39,7 +39,43 @@ yallaflow console list
 
 ## New project (1.4.0)
 
-**All projects → New project** creates a new project in four steps: idea (name, description, requirements, attachments, location from a home-folder chooser), stack, environment (Docker, local tools or later; Git on by default) and review & create. **Create the project** is bound to the exact plan you reviewed; a plan that installs dependencies also asks for the project name. Progress, the log (collapsed) and failure recovery are shown on the page. When it finishes, the project is added to the console and its Overview opens. **All projects → Add an existing project** registers a folder that already has YallaFlow. The console starts without any saved project, so the first one can be created here. See [`new-project.md`](new-project.md).
+**All projects → New project** creates a new project in four steps: idea (name, description, requirements, attachments, location from a home-folder chooser), stack, environment (Docker, local tools or later; Git on by default) and review & create. **Create the project** is bound to the exact plan you reviewed; a plan that installs dependencies also asks for the project name. Progress, the log (collapsed) and failure recovery are shown on the page. When it finishes, the project is added to the console and its Overview opens. **All projects → Add an existing project** opens the folder picker:
+- **Browsing.** A breadcrumb with Up (Backspace), a path field (`~/…` works), recent locations, and a filter. Each folder is labelled from file names only: YallaFlow project, existing code (with a hint such as Laravel or Node.js), or empty.
+- **The action follows the folder.** A YallaFlow project opens. For existing code or an empty folder, **Set up YallaFlow here** first shows exactly what `yallaflow init` would change: `.yallaflow/`, plus a managed block added to `CLAUDE.md`/`AGENTS.md` with your text kept. It also shows the detected stack and how many uncommitted changes Git reports; those are never touched.
+- **Confirming.** After you tick *I reviewed these changes*, the console runs the same `yallaflow init`, with its rollback, and the project opens. For an existing codebase, its next step is project understanding.
+- **Refused folders.** A hand-edited bootstrap block, a folder inside another YallaFlow project, or a lane is refused, and nothing is written.
+
+The same picker chooses a new project's location, and can create a new folder there. Browsing stays inside your home folder and never shows hidden folders. The console starts without any saved project, so the first one can be created here. See [`new-project.md`](new-project.md).
+
+### Navigation (1.5.2)
+
+**Workspace** (the Flow and the List, switched next to the filters; the last view is remembered) · **Agents** · **Setup & run** · **Project** · **More** (Insights, Worktrees). Every older link (`#/map`, `#/lines`, `#/insights`, `#/team`, `#/item/<id>`) still opens the same page.
+
+### Project readiness (1.5.2)
+
+While something a project needs is missing, the Workspace and Project pages show one line per step, each with its next action:
+- YallaFlow set up;
+- project understanding, which only an existing codebase needs: approved, in progress, or a draft waiting for your review;
+- the agent;
+- running the app, which is optional.
+
+The console works this out from YallaFlow's own state; nothing extra is stored. It enforces the same rule as the CLI:
+- **Creating work** is refused before an existing codebase's understanding is approved. The refusal is the same `PROJECT_UNDERSTANDING_REQUIRED` the CLI gives.
+- **Queue runs** also need a ready Codex. The understanding work item itself can always run.
+- **Never blocked:** new (Greenfield) projects, setup, discovery, agent sessions and read-only use.
+
+### Agent setup (1.5.2)
+
+**Setup & run → Agents → On this machine** shows Codex: the CLI, the adapter, the sign-in (only a ChatGPT subscription counts) and the connection. It offers one next step at a time:
+- **Install.** It shows the exact `npm install -g …` command and needs your tick. It never uses sudo, and it is refused, with the command to run yourself, when npm's global folder is not writable.
+- **Sign in with ChatGPT.** This is Codex's own device sign-in: an official link and a one-time code. YallaFlow never sees credentials.
+- **Test the connection.** It starts the adapter in an empty temporary folder, completes only the handshake, and ends it, so no session or work starts.
+
+Claude Code is detected and shown as experimental; its console connection is not part of published releases. When Codex is not ready, the Workspace shows one dismissible line pointing here.
+
+### Copying (1.5.2)
+
+**Copy** says *copied* only when the browser confirms it. If the browser refuses, the console tries a second method, then shows the text selected so you can press ⌘C or Ctrl+C.
 
 ## Setup: run your project (1.4.1)
 
@@ -68,7 +104,7 @@ See [`runtime.md`](runtime.md).
 
 The **Overview** tab shows the project itself, read-only:
 
-- **Project understanding.** Whether it is needed (an existing codebase without approved understanding), in progress, awaiting your review, established, or, for a new project, growing from your intent. It names the request to give your agent. Flow and Work show the same card until understanding is established. Viewing it never starts discovery, writes a draft or approves anything: approval stays your explicit decision through your agent or `yallaflow baseline approve`.
+- **Project understanding.** Whether it is needed (an existing codebase without approved understanding), in progress, awaiting your review, established, or, for a new project, growing from your intent. It names the request to give your agent. The Workspace shows the readiness card until understanding is established. Viewing it never starts discovery, writes a draft or approves anything: approval stays your explicit decision through your agent or `yallaflow baseline approve`.
 - **Purpose, architecture, stack, data and integrations** from approved project memory. Each fact shows its ID, confidence and freshness. "May be stale" means an evidence file changed, not that the fact is wrong.
 - **Stack from repository evidence.** Frameworks, runtimes, package managers, lockfiles, Docker images and source languages. Each row shows the file it came from and its basis: *declared* (a file says so, which is not proof the code uses it), *detected* (a file is present) or *inferred* (counted, not read). `.env` files and compose `environment` values are never read.
 - **Modules** by manifest folder. Several Node.js lockfiles in one module are flagged as a conflict.

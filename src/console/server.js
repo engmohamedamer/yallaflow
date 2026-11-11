@@ -33,12 +33,15 @@ import { withArabic } from '../execution/arabic.js';
 import { MergeService, listJournals } from '../execution/merge.js';
 import { conflictText } from '../execution/messages.js';
 import { detectProviders } from '../agents/detect.js';
-import { FolderError, listFolders } from './folders.js';
+import { FolderError, createFolder, listFolders } from './folders.js';
+import { connectFolder, previewConnect } from './connect.js';
+import { MachineSetup } from '../agents/setup.js';
 import { addProject as saveToRegistry, removeProject as forgetInRegistry } from './registry.js';
 import { addRuntimeService, attachPlannedFile, createdProjectRoot, gitInit, probeTools, workspaceRoot } from './greenfield.js';
 import { CLAUDE_NOT_INCLUDED, claudeIncluded, loadClaude } from '../agents/experimental.js';
 import { readAgentSettings, readApprovalWait, writeAgentSettings, writeApprovalWait } from '../agents/settings.js';
 import { markSetup, readSetup, scanSetup, setupPending } from './setup.js';
+import { computeReadiness, notReady } from './readiness.js';
 import { defaultIntegrationBranch } from '../shared/git.js';
 import { readYaml } from '../core/yaml.js';
 
@@ -48,6 +51,8 @@ const UI_FILES = Object.freeze({
   '/index.html': ['index.html', 'text/html; charset=utf-8'],
   '/app.js': ['app.js', 'text/javascript; charset=utf-8'],
   '/app.css': ['app.css', 'text/css; charset=utf-8'],
+  // PF-0123: the generated Tailwind utilities (npm run build:css), loaded after app.css.
+  '/tw.css': ['tw.css', 'text/css; charset=utf-8'],
   '/favicon.svg': ['favicon.svg', 'image/svg+xml'],
   '/fonts/ReadexPro.ttf': ['fonts/ReadexPro.ttf', 'font/ttf'],
   '/fonts/OFL.txt': ['fonts/OFL.txt', 'text/plain; charset=utf-8']
@@ -57,7 +62,7 @@ const UI_FILES = Object.freeze({
 // 1.4.0: work-item actions and review-gate decisions (PF-0043) join Create Work.
 // 1.4.0 Greenfield journey (PF-0057): register a project, enable agents for this run, Git init,
 // add a runtime service, attach a planned file to a new project's first work item.
-const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|revision-sources|actions\/[a-z]+|gates\/[a-z]+\/decision))?|runtime\/[a-z][a-z0-9-]{0,31}\/(?:trust|start|stop|restart)|runtime\/services|runtime\/(?:start|stop)-all|runtime\/analyze|runtime\/plan\/save|agents\/(?:settings|launch-files|approval-wait)|setup\/(?:scan|step)|git\/init)$|^\/api\/new\/(?:plan|create|plans\/NP-\d{14}-[0-9a-f]{6}\/files)$|^\/api\/(?:projects|projects\/remove|agents\/enable)$/;
+const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|revision-sources|actions\/[a-z]+|gates\/[a-z]+\/decision))?|runtime\/[a-z][a-z0-9-]{0,31}\/(?:trust|start|stop|restart)|runtime\/services|runtime\/(?:start|stop)-all|runtime\/analyze|runtime\/plan\/save|agents\/(?:settings|launch-files|approval-wait)|setup\/(?:scan|step)|git\/init)$|^\/api\/new\/(?:plan|create|plans\/NP-\d{14}-[0-9a-f]{6}\/files)$|^\/api\/(?:projects|projects\/remove|projects\/connect|agents\/enable|fs\/mkdir|machine\/codex\/(?:install|login|verify)|machine\/job\/cancel)$/;
 // Agent Interaction (v1.3.0, only with --agents): the Agent Workspace's actions.
 const AGENT_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/agent\/(start|message|permission|cancel|end|resume|connect|disconnect|activate)$/;
 // PF-0112: execution actions (queues): create a run and the developer's run/task controls.
@@ -122,6 +127,8 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
   let execution = null;
   let merges = null; // PF-0112 M3 Review & Merge service (created with the console)
   const runner = createRunner();
+  // PF-0123: agent setup on this machine (install, sign-in, connection test), one job at a time.
+  const machine = new MachineSetup({ env: agentEnv, readOnly });
   // PF-0112 review: nothing runs in a lane that is no longer a worktree of its home repository.
   // A lane is recognised from where it is and its home's lane list (never from files inside it),
   // whether or not it is open in this console; its Git directory is pinned for the child.
@@ -253,6 +260,28 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       launchCommand: launchFiles ? claudeKit.launchCommand(project.root) : null
     };
   }
+  // PF-0123: project readiness, derived on each request (src/console/readiness.js). A read-only
+  // console runs no agent probe (security review, PF-0069): its agent step reads "unknown".
+  // `runtime: false` for the write guards: runtime is optional and blocks nothing they check.
+  const runtimeCache = new Map(); // root -> { at, value } for readiness only
+  async function readinessFor(project, { runtime: withRuntime = true } = {}) {
+    let snapshotError = null;
+    try { await runner.get(project.root, 'snapshot', ['snapshot', '--json']); } catch (error) { snapshotError = error.message; }
+    let agent = { checked: false };
+    if (!readOnly) {
+      const found = await detectProviders({ env: agentEnv, claude: false });
+      const loginProblem = machine.loginProblem();
+      agent = { checked: true, enabled: agentsOn, ready: Boolean(found.codex?.ready) && !loginProblem, problems: [...(found.codex?.problems ?? []), ...(loginProblem ? [loginProblem] : [])] };
+    }
+    let runtime = null;
+    if (withRuntime) {
+      // A short cache: live updates re-read readiness often, and runtime is optional information here.
+      const hit = runtimeCache.get(project.root);
+      if (hit && Date.now() - hit.at < 5000) runtime = hit.value;
+      else { try { runtime = await runner.readFresh(project.root, ['runtime', 'status', '--json']); } catch { runtime = null; } runtimeCache.set(project.root, { at: Date.now(), value: runtime }); }
+    }
+    return computeReadiness(project.root, { snapshotError, agent, runtime });
+  }
   const heartbeat = setInterval(() => { for (const client of clients) client.write(': ping\n\n'); }, 25_000);
   heartbeat.unref();
 
@@ -308,6 +337,17 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
         throw error;
       }
     }
+    // PF-0123: agent setup status (runs the providers' own --version and login-status probes).
+    if (parts.length === 2 && parts[1] === 'machine') {
+      if (readOnly) return send(response, 405, { error: { code: 'READ_ONLY', message: 'This console was started with --read-only; it runs no agent probes.' } });
+      return send(response, 200, await machine.status());
+    }
+    if (parts.length === 3 && parts[1] === 'machine' && parts[2] === 'job') return send(response, 200, { job: machine.jobView() });
+    // PF-0123: what connecting a folder would do (read-only; the chooser's home-bounded rules).
+    if (parts.length === 3 && parts[1] === 'fs' && parts[2] === 'connect-preview') {
+      if (readOnly) return send(response, 405, { error: { code: 'READ_ONLY', message: 'This console was started with --read-only; it does not connect folders.' } });
+      return send(response, 200, await previewConnect(url.searchParams.get('path') ?? ''));
+    }
     // Probes run programs (--version only): never in a read-only console (security review).
     if (parts.length === 3 && parts[1] === 'new' && parts[2] === 'tools') return readOnly ? send(response, 405, { error: { code: 'READ_ONLY', message: 'This console was started with --read-only.' } }) : send(response, 200, await probeTools());
     if (parts.length === 2 && parts[1] === 'agents') {
@@ -344,6 +384,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       const record = await readSetup(project.root);
       return send(response, 200, { record, pending: !readOnly && setupPending(record), readOnly });
     }
+    if (rest.length === 1 && rest[0] === 'readiness') return send(response, 200, await readinessFor(project));
     if (rest.length === 1 && rest[0] === 'runtime') {
       return send(response, 200, await runner.readFresh(project.root, ['runtime', 'status', '--json']));
     }
@@ -424,6 +465,38 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
         throw error;
       }
     }
+    // PF-0123: connect a folder — Core's `yallaflow init` after the developer confirmed the
+    // exact preview (planHash), then the same registration as Add project.
+    if (parts.length === 3 && parts[1] === 'projects' && parts[2] === 'connect') {
+      const type = String(request.headers['content-type'] ?? '').split(';')[0].trim().toLowerCase();
+      if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+      const connected = await connectFolder(await readJsonBody(request), runner);
+      const registration = await registerRoot(connected.root);
+      return send(response, 200, { ...registration, initialized: connected.initialized, kind: connected.preview.kind, projectKind: connected.preview.projectKind ?? null });
+    }
+    if (parts[1] === 'machine') {
+      const type = String(request.headers['content-type'] ?? '').split(';')[0].trim().toLowerCase();
+      if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+      const body = await readJsonBody(request);
+      const action = parts.slice(2).join('/');
+      if (action === 'codex/install') return send(response, 202, { job: await machine.install(body) });
+      if (action === 'codex/login') return send(response, 202, { job: await machine.signIn(body) });
+      if (action === 'codex/verify') return send(response, 200, { verified: await machine.verify() });
+      return send(response, 200, { job: machine.cancel() });
+    }
+    if (parts.length === 3 && parts[1] === 'fs' && parts[2] === 'mkdir') {
+      const type = String(request.headers['content-type'] ?? '').split(';')[0].trim().toLowerCase();
+      if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+      const body = await readJsonBody(request);
+      const keys = body && typeof body === 'object' && !Array.isArray(body) ? Object.keys(body).sort().join(',') : '';
+      if (keys !== 'name,parent' || typeof body.parent !== 'string' || typeof body.name !== 'string') return send(response, 400, { error: { code: 'BAD_REQUEST', message: 'Send { parent, name }.' } });
+      try {
+        return send(response, 201, await createFolder(body.parent, body.name));
+      } catch (error) {
+        if (error instanceof FolderError) return send(response, error.status, { error: { code: error.code, message: error.message } });
+        throw error;
+      }
+    }
     if (parts.length === 3 && parts[1] === 'projects' && parts[2] === 'remove') {
       const type = String(request.headers['content-type'] ?? '').split(';')[0].trim().toLowerCase();
       if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
@@ -461,6 +534,11 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     if (rest.length === 1 && rest[0] === 'work') {
       if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
       const input = validateCreateBody(await readJsonBody(request));
+      // PF-0123: refused before anything is written while the project is not ready (Core's own
+      // understanding gate; Greenfield is never gated). Core refuses too — this adds the reason.
+      const readiness = await readinessFor(project, { runtime: false });
+      // Same status and code as Core's refusal (422 PROJECT_UNDERSTANDING_REQUIRED): the API contract is unchanged.
+      if (!readiness.allows.createWork) throw notReady('PROJECT_UNDERSTANDING_REQUIRED', 'PROJECT_UNDERSTANDING_REQUIRED: this existing project needs an approved project understanding before new work can be created. No work item was created.', readiness, 422);
       const result = await createWork(project.root, input, runner);
       const detail = await runner.get(project.root, `work:${result.id}`, ['work', 'show', result.id, '--json']);
       return send(response, result.created ? 201 : 200, { ...result, item: detail.item });
@@ -613,6 +691,13 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     }
     if (action === 'run') {
       if (body.confirmed !== true) return send(response, 400, { error: { code: 'CONFIRMATION_REQUIRED', message: 'Tick the confirmation to start the run.' } });
+      // PF-0123: a queue needs a ready agent and, in a Brownfield project, an approved
+      // understanding — except a run of the understanding work item itself (no deadlock).
+      const readiness = await readinessFor(project, { runtime: false });
+      const ids = Array.isArray(body.workIds) ? body.workIds.map(String) : [];
+      const onboardingOnly = Boolean(readiness.onboardingWorkId) && ids.length > 0 && ids.every((id) => id === readiness.onboardingWorkId);
+      if ((body.provider ?? bridge?.defaultProvider?.() ?? 'codex') === 'codex' && !readiness.allows.agentSessions) throw notReady('AGENT_NOT_READY', 'Codex is not ready in this console yet. Set it up first.', readiness);
+      if (!readiness.allows.runQueue && !onboardingOnly && readiness.steps.some((step) => step.id === 'understanding' && step.status !== 'done')) throw notReady('PROJECT_UNDERSTANDING_REQUIRED', 'PROJECT_UNDERSTANDING_REQUIRED: this existing project needs an approved project understanding before work can run.', readiness);
       return send(response, 201, await execution.createRun(project.id, { workIds: body.workIds, provider: body.provider, mode: body.mode, pauseBetween: body.pauseBetween === true, lang: body.lang }));
     }
     return send(response, 200, await execution.act(project.id, action, body));
@@ -953,6 +1038,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     // Resolves to the agent sessions whose processes could not all be ended (empty when
     // everything stopped), so the caller can say so instead of claiming a clean stop.
     async close() {
+      machine.close();
       execution?.close();
       const incomplete = (await bridge?.close()) ?? [];
       clearInterval(heartbeat);

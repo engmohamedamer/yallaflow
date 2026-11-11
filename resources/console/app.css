@@ -944,3 +944,73 @@ dialog.panel code, dialog.panel li, dialog.panel p, dialog.panel label { overflo
 .teamicon { font-size: 22px; line-height: 1.2; }
 .teamfacts { display: flex; flex-wrap: wrap; gap: 6px 22px; }
 .teamact { flex-wrap: wrap; gap: 10px; align-items: center; margin: 0; }
+
+/* PF-0123: the manual-copy dialog (shown only when the browser refused both copy methods). */
+dialog.copydlg { width: min(560px, calc(100vw - 32px)); border: 1px solid var(--line); color: var(--ink); }
+dialog.copydlg::backdrop { background: rgba(10, 12, 25, .45); }
+dialog.copydlg .copyarea { width: 100%; margin-top: 12px; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; background: var(--bg-2); color: var(--ink); font: 13px/1.5 var(--mono); resize: vertical; }
+
+/* PF-0123: the header's More menu (Insights, Worktrees) — styled like the other tabs. */
+.navmore { position: relative; }
+.navmore > summary { list-style: none; cursor: pointer; padding: 6px 18px; border-radius: 999px; color: var(--muted); font-weight: 500; white-space: nowrap; }
+.navmore > summary::-webkit-details-marker { display: none; }
+.navmore > summary[aria-current="page"] { background: var(--card); color: var(--ink); box-shadow: var(--shadow); }
+.navmore[open] > summary { color: var(--ink); }
+.navmenu { position: absolute; inset-inline-end: 0; top: calc(100% + 8px); z-index: 40; min-width: 180px; display: grid; gap: 2px; padding: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); }
+.navmenu a { padding: 8px 12px; border-radius: 10px; color: var(--ink); white-space: nowrap; }
+.navmenu a:hover, .navmenu a:focus-visible { background: var(--bg-2); }
+.navmenu a[aria-current="page"] { font-weight: 600; color: var(--nile-2); }
+:root[data-theme="dark"] .navmenu a[aria-current="page"] { color: var(--nile); }
+.top .tabs:has(.navmore[open]) { overflow: visible; }
+
+/* PF-0123: the folder picker (one picker for adding, connecting and choosing a location). */
+.folderdlg { width: min(720px, calc(100vw - 32px)); max-height: min(86vh, 820px); display: flex; flex-direction: column; gap: 10px; }
+.folderdlg:not([open]) { display: none; }
+.fpick-bar { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.fpick-up { width: 34px; height: 34px; flex: none; }
+.fpick-crumbs { min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.fpick-crumbs ol { display: flex; align-items: center; gap: 2px; list-style: none; margin: 0; padding: 0; white-space: nowrap; }
+.fpick-crumbs li { display: flex; align-items: center; }
+/* "›" is a mirrored character: right-to-left text shows it pointing the reading direction. */
+.fpick-crumbs li + li::before { content: "›"; color: var(--muted); padding-inline: 4px; }
+.fpick-crumbs button, .fpick-crumbs span { border: 0; background: transparent; padding: 4px 8px; border-radius: 8px; font-size: 14px; color: var(--muted); direction: ltr; unicode-bidi: isolate; }
+.fpick-crumbs button:hover { background: var(--bg-2); color: var(--ink); }
+.fpick-crumbs [aria-current] { color: var(--ink); font-weight: 600; }
+.fpick-pathform { display: flex; gap: 6px; }
+.fpick-pathform input, .fpick-tools input, .fpick-new input { flex: 1; min-width: 0; font: 13.5px/1.4 var(--mono); padding: 7px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.fpick-tools input[type="search"] { font-family: var(--font); }
+.fpick-pathform input:focus, .fpick-tools input:focus, .fpick-new input:focus { outline: 2px solid var(--nile); outline-offset: 0; border-color: transparent; }
+.fpick-recent { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.fpick-recent .fchip { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fpick-tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.fpick-new { display: flex; gap: 6px; flex: 1; min-width: 240px; }
+.fpick-list { list-style: none; margin: 0; padding: 4px; display: grid; gap: 2px; min-height: 160px; max-height: 42vh; overflow: auto; border: 1px solid var(--line); border-radius: 16px; background: var(--bg); }
+.fpick-row { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; border: 0; border-radius: 10px; background: transparent; color: var(--ink); text-align: start; }
+.fpick-row:hover, .fpick-row:focus-visible { background: var(--card); box-shadow: var(--shadow); outline: none; }
+.fpick-row:focus-visible { box-shadow: 0 0 0 2px var(--nile); }
+.fpick-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font); font-size: 14.5px; text-align: start; }
+.fpick-ico { display: inline-grid; place-items: center; width: 22px; flex: none; }
+.fpick-kind { font-size: 12px; padding: 1px 9px; border-radius: 999px; background: var(--bg-2); color: var(--ink-2); white-space: nowrap; }
+.fpick-kind.yf { background: var(--nile-soft); color: var(--nile-2); }
+.fpick-kind.code { background: var(--dusk-soft); color: var(--dusk); }
+:root[data-theme="dark"] .fpick-kind.yf { color: var(--nile); }
+.fpick-go { color: var(--muted); }
+.fpick-empty { padding: 14px; text-align: center; }
+.fpick-foot { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 16px; background: var(--bg-2); }
+.fpick-path { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fpick-preview { padding: 4px 2px; }
+.fpick-plan { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 4px; }
+.fpick-plan li { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; padding: 6px 10px; border-radius: 10px; background: var(--bg-2); }
+.fpick-op { font: 600 14px var(--mono); width: 14px; }
+.fpick-op.add { color: var(--palm); } .fpick-op.mod { color: var(--amber); }
+@media (max-width: 560px) { .fpick-foot { flex-wrap: wrap; } .fpick-foot .btn { width: 100%; } .fpick-list { max-height: 38vh; } }
+
+/* PF-0123 polish: the Flow keeps its layout; slightly tighter gaps and station icons give the
+   station names room, so "Understand" and "Remember" are no longer cut off at common widths. */
+.map { gap: 18px; }
+.map .st-head { gap: 8px; }
+.map .st-ico { width: 34px; height: 34px; border-radius: 12px; }
+.map .st-ico svg { width: 19px; height: 19px; }
+.map .st-add { width: 34px; height: 34px; border-radius: 12px; font-size: 20px; }
+/* PF-0123: in-page jumps (Go to Agents) stop below the sticky header. */
+#setup-agents, #setup-run, .setupsec, .setupguide { scroll-margin-top: 96px; }

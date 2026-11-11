@@ -28,7 +28,10 @@ const DYNAMIC_WRAPPERS = new Set([path.join('shared', 'git.js'), path.join('hist
 const INIT_FILES = new Set([path.join('newproject', 'project.js'), path.join('console', 'greenfield.js')]);
 // Reviewed files that start a program chosen at run time (never Git): verification commands,
 // agents, runtime services, the browser opener, tool probes, merge checks, the CLI itself.
-export const DYNAMIC_PROGRAMS = new Set(['commands/console.js', 'commands/verify.js', 'agents/detect.js', 'agents/acp.js', 'runtime/supervisor.js', 'runtime/observe.js', 'console/runner.js', 'console/greenfield.js', 'execution/merge.js', 'newproject/project.js'].map((entry) => entry.split('/').join(path.sep)));
+// PF-0123 (reviewed): agents/setup.js starts the developer's own npm (install -g of the reviewed
+// Codex packages, argv, no shell, no sudo, after explicit confirmation) and codex (`login status`,
+// `login --device-auth`), both resolved on PATH like agents/detect.js.
+export const DYNAMIC_PROGRAMS = new Set(['commands/console.js', 'commands/verify.js', 'agents/detect.js', 'agents/setup.js', 'agents/acp.js', 'runtime/supervisor.js', 'runtime/observe.js', 'console/runner.js', 'console/greenfield.js', 'execution/merge.js', 'newproject/project.js'].map((entry) => entry.split('/').join(path.sep)));
 // The only shell: `yallaflow verify --shell`, the developer's own explicit choice.
 const SHELL_FILES = new Set([path.join('commands', 'verify.js')]);
 const GIT_SUBCOMMANDS = new Set(['init', 'clone', 'push', 'pull', 'fetch', 'rebase', 'reset', 'revert', 'cherry-pick', 'stash', 'clean', 'checkout', 'switch', 'restore', 'branch', 'tag', 'update-ref', 'gc', 'prune', 'remote', 'am', 'apply', 'rm', 'mv', 'notes', 'replace', 'filter-branch', 'maintenance', 'worktree', 'merge', 'commit', 'add', 'read-tree', 'write-tree', 'commit-tree', 'merge-tree']);

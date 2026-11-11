@@ -207,9 +207,14 @@
       ? `<select class="projsel" data-project aria-label="${A('المشروع', 'Project')}">${projects.map((p) => `<option value="${p.id}" ${p.id === pid ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select>`
       : `<b class="projname">${esc(snap?.project?.name ?? projects[0]?.name ?? '')}</b>`;
     const count = snap ? needs().length : 0;
-    return `<header class="top"><a class="brand" href="#/map">${logo} YallaFlow</a><div class="projpick">${picker}<a class="tiny muted" href="#/projects">${A('كل المشاريع', 'All projects')}</a></div>
-      <nav class="tabs" aria-label="views">${tab('#/map', A('التدفق', 'Flow'), r.v === 'map')}${tab('#/lines', A('الشغل', 'Work'), r.v === 'lines' || r.v === 'item')}${tab('#/agents', A('الوكلاء', 'Agents') + (execView?.inbox?.length ? ` <b class="tabcount">${execView.inbox.length}</b>` : ''), r.v === 'agents')}${tab('#/setup', A('الإعداد والتشغيل', 'Setup & run'), r.v === 'setup')}${tab('#/overview', A('المشروع', 'Overview'), r.v === 'overview')}${tab('#/insights', A('الأرقام', 'Insights'), r.v === 'insights')}${tab('#/team', A('نسخ الشغل', 'Worktrees'), r.v === 'team')}</nav>
-      <span class="grow"></span>${!readOnly && projects.length ? `<button class="btn sm go create" data-create aria-label="${A('شغل جديد', 'Create work')}">＋<span class="lbl"> ${A('شغل جديد', 'Create work')}</span></button>` : ''}<span class="chip ${offline() ? 'fail' : 'active'}"><i></i>${offline() ? A('مفيش اتصال', 'offline') : A('مباشر', 'Live')}</span>
+    // PF-0123: Flow and Work are one Workspace (its page switches the view); Insights and
+    // Worktrees sit under More. Every old route (#/map, #/lines, #/insights, #/team) still works.
+    const moreOn = ['insights', 'team'].includes(r.v);
+    const more = `<details class="navmore" data-navmore><summary ${moreOn ? 'aria-current="page"' : ''} aria-haspopup="menu">${moreOn ? (r.v === 'team' ? A('نسخ الشغل', 'Worktrees') : A('الأرقام', 'Insights')) : A('المزيد', 'More')} <span aria-hidden="true">▾</span></summary>
+      <div class="navmenu" role="menu"><a role="menuitem" href="#/insights" ${r.v === 'insights' ? 'aria-current="page"' : ''}>${A('الأرقام', 'Insights')}</a><a role="menuitem" href="#/team" ${r.v === 'team' ? 'aria-current="page"' : ''}>${A('نسخ الشغل', 'Worktrees')}</a></div></details>`;
+    return `<header class="top"><a class="brand" href="${workspaceHref()}">${logo} YallaFlow</a><div class="projpick">${picker}<a class="tiny muted" href="#/projects">${A('كل المشاريع', 'All projects')}</a></div>
+      <nav class="tabs" aria-label="${A('الأقسام', 'Sections')}">${tab(workspaceHref(), A('مساحة الشغل', 'Workspace'), ['map', 'lines', 'item'].includes(r.v))}${tab('#/agents', A('الوكلاء', 'Agents') + (execView?.inbox?.length ? ` <b class="tabcount">${execView.inbox.length}</b>` : ''), r.v === 'agents')}${tab('#/setup', A('الإعداد والتشغيل', 'Setup & run'), r.v === 'setup')}${tab('#/overview', A('المشروع', 'Project'), r.v === 'overview')}${more}</nav>
+      <span class="grow"></span>${!readOnly && projects.length ? `<button class="btn sm go create" data-create aria-label="${A('شغل جديد', 'Create work')}" ${createBlockedReason() ? `disabled title="${esc(createBlockedReason())}"` : ''}>＋<span class="lbl"> ${A('شغل جديد', 'Create work')}</span></button>` : ''}<span class="chip ${offline() ? 'fail' : 'active'}"><i></i>${offline() ? A('مفيش اتصال', 'offline') : A('مباشر', 'Live')}</span>
       <button class="ibtn bell" data-bell aria-expanded="${bellOpen}" aria-label="${A('محتاج انتباهك', 'Needs your attention')}">🔔${count ? `<b>${count}</b>` : ''}</button>
       <button class="ibtn" data-lang aria-label="language">${lang === 'ar' ? 'EN' : 'ع'}</button><button class="ibtn" data-theme-toggle aria-label="theme">◐</button>${bellOpen ? notesPanel() : ''}</header>`;
   }
@@ -227,7 +232,8 @@
   const openCount = () => items().filter((it) => it.state !== 'done').length;
   // No work recorded yet: a welcome, never an empty board with 0%.
   function onboarding() {
-    const brownfieldNote = snap.project.kind === 'brownfield' ? `<p class="tiny muted" style="margin-top:6px">${A('في مشروع قايم بالفعل، YallaFlow بيطلب فهم المشروع والموافقة عليه الأول؛ الوكيل بيبدأه لوحده.', 'In an existing codebase, YallaFlow first asks for an approved project understanding; your agent starts it for you.')}</p>` : '';
+    // PF-0123: while the readiness card explains the next step, the empty state does not repeat it.
+    const brownfieldNote = snap.project.kind === 'brownfield' && !createBlockedReason() ? `<p class="tiny muted" style="margin-top:6px">${A('في مشروع قايم بالفعل، YallaFlow بيطلب فهم المشروع والموافقة عليه الأول؛ الوكيل بيبدأه لوحده.', 'In an existing codebase, YallaFlow first asks for an approved project understanding; your agent starts it for you.')}</p>` : '';
     return `<section class="hero calm"><span class="hico" aria-hidden="true">＋</span><div><h1>${A('لسه مفيش شغل مسجّل', 'No work recorded yet')}</h1>
       <p>${A('اوصف للوكيل (Claude Code أو Codex) الميزة أو المشكلة أو التعديل. الشغلانة هتتسجّل في YallaFlow وتظهر هنا في بوابة «جديد».', 'Describe a feature, bug or change to your agent (Claude Code or Codex). The work item is recorded in YallaFlow and appears here in the New gate.')}</p>${brownfieldNote}${createButton()}</div></section>`;
   }
@@ -246,7 +252,7 @@
       <p>${A(`${open} ${open === 1 ? 'شغلانة مفتوحة' : 'شغلانات مفتوحة'} واصلة في المتوسط ${pct}%، و${you} ${you === 1 ? 'شغلانة مستنية' : 'شغلانات مستنية'} قرارك.`, `${open} open work item${open === 1 ? ' is' : 's are'} on average ${pct}% along, and ${you} item${you === 1 ? '' : 's'} wait${you === 1 ? 's' : ''} for your decision.`)}</p><details class="progress-help tiny muted"><summary>${A('النسبة بتتحسب إزاي؟', 'How is progress calculated?')}</summary><p>${A('النسبة للشغل المفتوح المسجّل بس.', 'The percentage covers open recorded work only.')} ${formula()}</p></details></div>
       ${stats}</section>`;
   }
-  const createButton = () => (readOnly ? '' : `<button class="btn go" data-create style="margin-top:12px">＋ ${A('ابدأ أول شغلانة', 'Create work')}</button>`);
+  const createButton = () => (readOnly || createBlockedReason() ? '' : `<button class="btn go" data-create style="margin-top:12px">＋ ${A('ابدأ أول شغلانة', 'Create work')}</button>`);
   // Work items YallaFlow cannot validate: visible, never counted as open, done or proven.
   function integrityPanel() {
     const bad = snap?.invalid ?? [];
@@ -261,10 +267,83 @@
   const openSt = new Set();
   const CAP = 4;
   const vis = (it) => (!flt.q || (it.title + ' ' + it.id).toLowerCase().includes(flt.q.toLowerCase())) && (flt.st === 'all' || it.state === flt.st) && (flt.type === 'all' || it.type === flt.type);
+  // PF-0123: project readiness (GET /api/p/<id>/readiness), derived by the server from Core state.
+  let readiness = null; // { pid, data }
+  function createBlockedReason() {
+    const data = readiness?.pid === pid ? readiness.data : null;
+    if (!data || data.allows?.createWork !== false) return null;
+    const step = data.steps?.find((x) => x.blocks?.includes('createWork'));
+    const text = step && READY_TEXT[step.id]?.[step.status];
+    return text ? L({ ar: text[0], en: text[1] }) : A('المشروع لسه مش جاهز لشغل جديد.', 'The project is not ready for new work yet.');
+  }
+  async function loadReadiness() {
+    if (!pid) return;
+    const forPid = pid;
+    try { readiness = { pid: forPid, data: await api(`/api/p/${forPid}/readiness`) }; } catch { if (readiness?.pid !== forPid) readiness = null; }
+  }
+  // What the project still needs, one line per step with its single next action. Shown only
+  // while something required is missing, so an established project looks exactly as before.
+  const READY_TEXT = {
+    initialized: { done: ['YallaFlow متجهّز في المشروع', 'YallaFlow is set up in this project'], attention: ['YallaFlow مش قادر يقرا سجلات المشروع', 'YallaFlow cannot read this project\'s records'] },
+    understanding: {
+      done: ['فهم المشروع جاهز', 'Project understanding is in place'],
+      required: ['ده مشروع قايم: الوكيل يجهّز فهم للمشروع وإنت توافق عليه قبل أي شغل جديد', 'This is an existing codebase: your agent prepares a project understanding and you approve it before new work'],
+      'in-progress': ['الوكيل بيجهّز فهم المشروع', 'Your agent is preparing the project understanding'],
+      'awaiting-review': ['مسودة فهم المشروع مستنية مراجعتك', 'The project-understanding draft is waiting for your review']
+    },
+    agent: { done: ['Codex جاهز', 'Codex is ready'], off: ['الوكلاء مقفولين في الكونسول ده', 'Agents are off in this console'], missing: ['Codex مش جاهز على الجهاز ده', 'Codex is not ready on this machine'] },
+    runtime: { done: ['التطبيق شغّال', 'The app is running'], 'not-configured': ['تشغيل التطبيق من هنا (اختياري)', 'Run the app from here (optional)'], failed: ['خدمة من خدمات التطبيق واقفة', 'An app service has stopped'], stopped: ['التطبيق واقف', 'The app is stopped'] }
+  };
+  function readinessAction(st) {
+    const btn = (attrs, label, go = false) => `<button type="button" class="btn sm ${go ? 'go' : ''}" ${attrs}>${label}</button>`;
+    if (readOnly && st.status !== 'done') return st.next?.command ? `<code class="ltr tw:text-xs">${esc(st.next.command)}</code>` : '';
+    if (st.id === 'initialized' && st.status === 'attention') return `<code class="ltr tw:text-xs">yallaflow doctor</code>`;
+    if (st.id === 'understanding') {
+      if (st.status === 'awaiting-review' && st.baselineId) return `<a class="btn sm go" href="#/item/${encodeURIComponent(st.baselineId)}">${A('راجع المسودة', 'Review the draft')}</a>`;
+      if (st.status === 'required' || st.status === 'in-progress') {
+        const ask = st.status === 'required' ? A('جهّز فهم للمشروع ده بأدلة من المستودع، وبعدها اعرضه عليّا عشان أوافق.', 'Establish project understanding for this repository, then show it to me for approval.') : A('كمّل تجهيز فهم المشروع.', 'Continue the project-understanding discovery.');
+        const ready = agentsOn && readiness?.data?.allows?.agentSessions;
+        return ready ? btn(`data-ready-chat="${esc(ask)}"`, st.status === 'required' ? A('ابدأ مع الوكيل', 'Start with the agent') : A('كمّل مع الوكيل', 'Continue with the agent'), true)
+          : `<button type="button" class="btn sm" data-copy="${esc(ask)}" data-copy-what="text" title="${esc(ask)}">${A('انسخ الطلب لوكيلك', 'Copy the request for your agent')}</button>`;
+      }
+    }
+    if (st.id === 'agent' && st.status === 'off' && agentsCanEnable) return btn('data-agents-enable', A('شغّل الوكلاء', 'Turn agents on'), true);
+    if (st.id === 'agent' && st.status === 'missing') return `<a class="btn sm" href="#/setup" data-setup-jump="agents">${A('جهّز Codex', 'Set up Codex')}</a>`;
+    if (st.id === 'runtime' && st.status !== 'done') return `<a class="btn sm ghost" href="#/setup">${st.status === 'not-configured' ? A('جهّز التشغيل', 'Set up running') : A('افتح التشغيل', 'Open Run')}</a>`;
+    return '';
+  }
+  function readinessCard({ always = false } = {}) {
+    const data = readiness?.pid === pid ? readiness.data : null;
+    if (!data || (!always && data.level === 'ready')) return '';
+    const shown = data.steps.filter((st) => st.status !== 'unknown' && st.status !== 'unsupported' && READY_TEXT[st.id]?.[st.status] && !(st.id === 'agent' && st.status === 'done' && data.level === 'ready'));
+    const icon = (st) => (st.status === 'done' ? '<span class="tw:text-palm" aria-hidden="true">✓</span>' : st.optional ? '<span class="tw:text-muted" aria-hidden="true">○</span>' : st.status === 'attention' || st.status === 'failed' ? '<span class="tw:text-clay" aria-hidden="true">✕</span>' : '<span class="tw:text-amber" aria-hidden="true">◐</span>');
+    const left = data.steps.filter((st) => !st.optional && !['done', 'unknown'].includes(st.status) && (st.id !== 'agent' || data.steps.find((x) => x.id === 'understanding')?.status !== 'done')).length;
+    const title = data.level === 'ready' ? A('المشروع جاهز', 'The project is ready') : A(`فاضل ${left === 1 ? 'خطوة واحدة' : left === 2 ? 'خطوتين' : `${left} خطوات`} قبل الشغل الجديد`, `${left} step${left === 1 ? '' : 's'} left before new work`);
+    return `<section class="panel tw:mb-4 tw:px-5 tw:py-4" aria-labelledby="ready-h" data-readiness="${esc(data.level)}">
+      <div class="row"><span class="chip ${data.level === 'ready' ? 'done' : data.level === 'attention' ? 'fail' : 'wait'}"><i></i>${data.level === 'ready' ? A('جاهز', 'Ready') : data.level === 'attention' ? A('محتاج انتباه', 'Needs attention') : A('بيتجهّز', 'Getting ready')}</span><h2 id="ready-h" class="tw:text-lg tw:font-semibold">${title}</h2></div>
+      <ol class="tw:mt-3 tw:grid tw:gap-1 tw:p-0 tw:list-none">${shown.map((st) => `<li class="tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:rounded-field tw:px-3 tw:py-2 ${st.status === 'done' ? '' : 'tw:bg-bg-2'}"><span class="tw:w-5 tw:text-center">${icon(st)}</span><span class="grow ${st.status === 'done' ? 'muted' : ''}">${L({ ar: READY_TEXT[st.id][st.status][0], en: READY_TEXT[st.id][st.status][1] })}${st.optional ? ` <span class="tiny muted">${A('· اختياري', '· optional')}</span>` : ''}</span>${st.status === 'done' ? '' : readinessAction(st)}</li>`).join('')}</ol>
+      ${data.steps.some((st) => st.id === 'understanding' && st.status === 'awaiting-review') ? `<p class="tiny muted tw:mt-2">${A('بعد ما تراجعها، قول للوكيل «موافق» أو اللي عايز تغيّره. الموافقة قرارك إنت بس.', 'After reviewing it, tell your agent "Approve" or what to change. Approval is only your decision.')}</p>` : ''}</section>`;
+  }
+  // PF-0123: the New gate's ＋ is the same Create work action as the header button (keyboard
+  // reachable, named in both languages). While the project is not ready it stays visible but
+  // disabled, with the reason; a read-only console shows the plain icon.
+  function newGateButton() {
+    if (readOnly) return '<span class="st-ico" aria-hidden="true">＋</span>';
+    const blocked = createBlockedReason();
+    const label = A('شغل جديد', 'Create work');
+    return `<button type="button" class="st-ico st-add tw:cursor-pointer tw:border-0 tw:text-xl tw:transition-colors tw:hover:bg-nile-soft tw:hover:text-nile-2 tw:disabled:cursor-not-allowed tw:disabled:opacity-50" data-create aria-label="${label}" title="${esc(blocked ?? label)}" ${blocked ? `disabled aria-describedby="newgate-why"` : ''}>＋</button>${blocked ? `<span id="newgate-why" class="tw:sr-only">${esc(blocked)}</span>` : ''}`;
+  }
+  // PF-0123: the Workspace's two views. The last one chosen is where the Workspace tab returns.
+  const workspaceHref = () => (store.get('wsView', 'map') === 'lines' ? '#/lines' : '#/map');
+  function viewSwitch() {
+    const v = route().v;
+    const seg = (href, key, label, icon) => `<a href="${href}" class="tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-chip tw:px-3.5 tw:py-1 tw:text-sm tw:font-medium tw:no-underline ${v === key ? 'tw:bg-card tw:text-ink tw:shadow-card' : 'tw:text-muted tw:hover:text-ink'}" ${v === key ? 'aria-current="page"' : ''}><span aria-hidden="true">${icon}</span>${label}</a>`;
+    return `<nav class="tw:inline-flex tw:gap-0.5 tw:rounded-chip tw:bg-bg-2 tw:p-1" aria-label="${A('طريقة العرض', 'View')}">${seg('#/map', 'map', A('التدفق', 'Flow'), '⇄')}${seg('#/lines', 'lines', A('القايمة', 'List'), '☰')}</nav>`;
+  }
   function filterBar() {
     const c = (v, label) => `<button class="fchip ${flt.st === v ? 'on' : ''}" data-f="${v}">${label}</button>`;
     const shown = items().filter(vis).length;
-    return `<section class="fbar" aria-label="${A('فلترة', 'Filter')}"><input type="search" data-q value="${esc(flt.q)}" placeholder="${A('دوّر بالاسم أو الرقم…', 'Search by title or ID…')}" aria-label="${A('بحث', 'Search')}">
+    return `<section class="fbar" aria-label="${A('فلترة', 'Filter')}">${viewSwitch()}<input type="search" data-q value="${esc(flt.q)}" placeholder="${A('دوّر بالاسم أو الرقم…', 'Search by title or ID…')}" aria-label="${A('بحث', 'Search')}">
       ${c('all', A('الكل', 'All'))}${c('you', '◆ ' + L(STATE.you))}${c('fail', '✕ ' + L(STATE.fail))}${c('active', '● ' + L(STATE.active))}${c('paused', L(STATE.paused))}
       <select data-ftype aria-label="${A('النوع', 'Type')}"><option value="all">${A('كل الأنواع', 'All types')}</option>${Object.keys(TYPE).map((k) => `<option value="${k}" ${flt.type === k ? 'selected' : ''}>${L(TYPE[k])}</option>`).join('')}</select>
       <span class="grow"></span>${agentsOn && !readOnly && route().v === 'lines' ? `<button class="fchip ${selecting ? 'on' : ''}" data-select-toggle>${A('اختار لطابور', 'Select for a queue')}</button>` : ''}<span class="tiny muted">${A(`${shown} من ${items().length}`, `${shown} of ${items().length}`)}</span></section>`;
@@ -292,9 +371,9 @@
     const empty = `<p class="tiny muted" style="text-align:center;margin-top:20px">—</p>`;
     const capped = (list, i) => `${(openSt.has(i) ? list : list.slice(0, CAP)).map(pchip).join('') || empty}${list.length > CAP ? `<button class="more" data-more-st="${i}">${openSt.has(i) ? A('أقل ↑', 'Less ↑') : A(`+${list.length - CAP} كمان`, `+${list.length - CAP} more`)}</button>` : ''}`;
     if (!items().length) return onboarding() + integrityPanel();
-    const firstRun = items().every((it) => it.state === 'new') ? `<section class="panel firstrun" style="margin-bottom:14px"><b>${A('شغلك لسه في البوابة', 'Your work is at the gate')}</b><p class="small">${A('كل شغلانة جديدة بتستنى قبل المحطات. لما وكيلك يصنّفها (نوعها وحجمها)، بتدخل «افهم» وتعدّي على «قرّر» و«نفّذ» و«اتحقّق» و«افتكر» حسب اللي محتاجاه. المحطات الفاضية دي مش مشكلة.', 'Each new work item waits before the stations. Once your agent classifies it (type and size), it enters Understand and passes Decide, Change, Verify and Remember as needed. Empty stations are not a problem.')}</p>${items().slice(0, 3).map((it) => `<a class="btn sm" href="#/item/${encodeURIComponent(it.id)}">${esc(it.title)} →</a>`).join(' ')}</section>` : '';
+    const firstRun = items().every((it) => it.state === 'new') ? `<section class="panel firstrun" style="margin-bottom:14px"><b>${A('شغلك لسه في البوابة', 'Your work is at the gate')}</b><p class="small">${A('كل شغلانة جديدة بتستنى قبل المحطات. لما وكيلك يصنّفها (نوعها وحجمها)، بتدخل «افهم» وتعدّي على «قرّر» و«نفّذ» و«اتحقّق» و«افتكر» حسب اللي محتاجاه. المحطات الفاضية دي مش مشكلة.', 'Each new work item waits before the stations. Once your agent classifies it (type and size), it enters Understand and passes Decide, Change, Verify and Remember as needed. Empty stations are not a problem.')}</p>${items().slice(0, 3).map((it) => `<a class="btn sm" href="#/item/${encodeURIComponent(it.id)}">${esc(it.title)} ${fwd()}</a>`).join(' ')}</section>` : '';
     return digestCard() + hero() + firstRun + integrityPanel() + filterBar() + `<section class="map" id="map" aria-label="${A('التدفق', 'Flow')}">
-      <div class="station gate start" data-st="-1" style="--hue:var(--ink-2)"><div class="st-head"><span class="st-ico" aria-hidden="true">＋</span><div class="st-name">${A('جديد', 'New')}</div><span class="st-n">${entries.length}</span></div><div class="st-out">${A('الطلبات بتدخل من هنا', 'Requests enter here')}</div>
+      <div class="station gate start" data-st="-1" style="--hue:var(--ink-2)"><div class="st-head">${newGateButton()}<div class="st-name">${A('جديد', 'New')}</div><span class="st-n">${entries.length}</span></div><div class="st-out">${A('الطلبات بتدخل من هنا', 'Requests enter here')}</div>
         ${capped(entries, -1)}</div>
       ${ST.map((st, i) => `<div class="station ${i === neck ? 'neck' : ''}" data-st="${i}" style="--hue:${st.hue}"><div class="st-head"><span class="st-ico">${icon(st.k)}</span><div class="st-name">${L(st.name)}</div><span class="st-n">${at(i).length}</span></div><div class="st-out">${A('بيسلّم', 'hands off')} <b>${L(st.gives)}</b></div>
         ${i === neck ? `<span class="neckbadge">◆ ${A('عنق الزجاجة: هنا الشغل مستني', 'Bottleneck: work waits here')}</span>` : ''}${capped(at(i), i)}</div>`).join('')}
@@ -366,7 +445,7 @@
     const knowledgeOut = () => { const k = d?.knowledge; if (!k) return null; const promoted = k.candidates.filter((c) => c.status === 'promoted'); return k.reviewStatus === 'reviewed' ? { summary: promoted.length ? A(`${promoted.length} معرفة اتحفظت للمشروع`, `${promoted.length} fact(s) saved to project memory`) : A('اتراجع ومفيش معرفة جديدة', 'Reviewed; no new knowledge'), completedAt: null } : null; };
     const actionCmd = it.waitingFor?.action ?? it.nextAction;
     return `<div class="row" style="margin-bottom:14px"><a class="btn ghost sm" href="#/lines">${lang === 'ar' ? '→' : '←'} ${A('كل الشغل', 'All work')}</a></div>
-      <section class="ihead">${ring(it.completion, 132, 13)}<div><div class="row tiny muted"><span class="ltr">${esc(it.id)}</span><button type="button" class="ibtn" data-copy="${esc(it.id)}" title="${A('انسخ رقم الشغلانة', 'Copy the work item ID')}" aria-label="${A('انسخ رقم الشغلانة', 'Copy the work item ID')}">⧉</button><span>· ${L(TYPE[it.type] ?? { ar: 'لسه متصنفش', en: 'unrouted' })}</span>${it.scope ? `<span class="ltr">· ${esc(it.scope)}</span>` : ''}${it.stage ? `<span class="ltr">· ${esc(it.stage)}</span>` : ''}</div><h1>${esc(it.title)}</h1><p style="font-size:18px;color:var(--ink-2);margin-top:4px">${headline}</p><p class="tiny muted" style="margin-top:4px">${formula()}</p></div>
+      <section class="ihead">${ring(it.completion, 132, 13)}<div><div class="row tiny muted"><span class="ltr">${esc(it.id)}</span><button type="button" class="ibtn" data-copy="${esc(it.id)}" data-copy-what="id" title="${A('انسخ رقم الشغلانة', 'Copy the work item ID')}" aria-label="${A('انسخ رقم الشغلانة', 'Copy the work item ID')}">⧉</button><span>· ${L(TYPE[it.type] ?? { ar: 'لسه متصنفش', en: 'unrouted' })}</span>${it.scope ? `<span class="ltr">· ${esc(it.scope)}</span>` : ''}${it.stage ? `<span class="ltr">· ${esc(it.stage)}</span>` : ''}</div><h1>${esc(it.title)}</h1><p style="font-size:18px;color:var(--ink-2);margin-top:4px">${headline}</p><p class="tiny muted" style="margin-top:4px">${formula()}</p></div>
 </section>
       ${queueLine(it)}${nextCard(it)}
       ${actionBar(it)}
@@ -1468,10 +1547,51 @@
   // PF-0113: a work ID beside its title. The title leads; the canonical ID is shown whole and
   // never shortened into a second identifier — only clipped by width, with the full ID on hover.
   function wid(id) { return `<span class="ltr wid" title="${esc(id)}">${esc(id)}</span>`; }
-  function copy(text) {
-    const done = () => toast(A('اتنسخ ✓ شغّله في الترمينال أو ادّيه للوكيل.', 'Copied ✓ Run it in your terminal or give it to your agent.'));
-    if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(done, () => toast(esc(text)));
-    else toast(esc(text));
+  // PF-0123: copying says "copied" only after the browser confirms it. Order: the Clipboard API
+  // (called inside the click, as Safari requires), then a selection copy, then a dialog with the
+  // text selected so the developer copies it with the keyboard. `what` picks the message.
+  function selectionCopy(text) {
+    const area = document.createElement('textarea');
+    area.value = text;
+    area.setAttribute('readonly', '');
+    area.style.cssText = 'position:fixed;inset-block-start:0;inset-inline-start:0;opacity:0;pointer-events:none';
+    document.body.appendChild(area);
+    const focused = document.activeElement;
+    area.select();
+    area.setSelectionRange(0, text.length);
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch { ok = false; }
+    area.remove();
+    focused?.focus?.({ preventScroll: true });
+    return ok;
+  }
+  function manualCopy(text) {
+    const mac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+    document.getElementById('copydlg')?.remove();
+    const d = document.createElement('dialog');
+    d.id = 'copydlg';
+    d.className = 'panel copydlg';
+    d.setAttribute('aria-labelledby', 'copydlg-h');
+    d.innerHTML = `<h2 id="copydlg-h" class="tw:text-lg tw:font-semibold">${A('مقدرناش ننسخ تلقائياً', 'Could not copy automatically')}</h2>
+      <p class="small muted tw:mt-1">${A(`النص متحدد تحت — دوس ${mac ? '⌘C' : 'Ctrl+C'} عشان تنسخه.`, `The text is selected below — press ${mac ? '⌘C' : 'Ctrl+C'} to copy it.`)}</p>
+      <textarea class="ltr copyarea" readonly rows="${Math.min(6, Math.max(2, text.split('\n').length))}">${esc(text)}</textarea>
+      <div class="row end tw:mt-3"><button type="button" class="btn sm go" data-copydlg-close>${A('تمام', 'Done')}</button></div>`;
+    document.body.appendChild(d);
+    d.addEventListener('close', () => d.remove());
+    d.querySelector('[data-copydlg-close]').addEventListener('click', () => d.close());
+    d.showModal();
+    const area = d.querySelector('textarea');
+    area.focus();
+    area.select();
+  }
+  function copy(text, what = 'command') {
+    const done = () => toast(what === 'id' ? A('اتنسخ رقم الشغلانة ✓', 'Work ID copied ✓') : what === 'text' ? A('اتنسخ ✓', 'Copied ✓') : A('اتنسخ الأمر ✓ شغّله في الترمينال أو ادّيه للوكيل.', 'Command copied ✓ Run it in your terminal or give it to your agent.'));
+    const fallback = () => { if (selectionCopy(text)) done(); else manualCopy(text); };
+    if (window.isSecureContext && navigator.clipboard?.writeText) {
+      let promise;
+      try { promise = navigator.clipboard.writeText(text); } catch { promise = Promise.reject(); }
+      promise.then(done, fallback);
+    } else fallback();
   }
   function toast(html) { document.querySelector('.toast')?.remove(); const el = document.createElement('div'); el.className = 'toast'; el.setAttribute('role', 'status'); el.innerHTML = html; document.body.appendChild(el); setTimeout(() => el.remove(), 4200); }
   function celebrate() { if (reduced) return; const c = document.createElement('div'); c.className = 'celebrate'; const cols = ['#3d8bfd', '#8a63e8', '#0fae9d', '#f1a131', '#1d9a5a']; c.innerHTML = Array.from({ length: 40 }, (_, k) => `<i style="left:${Math.random() * 100}%;background:${cols[k % 5]};animation-delay:${Math.random() * 0.4}s"></i>`).join(''); document.body.appendChild(c); setTimeout(() => c.remove(), 2200); }
@@ -1604,7 +1724,7 @@
     if (!projectOverview || projectOverview.pid !== pid) return `<p class="muted" style="margin-top:30px">${A('بيقرا المشروع…', 'Reading the project…')}</p>`;
     if (projectOverview.error) return `<section class="errbar data" role="alert"><b>${A('مقدرناش نقرا نظرة المشروع', 'The project overview could not be read')}</b><p class="small">${esc(projectOverview.error)}</p></section>`;
     const o = projectOverview.data;
-    if (o.project.kind === 'greenfield' && !(o.memory?.current > 0)) return gitLine(o.git) + greenfieldOverview(o);
+    if (o.project.kind === 'greenfield' && !(o.memory?.current > 0)) return readinessCard() + gitLine(o.git) + greenfieldOverview(o);
     const m = o.memory;
     const facts = (area) => (o.areas[area]?.facts ?? []);
     const factList = (area, empty) => {
@@ -1637,7 +1757,7 @@
       : `${A('الجرد مش متاح:', 'Inventory unavailable:')} ${esc(cov.error ?? '')}`;
     const unread = o.stack.unread.length ? `<p class="tiny" style="margin-top:6px">${A('ماتقراش:', 'Not read:')} ${o.stack.unread.map((u) => `<span class="ltr">${esc(u.path)}</span> (${esc(u.reason)})`).join(' · ')}</p>` : '';
     const cmds = [o.understanding.command, 'yallaflow overview', 'yallaflow context status', 'yallaflow inspect'].filter(Boolean);
-    return gitLine(o.git) + `<section class="pagehead"><h1 style="font-size:26px">${esc(o.project.name)}</h1><p class="muted">${A('نظرة على المشروع: إيه هو، معمول بإيه، وفهمه متسجّل لحد فين. القراءة بس — مفيش حاجة بتتغيّر من هنا.', 'The project at a glance: what it is, what it is built with, and how far its understanding is recorded. Read-only — nothing changes from here.')}</p></section>
+    return readinessCard() + gitLine(o.git) + `<section class="pagehead"><h1 style="font-size:26px">${esc(o.project.name)}</h1><p class="muted">${A('نظرة على المشروع: إيه هو، معمول بإيه، وفهمه متسجّل لحد فين. القراءة بس — مفيش حاجة بتتغيّر من هنا.', 'The project at a glance: what it is, what it is built with, and how far its understanding is recorded. Read-only — nothing changes from here.')}</p></section>
       ${understandingCard(o.understanding)}
       <div class="ovgrid">
         <section class="panel"><h2>${A('المشروع', 'Purpose')}</h2>${factList('project', A('لسه مفيش وصف معتمد للمشروع.', 'No approved project description yet.'))}</section>
@@ -1721,7 +1841,14 @@
   async function loadRuntime() {
     const forPid = pid;
     try { runtime = { pid: forPid, data: await api(`/api/p/${forPid}/runtime`) }; } catch (e) { runtime = { pid: forPid, error: e.message }; }
+    // PF-0123: a failed service shows why without a click — its last log lines, read once per failure.
+    for (const sv of runtime.data?.services ?? []) {
+      if (sv.state === 'failed' && !failedTail[sv.id]) {
+        try { failedTail[sv.id] = (await api(`/api/p/${forPid}/runtime/${encodeURIComponent(sv.id)}/logs?lines=12`)).lines ?? []; } catch { failedTail[sv.id] = []; }
+      } else if (sv.state !== 'failed') delete failedTail[sv.id];
+    }
   }
+  const failedTail = {}; // service id -> last log lines while it is failed
   const RT_STATE = {
     stopped: { tone: 'todo', t: { ar: 'متوقف', en: 'stopped' } },
     starting: { tone: 'active', t: { ar: 'بيبدأ', en: 'starting' } },
@@ -1731,6 +1858,13 @@
   };
   // One compact row per saved service: state, ports and actions up front; the exact
   // definition, the trust review, confirmations and logs open beneath it.
+  // PF-0123: what failed and how to recover, shown on the failed service itself.
+  function failureBlock(sv) {
+    const tail = (failedTail[sv.id] ?? []).slice(-6);
+    const ask = A(`الخدمة «${sv.name}» (${sv.id}) وقعت في التشغيل. دي آخر سطور السجل:\n${tail.join('\n')}\nشوف السبب واقترح التصليح.`, `The service "${sv.name}" (${sv.id}) failed. These are its last log lines:\n${tail.join('\n')}\nFind the cause and propose a fix.`);
+    return `<div class="tw:mt-1 tw:rounded-field tw:bg-clay-soft tw:px-3 tw:py-2" role="status"><p class="small"><b class="tw:text-clay">${A('وقعت.', 'It stopped.')}</b> ${tail.length ? A('آخر سطور السجل:', 'Its last log lines:') : A('مفيش سجل لسه — دوس «السجل».', 'No log yet — press Logs.')}</p>${tail.length ? `<pre class="svclog ltr tw:mt-1" tabindex="0" aria-label="${A('آخر سطور السجل', 'Last log lines')}">${tail.map(esc).join('\n')}</pre>` : ''}
+      ${readOnly ? '' : `<div class="row tw:mt-2"><button class="btn sm go" data-rt="restart" data-id="${esc(sv.id)}" ${runtimeBusy[sv.id] ? 'disabled' : ''}>${A('شغّلها تاني', 'Restart')}</button><button class="btn sm ghost" data-rt-logs="${esc(sv.id)}">${A('السجل كله', 'Full log')}</button>${agentsOn ? `<button class="btn sm ghost" data-ready-chat="${esc(ask)}">${A('اطلب من الوكيل يصلّحها', 'Ask the agent to fix it')}</button>` : `<button class="btn sm ghost" data-copy="${esc(ask)}" data-copy-what="text">${A('انسخ للوكيل', 'Copy for your agent')}</button>`}</div>`}</div>`;
+  }
   function serviceCard(sv) {
     const st = RT_STATE[sv.state] ?? RT_STATE.unknown;
     const busy = runtimeBusy[sv.id];
@@ -1751,7 +1885,7 @@
       <div class="svchead"><span class="sdot ${st.tone}" aria-hidden="true"></span>
         <div class="svcname"><b>${esc(sv.name)}</b> <span class="tiny muted ltr">${esc(sv.id)}</span><div class="svcmeta"><span class="chip ${st.tone}" data-svc-state="${esc(sv.state)}"><i></i>${L(st.t)}</span>${trustLine}${sv.stale ? `<span class="chip wait">${A('شغّال بتعريف أقدم', 'running an older definition')}</span>` : ''}${sv.sharedMarker ? `<span class="chip fail" title="${esc(A('بتخدم مشاريع تانية كمان؛ «وقّف المشروع» مابيوقفهاش.', 'Also serves other projects; Stop project never stops it.'))}"><i></i>${A('مشترك', 'Shared')}</span>` : ''}${ports}</div></div>
         <div class="svcacts">${actions}<button class="btn sm ghost" data-rt-logs="${esc(sv.id)}">${logs ? A('حدّث السجل', 'Refresh logs') : A('السجل', 'Logs')}</button></div></div>
-      ${links ? `<div class="row svclinks">${links}</div>` : ''}${changed}
+      ${links ? `<div class="row svclinks">${links}</div>` : ''}${changed}${sv.state === 'failed' ? failureBlock(sv) : ''}
       ${sv.runningOutside?.length ? `<p class="small">${A('شغّالة برا YallaFlow:', 'Running outside YallaFlow:')} <span class="ltr">${esc(sv.runningOutside.join(', '))}</span> — ${A('YallaFlow مش هيشغّلها تاني ولا هيوقفها.', 'YallaFlow will not start it again or stop it.')}</p>` : ''}
       ${sv.reason ? `<p class="small">${esc(sv.reason)}</p>` : ''}
       ${sv.unmanagedPorts.length ? `<p class="small" style="color:var(--clay)">${A('المنفذ ده مستخدم من برنامج YallaFlow ماشغّلوش، ومش هيتلمس:', 'This port is held by a process YallaFlow did not start; it will not be touched:')} <span class="ltr">${sv.unmanagedPorts.join(', ')}</span></p>` : ''}
@@ -2022,14 +2156,15 @@
   function setupGuide() {
     const rec = setupInfo?.record;
     if (readOnly || !setupInfo || setupInfo.pid !== pid || !setupPending(rec)) return '';
+    // PF-0123: agents first (the stack and services steps can ask the agent), services optional.
     const steps = [
+      { k: 'agents', t: A('جهّز الوكيل', 'Set up the agent'), d: A('من «الوكلاء» تحت: تسطيب وتسجيل دخول واختيار للمشروع ده.', 'Under Agents below: install, sign in, and choose for this project.') },
       { k: 'stack', t: A('افحص الـ stack', 'Scan the stack'), d: A('بيقرا ملفات المشروع بس، ومابيشغّلش حاجة.', 'Reads the repository files only; runs nothing.') },
-      { k: 'services', t: A('اختار الخدمات', 'Choose services'), d: A('من «اعرف وضيف الخدمات» تحت: حلّل المشروع أو اسأل الوكيل، واحفظ اللي محتاجه. بتتحفظ من غير توثيق.', 'Under "Find and add services" below: analyze the project or ask the agent, then save what you need. Services are saved untrusted.') },
-      { k: 'agents', t: A('اختار الوكلاء', 'Choose agents'), d: A('من «الوكلاء» تحت. الاختيار بيتحفظ للمشروع ده.', 'Under Agents below. The choice is saved for this project.') }
+      { k: 'services', t: A('اختار الخدمات (اختياري)', 'Choose services (optional)'), d: A('لو عايز تشغّل التطبيق من هنا: من «اعرف وضيف الخدمات» تحت، حلّل المشروع أو اسأل الوكيل، واحفظ اللي محتاجه.', 'If you want to run the app from here: under "Find and add services" below, analyze the project or ask the agent, then save what you need.') }
     ];
     const current = steps.find((x) => !rec?.steps?.[x.k])?.k;
     return `<section class="panel setupguide" aria-label="${A('إعداد المشروع', 'Project setup')}"><div class="row"><h2 style="font-size:18px" class="grow">${A('إعداد المشروع لأول مرة', 'First-time project setup')}</h2><button class="btn sm ghost" data-setup-step="skip" ${setupBusy ? 'disabled' : ''}>${A('تخطّى', 'Skip')}</button></div>
-      <ol class="sgsteps">${steps.map((x, i) => `<li class="${rec?.steps?.[x.k] ? 'done' : x.k === current ? 'now' : ''}"><b>${i + 1}. ${x.t}</b><span class="tiny muted">${x.d}</span>${x.k === current ? (x.k === 'stack' ? `<button class="btn sm go" data-setup-scan ${setupBusy ? 'disabled' : ''}>${setupBusy === 'scan' ? A('بيفحص…', 'Scanning…') : A('افحص دلوقتي', 'Scan now')}</button>` : x.k === 'services' ? `<button class="btn sm go" data-setup-step="services" ${setupBusy ? 'disabled' : ''}>${runtime?.pid === pid && runtime.services?.length ? A('خلّصت اختيار الخدمات', 'Done choosing services') : A('مش محتاج خدمات دلوقتي', 'No services for now')}</button>` : '') : ''}</li>`).join('')}</ol></section>`;
+      <ol class="sgsteps">${steps.map((x, i) => `<li class="${rec?.steps?.[x.k] ? 'done' : x.k === current ? 'now' : ''}"><b>${i + 1}. ${x.t}</b><span class="tiny muted">${x.d}</span>${x.k === current ? (x.k === 'stack' ? `<button class="btn sm go" data-setup-scan ${setupBusy ? 'disabled' : ''}>${setupBusy === 'scan' ? A('بيفحص…', 'Scanning…') : A('افحص دلوقتي', 'Scan now')}</button>` : x.k === 'agents' ? `<button class="btn sm go" data-scroll-to="setup-agents">${A('روح للوكلاء', 'Go to Agents')}</button>` : x.k === 'services' ? `<button class="btn sm go" data-setup-step="services" ${setupBusy ? 'disabled' : ''}>${runtime?.pid === pid && runtime.data?.services?.length ? A('خلّصت اختيار الخدمات', 'Done choosing services') : A('مش محتاج خدمات دلوقتي', 'No services for now')}</button>` : '') : ''}</li>`).join('')}</ol></section>`;
   }
   // Core writes these notes in English; the console shows the known ones in its language.
   const SUGGESTION_NOTE = {
@@ -2096,6 +2231,109 @@
       ${opens.length ? `<div class="runopen"><span class="tiny muted">${A('افتح:', 'Open:')}</span> ${opens.join(' ')}</div>` : ''}
       ${rows}</section>`;
   }
+  // ---------- agent setup on this machine (PF-0123): install, sign in, test — each approved ----------
+  let machineInfo = null; // { data | error }
+  const machineUi = { open: null, ack: false, busy: null, verifyError: null };
+  let machineTimer = null;
+  async function loadMachine() {
+    if (readOnly) return;
+    try { machineInfo = { data: await api('/api/machine') }; } catch (e) { machineInfo = { error: e.message }; }
+    syncMachinePolling();
+  }
+  function syncMachinePolling() {
+    const running = ['running', 'cancelling'].includes(machineInfo?.data?.job?.state);
+    if (running && !machineTimer) machineTimer = setInterval(pollMachineJob, 1000);
+    if (!running && machineTimer) { clearInterval(machineTimer); machineTimer = null; }
+  }
+  async function pollMachineJob() {
+    try {
+      const { job } = await api('/api/machine/job');
+      if (machineInfo?.data) machineInfo.data.job = job;
+      if (!['running', 'cancelling'].includes(job?.state)) {
+        clearInterval(machineTimer); machineTimer = null;
+        await loadMachine(); await loadReadiness();
+        if (job?.state === 'done') toast(esc(job.kind === 'install' ? A('Codex اتسطّب ✓', 'Codex installed ✓') : A('دخلت باشتراكك ✓', 'Signed in with your subscription ✓')));
+        else if (job?.state === 'failed') toast(esc(A('الخطوة ماكملتش — شوف المخرجات', 'That step did not finish — see the output')));
+      }
+      render();
+    } catch { /* the next poll retries */ }
+  }
+  async function machinePost(action, body) {
+    machineUi.busy = action; machineUi.verifyError = null; render();
+    try {
+      const result = await post(`/api/machine/${action}`, JSON.stringify(body ?? {}), { 'Content-Type': 'application/json' });
+      if (result.job && machineInfo?.data) machineInfo.data.job = result.job;
+      if (result.verified) {
+        await loadMachine(); await loadReadiness();
+        toast(esc(result.verified.ok ? A('Codex رد ومتوصّل باشتراكك ✓', 'Codex answered on your subscription ✓') : A('الاتصال ماتمّش — شوف السبب', 'The connection test failed — see why')));
+      }
+      machineUi.open = null; machineUi.ack = false;
+      syncMachinePolling();
+    } catch (e) {
+      if (e.data?.status && machineInfo) machineInfo.data = e.data.status;
+      machineUi.verifyError = why(e);
+    } finally { machineUi.busy = null; render(); }
+  }
+  function agentSetupCard() {
+    if (readOnly) return '';
+    if (!machineInfo) return `<div class="tw:mb-3 tw:rounded-card tw:bg-bg-2 tw:px-4 tw:py-3"><p class="small muted">${A('بيفحص الجهاز…', 'Checking this machine…')}</p></div>`;
+    if (machineInfo.error) return `<p class="small warn">${esc(machineInfo.error)}</p>`;
+    const m = machineInfo.data;
+    const c = m.codex;
+    const job = m.job;
+    const running = job?.state === 'running';
+    if (job?.state === 'cancelling') return `<div class="tw:mb-4" data-agent-setup><p class="small muted">${A('بيلغي الخطوة الحالية…', 'Cancelling the current step…')}</p></div>`;
+    const row = (ok, label, detail) => `<li class="tw:flex tw:items-baseline tw:gap-2 tw:py-1"><span class="${ok === true ? 'tw:text-palm' : ok === false ? 'tw:text-clay' : 'tw:text-muted'}" aria-hidden="true">${ok === true ? '✓' : ok === false ? '✕' : '○'}</span><span class="tw:font-medium">${label}</span><span class="tiny muted grow">${detail}</span></li>`;
+    const login = c.login;
+    const loginText = !c.cli ? '—' : login.method === 'chatgpt' ? A('باشتراك ChatGPT', 'ChatGPT subscription') : login.method === 'api-key' ? A('بمفتاح API — مش مدعوم؛ ادخل باشتراك ChatGPT', 'with an API key — not supported; sign in with ChatGPT') : A('مش داخل', 'not signed in');
+    const v = c.verified;
+    const verifyText = v ? (v.ok ? `${A('رد', 'answered')} · ${esc(v.auth?.label ?? 'ChatGPT')} · ${ago(v.at)}` : esc(v.message ?? v.code)) : A('لسه ماتجرّبش', 'not tested yet');
+    const plan = c.install;
+    // One next step at a time, in order: install → sign in → test.
+    let next = '';
+    if (running && job.kind === 'install') {
+      next = `<div class="tw:mt-3"><p class="small">⏳ ${A('بيسطّب…', 'Installing…')}</p><pre class="cli tw:mt-2" dir="ltr">${esc(job.tail.split('\n').slice(-8).join('\n'))}</pre><button type="button" class="btn sm ghost tw:mt-2" data-machine="job/cancel">${A('إلغاء', 'Cancel')}</button></div>`;
+    } else if (running && job.kind === 'login') {
+      next = `<div class="tw:mt-3 tw:rounded-field tw:bg-dusk-soft tw:px-4 tw:py-3"><p class="small"><b>${A('كمّل تسجيل الدخول في المتصفح:', 'Finish signing in in your browser:')}</b></p>${job.url ? `<p class="tw:mt-2"><a class="btn sm go" href="${esc(job.url)}" target="_blank" rel="noopener noreferrer">${A('افتح صفحة تسجيل الدخول', 'Open the sign-in page')} ↗</a></p>` : `<p class="small muted tw:mt-1">${A('بيجهّز الرابط…', 'Getting the link…')}</p>`}${job.code ? `<p class="small tw:mt-2">${A('واكتب الكود ده:', 'Then enter this code:')} <b class="ltr tw:text-lg">${esc(job.code)}</b> <button type="button" class="btn sm ghost" data-copy="${esc(job.code)}" data-copy-what="text">${A('انسخ', 'Copy')}</button></p>` : ''}<p class="tiny muted tw:mt-2">${A('ده تسجيل الدخول بتاع Codex نفسه. YallaFlow مابيشوفش كلمة السر ولا أي توكن.', 'This is Codex’s own sign-in. YallaFlow never sees your password or any token.')}</p><button type="button" class="btn sm ghost tw:mt-1" data-machine="job/cancel">${A('إلغاء', 'Cancel')}</button></div>`;
+    } else if (plan) {
+      next = machineUi.open === 'install'
+        ? `<div class="tw:mt-3 tw:rounded-field tw:border tw:border-line tw:px-4 tw:py-3"><p class="small"><b>${A('YallaFlow هيشغّل الأمر ده في حسابك:', 'YallaFlow will run this command in your account:')}</b></p><div class="row tw:mt-2"><code class="cli grow" dir="ltr">${esc(plan.command)}</code><button type="button" class="btn sm ghost" data-copy="${esc(plan.command)}">${A('انسخ', 'Copy')}</button></div>
+          ${plan.writable
+            ? `<p class="tiny muted tw:mt-2">${A('من غير sudo — npm بيسطّب في فولدر متاح ليك:', 'No sudo — npm installs into a folder you can write:')} <span class="ltr">${esc(plan.prefix)}</span></p><label class="small tw:mt-2 tw:flex tw:items-center tw:gap-2"><input type="checkbox" data-machine-ack ${machineUi.ack ? 'checked' : ''}> ${A('راجعت الأمر', 'I reviewed this command')}</label><div class="row tw:mt-3"><button type="button" class="btn sm go" data-machine="codex/install" data-plan="${esc(plan.planHash)}" ${machineUi.ack && !machineUi.busy ? '' : 'disabled'}>${A('سطّب', 'Install')}</button><button type="button" class="btn sm ghost" data-machine-close>${A('إلغاء', 'Cancel')}</button></div>`
+            : `<p class="small tw:mt-2 tw:text-amber">${A('npm بيسطّب في فولدر اليوزر ده مايقدرش يكتب فيه، وYallaFlow مابيستخدمش sudo:', 'npm installs into a folder this user cannot write, and YallaFlow never uses sudo:')} <span class="ltr">${esc(plan.prefix ?? '')}</span></p><p class="tiny muted tw:mt-1">${A('شغّل الأمر بنفسك بـ Node متسطّب لليوزر بتاعك (زي nvm)، أو حدد npm prefix جوه فولدر البيت، وبعدين دوس «افحص الجهاز تاني».', 'Run the command yourself with a Node.js installed for your user (for example nvm), or set an npm prefix in your home folder, then press Rescan this machine.')}</p>`}</div>`
+        : `<button type="button" class="btn sm go tw:mt-3" data-machine-open="install">${A('سطّب Codex', 'Install Codex')}</button>`;
+    } else if (c.cli && login.method !== 'chatgpt') {
+      next = machineUi.open === 'login'
+        ? `<div class="tw:mt-3 tw:rounded-field tw:border tw:border-line tw:px-4 tw:py-3"><p class="small">${A('هنبدأ تسجيل الدخول بتاع Codex نفسه: هيظهر لك رابط رسمي وكود تكتبه في المتصفح. اشتراكك بس — من غير مفاتيح API، وYallaFlow مابيشوفش أي بيانات دخول.', 'This starts Codex’s own sign-in: you get an official link and a code to enter in your browser. Your subscription only — no API keys, and YallaFlow never sees credentials.')}</p><div class="row tw:mt-3"><button type="button" class="btn sm go" data-machine="codex/login" ${machineUi.busy ? 'disabled' : ''}>${A('ابدأ تسجيل الدخول', 'Start sign-in')}</button><button type="button" class="btn sm ghost" data-machine-close>${A('إلغاء', 'Cancel')}</button></div></div>`
+        : `<button type="button" class="btn sm go tw:mt-3" data-machine-open="login">${A('ادخل باشتراك ChatGPT', 'Sign in with ChatGPT')}</button>`;
+    } else if (c.installed) {
+      next = `<button type="button" class="btn sm ${v?.ok ? 'ghost' : 'go'} tw:mt-3" data-machine="codex/verify" ${machineUi.busy ? 'disabled' : ''}>${machineUi.busy === 'codex/verify' ? A('بيجرّب…', 'Testing…') : v?.ok ? A('جرّب تاني', 'Test again') : A('جرّب الاتصال', 'Test the connection')}</button>`;
+    }
+    const claude = m.claude;
+    const state = c.ready && v?.ok ? ['done', A('جاهز ومتجرّب', 'Ready · tested')] : c.ready ? ['active', A('جاهز', 'Ready')] : ['wait', A('محتاج إعداد', 'Needs setup')];
+    return `<div class="tw:mb-4" data-agent-setup>
+      <h3 class="tw:text-base tw:font-semibold">${A('على الجهاز ده', 'On this machine')}</h3>
+      ${m.supportedPlatform ? '' : `<p class="small tw:text-amber">${A('الإعداد ده مدعوم على Linux وmacOS.', 'This setup is supported on Linux and macOS.')}</p>`}
+      <div class="tw:mt-2 tw:grid tw:gap-3 tw:md:grid-cols-2">
+        <section class="tw:rounded-card tw:border tw:border-line tw:bg-card tw:px-4 tw:py-3" aria-label="Codex"><div class="row"><b class="grow">Codex</b><span class="chip ${state[0]}"><i></i>${state[1]}</span></div>
+          <ul class="tw:mt-2 tw:list-none tw:p-0">${row(Boolean(c.cli), A('البرنامج', 'Codex CLI'), c.cli ? `<span class="ltr">codex ${esc(c.cli.version ?? '')}</span>` : A('مش متسطّب', 'not installed'))}${row(Boolean(c.adapter) && !c.problems.some((x) => /not supported/.test(x)), A('الوصلة', 'Adapter'), c.adapter ? `<span class="ltr">codex-acp ${esc(c.adapter.version ?? '')}</span>` : A('مش متسطّبة', 'not installed'))}${row(!c.cli ? null : login.method === 'chatgpt', A('تسجيل الدخول', 'Sign-in'), loginText)}${row(v ? v.ok : null, A('الاتصال', 'Connection'), verifyText)}</ul>
+          ${c.tested ? `<p class="tiny muted tw:mt-2">${A('متجرّب مع', 'Tested with')} <span class="ltr">codex ${esc(c.tested.cli)} · codex-acp ${esc(c.tested.adapter)}</span>${c.installed && !c.matchesTested ? ` — ${A('النسخ المتسطّبة مختلفة؛ ممكن تشتغل، بس دي اللي اتجرّبت.', 'the installed versions differ; they may work, but these are the tested ones.')}` : ''}</p>` : ''}
+          ${next}${machineUi.verifyError ? `<p class="small tw:mt-2 tw:text-clay" role="alert" dir="auto">${esc(machineUi.verifyError)}</p>` : ''}</section>
+        <section class="tw:rounded-card tw:border tw:border-line tw:bg-card tw:px-4 tw:py-3" aria-label="Claude Code"><div class="row"><b class="grow">Claude Code</b><span class="chip wait">${A('تجريبي', 'Experimental')}</span></div>
+          <ul class="tw:mt-2 tw:list-none tw:p-0">${row(claude.installed ? true : null, A('البرنامج', 'Claude Code CLI'), claude.installed ? `<span class="ltr">claude ${esc(claude.version ?? '')}</span>` : A('مش متسطّب', 'not installed'))}${claude.auth ? row(claude.auth.loggedIn && claude.auth.method === 'claude.ai', A('تسجيل الدخول', 'Sign-in'), claude.auth.loggedIn ? `<span class="ltr">${esc(claude.auth.method ?? '')}${claude.auth.plan ? ` (${esc(claude.auth.plan)})` : ''}</span>` : A('مش داخل', 'not signed in')) : ''}</ul>
+          ${claude.connectionIncluded && claude.warnings?.length ? claudeWarnings({ warnings: claude.warnings }) : ''}<p class="tiny muted tw:mt-2">${claude.connectionIncluded ? A('التوصيل التجريبي موجود في النسخة دي (نسخة تطوير) — إعداده تحت.', 'The experimental connection is in this build (a development build) — set it up below.') : A('توصيل الكونسول بـ Claude Code تجريبي ومش جزء من النسخة دي. تقدر تستخدم Claude Code في الترمينال، وهو بيتبع YallaFlow من CLAUDE.md.', 'The console connection to Claude Code is experimental and not part of this release. You can use Claude Code in your terminal; it follows YallaFlow through CLAUDE.md.')}</p></section>
+      </div>
+      <p class="tiny muted tw:mt-2">${A('اشتراكك بس، من غير مفاتيح API. أي تسطيب أو تسجيل دخول بيستنى موافقتك، ومن غير sudo.', 'Your subscription only, never API keys. Every install or sign-in waits for your approval and never uses sudo.')}</p></div>`;
+  }
+  // First open: one quiet, dismissible line when Codex is not ready on this machine.
+  function agentStrip() {
+    const m = machineInfo?.data;
+    if (readOnly || !m || m.codex.ready) return '';
+    const key = `${m.codex.cli ? 1 : 0}${m.codex.adapter ? 1 : 0}${m.codex.login.method ?? 'none'}`;
+    if (store.get('agentStripDismissed', '') === key) return '';
+    const text = !m.codex.installed ? A('Codex مش متسطّب على الجهاز ده.', 'Codex is not installed on this machine.') : A('Codex محتاج تسجيل دخول باشتراكك.', 'Codex needs a sign-in with your subscription.');
+    return `<div class="tw:mb-3 tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:rounded-field tw:bg-dusk-soft tw:px-4 tw:py-2" role="status"><span class="grow small">${text} ${A('الوكلاء محتاجينه عشان يشتغلوا من الكونسول.', 'Agents need it to work from the console.')}</span><a class="btn sm go" href="#/setup">${A('جهّز Codex', 'Set up Codex')}</a><button type="button" class="ibtn" data-agent-strip-dismiss="${esc(key)}" aria-label="${A('اقفل', 'Dismiss')}">✕</button></div>`;
+  }
   function agentsSection() {
     if (!agentSetup || agentSetup.pid !== pid) return `<section class="panel setupsec" id="setup-agents"><p class="muted">${A('بيقرا الوكلاء…', 'Reading agents…')}</p></section>`;
     if (agentSetup.error) return `<section class="panel setupsec" id="setup-agents"><p class="small warn">${esc(agentSetup.error)}</p></section>`;
@@ -2120,8 +2358,8 @@
       <div class="row"><button class="btn go sm" type="submit" ${setupBusy ? 'disabled' : ''}>${setupBusy === 'agents' ? A('بيحفظ…', 'Saving…') : A('احفظ للمشروع ده', 'Save for this project')}</button><span class="tiny muted">${A('بيتحفظ في .yallaflow/local (مش بيتعمله commit) وبيتطبّق كل ما الكونسول يفتح. قفل الوكلاء بيتطبّق من التشغيل الجاي للكونسول؛ قفل Claude Code بيتطبّق على طول.', 'Saved in .yallaflow/local (not committed) and applied whenever the console opens. Turning agents off applies from the next console start; turning Claude Code off applies at once.')}</span></div>
       ${d.saved?.error ? `<p class="tiny warn">${esc(d.saved.error)}</p>` : ''}</form>`;
     return `<section class="panel setupsec" id="setup-agents"><div class="row"><h2 style="font-size:18px" class="grow">${A('الوكلاء', 'Agents')}</h2><button class="btn sm ghost" data-agents-rescan ${setupBusy ? 'disabled' : ''}>${setupBusy === 'rescan' ? A('بيفحص…', 'Checking…') : A('افحص الجهاز تاني', 'Rescan this machine')}</button></div>
-      <div class="tablewrap"><table><thead><tr><th>${A('الوكيل', 'Agent')}</th><th>${A('الإصدار', 'Version')}</th><th>${A('تسجيل الدخول', 'Login')}</th><th>${A('الحالة', 'State')}</th></tr></thead><tbody>${prov('Codex', d.codex)}${d.claude ? prov(A('Claude Code (تجريبي)', 'Claude Code (experimental)'), d.claude) : d.claudeAvailable ? `<tr><td><b>${A('Claude Code (تجريبي)', 'Claude Code (experimental)')}</b></td><td colspan="3" class="tiny muted">${A('ماتفحصش لسه. دوس «افحص الجهاز تاني» أو اختاره تحت.', 'Not checked yet. Press Rescan this machine, or choose it below.')}</td></tr>` : ''}</tbody></table></div>
-      <p class="tiny muted">${A('اشتراكك بس، من غير مفاتيح API. YallaFlow مابيقراش أي بيانات دخول.', 'Your subscription only, never API keys. YallaFlow reads no credentials.')}</p>${form}${approvalWaitForm(d)}${checklist}</section>`;
+      ${readOnly || !machineInfo?.data ? `<div class="tablewrap"><table><thead><tr><th>${A('الوكيل', 'Agent')}</th><th>${A('الإصدار', 'Version')}</th><th>${A('تسجيل الدخول', 'Login')}</th><th>${A('الحالة', 'State')}</th></tr></thead><tbody>${prov('Codex', d.codex)}${d.claude ? prov(A('Claude Code (تجريبي)', 'Claude Code (experimental)'), d.claude) : d.claudeAvailable ? `<tr><td><b>${A('Claude Code (تجريبي)', 'Claude Code (experimental)')}</b></td><td colspan="3" class="tiny muted">${A('ماتفحصش لسه. دوس «افحص الجهاز تاني» أو اختاره تحت.', 'Not checked yet. Press Rescan this machine, or choose it below.')}</td></tr>` : ''}</tbody></table></div>` : agentSetupCard()}
+      ${readOnly || !machineInfo?.data ? `<p class="tiny muted">${A('اشتراكك بس، من غير مفاتيح API. YallaFlow مابيقراش أي بيانات دخول.', 'Your subscription only, never API keys. YallaFlow reads no credentials.')}</p>` : `<h3 class="tw:text-base tw:font-semibold tw:mt-2">${A('للمشروع ده', 'For this project')}</h3>`}${form}${approvalWaitForm(d)}${checklist}</section>`;
   }
   // PF-0112 D15: how long an agent's approval request waits for you in this project.
   function approvalWaitForm(d) {
@@ -2135,10 +2373,10 @@
     if (runtime.error) return `<section class="errbar data" role="alert"><b>${A('مقدرناش نقرا خدمات التشغيل', 'Runtime services could not be read')}</b><p class="small">${esc(runtime.error)}</p></section>`;
     const r = runtime.data;
     const configured = r.services.length > 0;
-    const head = `<section class="pagehead"><h1 style="font-size:26px">${A('الإعداد والتشغيل', 'Setup & run')}</h1><p class="muted">${configured ? A('شغّل ووقّف المشروع وافتح تطبيقاته. الإعدادات (الخدمات، الـ stack، الوكلاء) تحت في «الإعدادات».', 'Start and stop the project and open its apps. Configuration (services, stack, agents) is below under Configuration.') : A('٣ خطوات: اعرف المشروع بيشتغل إزاي، احفظ الخدمات، وثّقها — وبعدها شغّل وقّف من هنا. مفيش حاجة بتشتغل لوحدها، وYallaFlow بيوقف بس اللي هو شغّله.', 'Three steps: find how the project runs, save its services, trust them — then start and stop it from here. Nothing runs on its own, and YallaFlow stops only what it started.')}</p></section>`;
+    const head = `<section class="pagehead"><h1 style="font-size:26px">${A('الإعداد والتشغيل', 'Setup & run')}</h1><p class="muted">${configured ? A('شغّل ووقّف المشروع وافتح تطبيقاته. الإعدادات (الخدمات، الـ stack، الوكلاء) تحت في «الإعدادات».', 'Start and stop the project and open its apps. Configuration (services, stack, agents) is below under Configuration.') : A('جهّز الوكيل الأول. تشغيل التطبيق من هنا اختياري: اعرف خدماته، احفظها ووثّقها، وبعدها شغّل ووقّف من هنا. مفيش حاجة بتشتغل لوحدها، وYallaFlow بيوقف بس اللي هو شغّله.', 'Set up the agent first. Running the app from here is optional: find its services, save and trust them, then start and stop it here. Nothing runs on its own, and YallaFlow stops only what it started.')}</p></section>`;
     if (!r.supported) return head + setupGuide() + stackSection() + `<section class="panel"><p>${A('مدير التشغيل مدعوم على Linux وmacOS بس.', 'The runtime manager supports Linux and macOS only.')}</p></section>` + agentsSection();
     const profileErr = r.profile.error ? `<section class="errbar data" role="alert"><b>${A('ملف التشغيل فيه مشكلة', 'The runtime profile is invalid')}</b><p class="small">${esc(r.profile.error)}</p></section>` : '';
-    const add = readOnly ? '' : `<details class="panel setupsec" data-sx="add" ${sxOpen('add', !configured && !r.suggestions.length && !(runtimePlan?.pid === pid && (runtimePlan.data?.scan?.services?.length || runtimePlan.data?.agent?.services?.length)))}><summary><b>${A('ضيف خدمة بنفسك', 'Add a service yourself')}</b></summary>
+    const add = readOnly ? '' : `<details class="panel setupsec" data-sx="add" ${sxOpen('add', false)}><summary><b>${A('ضيف خدمة بنفسك', 'Add a service yourself')}</b></summary>
       <form class="wizform" data-rt-form data-keep="rt-${esc(pid)}" style="margin-top:10px">
         <div class="twocol"><label>${A('الاسم', 'Name')}<input name="name" required maxlength="60" placeholder="Web"></label><label>${A('المعرّف', 'Id')} <span class="tiny muted">(a-z 0-9 -)</span><input class="ltr" name="id" required pattern="[a-z][a-z0-9-]{0,31}" placeholder="web"></label></div>
         <div class="twocol"><label>${A('النوع', 'Kind')}<select name="kind"><option value="process">${A('أمر (process)', 'Command (process)')}</option><option value="docker-compose">Docker Compose</option></select></label><label>${A('فولدر التشغيل (جوه المشروع)', 'Working folder (inside the project)')}<input class="ltr" name="cwd" value="."></label></div>
@@ -2149,7 +2387,9 @@
         ${runtimeErr.__add ? `<p class="small" role="alert" style="color:var(--clay);white-space:pre-wrap">${esc(runtimeErr.__add)}</p>` : ''}</form></details>`;
     const sugg = r.suggestions.length ? `<details class="panel setupsec" data-sx="sugg" ${sxOpen('sugg')}><summary><b>${A(`اقتراحات تانية من ملفات المشروع (${r.suggestions.length})`, `Other suggestions from repository files (${r.suggestions.length})`)}</b></summary><p class="tiny muted">${A('الاقتراحات مابتشتغلش. ضيفها، راجعها، ووثّقها — التشغيل خطوة منفصلة.', 'Suggestions never run. Add one, review it, then trust it — starting is a separate step.')}</p><ul class="modules">${r.suggestions.map((x) => `<li><b>${esc(x.name)}</b> <span class="ltr mono small">${esc(x.command.join(' '))}</span> <span class="tiny muted">${A('من', 'from')} <span class="ltr">${esc(x.evidence.join(', '))}</span></span>${x.note ? `<p class="tiny muted">${esc(suggestionNote(x.note))}</p>` : ''}${readOnly ? '' : `<div class="row" style="margin-top:6px"><button class="btn sm" data-rt-suggest="${esc(x.id)}">${A('ضيف الخدمة دي', 'Add this service')}</button></div>`}</li>`).join('')}</ul></details>` : '';
     const dev = devPanel(A('أوامر التشغيل', 'Runtime commands'), ['yallaflow runtime analyze', 'yallaflow runtime plan show', 'yallaflow runtime plan save <id>...', 'yallaflow runtime review <id>', 'yallaflow runtime status', 'yallaflow runtime suggest', 'yallaflow runtime add <id> --cwd DIR --port N -- <executable> [args...]', 'yallaflow runtime trust <id>', 'yallaflow runtime start|stop|restart <id>', 'yallaflow runtime start --all', 'yallaflow runtime stop --all', 'yallaflow runtime logs <id>']);
-    const config = planSection(r) + sugg + add + stackSection() + agentsSection();
+    // PF-0123: agents first while the app is not set up (the plan can ask the agent); the manual
+    // add form and the stack table are advanced and stay folded.
+    const config = configured ? planSection(r) + sugg + add + stackSection() + agentsSection() : agentsSection() + planSection(r) + sugg + add + stackSection();
     // Not configured yet: the guided flow is the page. Configured: Run first, the rest folded away.
     if (!configured) return head + profileErr + setupGuide() + config + dev;
     const rows = `<div class="svcrows">${r.services.map(serviceCard).join('')}</div>`;
@@ -2536,42 +2776,181 @@
     render();
   }
 
-  // ---------- folder chooser (1.4.0, PF-0057): folders inside the home folder only ----------
-  let folder = null; // { mode: 'parent'|'existing', data, error, busy }
+  // ---------- folder chooser (1.4.0, PF-0057; redesigned in 1.5.2, PF-0123) ----------
+  // One picker wherever the console asks for a project folder: 'existing' (add or connect a
+  // project) and 'parent' (where the New Project Wizard creates its new folder). Browsing stays
+  // inside the home folder, hidden folders stay out, and every path — typed or clicked — is
+  // checked by the server. Folder kinds come from file names only.
+  let folder = null; // { mode, data, error, busy, preview, previewError, previewBusy, ack, creating }
+  const RECENT_KEY = 'recentFolders';
+  const STACK_NAME = { laravel: 'Laravel', php: 'PHP', node: 'Node.js', python: 'Python', go: 'Go', ruby: 'Ruby', java: 'Java', rust: 'Rust', dotnet: '.NET' };
+  const FOLDER_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>';
+  const CODE_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m8 9-4 3 4 3M16 9l4 3-4 3M14 5l-4 14"/></svg>';
+  const YF_SVG = '<svg viewBox="0 0 64 64" width="18" height="18" aria-hidden="true" fill="none" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path d="M28.5 15.5 12.5 32 28.5 48.5" stroke="#0fae9d"/><path d="M50.5 15.5 34.5 32 50.5 48.5" stroke="#5961e8"/></svg>';
+  function folderKind(f) {
+    if (!f) return { icon: FOLDER_SVG, label: '', tone: 'tw:text-muted' };
+    if (f.kind === 'yallaflow' || f.yallaflow) return { icon: YF_SVG, label: A('مشروع YallaFlow', 'YallaFlow project'), tone: '' };
+    if (f.kind === 'code') return { icon: CODE_SVG, label: f.stack ? STACK_NAME[f.stack] ?? f.stack : A('كود موجود', 'Existing code'), tone: 'tw:text-dusk' };
+    if (f.kind === 'empty' || f.empty) return { icon: FOLDER_SVG, label: A('فاضي', 'Empty'), tone: 'tw:text-muted' };
+    return { icon: FOLDER_SVG, label: '', tone: 'tw:text-muted' };
+  }
+  // Paths inside home are shown as ~/…: short, and the folder's own name is never cut off.
+  const tildePath = (p, home = folder?.data?.home) => (home && p && (p === home || p.startsWith(`${home}/`)) ? `~${p.slice(home.length)}` : p ?? '');
+  const recentFolders = () => { const list = store.get(RECENT_KEY, []); return Array.isArray(list) ? list.filter((x) => typeof x === 'string').slice(0, 6) : []; };
+  const rememberFolder = (dir) => { if (dir) store.set(RECENT_KEY, [dir, ...recentFolders().filter((x) => x !== dir)].slice(0, 6)); };
   async function openFolder(mode, at) {
-    folder = { mode, data: folder?.data ?? null, error: null, busy: true };
+    const fresh = !folder || folder.mode !== mode;
+    folder = { mode, data: fresh ? null : folder.data, error: null, busy: true, preview: null, previewError: null, previewBusy: false, ack: false, creating: false };
     let d = document.getElementById('folderdlg');
-    if (!d) { d = document.createElement('dialog'); d.id = 'folderdlg'; d.className = 'panel folderdlg'; document.body.appendChild(d); }
+    if (!d) {
+      d = document.createElement('dialog'); d.id = 'folderdlg'; d.className = 'panel folderdlg';
+      d.addEventListener('close', () => { folder = null; });
+      d.addEventListener('input', onFolderInput);
+      d.addEventListener('keydown', onFolderKey);
+      d.addEventListener('submit', (e) => {
+        if (e.target.matches('[data-folder-pathform]')) { e.preventDefault(); const v = typedPath(e.target.path.value); if (v && folder) openFolder(folder.mode, v); }
+        else if (e.target.matches('[data-folder-newform]')) { e.preventDefault(); newFolder(e.target); }
+      });
+      d.addEventListener('change', (e) => { if (e.target.matches('[data-folder-ack]') && folder) { folder.ack = e.target.checked; const b = d.querySelector('[data-folder-connect]'); if (b) b.disabled = !folder.ack || folder.previewBusy; } });
+      document.body.appendChild(d);
+    }
     renderFolder();
     if (!d.open) d.showModal();
-    try { folder.data = await api(`/api/fs/dirs?path=${encodeURIComponent(at ?? (mode === 'parent' ? wizForm().parent : '') ?? '')}`); } catch (e) {
+    const start = at ?? (mode === 'parent' ? wizForm().parent : '') ?? '';
+    try { folder.data = await api(`/api/fs/dirs?path=${encodeURIComponent(start)}`); } catch (e) {
       try { folder.data = await api('/api/fs/dirs'); folder.error = e.message; } catch (e2) { folder.error = e2.message; }
     }
     folder.busy = false; renderFolder();
-    d.querySelector('[data-folder-go]')?.focus();
+    (d.querySelector('.fpick-list [data-folder-go]') ?? d.querySelector('[data-folder-filter]'))?.focus();
+  }
+  function crumbs(x) {
+    if (!x) return '';
+    const rel = x.path === x.home ? [] : x.path.slice(x.home.length + 1).split('/');
+    const parts = [{ label: A('البيت', 'Home'), path: x.home }, ...rel.map((name, i) => ({ label: name, path: `${x.home}/${rel.slice(0, i + 1).join('/')}` }))];
+    return `<nav class="fpick-crumbs" aria-label="${A('المسار', 'Path')}"><ol>${parts.map((c, i) => `<li>${i === parts.length - 1 ? `<span aria-current="location">${i === 0 ? '⌂ ' : ''}${esc(c.label)}</span>` : `<button type="button" data-folder-go="${esc(c.path)}">${i === 0 ? '⌂ ' : ''}${esc(c.label)}</button>`}</li>`).join('')}</ol></nav>`;
+  }
+  function folderFooter(x) {
+    const here = x?.here;
+    const k = folderKind(here);
+    const atHome = x && !x.parent;
+    let action = '';
+    if (folder.mode === 'parent') {
+      const name = wizForm().name;
+      action = `<button type="button" class="btn go" data-folder-choose ${x ? '' : 'disabled'}>${A('أنشئ المشروع هنا', 'Create the project here')}</button>`;
+      return `<div class="fpick-foot"><div class="grow tw:min-w-0"><div class="tiny muted">${A('المشروع الجديد هيتعمل في فولدر جديد جوه:', 'The new project gets a new folder inside:')}</div><div class="ltr fpick-path" title="${esc(x?.path ?? '')}">${esc(tildePath(x?.path))}${name ? `/<b>${esc(name)}</b>` : ''}</div>${here?.yallaflow ? `<div class="tiny tw:text-amber">${A('ده مشروع YallaFlow — غالباً عايز تختار فولدر برّاه.', 'This is a YallaFlow project — you probably want a folder outside it.')}</div>` : ''}</div>${action}</div>`;
+    }
+    if (!x || atHome) action = `<button type="button" class="btn go" disabled>${A('اختار فولدر المشروع', 'Choose the project folder')}</button>`;
+    else if (here?.yallaflow) action = `<button type="button" class="btn go" data-folder-choose>${A('افتح المشروع', 'Open this project')}</button>`;
+    else action = `<button type="button" class="btn go" data-folder-preview>${here?.empty ? A('ابدأ مشروع جديد هنا', 'Start a new project here') : A('جهّز YallaFlow هنا', 'Set up YallaFlow here')}</button>`;
+    return `<div class="fpick-foot"><span class="fpick-ico ${k.tone}">${k.icon}</span><div class="grow tw:min-w-0"><div class="ltr fpick-path" title="${esc(x?.path ?? '')}">${esc(tildePath(x?.path))}</div>${k.label ? `<div class="tiny muted">${esc(k.label)}</div>` : ''}</div>${action}</div>`;
+  }
+  function previewPanel() {
+    const p = folder.preview;
+    const opText = { create: A('ملف جديد', 'new file'), 'append-block': A('بيتضاف بلوك YallaFlow صغير في الآخر؛ كلامك فاضل زي ما هو', 'a short YallaFlow block is added at the end; your text stays as it is'), 'update-block': A('بلوك YallaFlow بيتحدّث', 'the YallaFlow block is updated'), unchanged: A('مفيش تغيير', 'no change') };
+    const opSign = { create: '+', 'append-block': '~', 'update-block': '~', unchanged: '=' };
+    const notes = { '.yallaflow/': A('سجلات المشروع', 'project records'), 'CLAUDE.md': '', 'AGENTS.md': A('بيوجّه Codex لـ YallaFlow', 'points Codex to YallaFlow') };
+    const existing = p.kind === 'existing-code';
+    return `<section class="fpick-preview" aria-labelledby="fpv-h">
+      <h3 id="fpv-h" class="tw:text-lg tw:font-semibold">${existing ? A(`جهّز YallaFlow في «${esc(p.name)}»`, `Set up YallaFlow in “${esc(p.name)}”`) : A(`مشروع جديد في «${esc(p.name)}»`, `A new project in “${esc(p.name)}”`)}</h3>
+      <p class="small tw:mt-1">${existing ? `${A('كود موجود', 'Existing codebase')}${p.stack?.length ? ` · <span class="ltr">${esc(p.stack.join(' · '))}</span>` : ''}${p.sourceFiles ? ` · ${A(`${p.sourceFiles} ملف كود`, `${p.sourceFiles} source files`)}` : ''}` : A('فولدر فاضي — المشروع هيبدأ من فكرتك ومتطلباتك.', 'An empty folder — the project starts from your idea and requirements.')}</p>
+      ${p.git ? `<p class="small tw:mt-1">✓ ${A('أي تغييرات عندك مش متعملها commit مش هتتلمس، ومفيش commit هيتعمل.', 'Any uncommitted changes you have stay untouched, and nothing is committed.')}</p>` : ''}
+      ${p.problems.length ? `<div class="tw:mt-3 tw:rounded-field tw:bg-clay-soft tw:px-3 tw:py-2" role="alert"><b class="tw:text-clay">${A('مش هينفع نجهّزه دلوقتي — ومفيش حاجة اتغيّرت:', 'This folder cannot be set up right now — nothing was changed:')}</b><ul class="small tw:mt-1 tw:ps-5">${p.problems.map((x) => `<li dir="auto">${esc(x.message)}</li>`).join('')}</ul></div>` : `
+      <p class="small tw:mt-3"><b>${A('YallaFlow هيعمل بالظبط:', 'YallaFlow will make exactly these changes:')}</b></p>
+      <ul class="fpick-plan">${p.plan.filter((x) => x.op !== 'unchanged').map((x) => `<li><span class="fpick-op ${x.op === 'create' ? 'add' : 'mod'}" aria-hidden="true">${opSign[x.op]}</span><span class="ltr">${esc(x.path)}</span><span class="tiny muted">${esc(notes[x.path] || opText[x.op])}${notes[x.path] && x.op !== 'create' ? ` · ${esc(opText[x.op])}` : ''}</span></li>`).join('')}</ul>
+      <p class="tiny muted tw:mt-2">${A('مفيش كود تطبيق هيتغيّر، ومفيش commit، ومفيش تغيير في Git.', 'No application code changes, no commit, no Git changes.')}${existing ? ` ${A('بعدها وكيلك بيجهّز فهم للمشروع وإنت توافق عليه.', 'Next, your agent prepares a project understanding for you to approve.')}` : ''}</p>
+      <label class="small tw:mt-3 tw:flex tw:items-center tw:gap-2"><input type="checkbox" data-folder-ack ${folder.ack ? 'checked' : ''}> ${A('راجعت التغييرات دي', 'I reviewed these changes')}</label>`}
+      ${folder.previewError ? `<p class="small tw:mt-2 tw:text-clay" role="alert" dir="auto" style="white-space:pre-wrap">${esc(folder.previewError)}</p>` : ''}
+      <div class="row tw:mt-4"><button type="button" class="btn ghost" data-folder-back>${A('رجوع', 'Back')}</button><span class="grow"></span>${p.problems.length ? '' : `<button type="button" class="btn go" data-folder-connect ${folder.ack && !folder.previewBusy ? '' : 'disabled'}>${folder.previewBusy ? A('بيجهّز…', 'Setting up…') : existing ? A('جهّز YallaFlow', 'Set up YallaFlow') : A('ابدأ المشروع', 'Start the project')}</button>`}</div></section>`;
   }
   function renderFolder() {
     const d = document.getElementById('folderdlg');
     if (!d || !folder) return;
     const x = folder.data;
-    const mark = (f) => `${f.yallaflow ? `<span class="chip done"><i></i>YallaFlow</span>` : ''}${f.git ? '<span class="chip todo">Git</span>' : ''}${f.empty ? `<span class="tag">${A('فاضي', 'empty')}</span>` : ''}`;
-    const here = x ? x.here : null;
-    const chooseLabel = folder.mode === 'parent' ? A('أنشئ المشروع جوه الفولدر ده', 'Create the project in this folder') : A('ضيف المشروع ده', 'Add this project');
-    const canChoose = x && (folder.mode === 'parent' || here?.yallaflow);
-    d.setAttribute('aria-label', folder.mode === 'parent' ? A('اختار فولدر', 'Choose a folder') : A('ضيف مشروع موجود', 'Add an existing project'));
-    d.innerHTML = `<div class="row"><b class="grow">${folder.mode === 'parent' ? A('اختار الفولدر اللي هيتعمل جواه المشروع', 'Choose where to create the project') : A('اختار فولدر مشروع YallaFlow موجود', 'Choose an existing YallaFlow project folder')}</b><button type="button" class="btn ghost sm" data-folder-close>${A('اقفل', 'Close')}</button></div>
-      ${x ? `<div class="row small" style="margin:8px 0">${x.parent ? `<button type="button" class="btn ghost sm" data-folder-go="${esc(x.parent)}" aria-label="${A('الفولدر الأعلى', 'Parent folder')}">↑</button>` : ''}<span class="ltr mono grow wizpath">${esc(x.path)}</span>${here ? mark(here) : ''}</div>` : ''}
-      ${folder.error ? `<p class="small" role="alert" style="color:var(--clay)">${esc(folder.error)}</p>` : ''}
-      ${folder.busy ? `<p class="muted small">${A('بيقرا…', 'Reading…')}</p>` : x ? `<ul class="folders" role="list">${x.folders.map((f) => `<li><button type="button" class="flink" data-folder-go="${esc(f.path)}"><span aria-hidden="true">📁</span> <span class="ltr">${esc(f.name)}</span></button>${mark(f)}</li>`).join('') || `<li class="muted small">${A('مفيش فولدرات هنا.', 'No folders here.')}</li>`}</ul>${x.truncated ? `<p class="tiny muted">${A('أول 500 فولدر بس.', 'First 500 folders only.')}</p>` : ''}` : ''}
-      ${folder.mode === 'existing' && x && !here?.yallaflow ? `<p class="tiny muted">${A('الفولدر ده مفيهوش YallaFlow. المشروع الموجود من غير YallaFlow بيتجهز بفهم المشروع (Brownfield) كخطوة منفصلة.', 'This folder has no YallaFlow workspace. An existing repository without YallaFlow is set up through project onboarding (Brownfield), a separate step.')}</p>` : ''}
-      <p class="tiny muted">${A('الفولدرات اللي جوه فولدر البيت بس، والمخفية مابتظهرش. مفيش ملفات بتتقري.', 'Only folders inside your home folder; hidden ones are not shown. No file is read.')}</p>
-      <div class="row" style="margin-top:8px"><span class="grow"></span><button type="button" class="btn go" data-folder-choose ${canChoose ? '' : 'disabled'}>${chooseLabel}</button></div>`;
+    const title = folder.mode === 'parent' ? A('فين نعمل المشروع الجديد؟', 'Where should the new project go?') : A('اختار فولدر المشروع', 'Choose the project folder');
+    d.setAttribute('aria-labelledby', 'fpick-h');
+    const head = `<div class="row"><h2 id="fpick-h" class="grow tw:text-lg tw:font-semibold">${title}</h2><button type="button" class="ibtn" data-folder-close aria-label="${A('اقفل', 'Close')}">✕</button></div>`;
+    if (folder.preview) { d.innerHTML = head + previewPanel(); d.querySelector('[data-folder-ack], [data-folder-back]')?.focus(); return; }
+    const recents = [...new Set([...(folder.mode === 'existing' ? projects.map((p) => p.root) : []), ...recentFolders()])].filter((p) => x && p.startsWith(x.home) && p !== x.path).slice(0, 6);
+    const label = (p) => projects.find((q) => q.root === p)?.name ?? p.split('/').pop();
+    const rows = x?.folders ?? [];
+    d.innerHTML = `${head}
+      <div class="fpick-bar">${x?.parent ? `<button type="button" class="ibtn fpick-up" data-folder-go="${esc(x.parent)}" aria-label="${A('الفولدر الأعلى', 'Up one folder')}" title="${A('الفولدر الأعلى (Backspace)', 'Up one folder (Backspace)')}">↑</button>` : ''}${crumbs(x)}</div>
+      <form class="fpick-pathform" data-folder-pathform><label class="tw:sr-only" for="fpick-path">${A('المسار', 'Path')}</label><input id="fpick-path" class="ltr" name="path" value="${esc(tildePath(x?.path))}" spellcheck="false" autocomplete="off" placeholder="~/code/my-project"><button type="submit" class="btn sm">${A('روح', 'Go')}</button></form>
+      ${recents.length ? `<div class="fpick-recent"><span class="tiny muted">${A('أخيراً:', 'Recent:')}</span>${recents.map((p) => `<button type="button" class="fchip" data-folder-go="${esc(p)}" title="${esc(tildePath(p))}">${esc(label(p))}</button>`).join('')}</div>` : ''}
+      <div class="fpick-tools"><input type="search" data-folder-filter placeholder="${A('دوّر في الفولدرات…', 'Filter folders…')}" aria-label="${A('دوّر في الفولدرات', 'Filter folders')}" autocomplete="off">${folder.mode === 'parent' && x ? (folder.creating ? `<form class="fpick-new" data-folder-newform><input name="name" maxlength="80" placeholder="${A('اسم الفولدر', 'Folder name')}" aria-label="${A('اسم الفولدر الجديد', 'New folder name')}" required><button type="submit" class="btn sm go">${A('اعمل', 'Create')}</button><button type="button" class="btn sm ghost" data-folder-newcancel>${A('إلغاء', 'Cancel')}</button></form>` : `<button type="button" class="btn sm" data-folder-new>＋ ${A('فولدر جديد', 'New folder')}</button>`) : ''}</div>
+      ${folder.error ? `<p class="small tw:text-clay" role="alert" dir="auto">${esc(folder.error)}</p>` : ''}
+      ${folder.busy ? `<p class="muted small fpick-list">${A('بيقرا…', 'Reading…')}</p>` : x ? `<ul class="fpick-list" role="list" aria-label="${A('الفولدرات', 'Folders')}">${rows.map((f) => { const k = folderKind(f); return `<li data-name="${esc(f.name.toLowerCase())}"><button type="button" class="fpick-row" data-folder-go="${esc(f.path)}"><span class="fpick-ico ${k.tone}">${k.icon}</span><span class="grow ltr fpick-name">${esc(f.name)}</span>${k.label ? `<span class="fpick-kind ${f.kind === 'yallaflow' ? 'yf' : f.kind === 'code' ? 'code' : ''}">${esc(k.label)}</span>` : ''}<span class="fpick-go" aria-hidden="true">›</span></button></li>`; }).join('') || `<li class="muted small fpick-empty">${A('مفيش فولدرات هنا.', 'No folders here.')}</li>`}<li class="muted small fpick-empty" data-folder-nomatch hidden>${A('مفيش فولدر بالاسم ده.', 'No folder matches.')}</li></ul>${x.truncated ? `<p class="tiny muted">${A('أول 500 فولدر بس.', 'First 500 folders only.')}</p>` : ''}` : ''}
+      ${folderFooter(x)}
+      <p class="tiny muted tw:mt-2">${A('فولدرات جوه فولدر البيت بس؛ المخفية مابتظهرش.', 'Folders inside your home folder only; hidden folders are not shown.')}</p>`;
+  }
+  // Filtering hides rows in place (no redraw, so typing keeps its focus and caret).
+  function onFolderInput(e) {
+    if (!e.target.matches('[data-folder-filter]')) return;
+    const q = e.target.value.trim().toLowerCase();
+    let shown = 0;
+    for (const li of document.querySelectorAll('#folderdlg .fpick-list li[data-name]')) { const hit = !q || li.dataset.name.includes(q); li.hidden = !hit; if (hit) shown++; }
+    const none = document.querySelector('#folderdlg [data-folder-nomatch]');
+    if (none) none.hidden = shown > 0 || !q;
+  }
+  function onFolderKey(e) {
+    const d = document.getElementById('folderdlg');
+    if (!folder || folder.preview) return;
+    const rows = [...d.querySelectorAll('.fpick-list li:not([hidden]) .fpick-row')];
+    const inField = e.target.matches('input');
+    const at = rows.indexOf(e.target);
+    if (e.key === 'ArrowDown' && (at >= 0 || e.target.matches('[data-folder-filter]'))) { e.preventDefault(); rows[Math.min(at + 1, rows.length - 1)]?.focus(); return; }
+    if (e.key === 'ArrowUp' && at >= 0) { e.preventDefault(); (at === 0 ? d.querySelector('[data-folder-filter]') : rows[at - 1])?.focus(); return; }
+    if (e.key === 'Enter' && e.target.matches('[data-folder-filter]')) { e.preventDefault(); rows[0]?.click(); return; }
+    if ((e.key === 'Backspace' && !inField) || (e.key === 'ArrowUp' && e.altKey)) { e.preventDefault(); if (folder.data?.parent) openFolder(folder.mode, folder.data.parent); return; }
+    // Typing on a row starts filtering.
+    if (!inField && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey && /\S/.test(e.key)) { const f = d.querySelector('[data-folder-filter]'); if (f) { f.focus(); f.value += e.key; onFolderInput({ target: f }); e.preventDefault(); } }
+  }
+  // A typed path: "~" means the home folder; the server checks everything else.
+  function typedPath(value) {
+    const v = String(value ?? '').trim();
+    const home = folder?.data?.home ?? '';
+    if (v === '~') return home;
+    if (v.startsWith('~/')) return `${home}/${v.slice(2)}`;
+    return v;
+  }
+  async function previewFolder() {
+    const x = folder?.data;
+    if (!x) return;
+    folder.previewBusy = true;
+    try { folder.preview = await api(`/api/fs/connect-preview?path=${encodeURIComponent(x.path)}`); folder.previewError = null; } catch (e) { folder.error = e.message; }
+    folder.previewBusy = false; folder.ack = false; renderFolder();
+  }
+  async function connectFolder() {
+    const p = folder?.preview;
+    if (!p || !folder.ack) return;
+    folder.previewBusy = true; folder.previewError = null; renderFolder();
+    try {
+      const reg = await post('/api/projects/connect', JSON.stringify({ root: p.path, planHash: p.planHash, confirm: true }), { 'Content-Type': 'application/json' });
+      rememberFolder(p.path.split('/').slice(0, -1).join('/'));
+      document.getElementById('folderdlg')?.close();
+      await reloadProjects();
+      toast(esc(A(`«${p.name}» بقى مشروع YallaFlow ✓`, `“${p.name}” is now a YallaFlow project ✓`)));
+      await switchProject(reg.id, 'map');
+    } catch (e) {
+      if (e.data?.preview) { folder.preview = e.data.preview; folder.ack = false; }
+      folder.previewBusy = false; folder.previewError = why(e); renderFolder();
+    }
+  }
+  async function newFolder(form) {
+    const name = form.name.value.trim();
+    if (!name || !folder?.data) return;
+    try {
+      const data = await post('/api/fs/mkdir', JSON.stringify({ parent: folder.data.path, name }), { 'Content-Type': 'application/json' });
+      folder.data = data; folder.creating = false; folder.error = null; renderFolder();
+      document.querySelector('#folderdlg [data-folder-choose]')?.focus();
+    } catch (e) { folder.error = why(e); renderFolder(); document.querySelector('#folderdlg [data-folder-newform] input')?.focus(); }
   }
   async function chooseFolder() {
     const x = folder?.data;
     if (!x) return;
     if (folder.mode === 'parent') {
       wizForm().parent = x.path;
+      rememberFolder(x.path);
       const typed = document.querySelector('[data-wiz-step="1"] input[name="parent"]');
       if (typed) { typed.value = x.path; typed.defaultValue = x.path; }
       document.getElementById('folderdlg')?.close();
@@ -2580,6 +2959,7 @@
     folder.busy = true; renderFolder();
     try {
       const reg = await post('/api/projects', JSON.stringify({ root: x.path }), { 'Content-Type': 'application/json' });
+      rememberFolder(x.path.split('/').slice(0, -1).join('/'));
       document.getElementById('folderdlg')?.close();
       folder = null;
       await reloadProjects();
@@ -2973,6 +3353,8 @@
 
   function openCreate() {
     if (readOnly) return;
+    const blocked = createBlockedReason();
+    if (blocked) { toast(esc(blocked)); return; }
     cw = { requestId: newRequestId(), pid, created: null, files: [], failed: [], attached: [] };
     document.querySelector('dialog.create')?.remove();
     const d = document.createElement('dialog');
@@ -3052,7 +3434,8 @@
       cw.classifyError = result.classifyError ?? null;
     } catch (e) {
       // Nothing was created (or a retry will return it: the same request ID is reused).
-      err.textContent = why(e);
+      if (e.data?.readiness) { readiness = { pid: cw.pid, data: e.data.readiness }; render(); }
+      err.textContent = e.code === 'PROJECT_UNDERSTANDING_REQUIRED' ? (createBlockedReason() ?? why(e)) : why(e);
       requestBusy(form, false);
       return;
     }
@@ -3079,11 +3462,47 @@
   }
 
   // ---------- render ----------
+  // PF-0123: a redraw never lands under a pressed pointer (the press would be lost: its click
+  // target is replaced before the button is released) and an identical page is never rebuilt.
+  // Deferral lasts only while the button is physically held (a safety limit covers a release the
+  // page never saw), so permission requests, failures and live agent states still appear promptly.
+  const POINTER_DEFER_MS = 4000;
+  let pointerDownAt = 0;
+  let deferredRender = null;
+  let lastHtml = null;
+  const pointerPressed = () => pointerDownAt && Date.now() - pointerDownAt < POINTER_DEFER_MS;
+  function flushDeferredRender() {
+    if (!deferredRender) return;
+    clearTimeout(deferredRender);
+    deferredRender = null;
+    render();
+  }
+  document.addEventListener('pointerdown', (e) => { if (e.button === 0 && e.target.closest?.('#app')) pointerDownAt = Date.now(); }, true);
+  window.addEventListener('blur', () => { pointerDownAt = 0; setTimeout(flushDeferredRender, 0); });
+  for (const type of ['pointerup', 'pointercancel', 'dragstart']) document.addEventListener(type, () => { pointerDownAt = 0; setTimeout(flushDeferredRender, 0); }, true);
+  // Scrollable regions inside the page keep their position across a redraw.
+  const SCROLL_KEEP = '.map, .chain, .svclog, .tablewrap, .astream, .logpre, .folders';
+  // The identical-page skip is only safe when nothing changed the page since it was drawn: some
+  // actions change it directly (a button disabled while its request runs, a streamed chat line)
+  // and rely on the next redraw. Any such change marks the page dirty, so the next redraw rebuilds
+  // it as before. The Flow connectors are measured decoration and do not count.
+  let domDirty = true;
+  const noteMutations = (records) => { if (records.some((rec) => !(rec.target.closest ? rec.target.closest('.connectors') : rec.target.parentElement?.closest('.connectors')))) domDirty = true; };
+  const domWatch = new MutationObserver(noteMutations);
+  // Typed values, ticks and selections are properties the observer cannot see: they mark the page
+  // dirty too, so a redraw meant to reset a field (a prepared message, a refused choice) is never skipped.
+  for (const type of ['input', 'change']) document.addEventListener(type, (e) => { if (e.target.closest?.('#app')) domDirty = true; }, true);
   function render() {
+    if (pointerPressed()) {
+      if (!deferredRender) deferredRender = setTimeout(() => { deferredRender = null; pointerDownAt = 0; render(); }, Math.max(0, POINTER_DEFER_MS - (Date.now() - pointerDownAt)));
+      return;
+    }
+    if (deferredRender) { clearTimeout(deferredRender); deferredRender = null; }
     document.documentElement.lang = lang;
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
     if (theme) document.documentElement.dataset.theme = theme; else delete document.documentElement.dataset.theme;
     const r = route();
+    if (r.v === 'map' || r.v === 'lines') store.set('wsView', r.v);
     const hadQ = document.activeElement?.matches?.('[data-q]');
     const hadAgent = document.activeElement?.matches?.('[data-agent-input]');
     const chatBody = document.querySelector('#chatwin .chatbody');
@@ -3095,7 +3514,20 @@
     const body = !snap ? `<p class="muted" style="margin-top:40px;text-align:center">${error ? '' : A('بيحمّل…', 'Loading…')}</p>` : (views[r.v] ?? viewMap)();
     // Forms marked data-keep survive a redraw: typed values and focus are carried over (PF-0057).
     const kept = [...document.querySelectorAll('form[data-keep]')].map((form) => ({ key: form.dataset.keep, values: [...form.elements].filter((el) => el.name && el.type !== 'file' && (el.type === 'checkbox' || el.type === 'radio' ? el.checked !== el.defaultChecked : el.value !== el.defaultValue)).map((el) => [el.name, el.type === 'checkbox' || el.type === 'radio' ? (el.type === 'radio' ? (el.checked ? el.value : null) : el.checked) : el.value, el.type]), focus: form.contains(document.activeElement) ? document.activeElement.name : null, caret: document.activeElement?.selectionStart ?? null }));
-    document.getElementById('app').innerHTML = topbar(r) + `<main>${banner()}${snap && ['map', 'lines'].includes(r.v) ? understandingStrip() : ''}${body}</main>` + (chatCtx(r) ? agentDock(chatCtx(r)) : '');
+    const html = topbar(r) + `<main>${banner()}${snap && ['map', 'lines'].includes(r.v) ? agentStrip() + (readiness?.pid === pid ? readinessCard() : understandingStrip()) : ''}${body}</main>` + (chatCtx(r) ? agentDock(chatCtx(r)) : '');
+    const appEl = document.getElementById('app');
+    // Nothing changed: keep the live DOM (focus, selection, open menus, hover, a click in progress).
+    noteMutations(domWatch.takeRecords());
+    if (html === lastHtml && appEl.childElementCount && !domDirty) return;
+    lastHtml = html;
+    const scrolls = [...appEl.querySelectorAll(SCROLL_KEEP)].map((el, i) => [i, el.scrollTop, el.scrollLeft]);
+    const pageY = window.scrollY;
+    appEl.innerHTML = html;
+    if (scrolls.length) { const now = [...appEl.querySelectorAll(SCROLL_KEEP)]; for (const [i, top, left] of scrolls) if (now[i]) { now[i].scrollTop = top; now[i].scrollLeft = left; } }
+    if (window.scrollY !== pageY) window.scrollTo(window.scrollX, pageY);
+    domWatch.observe(appEl, { childList: true, subtree: true, attributes: true, characterData: true });
+    domWatch.takeRecords();
+    domDirty = false;
     for (const k of kept) {
       const form = document.querySelector(`form[data-keep="${CSS.escape(k.key)}"]`);
       if (!form) continue;
@@ -3136,6 +3568,7 @@
   }
   addEventListener('resize', () => requestAnimationFrame(placeConnectors));
   // PF-0112: the queue sheet's confirmation tick and submit.
+  document.addEventListener('change', (e) => { if (e.target.matches('[data-machine-ack]')) { machineUi.ack = e.target.checked; const b = document.querySelector('[data-machine="codex/install"]'); if (b) b.disabled = !machineUi.ack || Boolean(machineUi.busy); } });
   document.addEventListener('change', (e) => {
     if (e.target.matches?.('[data-approval-wait]')) {
       setupPost('agents/approval-wait', { minutes: Number(e.target.value) }).then(() => toast(A('اتحفظ. بيتطبّق على الطلبات الجاية.', 'Saved. It applies to new requests.'))).catch((err) => toast(esc(why(err))));
@@ -3199,6 +3632,8 @@
   async function loadForView() {
     const v = route().v;
     if (!pid && !['new', 'projects'].includes(v)) return;
+    if (pid && (['map', 'lines', 'overview', 'setup'].includes(v) || readiness?.pid !== pid)) await loadReadiness();
+    if (!readOnly && (v === 'setup' || !machineInfo)) await loadMachine();
     // Project pages load the agent state only while the chat is open (PF-0067).
     if (v === 'item' || ((chatOpen || ['map', 'lines'].includes(v)) && PROJECT_CHAT_VIEWS.includes(v))) { if (agentsOn) await loadAgent(); else await loadAgentInfo(); }
     if (agentsOn && (v === 'agents' || !execView)) await loadExecution();
@@ -3331,6 +3766,11 @@
     const fg = e.target.closest('[data-folder-go]');
     if (fg && folder) { openFolder(folder.mode, fg.dataset.folderGo); return; }
     if (e.target.closest('[data-folder-choose]')) { chooseFolder(); return; }
+    if (e.target.closest('[data-folder-preview]')) { previewFolder(); return; }
+    if (e.target.closest('[data-folder-connect]')) { connectFolder(); return; }
+    if (e.target.closest('[data-folder-back]') && folder) { folder.preview = null; folder.previewError = null; renderFolder(); return; }
+    if (e.target.closest('[data-folder-new]') && folder) { folder.creating = true; renderFolder(); document.querySelector('#folderdlg [data-folder-newform] input')?.focus(); return; }
+    if (e.target.closest('[data-folder-newcancel]') && folder) { folder.creating = false; renderFolder(); return; }
     const wo = e.target.closest('[data-wiz-open]');
     if (wo) { const id = wo.dataset.wizOpen; resetWizard(); switchProject(id, 'overview'); return; }
     if (e.target.closest('[data-folder-close]')) { document.getElementById('folderdlg')?.close(); folder = null; return; }
@@ -3342,6 +3782,9 @@
     if (rmr) { askRemoveProject({ root: rmr.dataset.removeProjectRoot, name: rmr.dataset.removeProjectRoot }); return; }
     if (e.target.closest('[data-remove-project-cancel]')) { removing = null; document.getElementById('rmprojdlg')?.close(); return; }
     if (e.target.closest('[data-chat-toggle]')) { toggleChat(); return; }
+    // PF-0123: readiness → the project chat opens with the prepared request; the developer sends it.
+    const readyChat = e.target.closest('[data-ready-chat]');
+    if (readyChat) { agentDraft = readyChat.dataset.readyChat; toggleChat(true); return; }
     const sugg = e.target.closest('[data-suggest]');
     if (sugg) { useSuggestion(sugg.dataset.suggest); return; }
     const ask = e.target.closest('[data-chat-item]');
@@ -3384,7 +3827,17 @@
     const rshc = e.target.closest('[data-rt-shared-cancel]');
     if (rshc) { delete sharedAsk[rshc.dataset.rtSharedCancel]; render(); return; }
     if (e.target.closest('[data-agents-launch]')) { writeLaunch(); return; }
-    if (e.target.closest('[data-agents-rescan]')) { setupDo('rescan', async () => {}, { scanAgents: true }); return; }
+    if (e.target.closest('[data-agents-rescan]')) { setupDo('rescan', async () => { await loadMachine(); }, { scanAgents: true }); return; }
+    const scrollTo2 = e.target.closest('[data-scroll-to]');
+    if (scrollTo2) { const el = document.getElementById(scrollTo2.dataset.scrollTo); if (el) { if (el.tagName === 'DETAILS') el.open = true; el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' }); el.querySelector('button, a, input')?.focus({ preventScroll: true }); } return; }
+    // PF-0123: agent setup on this machine.
+    const mo = e.target.closest('[data-machine-open]');
+    if (mo) { machineUi.open = mo.dataset.machineOpen; machineUi.ack = false; machineUi.verifyError = null; render(); return; }
+    if (e.target.closest('[data-machine-close]')) { machineUi.open = null; machineUi.ack = false; render(); return; }
+    const machineBtn = e.target.closest('[data-machine]');
+    if (machineBtn) { const action = machineBtn.dataset.machine; machinePost(action, action === 'codex/install' ? { confirm: true, planHash: machineBtn.dataset.plan } : action === 'codex/login' ? { confirm: true } : {}); return; }
+    const sd = e.target.closest('[data-agent-strip-dismiss]');
+    if (sd) { store.set('agentStripDismissed', sd.dataset.agentStripDismiss); render(); return; }
     const sg = e.target.closest('[data-rt-suggest]');
     if (sg) { addService({ fromSuggestion: sg.dataset.rtSuggest }); return; }
     const rt = e.target.closest('[data-rt]');
@@ -3559,7 +4012,7 @@
     else if (x.dataset.file) openFile(x.dataset.file);
     else if (x.dataset.art) openArtifact(+x.dataset.art);
     else if (x.hasAttribute('data-more')) { const b = x.previousElementSibling; b.classList.toggle('clamp'); x.textContent = b.classList.contains('clamp') ? A('اقرأ الطلب كله ↓', 'Read the whole request ↓') : A('أقل ↑', 'Less ↑'); }
-    else if (x.dataset.copy) copy(x.dataset.copy);
+    else if (x.dataset.copy) copy(x.dataset.copy, x.dataset.copyWhat);
   });
   document.addEventListener('toggle', (e) => { const key = e.target.dataset?.overview; if (key && e.target.isConnected) { if (e.target.open) overviewExpanded.add(key); else overviewExpanded.delete(key); } const sx = e.target.dataset?.sx; if (sx && e.target.isConnected) setupOpen.set(sx, e.target.open); }, true);
   document.addEventListener('input', (e) => { if (e.target.closest('[data-gate-form]')) gateReady(e.target.closest('[data-gate-form]')); });
@@ -3623,6 +4076,9 @@
     button.textContent = chatWide ? '⤡' : '⤢';
     win?.querySelector('.chatbody')?.lastElementChild?.scrollIntoView?.({ block: 'end' });
   });
+  // PF-0123: the header's More menu closes with Esc (focus back on it) or a click elsewhere.
+  document.addEventListener('keydown', (e) => { const menu = document.querySelector('[data-navmore][open]'); if (e.key === 'Escape' && menu) { menu.open = false; menu.querySelector('summary')?.focus(); } });
+  document.addEventListener('click', (e) => { const menu = document.querySelector('[data-navmore][open]'); if (menu && !menu.contains(e.target)) menu.open = false; }, true);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && chatOpen && document.getElementById('chatwin')?.contains(e.target) && !document.querySelector('dialog[open]')) { e.preventDefault(); toggleChat(false); } });
   document.addEventListener('keydown', (e) => { if (e.target.matches?.('[data-agent-input]') && e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); e.target.form.requestSubmit(); } });
   document.addEventListener('submit', (e) => {
