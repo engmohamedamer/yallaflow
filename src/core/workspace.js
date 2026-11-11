@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { readdir } from 'node:fs/promises';
+import { lstat, readdir } from 'node:fs/promises';
 import { exists, ensureDir, writeText } from '../utils/fs.js';
 import { readYaml, writeYaml } from './yaml.js';
 import { KNOWLEDGE_POLICY_VERSION } from '../knowledge/constants.js';
@@ -78,6 +78,8 @@ export async function initWorkspace(root, name, kind, mode = 'adaptive', { origi
     if (kind !== 'greenfield') throw new Error('A wizard-created project is initialized as greenfield.');
   }
   const base = workspacePath(root);
+  // PF-0125 (security): a .yallaflow link (even a dangling one) would send every write elsewhere.
+  if ((await lstat(base).catch(() => null))?.isSymbolicLink()) throw new Error(`${base} is a symbolic link. YallaFlow creates its workspace only as a real folder inside the project; remove the link, then run \`yallaflow init\` again.\n\nNo files were changed.`);
   if (await exists(base)) throw new Error(`Workspace already exists at ${base}`);
   if (await exists(path.join(root, LEGACY_WORKSPACE_DIR))) {
     throw new Error('Legacy .projectflow workspace detected. YallaFlow does not migrate it automatically; migrate it deliberately before running `yallaflow init`.');

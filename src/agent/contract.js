@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { exists, readText, writeText } from '../utils/fs.js';
+import { readText } from '../utils/fs.js';
+import { resolveManagedFile, writeManaged } from './managed-files.js';
 
 // Package-owned agent guidance (.yallaflow/AGENT.md) with an explicit contract
 // version. AGENT.md is project-owned: YallaFlow manages only the marked block below,
@@ -117,11 +118,14 @@ function parseBlock(content) {
 //   legacy-customized  unversioned AGENT.md that differs from every generated template
 //   broken             begin marker without end marker
 //   missing            no AGENT.md
+//   unsafe-link        .yallaflow or AGENT.md is a link YallaFlow will not follow (PF-0125)
 export async function inspectAgentContract(root) {
   const file = agentFile(root);
   const installed = AGENT_CONTRACT_VERSION;
-  if (!await exists(file)) return { state: 'missing', installed };
-  const content = await readText(file);
+  const managed = await resolveManagedFile(root, file);
+  if (!managed.safe) return { state: 'unsafe-link', installed, reason: managed.reason };
+  if (!managed.exists) return { state: 'missing', installed };
+  const content = await readText(managed.realPath);
   const block = parseBlock(content);
   if (!block) {
     const legacy = LEGACY_GENERATED_CONTRACTS[sha256(content)];
@@ -149,7 +153,8 @@ export function describeAgentContractState(status) {
     'legacy-generated': `predates versioned agent contracts (unmodified ${status.legacy} template); run \`yallaflow agent refresh\``,
     'legacy-customized': 'predates versioned agent contracts and contains custom edits; run `yallaflow agent refresh --preserve-existing` (your content is kept verbatim below the new managed block)',
     broken: 'managed-block begin marker without end marker; fix AGENT.md manually',
-    missing: 'AGENT.md is missing; run `yallaflow agent refresh` to recreate it'
+    missing: 'AGENT.md is missing; run `yallaflow agent refresh` to recreate it',
+    'unsafe-link': `.yallaflow/AGENT.md is ${status.reason}; YallaFlow never writes through it — make .yallaflow a real folder and AGENT.md a regular file`
   }[status.state];
 }
 
@@ -177,8 +182,9 @@ export async function refreshAgentContract(root, { preserveExisting = false, dry
   }
   if (status.state === 'newer') throw new Error(`AGENT.md was written by a newer YallaFlow contract (v${status.version}); refusing to downgrade it to v${status.installed}.`);
   if (status.state === 'broken') throw new Error('AGENT.md has a YallaFlow managed-block begin marker without its end marker; fix it manually before refreshing.');
+  if (status.state === 'unsafe-link') throw Object.assign(new Error(`.yallaflow/AGENT.md is ${status.reason}; YallaFlow never writes through it. Make .yallaflow a real folder and AGENT.md a regular file. No files were changed.`), { code: 'MANAGED_FILE_UNSAFE' });
 
-  const content = status.state === 'missing' ? '' : await readText(file);
+  const content = status.state === 'missing' ? '' : await readText((await resolveManagedFile(root, file)).realPath);
   if (status.state === 'missing' || status.state === 'legacy-generated') {
     next = fresh;
     action = status.state === 'missing' ? 'created' : 'replaced-generated';
@@ -203,7 +209,7 @@ export async function refreshAgentContract(root, { preserveExisting = false, dry
     action = 'installed-with-preserved-content';
   }
 
-  if (!dryRun) await writeText(file, next);
+  if (!dryRun) await writeManaged(root, file, next);
   return { status, action, written: !dryRun, preview: dryRun ? next : undefined };
 }
 

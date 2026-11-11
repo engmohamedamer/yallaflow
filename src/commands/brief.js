@@ -182,7 +182,7 @@ async function primaryConcern(root, report, active, delivery, onboarding, shared
   if (shared?.pending?.blocked.length) return { text: `${shared.pending.blocked.length} pending shared knowledge update(s) changed in parallel and need reconciliation`, command: 'yallaflow shared status --verbose' };
   if (shared?.onIntegration && shared.pending.applicable.length) return { text: `integrate ${shared.pending.applicable.length} knowledge update(s) from merged work into shared project memory`, command: 'yallaflow shared integrate (then commit .yallaflow/)' };
   if (report.agent.state !== 'current') return { text: 'agent contract is not current', command: report.plan.find((step) => step.title.includes('Agent') || step.title.includes('package'))?.command ?? 'yallaflow agent status' };
-  const staleBootstrap = report.bootstraps.find((item) => ['outdated', 'modified', 'newer'].includes(item.state));
+  const staleBootstrap = report.bootstraps.find((item) => ['outdated', 'modified', 'newer', 'unsafe-link'].includes(item.state));
   if (staleBootstrap) return { text: `${staleBootstrap.file} agent bootstrap is ${staleBootstrap.state}`, command: report.plan.find((step) => step.title.includes(staleBootstrap.file) || step.title.includes('package'))?.command ?? 'yallaflow agent status' };
   if (report.reconciliation) return { text: 'legacy context reconciliation in progress', command: report.reconciliation.nextAction };
   if (report.pendingLegacy.length) return { text: 'legacy context reconciliation available', command: 'yallaflow context reconcile start' };

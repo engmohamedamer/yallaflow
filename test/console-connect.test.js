@@ -179,13 +179,13 @@ test('connect never writes through a CLAUDE.md or AGENTS.md link that leaves the
   await symlink(outside, path.join(laravel, 'CLAUDE.md'));
   await symlink(path.join(dir, 'not-there', 'x.desktop'), path.join(laravel, 'AGENTS.md'));
   const preview = await previewConnect(laravel, { home: dir });
-  assert.deepEqual(preview.problems.map((problem) => [problem.code, problem.file]), [['BOOTSTRAP_LINK_OUTSIDE', 'CLAUDE.md'], ['BOOTSTRAP_LINK_OUTSIDE', 'AGENTS.md']]);
+  assert.deepEqual(preview.problems.map((problem) => [problem.code, problem.file]), [['BOOTSTRAP_UNSAFE_LINK', 'CLAUDE.md'], ['BOOTSTRAP_UNSAFE_LINK', 'AGENTS.md']]);
   await withHome(dir, async () => {
     const { server, post } = await serve([]);
     try {
       const refused = await post('/api/projects/connect', { root: laravel, planHash: preview.planHash, confirm: true });
       assert.equal(refused.status, 409);
-      assert.equal(refused.body.error.code, 'BOOTSTRAP_LINK_OUTSIDE');
+      assert.equal(refused.body.error.code, 'BOOTSTRAP_UNSAFE_LINK');
     } finally {
       await server.close();
     }

@@ -53,6 +53,12 @@ The same console, smoother and easier to set up. Everything below is in the exis
 - **Copy says "copied" only when it really copied.** When the browser refuses, the console tries a second method, then shows the text selected for ⌘C or Ctrl+C.
 - **Setup's services step** now sees saved services. It always said "No services for now".
 
+### Security
+- **`yallaflow init`, `agent setup` and `agent refresh` never write through a symbolic link outside the project** (PF-0125). A repository could make init append its block to a file outside the project through a `CLAUDE.md` or `AGENTS.md` link, for example to `~/.bashrc`. A dangling link could make it create a file elsewhere, and a linked `.yallaflow/AGENT.md` could do the same through `agent refresh`.
+  - **Refused, with nothing written:** these links, links into another folder, links to something that isn't a regular file, and a linked `.yallaflow`.
+  - **Still supported:** `CLAUDE.md` linked to `AGENTS.md` next to it.
+  - **How files are written:** through a temporary file and a rename, so a link swapped in later is never followed. Read-only files stay read-only. A failed init's rollback restores only the files it recorded.
+
 ### Internal
 - **Tailwind CSS v4** utilities (prefix `tw:`, no reset) are built during development into the committed `resources/console/tw.css`, which ships as-is. CI requires the stylesheet freshness test and checks the packed file.
 - **Tests:**

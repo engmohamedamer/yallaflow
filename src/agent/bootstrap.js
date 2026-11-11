@@ -1,7 +1,10 @@
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { lstat, readFile, readlink, realpath, rm, writeFile } from 'node:fs/promises';
-import { exists, readText, writeText } from '../utils/fs.js';
+import { readFile, realpath, rm } from 'node:fs/promises';
+import { readText } from '../utils/fs.js';
+import { resolveManagedFile, writeManaged } from './managed-files.js';
+
+export { resolveManagedFile } from './managed-files.js';
 
 // First-party agent bootstrap (v0.3.8). A provider's own session-start file in the
 // repository root (AGENTS.md for Codex, CLAUDE.md for Claude) gets one thin,
@@ -97,12 +100,15 @@ function parseBlock(content) {
 //   modified       block edited by hand (hash mismatch)
 //   newer          block written by a newer YallaFlow
 //   broken         begin marker without end marker, or a block for another provider
+//   unsafe-link    a link leaving the project, a dangling link, or not a regular file (PF-0125)
 export async function inspectBootstrap(root, provider) {
   const file = providerFile(root, provider);
   const installed = BOOTSTRAP_VERSION;
   const base = { provider: provider.id, file: provider.file, installed };
-  if (!await exists(file)) return { ...base, state: 'not-installed', fileExists: false };
-  const block = parseBlock(await readText(file));
+  const managed = await resolveManagedFile(root, file);
+  if (!managed.safe) return { ...base, state: 'unsafe-link', fileExists: managed.exists, reason: managed.reason };
+  if (!managed.exists) return { ...base, state: 'not-installed', fileExists: false };
+  const block = parseBlock(await readText(managed.realPath));
   if (!block) return { ...base, state: 'not-installed', fileExists: true };
   if (!block.broken && block.provider !== provider.id) {
     // One file serving two providers (e.g. CLAUDE.md symlinked to AGENTS.md) carries
@@ -139,7 +145,8 @@ export function describeBootstrapState(status) {
     outdated: `outdated (v${status.version} → v${status.installed}); run \`yallaflow agent refresh\``,
     modified: `the YallaFlow-managed block in ${status.file} was edited by hand; move custom text outside the block, or run \`${setup} --preserve-existing\``,
     newer: `written by a newer YallaFlow (v${status.version} > installed v${status.installed}); upgrade YallaFlow instead`,
-    broken: `${status.file} has a malformed YallaFlow bootstrap block (missing end marker or wrong provider); fix it manually`
+    broken: `${status.file} has a malformed YallaFlow bootstrap block (missing end marker or wrong provider); fix it manually`,
+    'unsafe-link': `${status.file} is ${status.reason}; YallaFlow never writes through it — replace it with a regular file (or a link to a file next to it, such as CLAUDE.md -> AGENTS.md)`
   }[status.state];
 }
 
@@ -158,8 +165,9 @@ export async function setupBootstrap(root, provider, { preserveExisting = false,
   if (status.state === 'shared') throw new Error(`${provider.file} is the same file as the ${status.sharedWith} bootstrap file and already carries its YallaFlow block; no separate ${provider.id} block is needed. No files were changed.`);
   if (status.state === 'newer') throw new Error(`${provider.file} has a YallaFlow bootstrap block from a newer YallaFlow (v${status.version}); refusing to downgrade it to v${status.installed}. No files were changed.`);
   if (status.state === 'broken') throw new Error(`${provider.file} has a malformed YallaFlow bootstrap block (missing end marker or another provider's block); fix it manually. No files were changed.`);
+  if (status.state === 'unsafe-link') throw Object.assign(new Error(`${provider.file} is ${status.reason}; YallaFlow never writes through it. Replace it with a regular file (or a link to a file next to it, such as CLAUDE.md -> AGENTS.md). No files were changed.`), { code: 'BOOTSTRAP_UNSAFE_LINK' });
 
-  const content = status.fileExists ? await readText(file) : '';
+  const content = status.fileExists ? await readText((await resolveManagedFile(root, file)).realPath) : '';
   let next;
   let action;
   if (status.state === 'not-installed') {
@@ -184,7 +192,7 @@ export async function setupBootstrap(root, provider, { preserveExisting = false,
     next = `${block.prefix}${fresh}${preserved}${block.suffix}`;
     action = 'installed-with-preserved-content';
   }
-  if (!dryRun) await writeText(file, next);
+  if (!dryRun) await writeManaged(root, file, next);
   return { status, action, written: !dryRun, preview: dryRun ? next : undefined };
 }
 
@@ -218,30 +226,18 @@ export function bootstrapFileNames() {
   return onboardingProviders().map((provider) => provider.file).join(' and ');
 }
 
-const UNSAFE_BOOTSTRAP_STATES = Object.freeze(['modified', 'newer', 'broken']);
+const UNSAFE_BOOTSTRAP_STATES = Object.freeze(['modified', 'newer', 'broken', 'unsafe-link']);
 
 // PF-0123 (console connect preview): what init's bootstrap step would do to each agent file —
 // the same providers and states as installAllBootstraps, read-only. Unsafe states are problems.
 export async function bootstrapInitPlan(root) {
   const plan = [];
   const problems = [];
-  const realRoot = await realpath(root);
-  const inside = (target) => target === realRoot || target.startsWith(`${realRoot}${path.sep}`);
   for (const provider of onboardingProviders()) {
-    // A symbolic link (even a dangling one) would make init write wherever it points: the
-    // console refuses one that leaves the project folder (a link to the other agent file stays fine).
-    const file = providerFile(root, provider);
-    const info = await lstat(file).catch(() => null);
-    if (info?.isSymbolicLink()) {
-      const target = await realpath(file).catch(async () => path.resolve(path.dirname(file), await readlink(file)));
-      if (!inside(target)) {
-        problems.push({ code: 'BOOTSTRAP_LINK_OUTSIDE', file: provider.file, message: `${provider.file} is a link to a file outside this folder; YallaFlow will not write through it. Replace the link with a regular file, then try again.` });
-        continue;
-      }
-    }
+    // The same unsafe states init refuses (PF-0125 includes links that leave the project).
     const status = await inspectBootstrap(root, provider);
     if (UNSAFE_BOOTSTRAP_STATES.includes(status.state)) {
-      problems.push({ code: 'BOOTSTRAP_UNSAFE', file: provider.file, message: `${provider.file}: ${describeBootstrapState(status)}` });
+      problems.push({ code: status.state === 'unsafe-link' ? 'BOOTSTRAP_UNSAFE_LINK' : 'BOOTSTRAP_UNSAFE', file: provider.file, message: `${provider.file}: ${describeBootstrapState(status)}` });
       continue;
     }
     const op = status.state === 'not-installed' ? (status.fileExists ? 'append-block' : 'create') : status.state === 'outdated' ? 'update-block' : 'unchanged';
@@ -281,13 +277,14 @@ export async function installAllBootstraps(root) {
   return results;
 }
 
+// The rollback records each managed file's real path (PF-0125): a safe link restores the file it
+// pointed to, and nothing is ever written through a link found later.
 export async function snapshotBootstrapFiles(root) {
   const files = [];
   for (const provider of Object.values(BOOTSTRAP_PROVIDERS)) {
     const file = path.join(root, provider.file);
-    const info = await lstat(file).catch(() => null);
-    // readFile/writeFile follow a symlink, so a linked CLAUDE.md/AGENTS.md restores its target.
-    files.push({ file, existed: Boolean(info), content: info ? await readFile(file).catch(() => null) : null });
+    const managed = await resolveManagedFile(root, file);
+    files.push({ root, file, realPath: managed.safe ? managed.realPath : null, existed: managed.exists, content: managed.safe && managed.exists ? await readFile(managed.realPath).catch(() => null) : null });
   }
   return files;
 }
@@ -298,10 +295,13 @@ export async function restoreBootstrapFiles(snapshot) {
       await rm(entry.file, { force: true });
       continue;
     }
-    if (entry.content === null) continue;
+    if (entry.content === null || !entry.realPath) continue;
+    // Restore only the same real file, re-checked: a link swapped in since the snapshot is never followed.
+    const managed = await resolveManagedFile(entry.root, entry.file).catch(() => null);
+    if (!managed?.safe || managed.realPath !== entry.realPath) continue;
     // Rewrite only what actually changed, so an untouched (even read-only) file never
     // turns a rollback into a second failure.
-    const current = await readFile(entry.file).catch(() => null);
-    if (!current || !current.equals(entry.content)) await writeFile(entry.file, entry.content);
+    const current = await readFile(entry.realPath).catch(() => null);
+    if (!current || !current.equals(entry.content)) await writeManaged(entry.root, entry.file, entry.content);
   }
 }
