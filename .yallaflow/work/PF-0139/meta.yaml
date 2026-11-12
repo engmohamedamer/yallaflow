@@ -1,0 +1,95 @@
+{
+  "id": "PF-0139",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "file explorer مازال صعببب الاستخدام شوف ايه الافضل والمتعارف عليه واعمله  عشان نسهل حياه المستخدم\nايه رايك نزود git init",
+  "status": "DONE",
+  "readOnly": false,
+  "attestation": {
+    "recordedVia": "console",
+    "verified": false,
+    "requestId": "fec97c4c-6dad-4585-ba89-f0a154432867",
+    "at": "2026-11-12T12:56:34.465Z"
+  },
+  "activation": {
+    "deferred": false,
+    "keptActive": null,
+    "at": "2026-11-12T12:56:34.468Z",
+    "activatedAt": "2026-11-12T13:43:47.867Z"
+  },
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-12T12:56:34.468Z",
+  "updatedAt": "2026-11-12T14:25:18.913Z",
+  "title": "file explorer مازال صعببب الاستخدام شوف ايه الافضل والمتعارف عليه واعمله عشان نسهل حياه…",
+  "routingConfidence": "high",
+  "routingReason": "Classified by the user in the YallaFlow console.",
+  "routedAt": "2026-11-12T12:56:34.856Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0097",
+      "type": "file",
+      "name": "screenshot-1794488031586-1.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-12T12:56:35.723Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0098",
+      "type": "file",
+      "name": "screenshot-1794488146325-2.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-12T12:56:36.168Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ],
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-12T13:54:49.256Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    },
+    {
+      "completedAt": "2026-11-12T14:25:18.913Z",
+      "verificationRunIds": [
+        "V-002"
+      ]
+    }
+  ],
+  "lastInvalidationAt": "2026-11-12T14:19:14.009Z",
+  "lifecycleHistory": [
+    {
+      "action": "reopen",
+      "fromStage": "DONE",
+      "toStage": "IMPLEMENTATION",
+      "reason": "The git init checkbox label uses the utility class tw:items-start, which is not in the prebuilt tw.css, so the checkbox would sit centred against a multi-line label. Found while updating the local installation.",
+      "changedAt": "2026-11-12T14:19:14.009Z"
+    }
+  ]
+}

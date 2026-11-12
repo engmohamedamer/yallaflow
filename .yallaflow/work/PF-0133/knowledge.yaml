@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "business-rule",
+      "source": "implementation-runtime",
+      "summary": "Console project readiness (src/console/readiness.js): choosing the project's agent is the first required step. Its status is 'choose' until a choice is saved in .yallaflow/local/agents.json (per project, per machine), then off/missing/done for the chosen provider (Codex, or the experimental Claude Code). An unchosen agent makes the project read 'incomplete' and blocks agent sessions and queue runs (AGENT_NOT_READY: 'Choose this project's agent first'), but never blocks creating work. The console offers the choice in place in the readiness card and as the chat panel's first screen.",
+      "evidence": [
+        "src/console/readiness.js#computeReadiness",
+        "src/console/server.js#readinessFor",
+        "test/console-readiness.test.js",
+        "verification:V-001"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-11T15:09:57.971Z",
+      "factId": "CTX-0153",
+      "promotedAt": "2026-11-11T15:32:33.201Z",
+      "target": "context/business-rules.md"
+    }
+  ],
+  "updatedAt": "2026-11-11T15:32:33.201Z",
+  "reviewedAt": "2026-11-11T15:32:33.201Z"
+}

@@ -17,16 +17,31 @@
       "summary": "Owner asked to release 1.5.1 (to test with someone else). Scope: PF-0115..PF-0118 on release/1.5.1. Plan: bump package and CLI version to 1.5.1, CHANGELOG and README, release checks, commit, fast-forward main, annotated tag, push, GitHub Release (release.yml, Trusted Publisher), verify npm and provenance. Parallel and Automated Merge stay disabled."
     },
     "implementation": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-10T14:31:02.597Z",
+      "completedAt": "2026-11-10T14:31:02.597Z",
+      "summary": "Release v1.5.1: commit 3491b3b on main (fast-forward from 8bcddf5), annotated tag v1.5.1, pushed; GitHub Release https://github.com/engmohamedamer/yallaflow/releases/tag/v1.5.1; release.yml run 42833526553 green; npm latest 1.5.1 with SLSA provenance, shasum 9a6a2ae identical to the local pack."
     },
     "verification": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-10T14:31:03.708Z",
+      "completedAt": "2026-11-10T14:31:03.708Z",
+      "summary": "Release checks V-001 (suite 1142/1142) and V-002 (pack smoke) passed; the published artifact matches the local pack.",
+      "evidence": [
+        "verification:V-001"
+      ]
     },
     "code-review": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-10T14:31:04.187Z",
+      "completedAt": "2026-11-10T14:31:04.187Z",
+      "summary": "Release checks V-001 (suite 1142/1142) and V-002 (pack smoke) passed; the published artifact matches the local pack.",
+      "evidence": [
+        "verification:V-001"
+      ]
     }
   },
   "rulings": [],
   "history": [],
-  "updatedAt": "2026-11-10T14:15:01.415Z"
+  "updatedAt": "2026-11-10T14:31:04.187Z"
 }

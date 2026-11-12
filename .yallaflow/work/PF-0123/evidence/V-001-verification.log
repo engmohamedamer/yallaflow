@@ -1,0 +1,11 @@
+# pass 13
+# fail 0
+PASS setup polling keeps the same DOM when nothing changed
+PASS pressed card is not replaced during a live update
+PASS click completed after the update (#/item/PF-0004)
+PASS the update appears after release (4 cards)
+PASS copy via Clipboard API reports success (اتنسخ رقم الشغلانة ✓)
+PASS denied API falls back to selection copy (اتنسخ رقم الشغلانة ✓|false)
+PASS both methods refused: dialog with the text selected, no false success
+PASS no console errors
+RESULT pass=8 fail=0

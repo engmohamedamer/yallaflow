@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0077",
+  "sourceType": "file",
+  "sourceName": "05-project-settings-light.png",
+  "detectedFormat": "png",
+  "contentType": "image/png",
+  "contentAvailability": "original-only",
+  "capturedAt": "2026-11-11T14:13:37.522Z",
+  "original": {
+    "path": "sources/SRC-0077/05-project-settings-light.png",
+    "sha256": "da0b50dcd7b0ff2608b114441815902444eb32b773a70185012501902c93a7ba",
+    "sizeBytes": 209493
+  },
+  "metadata": {
+    "extension": ".png",
+    "detectedFormat": "png",
+    "format": "png",
+    "width": 1440,
+    "height": 1652
+  },
+  "linkedWork": [
+    "PF-0132"
+  ]
+}

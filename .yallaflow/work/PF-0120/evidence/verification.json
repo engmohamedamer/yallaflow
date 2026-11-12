@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "grep -n \"getElementById('app').innerHTML = topbar\" resources/console/app.js && grep -n 'st-ico\" aria-hidden=\"true\">＋' resources/console/app.js && grep -n 'NOT_A_YALLAFLOW_PROJECT' src/console/greenfield.js && grep -n 'navigator.clipboard.writeText(text).then(done, () => toast(esc(text)))' resources/console/app.js && node -e \"const h=require('fs').readFileSync('research/ux-1.5.2/prototype.html','utf8');new Function(h.split('<script>')[1].split('</script>')[0]);console.log('prototype script parses')\" && test -z \"$(git status --porcelain -- . ':!.yallaflow' ':!research/ux-1.5.2' ':!.playwright-cli')\" && echo 'no other files changed'",
+      "executionMode": "shell",
+      "executable": "grep -n \"getElementById('app').innerHTML = topbar\" resources/console/app.js && grep -n 'st-ico\" aria-hidden=\"true\">＋' resources/console/app.js && grep -n 'NOT_A_YALLAFLOW_PROJECT' src/console/greenfield.js && grep -n 'navigator.clipboard.writeText(text).then(done, () => toast(esc(text)))' resources/console/app.js && node -e \"const h=require('fs').readFileSync('research/ux-1.5.2/prototype.html','utf8');new Function(h.split('<script>')[1].split('</script>')[0]);console.log('prototype script parses')\" && test -z \"$(git status --porcelain -- . ':!.yallaflow' ':!research/ux-1.5.2' ':!.playwright-cli')\" && echo 'no other files changed'",
+      "args": [],
+      "displayCommand": "grep -n \"getElementById('app').innerHTML = topbar\" resources/console/app.js && grep -n 'st-ico\" aria-hidden=\"true\">＋' resources/console/app.js && grep -n 'NOT_A_YALLAFLOW_PROJECT' src/console/greenfield.js && grep -n 'navigator.clipboard.writeText(text).then(done, () => toast(esc(text)))' resources/console/app.js && node -e \"const h=require('fs').readFileSync('research/ux-1.5.2/prototype.html','utf8');new Function(h.split('<script>')[1].split('</script>')[0]);console.log('prototype script parses')\" && test -z \"$(git status --porcelain -- . ':!.yallaflow' ':!research/ux-1.5.2' ':!.playwright-cli')\" && echo 'no other files changed'",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-10T22:46:58.980Z",
+      "finishedAt": "2026-11-10T22:46:59.081Z",
+      "verifiedAt": "2026-11-10T22:46:59.081Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

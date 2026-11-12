@@ -1,0 +1,18 @@
+# pass 15
+# fail 0
+PASS header: Workspace|Agents|Setup & run|Project|More ▾
+PASS #/map keeps Workspace current
+PASS #/lines keeps Workspace current
+PASS #/item/PF-0001 keeps Workspace current
+PASS #/map shows the Flow with the switch on Flow
+PASS #/lines shows the List with the switch on List
+PASS Workspace tab returns to the last view (List)
+PASS #/insights opens and More shows it (page|Insights ▾)
+PASS #/team opens and More shows it (page|Worktrees ▾)
+PASS More menu lists Insights and Worktrees
+PASS Esc closes More and returns focus
+PASS New gate + is a button named Create work
+PASS Enter on + opens the existing Create work form
+PASS Arabic: + named شغل جديد in RTL
+PASS no console errors
+RESULT pass=15 fail=0

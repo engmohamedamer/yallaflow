@@ -1,0 +1,1756 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-11T10:36:01.281Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 2,
+        "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+        "verificationRunIds": [
+          "V-003",
+          "V-013",
+          "V-012",
+          "V-014",
+          "V-006",
+          "V-009",
+          "V-005",
+          "V-004",
+          "V-001"
+        ]
+      },
+      "summary": "Assessed after the final full check V-013 (npm run check: 1167 pass, 0 fail) and the final browser checks V-014 (78 checks).",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "The package lists resources/console/tw.css (npm pack --dry-run); the server serves it after app.css; users run no build.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/tw.css",
+              "contentHash": "sha256:088802e25e116bb29d056c9d6e19e636e7f79fe59e563ece94804615b0dc0235",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:840c96c4b33e8c31cab7d45f170409bb1b47544cab417f5bdcab0fc7b97f5f3b",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "package.json",
+              "contentHash": "sha256:f5db872f6e68633eea7af98db44320046188d1f83b067438fb57d20bb20d1c30",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node -e \"JSON.parse(require('fs').readFileSync('package.json','utf8'))\" && node --import ./test-support/isolate-user-config.js --test test/console-refinement.test.js test/console-server.test.js 2>&1 | grep -E '^# (pass|fail|skipped)' && cp /home/engamer/Amasi/YallaFlow/resources/console/app.js /home/engamer/Amasi/YallaFlow/resources/console/tw.css /home/engamer/Amasi/YallaFlow/resources/console/tailwind.input.css /home/engamer/Amasi/YallaFlow/resources/console/index.html /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror/resources/console/ && cp test/console-refinement.test.js /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror/test/ && cp package.json /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror/ && (cd /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror && node --test test/console-refinement.test.js 2>&1 | grep -E '^# (pass|fail)' | sed 's/^/mirror-with-tailwind-cli /') && npm pack --dry-run --ignore-scripts --json 2>/dev/null | node -e \"let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{const f=JSON.parse(d)[0].files.map(x=>x.path);if(!f.includes('resources/console/tw.css'))process.exit(1);console.log('package ships resources/console/tw.css')})\" (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-003"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-013"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "A test builds tw.css with the pinned CLI and compares it; it passes when fresh and fails when stale (proven where the CLI is installed; CI installs it with npm ci).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/console-refinement.test.js",
+              "contentHash": "sha256:81335bcf71932ed62c8ced562ed136a20a5375302f9ff31748e1bc084366ba8e",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node -e \"JSON.parse(require('fs').readFileSync('package.json','utf8'))\" && node --import ./test-support/isolate-user-config.js --test test/console-refinement.test.js test/console-server.test.js 2>&1 | grep -E '^# (pass|fail|skipped)' && cp /home/engamer/Amasi/YallaFlow/resources/console/app.js /home/engamer/Amasi/YallaFlow/resources/console/tw.css /home/engamer/Amasi/YallaFlow/resources/console/tailwind.input.css /home/engamer/Amasi/YallaFlow/resources/console/index.html /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror/resources/console/ && cp test/console-refinement.test.js /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror/test/ && cp package.json /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror/ && (cd /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror && node --test test/console-refinement.test.js 2>&1 | grep -E '^# (pass|fail)' | sed 's/^/mirror-with-tailwind-cli /') && npm pack --dry-run --ignore-scripts --json 2>/dev/null | node -e \"let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{const f=JSON.parse(d)[0].files.map(x=>x.path);if(!f.includes('resources/console/tw.css'))process.exit(1);console.log('package ships resources/console/tw.css')})\" (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-003"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-013"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "Utilities are prefixed tw:, carry no preflight, and map colours/fonts/radii to app.css variables, so light/dark and RTL/LTR keep working; no framework was added.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/tailwind.input.css",
+              "contentHash": "sha256:6e6a9ff70baaf6f073953523ca09a38eb80a1b400b5994d52a3c22e48a482c43",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-refinement.test.js",
+              "contentHash": "sha256:81335bcf71932ed62c8ced562ed136a20a5375302f9ff31748e1bc084366ba8e",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node -e \"JSON.parse(require('fs').readFileSync('package.json','utf8'))\" && node --import ./test-support/isolate-user-config.js --test test/console-refinement.test.js test/console-server.test.js 2>&1 | grep -E '^# (pass|fail|skipped)' && cp /home/engamer/Amasi/YallaFlow/resources/console/app.js /home/engamer/Amasi/YallaFlow/resources/console/tw.css /home/engamer/Amasi/YallaFlow/resources/console/tailwind.input.css /home/engamer/Amasi/YallaFlow/resources/console/index.html /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror/resources/console/ && cp test/console-refinement.test.js /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror/test/ && cp package.json /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror/ && (cd /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror && node --test test/console-refinement.test.js 2>&1 | grep -E '^# (pass|fail)' | sed 's/^/mirror-with-tailwind-cli /') && npm pack --dry-run --ignore-scripts --json 2>/dev/null | node -e \"let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{const f=JSON.parse(d)[0].files.map(x=>x.path);if(!f.includes('resources/console/tw.css'))process.exit(1);console.log('package ships resources/console/tw.css')})\" (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-003"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-013"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "Before/after screenshots of Workspace (Flow, List), Setup & run, Project, Projects and mobile in ar/en and light/dark show the same layouts with the refinements; no feature removed.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "research/ux-1.5.2/before-after/index.html",
+              "contentHash": "sha256:646fd0f0c25d682cccd3f9b9cc943ff183ec7cd13a31e974665282a560c58a49",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-p7.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-012"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-014"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "Folder rows are labelled YallaFlow project / existing code with a stack hint / empty, and the primary action follows the kind (Open / Set up YallaFlow here / Start a new project here).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/folders.js",
+              "contentHash": "sha256:a935805f8a07a2f3f35767d3f32e6f434601dcf2d5625b7fa1b50706691cd57b",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:25a076079dbb4a80ace20b9c6764436c48c8e9df81813975cc9c168a64957bbc",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-connect.test.js",
+              "contentHash": "sha256:abd6c1ef9d60a35eacc739721142f5231c674fd55b1a42cf89e8281283ee8df5",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --check src/console/server.js && node --check src/console/connect.js && node --check src/console/folders.js && node --import ./test-support/isolate-user-config.js --test test/console-*.test.js test/project-setup.test.js 2>&1 | grep -E '^# (tests|pass|fail|skipped)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase5.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-006"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-014"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "The connect preview shows the detected stack, Git's uncommitted count (untouched) and the exact file plan before anything is written.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/connect.js",
+              "contentHash": "sha256:ee25ad36f747b73c8b61396ec109004befd208b7f1a74c9e48d5403acc9179ff",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-connect.test.js",
+              "contentHash": "sha256:abd6c1ef9d60a35eacc739721142f5231c674fd55b1a42cf89e8281283ee8df5",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --check src/console/server.js && node --check src/console/connect.js && node --check src/console/folders.js && node --import ./test-support/isolate-user-config.js --test test/console-*.test.js test/project-setup.test.js 2>&1 | grep -E '^# (tests|pass|fail|skipped)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase5.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-006"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-014"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "Confirming runs yallaflow init through the runner, bound to the preview hash; unsafe folders write nothing; the project registers and opens with project understanding as its next step.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/connect.js",
+              "contentHash": "sha256:ee25ad36f747b73c8b61396ec109004befd208b7f1a74c9e48d5403acc9179ff",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-connect.test.js",
+              "contentHash": "sha256:abd6c1ef9d60a35eacc739721142f5231c674fd55b1a42cf89e8281283ee8df5",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --check src/console/server.js && node --check src/console/connect.js && node --check src/console/folders.js && node --import ./test-support/isolate-user-config.js --test test/console-*.test.js test/project-setup.test.js 2>&1 | grep -E '^# (tests|pass|fail|skipped)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase5.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-006"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-014"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-008",
+          "status": "satisfied",
+          "reason": "The On this machine card shows Codex CLI and adapter versions, the sign-in method and the connection test, and Claude Code installed/version/sign-in with its experimental status and the Team/Enterprise warning.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/setup.js",
+              "contentHash": "sha256:e4f8d8de6775b561acce150bdf038711c04228bc08d389c9d15526307b10cec5",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:25a076079dbb4a80ace20b9c6764436c48c8e9df81813975cc9c168a64957bbc",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-p6.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-009"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-014"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-009",
+          "status": "satisfied",
+          "reason": "Install shows the exact npm install -g command, needs the review tick and a matching plan hash, never uses sudo, and is refused with the command to run by hand when the npm prefix is not writable; no credential reaches npm.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/setup.js",
+              "contentHash": "sha256:e4f8d8de6775b561acce150bdf038711c04228bc08d389c9d15526307b10cec5",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-machine.test.js",
+              "contentHash": "sha256:5157cbc1729a9f34beabd59d897562759db1ddefbd36ee87f097366e23ba51fb",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-p6.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-009"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-014"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-010",
+          "status": "satisfied",
+          "reason": "Sign-in runs Codex's own login --device-auth and shows only the link and code; Test connection performs only the ACP handshake in a temporary folder with API keys stripped, creates no session and ends the adapter; an API-key login is not usable.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/setup.js",
+              "contentHash": "sha256:e4f8d8de6775b561acce150bdf038711c04228bc08d389c9d15526307b10cec5",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-machine.test.js",
+              "contentHash": "sha256:5157cbc1729a9f34beabd59d897562759db1ddefbd36ee87f097366e23ba51fb",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-p6.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-009"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-014"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-011",
+          "status": "satisfied",
+          "reason": "A read-only console refuses /api/machine and every setup action (405).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:840c96c4b33e8c31cab7d45f170409bb1b47544cab417f5bdcab0fc7b97f5f3b",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-machine.test.js",
+              "contentHash": "sha256:5157cbc1729a9f34beabd59d897562759db1ddefbd36ee87f097366e23ba51fb",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-p6.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-009"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-014"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-012",
+          "status": "satisfied",
+          "reason": "GET /api/p/<id>/readiness reports initialized, understanding (Core's projectUnderstandingGate), agent and optional runtime with the next action, computed on each request.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/readiness.js",
+              "contentHash": "sha256:e1d5f09c22f93ec9c4922bd56bc0a87acec7209d5140a98afd1044cd3371b40f",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-readiness.test.js",
+              "contentHash": "sha256:9d0f3803fd16b7f97222b64121ee9b83b808d2e9811369d91f296aef11a1cf3e",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --check src/console/server.js && node --check src/console/readiness.js && node --import ./test-support/isolate-user-config.js --test test/console-*.test.js test/project-setup.test.js 2>&1 | grep -E '^# (tests|pass|fail|skipped)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase4.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-005"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-014"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-013",
+          "status": "satisfied",
+          "reason": "Create work before understanding is refused (422 PROJECT_UNDERSTANDING_REQUIRED with readiness); queue runs need a ready agent and understanding except for the understanding item; agent sessions, setup, runtime and reads stay available.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:840c96c4b33e8c31cab7d45f170409bb1b47544cab417f5bdcab0fc7b97f5f3b",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-readiness.test.js",
+              "contentHash": "sha256:9d0f3803fd16b7f97222b64121ee9b83b808d2e9811369d91f296aef11a1cf3e",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --check src/console/server.js && node --check src/console/readiness.js && node --import ./test-support/isolate-user-config.js --test test/console-*.test.js test/project-setup.test.js 2>&1 | grep -E '^# (tests|pass|fail|skipped)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase4.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-005"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-014"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-014",
+          "status": "satisfied",
+          "reason": "Approved Brownfield and Greenfield projects are ready with no migration; the CLI is unchanged and its tests pass.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/console-readiness.test.js",
+              "contentHash": "sha256:9d0f3803fd16b7f97222b64121ee9b83b808d2e9811369d91f296aef11a1cf3e",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --check src/console/server.js && node --check src/console/readiness.js && node --import ./test-support/isolate-user-config.js --test test/console-*.test.js test/project-setup.test.js 2>&1 | grep -E '^# (tests|pass|fail|skipped)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase4.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-005"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-013"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-015",
+          "status": "satisfied",
+          "reason": "The header shows Workspace, Agents, Setup & run, Project and More; the Workspace switches Flow/List and remembers it; #/map, #/lines, #/item, #/insights and #/team open the same pages.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:25a076079dbb4a80ace20b9c6764436c48c8e9df81813975cc9c168a64957bbc",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --import ./test-support/isolate-user-config.js --test test/console-refinement.test.js test/console-presentation.test.js test/console-acceptance.test.js 2>&1 | grep -E '^# (pass|fail)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase3.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-014"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-016",
+          "status": "satisfied",
+          "reason": "The New-gate + is a button named Create work / شغل جديد that opens the existing form by keyboard, shows a plain icon in read-only and is disabled with the reason when readiness blocks creation.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:25a076079dbb4a80ace20b9c6764436c48c8e9df81813975cc9c168a64957bbc",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --import ./test-support/isolate-user-config.js --test test/console-refinement.test.js test/console-presentation.test.js test/console-acceptance.test.js 2>&1 | grep -E '^# (pass|fail)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase3.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-014"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-017",
+          "status": "satisfied",
+          "reason": "A configured project shows its state, N of M running, Start/Stop project and app links first; a failed service shows its last log lines with Restart, Full log and Ask the agent; advanced parts are folded.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:25a076079dbb4a80ace20b9c6764436c48c8e9df81813975cc9c168a64957bbc",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-p7.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-012"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-014"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-018",
+          "status": "satisfied",
+          "reason": "An unconfigured project shows Set up the agent → Scan the stack → Choose services (optional) and says running the app is optional.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:25a076079dbb4a80ace20b9c6764436c48c8e9df81813975cc9c168a64957bbc",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/project-setup.test.js",
+              "contentHash": "sha256:78831ea7256278abeb109a5e2d7c7ab0c880e0dd494f77d6dc3d1a985bad198a",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-p7.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-012"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-014"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-019",
+          "status": "satisfied",
+          "reason": "Copy uses the Clipboard API inside the click, then a selection copy, then a dialog with the text selected; success is shown only after a confirmed write.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:25a076079dbb4a80ace20b9c6764436c48c8e9df81813975cc9c168a64957bbc",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-refinement.test.js",
+              "contentHash": "sha256:81335bcf71932ed62c8ced562ed136a20a5375302f9ff31748e1bc084366ba8e",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --import ./test-support/isolate-user-config.js --test test/console-refinement.test.js test/console-server.test.js test/console-presentation.test.js 2>&1 | grep -E '^# (pass|fail)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase1.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-001"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-014"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-020",
+          "status": "satisfied",
+          "reason": "An unchanged page is not rebuilt (unless the DOM was changed directly), a redraw waits while a pointer is held, scroll positions are kept; a click held during a live update completes.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:25a076079dbb4a80ace20b9c6764436c48c8e9df81813975cc9c168a64957bbc",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-refinement.test.js",
+              "contentHash": "sha256:81335bcf71932ed62c8ced562ed136a20a5375302f9ff31748e1bc084366ba8e",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --import ./test-support/isolate-user-config.js --test test/console-refinement.test.js test/console-server.test.js test/console-presentation.test.js 2>&1 | grep -E '^# (pass|fail)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase1.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-001"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-014"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-021",
+          "status": "satisfied",
+          "reason": "New write routes require the token, the console Origin, JSON and confirmation, and read-only refuses them; the architecture, Git and no-network guards pass; the full suite passes (1167 pass, 0 fail, 1 skipped freshness check that runs in CI).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:840c96c4b33e8c31cab7d45f170409bb1b47544cab417f5bdcab0fc7b97f5f3b",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test-support/git-scan.js",
+              "contentHash": "sha256:a287001b15c65b2bebb66e2ade975cc47f7ed19166564464d6689b121ce573c8",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-p7.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-012"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-013"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-022",
+          "status": "satisfied",
+          "reason": "The picker has a breadcrumb with Up/Backspace, a validated path field with ~, recent locations, an in-place filter, arrow-key navigation, and works in Arabic and English.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:25a076079dbb4a80ace20b9c6764436c48c8e9df81813975cc9c168a64957bbc",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --check src/console/server.js && node --check src/console/connect.js && node --check src/console/folders.js && node --import ./test-support/isolate-user-config.js --test test/console-*.test.js test/project-setup.test.js 2>&1 | grep -E '^# (tests|pass|fail|skipped)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase5.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-006"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-014"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-023",
+          "status": "satisfied",
+          "reason": "Folder kinds come from file names in the directory listing (artisan+composer.json, package.json, …); no file is opened.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/folders.js",
+              "contentHash": "sha256:a935805f8a07a2f3f35767d3f32e6f434601dcf2d5625b7fa1b50706691cd57b",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-connect.test.js",
+              "contentHash": "sha256:abd6c1ef9d60a35eacc739721142f5231c674fd55b1a42cf89e8281283ee8df5",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --check src/console/server.js && node --check src/console/connect.js && node --check src/console/folders.js && node --import ./test-support/isolate-user-config.js --test test/console-*.test.js test/project-setup.test.js 2>&1 | grep -E '^# (tests|pass|fail|skipped)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase5.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-006"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-014"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-024",
+          "status": "satisfied",
+          "reason": "New folder creates one safe name with a non-recursive mkdir inside a home-bounded parent; hidden, outside-home and existing names are refused; the wizard's destination checks are unchanged.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/folders.js",
+              "contentHash": "sha256:a935805f8a07a2f3f35767d3f32e6f434601dcf2d5625b7fa1b50706691cd57b",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-connect.test.js",
+              "contentHash": "sha256:abd6c1ef9d60a35eacc739721142f5231c674fd55b1a42cf89e8281283ee8df5",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --check src/console/server.js && node --check src/console/connect.js && node --check src/console/folders.js && node --import ./test-support/isolate-user-config.js --test test/console-*.test.js test/project-setup.test.js 2>&1 | grep -E '^# (tests|pass|fail|skipped)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase5.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-006"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-014"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-025",
+          "status": "satisfied",
+          "reason": "The same picker serves Add an existing project (leading to the init preview) and the New Project location.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:25a076079dbb4a80ace20b9c6764436c48c8e9df81813975cc9c168a64957bbc",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --check src/console/server.js && node --check src/console/connect.js && node --check src/console/folders.js && node --import ./test-support/isolate-user-config.js --test test/console-*.test.js test/project-setup.test.js 2>&1 | grep -E '^# (tests|pass|fail|skipped)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase5.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-006"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-014"
+            }
+          ]
+        }
+      ],
+      "unrequested": [
+        {
+          "id": "UR-001",
+          "disposition": "accepted",
+          "summary": "The connect preview also accepts an empty folder and starts a new (Greenfield) project there through the same init.",
+          "reason": "Covers the empty-folder case the brief asked the console to detect, with the same preview and confirmation.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/connect.js",
+              "contentHash": "sha256:ee25ad36f747b73c8b61396ec109004befd208b7f1a74c9e48d5403acc9179ff",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            }
+          ]
+        },
+        {
+          "id": "UR-002",
+          "disposition": "accepted",
+          "summary": "detectCodex now reports an override path (YALLAFLOW_CODEX_BIN / YALLAFLOW_CODEX_ACP) that does not exist.",
+          "reason": "Needed so readiness and setup do not report a missing Codex as installed.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/detect.js",
+              "contentHash": "sha256:a823675811a524957503b80f0ce08391a894da57e589201f9455e1eba1b0cfc1",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            }
+          ]
+        },
+        {
+          "id": "UR-003",
+          "disposition": "accepted",
+          "summary": "Fixed the setup guide reading runtime.services instead of runtime.data.services.",
+          "reason": "Existing bug in the Setup & Run flow this work reorganises.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:25a076079dbb4a80ace20b9c6764436c48c8e9df81813975cc9c168a64957bbc",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/project-setup.test.js",
+              "contentHash": "sha256:78831ea7256278abeb109a5e2d7c7ab0c880e0dd494f77d6dc3d1a985bad198a",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            }
+          ]
+        },
+        {
+          "id": "UR-004",
+          "disposition": "accepted",
+          "summary": "docs/console.md updated for navigation, connecting folders, readiness, agent setup and copying.",
+          "reason": "The old text described behaviour that changed.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "docs/console.md",
+              "contentHash": "sha256:842b6c8ddb682b696eef97569c1ae6d368189a4a15f7ed9ac5ad5105a2548c28",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CV-002",
+      "recordedAt": "2026-11-11T11:01:46.548Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 2,
+        "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+        "verificationRunIds": [
+          "V-003",
+          "V-015",
+          "V-012",
+          "V-016",
+          "V-006",
+          "V-009",
+          "V-005",
+          "V-004",
+          "V-001"
+        ]
+      },
+      "summary": "Re-assessed after the independent code review fixes: full check V-015 (1171 pass, 0 fail) and browser checks V-016 (78 checks).",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "The package lists resources/console/tw.css (npm pack --dry-run); the server serves it after app.css; users run no build.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/tw.css",
+              "contentHash": "sha256:088802e25e116bb29d056c9d6e19e636e7f79fe59e563ece94804615b0dc0235",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:0d302a25322698988858629de425e2963a8d9bbee845633e8a2bb048fcc89700",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "package.json",
+              "contentHash": "sha256:f5db872f6e68633eea7af98db44320046188d1f83b067438fb57d20bb20d1c30",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node -e \"JSON.parse(require('fs').readFileSync('package.json','utf8'))\" && node --import ./test-support/isolate-user-config.js --test test/console-refinement.test.js test/console-server.test.js 2>&1 | grep -E '^# (pass|fail|skipped)' && cp /home/engamer/Amasi/YallaFlow/resources/console/app.js /home/engamer/Amasi/YallaFlow/resources/console/tw.css /home/engamer/Amasi/YallaFlow/resources/console/tailwind.input.css /home/engamer/Amasi/YallaFlow/resources/console/index.html /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror/resources/console/ && cp test/console-refinement.test.js /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror/test/ && cp package.json /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror/ && (cd /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror && node --test test/console-refinement.test.js 2>&1 | grep -E '^# (pass|fail)' | sed 's/^/mirror-with-tailwind-cli /') && npm pack --dry-run --ignore-scripts --json 2>/dev/null | node -e \"let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{const f=JSON.parse(d)[0].files.map(x=>x.path);if(!f.includes('resources/console/tw.css'))process.exit(1);console.log('package ships resources/console/tw.css')})\" (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-003"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-015"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "A test builds tw.css with the pinned CLI and compares it; it passes when fresh and fails when stale (proven where the CLI is installed; CI installs it with npm ci).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/console-refinement.test.js",
+              "contentHash": "sha256:77ebf9a913a2830aaae89d64a971a9e306b91e012a16705a8d9b11957ff7fac5",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node -e \"JSON.parse(require('fs').readFileSync('package.json','utf8'))\" && node --import ./test-support/isolate-user-config.js --test test/console-refinement.test.js test/console-server.test.js 2>&1 | grep -E '^# (pass|fail|skipped)' && cp /home/engamer/Amasi/YallaFlow/resources/console/app.js /home/engamer/Amasi/YallaFlow/resources/console/tw.css /home/engamer/Amasi/YallaFlow/resources/console/tailwind.input.css /home/engamer/Amasi/YallaFlow/resources/console/index.html /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror/resources/console/ && cp test/console-refinement.test.js /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror/test/ && cp package.json /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror/ && (cd /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror && node --test test/console-refinement.test.js 2>&1 | grep -E '^# (pass|fail)' | sed 's/^/mirror-with-tailwind-cli /') && npm pack --dry-run --ignore-scripts --json 2>/dev/null | node -e \"let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{const f=JSON.parse(d)[0].files.map(x=>x.path);if(!f.includes('resources/console/tw.css'))process.exit(1);console.log('package ships resources/console/tw.css')})\" (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-003"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-015"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "Utilities are prefixed tw:, carry no preflight, and map colours/fonts/radii to app.css variables, so light/dark and RTL/LTR keep working; no framework was added.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/tailwind.input.css",
+              "contentHash": "sha256:6e6a9ff70baaf6f073953523ca09a38eb80a1b400b5994d52a3c22e48a482c43",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-refinement.test.js",
+              "contentHash": "sha256:77ebf9a913a2830aaae89d64a971a9e306b91e012a16705a8d9b11957ff7fac5",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node -e \"JSON.parse(require('fs').readFileSync('package.json','utf8'))\" && node --import ./test-support/isolate-user-config.js --test test/console-refinement.test.js test/console-server.test.js 2>&1 | grep -E '^# (pass|fail|skipped)' && cp /home/engamer/Amasi/YallaFlow/resources/console/app.js /home/engamer/Amasi/YallaFlow/resources/console/tw.css /home/engamer/Amasi/YallaFlow/resources/console/tailwind.input.css /home/engamer/Amasi/YallaFlow/resources/console/index.html /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror/resources/console/ && cp test/console-refinement.test.js /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror/test/ && cp package.json /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror/ && (cd /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/mirror && node --test test/console-refinement.test.js 2>&1 | grep -E '^# (pass|fail)' | sed 's/^/mirror-with-tailwind-cli /') && npm pack --dry-run --ignore-scripts --json 2>/dev/null | node -e \"let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{const f=JSON.parse(d)[0].files.map(x=>x.path);if(!f.includes('resources/console/tw.css'))process.exit(1);console.log('package ships resources/console/tw.css')})\" (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-003"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-015"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "Before/after screenshots of Workspace (Flow, List), Setup & run, Project, Projects and mobile in ar/en and light/dark show the same layouts with the refinements; no feature removed.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "research/ux-1.5.2/before-after/index.html",
+              "contentHash": "sha256:646fd0f0c25d682cccd3f9b9cc943ff183ec7cd13a31e974665282a560c58a49",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-p7.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-012"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-016"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "Folder rows are labelled YallaFlow project / existing code with a stack hint / empty, and the primary action follows the kind (Open / Set up YallaFlow here / Start a new project here).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/folders.js",
+              "contentHash": "sha256:a935805f8a07a2f3f35767d3f32e6f434601dcf2d5625b7fa1b50706691cd57b",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:61d2aff076f43f0e9d2b78fcd3b7e74b5854c80c28d73e5747c659c3143c4217",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-connect.test.js",
+              "contentHash": "sha256:f928a6c9f9857274488da42697623e76d74070c52fad325aee043a1cb636995f",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --check src/console/server.js && node --check src/console/connect.js && node --check src/console/folders.js && node --import ./test-support/isolate-user-config.js --test test/console-*.test.js test/project-setup.test.js 2>&1 | grep -E '^# (tests|pass|fail|skipped)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase5.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-006"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-016"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "The connect preview shows the detected stack, that any uncommitted work stays untouched (no Git command runs on a previewed folder, after the review), and the exact file plan, before anything is written.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/connect.js",
+              "contentHash": "sha256:91903c4bb4eab2a5e8dd601541ce7f05a308b31cf7984071d9da654d9e8f2059",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-connect.test.js",
+              "contentHash": "sha256:f928a6c9f9857274488da42697623e76d74070c52fad325aee043a1cb636995f",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --check src/console/server.js && node --check src/console/connect.js && node --check src/console/folders.js && node --import ./test-support/isolate-user-config.js --test test/console-*.test.js test/project-setup.test.js 2>&1 | grep -E '^# (tests|pass|fail|skipped)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase5.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-006"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-016"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "Confirming runs yallaflow init through the runner, bound to the preview hash; unsafe folders write nothing; the project registers and opens with project understanding as its next step. A CLAUDE.md/AGENTS.md link leaving the folder is refused (BOOTSTRAP_LINK_OUTSIDE), and one connect per folder runs at a time.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/connect.js",
+              "contentHash": "sha256:91903c4bb4eab2a5e8dd601541ce7f05a308b31cf7984071d9da654d9e8f2059",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-connect.test.js",
+              "contentHash": "sha256:f928a6c9f9857274488da42697623e76d74070c52fad325aee043a1cb636995f",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --check src/console/server.js && node --check src/console/connect.js && node --check src/console/folders.js && node --import ./test-support/isolate-user-config.js --test test/console-*.test.js test/project-setup.test.js 2>&1 | grep -E '^# (tests|pass|fail|skipped)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase5.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-006"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-016"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-008",
+          "status": "satisfied",
+          "reason": "The On this machine card shows Codex CLI and adapter versions, the sign-in method and the connection test, and Claude Code installed/version/sign-in with its experimental status and the Team/Enterprise warning.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/setup.js",
+              "contentHash": "sha256:908d5ad75223f4439d6cdcba7ef63822a8dd82b11474d54fce7e2ee994241c4e",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:61d2aff076f43f0e9d2b78fcd3b7e74b5854c80c28d73e5747c659c3143c4217",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-p6.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-009"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-016"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-009",
+          "status": "satisfied",
+          "reason": "Install shows the exact npm install -g command, needs the review tick and a matching plan hash, never uses sudo, and is refused with the command to run by hand when the npm prefix is not writable; no credential reaches npm. Only one setup step runs at a time; cancel ends the whole process group.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/setup.js",
+              "contentHash": "sha256:908d5ad75223f4439d6cdcba7ef63822a8dd82b11474d54fce7e2ee994241c4e",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-machine.test.js",
+              "contentHash": "sha256:b4eabe7a3fc5ffa0cd91edfac1f8c46ffcc63985cc1352ad306fa7a2ebdd50c6",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-p6.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-009"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-016"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-010",
+          "status": "satisfied",
+          "reason": "Sign-in runs Codex's own login --device-auth and shows only the link and code; Test connection performs only the ACP handshake in a temporary folder with API keys stripped, creates no session and ends the adapter; an API-key login is not usable.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/setup.js",
+              "contentHash": "sha256:908d5ad75223f4439d6cdcba7ef63822a8dd82b11474d54fce7e2ee994241c4e",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-machine.test.js",
+              "contentHash": "sha256:b4eabe7a3fc5ffa0cd91edfac1f8c46ffcc63985cc1352ad306fa7a2ebdd50c6",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-p6.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-009"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-016"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-011",
+          "status": "satisfied",
+          "reason": "A read-only console refuses /api/machine and every setup action (405).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:0d302a25322698988858629de425e2963a8d9bbee845633e8a2bb048fcc89700",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-machine.test.js",
+              "contentHash": "sha256:b4eabe7a3fc5ffa0cd91edfac1f8c46ffcc63985cc1352ad306fa7a2ebdd50c6",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-p6.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-009"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-016"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-012",
+          "status": "satisfied",
+          "reason": "GET /api/p/<id>/readiness reports initialized, understanding (Core's projectUnderstandingGate), agent and optional runtime with the next action, computed on each request.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/readiness.js",
+              "contentHash": "sha256:e1d5f09c22f93ec9c4922bd56bc0a87acec7209d5140a98afd1044cd3371b40f",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-readiness.test.js",
+              "contentHash": "sha256:9d0f3803fd16b7f97222b64121ee9b83b808d2e9811369d91f296aef11a1cf3e",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --check src/console/server.js && node --check src/console/readiness.js && node --import ./test-support/isolate-user-config.js --test test/console-*.test.js test/project-setup.test.js 2>&1 | grep -E '^# (tests|pass|fail|skipped)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase4.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-005"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-016"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-013",
+          "status": "satisfied",
+          "reason": "Create work before understanding is refused (422 PROJECT_UNDERSTANDING_REQUIRED with readiness); queue runs need a ready agent and understanding except for the understanding item; agent sessions, setup, runtime and reads stay available.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:0d302a25322698988858629de425e2963a8d9bbee845633e8a2bb048fcc89700",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-readiness.test.js",
+              "contentHash": "sha256:9d0f3803fd16b7f97222b64121ee9b83b808d2e9811369d91f296aef11a1cf3e",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --check src/console/server.js && node --check src/console/readiness.js && node --import ./test-support/isolate-user-config.js --test test/console-*.test.js test/project-setup.test.js 2>&1 | grep -E '^# (tests|pass|fail|skipped)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase4.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-005"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-016"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-014",
+          "status": "satisfied",
+          "reason": "Approved Brownfield and Greenfield projects are ready with no migration; the CLI is unchanged and its tests pass.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/console-readiness.test.js",
+              "contentHash": "sha256:9d0f3803fd16b7f97222b64121ee9b83b808d2e9811369d91f296aef11a1cf3e",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --check src/console/server.js && node --check src/console/readiness.js && node --import ./test-support/isolate-user-config.js --test test/console-*.test.js test/project-setup.test.js 2>&1 | grep -E '^# (tests|pass|fail|skipped)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase4.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-005"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-015"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-015",
+          "status": "satisfied",
+          "reason": "The header shows Workspace, Agents, Setup & run, Project and More; the Workspace switches Flow/List and remembers it; #/map, #/lines, #/item, #/insights and #/team open the same pages.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:61d2aff076f43f0e9d2b78fcd3b7e74b5854c80c28d73e5747c659c3143c4217",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --import ./test-support/isolate-user-config.js --test test/console-refinement.test.js test/console-presentation.test.js test/console-acceptance.test.js 2>&1 | grep -E '^# (pass|fail)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase3.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-016"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-016",
+          "status": "satisfied",
+          "reason": "The New-gate + is a button named Create work / شغل جديد that opens the existing form by keyboard, shows a plain icon in read-only and is disabled with the reason when readiness blocks creation.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:61d2aff076f43f0e9d2b78fcd3b7e74b5854c80c28d73e5747c659c3143c4217",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --import ./test-support/isolate-user-config.js --test test/console-refinement.test.js test/console-presentation.test.js test/console-acceptance.test.js 2>&1 | grep -E '^# (pass|fail)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase3.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-016"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-017",
+          "status": "satisfied",
+          "reason": "A configured project shows its state, N of M running, Start/Stop project and app links first; a failed service shows its last log lines with Restart, Full log and Ask the agent; advanced parts are folded.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:61d2aff076f43f0e9d2b78fcd3b7e74b5854c80c28d73e5747c659c3143c4217",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-p7.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-012"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-016"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-018",
+          "status": "satisfied",
+          "reason": "An unconfigured project shows Set up the agent → Scan the stack → Choose services (optional) and says running the app is optional.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:61d2aff076f43f0e9d2b78fcd3b7e74b5854c80c28d73e5747c659c3143c4217",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/project-setup.test.js",
+              "contentHash": "sha256:78831ea7256278abeb109a5e2d7c7ab0c880e0dd494f77d6dc3d1a985bad198a",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-p7.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-012"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-016"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-019",
+          "status": "satisfied",
+          "reason": "Copy uses the Clipboard API inside the click, then a selection copy, then a dialog with the text selected; success is shown only after a confirmed write.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:61d2aff076f43f0e9d2b78fcd3b7e74b5854c80c28d73e5747c659c3143c4217",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-refinement.test.js",
+              "contentHash": "sha256:77ebf9a913a2830aaae89d64a971a9e306b91e012a16705a8d9b11957ff7fac5",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --import ./test-support/isolate-user-config.js --test test/console-refinement.test.js test/console-server.test.js test/console-presentation.test.js 2>&1 | grep -E '^# (pass|fail)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase1.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-001"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-016"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-020",
+          "status": "satisfied",
+          "reason": "An unchanged page is not rebuilt (unless the DOM was changed directly), a redraw waits while a pointer is held, scroll positions are kept; a click held during a live update completes.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:61d2aff076f43f0e9d2b78fcd3b7e74b5854c80c28d73e5747c659c3143c4217",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-refinement.test.js",
+              "contentHash": "sha256:77ebf9a913a2830aaae89d64a971a9e306b91e012a16705a8d9b11957ff7fac5",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --import ./test-support/isolate-user-config.js --test test/console-refinement.test.js test/console-server.test.js test/console-presentation.test.js 2>&1 | grep -E '^# (pass|fail)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase1.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-001"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-016"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-021",
+          "status": "satisfied",
+          "reason": "New write routes require the token, the console Origin, JSON and confirmation, and read-only refuses them; the architecture, Git and no-network guards pass; the full suite passes (1171 pass, 0 fail, 1 skipped freshness check that runs in CI).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:0d302a25322698988858629de425e2963a8d9bbee845633e8a2bb048fcc89700",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test-support/git-scan.js",
+              "contentHash": "sha256:a287001b15c65b2bebb66e2ade975cc47f7ed19166564464d6689b121ce573c8",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-p7.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-012"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-015"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-022",
+          "status": "satisfied",
+          "reason": "The picker has a breadcrumb with Up/Backspace, a validated path field with ~, recent locations, an in-place filter, arrow-key navigation, and works in Arabic and English.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:61d2aff076f43f0e9d2b78fcd3b7e74b5854c80c28d73e5747c659c3143c4217",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --check src/console/server.js && node --check src/console/connect.js && node --check src/console/folders.js && node --import ./test-support/isolate-user-config.js --test test/console-*.test.js test/project-setup.test.js 2>&1 | grep -E '^# (tests|pass|fail|skipped)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase5.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-006"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-016"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-023",
+          "status": "satisfied",
+          "reason": "Folder kinds come from file names in the directory listing (artisan+composer.json, package.json, …); no file is opened.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/folders.js",
+              "contentHash": "sha256:a935805f8a07a2f3f35767d3f32e6f434601dcf2d5625b7fa1b50706691cd57b",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-connect.test.js",
+              "contentHash": "sha256:f928a6c9f9857274488da42697623e76d74070c52fad325aee043a1cb636995f",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --check src/console/server.js && node --check src/console/connect.js && node --check src/console/folders.js && node --import ./test-support/isolate-user-config.js --test test/console-*.test.js test/project-setup.test.js 2>&1 | grep -E '^# (tests|pass|fail|skipped)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase5.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-006"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-016"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-024",
+          "status": "satisfied",
+          "reason": "New folder creates one safe name with a non-recursive mkdir inside a home-bounded parent; hidden, outside-home and existing names are refused; the wizard's destination checks are unchanged.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/folders.js",
+              "contentHash": "sha256:a935805f8a07a2f3f35767d3f32e6f434601dcf2d5625b7fa1b50706691cd57b",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-connect.test.js",
+              "contentHash": "sha256:f928a6c9f9857274488da42697623e76d74070c52fad325aee043a1cb636995f",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --check src/console/server.js && node --check src/console/connect.js && node --check src/console/folders.js && node --import ./test-support/isolate-user-config.js --test test/console-*.test.js test/project-setup.test.js 2>&1 | grep -E '^# (tests|pass|fail|skipped)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase5.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-006"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-016"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-025",
+          "status": "satisfied",
+          "reason": "The same picker serves Add an existing project (leading to the init preview) and the New Project location.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:61d2aff076f43f0e9d2b78fcd3b7e74b5854c80c28d73e5747c659c3143c4217",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --check resources/console/app.js && node --check src/console/server.js && node --check src/console/connect.js && node --check src/console/folders.js && node --import ./test-support/isolate-user-config.js --test test/console-*.test.js test/project-setup.test.js 2>&1 | grep -E '^# (tests|pass|fail|skipped)' && bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/check-phase5.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-006"
+            },
+            {
+              "type": "runtime",
+              "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+              "workId": "PF-0123",
+              "verificationRunId": "V-016"
+            }
+          ]
+        }
+      ],
+      "unrequested": [
+        {
+          "id": "UR-005",
+          "disposition": "accepted",
+          "summary": "The connect preview also accepts an empty folder and starts a new (Greenfield) project there through the same init.",
+          "reason": "Covers the empty-folder case the brief asked the console to detect, with the same preview and confirmation.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/connect.js",
+              "contentHash": "sha256:91903c4bb4eab2a5e8dd601541ce7f05a308b31cf7984071d9da654d9e8f2059",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            }
+          ]
+        },
+        {
+          "id": "UR-006",
+          "disposition": "accepted",
+          "summary": "detectCodex now reports an override path (YALLAFLOW_CODEX_BIN / YALLAFLOW_CODEX_ACP) that does not exist.",
+          "reason": "Needed so readiness and setup do not report a missing Codex as installed.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/detect.js",
+              "contentHash": "sha256:da8c05b0bae9271e003ffacff333274c25b0606b8699c87d0a92fe5854aa5f2c",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            }
+          ]
+        },
+        {
+          "id": "UR-007",
+          "disposition": "accepted",
+          "summary": "Fixed the setup guide reading runtime.services instead of runtime.data.services.",
+          "reason": "Existing bug in the Setup & Run flow this work reorganises.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:61d2aff076f43f0e9d2b78fcd3b7e74b5854c80c28d73e5747c659c3143c4217",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/project-setup.test.js",
+              "contentHash": "sha256:78831ea7256278abeb109a5e2d7c7ab0c880e0dd494f77d6dc3d1a985bad198a",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            }
+          ]
+        },
+        {
+          "id": "UR-008",
+          "disposition": "accepted",
+          "summary": "docs/console.md updated for navigation, connecting folders, readiness, agent setup and copying.",
+          "reason": "The old text described behaviour that changed.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "docs/console.md",
+              "contentHash": "sha256:842b6c8ddb682b696eef97569c1ae6d368189a4a15f7ed9ac5ad5105a2548c28",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "updatedAt": "2026-11-11T11:01:46.548Z"
+}

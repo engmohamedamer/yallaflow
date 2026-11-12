@@ -1,0 +1,78 @@
+{
+  "id": "PF-0134",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Claude Code in the console chat: open on the project's chosen agent (no Codex default when Claude Code is chosen); a one-line Team/Enterprise warning with details on demand; Connect opens a terminal in the project folder running the launch command so the developer only confirms in Claude Code, with the copy-the-command path as the fallback; fewer status lines",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-11T15:16:43.797Z",
+  "updatedAt": "2026-11-11T15:45:44.876Z",
+  "title": "Claude Code in the console chat: open on the project's chosen agent (no Codex default when Claude Code is chosen); a one-line Team/Enterprise warning with details on demand; Connect opens a terminal in the project folder running the launch command so the developer only confirms in Claude Code, with the copy-the-command path as the fallback; fewer status lines",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-11T15:16:43.864Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0082",
+      "type": "file",
+      "name": "Screenshot from 2026-11-11 17-11-59.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-11T15:16:44.364Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0083",
+      "type": "file",
+      "name": "Screenshot from 2026-11-11 17-12-51.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-11T15:16:44.686Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0084",
+      "type": "file",
+      "name": "Screenshot from 2026-11-11 17-14-10.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-11T15:16:45.016Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ],
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-11T15:45:44.876Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002"
+      ]
+    }
+  ]
+}

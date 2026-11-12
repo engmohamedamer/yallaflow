@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-10T23:36:59.235Z",
+      "completedAt": "2026-11-10T23:36:59.235Z",
+      "summary": "Reused PF-0120 discovery of the console; three design directions prototyped on shared data and reviewed across ar/en, light/dark, desktop/mobile",
+      "evidence": [
+        "research/ux-1.5.2/DESIGN-DIRECTIONS.md"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-10T23:36:59.448Z",
+      "completedAt": "2026-11-10T23:36:59.448Z",
+      "summary": "Each direction critically reviewed from uniform screenshots; prototype defects recorded (B truncation/scale, A inspector width, C FAB overlap and copy-icon overlap); shared data.js duplicate memory key fixed without changing rendered output",
+      "evidence": [
+        "research/ux-1.5.2/shots"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-10T23:37:15.237Z",
+      "completedAt": "2026-11-10T23:37:15.237Z",
+      "summary": "V-002: all prototype and comparison scripts parse, data.js parses, 44 screenshots present, no files changed outside research/ux-1.5.2 and .yallaflow (V-001 failed only on an archive the owner created, research/ux-1.5.2.zip, left untouched)",
+      "evidence": [
+        "verification:V-002"
+      ]
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Design prototypes, a shared sample-data file, screenshots and design documents are written to research/ux-1.5.2/ (new, untracked, not application code) as this investigation's output, at the owner's explicit request; no production file is changed",
+      "reason": "Owner authorised independent prototypes and design research under research/ux-1.5.2/ during the design-approval stage",
+      "costIfWrong": "Low: new untracked files only",
+      "createdAt": "2026-11-10T22:58:27.209Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-10T23:37:15.237Z"
+}

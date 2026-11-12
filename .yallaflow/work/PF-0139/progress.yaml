@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-12T13:43:48.330Z",
+      "completedAt": "2026-11-12T13:45:21.956Z",
+      "summary": "The folder picker (app.js renderFolder/folderFooter/onFolderKey, listing from src/console/folders.js) already has a breadcrumb, a typed path field, recents, a filter and keyboard keys, but it breaks the standard file-dialog model: a single click on a row enters the folder, so a folder can only be chosen by entering it and then pressing the footer button; at home the footer button is disabled with no explanation; breadcrumb and path field are both always shown, and the list is short. Git init already exists in the console (greenfield.js gitInit, POST /api/p/<id>/git/init with {confirm:true}; never adds a remote or a commit) but is not offered when an existing folder without Git is connected (connect.js previewConnect only reports git: true/false).",
+      "evidence": [
+        "resources/console/app.js",
+        "src/console/folders.js",
+        "src/console/connect.js",
+        "src/console/greenfield.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-12T13:45:34.746Z",
+      "completedAt": "2026-11-12T13:45:34.746Z",
+      "summary": "Requested delta: make the folder picker behave like a standard file dialog and offer git init. (1) One click selects a folder; double-click, Enter or the row's arrow opens it; the footer's primary button acts on the selected folder, or on the current folder when nothing is selected, and says which. (2) The path bar shows the breadcrumb, with the typed path one click away instead of always on screen; the list gets more room; a short line states the keys. (3) When a folder being connected has no Git repository, the preview offers an opt-in 'git init' (unticked by default; no commit, no remote). No business ambiguity left: the git init decision is recorded as a ruling."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-12T13:45:35.197Z",
+      "completedAt": "2026-11-12T13:45:35.197Z",
+      "summary": "Plan. app.js: add folder.sel and folderTarget(); rows become a select button plus an open arrow; click selects in place (no redraw of the list), dblclick/Enter/arrow key opens; ArrowUp/Down move and select; footer and preview/choose act on the target; breadcrumb with an edit-path toggle; key hint line. Preview: opt-in git init checkbox when the folder has no .git and no Git repository above it; after a successful connect call the existing POST /api/p/<id>/git/init. connect.js: previewConnect reports gitAbove (lstat walk up to home; no Git command). app.css: selected row, open arrow, taller list. Tests: new test/console-folder-picker.test.js (vm over shipped app.js) plus a previewConnect gitAbove test. Impact: console only; listing API and trust rules unchanged."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-12T14:19:14.009Z",
+      "completedAt": "2026-11-12T14:19:25.843Z",
+      "summary": "Correction after reopen: the git init label is laid out by its own .fpick-git rule in app.css instead of the utility class tw:items-start, which the prebuilt tw.css does not contain. Everything else as recorded before.",
+      "evidence": [
+        "resources/console/app.js",
+        "resources/console/app.css"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-12T14:24:38.679Z",
+      "completedAt": "2026-11-12T14:24:38.679Z",
+      "summary": "After the reopen: npm test 1246 tests, 1245 pass, 0 fail, 1 skipped (V-002). Not exercised in a live browser.",
+      "evidence": [
+        "verification:V-002"
+      ]
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Offer git init as an opt-in checkbox (unticked by default) in the connect preview when the folder has no Git repository, reusing the console's existing confirmed git init action after the project is connected",
+      "reason": "The owner asked for an opinion on adding git init inside a request to make the flow easier. The action already exists in the console with its own confirmation; surfacing it at connect time adds no new write path, stays off unless ticked, and keeps source control in the developer's hands.",
+      "costIfWrong": "Low: one optional checkbox to remove; nothing runs unless the developer ticks it.",
+      "createdAt": "2026-11-12T13:45:22.171Z"
+    }
+  ],
+  "history": [
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "The git init checkbox label uses the utility class tw:items-start, which is not in the prebuilt tw.css, so the checkbox would sit centred against a multi-line label. Found while updating the local installation.",
+      "changedAt": "2026-11-12T14:19:14.009Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: The git init checkbox label uses the utility class tw:items-start, which is not in the prebuilt tw.css, so the checkbox would sit centred against a multi-line label. Found while updating the local installation.",
+      "changedAt": "2026-11-12T14:19:14.009Z"
+    }
+  ],
+  "updatedAt": "2026-11-12T14:24:38.679Z"
+}

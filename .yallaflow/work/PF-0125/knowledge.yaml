@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Files YallaFlow manages but a repository may already contain — the agent bootstrap files CLAUDE.md/AGENTS.md and the agent contract .yallaflow/AGENT.md — go through src/agent/managed-files.js: every folder on the way must be a real folder (no linked .yallaflow), and the file may only be absent, a regular file, or a link to a regular file in the same folder (CLAUDE.md -> AGENTS.md). Anything else is the unsafe-link state, refused before any write by init, agent setup, agent refresh and the console connect. Writes re-check, use an exclusive temporary file with the final permissions and a rename (never following a link), keep read-only files read-only, and the init rollback restores only the recorded real paths. init also refuses a linked .yallaflow. Other .yallaflow write paths (context render, PROJECT.md, state) are not yet covered (follow-up).",
+      "evidence": [
+        "src/agent/managed-files.js",
+        "src/agent/bootstrap.js",
+        "src/agent/contract.js",
+        "test/agent-bootstrap-security.test.js"
+      ],
+      "confidence": "confirmed",
+      "status": "promoted",
+      "createdAt": "2026-11-11T12:01:30.388Z",
+      "factId": "CTX-0148",
+      "promotedAt": "2026-11-11T12:01:30.553Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-11T12:01:30.553Z",
+  "reviewedAt": "2026-11-11T12:01:30.553Z"
+}

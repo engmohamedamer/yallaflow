@@ -1,0 +1,15 @@
+# tests 126
+# pass 125
+# fail 0
+# skipped 1
+PASS existing codebase shows the readiness card (incomplete|2 steps left before new work)
+PASS steps: understanding needed, runtime optional
+PASS header Create work is disabled with the reason (true|true|no-gate)
+PASS the understanding step offers its next action
+PASS server refuses a bypassed create (422|PROJECT_UNDERSTANDING_REQUIRED|readiness)
+PASS no work item was created
+PASS Project page shows the same readiness card
+PASS Arabic readiness card (rtl|فاضل خطوتين قبل الشغل الجديد)
+PASS Greenfield project: no card, Create work enabled
+PASS no console errors (besides the expected 422 probe)
+RESULT pass=10 fail=0

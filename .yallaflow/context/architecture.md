@@ -589,39 +589,6 @@ print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_commo
   - test/agent-continue.test.js (repository @ 9cfe4b5)
   - npm run check (passed) (runtime, PF-0066 V-002)
 
-<!-- yallaflow-fact:CTX-0124 -->
-### CTX-0124 — The console's floating agent chat follows the page (chatCtx in resources/console/app.js): a work item page is that item's chat; Overview, Flow, Work, Setup, Worktrees and Insights share a project chat whose session has no workId. One agent session per checkout still applies: an item's session appears on project pages as a link, and a project session on an item page is labelled as the project chat.
-
-- **State:** current
-- **Confidence:** confirmed
-- **Provenance:** repository
-- **Source work:** PF-0067
-- **Knowledge ID:** K-001
-- **Promoted at:** 2026-11-07T23:45:18.289Z
-- **Verified:** 2026-11-07T23:45:18.289Z (commit 9cfe4b5)
-- **Evidence:**
-  - resources/console/app.js (repository @ 9cfe4b5)
-  - test/console-project-chat.test.js (repository @ 9cfe4b5)
-  - npm run check (passed) (runtime, PF-0067 V-001)
-
-<!-- yallaflow-fact:CTX-0125 -->
-### CTX-0125 — The experimental Claude Code connection ships in the package but is off by default. It is turned on per project from the console's Setup page: the choice (agents, and Claude Code) is saved in .yallaflow/local/agents.json (git-ignored, owner-only 0600, ignored when tracked by Git or readable by others) and applied whenever the console opens, with no flags and no restart; 'yallaflow console --agents --experimental-claude' still turns it on for one run, and --read-only ignores the saved choice. The developer starts Claude Code with the launch command Setup shows; it opens with a short first prompt (run yallaflow brief) because SessionStart hooks carry no permission mode, so the mode is reported at once. The channel and hook send the bridge token only after the console proves it (HMAC over a nonce at /api/agent-bridge/claude/hello, live pid); messages are refused until a hook reports the mode, and bypassPermissions is never served. Codex remains the managed provider; subscription logins only, no API keys.
-
-- **State:** current
-- **Confidence:** confirmed
-- **Provenance:** repository
-- **Source work:** PF-0069
-- **Knowledge ID:** K-001
-- **Promoted at:** 2026-11-08T13:32:37.776Z
-- **Supersedes:** CTX-0121
-- **Verified:** 2026-11-08T13:32:37.776Z (commit a8236e9)
-- **Evidence:**
-  - src/agents/settings.js (repository @ a8236e9)
-  - src/agents/claude-files.js (repository @ a8236e9)
-  - src/console/server.js (repository @ a8236e9)
-  - npm test (passed) (runtime, PF-0069 V-004)
-  - portal session 2026-11-08: saved choice applied after a restart with no flags; mode known without typing (runtime)
-
 <!-- yallaflow-fact:CTX-0126 -->
 ### CTX-0126 — Runtime trust is bound to the effective configuration: the material definition fields plus hashes of package/composer script definitions, directly invoked local shell scripts, the Compose files a service loads (named -f files in any spelling, else the default file and its override) and the Dockerfiles of the build contexts they declare; .env and --env-file files are bound by file metadata only (content never read) and COMPOSE_/DOCKER_ settings passed by name by a digest of their value. Compose files are read by a conservative in-house reader (src/runtime/compose.js) that fails closed: anchors, aliases, merge keys, tags, flow mappings, several documents, include/extends, escaped or unknown keys, env-dependent or remote builds block trust and start until resolved. The reviewed hash is rechecked inside the service lock before spawn and again after the settle window; if it changed, only the process group YallaFlow just started and positively owns is stopped, and a shared service is left running. Trust and plan save come only from a person: a terminal for the CLI, or the console, which runs them in-process (no environment flag stands in for a person). Application code and indirect dependencies remain outside the fingerprint.
 
@@ -657,21 +624,6 @@ print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_commo
   - docs/runtime.md (repository @ a8236e9)
   - npm test (passed) (runtime, PF-0072 V-002)
 
-<!-- yallaflow-fact:CTX-0128 -->
-### CTX-0128 — The console Setup page (viewSetup in resources/console/app.js) has two layouts. Before any service is saved it is a guided flow: 1) find how the project runs, with Ask the agent first and recommended (the agent runs yallaflow runtime analyze itself and proposes the plan, which arrives preselected while the page polls for it) and the quick scan as the fallback; 2) choose and save; 3) review, trust, then start. Once services exist, the Run control is the head of the page (overall state, Start/Stop project, Open links, one compact row per service with Review and trust or Start/Restart/Stop and Logs), and plan, suggestions, add form, stack and agents fold into a Configuration disclosure. Disclosure state survives the 3-second redraw through data-sx keys. Save, trust (typed id bound to the reviewed definitionHash) and start remain human actions.
-
-- **State:** current
-- **Confidence:** confirmed
-- **Provenance:** repository
-- **Source work:** PF-0073
-- **Knowledge ID:** K-001
-- **Promoted at:** 2026-11-08T16:25:58.149Z
-- **Verified:** 2026-11-08T16:25:58.149Z (commit a8236e9)
-- **Evidence:**
-  - resources/console/app.js (repository @ a8236e9)
-  - resources/console/app.css (repository @ a8236e9)
-  - npm test (passed) (runtime, PF-0073 V-002)
-
 <!-- yallaflow-fact:CTX-0134 -->
 ### CTX-0134 — Web console (v1.2.0, extended in 1.4.0): 'yallaflow console' is a local web UI inside the yallaflow package (no daemon, no new dependency, no build step). src/console/server.js (node:http on 127.0.0.1; per-run Bearer token; Host 421, Origin 403; GET/HEAD for reads; UI from a fixed file map; sources served by ID only, previews sandboxed) reads by spawning this package's CLI (snapshot/work show/overview/runtime status --json) and refreshes on a debounced .yallaflow watcher with polling fallback. POST is accepted only on WRITE_ROUTE: Create Work and its attach route, work-item actions and gate decisions, runtime trust/start/stop/restart and adding a service, the New Project Wizard (plan, create with the full plan hash, planned files), project registration and removal, enabling agents for the run, and Git init; each needs the console Origin and exact content type, and '--read-only' refuses every POST. The project list can grow and shrink at runtime: registration and removal (POST /api/projects/remove with {id}, or {root} for an unavailable saved entry) run in one serialized queue; removal edits only the user-level console list, closes the project's watcher, and releases its agent checkout via AgentBridge.removeProject, refused with 409 SESSION_ACTIVE while an agent session or Claude Code channel is live. The console starts with no saved project unless read-only. GET /api/fs/dirs is the only filesystem listing: directories inside the real home folder, no hidden folders, no files, not in read-only.
 
@@ -704,5 +656,208 @@ print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_commo
   - src/console/actions.js (repository @ d3652e8)
   - src/console/server.js (repository @ d3652e8)
   - node --test test/console-actions.test.js test/console-presentation.test.js test/console-acceptance.test.js test/console-project-chat.test.js test/console-server.test.js (passed) (runtime, PF-0097 V-001)
+
+<!-- yallaflow-fact:CTX-0141 -->
+### CTX-0141 — The console UI (resources/console/app.js, one IIFE, no framework) still renders by rebuilding #app from HTML strings, but render() skips the rebuild when the generated HTML is identical and nothing changed the page since it was drawn (MutationObserver plus input/change events mark it dirty), defers a redraw while a pointer is held (max 4 s), and keeps scroll positions of scrollable regions. Code that changes the page directly is safe (it forces the next rebuild); a redraw is never relied on to reset a field the user typed in without marking it.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0123
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-11T11:02:17.754Z
+- **Supersedes:** CTX-0140
+- **Verified:** 2026-11-11T11:02:17.754Z (commit 3491b3b)
+- **Evidence:**
+  - resources/console/app.js (repository @ 3491b3b)
+  - bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed) (runtime, PF-0123 V-016)
+
+<!-- yallaflow-fact:CTX-0143 -->
+### CTX-0143 — Console project readiness (src/console/readiness.js) is derived on every request, never stored: initialized, understanding (Core's projectUnderstandingGate, so only recorded-Brownfield projects are gated and Greenfield never is), agent (blocks only agent sessions and queue runs), runtime (optional). The server enforces it: Create work before understanding returns Core's 422 PROJECT_UNDERSTANDING_REQUIRED plus the readiness document; queue runs need a ready agent and understanding, except a run of the understanding work item itself.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0123
+- **Knowledge ID:** K-003
+- **Promoted at:** 2026-11-11T11:02:18.679Z
+- **Verified:** 2026-11-11T11:02:18.679Z (commit 3491b3b)
+- **Evidence:**
+  - src/console/readiness.js (repository @ 3491b3b)
+  - src/console/server.js (repository @ 3491b3b)
+  - test/console-readiness.test.js (repository @ 3491b3b)
+
+<!-- yallaflow-fact:CTX-0144 -->
+### CTX-0144 — Connecting a folder from the console (src/console/connect.js) is a read-only preview (home-bounded path, stack from manifest hints, no Git command, the exact bootstrap plan from bootstrapInitPlan in src/agent/bootstrap.js, refusals for nested projects, lanes, hand-edited/newer/broken bootstrap blocks and CLAUDE.md/AGENTS.md links leaving the folder) followed by Core's yallaflow init through the runner, only with the preview's planHash and an explicit confirmation, one connect per folder at a time. Agent setup on the machine lives in src/agents/setup.js (provider knowledge stays in src/agent and src/agents, AC-108); its dynamic programs (npm, codex) are listed in test-support/git-scan.js DYNAMIC_PROGRAMS.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0123
+- **Knowledge ID:** K-004
+- **Promoted at:** 2026-11-11T11:02:19.116Z
+- **Verified:** 2026-11-11T11:02:19.116Z (commit 3491b3b)
+- **Evidence:**
+  - src/console/connect.js (repository @ 3491b3b)
+  - src/agents/setup.js (repository @ 3491b3b)
+  - test-support/git-scan.js (repository @ 3491b3b)
+
+<!-- yallaflow-fact:CTX-0148 -->
+### CTX-0148 — Files YallaFlow manages but a repository may already contain — the agent bootstrap files CLAUDE.md/AGENTS.md and the agent contract .yallaflow/AGENT.md — go through src/agent/managed-files.js: every folder on the way must be a real folder (no linked .yallaflow), and the file may only be absent, a regular file, or a link to a regular file in the same folder (CLAUDE.md -> AGENTS.md). Anything else is the unsafe-link state, refused before any write by init, agent setup, agent refresh and the console connect. Writes re-check, use an exclusive temporary file with the final permissions and a rename (never following a link), keep read-only files read-only, and the init rollback restores only the recorded real paths. init also refuses a linked .yallaflow. Other .yallaflow write paths (context render, PROJECT.md, state) are not yet covered (follow-up).
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0125
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-11T12:01:30.553Z
+- **Verified:** 2026-11-11T12:01:30.553Z (commit 3491b3b)
+- **Evidence:**
+  - src/agent/managed-files.js (repository @ 3491b3b)
+  - src/agent/bootstrap.js (repository @ 3491b3b)
+  - src/agent/contract.js (repository @ 3491b3b)
+  - test/agent-bootstrap-security.test.js (repository @ 3491b3b)
+
+<!-- yallaflow-fact:CTX-0149 -->
+### CTX-0149 — The console can open a registered project's folder in the OS file manager: POST /api/p/<project>/open-folder (a WRITE_ROUTE, so token + same Origin, refused in --read-only) calls src/console/reveal.js, which spawns xdg-open / open / explorer.exe with the project's registered root only (never a path from the request), shell:false and detached. startConsoleServer accepts an openFolder option so tests never launch a real file manager.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0128
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-11T13:20:19.547Z
+- **Verified:** 2026-11-11T13:20:19.547Z (commit 4d7c388)
+- **Evidence:**
+  - src/console/reveal.js (repository @ 4d7c388)
+  - src/console/server.js#handleWrite (repository @ 4d7c388)
+  - npm run check (passed) (runtime, PF-0128 V-001)
+
+<!-- yallaflow-fact:CTX-0150 -->
+### CTX-0150 — Console information architecture (PF-0132, 1.5.2): header tabs are Workspace · Project · More (Insights, Worktrees), with the project switcher and a permanent team indicator (Team/Solo + current branch, amber when Solo off the integration branch). Projects (#/projects) is the machine-level home: a Needs-you inbox of agent requests from all projects (when agents are on) above project cards that list each project's own lanes; #/agents is an alias for #/projects/inbox, and queue controls, Review & Merge and lane clean-up live on Worktrees (#/team). The Project destination is one page (projectPage/projHead/projTabs in resources/console/app.js) with tabs Overview (#/overview), Run (#/run: Start/Stop project, one compact row per service, a failure as one line with View log / Ask the agent to fix / Start again, links and setup analysis collapsed) and Settings (#/settings: setup guide, Agents, Team mode, Service definitions incl. analyze/plan/add, Project). #/setup and the old #setup-* anchors are normalized to Run or the matching Settings section (canonicalHash/normalizeRoute). Disclosure state still survives redraws through data-sx keys; save, trust and start remain human actions.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0132
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-11T14:49:34.985Z
+- **Supersedes:** CTX-0128
+- **Verified:** 2026-11-11T14:49:34.985Z (commit 4d7c388)
+- **Evidence:**
+  - resources/console/app.js#projTabs (repository @ 4d7c388)
+  - resources/console/app.js#canonicalHash (repository @ 4d7c388)
+  - resources/console/app.js#inboxSection (repository @ 4d7c388)
+  - test/console-ia.test.js (repository @ 4d7c388)
+  - npm run check (passed) (runtime, PF-0132 V-001)
+
+<!-- yallaflow-fact:CTX-0151 -->
+### CTX-0151 — The console's floating agent chat follows the page (chatCtx in resources/console/app.js): a work item page is that item's chat; Workspace (Flow, Work), the Project tabs (Overview, Run, Settings), Worktrees and Insights share a project chat whose session has no workId. One agent session per checkout still applies: an item's session appears on project pages as a link, and a project session on an item page is labelled as the project chat.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0132
+- **Knowledge ID:** K-002
+- **Promoted at:** 2026-11-11T14:49:35.462Z
+- **Supersedes:** CTX-0124
+- **Verified:** 2026-11-11T14:49:35.462Z (commit 4d7c388)
+- **Evidence:**
+  - resources/console/app.js#chatCtx (repository @ 4d7c388)
+  - npm run check (passed) (runtime, PF-0132 V-001)
+
+<!-- yallaflow-fact:CTX-0152 -->
+### CTX-0152 — The experimental Claude Code connection ships in the package but is off by default. It is turned on per project from the console's Project › Settings › Agents section: the choice (agents, and Claude Code) is saved in .yallaflow/local/agents.json (git-ignored, owner-only 0600, ignored when tracked by Git or readable by others) and applied whenever the console opens, with no flags and no restart; 'yallaflow console --agents --experimental-claude' still turns it on for one run, and --read-only ignores the saved choice. The developer starts Claude Code with the launch command Settings › Agents shows; it opens with a short first prompt (run yallaflow brief) because SessionStart hooks carry no permission mode, so the mode is reported at once. The channel and hook send the bridge token only after the console proves it (HMAC over a nonce at /api/agent-bridge/claude/hello, live pid); messages are refused until a hook reports the mode, and bypassPermissions is never served. Codex remains the managed provider; subscription logins only, no API keys.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0132
+- **Knowledge ID:** K-003
+- **Promoted at:** 2026-11-11T14:49:35.901Z
+- **Supersedes:** CTX-0125
+- **Verified:** 2026-11-11T14:49:35.901Z (commit 4d7c388)
+- **Evidence:**
+  - resources/console/app.js#viewSettings (repository @ 4d7c388)
+  - npm run check (passed) (runtime, PF-0132 V-001)
+
+<!-- yallaflow-fact:CTX-0154 -->
+### CTX-0154 — Connecting Claude Code from the console opens it in a terminal: POST /api/p/<project>/agents/open-terminal (WRITE_ROUTE, token + same Origin, empty body, Claude Code on for the project) writes the launch files and runs the launch command — built by the server from src/agents/claude-files.js and the detected claude binary, never taken from the request — in the project folder through src/agents/terminal.js (first of gnome-terminal, konsole, xfce4-terminal, kitty, alacritty, x-terminal-emulator, xterm on PATH; macOS Terminal via osascript; detached, shell:false). The developer only answers Claude Code's own development-channel prompt; when no terminal opens, the chat keeps the copy-the-command fallback. startConsoleServer takes openTerminalFor so tests never open a terminal.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0134
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-11T15:45:44.488Z
+- **Verified:** 2026-11-11T15:45:44.488Z (commit 4d7c388)
+- **Evidence:**
+  - src/agents/terminal.js (repository @ 4d7c388)
+  - src/console/server.js#handleWrite (repository @ 4d7c388)
+  - test/agent-terminal.test.js (repository @ 4d7c388)
+  - npm run check (passed) (runtime, PF-0134 V-002)
+
+<!-- yallaflow-fact:CTX-0155 -->
+### CTX-0155 — A Repository Baseline work item stays at stage INTAKE for its whole life (approval sets DONE). The flow snapshot (src/flow/snapshot.js baselineView) therefore derives a non-DONE baseline item's state, stations, completion, waitingFor and nextAction from baselineNextStep instead of its stage: discovery/draft/changes-requested are in progress at Understand, and awaiting-review is state 'you' with waitingFor.kind 'baseline'. The console never decides the baseline gate: its chat sends the developer's explicit approval message to the agent, which records it.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0135
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-12T10:25:23.699Z
+- **Verified:** 2026-11-12T10:25:23.699Z (commit 4d7c388)
+- **Evidence:**
+  - src/flow/snapshot.js#baselineView (repository @ 4d7c388)
+  - test/console-baseline-item.test.js (repository @ 4d7c388)
+  - npm run check (passed) (runtime, PF-0135 V-002)
+
+<!-- yallaflow-fact:CTX-0156 -->
+### CTX-0156 — Console run setup is one path on the Run tab (resources/console/app.js runFind / runApprove): the agent proposes the services (startAgentPlan sends the fixed read-only request directly when a session can take a message; quick scan is the fallback), the developer saves the picked services, then approves them together. Bulk approval is client-side only: each service is trusted through the existing per-service trust endpoint with the definitionHash of the review shown; shared or blocked services are excluded and keep their own per-row review. Settings keeps manual service editing as 'Advanced run setup'.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0136
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-12T11:45:51.263Z
+- **Verified:** 2026-11-12T11:45:51.263Z (commit 4d7c388)
+- **Evidence:**
+  - resources/console/app.js (repository @ 4d7c388)
+  - test/console-run-flow.test.js (repository @ 4d7c388)
+  - npm run check (passed) (runtime, PF-0136 V-004)
+
+<!-- yallaflow-fact:CTX-0157 -->
+### CTX-0157 — Claude Code can be attached to a project through its channel without a linked session record. In that state AgentBridge.disconnectClaude turns the Claude connection off for the project for this console run (disableClaude drops the channel and removes the bridge file, because the channel reconnects while that file exists), and removeProject releases an idle unlinked connection itself; removal is refused only for a real session or while Claude Code is mid-turn.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0138
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-12T11:56:57.382Z
+- **Verified:** 2026-11-12T11:56:57.382Z (commit 4d7c388)
+- **Evidence:**
+  - src/agents/bridge.js#disconnectClaude (repository @ 4d7c388)
+  - test/agent-claude-unlink.test.js (repository @ 4d7c388)
+  - npm run check (passed) (runtime, PF-0138 V-001)
+
+<!-- yallaflow-fact:CTX-0158 -->
+### CTX-0158 — Console first-run rules (1.5.2, PF-0140): (1) 'yallaflow work show <id> --json' carries an additive 'baseline' object (status, facts, limitations) for a Repository Baseline that has a draft, and the console item page renders it so the developer reviews the draft itself before approving. (2) The readiness card offers an optional step (running the app) only when no required step is open. (3) On the Run tab a service with runningOutside that YallaFlow did not start is shown as 'running outside YallaFlow', never 'stopped': Start, Start project and Stop project are disabled when there is nothing YallaFlow can start or stop, and readiness counts it as running. (4) A service listed in the bulk approval card has no second 'Review and trust' control on its row.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0140
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-12T13:43:20.754Z
+- **Verified:** 2026-11-12T13:43:20.754Z (commit 4d7c388)
+- **Evidence:**
+  - src/flow/snapshot.js (repository @ 4d7c388)
+  - resources/schemas/work-1.schema.json (repository @ 4d7c388)
+  - resources/console/app.js (repository @ 4d7c388)
+  - src/console/readiness.js (repository @ 4d7c388)
+  - test/console-first-run.test.js (repository @ 4d7c388)
+  - npm test (passed) (runtime, PF-0140 V-001)
 
 <!-- yallaflow-context:end -->

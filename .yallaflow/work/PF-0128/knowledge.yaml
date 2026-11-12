@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "The console can open a registered project's folder in the OS file manager: POST /api/p/<project>/open-folder (a WRITE_ROUTE, so token + same Origin, refused in --read-only) calls src/console/reveal.js, which spawns xdg-open / open / explorer.exe with the project's registered root only (never a path from the request), shell:false and detached. startConsoleServer accepts an openFolder option so tests never launch a real file manager.",
+      "evidence": [
+        "src/console/reveal.js",
+        "src/console/server.js#handleWrite",
+        "verification:V-001"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-11T13:20:09.633Z",
+      "factId": "CTX-0149",
+      "promotedAt": "2026-11-11T13:20:19.547Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-11T13:20:19.547Z",
+  "reviewedAt": "2026-11-11T13:20:19.547Z"
+}

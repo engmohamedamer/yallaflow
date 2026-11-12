@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-12T11:47:23.787Z",
+      "completedAt": "2026-11-12T11:47:23.787Z",
+      "summary": "Claude Code attaches through its channel (resources/agents/claude-channel.mjs -> AgentBridge ClaudeLink stream) without any linked session record; the chat then shows a synthesized 'connected' session with an Unlink button. AgentBridge.disconnectClaude handles only a linked session; removeProject refuses while project.session or the channel stream is attached, before it reaches disableClaude (the only path that drops the channel and the bridge file). The channel reconnects every 2-3 s while the bridge file exists."
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-12T11:47:24.060Z",
+      "completedAt": "2026-11-12T11:47:24.060Z",
+      "summary": "Root cause: with Claude Code connected but not linked, disconnectClaude throws NO_SESSION ('No Claude Code session is linked') because project.session is null, and removeProject throws SESSION_ACTIVE because claude.streamBusy() is true — checked before disableClaude, which is what would release the channel. Neither action can succeed, so the only way out is to quit Claude Code. Reproduction is the developer's screenshots (SRC on this item); a simulated-channel test reproduces it. Fix: Unlink without a linked session turns the Claude connection off for this console run (disableClaude); removeProject releases an idle, unlinked channel itself and refuses only for a real session or while Claude Code is mid-turn.",
+      "evidence": [
+        "src/agents/bridge.js:136-141",
+        "src/agents/bridge.js:776-778",
+        "resources/agents/claude-channel.mjs:98-132"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-12T11:48:07.300Z",
+      "completedAt": "2026-11-12T11:48:07.300Z",
+      "summary": "src/agents/bridge.js: disconnectClaude with Claude Code connected but not linked now turns the Claude connection off for the project (disableClaude: channel dropped, bridge file removed) and reports session.ended instead of throwing NO_SESSION; removeProject refuses only for a real session or while Claude Code is mid-turn, and otherwise releases an idle unlinked connection itself. New test/agent-claude-unlink.test.js (simulated channel)."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-12T11:56:56.976Z",
+      "completedAt": "2026-11-12T11:56:56.976Z",
+      "summary": "npm run check passed (V-001: 1223 pass, 0 fail), including the new simulated-channel tests for Unlink and removal with an unlinked Claude Code connection."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-12T11:56:56.976Z"
+}

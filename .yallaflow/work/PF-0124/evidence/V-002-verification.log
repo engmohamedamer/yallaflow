@@ -1,0 +1,10 @@
+== npm ci
+
+added 63 packages in 3s
+tailwind CLI: ≈ tailwindcss v4.3.5
+== npm run check (freshness required)
+not ok 652 - every installed dependency officially supports YallaFlow's declared Node floor — no engines mismatch anywhere in the tree
+# tests 1173
+# pass 1168
+# fail 1
+# skipped 4

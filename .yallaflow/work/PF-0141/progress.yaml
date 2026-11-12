@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-12T14:43:46.509Z",
+      "completedAt": "2026-11-12T14:43:46.509Z",
+      "summary": "npm latest is 1.5.1; branch release/1.5.2 holds version 1.5.2 with an 'unreleased' CHANGELOG section that covers PF-0123..PF-0125 only. The working tree adds the console work of PF-0127..PF-0140 (one Project destination with Overview/Run/Settings tabs, Agents inside Projects, project switcher, required agent choice, guided Run flow, new file explorer), not yet in the CHANGELOG or docs. docs/tour.md still says 1.4.1; tour and site screens date from 2026-11-08 and show the old header. research/docs-tour/capture.mjs stops after project creation because the wizard no longer lands on #/overview and Setup moved to #/run.",
+      "evidence": [
+        "CHANGELOG.md",
+        "research/docs-tour/capture.mjs",
+        "docs/tour.md",
+        "resources/console/app.js"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-12T14:43:47.013Z",
+      "completedAt": "2026-11-12T14:43:47.013Z",
+      "summary": "1) Update capture.mjs for the current console and recapture the tour (EN light, AR dark), convert to WebP, rebuild hero.gif. 2) Recapture the site's real-project screens read-only from YallaFlow's own repository. 3) CHANGELOG 1.5.2: add the console work since the candidate. 4) Docs: tour (EN/AR), console.md, README where navigation or screens changed. 5) Site: English page first, regenerate Arabic, copy screens. 6) Release checklist locally (check, doctor, audit, pack, smoke). No commit, tag, push or publish."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-12T15:17:07.230Z",
+      "completedAt": "2026-11-12T15:17:07.230Z",
+      "summary": "CHANGELOG 1.5.2 dated 2026-11-12 and extended with the console work since the candidate (PF-0127..PF-0140). capture.mjs follows the current console (wizard ready card, agent choice, Project > Run guided flow, All projects); 26 tour screens recaptured (EN light, AR dark) plus a new All projects screen, hero.gif rebuilt. docs/console.md, tour.md, tour.ar.md, README, runtime.md, agents.md, execution-modes.md and agents-claude-experimental.md describe Workspace / Project / More and the one-approval Run flow. Site: 1.5.2 what's-new, stats, timeline (1.4.2..1.5.2), screens, a read-only capture of YallaFlow's own Flow, Arabic page regenerated, share cards rebuilt, sitemap with lastmod and images, softwareVersion in structured data. Nothing committed, tagged, pushed or published.",
+      "evidence": [
+        "CHANGELOG.md",
+        "research/docs-tour/capture.mjs",
+        "docs/tour.md",
+        "site/index.html",
+        "site/sitemap.xml"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-12T15:17:47.129Z",
+      "completedAt": "2026-11-12T15:17:47.129Z",
+      "summary": "V-001 passed: syntax, package/console presentation tests, whitespace, Arabic page generation, sitemap XML, pack dry run, doctor. Full suite separately: 1245 pass, 0 fail, 1 skipped at --test-concurrency=4; at default concurrency on this loaded machine one timing test failed per run (a different one each time; each passes alone). npm audit: the 2 known moderate file-type/officeparser entries only. Local site preview checked in EN and AR: no broken images.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    },
+    "code-review": {
+      "status": "completed",
+      "startedAt": "2026-11-12T15:17:47.327Z",
+      "completedAt": "2026-11-12T15:17:47.327Z",
+      "summary": "Self-review of the diff: capture.mjs selectors match the current console and the full run completes; site image sizes match the files; the Arabic generator has a pair for every new string; old 07-setup-plan copies removed from site/media/tour because nothing references them. Not reviewed by a second person.",
+      "evidence": [
+        "research/docs-tour/capture.mjs",
+        "research/site/make-ar.py"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-12T15:17:47.327Z"
+}

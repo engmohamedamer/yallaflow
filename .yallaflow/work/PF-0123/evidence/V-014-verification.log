@@ -1,0 +1,12 @@
+== phase 1
+RESULT pass=8 fail=0
+== phase 3
+RESULT pass=15 fail=0
+== phase 4
+RESULT pass=10 fail=0
+== phase 5
+RESULT pass=22 fail=0
+== phase 6
+RESULT pass=12 fail=0
+== phase 7
+RESULT pass=11 fail=0

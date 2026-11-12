@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Console information architecture (PF-0132, 1.5.2): header tabs are Workspace · Project · More (Insights, Worktrees), with the project switcher and a permanent team indicator (Team/Solo + current branch, amber when Solo off the integration branch). Projects (#/projects) is the machine-level home: a Needs-you inbox of agent requests from all projects (when agents are on) above project cards that list each project's own lanes; #/agents is an alias for #/projects/inbox, and queue controls, Review & Merge and lane clean-up live on Worktrees (#/team). The Project destination is one page (projectPage/projHead/projTabs in resources/console/app.js) with tabs Overview (#/overview), Run (#/run: Start/Stop project, one compact row per service, a failure as one line with View log / Ask the agent to fix / Start again, links and setup analysis collapsed) and Settings (#/settings: setup guide, Agents, Team mode, Service definitions incl. analyze/plan/add, Project). #/setup and the old #setup-* anchors are normalized to Run or the matching Settings section (canonicalHash/normalizeRoute). Disclosure state still survives redraws through data-sx keys; save, trust and start remain human actions.",
+      "evidence": [
+        "resources/console/app.js#projTabs",
+        "resources/console/app.js#canonicalHash",
+        "resources/console/app.js#inboxSection",
+        "test/console-ia.test.js",
+        "verification:V-001"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0128"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-11T14:49:27.174Z",
+      "factId": "CTX-0150",
+      "promotedAt": "2026-11-11T14:49:34.985Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-002",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "The console's floating agent chat follows the page (chatCtx in resources/console/app.js): a work item page is that item's chat; Workspace (Flow, Work), the Project tabs (Overview, Run, Settings), Worktrees and Insights share a project chat whose session has no workId. One agent session per checkout still applies: an item's session appears on project pages as a link, and a project session on an item page is labelled as the project chat.",
+      "evidence": [
+        "resources/console/app.js#chatCtx",
+        "verification:V-001"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0124"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-11T14:49:27.350Z",
+      "factId": "CTX-0151",
+      "promotedAt": "2026-11-11T14:49:35.462Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-003",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "The experimental Claude Code connection ships in the package but is off by default. It is turned on per project from the console's Project › Settings › Agents section: the choice (agents, and Claude Code) is saved in .yallaflow/local/agents.json (git-ignored, owner-only 0600, ignored when tracked by Git or readable by others) and applied whenever the console opens, with no flags and no restart; 'yallaflow console --agents --experimental-claude' still turns it on for one run, and --read-only ignores the saved choice. The developer starts Claude Code with the launch command Settings › Agents shows; it opens with a short first prompt (run yallaflow brief) because SessionStart hooks carry no permission mode, so the mode is reported at once. The channel and hook send the bridge token only after the console proves it (HMAC over a nonce at /api/agent-bridge/claude/hello, live pid); messages are refused until a hook reports the mode, and bypassPermissions is never served. Codex remains the managed provider; subscription logins only, no API keys.",
+      "evidence": [
+        "resources/console/app.js#viewSettings",
+        "verification:V-001"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0125"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-11T14:49:34.804Z",
+      "factId": "CTX-0152",
+      "promotedAt": "2026-11-11T14:49:35.901Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-11T14:49:35.901Z",
+  "reviewedAt": "2026-11-11T14:49:35.901Z"
+}

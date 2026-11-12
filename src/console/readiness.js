@@ -5,8 +5,9 @@
 // - initialized    the project's records can be read (it is registered, so .yallaflow exists).
 // - understanding  Core's own gate (projectUnderstandingGate): only a project recorded as
 //                  Brownfield needs an approved understanding; Greenfield is never gated.
-// - agent          a provider the console can use is set up (needed for agent sessions and
-//                  queue runs only — creating work never needs an agent).
+// - agent          the agent provider chosen for this project is set up; first and required
+//                  while no agent is chosen (needed for agent sessions and queue runs only —
+//                  creating work never needs an agent).
 // - runtime        optional: blocks nothing but "Start project".
 //
 // `allows` is what the server enforces (see server.js); the console only explains it.
@@ -21,13 +22,27 @@ const STATUS_BY_UNDERSTANDING = Object.freeze({
 });
 
 // snapshotError: the message when the project's records could not be read (null when fine).
-// agent: { checked: boolean, enabled: boolean, ready: boolean, problems: string[] }.
+// agent: { checked, enabled, chosen?, provider?: string, ready, problems: string[], warnings?: string[] }.
 // runtime: the `runtime status --json` document, or null when it could not be read.
 export async function computeReadiness(root, { snapshotError = null, agent, runtime = null } = {}) {
   const steps = [];
   steps.push(snapshotError
     ? { id: 'initialized', status: 'attention', detail: String(snapshotError).slice(0, 300), next: { kind: 'command', command: 'yallaflow doctor' } }
     : { id: 'initialized', status: 'done' });
+
+  // PF-0133: choosing the project's agent is the first required step (before the understanding
+  // the agent prepares). `chosen: false` = no saved choice; callers that do not say are treated
+  // as chosen (the default provider). An unchosen agent blocks agent sessions and queues, never creating work.
+  const agentStatus = !agent?.checked ? 'unknown' : agent.chosen === false ? 'choose' : !agent.enabled ? 'off' : agent.ready ? 'done' : 'missing';
+  steps.push({
+    id: 'agent',
+    status: agentStatus,
+    provider: agent?.provider ?? null,
+    blocks: agentStatus === 'done' || agentStatus === 'unknown' ? [] : ['agentSession', 'runQueue'],
+    ...(agent?.problems?.length ? { problems: agent.problems.slice(0, 5) } : {}),
+    ...(agent?.warnings?.length ? { warnings: agent.warnings.slice(0, 3) } : {}),
+    ...(agentStatus === 'done' || agentStatus === 'unknown' ? {} : { next: { kind: agentStatus === 'choose' ? 'choose-agent' : 'setup' } })
+  });
 
   let gate = null;
   let understanding = null;
@@ -51,17 +66,10 @@ export async function computeReadiness(root, { snapshotError = null, agent, runt
     });
   }
 
-  const agentStatus = !agent?.checked ? 'unknown' : !agent.enabled ? 'off' : agent.ready ? 'done' : 'missing';
-  steps.push({
-    id: 'agent',
-    status: agentStatus,
-    blocks: agentStatus === 'done' || agentStatus === 'unknown' ? [] : ['agentSession', 'runQueue'],
-    ...(agent?.problems?.length ? { problems: agent.problems.slice(0, 5) } : {}),
-    ...(agentStatus === 'done' || agentStatus === 'unknown' ? {} : { next: { kind: 'setup' } })
-  });
 
   const services = Array.isArray(runtime?.services) ? runtime.services : [];
-  const running = services.filter((service) => ['running', 'starting'].includes(service.state)).length;
+  // PF-0140: a stack that already runs outside YallaFlow is up — there is nothing to start.
+  const running = services.filter((service) => ['running', 'starting'].includes(service.state) || service.runningOutside?.length).length;
   const failed = services.filter((service) => service.state === 'failed').length;
   steps.push({
     id: 'runtime',
@@ -73,7 +81,7 @@ export async function computeReadiness(root, { snapshotError = null, agent, runt
   });
 
   const blocks = new Set(steps.flatMap((step) => step.blocks ?? []));
-  const requiredOpen = steps.filter((step) => !step.optional && !['done', 'unknown'].includes(step.status) && (step.id !== 'agent'));
+  const requiredOpen = steps.filter((step) => !step.optional && !['done', 'unknown'].includes(step.status) && (step.id !== 'agent' || step.status === 'choose'));
   return {
     schema: READINESS_SCHEMA,
     level: steps.some((step) => step.status === 'attention') ? 'attention' : requiredOpen.length ? 'incomplete' : 'ready',

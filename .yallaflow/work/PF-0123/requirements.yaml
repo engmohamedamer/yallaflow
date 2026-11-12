@@ -1,0 +1,771 @@
+{
+  "schemaVersion": 1,
+  "revision": 2,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "Introduce Tailwind CSS into the existing console; built only at development/publish time; the package ships the generated assets.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§1,§8"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "Polish typography, spacing, controls, status, cards, station columns and states of the existing console without changing its identity or layouts.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§1"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "Connect an existing folder without .yallaflow from the console, previewing and running the canonical yallaflow init.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§2A"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "REQ-004",
+      "statement": "Provide a compact guided agent setup that detects, installs with approval, signs in by subscription and verifies the connection.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§2B"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "REQ-005",
+      "statement": "Enforce mandatory project readiness on the server, derived from Core state, without blocking onboarding, recovery or read-only use.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§2C"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "REQ-006",
+      "statement": "Simplify navigation by merging Flow and Work into one Workspace page with a view switcher, keeping all destinations and deep links.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§3"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "REQ-007",
+      "statement": "Make the New-column + a real, keyboard-accessible Create Work button that respects readiness.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§4"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "REQ-008",
+      "statement": "Make Setup & Run clearly show readiness, running services, start/stop, links and failure recovery, with advanced configuration collapsed.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§5"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "REQ-009",
+      "statement": "Make Copy reliable with a fallback and accurate success/failure messages.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§6"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "REQ-010",
+      "statement": "Stop unnecessary redraws that lose clicks, focus, values or scroll position.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§7"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "REQ-011",
+      "statement": "Keep compatibility and safety: tests pass, CLI/JSON contracts unchanged, read-only respected, old projects keep working.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§8"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "REQ-012",
+      "statement": "Provide one clear, fast folder picker wherever the console asks for a project folder, connected to the init preview and the new-project destination checks.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0065"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:43:28.742Z",
+      "updatedAt": "2026-11-11T08:43:28.742Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "npm pack --dry-run lists the generated Tailwind stylesheet and the console serves it with no build step at runtime.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§1,§8"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "A test fails when the generated Tailwind stylesheet is out of date with the console sources.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§1,§8"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-001",
+      "statement": "Tailwind utilities use the existing colour tokens, so light/dark and Arabic/English keep working, and no frontend framework is added.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§1,§8"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-002",
+      "statement": "Before/after screenshots of the existing Workspace, Setup & Run, Project and mobile views in ar/en and light/dark show the same layouts with improved polish and no lost features.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§1"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "AC-005",
+      "requirement": "REQ-003",
+      "statement": "The folder chooser labels folders as YallaFlow project, existing code or empty and offers the matching action.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§2A"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "AC-006",
+      "requirement": "REQ-003",
+      "statement": "For existing code, a preview lists the detected stack, uncommitted changes left untouched, and exactly which files init creates or changes, before anything is written.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§2A"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "AC-007",
+      "requirement": "REQ-003",
+      "statement": "Confirming runs the canonical yallaflow init; unsafe cases write nothing; on success the project is registered and opens showing project understanding as the next step.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§2A"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "AC-008",
+      "requirement": "REQ-004",
+      "statement": "The console shows Codex CLI, adapter, versions and sign-in status, and whether Claude Code is installed together with its experimental status.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§2B"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "AC-009",
+      "requirement": "REQ-004",
+      "statement": "Missing Codex parts install only after the exact command is shown and explicitly confirmed; never with sudo; refused with a copyable command when the npm global prefix is not writable.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§2B"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "AC-010",
+      "requirement": "REQ-004",
+      "statement": "Sign-in uses Codex's own device sign-in, and Test connection starts the adapter and confirms a ChatGPT subscription login without API keys.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§2B"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "AC-011",
+      "requirement": "REQ-004",
+      "statement": "A read-only console runs none of the setup actions.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§2B"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "AC-012",
+      "requirement": "REQ-005",
+      "statement": "A readiness endpoint reports initialization, understanding, agent and optional runtime with the next action, derived from Core state.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§2C"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "AC-013",
+      "requirement": "REQ-005",
+      "statement": "The server refuses work creation before understanding and refuses queue runs without a ready agent or understanding (except the understanding item), while onboarding, setup, agent sessions and read-only views stay available.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§2C"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "AC-014",
+      "requirement": "REQ-005",
+      "statement": "Existing approved Brownfield and Greenfield projects are ready without migration, and CLI behaviour is unchanged.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§2C"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "AC-015",
+      "requirement": "REQ-006",
+      "statement": "The header shows Workspace, Agents, Setup & Run, Project and More; Workspace switches between Flow and List; #/map #/lines #/team #/insights #/item still open the same pages.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§3"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "AC-016",
+      "requirement": "REQ-007",
+      "statement": "The + is a focusable button with Arabic and English names that opens the existing Create Work form, is hidden in read-only and disabled with a reason when the project is not ready.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§4"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "AC-017",
+      "requirement": "REQ-008",
+      "statement": "A configured project shows ready state, N of M running, Start/Stop project and app links first; a failed service shows its last log lines and recovery actions; advanced configuration is collapsed.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§5"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "AC-018",
+      "requirement": "REQ-008",
+      "statement": "An unconfigured project shows the essential setup steps in order and marks runtime as optional.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§5"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "AC-019",
+      "requirement": "REQ-009",
+      "statement": "Copy reports success only after a successful write, falls back to selection copy, and otherwise shows the text selected with the platform shortcut.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§6"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "AC-020",
+      "requirement": "REQ-010",
+      "statement": "Live updates and polling do not rebuild the page when nothing changed, and clicks, focused inputs, typed values and scroll positions survive updates.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§7"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "AC-021",
+      "requirement": "REQ-011",
+      "statement": "The full test suite passes, CLI/JSON contracts are unchanged, and new write routes require token, Origin and confirmation and are refused in read-only.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0064",
+          "locator": "§8"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:36:41.512Z",
+      "updatedAt": "2026-11-11T08:36:41.512Z"
+    },
+    {
+      "id": "AC-022",
+      "requirement": "REQ-012",
+      "statement": "The picker offers breadcrumbs, up/back, filtering, recent locations, the full selected path and safe manual path entry, with keyboard navigation in Arabic and English.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0065"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:43:28.742Z",
+      "updatedAt": "2026-11-11T08:43:28.742Z"
+    },
+    {
+      "id": "AC-023",
+      "requirement": "REQ-012",
+      "statement": "Each folder is labelled as a YallaFlow project, existing code (with a framework hint such as Laravel or Node.js) or empty, using marker names only, without reading file contents.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0065"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:43:28.742Z",
+      "updatedAt": "2026-11-11T08:43:28.742Z"
+    },
+    {
+      "id": "AC-024",
+      "requirement": "REQ-012",
+      "statement": "The new-project flow can create a new folder inside the chosen location; manual paths, creation and symlinks stay home-bounded, exclude hidden folders and keep the existing destination checks.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0065"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:43:28.742Z",
+      "updatedAt": "2026-11-11T08:43:28.742Z"
+    },
+    {
+      "id": "AC-025",
+      "requirement": "REQ-012",
+      "statement": "The same picker is used for adding an existing project (leading to the init preview) and for choosing a new project's location.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0065"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T08:43:28.742Z",
+      "updatedAt": "2026-11-11T08:43:28.742Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-004",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-005",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-006",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-007",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-008",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-009",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-010",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-011",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-005",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-006",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-007",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-008",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-009",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-010",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-011",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-012",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-013",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-014",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-015",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-016",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-017",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-018",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-019",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-020",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-021",
+      "at": "2026-11-11T08:36:41.512Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-012",
+      "at": "2026-11-11T08:43:28.742Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-022",
+      "at": "2026-11-11T08:43:28.742Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-023",
+      "at": "2026-11-11T08:43:28.742Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-024",
+      "at": "2026-11-11T08:43:28.742Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-025",
+      "at": "2026-11-11T08:43:28.742Z",
+      "revision": 2
+    }
+  ],
+  "updatedAt": "2026-11-11T08:43:28.742Z"
+}

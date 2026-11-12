@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "npm run check:syntax && node --import ./test-support/isolate-user-config.js --test test/cli.test.js test/console-presentation.test.js test/console-readiness.test.js && git diff --check && python3 research/site/make-ar.py site && python3 -c \"import xml.dom.minidom;xml.dom.minidom.parse('site/sitemap.xml')\" && npm pack --dry-run >/dev/null 2>&1 && node src/cli.js doctor | tail -2",
+      "executionMode": "shell",
+      "executable": "npm run check:syntax && node --import ./test-support/isolate-user-config.js --test test/cli.test.js test/console-presentation.test.js test/console-readiness.test.js && git diff --check && python3 research/site/make-ar.py site && python3 -c \"import xml.dom.minidom;xml.dom.minidom.parse('site/sitemap.xml')\" && npm pack --dry-run >/dev/null 2>&1 && node src/cli.js doctor | tail -2",
+      "args": [],
+      "displayCommand": "npm run check:syntax && node --import ./test-support/isolate-user-config.js --test test/cli.test.js test/console-presentation.test.js test/console-readiness.test.js && git diff --check && python3 research/site/make-ar.py site && python3 -c \"import xml.dom.minidom;xml.dom.minidom.parse('site/sitemap.xml')\" && npm pack --dry-run >/dev/null 2>&1 && node src/cli.js doctor | tail -2",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-12T15:17:07.669Z",
+      "finishedAt": "2026-11-12T15:17:37.611Z",
+      "verifiedAt": "2026-11-12T15:17:37.611Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

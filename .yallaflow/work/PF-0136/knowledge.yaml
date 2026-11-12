@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Console run setup is one path on the Run tab (resources/console/app.js runFind / runApprove): the agent proposes the services (startAgentPlan sends the fixed read-only request directly when a session can take a message; quick scan is the fallback), the developer saves the picked services, then approves them together. Bulk approval is client-side only: each service is trusted through the existing per-service trust endpoint with the definitionHash of the review shown; shared or blocked services are excluded and keep their own per-row review. Settings keeps manual service editing as 'Advanced run setup'.",
+      "evidence": [
+        "resources/console/app.js",
+        "test/console-run-flow.test.js",
+        "verification:V-004"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-12T11:45:51.010Z",
+      "factId": "CTX-0156",
+      "promotedAt": "2026-11-12T11:45:51.263Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-12T11:45:51.263Z",
+  "reviewedAt": "2026-11-12T11:45:51.263Z"
+}

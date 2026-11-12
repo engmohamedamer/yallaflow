@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node -e \"const h=require('fs').readFileSync('research/ux-1.5.2/evolve/index.html','utf8');new Function(h.split('<script>')[1].split('</script>')[0]);console.log('evolve mockup script parses')\" && test -z \"$(git status --porcelain -- . ':!.yallaflow' ':!research/ux-1.5.2' ':!research/ux-1.5.2.zip' ':!.playwright-cli')\" && echo 'no production files changed'",
+      "executionMode": "shell",
+      "executable": "node -e \"const h=require('fs').readFileSync('research/ux-1.5.2/evolve/index.html','utf8');new Function(h.split('<script>')[1].split('</script>')[0]);console.log('evolve mockup script parses')\" && test -z \"$(git status --porcelain -- . ':!.yallaflow' ':!research/ux-1.5.2' ':!research/ux-1.5.2.zip' ':!.playwright-cli')\" && echo 'no production files changed'",
+      "args": [],
+      "displayCommand": "node -e \"const h=require('fs').readFileSync('research/ux-1.5.2/evolve/index.html','utf8');new Function(h.split('<script>')[1].split('</script>')[0]);console.log('evolve mockup script parses')\" && test -z \"$(git status --porcelain -- . ':!.yallaflow' ':!research/ux-1.5.2' ':!research/ux-1.5.2.zip' ':!.playwright-cli')\" && echo 'no production files changed'",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-11T08:29:43.115Z",
+      "finishedAt": "2026-11-11T08:29:43.212Z",
+      "verifiedAt": "2026-11-11T08:29:43.212Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

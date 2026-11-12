@@ -60,6 +60,13 @@ export async function previewConnect(requested, { home } = {}) {
   const manifests = inventory.manifests.map((entry) => entry.path).slice(0, 8);
   const empty = inventory.sourceFiles.total === 0 && inventory.manifests.length === 0 && !(inventory.containerCi?.length);
   const git = await present(path.join(folder, '.git'));
+  // PF-0139: a Git repository in a folder above this one (inside home) — found by name only,
+  // no Git command — so the console never offers `git init` inside an existing repository.
+  let gitAbove = false;
+  for (let current = path.dirname(folder); !git && current.startsWith(base) && current !== path.dirname(current); current = path.dirname(current)) {
+    if (await present(path.join(current, '.git'))) { gitAbove = true; break; }
+    if (current === base) break;
+  }
   // The agent files init's bootstrap step writes (and why it would refuse) come from Core.
   const bootstrap = await bootstrapInitPlan(folder);
   const plan = [{ path: '.yallaflow/', op: 'create' }, ...bootstrap.plan];
@@ -76,6 +83,7 @@ export async function previewConnect(requested, { home } = {}) {
     // No Git command runs here: a previewed folder's own Git config could name programs (filters)
     // that `git status` would start. Init never touches uncommitted work either way.
     git,
+    gitAbove,
     uncommitted: null,
     plan,
     problems

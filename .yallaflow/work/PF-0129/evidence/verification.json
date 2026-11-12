@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "test -s research/ux-1.5.2/ia/index.html && test -s research/ux-1.5.2/ia/tw.css && test $(ls research/ux-1.5.2/ia/shots/*.png | wc -l) -ge 16 && ! grep -Eq 'https?://(cdn|unpkg|fonts\\.g)' research/ux-1.5.2/ia/index.html",
+      "executionMode": "shell",
+      "executable": "test -s research/ux-1.5.2/ia/index.html && test -s research/ux-1.5.2/ia/tw.css && test $(ls research/ux-1.5.2/ia/shots/*.png | wc -l) -ge 16 && ! grep -Eq 'https?://(cdn|unpkg|fonts\\.g)' research/ux-1.5.2/ia/index.html",
+      "args": [],
+      "displayCommand": "test -s research/ux-1.5.2/ia/index.html && test -s research/ux-1.5.2/ia/tw.css && test $(ls research/ux-1.5.2/ia/shots/*.png | wc -l) -ge 16 && ! grep -Eq 'https?://(cdn|unpkg|fonts\\.g)' research/ux-1.5.2/ia/index.html",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-11T14:12:43.455Z",
+      "finishedAt": "2026-11-11T14:12:43.465Z",
+      "verifiedAt": "2026-11-11T14:12:43.465Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

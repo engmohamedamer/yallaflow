@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0068",
+  "sourceType": "file",
+  "sourceName": "owner-1.5.2-closeout.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-11-11T11:49:20.200Z",
+  "original": {
+    "path": "sources/SRC-0068/owner-1.5.2-closeout.md",
+    "sha256": "aab578e091e991b882fd368dcb1082d35754a57aad43ce7f8aa9f62ca5025fd7",
+    "sizeBytes": 1630
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0126"
+  ],
+  "rawText": "# Owner instructions — closing items before v1.5.2 release approval (2026-11-11)\n1. CLI symlink security (release blocker): a separate security work item for the existing `yallaflow init` vulnerability; review all managed bootstrap files; initialization must not follow malicious symlinks and modify files outside the project; reuse existing safety patterns; regression tests.\n2. Tailwind packaging: publish the committed, prebuilt CSS; do not regenerate during `npm pack`; CI requires a passing freshness check and verifies the generated CSS is in the npm package; before release run a clean installation and full checks in an isolated environment with the Tailwind CLI, where the freshness test actually executes (not skipped).\n3. Codex installation versions: pin installs to explicitly tested compatible versions (especially the ACP adapter); document how versions are updated and validate compatibility before offering installation.\n4. Commits: separate local commits after verification — v1.5.2 functional/UI improvements; CLI symlink security fix separately. Do not include PF-0119 release records. Preserve unrelated local modifications. No push, tag, publish or release.\n5. Final manual acceptance: a local installation from the exact package intended for release (not published); journey: first-time setup, Codex connection, adding an existing Laravel project, folder picker, Create Work, Setup & Run. Distinguish automated browser coverage from real macOS testing; do not claim the Mac clipboard issue is verified unless tested on macOS. Report final security and packaging results, then stop for manual acceptance.\n"
+}

@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-12T10:09:18.220Z",
+      "completedAt": "2026-11-12T10:09:18.220Z",
+      "summary": "Console item state comes from src/flow/snapshot.js collectItem + src/flow/stations.js itemState (stage INTAKE => 'new'). A Repository Baseline work item stays at stage INTAKE for its whole life (baseline draft/approve never advance stages; approve sets DONE), and its real progress is src/baseline/store.js baselineNextStep (discovery, draft, awaiting-review, changes-requested, approved). The client (resources/console/app.js) keys the Start button, next-step card, chat draft (goText), Continue button (goOnText) and suggestions on state/waitingFor/nextAction."
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-12T10:09:26.071Z",
+      "completedAt": "2026-11-12T10:09:26.071Z",
+      "summary": "Root cause: collectItem ignores baseline progress (baselineNextStep). A baseline item stays at stage INTAKE, so itemState returns 'new' (Start button, 0%, at the gate), waitingFor is null and nextAction is 'advance' (next-step card and chat offer Continue with the whole-job message, which the agent correctly refuses as not an approval). Fix: derive the baseline item's state, waiting-for and next action from baselineNextStep, and give the console an explicit approve / request-changes reply for the draft.",
+      "evidence": [
+        "src/flow/stations.js:80",
+        "src/flow/snapshot.js:147-190",
+        "src/baseline/store.js:345-370",
+        "runtime:lalaff PF-0001 baseline.yaml status=draft, repository-baseline completed, meta.status=INTAKE; yallaflow guide next action = yallaflow advance"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-12T10:10:58.313Z",
+      "completedAt": "2026-11-12T10:10:58.313Z",
+      "summary": "src/flow/snapshot.js: a non-DONE Repository Baseline item takes its state, stations, completion, waiting-for and next action from baselineNextStep (discovery/draft/changes-requested => in progress at Understand; awaiting-review => state 'you' with waitingFor kind 'baseline'); never 'new', never 'yallaflow advance'. resources/console/app.js: next-step text and attention reason for the baseline draft; the chat shows 'Approve the draft' (sends an explicit approval message) and 'Request changes' (fills the box) instead of Continue; no whole-job draft; no advance action or drag for a baseline. New test/console-baseline-item.test.js."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-12T10:25:04.661Z",
+      "completedAt": "2026-11-12T10:25:04.661Z",
+      "summary": "npm run check passed (V-002: 1215 pass, 0 fail). V-001 failed on two timing-dependent tests unrelated to this change (agent-bridge permission timeout, console-execution queue end-to-end); both passed when rerun alone and in V-002."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-12T10:25:04.661Z"
+}

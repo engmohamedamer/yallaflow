@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "cd research/ux-1.5.2 && for f in directions/atelier.html directions/mission-control.html directions/daylight.html compare.html; do node -e \"const h=require('fs').readFileSync('$f','utf8');const re=/<script>([\\\\s\\\\S]*?)<\\\\/script>/g;let m,n=0;while((m=re.exec(h))){new Function(m[1]);n++}if(!n)throw new Error('no inline script');console.log('$f: '+n+' script block(s) parse')\" || exit 1; done && node --check directions/data.js && echo 'data.js parses' && test $(ls shots/*.png | wc -l) -ge 44 && echo \"$(ls shots/*.png | wc -l) screenshots\" && cd ../.. && test -z \"$(git status --porcelain -- . ':!.yallaflow' ':!research/ux-1.5.2' ':!.playwright-cli')\" && echo 'no other files changed'",
+      "executionMode": "shell",
+      "executable": "cd research/ux-1.5.2 && for f in directions/atelier.html directions/mission-control.html directions/daylight.html compare.html; do node -e \"const h=require('fs').readFileSync('$f','utf8');const re=/<script>([\\\\s\\\\S]*?)<\\\\/script>/g;let m,n=0;while((m=re.exec(h))){new Function(m[1]);n++}if(!n)throw new Error('no inline script');console.log('$f: '+n+' script block(s) parse')\" || exit 1; done && node --check directions/data.js && echo 'data.js parses' && test $(ls shots/*.png | wc -l) -ge 44 && echo \"$(ls shots/*.png | wc -l) screenshots\" && cd ../.. && test -z \"$(git status --porcelain -- . ':!.yallaflow' ':!research/ux-1.5.2' ':!.playwright-cli')\" && echo 'no other files changed'",
+      "args": [],
+      "displayCommand": "cd research/ux-1.5.2 && for f in directions/atelier.html directions/mission-control.html directions/daylight.html compare.html; do node -e \"const h=require('fs').readFileSync('$f','utf8');const re=/<script>([\\\\s\\\\S]*?)<\\\\/script>/g;let m,n=0;while((m=re.exec(h))){new Function(m[1]);n++}if(!n)throw new Error('no inline script');console.log('$f: '+n+' script block(s) parse')\" || exit 1; done && node --check directions/data.js && echo 'data.js parses' && test $(ls shots/*.png | wc -l) -ge 44 && echo \"$(ls shots/*.png | wc -l) screenshots\" && cd ../.. && test -z \"$(git status --porcelain -- . ':!.yallaflow' ':!research/ux-1.5.2' ':!.playwright-cli')\" && echo 'no other files changed'",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-10T23:37:00.726Z",
+      "finishedAt": "2026-11-10T23:37:01.084Z",
+      "verifiedAt": "2026-11-10T23:37:01.084Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "cd research/ux-1.5.2 && for f in directions/atelier.html directions/mission-control.html directions/daylight.html compare.html; do node -e \"const h=require('fs').readFileSync('$f','utf8');const re=/<script>([\\\\s\\\\S]*?)<\\\\/script>/g;let m,n=0;while((m=re.exec(h))){new Function(m[1]);n++}if(!n)throw new Error('no inline script');console.log('$f: '+n+' script block(s) parse')\" || exit 1; done && node --check directions/data.js && echo 'data.js parses' && test $(ls shots/*.png | wc -l) -ge 44 && echo \"$(ls shots/*.png | wc -l) screenshots\" && cd ../.. && test -z \"$(git status --porcelain -- . ':!.yallaflow' ':!research/ux-1.5.2' ':!research/ux-1.5.2.zip' ':!.playwright-cli')\" && echo 'no other files changed (research/ux-1.5.2.zip is the owner'\"'\"'s archive, not created by this work)'",
+      "executionMode": "shell",
+      "executable": "cd research/ux-1.5.2 && for f in directions/atelier.html directions/mission-control.html directions/daylight.html compare.html; do node -e \"const h=require('fs').readFileSync('$f','utf8');const re=/<script>([\\\\s\\\\S]*?)<\\\\/script>/g;let m,n=0;while((m=re.exec(h))){new Function(m[1]);n++}if(!n)throw new Error('no inline script');console.log('$f: '+n+' script block(s) parse')\" || exit 1; done && node --check directions/data.js && echo 'data.js parses' && test $(ls shots/*.png | wc -l) -ge 44 && echo \"$(ls shots/*.png | wc -l) screenshots\" && cd ../.. && test -z \"$(git status --porcelain -- . ':!.yallaflow' ':!research/ux-1.5.2' ':!research/ux-1.5.2.zip' ':!.playwright-cli')\" && echo 'no other files changed (research/ux-1.5.2.zip is the owner'\"'\"'s archive, not created by this work)'",
+      "args": [],
+      "displayCommand": "cd research/ux-1.5.2 && for f in directions/atelier.html directions/mission-control.html directions/daylight.html compare.html; do node -e \"const h=require('fs').readFileSync('$f','utf8');const re=/<script>([\\\\s\\\\S]*?)<\\\\/script>/g;let m,n=0;while((m=re.exec(h))){new Function(m[1]);n++}if(!n)throw new Error('no inline script');console.log('$f: '+n+' script block(s) parse')\" || exit 1; done && node --check directions/data.js && echo 'data.js parses' && test $(ls shots/*.png | wc -l) -ge 44 && echo \"$(ls shots/*.png | wc -l) screenshots\" && cd ../.. && test -z \"$(git status --porcelain -- . ':!.yallaflow' ':!research/ux-1.5.2' ':!research/ux-1.5.2.zip' ':!.playwright-cli')\" && echo 'no other files changed (research/ux-1.5.2.zip is the owner'\"'\"'s archive, not created by this work)'",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-10T23:37:14.697Z",
+      "finishedAt": "2026-11-10T23:37:15.023Z",
+      "verifiedAt": "2026-11-10T23:37:15.023Z",
+      "log": "V-002-verification.log"
+    }
+  ]
+}

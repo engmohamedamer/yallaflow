@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-11T13:46:27.381Z",
+      "completedAt": "2026-11-11T13:46:27.381Z",
+      "summary": "Read the current Projects, Agents, Overview, Setup & Run views and the team-mode card in resources/console/app.js and the owner's screenshots (SRC-0070..0072). Built a standalone non-production prototype at research/ux-1.5.2/ia/index.html (Tailwind 4.3.5 build in tw.css via build-css.mjs, no network) with Projects+Agents merged, Project tabs Overview/Run/Settings, team indicator in the header, Workspace off-branch banner, New project wizard team step, and a 'What changed' page; 16 screenshots in research/ux-1.5.2/ia/shots/. Open guesses for owner review: no Projects tab (reached via switcher and bell); queue controls stay on the item page/Worktrees; header indicator shows the current branch."
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-11T14:12:43.131Z",
+      "completedAt": "2026-11-11T14:12:43.131Z",
+      "summary": "Evidence for the IA problem: the owner's screenshots show Setup & Run mixing run actions with service-definition steps and a dominating failure log (SRC-0072), Agents and Projects are both machine-level views (viewAgents lists lanes across all open projects), and the team-mode card sits only on the Project page. The approved prototype resolves each: Projects+Agents merged, Project tabs Overview/Run/Settings, team indicator + off-branch banner."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-11T14:12:51.679Z",
+      "completedAt": "2026-11-11T14:12:51.679Z",
+      "summary": "V-001: the prototype, its local Tailwind build and 16 screenshots exist and load nothing from a CDN; owner reviewed and confirmed it in the session."
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Owner decisions in the agent session (2026-11-11): merge Agents into Projects; Project and Setup & Run become one Project destination with tabs; team mode = optional setup step + permanent indicator; build a review prototype first",
+      "reason": "Owner chose the recommended option for each of four questions; owner feedback: Setup page is hard to manage and read, Project page needs restructuring and better data display using Tailwind, team work is important and under-placed",
+      "costIfWrong": "Prototype built on the wrong navigation model would need rework before implementation",
+      "createdAt": "2026-11-11T13:31:06.306Z"
+    },
+    {
+      "decision": "Owner approved the IA prototype (research/ux-1.5.2/ia/index.html) and its three open choices: no Projects tab (reached via the switcher and the bell), queue controls stay off the project card, header indicator shows the current branch with an amber dot when Solo off the integration branch",
+      "reason": "Owner replied 'confirm' in the agent session after reviewing the prototype summary and the three questions",
+      "costIfWrong": "Implementation would follow a navigation model the owner did not intend",
+      "createdAt": "2026-11-11T14:12:37.244Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-11T14:12:51.679Z"
+}

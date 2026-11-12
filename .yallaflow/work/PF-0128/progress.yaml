@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-11T13:05:25.000Z",
+      "completedAt": "2026-11-11T13:05:25.000Z",
+      "summary": "Reviewed the pre-authorization diff in resources/console/app.js against HEAD and the two acceptance screenshots (SRC-0070 projects page: cards only clickable as a whole with a tiny ✕; SRC-0071 Workspace: tall hero with separate stat boxes). Gaps found: no CSS for .pcard/.hero.slim/.hstat/main.enter; tw:min-w-0 is not in the committed tw.css; POST /api/p/<id>/open-folder does not exist in src/console/server.js (WRITE_ROUTE)."
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-11T13:05:25.186Z",
+      "completedAt": "2026-11-11T13:05:25.186Z",
+      "summary": "Acceptance: (1) each project card shows name, short path, readiness/progress badge, counts, and footer actions Open, Open folder (not in read-only), Copy path, Remove (not in read-only); (2) Workspace hero is one slim row: small ring, greeting + one sentence, four counts that act as state filters (aria-pressed); (3) a short entrance motion only when the page changes, never on live redraws, and none under prefers-reduced-motion; (4) Open folder opens only a registered project's root via the OS file manager, token+Origin guarded like other writes, refused in read-only; ar/en, light/dark."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-11T13:05:25.382Z",
+      "completedAt": "2026-11-11T13:05:25.382Z",
+      "summary": "Plan: app.css — pcard layout/footer, hero.slim + hstats, main.enter keyframe (global reduced-motion rule already disables it); replace tw:min-w-0 with plain CSS. server.js — add open-folder to WRITE_ROUTE and a handler that spawns xdg-open/open/explorer with the registered root (shell:false, detached, injectable opener for tests). Tests in a new test/console-polish.test.js: route opens only registered roots, read-only refusal, UI markers. Verify with npm run check."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-11T13:14:14.625Z",
+      "completedAt": "2026-11-11T13:14:14.625Z",
+      "summary": "Kept and completed the earlier app.js edits: project cards (pcard) with Open, Open folder (non read-only), Copy path (path toast), Remove; slim Workspace hero with four count-filter pills (aria-pressed); entrance motion class added to the live <main> only on a view change (no redraw churn; reduced-motion global rule disables it). New src/console/reveal.js + POST /api/p/<id>/open-folder (WRITE_ROUTE, token+Origin, read-only refused, registered root only, no shell, detached; injectable openFolder for tests). CSS in app.css. Tests: test/console-polish.test.js."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-11T13:20:04.140Z",
+      "completedAt": "2026-11-11T13:20:04.140Z",
+      "summary": "V-001: npm run check (syntax + full suite) passed, including test/console-polish.test.js (open-folder route guarded by token/Origin, read-only refusal, registered root only, no-shell spawn, missing folder and missing file manager errors; card actions, slim hero filters, entrance motion)."
+    }
+  },
+  "rulings": [
+    {
+      "decision": "resources/console/app.js (Workspace slim hero + hstats filters, project cards pcard with Open/Open folder/Copy path, entrance-motion class on main, data-open-folder click handler, 'path' copy toast) was edited before PF-0128 authorized modification (stage PLAN), without workflow authorization; adopted for review and verification",
+      "reason": "Edits made in an earlier session while PF-0127 was in implementation; kept per recovery protocol and walked through the workflow",
+      "costIfWrong": "Unreviewed UI edits could ship with missing CSS or a missing open-folder endpoint",
+      "createdAt": "2026-11-11T13:04:51.982Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-11T13:20:04.140Z"
+}

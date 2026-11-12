@@ -45,7 +45,7 @@ It runs locally, sends no telemetry, and keeps everything in your repository.
 | | |
 | --- | --- |
 | **Create work in your own words.** Write the request the way you'd tell a colleague, and attach a screenshot or a BRD if you have one. Your agent takes it from there.<br><br>![Create work](docs/images/tour/02-create-work-en.webp) | **Watch every request move.** Each item moves through Understand → Decide → Change → Verify → Remember, and its % is computed from evidence.<br><br>![Work board](docs/images/tour/03-work-board-en.webp) |
-| **Set the project up with your agent.** The agent works out how the project really runs, including Docker, vhosts and parent folders, and proposes a plan with its evidence. Its investigation is read-only and never touches secrets.<br><br>![The agent's runtime plan](docs/images/tour/07-setup-plan-en.webp) | **Then just press ▶ Start project.** One page shows the state, Start/Stop, the apps to open, and a row per service. Shared infrastructure is never stopped by mistake.<br><br>![Run the project](docs/images/tour/09-setup-running-en.webp) |
+| **Get the app running with your agent.** The agent works out how the project really runs, including Docker, vhosts and parent folders, and proposes the services. You approve the exact commands once. Its investigation is read-only and never touches secrets.<br><br>![The agent's proposal](docs/images/tour/07-setup-plan-en.webp) | **Then just press ▶ Start project.** One page shows the state, Start/Stop, the apps to open, and a row per service. Shared infrastructure is never stopped by mistake.<br><br>![Run the project](docs/images/tour/09-setup-running-en.webp) |
 
 <details>
 <summary><b>The same console in Arabic, dark theme</b> · نفس الكونسول بالعربي</summary>
@@ -57,7 +57,7 @@ It runs locally, sends no telemetry, and keeps everything in your repository.
 
 </details>
 
-**[Take the full visual tour →](docs/tour.md)** It goes from an empty folder to a running app in 12 screens. **[الجولة كاملة بالعربي ←](docs/tour.ar.md)**
+**[Take the full visual tour →](docs/tour.md)** It goes from an empty folder to a running app in 13 screens. **[الجولة كاملة بالعربي ←](docs/tour.ar.md)**
 
 ## Install
 
@@ -117,7 +117,7 @@ flowchart LR
 YallaFlow never updates itself and never checks the network for versions. You decide when to upgrade:
 
 ```bash
-npm install -g yallaflow@latest     # or an exact version: yallaflow@1.5.1
+npm install -g yallaflow@latest     # or an exact version: yallaflow@1.5.2
 yallaflow --version
 
 # in each project
@@ -173,6 +173,17 @@ flowchart TB
 
 The depth adapts to the work. A bounded bug fix goes from root-cause analysis straight to the fix, while architectural work gets a reviewed design, specification, or plan. Nothing is called done without fresh verification evidence, and work that carries acceptance criteria is checked against them before it closes. What was learned becomes reviewed project knowledge. [Workflows in detail →](docs/workflows.md)
 
+## What's new in 1.5.2
+
+**An easier first hour.** [Changelog →](CHANGELOG.md#152---2026-11-12--an-easier-first-hour)
+
+- **Connect an existing project from the console.** Choose a folder, review exactly what `yallaflow init` would change, and confirm. The folder picker works like a file dialog.
+- **Workspace · Project · More.** One Project page with **Overview**, **Run** and **Settings** tabs, a project switcher in the header, and agents inside **All projects** with a **Needs you** inbox on top.
+- **Choose the project's agent first.** Codex, or Claude Code as experimental. The console can install Codex, sign you in and test the connection, one approved step at a time.
+- **Getting the app running is one guided flow.** The agent proposes the services, you approve the exact commands once, and the app starts.
+- **Clicks, typing and scrolling survive live updates**, and Copy says "copied" only when it really copied.
+- **Security:** `yallaflow init`, `agent setup` and `agent refresh` never write through a symbolic link outside the project.
+
 ## What's new in 1.5.1
 
 **A steadier console.** [Changelog →](CHANGELOG.md#151---2026-11-10--steadier-console)
@@ -219,7 +230,7 @@ The depth adapts to the work. A bounded bug fix goes from root-cause analysis st
 - **Work lifecycle.** Put work on hold, resume it, or close it without delivery (`yallaflow work hold|resume|close`). Closed work is never counted as done.
 - **Manage work from the console.** Run YallaFlow's own actions on a work item, make review-gate decisions with a note, and edit a request before work starts. [Console →](docs/console.md)
 - **Project Overview.** Stack from repository evidence, understanding from project memory, and guided onboarding. Run `yallaflow overview` or open the console's **Overview** tab.
-- **Development runtime.** Start, stop and watch your app's services from the console's **Setup** tab, after you review and trust them. [Runtime →](docs/runtime.md)
+- **Development runtime.** Start, stop and watch your app's services from the console's **Run** tab, after you approve their commands. [Runtime →](docs/runtime.md)
 - **New Project Wizard.** Plan a new project with an official generator, review the exact commands, then create it. [New project →](docs/new-project.md)
 - **An agent chat that keeps work moving.** The chat is on every console page: a work item page is that item's chat, and the other pages share a project chat. If an agent stops (for example, at a usage limit), the item offers to continue with another agent. Codex is supported, and Claude Code is available as an opt-in experiment. [Agents →](docs/agents.md)
 
@@ -331,7 +342,7 @@ The YallaFlow website, [engmohamedamer.github.io/yallaflow](https://engmohamedam
 
 ## Status
 
-**1.5.1** steadies the console of 1.5.0, which runs work your way: one task now, or a queue of tasks one after another, with review and manual merge for lanes. Parallel execution and Automated Merge are disabled in this release. 1.0.0 was the first public, stable release. YallaFlow follows Semantic Versioning and keeps existing workspaces readable ([compatibility promise](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise)).
+**1.5.2** makes the first hour easier (connect a project, choose its agent, get the app running) on the console of 1.5.0, which runs work your way: one task now, or a queue of tasks one after another, with review and manual merge for lanes. Parallel execution and Automated Merge are disabled in this release. 1.0.0 was the first public, stable release. YallaFlow follows Semantic Versioning and keeps existing workspaces readable ([compatibility promise](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise)).
 
 - **Local-first.** There is no YallaFlow server, account, or cloud service.
 - **Agent-agnostic**, with first-party setup for Claude Code and Codex.

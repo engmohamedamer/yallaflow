@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "workId": "PF-0120",
+  "mode": "intent",
+  "objective": "Research and propose a v1.5.2 console UX & onboarding redesign: frontend stack (Tailwind/Preact vs vanilla), first-time agent setup, unified project entry (new/connect/open), enforceable project readiness, simplified IA (Workspace merges Flow+Work), board + create, Setup & Run split, reliable clipboard; no implementation",
+  "preservation": [
+    "AI-agent-agnostic workflow; durable memory; evidence-based verification; subscription-only agent integration (no API keys); explicit approval for sensitive ops; backward compatibility for existing projects and CLI"
+  ],
+  "focus": [],
+  "history": [
+    {
+      "action": "recorded",
+      "at": "2026-11-10T22:36:35.625Z"
+    }
+  ],
+  "recordedAt": "2026-11-10T22:36:35.625Z",
+  "updatedAt": "2026-11-10T22:36:35.625Z"
+}

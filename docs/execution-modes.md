@@ -115,7 +115,7 @@ It shows exactly what will be deleted. Only reproducible dependency folders are 
 
 ## Approval wait
 
-An agent's tool request waits for your answer for **5 minutes** by default, then it is **denied** (never approved on its own). In **Setup & run → Agents** you can choose 5, 15, 30 or 60 minutes for this project, for example for long queues. The setting lives in `.yallaflow/local/approval.json`, is personal to your checkout and is never committed.
+An agent's tool request waits for your answer for **5 minutes** by default, then it is **denied** (never approved on its own). In **Project → Settings → Agents** you can choose 5, 15, 30 or 60 minutes for this project, for example for long queues. The setting lives in `.yallaflow/local/approval.json`, is personal to your checkout and is never committed.
 
 ## What YallaFlow never does
 

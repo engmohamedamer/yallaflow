@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0076",
+  "sourceType": "file",
+  "sourceName": "03-project-run-light.png",
+  "detectedFormat": "png",
+  "contentType": "image/png",
+  "contentAvailability": "original-only",
+  "capturedAt": "2026-11-11T14:13:37.520Z",
+  "original": {
+    "path": "sources/SRC-0076/03-project-run-light.png",
+    "sha256": "ff8438e4e8fc4ad83ec93c73cbcc536e03b132b3cbcb3d912db56fc2b9eb513f",
+    "sizeBytes": 167309
+  },
+  "metadata": {
+    "extension": ".png",
+    "detectedFormat": "png",
+    "format": "png",
+    "width": 1440,
+    "height": 1008
+  },
+  "linkedWork": [
+    "PF-0132"
+  ]
+}

@@ -1,0 +1,100 @@
+TAP version 13
+# Subtest: agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+ok 1 - agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+  ---
+  duration_ms: 8.781398
+  type: 'test'
+  ...
+# Subtest: paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+ok 2 - paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+  ---
+  duration_ms: 5.799604
+  type: 'test'
+  ...
+# Subtest: file selection and paste combine; unsupported, empty and oversized files are explained
+ok 3 - file selection and paste combine; unsupported, empty and oversized files are explained
+  ---
+  duration_ms: 3.547212
+  type: 'test'
+  ...
+# Subtest: revision partial failure keeps pending files and retries without duplicating text or successful uploads
+ok 4 - revision partial failure keeps pending files and retries without duplicating text or successful uploads
+  ---
+  duration_ms: 6.473291
+  type: 'test'
+  ...
+# Subtest: create uploads pasted files through the existing bound request endpoint
+ok 5 - create uploads pasted files through the existing bound request endpoint
+  ---
+  duration_ms: 4.742351
+  type: 'test'
+  ...
+# Subtest: overview previews keep full facts available under View more, including after redraw
+ok 6 - overview previews keep full facts available under View more, including after redraw
+  ---
+  duration_ms: 5.11985
+  type: 'test'
+  ...
+# Subtest: a redraw never rebuilds an unchanged page and waits while a pointer is pressed
+ok 7 - a redraw never rebuilds an unchanged page and waits while a pointer is pressed
+  ---
+  duration_ms: 3.899197
+  type: 'test'
+  ...
+# Subtest: copy reports success only after the browser confirms it, with two fallbacks
+ok 8 - copy reports success only after the browser confirms it, with two fallbacks
+  ---
+  duration_ms: 1.351435
+  type: 'test'
+  ...
+# Subtest: Tailwind is a pinned development tool; users get the built stylesheet with no build step
+ok 9 - Tailwind is a pinned development tool; users get the built stylesheet with no build step
+  ---
+  duration_ms: 6.882515
+  type: 'test'
+  ...
+# Subtest: tw.css is up to date with tailwind.input.css and app.js
+ok 10 - tw.css is up to date with tailwind.input.css and app.js # SKIP Tailwind CLI not installed here (npm ci installs it; CI runs this check)
+  ---
+  duration_ms: 0.487899
+  type: 'test'
+  ...
+# Subtest: typing or changing a field marks the page changed, so a redraw that resets it is never skipped
+ok 11 - typing or changing a field marks the page changed, so a redraw that resets it is never skipped
+  ---
+  duration_ms: 0.455676
+  type: 'test'
+  ...
+# Subtest: the switcher shows the current project with its readiness and lists every project
+ok 12 - the switcher shows the current project with its readiness and lists every project
+  ---
+  duration_ms: 1.716266
+  type: 'test'
+  ...
+# Subtest: project actions live in the same menu; read-only hides Add and New
+ok 13 - project actions live in the same menu; read-only hides Add and New
+  ---
+  duration_ms: 0.64023
+  type: 'test'
+  ...
+# Subtest: header menus: Esc closes and refocuses, arrows move, outside click and opening another close it
+ok 14 - header menus: Esc closes and refocuses, arrows move, outside click and opening another close it
+  ---
+  duration_ms: 1.524887
+  type: 'test'
+  ...
+# Subtest: switcher styles cover readiness, focus, dark mode and phone width
+ok 15 - switcher styles cover readiness, focus, dark mode and phone width
+  ---
+  duration_ms: 0.836934
+  type: 'test'
+  ...
+1..15
+# tests 15
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 1
+# todo 0
+# duration_ms 185.8403

@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Console first-run rules (1.5.2, PF-0140): (1) 'yallaflow work show <id> --json' carries an additive 'baseline' object (status, facts, limitations) for a Repository Baseline that has a draft, and the console item page renders it so the developer reviews the draft itself before approving. (2) The readiness card offers an optional step (running the app) only when no required step is open. (3) On the Run tab a service with runningOutside that YallaFlow did not start is shown as 'running outside YallaFlow', never 'stopped': Start, Start project and Stop project are disabled when there is nothing YallaFlow can start or stop, and readiness counts it as running. (4) A service listed in the bulk approval card has no second 'Review and trust' control on its row.",
+      "evidence": [
+        "src/flow/snapshot.js",
+        "resources/schemas/work-1.schema.json",
+        "resources/console/app.js",
+        "src/console/readiness.js",
+        "test/console-first-run.test.js",
+        "verification:V-001"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-12T13:43:05.395Z",
+      "factId": "CTX-0158",
+      "promotedAt": "2026-11-12T13:43:20.754Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-12T13:43:20.754Z",
+  "reviewedAt": "2026-11-12T13:43:20.754Z"
+}

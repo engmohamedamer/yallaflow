@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-11T13:40:08.020Z",
+      "completedAt": "2026-11-11T13:40:08.020Z",
+      "summary": "digestCard() in resources/console/app.js (~1660) renders one <li> per changed item with ID + full title + up to 3 events; .digest styles in app.css (~254). buildDigest computes events (Done, station completed, verification, went back). Owner screenshot SRC: long titles make the notice tall."
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-11T13:40:08.210Z",
+      "completedAt": "2026-11-11T13:40:08.210Z",
+      "summary": "Each changed item becomes one compact chip-link to #/item/<id>: the work ID plus its latest event icon and short text; the full title and all events are in the tooltip/accessible label. Header, 'Got it' and the recorded-entry note stay. Data and event logic unchanged."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-11T13:40:08.410Z",
+      "completedAt": "2026-11-11T13:40:08.410Z",
+      "summary": "Change only digestCard markup to a flex-wrap list of .digest-chip links (title attribute + aria-label carry title and events); CSS for .digest-chip in light/dark; one test in test/console-polish.test.js; verify with console tests."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-11T13:40:32.744Z",
+      "completedAt": "2026-11-11T13:40:32.744Z",
+      "summary": "digestCard now renders a flex-wrap list of .digest-chip links: work ID + latest event (icon + short text, colored for failed/went back); title and all events in title/aria-label. Event logic unchanged. CSS appended to app.css; test added to test/console-polish.test.js."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-11T13:40:46.385Z",
+      "completedAt": "2026-11-11T13:40:46.385Z",
+      "summary": "V-001 passed: console polish (incl. new digest test), switcher, refinement, presentation and server tests."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-11T13:40:46.385Z"
+}

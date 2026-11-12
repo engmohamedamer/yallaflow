@@ -12689,7 +12689,7 @@
     {
       "id": "CTX-0124",
       "area": "architecture",
-      "state": "current",
+      "state": "superseded",
       "confidence": "confirmed",
       "summary": "The console's floating agent chat follows the page (chatCtx in resources/console/app.js): a work item page is that item's chat; Overview, Flow, Work, Setup, Worktrees and Insights share a project chat whose session has no workId. One agent session per checkout still applies: an item's session appears on project pages as a link, and a project session on an item page is labelled as the project chat.",
       "provenance": "repository",
@@ -12722,22 +12722,29 @@
       "verifiedAt": "2026-11-07T23:45:18.289Z",
       "verifiedAtCommit": "9cfe4b5935d1454f00b77afb3946b5176b6388ec",
       "supersedes": [],
-      "supersededBy": null,
+      "supersededBy": "CTX-0151",
       "history": [
         {
           "action": "introduced",
           "at": "2026-11-07T23:45:18.289Z",
           "workId": "PF-0067",
           "candidateId": "K-001"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-11-11T14:49:35.462Z",
+          "supersededBy": "CTX-0151",
+          "workId": "PF-0132",
+          "candidateId": "K-002"
         }
       ],
       "createdAt": "2026-11-07T23:45:18.289Z",
-      "updatedAt": "2026-11-07T23:45:18.289Z"
+      "updatedAt": "2026-11-11T14:49:35.462Z"
     },
     {
       "id": "CTX-0125",
       "area": "architecture",
-      "state": "current",
+      "state": "superseded",
       "confidence": "confirmed",
       "summary": "The experimental Claude Code connection ships in the package but is off by default. It is turned on per project from the console's Setup page: the choice (agents, and Claude Code) is saved in .yallaflow/local/agents.json (git-ignored, owner-only 0600, ignored when tracked by Git or readable by others) and applied whenever the console opens, with no flags and no restart; 'yallaflow console --agents --experimental-claude' still turns it on for one run, and --read-only ignores the saved choice. The developer starts Claude Code with the launch command Setup shows; it opens with a short first prompt (run yallaflow brief) because SessionStart hooks carry no permission mode, so the mode is reported at once. The channel and hook send the bridge token only after the console proves it (HMAC over a nonce at /api/agent-bridge/claude/hello, live pid); messages are refused until a hook reports the mode, and bypassPermissions is never served. Codex remains the managed provider; subscription logins only, no API keys.",
       "provenance": "repository",
@@ -12783,7 +12790,7 @@
       "supersedes": [
         "CTX-0121"
       ],
-      "supersededBy": null,
+      "supersededBy": "CTX-0152",
       "history": [
         {
           "action": "introduced",
@@ -12791,10 +12798,17 @@
           "workId": "PF-0069",
           "candidateId": "K-001",
           "supersedes": "CTX-0121"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-11-11T14:49:35.901Z",
+          "supersededBy": "CTX-0152",
+          "workId": "PF-0132",
+          "candidateId": "K-003"
         }
       ],
       "createdAt": "2026-11-08T13:32:37.776Z",
-      "updatedAt": "2026-11-08T13:32:37.776Z"
+      "updatedAt": "2026-11-11T14:49:35.901Z"
     },
     {
       "id": "CTX-0126",
@@ -12926,7 +12940,7 @@
     {
       "id": "CTX-0128",
       "area": "architecture",
-      "state": "current",
+      "state": "superseded",
       "confidence": "confirmed",
       "summary": "The console Setup page (viewSetup in resources/console/app.js) has two layouts. Before any service is saved it is a guided flow: 1) find how the project runs, with Ask the agent first and recommended (the agent runs yallaflow runtime analyze itself and proposes the plan, which arrives preselected while the page polls for it) and the quick scan as the fallback; 2) choose and save; 3) review, trust, then start. Once services exist, the Run control is the head of the page (overall state, Start/Stop project, Open links, one compact row per service with Review and trust or Start/Restart/Stop and Logs), and plan, suggestions, add form, stack and agents fold into a Configuration disclosure. Disclosure state survives the 3-second redraw through data-sx keys. Save, trust (typed id bound to the reviewed definitionHash) and start remain human actions.",
       "provenance": "repository",
@@ -12959,17 +12973,24 @@
       "verifiedAt": "2026-11-08T16:25:58.149Z",
       "verifiedAtCommit": "a8236e9b0865aebc3e088e9bc5ed55101073b24f",
       "supersedes": [],
-      "supersededBy": null,
+      "supersededBy": "CTX-0150",
       "history": [
         {
           "action": "introduced",
           "at": "2026-11-08T16:25:58.149Z",
           "workId": "PF-0073",
           "candidateId": "K-001"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-11-11T14:49:34.985Z",
+          "supersededBy": "CTX-0150",
+          "workId": "PF-0132",
+          "candidateId": "K-001"
         }
       ],
       "createdAt": "2026-11-08T16:25:58.149Z",
-      "updatedAt": "2026-11-08T16:25:58.149Z"
+      "updatedAt": "2026-11-11T14:49:34.985Z"
     },
     {
       "id": "CTX-0129",
@@ -13585,7 +13606,1131 @@
       ],
       "createdAt": "2026-11-09T13:36:59.784Z",
       "updatedAt": "2026-11-09T13:36:59.784Z"
+    },
+    {
+      "id": "CTX-0140",
+      "area": "architecture",
+      "state": "superseded",
+      "confidence": "confirmed",
+      "summary": "The console UI (resources/console/app.js, one IIFE, no framework) renders by rebuilding the whole page: render() assigns #app.innerHTML on every change, and typed values, focus, caret, chat scroll and <details> state are captured and restored around it (data-keep forms, rtFormBusy, setupOpen). Polling views (Setup every 3 s) therefore replace DOM under the pointer; UI changes must preserve or avoid full redraws during interaction.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0120",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "resources/console/app.js",
+          "range": "3082-3115",
+          "contentHash": "sha256:1fc7e04de7f374979c408ec3ff3cc3c4472a075b821411a212b86f5989c91da0",
+          "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "resources/console/app.js",
+          "range": "2219-2223",
+          "contentHash": "sha256:1fc7e04de7f374979c408ec3ff3cc3c4472a075b821411a212b86f5989c91da0",
+          "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+          "workingTree": "head"
+        }
+      ],
+      "verifiedAt": "2026-11-10T22:47:23.410Z",
+      "verifiedAtCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+      "supersedes": [],
+      "supersededBy": "CTX-0141",
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-10T22:47:23.410Z",
+          "workId": "PF-0120",
+          "candidateId": "K-001"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-11-11T11:02:17.754Z",
+          "supersededBy": "CTX-0141",
+          "workId": "PF-0123",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-10T22:47:23.410Z",
+      "updatedAt": "2026-11-11T11:02:17.754Z"
+    },
+    {
+      "id": "CTX-0141",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "The console UI (resources/console/app.js, one IIFE, no framework) still renders by rebuilding #app from HTML strings, but render() skips the rebuild when the generated HTML is identical and nothing changed the page since it was drawn (MutationObserver plus input/change events mark it dirty), defers a redraw while a pointer is held (max 4 s), and keeps scroll positions of scrollable regions. Code that changes the page directly is safe (it forces the next rebuild); a redraw is never relied on to reset a field the user typed in without marking it.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0123",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "resources/console/app.js",
+          "contentHash": "sha256:61d2aff076f43f0e9d2b78fcd3b7e74b5854c80c28d73e5747c659c3143c4217",
+          "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+          "workingTree": "modified"
+        },
+        {
+          "type": "runtime",
+          "description": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/verify-browser.sh (passed)",
+          "workId": "PF-0123",
+          "verificationRunId": "V-016"
+        }
+      ],
+      "verifiedAt": "2026-11-11T11:02:17.754Z",
+      "verifiedAtCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+      "supersedes": [
+        "CTX-0140"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-11T11:02:17.754Z",
+          "workId": "PF-0123",
+          "candidateId": "K-001",
+          "supersedes": "CTX-0140"
+        }
+      ],
+      "createdAt": "2026-11-11T11:02:17.754Z",
+      "updatedAt": "2026-11-11T11:02:17.754Z"
+    },
+    {
+      "id": "CTX-0142",
+      "area": "convention",
+      "state": "superseded",
+      "confidence": "confirmed",
+      "summary": "Console styling uses Tailwind CSS v4 utilities next to app.css: classes are prefixed tw: (e.g. tw:flex), there is no preflight reset, utilities are unlayered so they refine app.css rules, and colours/fonts/radii map to app.css variables (themes keep working). The input is resources/console/tailwind.input.css; npm run build:css writes the committed resources/console/tw.css (also run by prepack); a test fails when tw.css is stale where the pinned devDependency CLI is installed. Users never build; no frontend framework is used.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0123",
+        "candidateId": "K-002"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "resources/console/tailwind.input.css",
+          "contentHash": "sha256:6e6a9ff70baaf6f073953523ca09a38eb80a1b400b5994d52a3c22e48a482c43",
+          "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "package.json",
+          "contentHash": "sha256:f5db872f6e68633eea7af98db44320046188d1f83b067438fb57d20bb20d1c30",
+          "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/console-refinement.test.js",
+          "contentHash": "sha256:77ebf9a913a2830aaae89d64a971a9e306b91e012a16705a8d9b11957ff7fac5",
+          "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-11T11:02:18.241Z",
+      "verifiedAtCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+      "supersedes": [],
+      "supersededBy": "CTX-0145",
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-11T11:02:18.241Z",
+          "workId": "PF-0123",
+          "candidateId": "K-002"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-11-11T11:48:42.905Z",
+          "supersededBy": "CTX-0145",
+          "workId": "PF-0124",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-11T11:02:18.241Z",
+      "updatedAt": "2026-11-11T11:48:42.905Z"
+    },
+    {
+      "id": "CTX-0143",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Console project readiness (src/console/readiness.js) is derived on every request, never stored: initialized, understanding (Core's projectUnderstandingGate, so only recorded-Brownfield projects are gated and Greenfield never is), agent (blocks only agent sessions and queue runs), runtime (optional). The server enforces it: Create work before understanding returns Core's 422 PROJECT_UNDERSTANDING_REQUIRED plus the readiness document; queue runs need a ready agent and understanding, except a run of the understanding work item itself.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0123",
+        "candidateId": "K-003"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/console/readiness.js",
+          "contentHash": "sha256:e1d5f09c22f93ec9c4922bd56bc0a87acec7209d5140a98afd1044cd3371b40f",
+          "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/console/server.js",
+          "contentHash": "sha256:0d302a25322698988858629de425e2963a8d9bbee845633e8a2bb048fcc89700",
+          "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/console-readiness.test.js",
+          "contentHash": "sha256:9d0f3803fd16b7f97222b64121ee9b83b808d2e9811369d91f296aef11a1cf3e",
+          "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-11T11:02:18.679Z",
+      "verifiedAtCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-11T11:02:18.679Z",
+          "workId": "PF-0123",
+          "candidateId": "K-003"
+        }
+      ],
+      "createdAt": "2026-11-11T11:02:18.679Z",
+      "updatedAt": "2026-11-11T11:02:18.679Z"
+    },
+    {
+      "id": "CTX-0144",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Connecting a folder from the console (src/console/connect.js) is a read-only preview (home-bounded path, stack from manifest hints, no Git command, the exact bootstrap plan from bootstrapInitPlan in src/agent/bootstrap.js, refusals for nested projects, lanes, hand-edited/newer/broken bootstrap blocks and CLAUDE.md/AGENTS.md links leaving the folder) followed by Core's yallaflow init through the runner, only with the preview's planHash and an explicit confirmation, one connect per folder at a time. Agent setup on the machine lives in src/agents/setup.js (provider knowledge stays in src/agent and src/agents, AC-108); its dynamic programs (npm, codex) are listed in test-support/git-scan.js DYNAMIC_PROGRAMS.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0123",
+        "candidateId": "K-004"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/console/connect.js",
+          "contentHash": "sha256:91903c4bb4eab2a5e8dd601541ce7f05a308b31cf7984071d9da654d9e8f2059",
+          "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/agents/setup.js",
+          "contentHash": "sha256:908d5ad75223f4439d6cdcba7ef63822a8dd82b11474d54fce7e2ee994241c4e",
+          "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "test-support/git-scan.js",
+          "contentHash": "sha256:a287001b15c65b2bebb66e2ade975cc47f7ed19166564464d6689b121ce573c8",
+          "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+          "workingTree": "modified"
+        }
+      ],
+      "verifiedAt": "2026-11-11T11:02:19.116Z",
+      "verifiedAtCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-11T11:02:19.116Z",
+          "workId": "PF-0123",
+          "candidateId": "K-004"
+        }
+      ],
+      "createdAt": "2026-11-11T11:02:19.116Z",
+      "updatedAt": "2026-11-11T11:02:19.116Z"
+    },
+    {
+      "id": "CTX-0145",
+      "area": "convention",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Console styling uses Tailwind CSS v4 utilities next to app.css: classes are prefixed tw: (e.g. tw:flex), there is no preflight reset, utilities are unlayered so they refine app.css rules, and colours/fonts/radii map to app.css variables (themes keep working). The input is resources/console/tailwind.input.css; npm run build:css writes resources/console/tw.css, which is committed and shipped as-is (nothing rebuilds it on pack or publish). A test fails when tw.css is stale; CI sets YALLAFLOW_REQUIRE_CSS_CHECK=1 so it can never skip, and the release workflow checks the packed tw.css equals the committed file. The build tools are devDependencies and need Node 20.19+; users never build.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0124",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "resources/console/tw.css",
+          "contentHash": "sha256:088802e25e116bb29d056c9d6e19e636e7f79fe59e563ece94804615b0dc0235",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "head"
+        },
+        {
+          "type": "repository",
+          "path": "resources/console/app.css",
+          "contentHash": "sha256:2829e3d714df9bed07e4b4091a2416e5e05d056f2300ab236158c5be1e2102ba",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "package.json",
+          "contentHash": "sha256:db755b1ba9ad32a6c5228ba1c2357a8574e5da11e2079b8287be0e7746ef3e92",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "head"
+        }
+      ],
+      "verifiedAt": "2026-11-12T14:25:18.487Z",
+      "verifiedAtCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+      "supersedes": [
+        "CTX-0142"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-11T11:48:42.905Z",
+          "workId": "PF-0124",
+          "candidateId": "K-001",
+          "supersedes": "CTX-0142"
+        },
+        {
+          "action": "reconfirmed",
+          "at": "2026-11-12T14:25:18.487Z",
+          "workId": "PF-0139",
+          "candidateId": "K-002",
+          "previousEvidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/tailwind.input.css",
+              "contentHash": "sha256:a98ed6cde690b224d2759cd1cc5fd4c7c33f256bf8f81d32d9f5890a1f3f6637",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "package.json",
+              "contentHash": "sha256:865bd21c20894e8c38335806ba8fcf92b8d332002e396ec2759ba738ce6d262f",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": ".github/workflows/release.yml",
+              "contentHash": "sha256:632e8c912d24ad1a71016d9f266c8ca310870b8e7a66eda3ae8a0d51db68f4d0",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-refinement.test.js",
+              "contentHash": "sha256:bfcc186b75c77a95494e9d469b4294250fe87e40df8849f2753b9dc8336b2c51",
+              "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+              "workingTree": "untracked"
+            }
+          ],
+          "previousVerifiedAt": "2026-11-11T11:48:42.905Z",
+          "previousVerifiedAtCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461"
+        }
+      ],
+      "createdAt": "2026-11-11T11:48:42.905Z",
+      "updatedAt": "2026-11-12T14:25:18.487Z"
+    },
+    {
+      "id": "CTX-0146",
+      "area": "integration",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "The console installs exact, tested Codex versions — TESTED_CODEX in src/agents/detect.js (@openai/codex 0.167.0, @agentclientprotocol/codex-acp 2.5.0, tested 2026-11-11 with a real handshake) — never a range; it offers an install only when the pinned adapter is inside REQUIREMENTS.codexAcp and Node is supported, and shows when installed versions differ from the tested pair. docs/agents.md 'Tested Codex versions' describes how maintainers update the pins.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0124",
+        "candidateId": "K-002"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/agents/detect.js",
+          "contentHash": "sha256:a6be0a91dbac690a321e9b3ca4e55f27b84c3c583f58f23cbcf3e609eeaa31ba",
+          "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/agents/setup.js",
+          "contentHash": "sha256:ed18f12ff4f8f6a9f53aa4e10eca08863407bb6c6ff60572bef8bd7fa49294e1",
+          "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "docs/agents.md",
+          "contentHash": "sha256:60276831d8d8173de7ff070d79bdb3d29a6c127d13d07e7730f75da25baf0829",
+          "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+          "workingTree": "modified"
+        },
+        {
+          "type": "runtime",
+          "description": "node /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/real-codex-check.mjs (passed)",
+          "workId": "PF-0124",
+          "verificationRunId": "V-001"
+        }
+      ],
+      "verifiedAt": "2026-11-11T11:48:43.314Z",
+      "verifiedAtCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-11T11:48:43.314Z",
+          "workId": "PF-0124",
+          "candidateId": "K-002"
+        }
+      ],
+      "createdAt": "2026-11-11T11:48:43.314Z",
+      "updatedAt": "2026-11-11T11:48:43.314Z"
+    },
+    {
+      "id": "CTX-0147",
+      "area": "convention",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "The Node engines contract (>=20.16.0) is checked against the shipped runtime dependency tree only (packages not marked dev in package-lock.json); development-only tools are checked separately against the documented build floor, Node 20.19, which the release workflow's Node 20 job meets with the latest 20.x.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0124",
+        "candidateId": "K-003"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "test/node-compatibility.test.js",
+          "contentHash": "sha256:2bad735658fa47d560449d7a7d2f92aa7e3dfcfb066881be1d3abef8b002ff54",
+          "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "package-lock.json",
+          "contentHash": "sha256:2e354bffce08a051428de6c118180a98f18762f7dab2b6843c76fde757975aa1",
+          "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+          "workingTree": "modified"
+        }
+      ],
+      "verifiedAt": "2026-11-11T11:48:43.692Z",
+      "verifiedAtCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-11T11:48:43.692Z",
+          "workId": "PF-0124",
+          "candidateId": "K-003"
+        }
+      ],
+      "createdAt": "2026-11-11T11:48:43.692Z",
+      "updatedAt": "2026-11-11T11:48:43.692Z"
+    },
+    {
+      "id": "CTX-0148",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Files YallaFlow manages but a repository may already contain — the agent bootstrap files CLAUDE.md/AGENTS.md and the agent contract .yallaflow/AGENT.md — go through src/agent/managed-files.js: every folder on the way must be a real folder (no linked .yallaflow), and the file may only be absent, a regular file, or a link to a regular file in the same folder (CLAUDE.md -> AGENTS.md). Anything else is the unsafe-link state, refused before any write by init, agent setup, agent refresh and the console connect. Writes re-check, use an exclusive temporary file with the final permissions and a rename (never following a link), keep read-only files read-only, and the init rollback restores only the recorded real paths. init also refuses a linked .yallaflow. Other .yallaflow write paths (context render, PROJECT.md, state) are not yet covered (follow-up).",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0125",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/agent/managed-files.js",
+          "contentHash": "sha256:796a0269c71d757aef8031844daf843a09cd09335c5455afecf7aa93319b8ce4",
+          "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/agent/bootstrap.js",
+          "contentHash": "sha256:3889304280ec79975f018283d526934a4285a1a91e3b1861fe81dbfbc545768f",
+          "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/agent/contract.js",
+          "contentHash": "sha256:d5c3c2a9b45a1eec8cca5a35df943482dc810613a265098c6ddd9c40fdf98082",
+          "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/agent-bootstrap-security.test.js",
+          "contentHash": "sha256:0c171af2cdfd69866bab06a828c1266a2ec45899544b2ec37cb50c9bf3ab15da",
+          "gitCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-11T12:01:30.553Z",
+      "verifiedAtCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-11T12:01:30.553Z",
+          "workId": "PF-0125",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-11T12:01:30.553Z",
+      "updatedAt": "2026-11-11T12:01:30.553Z"
+    },
+    {
+      "id": "CTX-0149",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "The console can open a registered project's folder in the OS file manager: POST /api/p/<project>/open-folder (a WRITE_ROUTE, so token + same Origin, refused in --read-only) calls src/console/reveal.js, which spawns xdg-open / open / explorer.exe with the project's registered root only (never a path from the request), shell:false and detached. startConsoleServer accepts an openFolder option so tests never launch a real file manager.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0128",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/console/reveal.js",
+          "contentHash": "sha256:4d77accaba1ac94d475a540aa45b7a31f236f4bbc6fdcd5173a318ba80c813e7",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/console/server.js",
+          "symbol": "handleWrite",
+          "contentHash": "sha256:f31bfbc00c8d61d7dd4df79940e017908e4aea7f222732c7cb56dc89729617f5",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "runtime",
+          "description": "npm run check (passed)",
+          "workId": "PF-0128",
+          "verificationRunId": "V-001"
+        }
+      ],
+      "verifiedAt": "2026-11-11T13:20:19.547Z",
+      "verifiedAtCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-11T13:20:19.547Z",
+          "workId": "PF-0128",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-11T13:20:19.547Z",
+      "updatedAt": "2026-11-11T13:20:19.547Z"
+    },
+    {
+      "id": "CTX-0150",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Console information architecture (PF-0132, 1.5.2): header tabs are Workspace · Project · More (Insights, Worktrees), with the project switcher and a permanent team indicator (Team/Solo + current branch, amber when Solo off the integration branch). Projects (#/projects) is the machine-level home: a Needs-you inbox of agent requests from all projects (when agents are on) above project cards that list each project's own lanes; #/agents is an alias for #/projects/inbox, and queue controls, Review & Merge and lane clean-up live on Worktrees (#/team). The Project destination is one page (projectPage/projHead/projTabs in resources/console/app.js) with tabs Overview (#/overview), Run (#/run: Start/Stop project, one compact row per service, a failure as one line with View log / Ask the agent to fix / Start again, links and setup analysis collapsed) and Settings (#/settings: setup guide, Agents, Team mode, Service definitions incl. analyze/plan/add, Project). #/setup and the old #setup-* anchors are normalized to Run or the matching Settings section (canonicalHash/normalizeRoute). Disclosure state still survives redraws through data-sx keys; save, trust and start remain human actions.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0132",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "resources/console/app.js",
+          "symbol": "projTabs",
+          "contentHash": "sha256:e30c89f016a7f53fa4af78bd48d0543b4880b3c21f3b9de53d089d119c2d5567",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "resources/console/app.js",
+          "symbol": "canonicalHash",
+          "contentHash": "sha256:e30c89f016a7f53fa4af78bd48d0543b4880b3c21f3b9de53d089d119c2d5567",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "resources/console/app.js",
+          "symbol": "inboxSection",
+          "contentHash": "sha256:e30c89f016a7f53fa4af78bd48d0543b4880b3c21f3b9de53d089d119c2d5567",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/console-ia.test.js",
+          "contentHash": "sha256:1b47186aa7155bf81f5c366465202f1df2a56862f9631de6ffb0462fef90fb76",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "npm run check (passed)",
+          "workId": "PF-0132",
+          "verificationRunId": "V-001"
+        }
+      ],
+      "verifiedAt": "2026-11-11T14:49:34.985Z",
+      "verifiedAtCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+      "supersedes": [
+        "CTX-0128"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-11T14:49:34.985Z",
+          "workId": "PF-0132",
+          "candidateId": "K-001",
+          "supersedes": "CTX-0128"
+        }
+      ],
+      "createdAt": "2026-11-11T14:49:34.985Z",
+      "updatedAt": "2026-11-11T14:49:34.985Z"
+    },
+    {
+      "id": "CTX-0151",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "The console's floating agent chat follows the page (chatCtx in resources/console/app.js): a work item page is that item's chat; Workspace (Flow, Work), the Project tabs (Overview, Run, Settings), Worktrees and Insights share a project chat whose session has no workId. One agent session per checkout still applies: an item's session appears on project pages as a link, and a project session on an item page is labelled as the project chat.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0132",
+        "candidateId": "K-002"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "resources/console/app.js",
+          "symbol": "chatCtx",
+          "contentHash": "sha256:e30c89f016a7f53fa4af78bd48d0543b4880b3c21f3b9de53d089d119c2d5567",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "runtime",
+          "description": "npm run check (passed)",
+          "workId": "PF-0132",
+          "verificationRunId": "V-001"
+        }
+      ],
+      "verifiedAt": "2026-11-11T14:49:35.462Z",
+      "verifiedAtCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+      "supersedes": [
+        "CTX-0124"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-11T14:49:35.462Z",
+          "workId": "PF-0132",
+          "candidateId": "K-002",
+          "supersedes": "CTX-0124"
+        }
+      ],
+      "createdAt": "2026-11-11T14:49:35.462Z",
+      "updatedAt": "2026-11-11T14:49:35.462Z"
+    },
+    {
+      "id": "CTX-0152",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "The experimental Claude Code connection ships in the package but is off by default. It is turned on per project from the console's Project › Settings › Agents section: the choice (agents, and Claude Code) is saved in .yallaflow/local/agents.json (git-ignored, owner-only 0600, ignored when tracked by Git or readable by others) and applied whenever the console opens, with no flags and no restart; 'yallaflow console --agents --experimental-claude' still turns it on for one run, and --read-only ignores the saved choice. The developer starts Claude Code with the launch command Settings › Agents shows; it opens with a short first prompt (run yallaflow brief) because SessionStart hooks carry no permission mode, so the mode is reported at once. The channel and hook send the bridge token only after the console proves it (HMAC over a nonce at /api/agent-bridge/claude/hello, live pid); messages are refused until a hook reports the mode, and bypassPermissions is never served. Codex remains the managed provider; subscription logins only, no API keys.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0132",
+        "candidateId": "K-003"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "resources/console/app.js",
+          "symbol": "viewSettings",
+          "contentHash": "sha256:e30c89f016a7f53fa4af78bd48d0543b4880b3c21f3b9de53d089d119c2d5567",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "runtime",
+          "description": "npm run check (passed)",
+          "workId": "PF-0132",
+          "verificationRunId": "V-001"
+        }
+      ],
+      "verifiedAt": "2026-11-11T14:49:35.901Z",
+      "verifiedAtCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+      "supersedes": [
+        "CTX-0125"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-11T14:49:35.901Z",
+          "workId": "PF-0132",
+          "candidateId": "K-003",
+          "supersedes": "CTX-0125"
+        }
+      ],
+      "createdAt": "2026-11-11T14:49:35.901Z",
+      "updatedAt": "2026-11-11T14:49:35.901Z"
+    },
+    {
+      "id": "CTX-0153",
+      "area": "business-rule",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Console project readiness (src/console/readiness.js): choosing the project's agent is the first required step. Its status is 'choose' until a choice is saved in .yallaflow/local/agents.json (per project, per machine), then off/missing/done for the chosen provider (Codex, or the experimental Claude Code). An unchosen agent makes the project read 'incomplete' and blocks agent sessions and queue runs (AGENT_NOT_READY: 'Choose this project's agent first'), but never blocks creating work. The console offers the choice in place in the readiness card and as the chat panel's first screen.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0133",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/console/readiness.js",
+          "symbol": "computeReadiness",
+          "contentHash": "sha256:966daf8525c0c90e4b86fa6ccf3f9aa9b4fd757fa513ce1a0cde4b5a8da17291",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/console/server.js",
+          "symbol": "readinessFor",
+          "contentHash": "sha256:a23a08889cdbb6fb4462cf8d1230219bfef86b0d9d7ebcddd7f568398d17b11d",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/console-readiness.test.js",
+          "contentHash": "sha256:f1c9713c9bc27950ba35c9b26883328b087a6f300a6d134671d888e01d26212e",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "runtime",
+          "description": "npm run check (failed)",
+          "workId": "PF-0133",
+          "verificationRunId": "V-001"
+        }
+      ],
+      "verifiedAt": "2026-11-11T15:32:33.201Z",
+      "verifiedAtCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-11T15:32:33.201Z",
+          "workId": "PF-0133",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-11T15:32:33.201Z",
+      "updatedAt": "2026-11-11T15:32:33.201Z"
+    },
+    {
+      "id": "CTX-0154",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Connecting Claude Code from the console opens it in a terminal: POST /api/p/<project>/agents/open-terminal (WRITE_ROUTE, token + same Origin, empty body, Claude Code on for the project) writes the launch files and runs the launch command — built by the server from src/agents/claude-files.js and the detected claude binary, never taken from the request — in the project folder through src/agents/terminal.js (first of gnome-terminal, konsole, xfce4-terminal, kitty, alacritty, x-terminal-emulator, xterm on PATH; macOS Terminal via osascript; detached, shell:false). The developer only answers Claude Code's own development-channel prompt; when no terminal opens, the chat keeps the copy-the-command fallback. startConsoleServer takes openTerminalFor so tests never open a terminal.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0134",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/agents/terminal.js",
+          "contentHash": "sha256:3d94303a8f25562eaf47078b8d2677b18c6fdd8862ce745f2ae0ba7bd789e928",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/console/server.js",
+          "symbol": "handleWrite",
+          "contentHash": "sha256:f2757025fcf0e689f7b15e3a91f61edf440e2da265a73ae58ffd2b13264d6941",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/agent-terminal.test.js",
+          "contentHash": "sha256:cef90d726019f5a10452eaf61b4ab15436d01259d045cf84c6fe836cbacab48c",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "npm run check (passed)",
+          "workId": "PF-0134",
+          "verificationRunId": "V-002"
+        }
+      ],
+      "verifiedAt": "2026-11-11T15:45:44.488Z",
+      "verifiedAtCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-11T15:45:44.488Z",
+          "workId": "PF-0134",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-11T15:45:44.488Z",
+      "updatedAt": "2026-11-11T15:45:44.488Z"
+    },
+    {
+      "id": "CTX-0155",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "A Repository Baseline work item stays at stage INTAKE for its whole life (approval sets DONE). The flow snapshot (src/flow/snapshot.js baselineView) therefore derives a non-DONE baseline item's state, stations, completion, waitingFor and nextAction from baselineNextStep instead of its stage: discovery/draft/changes-requested are in progress at Understand, and awaiting-review is state 'you' with waitingFor.kind 'baseline'. The console never decides the baseline gate: its chat sends the developer's explicit approval message to the agent, which records it.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0135",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/flow/snapshot.js",
+          "symbol": "baselineView",
+          "contentHash": "sha256:f61fa28058e4ceca7ddbd8d164c3c065c8f07aa2e71d3122814f3fe383f3bf1e",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/console-baseline-item.test.js",
+          "contentHash": "sha256:bedbbdfcbe8b9a5ce5d407f2bcb85a3c354457d6a034926313bbda6db1454a49",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "npm run check (passed)",
+          "workId": "PF-0135",
+          "verificationRunId": "V-002"
+        }
+      ],
+      "verifiedAt": "2026-11-12T10:25:23.699Z",
+      "verifiedAtCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-12T10:25:23.699Z",
+          "workId": "PF-0135",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-12T10:25:23.699Z",
+      "updatedAt": "2026-11-12T10:25:23.699Z"
+    },
+    {
+      "id": "CTX-0156",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Console run setup is one path on the Run tab (resources/console/app.js runFind / runApprove): the agent proposes the services (startAgentPlan sends the fixed read-only request directly when a session can take a message; quick scan is the fallback), the developer saves the picked services, then approves them together. Bulk approval is client-side only: each service is trusted through the existing per-service trust endpoint with the definitionHash of the review shown; shared or blocked services are excluded and keep their own per-row review. Settings keeps manual service editing as 'Advanced run setup'.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0136",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "resources/console/app.js",
+          "contentHash": "sha256:989da8e539b6a9d7f3a79ff9bc086d7195cc2fa6d45d6da494929674466628ed",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/console-run-flow.test.js",
+          "contentHash": "sha256:a673b7e3dfafc921ff474a0447ae011adb0f960a6c45db823a8cc50f10562666",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "npm run check (passed)",
+          "workId": "PF-0136",
+          "verificationRunId": "V-004"
+        }
+      ],
+      "verifiedAt": "2026-11-12T11:45:51.263Z",
+      "verifiedAtCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-12T11:45:51.263Z",
+          "workId": "PF-0136",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-12T11:45:51.263Z",
+      "updatedAt": "2026-11-12T11:45:51.263Z"
+    },
+    {
+      "id": "CTX-0157",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Claude Code can be attached to a project through its channel without a linked session record. In that state AgentBridge.disconnectClaude turns the Claude connection off for the project for this console run (disableClaude drops the channel and removes the bridge file, because the channel reconnects while that file exists), and removeProject releases an idle unlinked connection itself; removal is refused only for a real session or while Claude Code is mid-turn.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0138",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/agents/bridge.js",
+          "symbol": "disconnectClaude",
+          "contentHash": "sha256:e206cf23ea8514c52812e09b5c3c0b076917bd74e87baa0c0b6a174f9fc49217",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/agent-claude-unlink.test.js",
+          "contentHash": "sha256:eb2897cb52e8f3b27e7b96fc05e9c5a10f00d9a058b3a9072a237ca9cea8d368",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "npm run check (passed)",
+          "workId": "PF-0138",
+          "verificationRunId": "V-001"
+        }
+      ],
+      "verifiedAt": "2026-11-12T11:56:57.382Z",
+      "verifiedAtCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-12T11:56:57.382Z",
+          "workId": "PF-0138",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-12T11:56:57.382Z",
+      "updatedAt": "2026-11-12T11:56:57.382Z"
+    },
+    {
+      "id": "CTX-0158",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Console first-run rules (1.5.2, PF-0140): (1) 'yallaflow work show <id> --json' carries an additive 'baseline' object (status, facts, limitations) for a Repository Baseline that has a draft, and the console item page renders it so the developer reviews the draft itself before approving. (2) The readiness card offers an optional step (running the app) only when no required step is open. (3) On the Run tab a service with runningOutside that YallaFlow did not start is shown as 'running outside YallaFlow', never 'stopped': Start, Start project and Stop project are disabled when there is nothing YallaFlow can start or stop, and readiness counts it as running. (4) A service listed in the bulk approval card has no second 'Review and trust' control on its row.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0140",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/flow/snapshot.js",
+          "contentHash": "sha256:775170e0ca3b77dd63c33e0433e6c30ff7c6e088c1e1d725099c3fc6f7ef3a41",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "resources/schemas/work-1.schema.json",
+          "contentHash": "sha256:424a3fc9afb61cec569a6c406faac75978b0b5110cc1e0be01d0026686a6b576",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "resources/console/app.js",
+          "contentHash": "sha256:79508c0a8b2e116f8a775e4503ef84371aa886bfc2210c240b70edb3b8b303bf",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/console/readiness.js",
+          "contentHash": "sha256:07474850545a5e96a4af319861916edd8b5830cd3d8849e3ce0aaf46873cc8d2",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/console-first-run.test.js",
+          "contentHash": "sha256:4f59df68223bb7ae18f32a7ef4198f657cf2e42c595fd8d051a91acb4d5671e5",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "npm test (passed)",
+          "workId": "PF-0140",
+          "verificationRunId": "V-001"
+        }
+      ],
+      "verifiedAt": "2026-11-12T13:43:20.754Z",
+      "verifiedAtCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-12T13:43:20.754Z",
+          "workId": "PF-0140",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-12T13:43:20.754Z",
+      "updatedAt": "2026-11-12T13:43:20.754Z"
+    },
+    {
+      "id": "CTX-0159",
+      "area": "convention",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Console folder picker (1.5.2, PF-0139) follows the file-dialog model: one click selects a folder row, double-click / Enter / the forward arrow / the row's arrow opens it, and the footer's primary button acts on the selected folder, or on the open folder when nothing is selected. Connecting a folder with no Git repository (none in it, none above it inside home; previewConnect reports git and gitAbove from names only, never by running Git) offers an opt-in, unticked 'git init' that runs the console's existing confirmed git init after the connect; a refusal never undoes the connect.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0139",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "resources/console/app.js",
+          "contentHash": "sha256:835a0de1c33d6570c8aebe5ca1c90b18f973783747624bb6a62f3453f3957854",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/console/connect.js",
+          "contentHash": "sha256:1a95d6706f46b879a1a6e30a8b90c431306b249a7a308b9ee6d07b8f6e20a4a0",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/console-folder-picker.test.js",
+          "contentHash": "sha256:d2347eeb7d602a80300741d9acff6e8a9d1aa17fbc9ee087ea1d74d2857df18f",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "npm test (passed)",
+          "workId": "PF-0139",
+          "verificationRunId": "V-001"
+        }
+      ],
+      "verifiedAt": "2026-11-12T13:54:48.696Z",
+      "verifiedAtCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-12T13:54:48.696Z",
+          "workId": "PF-0139",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-12T13:54:48.696Z",
+      "updatedAt": "2026-11-12T13:54:48.696Z"
+    },
+    {
+      "id": "CTX-0160",
+      "area": "convention",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Site media file names must not contain 'yallaflow': research/site/make-ar.py maps an image URL to its file by removing every '/yallaflow' from the path, so media/real/yallaflow-flow-en.webp resolves to a missing file. The capture script research/docs-tour/capture.mjs follows the console as of 1.5.2 (wizard ready card, agent choice on Project > Overview, guided flow on Project > Run, All projects) and accepts YF_TOUR_OUT for a trial run outside docs/images/tour.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0141",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "research/site/make-ar.py",
+          "contentHash": "sha256:fd2b8110e98314ba63575e5bf4108f36cd67fca46c33388654ac7a14fa643259",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "research/docs-tour/capture.mjs",
+          "contentHash": "sha256:ea6363af6364d4e816e9111ad9e209eb0e8ace83cc931f806e7b5d440d6cdf6b",
+          "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+          "workingTree": "modified"
+        }
+      ],
+      "verifiedAt": "2026-11-12T15:18:03.930Z",
+      "verifiedAtCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-12T15:18:03.930Z",
+          "workId": "PF-0141",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-12T15:18:03.930Z",
+      "updatedAt": "2026-11-12T15:18:03.930Z"
     }
   ],
-  "updatedAt": "2026-11-09T16:20:19.058Z"
+  "updatedAt": "2026-11-12T15:18:03.930Z"
 }

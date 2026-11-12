@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "test \"$(git rev-parse HEAD^{tree})\" = \"5a9a0b077ae53121776a9685cb9177b2cbd07782\" && echo 'HEAD tree equals the isolated-tested tree' && tar -xzOf /home/engamer/yallaflow-1.5.2-acceptance/yallaflow-1.5.2.tgz package/resources/console/tw.css | cmp - resources/console/tw.css && echo 'acceptance tarball tw.css equals HEAD' && test \"$(/home/engamer/yallaflow-1.5.2-acceptance/node_modules/.bin/yallaflow --version)\" = 1.5.2 && echo 'installed acceptance package reports 1.5.2' && test -z \"$(git status --porcelain -- . ':!.yallaflow' ':!research' ':!.playwright-cli')\" && echo 'no uncommitted product changes' && git log --format='%h %s' -2",
+      "executionMode": "shell",
+      "executable": "test \"$(git rev-parse HEAD^{tree})\" = \"5a9a0b077ae53121776a9685cb9177b2cbd07782\" && echo 'HEAD tree equals the isolated-tested tree' && tar -xzOf /home/engamer/yallaflow-1.5.2-acceptance/yallaflow-1.5.2.tgz package/resources/console/tw.css | cmp - resources/console/tw.css && echo 'acceptance tarball tw.css equals HEAD' && test \"$(/home/engamer/yallaflow-1.5.2-acceptance/node_modules/.bin/yallaflow --version)\" = 1.5.2 && echo 'installed acceptance package reports 1.5.2' && test -z \"$(git status --porcelain -- . ':!.yallaflow' ':!research' ':!.playwright-cli')\" && echo 'no uncommitted product changes' && git log --format='%h %s' -2",
+      "args": [],
+      "displayCommand": "test \"$(git rev-parse HEAD^{tree})\" = \"5a9a0b077ae53121776a9685cb9177b2cbd07782\" && echo 'HEAD tree equals the isolated-tested tree' && tar -xzOf /home/engamer/yallaflow-1.5.2-acceptance/yallaflow-1.5.2.tgz package/resources/console/tw.css | cmp - resources/console/tw.css && echo 'acceptance tarball tw.css equals HEAD' && test \"$(/home/engamer/yallaflow-1.5.2-acceptance/node_modules/.bin/yallaflow --version)\" = 1.5.2 && echo 'installed acceptance package reports 1.5.2' && test -z \"$(git status --porcelain -- . ':!.yallaflow' ':!research' ':!.playwright-cli')\" && echo 'no uncommitted product changes' && git log --format='%h %s' -2",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-11T12:33:00.147Z",
+      "finishedAt": "2026-11-11T12:33:00.327Z",
+      "verifiedAt": "2026-11-11T12:33:00.327Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

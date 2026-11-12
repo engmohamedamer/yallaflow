@@ -1,0 +1,33 @@
+{
+  "id": "PF-0120",
+  "type": "investigation",
+  "scope": "architectural",
+  "routingStatus": "routed",
+  "rawRequest": "v1.5.2 UX & onboarding redesign: research and proposal (console IA, agent setup, project entry, readiness, Setup & Run, clipboard, frontend stack) — no implementation",
+  "status": "DONE",
+  "readOnly": true,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-10T22:36:20.151Z",
+  "updatedAt": "2026-11-10T22:47:23.883Z",
+  "title": "v1.5.2 UX & onboarding redesign: research and proposal (console IA, agent setup, project entry, readiness, Setup & Run, clipboard, frontend stack) — no implementation",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow investigate --scope architectural`.",
+  "routedAt": "2026-11-10T22:36:20.214Z",
+  "workflow": "investigation",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "verification"
+    ]
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "id": "PF-0123",
+  "type": "feature",
+  "scope": "architectural",
+  "routingStatus": "routed",
+  "rawRequest": "v1.5.2 console refinement: Tailwind CSS on the existing console, connect existing projects from the console, guided agent setup, mandatory project readiness, Workspace navigation, real + Create Work, clearer Setup & Run, reliable clipboard, fewer redraws",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-11T08:30:21.144Z",
+  "updatedAt": "2026-11-11T11:02:19.645Z",
+  "title": "v1.5.2 console refinement: Tailwind CSS on the existing console, connect existing projects from the console, guided agent setup, mandatory project readiness, Workspace navigation, real + Create Work, clearer Setup & Run, reliable clipboard, fewer redraws",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope architectural`.",
+  "routedAt": "2026-11-11T08:30:21.190Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "brainstorm",
+    "specify",
+    "plan",
+    "implement",
+    "verify",
+    "converge",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "design-exploration",
+      "specification",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "delivery-convergence",
+      "code-review"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0064",
+      "type": "file",
+      "name": "v152-brief.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-11T08:30:42.047Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0065",
+      "type": "file",
+      "name": "picker-addendum.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-11T08:43:20.279Z",
+      "workStatusAtLink": "SPECIFICATION",
+      "relationship": "work-input"
+    }
+  ],
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-11T11:02:19.645Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004",
+        "V-005",
+        "V-006",
+        "V-007",
+        "V-008",
+        "V-009",
+        "V-010",
+        "V-011",
+        "V-012",
+        "V-013",
+        "V-014",
+        "V-015",
+        "V-016"
+      ]
+    }
+  ]
+}

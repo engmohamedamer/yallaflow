@@ -1,0 +1,17 @@
+# tests 201
+# pass 197
+# fail 3
+# skipped 1
+PASS first open: a quiet line says Codex is not installed
+PASS the line can be dismissed
+PASS Setup shows Codex needs setup with one next step
+PASS exact command shown; Install waits for the review tick
+PASS nothing ran before approval
+PASS ticking the review enables Install
+PASS install runs with live output
+PASS npm received exactly the reviewed command
+PASS the job finished and the card re-checked
+PASS sign-in asks first and explains it is Codex's own
+PASS the official link and the one-time code are shown
+PASS no console errors
+RESULT pass=12 fail=0

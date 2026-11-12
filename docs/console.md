@@ -40,7 +40,7 @@ yallaflow console list
 ## New project (1.4.0)
 
 **All projects → New project** creates a new project in four steps: idea (name, description, requirements, attachments, location from a home-folder chooser), stack, environment (Docker, local tools or later; Git on by default) and review & create. **Create the project** is bound to the exact plan you reviewed; a plan that installs dependencies also asks for the project name. Progress, the log (collapsed) and failure recovery are shown on the page. When it finishes, the project is added to the console and its Overview opens. **All projects → Add an existing project** opens the folder picker:
-- **Browsing.** A breadcrumb with Up (Backspace), a path field (`~/…` works), recent locations, and a filter. Each folder is labelled from file names only: YallaFlow project, existing code (with a hint such as Laravel or Node.js), or empty.
+- **Browsing.** It works like a file dialog: one click selects a folder, a double click opens it, the arrows move the selection and Enter opens. There is a breadcrumb with Up (Backspace), a path field (`~/…` works), recent locations, and a filter. Each folder is labelled from file names only: YallaFlow project, existing code (with a hint such as Laravel or Node.js), or empty.
 - **The action follows the folder.** A YallaFlow project opens. For existing code or an empty folder, **Set up YallaFlow here** first shows exactly what `yallaflow init` would change: `.yallaflow/`, plus a managed block added to `CLAUDE.md`/`AGENTS.md` with your text kept. It also shows the detected stack and how many uncommitted changes Git reports; those are never touched.
 - **Confirming.** After you tick *I reviewed these changes*, the console runs the same `yallaflow init`, with its rollback, and the project opens. For an existing codebase, its next step is project understanding.
 - **Refused folders.** A hand-edited bootstrap block, a folder inside another YallaFlow project, or a lane is refused, and nothing is written.
@@ -49,14 +49,22 @@ The same picker chooses a new project's location, and can create a new folder th
 
 ### Navigation (1.5.2)
 
-**Workspace** (the Flow and the List, switched next to the filters; the last view is remembered) · **Agents** · **Setup & run** · **Project** · **More** (Insights, Worktrees). Every older link (`#/map`, `#/lines`, `#/insights`, `#/team`, `#/item/<id>`) still opens the same page.
+The header has a **project switcher**, then **Workspace · Project · More**:
+
+- **Project switcher.** The current project's name with a readiness dot. Its menu lists your projects and has **Add an existing project**, **New project** and **All projects**. Beside it, the header shows **Team** or **Solo** and the current branch; it turns amber when you work Solo away from the integration branch.
+- **Workspace.** The Flow and the List, switched next to the filters. The last view is remembered.
+- **Project.** Three tabs: **Overview**, **Run** and **Settings** (agents, services, team mode).
+- **More.** Insights and Worktrees.
+- **All projects.** **Needs you** comes first: the agent requests from every project. Each project card shows its open and done work, its running agents, and **Open**, **Open folder** and **Copy path**.
+
+Every older link (`#/map`, `#/lines`, `#/insights`, `#/team`, `#/item/<id>`, `#/setup`, `#/agents`) still opens the matching page or tab.
 
 ### Project readiness (1.5.2)
 
 While something a project needs is missing, the Workspace and Project pages show one line per step, each with its next action:
 - YallaFlow set up;
 - project understanding, which only an existing codebase needs: approved, in progress, or a draft waiting for your review;
-- the agent;
+- the agent: you choose the project's agent, Codex or Claude Code (experimental), and it must be ready on this machine. The choice is saved for this project on this machine, and you change it under **Project → Settings → Agents**;
 - running the app, which is optional.
 
 The console works this out from YallaFlow's own state; nothing extra is stored. It enforces the same rule as the CLI:
@@ -66,36 +74,37 @@ The console works this out from YallaFlow's own state; nothing extra is stored. 
 
 ### Agent setup (1.5.2)
 
-**Setup & run → Agents → On this machine** shows Codex: the CLI, the adapter, the sign-in (only a ChatGPT subscription counts) and the connection. It offers one next step at a time:
+**Project → Settings → Agents → On this machine** shows Codex: the CLI, the adapter, the sign-in (only a ChatGPT subscription counts) and the connection. It offers one next step at a time:
 - **Install.** It shows the exact `npm install -g …` command and needs your tick. It never uses sudo, and it is refused, with the command to run yourself, when npm's global folder is not writable.
 - **Sign in with ChatGPT.** This is Codex's own device sign-in: an official link and a one-time code. YallaFlow never sees credentials.
 - **Test the connection.** It starts the adapter in an empty temporary folder, completes only the handshake, and ends it, so no session or work starts.
 
-Claude Code is detected and shown as experimental; its console connection is not part of published releases. When Codex is not ready, the Workspace shows one dismissible line pointing here.
+Claude Code is detected and shown as experimental. In the chat, **Connect** opens a terminal in the project folder with the launch command, so you only confirm in Claude Code; copying the command is the fallback. On Claude Team or Enterprise accounts, console messages reach Claude Code only when the organization enabled channels. When Codex is not ready, the Workspace shows one dismissible line pointing here.
 
 ### Copying (1.5.2)
 
 **Copy** says *copied* only when the browser confirms it. If the browser refuses, the console tries a second method, then shows the text selected so you can press ⌘C or Ctrl+C.
 
-## Setup: run your project (1.4.1)
+## Run: get your app running (1.4.1, one guided flow since 1.5.2)
 
-**Setup** has two layouts. [Screens →](tour.md#part-3--set-the-project-up-once-then-just-press-start)
+**Project → Run** has two layouts. [Screens →](tour.md#part-3--get-the-app-running-then-just-press-start)
 
-**Before any service is saved, it is a three-step guide.**
-1. **Find how the project runs.** **Ask the agent** comes first and is recommended. It prepares a fixed, read-only request in the project chat, and nothing is sent until you press Send. The agent runs `yallaflow runtime analyze` itself, reads the real configuration (Compose files, vhosts, parent folders), and proposes the plan with `yallaflow runtime plan propose`. While you wait, the page shows *Waiting for the agent's proposal* and checks for it every few seconds. When it arrives, the page switches to it and preselects the new services that nothing blocks. **Quick scan** (`yallaflow runtime analyze`) is the fallback, and it becomes the main button when agents are off. A link then takes you to the Agents settings.
-2. **Choose the services and save.** Each proposed service shows its command, folder, ports, dependencies, links, confidence, evidence and notes. Shared infrastructure, port conflicts and anything that blocks trust are shown too. Unresolved items are listed apart. **Save selected** writes untrusted definitions only.
-3. **Review, trust, then start.**
+**Before any service is saved, it is a guided flow in three steps.**
+1. **Propose the services.** **Ask the agent to set it up** comes first. It prepares a fixed, read-only request in the project chat, and nothing is sent until you press Send. The agent runs `yallaflow runtime analyze` itself, reads the real configuration (Compose files, vhosts, parent folders), and proposes the plan with `yallaflow runtime plan propose`. While you wait, the page says the agent is preparing the proposal and shows it when it arrives, with the services that nothing blocks already selected. **Quick scan** (`yallaflow runtime analyze`) is the fallback, and it is the main button when agents are off. Each proposed service shows its command and port; **Details** has the folder, dependencies, confidence, evidence and notes. Shared infrastructure, port conflicts and anything that blocks a service are marked. What could not be verified is listed apart. **Use the selected services** saves the definitions only; nothing runs.
+2. **Your approval.** One card lists every exact command that will run on your machine, each with its folder, environment variable names and the files the approval is bound to. **▶ Approve and start the app** approves them together and starts the app; **Approve without starting** only records the approval. A service shared with other projects, or one that something blocks, is not in this card: it needs its own review in the list below.
+3. **Start.**
 
-**Once services are saved, Setup is the Run page.**
-- **The run control is on top.** It shows one overall state (*running*, *partly running*, *stopped*, *a service failed*, or *not ready to start yet*), trusted and running counts, **▶ Start project**, **■ Stop project**, and **Open** links for the running apps.
-- **One compact row per service.** Each row shows the state, the trust status, a Shared badge and its ports. An untrusted service offers **Review and trust**, and the review opens in the row. A trusted service offers Start, Restart and Stop. Every service has **Logs**. The exact definition is under *Definition* in each row.
-- **Configuration is folded away below.** It holds finding and adding services, the other suggestions, adding a service yourself, the stack and the agents.
-- Sections you open stay open while the page refreshes its state.
+**Once services are saved, Run is the control page.**
+- **The run control is on top.** It shows one overall state (*running*, *partly running*, *stopped*, *a service failed*, or *not ready to start yet*), trusted and running counts, **▶ Start project**, **■ Stop project**, and **Open quickly** links for the running apps.
+- **One compact row per service.** Each row shows the state, the approval status, a Shared badge and its ports. A service that is not approved offers **Review**, and the review opens in the row. An approved service offers Start, Restart and Stop. Every service has **Logs**. The exact definition is under *Definition* in each row.
+- **Already running outside YallaFlow.** A service that is up but was not started by YallaFlow, such as a Compose stack you started yourself, shows as running. Start project skips it and says so.
+- **A failed service** shows its last log lines with Restart, Full log and Ask the agent.
+- **Advanced editing is in Settings → Services:** finding and adding services, the other suggestions, adding a service yourself, and the stack.
 
 The safety rules do not change:
-- A service runs only after you trust its exact command by typing its id.
+- A service runs only after you approve its exact command. If the command, its folder or a file it is bound to changes later, the approval ends until you review it again.
 - Opening the console starts nothing.
-- Start project starts trusted services in dependency order.
+- Start project starts approved services in dependency order.
 - Stop project stops only what YallaFlow started and can still identify. It never stops shared infrastructure, which needs its own explicit confirmation (a ticked box).
 
 See [`runtime.md`](runtime.md).

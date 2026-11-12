@@ -11,6 +11,7 @@ import { computeReadiness } from '../src/console/readiness.js';
 import { approveTeamBaseline, writeTeamApp } from '../test-support/shared.js';
 import { startBaseline } from '../src/baseline/store.js';
 import { consoleWith, fakeTools } from '../test-support/agent-fixtures.js';
+import { writeAgentSettings } from '../src/agents/settings.js';
 
 const workIds = async (root) => (await readdir(path.join(root, '.yallaflow', 'work')).catch(() => [])).sort();
 
@@ -132,15 +133,28 @@ test('queue runs: refused before understanding except for the understanding item
   const c = await consoleWith(root, { agents: true, agentEnv: tools.env });
   const run = (body, env = c) => fetch(`${env.server.url}api/p/${env.pid}/execution/run`, { method: 'POST', headers: { Authorization: `Bearer ${env.server.token}`, Origin: env.server.url.replace(/\/$/, ''), 'Content-Type': 'application/json' }, body: JSON.stringify({ confirmed: true, provider: 'codex', ...body }) });
   try {
-    const refused = await run({ workIds: ['PF-9999'] });
+    // PF-0133: until the project's agent is chosen, a queue run is refused with that next step.
+    const unchosen = await run({ workIds: [meta.id] });
+    assert.equal(unchosen.status, 409);
+    const first = await unchosen.json();
+    assert.equal(first.error.code, 'AGENT_NOT_READY');
+    assert.match(first.error.message, /Choose this project's agent first/);
+    assert.equal(step(first.readiness, 'agent').status, 'choose');
+    await writeAgentSettings(root, { agents: true, claude: false });
+  } finally {
+    await c.close();
+  }
+  const chosen = await consoleWith(root, { agents: true, agentEnv: tools.env });
+  try {
+    const refused = await run({ workIds: ['PF-9999'] }, chosen);
     assert.equal(refused.status, 409);
     const payload = await refused.json();
     assert.equal(payload.error.code, 'PROJECT_UNDERSTANDING_REQUIRED');
     assert.equal(payload.readiness.onboardingWorkId, meta.id);
-    const onboarding = await run({ workIds: [meta.id] });
+    const onboarding = await run({ workIds: [meta.id] }, chosen);
     assert.notEqual((await onboarding.json()).error?.code, 'PROJECT_UNDERSTANDING_REQUIRED', 'the understanding item itself may run');
   } finally {
-    await c.close();
+    await chosen.close();
   }
   const broken = await consoleWith(root, { agents: true, agentEnv: { ...tools.env, YALLAFLOW_CODEX_BIN: '', YALLAFLOW_CODEX_ACP: '', PATH: await mkdtemp(path.join(os.tmpdir(), 'yf-empty-path-')) } });
   try {
@@ -149,5 +163,36 @@ test('queue runs: refused before understanding except for the understanding item
     assert.equal((await refused.json()).error.code, 'AGENT_NOT_READY');
   } finally {
     await broken.close();
+  }
+});
+
+test('PF-0133: choosing the project agent is the first required step; it follows the chosen provider', async () => {
+  const root = await project('greenfield');
+  const unchosen = await computeReadiness(root, { agent: { checked: true, enabled: true, chosen: false, provider: 'codex', ready: true, problems: [] } });
+  assert.deepEqual(unchosen.steps.map((st) => st.id).slice(0, 2), ['initialized', 'agent'], 'the agent comes before the understanding it prepares');
+  assert.equal(step(unchosen, 'agent').status, 'choose');
+  assert.equal(step(unchosen, 'agent').next.kind, 'choose-agent');
+  assert.equal(unchosen.level, 'incomplete', 'an unchosen agent keeps the project from reading ready');
+  assert.deepEqual([unchosen.allows.createWork, unchosen.allows.agentSessions, unchosen.allows.runQueue], [true, false, false], 'creating work never needs an agent');
+  const claude = await computeReadiness(root, { agent: { checked: true, enabled: true, chosen: true, provider: 'claude', ready: false, problems: ['Claude Code is not signed in.'], warnings: ['Team account'] } });
+  assert.deepEqual({ status: step(claude, 'agent').status, provider: step(claude, 'agent').provider, warnings: step(claude, 'agent').warnings }, { status: 'missing', provider: 'claude', warnings: ['Team account'] });
+  const legacy = await computeReadiness(root, { agent: { checked: true, enabled: true, ready: true, problems: [] } });
+  assert.equal(step(legacy, 'agent').status, 'done', 'callers that do not report a choice are read as Codex chosen');
+});
+
+test('PF-0133: a console with no saved agent choice asks for one; saving one answers it', async () => {
+  const root = await project('greenfield');
+  const tools = await fakeTools();
+  const c = await consoleWith(root, { agents: true, agentEnv: tools.env });
+  const get = (env) => fetch(`${env.server.url}api/p/${env.pid}/readiness`, { headers: { Authorization: `Bearer ${env.server.token}` } }).then((r) => r.json());
+  const save = (env, body) => fetch(`${env.server.url}api/p/${env.pid}/agents/settings`, { method: 'POST', headers: { Authorization: `Bearer ${env.server.token}`, Origin: env.server.url.replace(/\/$/, ''), 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  try {
+    assert.equal(step(await get(c), 'agent').status, 'choose');
+    assert.equal((await save(c, { agents: true, claude: false })).status, 200);
+    const after = step(await get(c), 'agent');
+    assert.equal(after.provider, 'codex');
+    assert.notEqual(after.status, 'choose');
+  } finally {
+    await c.close();
   }
 });

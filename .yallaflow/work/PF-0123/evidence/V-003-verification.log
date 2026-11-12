@@ -1,0 +1,6 @@
+# pass 8
+# fail 0
+# skipped 1
+mirror-with-tailwind-cli # pass 4
+mirror-with-tailwind-cli # fail 0
+package ships resources/console/tw.css

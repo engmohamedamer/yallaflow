@@ -1,0 +1,17 @@
+== npm ci
+
+added 63 packages in 2s
+tailwind CLI: ≈ tailwindcss v4.3.5
+== npm run check (freshness required)
+# tests 1181
+# pass 1177
+# fail 0
+# skipped 4
+ok 219 - tw.css is up to date with tailwind.input.css and app.js
+== npm pack
+tw.css in the tarball is byte-identical to the committed file
+766b5728c5857cc6d57c629421197544b25a60e26338a1885839e2900eec6218  yallaflow-1.5.1.tgz
+added 32 packages in 6s
+1.5.1
+Workspace healthy.
+installed package has no Tailwind (devDependency only)

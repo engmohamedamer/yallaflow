@@ -1,0 +1,60 @@
+{
+  "id": "PF-0125",
+  "type": "bug",
+  "scope": "architectural",
+  "routingStatus": "routed",
+  "rawRequest": "Security: yallaflow init (and agent setup/refresh) must never follow symlinks in managed bootstrap files and modify files outside the project",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-11T11:29:33.332Z",
+  "updatedAt": "2026-11-11T12:01:31.088Z",
+  "title": "Security: yallaflow init (and agent setup/refresh) must never follow symlinks in managed bootstrap files and modify files outside the project",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope architectural`.",
+  "routedAt": "2026-11-11T11:29:33.380Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "plan",
+    "implement",
+    "verify",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "code-review"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0067",
+      "type": "file",
+      "name": "owner-1.5.2-closeout.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-11T11:29:33.712Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ],
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-11T12:01:31.088Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002"
+      ]
+    }
+  ]
+}

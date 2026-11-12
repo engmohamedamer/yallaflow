@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Console styling uses Tailwind CSS v4 utilities next to app.css: classes are prefixed tw: (e.g. tw:flex), there is no preflight reset, utilities are unlayered so they refine app.css rules, and colours/fonts/radii map to app.css variables (themes keep working). The input is resources/console/tailwind.input.css; npm run build:css writes resources/console/tw.css, which is committed and shipped as-is (nothing rebuilds it on pack or publish). A test fails when tw.css is stale; CI sets YALLAFLOW_REQUIRE_CSS_CHECK=1 so it can never skip, and the release workflow checks the packed tw.css equals the committed file. The build tools are devDependencies and need Node 20.19+; users never build.",
+      "evidence": [
+        "resources/console/tailwind.input.css",
+        "package.json",
+        ".github/workflows/release.yml",
+        "test/console-refinement.test.js"
+      ],
+      "confidence": "confirmed",
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0142"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-11T11:48:42.422Z",
+      "factId": "CTX-0145",
+      "promotedAt": "2026-11-11T11:48:42.905Z",
+      "target": "context/conventions.md"
+    },
+    {
+      "id": "K-002",
+      "kind": "integration",
+      "source": "implementation-runtime",
+      "summary": "The console installs exact, tested Codex versions — TESTED_CODEX in src/agents/detect.js (@openai/codex 0.167.0, @agentclientprotocol/codex-acp 2.5.0, tested 2026-11-11 with a real handshake) — never a range; it offers an install only when the pinned adapter is inside REQUIREMENTS.codexAcp and Node is supported, and shows when installed versions differ from the tested pair. docs/agents.md 'Tested Codex versions' describes how maintainers update the pins.",
+      "evidence": [
+        "src/agents/detect.js",
+        "src/agents/setup.js",
+        "docs/agents.md",
+        "verification:V-001"
+      ],
+      "confidence": "confirmed",
+      "status": "promoted",
+      "createdAt": "2026-11-11T11:48:42.593Z",
+      "factId": "CTX-0146",
+      "promotedAt": "2026-11-11T11:48:43.314Z",
+      "target": "context/integrations.md"
+    },
+    {
+      "id": "K-003",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "The Node engines contract (>=20.16.0) is checked against the shipped runtime dependency tree only (packages not marked dev in package-lock.json); development-only tools are checked separately against the documented build floor, Node 20.19, which the release workflow's Node 20 job meets with the latest 20.x.",
+      "evidence": [
+        "test/node-compatibility.test.js",
+        "package-lock.json"
+      ],
+      "confidence": "confirmed",
+      "status": "promoted",
+      "createdAt": "2026-11-11T11:48:42.751Z",
+      "factId": "CTX-0147",
+      "promotedAt": "2026-11-11T11:48:43.692Z",
+      "target": "context/conventions.md"
+    }
+  ],
+  "updatedAt": "2026-11-11T11:48:43.692Z",
+  "reviewedAt": "2026-11-11T11:48:43.692Z"
+}

@@ -1,0 +1,32 @@
+# tests 242
+# pass 241
+# fail 0
+# skipped 1
+PASS header: Workspace|Agents|Setup & run|Project|More ▾
+PASS #/map keeps Workspace current
+PASS #/lines keeps Workspace current
+PASS #/item/PF-0001 keeps Workspace current
+PASS #/map shows the Flow with the switch on Flow
+PASS #/lines shows the List with the switch on List
+PASS Workspace tab returns to the last view (List)
+PASS #/insights opens and More shows it (page|Insights ▾)
+PASS #/team opens and More shows it (page|Worktrees ▾)
+PASS More menu lists Insights and Worktrees
+PASS Esc closes More and returns focus
+PASS New gate + is a button named Create work
+PASS Enter on + opens the existing Create work form
+PASS Arabic: + named شغل جديد in RTL
+PASS no console errors
+RESULT pass=15 fail=0
+PASS intro: agent first, running the app optional
+PASS first-time steps in order: 1. Set up the agent | 2. Scan the stack | 3. Choose services (optional)
+PASS Agents comes before finding services
+PASS manual add-service form is folded (advanced)
+PASS Go to Agents scrolls to the agent setup, below the sticky header (96 px)
+PASS run state names the failure: 1 service(s) failed
+PASS failed service shows its last log lines with Restart and Ask/Copy for the agent
+PASS app link is shown for the running service (Open :4955 ↗)
+PASS no station name is cut off at 1440px (English)
+PASS first-run arrows point the Arabic reading direction (←←←)
+PASS no console errors
+RESULT pass=11 fail=0

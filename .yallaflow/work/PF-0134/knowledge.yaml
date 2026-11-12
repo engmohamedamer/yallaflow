@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Connecting Claude Code from the console opens it in a terminal: POST /api/p/<project>/agents/open-terminal (WRITE_ROUTE, token + same Origin, empty body, Claude Code on for the project) writes the launch files and runs the launch command — built by the server from src/agents/claude-files.js and the detected claude binary, never taken from the request — in the project folder through src/agents/terminal.js (first of gnome-terminal, konsole, xfce4-terminal, kitty, alacritty, x-terminal-emulator, xterm on PATH; macOS Terminal via osascript; detached, shell:false). The developer only answers Claude Code's own development-channel prompt; when no terminal opens, the chat keeps the copy-the-command fallback. startConsoleServer takes openTerminalFor so tests never open a terminal.",
+      "evidence": [
+        "src/agents/terminal.js",
+        "src/console/server.js#handleWrite",
+        "test/agent-terminal.test.js",
+        "verification:V-002"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-11T15:45:44.332Z",
+      "factId": "CTX-0154",
+      "promotedAt": "2026-11-11T15:45:44.488Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-11T15:45:44.488Z",
+  "reviewedAt": "2026-11-11T15:45:44.488Z"
+}

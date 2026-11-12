@@ -116,6 +116,8 @@ test('Queue end to end: two items run one after the other through the real bridg
   const first = await helpers.investigation(root, 'Why are totals rounded twice?');
   const second = await helpers.investigation(root, 'Where is tax computed?');
   for (const workId of [first, second]) helpers.cli(root, ['knowledge', 'review', workId, '--none']);
+  // PF-0133: a queue runs only once the project's agent is chosen.
+  await (await import('../src/agents/settings.js')).writeAgentSettings(root, { agents: true, claude: false });
   const tools = await fakeTools();
   const c = await consoleWith(root, { agents: true, agentEnv: tools.env });
   const exec = (action, body) => fetch(`${c.server.url}api/p/${c.pid}/execution/${action}`, { method: 'POST', headers: { Authorization: `Bearer ${c.server.token}`, Origin: c.origin, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });

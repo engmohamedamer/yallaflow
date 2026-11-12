@@ -1,0 +1,57 @@
+{
+  "id": "PF-0127",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Header project switcher: replace the native select and the small All projects link with one styled switcher (name, readiness dot, menu of projects with Add/New/All projects), keyboard accessible, ar/en, light/dark",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-11T12:59:17.738Z",
+  "updatedAt": "2026-11-11T13:14:25.524Z",
+  "title": "Header project switcher: replace the native select and the small All projects link with one styled switcher (name, readiness dot, menu of projects with Add/New/All projects), keyboard accessible, ar/en, light/dark",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-11T12:59:17.791Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0069",
+      "type": "file",
+      "name": "header-feedback.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-11T12:59:18.163Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ],
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-11T13:14:25.524Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

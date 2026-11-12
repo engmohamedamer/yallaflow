@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "gates": {
+    "specification": {
+      "status": "approved",
+      "respondedAt": "2026-11-11T08:43:56.066Z",
+      "note": "Approved by the owner (Mohamed Amer) in the agent session: 'I approve the specification and implementation plan for YallaFlow PF-0123 / v1.5.2, with the following conditions' (preserve UI identity; readiness respects project type; safe agent setup; stable redraws with prompt live states; preserve unrelated local changes; baseline first; phase-by-phase verification; no breaking changes; no commit/push/tag/publish without approval), together with the folder-picker addendum: 'Please update PF-0123's specification, acceptance criteria, and implementation plan to include this improvement.' The specification approved is the version including REQ-012 and AC-022..AC-025.",
+      "history": [
+        {
+          "status": "awaiting_review",
+          "at": "2026-11-11T08:36:47.028Z"
+        },
+        {
+          "status": "approved",
+          "at": "2026-11-11T08:43:56.066Z",
+          "note": "Approved by the owner (Mohamed Amer) in the agent session: 'I approve the specification and implementation plan for YallaFlow PF-0123 / v1.5.2, with the following conditions' (preserve UI identity; readiness respects project type; safe agent setup; stable redraws with prompt live states; preserve unrelated local changes; baseline first; phase-by-phase verification; no breaking changes; no commit/push/tag/publish without approval), together with the folder-picker addendum: 'Please update PF-0123's specification, acceptance criteria, and implementation plan to include this improvement.' The specification approved is the version including REQ-012 and AC-022..AC-025."
+        }
+      ]
+    },
+    "plan": {
+      "status": "approved",
+      "respondedAt": "2026-11-11T08:44:08.275Z",
+      "note": "Approved by the owner (Mohamed Amer) in the agent session: 'I approve the specification and implementation plan for YallaFlow PF-0123 / v1.5.2' with the listed conditions, and 'You may proceed with implementation phase by phase after the baseline passes'; the folder picker added to Phase 5 at the owner's request ('Keep it within Phase 5 unless a dependency requires a different ordering').",
+      "history": [
+        {
+          "status": "awaiting_review",
+          "at": "2026-11-11T08:44:01.156Z"
+        },
+        {
+          "status": "approved",
+          "at": "2026-11-11T08:44:08.275Z",
+          "note": "Approved by the owner (Mohamed Amer) in the agent session: 'I approve the specification and implementation plan for YallaFlow PF-0123 / v1.5.2' with the listed conditions, and 'You may proceed with implementation phase by phase after the baseline passes'; the folder picker added to Phase 5 at the owner's request ('Keep it within Phase 5 unless a dependency requires a different ordering')."
+        }
+      ]
+    }
+  },
+  "updatedAt": "2026-11-11T08:44:08.275Z"
+}

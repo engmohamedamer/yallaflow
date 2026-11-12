@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-12T12:47:39.352Z",
+      "completedAt": "2026-11-12T12:47:39.352Z",
+      "summary": "The screenshot (SRC-0092) is the work map with all recorded work done: hero() renders '.hero calm' (resources/console/app.js) with a 96px icon, a 24-34px heading, 17px text and large stat tiles. The hero for open work was already slimmed in PF-0128 ('.hero slim', 56px ring, 18-22px heading, 13.5px text, filter chips). SRC-0093 and SRC-0094 were attached to this item by the agent by mistake and belong to PF-0138; they do not describe this request."
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-12T12:47:39.563Z",
+      "completedAt": "2026-11-12T12:47:39.563Z",
+      "summary": "Owner request (console): the box at the top of the page is a bit large and so is its font; improve the look. Read as: make the all-done summary box as compact as the slim hero used when work is open; same information."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-12T12:47:39.773Z",
+      "completedAt": "2026-11-12T12:47:39.773Z",
+      "summary": "Render the all-done hero as '.hero calm slim' with a 56px icon and the same filter chips as the open-work hero; smaller new-work button with a label that fits a project that already has work. CSS only for the icon size and button spacing. Test asserting the markup; full npm run check."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-12T12:48:23.222Z",
+      "completedAt": "2026-11-12T12:48:23.222Z",
+      "summary": "resources/console/app.js hero(): the all-done box renders as '.hero calm slim' with a 56px icon, the same filter chips as the open-work hero instead of large stat tiles, and a small 'New work' button (createButton(true)); app.css: .hico.xs and the calm-slim grid. Test added to test/console-polish.test.js."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-12T12:55:48.371Z",
+      "completedAt": "2026-11-12T12:55:48.371Z",
+      "summary": "npm run check passed (V-001: 1224 pass, 0 fail). Seen in a browser on a scratch copy of the test project: the all-done box is one slim row with the filter chips and the small New work button; no console errors."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-12T12:55:48.371Z"
+}

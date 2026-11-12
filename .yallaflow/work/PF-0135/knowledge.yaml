@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "A Repository Baseline work item stays at stage INTAKE for its whole life (approval sets DONE). The flow snapshot (src/flow/snapshot.js baselineView) therefore derives a non-DONE baseline item's state, stations, completion, waitingFor and nextAction from baselineNextStep instead of its stage: discovery/draft/changes-requested are in progress at Understand, and awaiting-review is state 'you' with waitingFor.kind 'baseline'. The console never decides the baseline gate: its chat sends the developer's explicit approval message to the agent, which records it.",
+      "evidence": [
+        "src/flow/snapshot.js#baselineView",
+        "test/console-baseline-item.test.js",
+        "verification:V-002"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-12T10:25:11.826Z",
+      "factId": "CTX-0155",
+      "promotedAt": "2026-11-12T10:25:23.699Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-12T10:25:23.699Z",
+  "reviewedAt": "2026-11-12T10:25:23.699Z"
+}

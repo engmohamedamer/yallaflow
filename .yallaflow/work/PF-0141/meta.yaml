@@ -1,0 +1,45 @@
+{
+  "id": "PF-0141",
+  "type": "release",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Prepare the 1.5.2 release locally: CHANGELOG for the console work since the candidate (PF-0127..PF-0139), docs brought in line with the current console, tour and site screenshots recaptured in the current design, website updated (EN + AR), release checklist run. Nothing committed, tagged, pushed or published without the maintainer's approval",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-12T14:40:36.264Z",
+  "updatedAt": "2026-11-12T15:18:04.365Z",
+  "title": "Prepare the 1.5.2 release locally: CHANGELOG for the console work since the candidate (PF-0127..PF-0139), docs brought in line with the current console, tour and site screenshots recaptured in the current design, website updated (EN + AR), release checklist run. Nothing committed, tagged, pushed or published without the maintainer's approval",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow release --scope bounded`.",
+  "routedAt": "2026-11-12T14:40:36.326Z",
+  "workflow": "release",
+  "requiredCapabilities": [
+    "discover",
+    "plan",
+    "implement",
+    "verify",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "code-review"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-12T15:18:04.365Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

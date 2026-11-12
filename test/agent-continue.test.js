@@ -83,6 +83,8 @@ function ui({ session = null, events = [], history = [], providers, lang = 'en',
     agent: { session, events, history, providers: providers ?? [{ id: 'codex', ready: true }, { id: 'claude', ready: true }] },
     A: (ar, en) => (lang === 'ar' ? ar : en), L: (value) => value?.[lang], esc, ago: () => 'just now',
     renderAgent() {}, loadAgent: async () => {}, calls,
+    // PF-0134: Connect also asks the server to open a terminal.
+    agentTerminal: null, pid: 'p', why: (e) => e.message, post: async (url) => { calls.push(['open-terminal', url]); return { opened: true, terminal: 'xterm' }; },
     agentPost: async (action, body) => { calls.push([action, body]); return post(action, body); }
   });
   vm.runInContext(`${code}\nthis.card = (it) => stopCard(it); this.hist = (it) => sessionHistory(it); this.switchTo = async (to, it) => { await switchAgent(to, it); return { draft: agentDraft, launch: agentLaunch }; };`, context);
@@ -136,7 +138,7 @@ test('UI: switching ends Codex first, connects Claude, and prepares (never sends
     post: async (action) => (action === 'connect' ? { launch: { command: 'claude --mcp-config x' } } : {})
   });
   const result = await c.switchTo('claude', item);
-  assert.deepEqual(c.calls.map(([action]) => action), ['end', 'connect']);
+  assert.deepEqual(c.calls.map(([action]) => action), ['end', 'connect', 'open-terminal']);
   assert.equal(c.calls[1][1].workId, 'PF-0007');
   assert.equal(result.launch, 'claude --mcp-config x');
   assert.match(result.draft, /^Continue PF-0007\. The previous agent \(Codex\) reached its subscription usage limit\. Start with yallaflow handoff PF-0007/);

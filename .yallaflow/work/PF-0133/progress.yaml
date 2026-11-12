@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-11T15:01:29.080Z",
+      "completedAt": "2026-11-11T15:01:29.080Z",
+      "summary": "Readiness agent step (src/console/readiness.js) was 'done' when Codex was ready on the machine, never asking which agent the project uses; the saved per-project choice lives in .yallaflow/local/agents.json (src/agents/settings.js, savedChoices in server.js, POST /api/p/<id>/agents/settings enables agents and Claude). The chat panel's setupHint links to Settings → Agents and leaves the chat open over the page (owner screenshots). New-project wizard already saves a choice; Add existing project does not."
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-11T15:01:29.249Z",
+      "completedAt": "2026-11-11T15:01:29.249Z",
+      "summary": "Agent step is first and required until a choice is saved; statuses choose/off/missing/done follow the chosen provider; choice made inline from the readiness card and from the chat panel (Codex: ChatGPT subscription; Claude Code: experimental, Claude subscription, Team-organization warning) without leaving the page; any link to Settings closes the chat panel; creating work is never blocked by the agent step."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-11T15:01:29.444Z",
+      "completedAt": "2026-11-11T15:01:29.444Z",
+      "summary": "Server: readinessFor passes chosen/provider/warnings. readiness.js: agent step first, 'choose' counted as required. app.js: readyText() per provider, agentChooser() used by readiness card and chat panel, data-agent-choose handler (POST agents/settings + setup step, reload readiness/agent info), setupHint offers 'Use Claude Code here' inline, data-setup-agents closes the chat. Tests in test/console-readiness.test.js and test/console-ia.test.js."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-11T15:03:15.816Z",
+      "completedAt": "2026-11-11T15:03:15.816Z",
+      "summary": "Server: readinessFor reads the saved per-project choice, checks the chosen provider (Codex, or Claude Code when included) and passes chosen/provider/warnings; queue runs without a chosen agent are refused with 'Choose this project's agent first'. readiness.js: agent step first, status 'choose' (required, blocks agent sessions/queues, never createWork), provider and warnings. app.js: readyPair() per provider, agentChooser() (Codex recommended; Claude Code experimental with the Team/Enterprise channels warning) in the readiness card and as the chat panel's first screen, chooseAgent() saves via POST agents/settings + setup step and reloads readiness/agent, setupHint offers 'Use it for this project' inline, links from the chat close it. CSS .agentpick. Tests: console-readiness (updated queue test + 2 new), console-polish (chooser)."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-11T15:32:33.039Z",
+      "completedAt": "2026-11-11T15:32:33.039Z",
+      "summary": "V-003: npm run check passed (1207 tests). V-001 failed on intended-change fallout (provider names in readiness.js, chat harness missing readiness, the Claude-off picker test, a queue test without a chosen agent) — all fixed. V-002 failed only on the Queue end-to-end timing test ('condition not met in time'); it passed in isolation, in a separate full run and in V-003."
+    }
+  },
+  "rulings": [
+    {
+      "decision": "src/console/server.js (readinessFor reads the saved agent choice and checks the chosen provider) and src/console/readiness.js (agent step first, 'choose' status, provider/warnings) were edited before PF-0133 authorized modification, without workflow authorization; adopted for review and verification",
+      "reason": "Edited while discovery was still in progress; kept per recovery protocol",
+      "costIfWrong": "An unreviewed readiness change could mark projects not ready or misreport the agent",
+      "createdAt": "2026-11-11T15:01:28.753Z"
+    },
+    {
+      "decision": "Owner decision: choosing the project's agent (Codex or Claude Code, experimental with the Team-organization warning) is required; an unchosen agent makes readiness incomplete. This replaces the earlier rule that a project without console agents still reads 'ready' (PF-0123), for the unchosen case only; an unchosen or missing agent still never blocks creating work",
+      "reason": "Owner chose 'mandatory choice between the two' in the agent session on 2026-11-11",
+      "costIfWrong": "CLI-only users see 'getting ready' until they choose an agent in the console",
+      "createdAt": "2026-11-11T15:01:28.914Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-11T15:32:33.039Z"
+}

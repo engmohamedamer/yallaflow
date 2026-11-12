@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Claude Code can be attached to a project through its channel without a linked session record. In that state AgentBridge.disconnectClaude turns the Claude connection off for the project for this console run (disableClaude drops the channel and removes the bridge file, because the channel reconnects while that file exists), and removeProject releases an idle unlinked connection itself; removal is refused only for a real session or while Claude Code is mid-turn.",
+      "evidence": [
+        "src/agents/bridge.js#disconnectClaude",
+        "test/agent-claude-unlink.test.js",
+        "verification:V-001"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-12T11:56:57.174Z",
+      "factId": "CTX-0157",
+      "promotedAt": "2026-11-12T11:56:57.382Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-12T11:56:57.382Z",
+  "reviewedAt": "2026-11-12T11:56:57.382Z"
+}

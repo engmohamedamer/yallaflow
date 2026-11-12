@@ -1,0 +1,6 @@
+HEAD tree equals the isolated-tested tree
+acceptance tarball tw.css equals HEAD
+installed acceptance package reports 1.5.2
+no uncommitted product changes
+4d7c388 fix(security): init and agent commands never write through links outside the project
+a71dcf3 feat(console): v1.5.2 — An easier first hour

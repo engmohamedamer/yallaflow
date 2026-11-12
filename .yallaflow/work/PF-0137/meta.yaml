@@ -1,0 +1,88 @@
+{
+  "id": "PF-0137",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "محتاجين تحسين فى الشكل شويه ال box فى اول الصفحه كيره شويه والفونت برضو",
+  "status": "DONE",
+  "readOnly": false,
+  "attestation": {
+    "recordedVia": "console",
+    "verified": false,
+    "requestId": "05d2243d-a97d-43b4-96bd-04273cc8a1fd",
+    "at": "2026-11-12T11:24:50.893Z"
+  },
+  "activation": {
+    "deferred": true,
+    "keptActive": "PF-0136",
+    "at": "2026-11-12T11:24:50.904Z"
+  },
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-12T11:24:50.904Z",
+  "updatedAt": "2026-11-12T12:55:48.854Z",
+  "sources": [
+    {
+      "id": "SRC-0092",
+      "type": "file",
+      "name": "screenshot-1794482646653-1.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-12T11:24:52.521Z",
+      "workStatusAtLink": "PENDING",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0093",
+      "type": "file",
+      "name": "Screenshot from 2026-11-12 12-53-40.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-12T11:46:05.535Z",
+      "workStatusAtLink": "PENDING",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0094",
+      "type": "file",
+      "name": "Screenshot from 2026-11-12 12-53-58.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-12T11:46:05.971Z",
+      "workStatusAtLink": "PENDING",
+      "relationship": "work-input"
+    }
+  ],
+  "title": "Change work",
+  "routingConfidence": "high",
+  "routingReason": "Visual-only adjustment of the work map's top summary box (size and font); no behavior, data or security impact.",
+  "routedAt": "2026-11-12T12:47:03.828Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-12T12:55:48.854Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

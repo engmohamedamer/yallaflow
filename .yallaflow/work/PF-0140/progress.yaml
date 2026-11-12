@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-12T13:19:01.306Z",
+      "completedAt": "2026-11-12T13:20:56.530Z",
+      "summary": "Read the 12 screenshots and traced each screen to console code. Readiness strip (app.js readinessCard/readinessAction) lists the optional runtime step beside the required draft review. 'Review the draft' links to the item page, which shows only next-step text: work show JSON (flow/snapshot.js workDetail) carries no baseline draft. Run tab (viewRun) renders the bulk approval card and, under it, service rows that still offer 'Review and trust' for the same services. A Compose stack already up outside YallaFlow is reported by Core as state stopped + runningOutside; startOne returns running-outside without starting (supervisor.js:279).",
+      "evidence": [
+        "resources/console/app.js",
+        "src/flow/snapshot.js",
+        "src/runtime/supervisor.js",
+        "src/console/readiness.js"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-12T13:21:08.284Z",
+      "completedAt": "2026-11-12T13:21:08.500Z",
+      "summary": "Root causes (all console presentation; Core behaves as designed). (1) Start does nothing: for a Compose stack already up outside YallaFlow, Core reports state 'stopped' plus runningOutside and startOne returns {state:'running-outside'} without starting. serviceCard shows the chip 'stopped' with an enabled Start, and runtimeAction discards the result, so the click has no visible effect; Start project stays enabled too while the panel head says 'running'. Reproduction is by code path (test/runtime-plan.test.js:469 already proves the Core result); a live Docker stack is not needed. (2) Two approve controls: viewRun renders runApprove and service rows whose untrusted action is 'Review and trust' for the same bulkable services. (3) Thin draft review: the item page has no draft content because workDetail never includes baseline.yaml. (4) Two open next steps: readinessCard lists the optional runtime step while a required step is open, then hides the whole card once ready. Fix direction: show outside-running as its own state with Start disabled and an explanation; one approval control per service; add the draft to work detail and render it on the item page; show optional steps only when no required step is open.",
+      "evidence": [
+        "resources/console/app.js",
+        "src/runtime/supervisor.js",
+        "test/runtime-plan.test.js"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-12T13:21:17.461Z",
+      "completedAt": "2026-11-12T13:36:02.205Z",
+      "summary": "Console first-run fixes. (1) Item page shows the project-understanding draft itself (facts by area with confirmed/inferred/unresolved, evidence, and what was not inspected); work show JSON gains an additive 'baseline' field (schema work-1 updated). (2) Readiness card offers an optional step only when no required step is open; '(optional)' is no longer printed twice. (3) Run tab: a stack already running outside YallaFlow shows as 'running outside YallaFlow' (not 'stopped'), Start and Start project are disabled with the reason, Stop project is disabled when YallaFlow started nothing, the foreign-port warning is dropped for the project's own outside stack, and readiness counts it as running. (4) A service waiting in the approval card no longer has a second 'Review and trust' on its row; when everything already runs outside, the card offers one 'Approve the commands' action and says nothing will start; approving without starting now reports what happened. New test file test/console-first-run.test.js (11 tests).",
+      "evidence": [
+        "resources/console/app.js",
+        "resources/console/app.css",
+        "src/flow/snapshot.js",
+        "src/console/readiness.js",
+        "resources/schemas/work-1.schema.json",
+        "test/console-first-run.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-12T13:36:02.748Z",
+      "completedAt": "2026-11-12T13:42:56.875Z",
+      "summary": "npm test: 1236 tests, 1235 pass, 0 fail, 1 skipped (V-001), including the 11 new first-run console tests. Not checked in a live browser against a real Docker stack.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-12T13:42:56.875Z"
+}

@@ -1,0 +1,40 @@
+# tests 201
+# pass 200
+# fail 0
+# skipped 1
+PASS picker opens at Home with a breadcrumb
+PASS kinds: clinic-legacy:YallaFlow project,demo:YallaFlow project,fresh-empty:Empty,laravel-shop:Laravel
+PASS breadcrumb Home › code
+PASS filter narrows in place and keeps focus
+PASS ArrowDown moves from the filter to the first match
+PASS selected folder: full path + Set up YallaFlow here
+PASS Backspace goes up one folder
+PASS typed ~/ path is accepted
+PASS a path outside home is refused by the server (Only folders inside your home folder can be browsed.)
+PASS preview: Laravel 11, 2 uncommitted untouched, exact plan, confirm off until reviewed
+PASS the preview wrote nothing
+PASS connected: dialog closed, project open on the Workspace
+PASS Core init created .yallaflow
+PASS CLAUDE.md keeps the team's text
+PASS uncommitted work and application files untouched
+PASS next step shown: project understanding
+PASS New folder focuses its name field
+PASS new folder created and selected
+PASS folder exists on disk
+PASS wizard location set to the new folder (/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/home/code/apps)
+PASS no horizontal scroll at 390px
+PASS no console errors (besides the expected outside-home refusal)
+RESULT pass=22 fail=0
+PASS first open: a quiet line says Codex is not installed
+PASS the line can be dismissed
+PASS Setup shows Codex needs setup with one next step
+PASS exact command shown; Install waits for the review tick
+PASS nothing ran before approval
+PASS ticking the review enables Install
+PASS install runs with live output
+PASS npm received exactly the reviewed command
+PASS the job finished and the card re-checked
+PASS sign-in asks first and explains it is Codex's own
+PASS the official link and the one-time code are shown
+PASS no console errors
+RESULT pass=12 fail=0

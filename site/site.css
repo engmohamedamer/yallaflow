@@ -322,3 +322,4 @@ footer p { margin: 0; }
 .story p { margin: 0; color: var(--muted); font-size: 0.94rem; }
 .story b { color: var(--fg); }
 [dir="rtl"] .story .tag { text-transform: none; letter-spacing: 0; font-family: inherit; font-size: .85rem; }
+.built-shot { margin-top: 28px; }

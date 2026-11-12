@@ -1,0 +1,10 @@
+== npm ci
+
+added 63 packages in 2s
+tailwind CLI: ≈ tailwindcss v4.3.5
+== npm run check (freshness required)
+not ok 543 - a failure while installing the bootstrap rolls init back: no half-configured workspace, agent files restored
+# tests 1181
+# pass 1176
+# fail 1
+# skipped 4

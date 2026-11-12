@@ -136,7 +136,10 @@ export class AgentBridge {
   async removeProject(projectId) {
     const project = this.projects.get(projectId);
     if (!project) return;
-    if (project.session || project.claude?.streamBusy()) throw conflict('An agent session is running in this project. End it first, then remove the project.');
+    // PF-0138: Claude Code that is only connected (no linked session) and idle is let go here;
+    // only a real session, or Claude Code in the middle of a turn, refuses the removal.
+    if (project.session) throw conflict('An agent session is running in this project. End it first, then remove the project.');
+    if (project.claude?.streamBusy() && project.claude.status === 'working') throw conflict('Claude Code is working in this project. Wait for it to finish, or stop it in Claude Code, then remove the project.');
     if (project.claudeOn) await this.disableClaude(projectId);
     if (project.session || project.claude?.streamBusy()) throw conflict('An agent session is running in this project. End it first, then remove the project.');
     this.denyPending(project, null, 'project removed from the console');
@@ -775,7 +778,17 @@ export class AgentBridge {
 
   async disconnectClaude(projectId) {
     const project = this.project(projectId);
-    if (project.session?.provider !== 'claude') throw Object.assign(new Error('No Claude Code session is linked.'), { status: 409, code: 'NO_SESSION' });
+    if (project.session?.provider !== 'claude') {
+      // PF-0138: Claude Code is connected through its channel but was never linked to a session.
+      // The channel reconnects while the bridge file exists, so unlinking turns the connection
+      // off for this project until it is turned on again (Claude Code itself keeps running).
+      if (!project.session && project.claudeOn && project.claude?.streamBusy()) {
+        await this.disableClaude(projectId);
+        this.emit(project, agentEvent('session.ended', { reason: 'disconnected from YallaFlow (Claude Code keeps running); turn Claude Code on again under Settings → Agents', resumable: false }));
+        return { ok: true, claude: false };
+      }
+      throw Object.assign(new Error('No Claude Code session is linked.'), { status: 409, code: 'NO_SESSION' });
+    }
     const { record } = project.session;
     project.session = null;
     this.denyPending(project, 'claude', 'unlinked');

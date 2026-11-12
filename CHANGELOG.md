@@ -4,7 +4,7 @@ All notable changes to YallaFlow are documented here. The format loosely follows
 
 **1.0.0 is the first public release**, published to npm as `yallaflow`. From 1.0.0 the package follows Semantic Versioning with the compatibility promise in [`docs/releasing.md`](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise). Every earlier version below is an **internal prerelease**: git-tagged, never published to npm, and kept here as history.
 
-## [1.5.2] - unreleased — An easier first hour
+## [1.5.2] - 2026-11-12 — An easier first hour
 
 The same console, smoother and easier to set up. Everything below is in the existing design; no new framework.
 
@@ -35,23 +35,38 @@ The same console, smoother and easier to set up. Everything below is in the exis
   - new (Greenfield) projects, setup, agent sessions and read-only use are never blocked.
 
 ### Changed
-- **Simpler navigation.** The header is now:
+- **One Project page, three tabs** (PF-0132). The header is now **Workspace · Project · More**:
   - **Workspace:** the Flow and the List, with a switch that remembers your choice;
-  - **Agents**, **Setup & run**, **Project**;
+  - **Project:** **Overview**, **Run** and **Settings** as tabs, replacing the separate Project and Setup & run pages;
   - **More:** Insights, Worktrees.
 
-  Every older link still opens the same page.
+  Every older link still opens the matching page or tab.
+- **Agents live inside Projects** (PF-0132). **All projects** starts with **Needs you**, the agent requests from every project, and each project card shows its running agents. The separate Agents page is gone; its link opens this inbox.
+- **A project switcher in the header** (PF-0127) replaces the plain list: the project's name, a readiness dot, and a menu with your projects, **Add an existing project**, **New project** and **All projects**. It works from the keyboard.
+- **Team or Solo, always visible** (PF-0132). Beside the switcher, the header shows Team or Solo and the current branch. It turns amber when you work Solo away from the integration branch, and the Workspace explains why. Team mode is an optional step in New project and a section in Settings.
+- **Choose the project's agent first** (PF-0133). A project is ready for new work after you choose its agent, Codex or Claude Code (experimental), and that agent is ready. The choice is saved for the project on this machine, and you can change it under **Settings → Agents**.
+- **Getting the app running is one guided flow in the Run tab** (PF-0136):
+  1. the agent, or a quick scan, proposes the services;
+  2. one card shows every exact command, and one approval covers the ones you selected;
+  3. **Approve and start the app**.
+
+  Nothing runs before you approve, and a command that changes later asks for your approval again. Advanced editing stays in **Settings**.
+- **A service already running outside YallaFlow shows as running** (PF-0140), not stopped. Start project skips it and says so, and when the whole app is already up, approving only records the commands.
+- **Project understanding reads as its own steps** (PF-0135, PF-0140). A baseline shows prepare, draft and your review instead of workflow stations. The draft itself is on its page, so you review what you approve.
+- **Claude Code in the console chat** (PF-0134). The chat opens on the project's chosen agent. **Connect** opens a terminal in the project folder with the launch command, so you only confirm in Claude Code; copying the command is the fallback. A one-line note covers Team and Enterprise accounts.
+- **The folder picker works like a file dialog** (PF-0139). One click selects a folder and a double click opens it. The arrows move the selection and Enter opens. The footer button acts on the selected folder. When you connect a folder that has no Git repository, the preview offers `git init` as a tick box, and it reports a repository found in a folder above.
+- **Project cards** have **Open**, **Open folder** and **Copy path** (PF-0128), and the Workspace opens with a compact greeting and one stats bar.
+- **Smaller notices** (PF-0130, PF-0131, PF-0137). "Since you were last here" and the live handoff toast show the work ID as a link with its outcome; the full title is the tooltip.
 - **The ＋ in the Flow's New column** opens Create work, from the keyboard too.
-- **Setup & run:**
-  - the agent comes first, and running the app is marked optional;
-  - advanced parts are collapsed;
-  - a failed service shows its last log lines with Restart, Full log and Ask the agent.
+- **Run:** a failed service shows its last log lines with Restart, Full log and Ask the agent.
 - **Station names fit** on common screen widths, and arrows follow the reading direction in Arabic.
 
 ### Fixed
 - **Clicks, typing and scrolling survive live updates.** The console no longer rebuilds an unchanged page, and it waits while you are clicking.
 - **Copy says "copied" only when it really copied.** When the browser refuses, the console tries a second method, then shows the text selected for ⌘C or Ctrl+C.
 - **Setup's services step** now sees saved services. It always said "No services for now".
+- **A work item whose agent was started in a terminal** shows as running or waiting for you (PF-0135). It showed Start and "new".
+- **Disconnect from YallaFlow works for Claude Code without a linked session** (PF-0138). It failed with "No Claude Code session is linked", so the project could not be removed until Claude Code was closed.
 
 ### Security
 - **`yallaflow init`, `agent setup` and `agent refresh` never write through a symbolic link outside the project** (PF-0125). A repository could make init append its block to a file outside the project through a `CLAUDE.md` or `AGENTS.md` link, for example to `~/.bashrc`. A dangling link could make it create a file elsewhere, and a linked `.yallaflow/AGENT.md` could do the same through `agent refresh`.

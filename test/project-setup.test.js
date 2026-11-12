@@ -244,7 +244,7 @@ const cut = (from, to) => { const start = app.indexOf(from); assert.ok(start >= 
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 function ui({ setupInfo = null, agentSetup = null, readOnly = false, lang = 'en', runtime = null, calls = [] } = {}) {
   // PF-0102: Setup → Agents also shows the Claude Team/Enterprise warning (claudeWarnings).
-  const code = cut('  // ---------- project setup: Stack, Run, Agents', '  function viewSetup(') + cut('  // PF-0102: Claude Team/Enterprise accounts', '  // PF-0103: one agent per checkout');
+  const code = cut('  // ---------- project setup: Stack, Run, Agents', '  // PF-0132: the former Setup & run page') + cut('  // PF-0102: Claude Team/Enterprise accounts', '  // PF-0103: one agent per checkout');
   const context = vm.createContext({ pid: 'p', readOnly, lang, runtime, agentsOn: false, A: (ar, en) => (lang === 'ar' ? ar : en), esc, toast() {}, render() {}, api: async (url) => { calls.push(url); return {}; }, post: async () => ({}), loadRuntime: async () => {}, loadPlan: async () => {} });
   vm.runInContext(`${code}\nsetupInfo = ${JSON.stringify(setupInfo)}; agentSetup = ${JSON.stringify(agentSetup)};\nthis.guide = setupGuide; this.stack = stackSection; this.runS = runSection; this.agents = agentsSection; this.links = openLinks;`, context);
   return context;
@@ -284,7 +284,7 @@ test('UI: Stack lists the scan with what changed; Run links running services to 
 // PF-0077: the Start/Stop/Save message follows the language the page is shown in now.
 test('UI: the run message is re-rendered in the current language after a switch', async () => {
   // PF-0102: Setup → Agents also shows the Claude Team/Enterprise warning (claudeWarnings).
-  const code = cut('  // ---------- project setup: Stack, Run, Agents', '  function viewSetup(') + cut('  // PF-0102: Claude Team/Enterprise accounts', '  // PF-0103: one agent per checkout');
+  const code = cut('  // ---------- project setup: Stack, Run, Agents', '  // PF-0132: the former Setup & run page') + cut('  // PF-0102: Claude Team/Enterprise accounts', '  // PF-0103: one agent per checkout');
   const context = vm.createContext({
     pid: 'p', readOnly: false, lang: 'en', runtime: null, agentsOn: false, esc, toast() {}, render() {},
     api: async () => ({}), loadRuntime: async () => {}, loadPlan: async () => {},

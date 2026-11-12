@@ -147,12 +147,12 @@ yallaflow runtime stop web          # or: yallaflow runtime stop --all
   - A start is refused if a configured port is already in use. That process is reported and never touched.
   - Dependencies (`--depends-on`) start first.
   - The command waits for readiness, and an immediate crash is reported with the last log lines.
-- **Start project** (`runtime start --all`, or **Start project** on the console's Setup page).
+- **Start project** (`runtime start --all`, or **Start project** on the console's Run tab).
   - It starts every service whose whole dependency chain is trusted, in dependency order, one at a time, waiting for each to be ready.
   - A service with an untrusted or changed link in its chain is not started. It is listed with what to review.
   - The first failure stops the sequence, and services already running are left as they are.
   - **Stop project** (`runtime stop --all`) stops only services YallaFlow started, in reverse order.
-- **Open.** A running service with a port shows **Open** on the Setup page. It links to `http://127.0.0.1:<port>/`, or to the path set in the service's optional `open` field.
+- **Open.** A running service with a port shows **Open** on the Run tab. It links to `http://127.0.0.1:<port>/`, or to the path set in the service's optional `open` field.
   - `open` is a path on the service's own port, starting with a single `/` (for example `"open": "/admin"`), never a URL.
   - Nothing opens by itself, and changing `open` does not require trusting the service again.
 - **Lifetime.** Services keep running after the console or the browser closes. Nothing starts when you open a project or the console.

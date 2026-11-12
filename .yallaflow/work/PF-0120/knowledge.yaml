@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "The console UI (resources/console/app.js, one IIFE, no framework) renders by rebuilding the whole page: render() assigns #app.innerHTML on every change, and typed values, focus, caret, chat scroll and <details> state are captured and restored around it (data-keep forms, rtFormBusy, setupOpen). Polling views (Setup every 3 s) therefore replace DOM under the pointer; UI changes must preserve or avoid full redraws during interaction.",
+      "evidence": [
+        "resources/console/app.js:3082-3115",
+        "resources/console/app.js:2219-2223"
+      ],
+      "confidence": "confirmed",
+      "status": "promoted",
+      "createdAt": "2026-11-10T22:47:17.218Z",
+      "factId": "CTX-0140",
+      "promotedAt": "2026-11-10T22:47:23.410Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-10T22:47:23.410Z",
+  "reviewedAt": "2026-11-10T22:47:23.410Z"
+}

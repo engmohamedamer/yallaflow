@@ -1,0 +1,70 @@
+{
+  "id": "PF-0136",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console: one simple guided flow to get the app running, inside the Run tab (AI proposes the services, the developer approves the selected ones in one step, then starts the app); Overview names the next run step; Settings keeps only advanced runtime editing",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-12T10:51:12.359Z",
+  "updatedAt": "2026-11-12T11:45:51.860Z",
+  "title": "Console: one simple guided flow to get the app running, inside the Run tab (AI proposes the services, the developer approves the selected ones in one step, then starts the app); Overview names the next run step; Settings keeps only advanced runtime editing",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-12T10:51:12.417Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0090",
+      "type": "file",
+      "name": "Screenshot from 2026-11-12 12-25-53.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-12T10:51:18.888Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0091",
+      "type": "file",
+      "name": "Screenshot from 2026-11-12 12-51-54.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-12T10:52:46.707Z",
+      "workStatusAtLink": "CURRENT_BEHAVIOR",
+      "relationship": "work-input"
+    }
+  ],
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-12T11:45:51.860Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004"
+      ]
+    }
+  ]
+}

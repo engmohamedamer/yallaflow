@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "environment",
+      "summary": "The console was not run in a browser; macOS/Safari clipboard behavior was analysed from code, not reproduced",
+      "reason": "No macOS device in this session; research-only scope",
+      "recordedAt": "2026-11-10T22:39:18.300Z"
+    },
+    {
+      "id": "DL-002",
+      "type": "not-inspected",
+      "area": "integration",
+      "summary": "Codex CLI login-status / device-login subcommands and npm global-install behavior were not verified against current Codex versions",
+      "reason": "Nothing may be installed in this task; to verify in an implementation spike",
+      "recordedAt": "2026-11-10T22:39:18.436Z"
+    }
+  ],
+  "updatedAt": "2026-11-10T22:39:18.436Z"
+}

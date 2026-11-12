@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-11T15:17:27.880Z",
+      "completedAt": "2026-11-11T15:17:27.880Z",
+      "summary": "Chat panel (agentPanel no-session branch, app.js ~1249) picks agentProvider ?? first ready provider, so Codex stays the default and both providers are listed even when the project chose Claude Code (SRC owner screenshots). claudeWarnings() prints the full Team/Enterprise paragraph. Connect (data-agent-connect → agentAction connect) only shows the launch command to copy (alaunch block); the command comes from src/agents/claude-files.js launchCommand (relative .yallaflow/local/agent files, so it must run in the project root). Server writes launch files via POST agents/launch-files; claude binary path is known from claude-detect."
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-11T15:17:28.136Z",
+      "completedAt": "2026-11-11T15:17:28.136Z",
+      "summary": "1) The chat opens on the project's chosen agent and lists only it, with a small 'use the other agent instead' action. 2) The Team/Enterprise warning is one line with details on demand. 3) Connect also opens a terminal in the project folder running the launch command (server-built, never from the request; token+Origin; agents on and Claude on for the project); the developer only confirms Claude Code's own channel prompt there. If no terminal can be opened, the copy-the-command block remains, collapsed under a short line. 4) Fewer repeated session status lines."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-11T15:17:28.363Z",
+      "completedAt": "2026-11-11T15:17:28.363Z",
+      "summary": "New src/agents/terminal.js (find a terminal emulator on PATH: gnome-terminal, konsole, xfce4-terminal, kitty, alacritty, x-terminal-emulator, xterm; macOS Terminal via osascript; spawn detached, shell:false, cwd root). server.js: POST /api/p/<id>/agents/open-terminal (WRITE_ROUTE agents/(…|open-terminal)) builds the command from the detected claude path + launchCommand. app.js: default provider from the readiness agent step, single-provider picker + switch link, compact claudeWarnings, connect → open-terminal then compact status with collapsed fallback, collapse repeated session.started/ended lines. Tests: test/agent-terminal.test.js + console tests."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-11T15:34:14.703Z",
+      "completedAt": "2026-11-11T15:34:14.703Z",
+      "summary": "New src/agents/terminal.js (first terminal app on PATH — gnome-terminal, konsole, xfce4-terminal, kitty, alacritty, x-terminal-emulator, xterm — or macOS Terminal via osascript; detached, shell:false, cwd = project). server.js: POST /api/p/<id>/agents/open-terminal (empty body; Claude Code on for the project; command built from launch files + detected binary). app.js: chat opens on the project's chosen agent and lists only it with 'Use X instead'; one-line Team/Enterprise warning with details; Connect opens the terminal and shows a short 'confirm there' line with the copy command collapsed as fallback; runs of plain session started/ended lines collapse to the last. Tests: test/agent-terminal.test.js."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-11T15:45:44.150Z",
+      "completedAt": "2026-11-11T15:45:44.150Z",
+      "summary": "V-002: npm run check passed (1212). V-001 failed on test/agent-continue.test.js because its harness did not include the new openClaudeTerminal helper; the helper moved beside switchAgent and the harness got pid/post/why/agentTerminal stubs, with the switch test now also expecting the open-terminal call."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-11T15:45:44.150Z"
+}

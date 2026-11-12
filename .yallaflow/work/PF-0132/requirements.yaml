@@ -1,0 +1,274 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "Merge the Agents page into the Projects page: a Needs-you inbox of agent requests from all projects on top, and each project card shows that project's agents and lanes (agent, work item, status, last activity). The header has no Agents tab; #/agents keeps working and lands on the inbox.",
+      "provenance": [
+        {
+          "type": "request"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0075"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T14:14:13.366Z",
+      "updatedAt": "2026-11-11T14:14:13.366Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "One Project destination with three tabs — Overview (project memory organized in sections and tables), Run (services, start/stop, logs), Settings (agents, team mode, service definitions and analysis) — replacing the Project and Setup & run pages. #/overview, #/setup and the existing in-page anchors keep working.",
+      "provenance": [
+        {
+          "type": "request"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0076"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0077"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0078"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0079"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T14:14:13.366Z",
+      "updatedAt": "2026-11-11T14:14:13.366Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "Run tab: start/stop project at the top, one compact row per service; a failed service shows one short error line with View log, Ask the agent to fix and Start again instead of a large log; links, definitions and the agent's setup analysis are collapsed.",
+      "provenance": [
+        {
+          "type": "request"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0079"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0076"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T14:14:13.366Z",
+      "updatedAt": "2026-11-11T14:14:13.366Z"
+    },
+    {
+      "id": "REQ-004",
+      "statement": "Team mode: a permanent header indicator (Team or Solo plus the current branch, amber when Solo and off the integration branch), a Team mode section in Project Settings, an optional team-mode step after creating a new project, and a Workspace banner when the checkout is not on the integration branch.",
+      "provenance": [
+        {
+          "type": "request"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0077"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T14:14:13.366Z",
+      "updatedAt": "2026-11-11T14:14:13.366Z"
+    },
+    {
+      "id": "REQ-005",
+      "statement": "Header tabs are Workspace · Project · More; Projects is reached from the project switcher and the bell; queue controls stay on the work item page and Worktrees.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T14:14:13.366Z",
+      "updatedAt": "2026-11-11T14:14:13.366Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "With agents on, #/projects shows the Needs-you inbox above the cards (approve/deny work as before) and each card lists only its own project's lanes; with agents off the inbox and lanes are absent and the page still works.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T14:14:13.366Z",
+      "updatedAt": "2026-11-11T14:14:13.366Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "The header has no Agents tab; #/agents renders the Projects page scrolled to the inbox; the bell count still reflects pending agent requests.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T14:14:13.366Z",
+      "updatedAt": "2026-11-11T14:14:13.366Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-002",
+      "statement": "#/overview, #/run and #/settings render one Project page with an accessible tab bar (Overview, Run, Settings); #/setup lands on Run, and old links to setup sections (agents, run) land on the matching tab and section.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T14:14:13.366Z",
+      "updatedAt": "2026-11-11T14:14:13.366Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-002",
+      "statement": "Overview presents project memory as an organized layout (summary, needs-care list, area sections, stack) in two columns on desktop and one on phones, with no horizontal scroll at 390 px.",
+      "provenance": [
+        {
+          "type": "request"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0078"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T14:14:13.366Z",
+      "updatedAt": "2026-11-11T14:14:13.366Z"
+    },
+    {
+      "id": "AC-005",
+      "requirement": "REQ-003",
+      "statement": "A failed service shows a one-line error with View log, Ask the agent to fix and Start again; the log opens on demand; the agent setup analysis and service links/definitions are collapsed by default; all existing runtime actions still work.",
+      "provenance": [
+        {
+          "type": "request"
+        },
+        {
+          "type": "source",
+          "source": "SRC-0079"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T14:14:13.366Z",
+      "updatedAt": "2026-11-11T14:14:13.366Z"
+    },
+    {
+      "id": "AC-006",
+      "requirement": "REQ-004",
+      "statement": "The header shows Team or Solo with the current branch on every project page; amber when Solo and off the integration branch; Settings has the Team mode section with the existing confirmed enable flow; the new-project success step offers team mode as optional; the Workspace shows the off-integration-branch banner.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T14:14:13.366Z",
+      "updatedAt": "2026-11-11T14:14:13.366Z"
+    },
+    {
+      "id": "AC-007",
+      "requirement": "REQ-005",
+      "statement": "Header tabs are exactly Workspace, Project, More; the project switcher and the bell lead to Projects; Arabic/English and light/dark work on every changed page; npm run check passes.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-11T14:14:13.366Z",
+      "updatedAt": "2026-11-11T14:14:13.366Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-11T14:14:13.366Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-11T14:14:13.366Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-11T14:14:13.366Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-004",
+      "at": "2026-11-11T14:14:13.366Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-005",
+      "at": "2026-11-11T14:14:13.366Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-11T14:14:13.366Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-11T14:14:13.366Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-11T14:14:13.366Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-11-11T14:14:13.366Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-005",
+      "at": "2026-11-11T14:14:13.366Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-006",
+      "at": "2026-11-11T14:14:13.366Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-007",
+      "at": "2026-11-11T14:14:13.366Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-11T14:14:13.366Z"
+}

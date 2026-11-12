@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-11T11:30:34.646Z",
+      "completedAt": "2026-11-11T11:30:34.646Z",
+      "summary": "Writers of managed bootstrap files: src/agent/bootstrap.js setupBootstrap (via installAllBootstraps from init, and yallaflow agent setup/refresh via src/commands/agent.js), restoreBootstrapFiles (init rollback). Managed files: CLAUDE.md and AGENTS.md at the project root (BOOTSTRAP_PROVIDERS). Legitimate existing setup: CLAUDE.md linked to AGENTS.md ('shared' state). Existing safety patterns: src/agents/local-files.js (refuse links, temp file + rename), writeTextAtomic in src/utils/fs.js. initWorkspace refuses an existing .yallaflow (exists follows links)",
+      "evidence": [
+        "src/agent/bootstrap.js",
+        "src/commands/init.js",
+        "src/agents/local-files.js"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-11T11:30:40.722Z",
+      "completedAt": "2026-11-11T11:30:40.722Z",
+      "summary": "Root cause confirmed by reproduction: bootstrap inspection and writes resolve symbolic links implicitly (access/readFile/writeFile), so a planted CLAUDE.md/AGENTS.md link (existing or dangling) redirects init/agent setup/agent refresh/rollback outside the project; .yallaflow as a link fails only by accident (ENOTDIR)",
+      "evidence": [
+        "src/agent/bootstrap.js"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-11T11:31:00.908Z",
+      "completedAt": "2026-11-11T11:31:00.908Z",
+      "summary": "Specification and plan in work.md: unsafe-link state for bootstrap links leaving the project/dangling/non-regular (refused before any write by init, agent setup/refresh, console connect); .yallaflow link refused; no-follow atomic writes with re-check; rollback restores recorded real paths only; regression tests for all reproductions",
+      "evidence": [
+        "src/agent/bootstrap.js"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-11T11:33:16.624Z",
+      "completedAt": "2026-11-11T11:33:16.624Z",
+      "summary": "src/agent/bootstrap.js: resolveManagedFile (follows a link only to an existing regular file inside the project root), new unsafe-link state in UNSAFE_BOOTSTRAP_STATES (init refuses before any write; agent setup/refresh refuse; status describes it; console connect reuses it), writeManaged (re-check + exclusive temp file + rename, permissions kept), snapshot/restore by recorded real path with re-check; src/core/workspace.js refuses a .yallaflow link. Regression tests in test/agent-bootstrap-security.test.js",
+      "evidence": [
+        "src/agent/bootstrap.js",
+        "src/core/workspace.js",
+        "test/agent-bootstrap-security.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-11T12:01:16.742Z",
+      "completedAt": "2026-11-11T12:01:16.742Z",
+      "summary": "V-002: npm run check 1183 tests, 1182 pass, 0 fail, 1 skipped (Tailwind freshness; runs in the isolated/CI environment). Regression tests in test/agent-bootstrap-security.test.js cover outside, dangling, linked-folder, folder-target, subfolder links; .yallaflow link at init; AGENT.md link and linked .yallaflow at refresh; agent setup/refresh refusals (refresh test uses an outdated block so the old code would have written); rollback re-check; no temporary files after a failed write; the shared CLAUDE.md -> AGENTS.md setup and permissions kept. The scratch reproduction now refuses all three cases. V-001 failed only because the version was bumped during that run",
+      "evidence": [
+        "verification:V-002"
+      ]
+    },
+    "code-review": {
+      "status": "completed",
+      "startedAt": "2026-11-11T12:01:23.035Z",
+      "completedAt": "2026-11-11T12:01:23.035Z",
+      "summary": "Two independent reviews on isolated copies. Review 1 (PF-0123) found the issue. Review 2 (this fix): no blocking issue for bootstrap files; found AGENT.md/linked .yallaflow still followed by agent refresh (reproduced) — fixed by the shared src/agent/managed-files.js used by bootstrap.js and contract.js; subfolder-swap race — fixed by allowing links only to a regular file in the same folder; Windows rename retry, temp-file cleanup on failed writes, temp file created with final permissions (new files 0o666 & ~umask) — fixed; brief now surfaces unsafe-link; error code renamed BOOTSTRAP_UNSAFE_LINK; refresh test made meaningful. Broader .yallaflow write paths recorded as a follow-up",
+      "evidence": [
+        "src/agent/managed-files.js",
+        "verification:V-002"
+      ]
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Reproduced in scratch (no real project touched): (1) CLAUDE.md -> ../outside/bashrc: yallaflow init appended its bootstrap block to the outside file; (2) dangling AGENTS.md -> ../outside/autostart.desktop: init created the outside file; (3) .yallaflow as a dangling link: init failed with ENOTDIR (no outside write, unclear message). Root cause: inspectBootstrap uses exists()/readText and setupBootstrap uses writeText — all follow symbolic links; snapshot/restore (rollback) uses readFile/writeFile, which also follow links",
+      "reason": "Owner item 1: release-blocking security fix",
+      "costIfWrong": "A repository with planted links could make init modify user files outside the project",
+      "createdAt": "2026-11-11T11:30:34.395Z"
+    },
+    {
+      "decision": "Follow-up (not in this fix, recorded for the owner): the same symlink class can affect other files YallaFlow writes inside a committed .yallaflow (context render, PROJECT.md, context/*.md, state/) and findProjectRoot accepts a linked .yallaflow for other commands. This fix covers the files the owner named (managed bootstrap files) plus the agent contract .yallaflow/AGENT.md and init's .yallaflow; a separate security work item should extend managed-files.js to every .yallaflow write path. Accepted behaviour changes: a link from CLAUDE.md/AGENTS.md into a subfolder, or a dangling CLAUDE.md -> AGENTS.md before AGENTS.md exists, is now refused with a clear message",
+      "reason": "Second independent review findings beyond the requested scope",
+      "costIfWrong": "A repository with a linked .yallaflow could still redirect non-bootstrap writes until the follow-up",
+      "createdAt": "2026-11-11T12:01:16.564Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-11T12:01:23.035Z"
+}

@@ -187,11 +187,32 @@
 
   // ---------- views ----------
   const route = () => { const h = location.hash.replace(/^#\/?/, '').split('/'); return { v: h[0] || 'map', id: h[1] ? decodeURIComponent(h[1]) : null }; };
+  // PF-0132: one Project destination with three tabs, and Agents inside Projects. Every old
+  // route and in-page anchor still lands: #/agents on the Projects inbox, #/setup on Run, and
+  // the Setup sections on the matching tab and section.
+  const PROJECT_TABS = ['overview', 'run', 'settings'];
+  const OLD_ROUTE = { agents: '#/projects/inbox', 'setup-run': '#/run', 'setup-agents': '#/settings/agents', 'setup-config': '#/settings/services', 'setup-plan': '#/settings/services', 'setup-stack': '#/settings/services' };
+  function canonicalHash(r = route()) {
+    if (r.v === 'setup') return r.id === 'agents' ? '#/settings/agents' : r.id === 'services' ? '#/settings/services' : '#/run';
+    return OLD_ROUTE[r.v] ?? null;
+  }
+  function normalizeRoute() {
+    const to = canonicalHash();
+    if (to) history.replaceState(null, '', location.pathname + location.search + to);
+  }
+  // A deep link to a section (#/settings/team, #/projects/inbox) scrolls to it once the page is drawn.
+  const SECTION_ID = { agents: 'setup-agents', team: 'set-team', services: 'set-services', project: 'set-project', inbox: 'inbox' };
+  function landOnSection() {
+    const r = route();
+    const id = ['settings', 'projects'].includes(r.v) ? SECTION_ID[r.id] : null;
+    const el = id ? document.getElementById(id) : null;
+    if (el) el.scrollIntoView({ block: 'start', behavior: 'auto' });
+  }
   const items = () => (snap?.items ?? []);
   const byId = (id) => items().find((it) => it.id === id);
   // The floating agent chat follows the page (PF-0067): a work item page is that item's chat;
   // the other project pages share one project chat, which is not tied to a work item.
-  const PROJECT_CHAT_VIEWS = ['overview', 'map', 'lines', 'setup', 'team', 'insights'];
+  const PROJECT_CHAT_VIEWS = ['overview', 'run', 'settings', 'map', 'lines', 'setup', 'team', 'insights'];
   const PROJECT_CHAT = Object.freeze({ id: null, project: true });
   function chatCtx(r = route()) {
     if (!snap) return null;
@@ -203,20 +224,49 @@
   function topbar(r) {
     const logo = '<svg width="32" height="32" viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"' + (lang === 'ar' ? '' : ' transform="matrix(-1 0 0 1 64 0)"') + '><path d="M28.5 15.5 12.5 32 28.5 48.5" stroke="#0fae9d"/><path d="M50.5 15.5 34.5 32 50.5 48.5" stroke="#5961e8"/></g></svg>';
     const tab = (href, label, on) => `<a href="${href}" ${on ? 'aria-current="page"' : ''}>${label}</a>`;
-    const picker = projects.length > 1
-      ? `<select class="projsel" data-project aria-label="${A('المشروع', 'Project')}">${projects.map((p) => `<option value="${p.id}" ${p.id === pid ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select>`
-      : `<b class="projname">${esc(snap?.project?.name ?? projects[0]?.name ?? '')}</b>`;
+    // PF-0127: one project switcher — the current project with its readiness, a menu of every
+    // project, and the project actions together (no separate small "All projects" link).
+    const current = projects.find((p) => p.id === pid);
+    const level = readiness?.pid === pid ? readiness.data?.level : null;
+    const levelText = { ready: A('جاهز', 'Ready'), incomplete: A('محتاج خطوات', 'Needs setup'), attention: A('محتاج انتباه', 'Needs attention') };
+    const dot = level ? `<span class="projdot ${level}" aria-hidden="true"></span>` : '';
+    const folderTail = (root) => String(root ?? '').split('/').slice(-2).join('/');
+    const picker = !projects.length ? '' : `<details class="projmenu" data-popmenu><summary aria-haspopup="menu" aria-label="${A('المشروع', 'Project')}: ${esc(current?.name ?? '')}${level ? ` — ${esc(levelText[level])}` : ''}" title="${esc(current?.root ?? '')}">${dot}<span class="projmenu-name">${esc(snap?.project?.name ?? current?.name ?? '')}</span><span class="projmenu-chev" aria-hidden="true">▾</span></summary>
+      <div class="projmenu-panel" role="menu"><div class="projmenu-h tiny muted">${A('المشاريع', 'Projects')}</div>
+        ${projects.map((p) => `<a role="menuitem" href="#/map" data-open-project="${esc(p.id)}" class="projmenu-item" ${p.id === pid ? 'aria-current="true"' : ''}><span class="projmenu-check" aria-hidden="true">${p.id === pid ? '✓' : ''}</span><span class="grow"><b>${esc(p.name)}</b><span class="tiny muted ltr projmenu-path">${esc(folderTail(p.root))}</span></span></a>`).join('')}
+        <div class="projmenu-sep" role="separator"></div>
+        ${readOnly ? '' : `<button type="button" role="menuitem" class="projmenu-item" data-folder-open="existing"><span class="projmenu-check" aria-hidden="true">＋</span>${A('ضيف مشروع موجود', 'Add an existing project')}</button><a role="menuitem" class="projmenu-item" href="#/new"><span class="projmenu-check" aria-hidden="true">✦</span>${A('مشروع جديد', 'New project')}</a>`}
+        <a role="menuitem" class="projmenu-item" href="#/projects"><span class="projmenu-check" aria-hidden="true">▤</span>${agentsOn ? A('كل المشاريع والوكلاء', 'All projects & agents') : A('كل المشاريع', 'All projects')}</a></div></details>`;
     const count = snap ? needs().length : 0;
     // PF-0123: Flow and Work are one Workspace (its page switches the view); Insights and
     // Worktrees sit under More. Every old route (#/map, #/lines, #/insights, #/team) still works.
+    // PF-0132: Workspace · Project · More. Projects (with every agent) is reached from the
+    // project switcher and the bell; Run and Settings are tabs inside Project.
     const moreOn = ['insights', 'team'].includes(r.v);
-    const more = `<details class="navmore" data-navmore><summary ${moreOn ? 'aria-current="page"' : ''} aria-haspopup="menu">${moreOn ? (r.v === 'team' ? A('نسخ الشغل', 'Worktrees') : A('الأرقام', 'Insights')) : A('المزيد', 'More')} <span aria-hidden="true">▾</span></summary>
+    const more = `<details class="navmore" data-navmore data-popmenu><summary ${moreOn ? 'aria-current="page"' : ''} aria-haspopup="menu">${moreOn ? (r.v === 'team' ? A('نسخ الشغل', 'Worktrees') : A('الأرقام', 'Insights')) : A('المزيد', 'More')} <span aria-hidden="true">▾</span></summary>
       <div class="navmenu" role="menu"><a role="menuitem" href="#/insights" ${r.v === 'insights' ? 'aria-current="page"' : ''}>${A('الأرقام', 'Insights')}</a><a role="menuitem" href="#/team" ${r.v === 'team' ? 'aria-current="page"' : ''}>${A('نسخ الشغل', 'Worktrees')}</a></div></details>`;
-    return `<header class="top"><a class="brand" href="${workspaceHref()}">${logo} YallaFlow</a><div class="projpick">${picker}<a class="tiny muted" href="#/projects">${A('كل المشاريع', 'All projects')}</a></div>
-      <nav class="tabs" aria-label="${A('الأقسام', 'Sections')}">${tab(workspaceHref(), A('مساحة الشغل', 'Workspace'), ['map', 'lines', 'item'].includes(r.v))}${tab('#/agents', A('الوكلاء', 'Agents') + (execView?.inbox?.length ? ` <b class="tabcount">${execView.inbox.length}</b>` : ''), r.v === 'agents')}${tab('#/setup', A('الإعداد والتشغيل', 'Setup & run'), r.v === 'setup')}${tab('#/overview', A('المشروع', 'Project'), r.v === 'overview')}${more}</nav>
+    return `<header class="top"><a class="brand" href="${workspaceHref()}">${logo} YallaFlow</a><div class="projpick">${picker}</div>${teamIndicator()}
+      <nav class="tabs" aria-label="${A('الأقسام', 'Sections')}">${tab(workspaceHref(), A('مساحة الشغل', 'Workspace'), ['map', 'lines', 'item'].includes(r.v))}${tab('#/overview', A('المشروع', 'Project'), [...PROJECT_TABS, 'setup'].includes(r.v))}${more}</nav>
       <span class="grow"></span>${!readOnly && projects.length ? `<button class="btn sm go create" data-create aria-label="${A('شغل جديد', 'Create work')}" ${createBlockedReason() ? `disabled title="${esc(createBlockedReason())}"` : ''}>＋<span class="lbl"> ${A('شغل جديد', 'Create work')}</span></button>` : ''}<span class="chip ${offline() ? 'fail' : 'active'}"><i></i>${offline() ? A('مفيش اتصال', 'offline') : A('مباشر', 'Live')}</span>
       <button class="ibtn bell" data-bell aria-expanded="${bellOpen}" aria-label="${A('محتاج انتباهك', 'Needs your attention')}">🔔${count ? `<b>${count}</b>` : ''}</button>
       <button class="ibtn" data-lang aria-label="language">${lang === 'ar' ? 'EN' : 'ع'}</button><button class="ibtn" data-theme-toggle aria-label="theme">◐</button>${bellOpen ? notesPanel() : ''}</header>`;
+  }
+
+  // PF-0132: Team or Solo and the current branch, always beside the project switcher. Amber
+  // when Solo and off the integration branch (only when that branch is known, never a guess).
+  const projectGit = () => (projectOverview?.pid === pid ? projectOverview.data?.git ?? null : null);
+  const offIntegration = (g) => Boolean(g && !g.lane && g.branch && g.integrationBranch && g.branch !== g.integrationBranch);
+  function teamIndicator() {
+    const g = projectGit();
+    if (!g || !projects.length) return '';
+    const team = Boolean(g.sharedMode);
+    const warn = !team && offIntegration(g);
+    const mode = team ? A('فريق', 'Team') : A('فردي', 'Solo');
+    const tip = team
+      ? A('وضع الفريق شغّال: أرقام الشغل مبتتكررش بين الفروع.', 'Team mode is on: work IDs never collide across branches.')
+      : warn ? A(`فردي، ومش على فرع الدمج ${g.integrationBranch}: الأرقام ممكن تتكرر مع فرع زميلك.`, `Solo, and not on the integration branch ${g.integrationBranch}: IDs can collide with a teammate's branch.`)
+        : A('فردي: كل نسخة بترقّم الشغل لوحدها.', 'Solo: each checkout numbers its work on its own.');
+    return `<a class="teamind ${team ? 'team' : 'solo'} ${warn ? 'off' : ''}" href="#/settings/team" data-team-indicator="${team ? 'team' : 'solo'}" title="${esc(tip)}" aria-label="${esc(`${A('وضع الفريق', 'Team mode')}: ${mode}${g.branch ? ` · ${g.branch}` : ''}${warn ? ` · ${A('مش على فرع الدمج', 'not on the integration branch')}` : ''}`)}">${warn ? '<span class="teamind-dot" aria-hidden="true"></span>' : ''}<span aria-hidden="true">${team ? '👥' : '👤'}</span><span class="teamind-mode">${mode}</span>${g.branch ? `<span class="teamind-branch ltr" aria-hidden="true">⑂ ${esc(g.branch)}</span>` : ''}</a>`;
   }
 
   // Three different failures, never confused: the console itself is unreachable (offline),
@@ -243,16 +293,20 @@
     const open = openCount();
     const h = new Date().getHours();
     const greet = `${A(h < 12 ? 'صباح الخير' : 'مساء الخير', h < 12 ? 'Good morning' : 'Good evening')} 👋`;
-    const stats = `<div class="stats"><div class="stat you"><b>${c.you}</b><span>◆ ${L(STATE.you)}</span></div><div class="stat active"><b>${c.new + c.active + c.paused}</b><span>● ${A('شغل مفتوح', 'open work')}</span></div><div class="stat fail"><b>${c.fail}</b><span>✕ ${L(STATE.fail)}</span></div><div class="stat done"><b>${c.done}</b><span>✓ ${L(STATE.done)}</span></div></div>`;
+    // PF-0128: one slim row — the ring, the greeting with one sentence, and the counts as filters.
+    // PF-0137: the all-done box uses the same slim row.
+    const hs = (key, n, label, cls) => `<button type="button" class="hstat ${cls} ${flt.st === key ? 'on' : ''}" data-f="${key}" aria-pressed="${flt.st === key}" title="${esc(A('اعرض دول بس', 'Show only these'))}"><b>${n}</b><span>${label}</span></button>`;
+    const chips = `<div class="hstats" role="group" aria-label="${A('فلترة سريعة', 'Quick filters')}">${hs('you', c.you, L(STATE.you), 'you')}${hs('active', c.active, L(STATE.active), 'active')}${hs('fail', c.fail, L(STATE.fail), 'fail')}${hs('done', c.done, L(STATE.done), 'done')}</div>`;
     // All recorded work is done: that is the recorded work, not the whole software project.
-    if (!open) return `<section class="hero calm"><span class="hico done" aria-hidden="true">✓</span><div><h1>${A(`كل الشغل المسجّل خلص (${c.done})`, `All ${c.done} recorded work item${c.done === 1 ? ' is' : 's are'} done`)}</h1>
-      <p>${A('ده الشغل المسجّل في YallaFlow، مش المشروع كله. الشغل الجديد بيدخل من بوابة «جديد».', 'This is the work recorded in YallaFlow, not the whole software project. New work enters through the New gate.')}</p>${createButton()}</div>${stats}</section>`;
+    if (!open) return `<section class="hero calm slim"><span class="hico done xs" aria-hidden="true">✓</span><div class="grow"><h1>${A(`كل الشغل المسجّل خلص (${c.done})`, `All ${c.done} recorded work item${c.done === 1 ? ' is' : 's are'} done`)}</h1>
+      <p>${A('ده الشغل المسجّل في YallaFlow، مش المشروع كله. الشغل الجديد بيدخل من بوابة «جديد».', 'This is the work recorded in YallaFlow, not the whole software project. New work enters through the New gate.')}</p></div>${createButton(true)}${chips}</section>`;
     const pct = snap.openCompletion ?? 0;
-    return `<section class="hero compact">${ring(pct, 80, 8)}<div><h1>${greet}</h1>
-      <p>${A(`${open} ${open === 1 ? 'شغلانة مفتوحة' : 'شغلانات مفتوحة'} واصلة في المتوسط ${pct}%، و${you} ${you === 1 ? 'شغلانة مستنية' : 'شغلانات مستنية'} قرارك.`, `${open} open work item${open === 1 ? ' is' : 's are'} on average ${pct}% along, and ${you} item${you === 1 ? '' : 's'} wait${you === 1 ? 's' : ''} for your decision.`)}</p><details class="progress-help tiny muted"><summary>${A('النسبة بتتحسب إزاي؟', 'How is progress calculated?')}</summary><p>${A('النسبة للشغل المفتوح المسجّل بس.', 'The percentage covers open recorded work only.')} ${formula()}</p></details></div>
-      ${stats}</section>`;
+    return `<section class="hero slim">${ring(pct, 56, 6)}<div class="grow"><h1>${greet}</h1>
+      <p>${A(`${open} ${open === 1 ? 'شغلانة مفتوحة' : 'شغلانات مفتوحة'} واصلة في المتوسط ${pct}%، و${you} ${you === 1 ? 'شغلانة مستنية' : 'شغلانات مستنية'} قرارك.`, `${open} open work item${open === 1 ? ' is' : 's are'} on average ${pct}% along, and ${you} item${you === 1 ? '' : 's'} wait${you === 1 ? 's' : ''} for your decision.`)}</p></div>
+      ${chips}</section>`;
   }
-  const createButton = () => (readOnly || createBlockedReason() ? '' : `<button class="btn go" data-create style="margin-top:12px">＋ ${A('ابدأ أول شغلانة', 'Create work')}</button>`);
+  // PF-0137: `more` is the small button beside a summary of work that already exists.
+  const createButton = (more = false) => (readOnly || createBlockedReason() ? '' : more ? `<button class="btn go sm" data-create>＋ ${A('شغل جديد', 'New work')}</button>` : `<button class="btn go" data-create style="margin-top:12px">＋ ${A('ابدأ أول شغلانة', 'Create work')}</button>`);
   // Work items YallaFlow cannot validate: visible, never counted as open, done or proven.
   function integrityPanel() {
     const bad = snap?.invalid ?? [];
@@ -273,7 +327,7 @@
     const data = readiness?.pid === pid ? readiness.data : null;
     if (!data || data.allows?.createWork !== false) return null;
     const step = data.steps?.find((x) => x.blocks?.includes('createWork'));
-    const text = step && READY_TEXT[step.id]?.[step.status];
+    const text = step && readyPair(step);
     return text ? L({ ar: text[0], en: text[1] }) : A('المشروع لسه مش جاهز لشغل جديد.', 'The project is not ready for new work yet.');
   }
   async function loadReadiness() {
@@ -291,10 +345,37 @@
       'in-progress': ['الوكيل بيجهّز فهم المشروع', 'Your agent is preparing the project understanding'],
       'awaiting-review': ['مسودة فهم المشروع مستنية مراجعتك', 'The project-understanding draft is waiting for your review']
     },
-    agent: { done: ['Codex جاهز', 'Codex is ready'], off: ['الوكلاء مقفولين في الكونسول ده', 'Agents are off in this console'], missing: ['Codex مش جاهز على الجهاز ده', 'Codex is not ready on this machine'] },
-    runtime: { done: ['التطبيق شغّال', 'The app is running'], 'not-configured': ['تشغيل التطبيق من هنا (اختياري)', 'Run the app from here (optional)'], failed: ['خدمة من خدمات التطبيق واقفة', 'An app service has stopped'], stopped: ['التطبيق واقف', 'The app is stopped'] }
+    agent: { choose: ['اختار وكيل المشروع ده', 'Choose this project\'s agent'], done: ['Codex جاهز', 'Codex is ready'], off: ['الوكلاء مقفولين في الكونسول ده', 'Agents are off in this console'], missing: ['Codex مش جاهز على الجهاز ده', 'Codex is not ready on this machine'] },
+    runtime: { done: ['التطبيق شغّال', 'The app is running'], 'not-configured': ['تشغيل التطبيق من هنا', 'Run the app from here'], failed: ['خدمة من خدمات التطبيق واقفة', 'An app service has stopped'], stopped: ['التطبيق متوقف', 'The app is stopped'] }
   };
+  // PF-0133: the agent step names the agent chosen for this project.
+  const CLAUDE_READY_TEXT = { done: ['Claude Code جاهز', 'Claude Code is ready'], missing: ['Claude Code مش جاهز على الجهاز ده', 'Claude Code is not ready on this machine'] };
+  const readyPair = (st) => (st.id === 'agent' && st.provider === 'claude' && CLAUDE_READY_TEXT[st.status]) || READY_TEXT[st.id]?.[st.status];
+  // PF-0133: choose the project's agent in place (readiness card, chat panel) — no page change.
+  function agentChooser() {
+    if (readOnly) return '';
+    const card = (id, name, sub, extra = '') => `<button type="button" class="agentpick-opt" data-agent-choose="${id}"><b>${name}</b><span class="tiny muted">${sub}</span>${extra}</button>`;
+    const claude = agentsClaudeAvailable
+      ? card('claude', `Claude Code <span class="chip wait tiny">${A('تجريبي', 'experimental')}</span>`, A('اشتراك Claude بتاعك', 'Your Claude subscription'), `<span class="tiny agentpick-warn">${A('على حسابات Claude Team أو Enterprise، رسايل الكونسول مش بتوصل إلا لو المؤسسة مفعّلة الـ channels. ساعتها اشتغل من ترمينال Claude Code.', 'On Claude Team or Enterprise accounts, console messages reach Claude Code only if your organization enabled channels; otherwise work in the Claude Code terminal.')}</span>`)
+      : '';
+    return `<div class="agentpick" role="group" aria-label="${A('اختار وكيل المشروع', 'Choose the project\'s agent')}">${card('codex', 'Codex', A('اشتراك ChatGPT بتاعك · الموصى بيه', 'Your ChatGPT subscription · recommended'))}${claude}</div>
+      <p class="tiny muted agentpick-note">${A('الاختيار بيتحفظ للمشروع ده على جهازك بس، وتقدر تغيّره من الإعدادات ← الوكلاء. الوكيل بيستخدم اشتراكك، من غير مفاتيح API.', 'The choice is saved for this project on this machine only; change it under Settings → Agents. The agent uses your subscription, never API keys.')}</p>`;
+  }
+  async function chooseAgent(provider, el) {
+    if (el) el.disabled = true;
+    try {
+      await post(`/api/p/${pid}/agents/settings`, JSON.stringify({ agents: true, claude: provider === 'claude' }), { 'Content-Type': 'application/json' });
+      await post(`/api/p/${pid}/setup/step`, JSON.stringify({ step: 'agents' }), { 'Content-Type': 'application/json' }).catch(() => {});
+      agentsOn = true;
+      if (provider === 'claude') agentProvider = 'claude';
+      await reloadProjects().catch(() => {});
+      await Promise.all([loadReadiness(), agentsOn ? loadAgent().catch(() => {}) : loadAgentInfo()]);
+      toast(esc(provider === 'claude' ? A('Claude Code بقى وكيل المشروع ده ✓', 'Claude Code is now this project\'s agent ✓') : A('Codex بقى وكيل المشروع ده ✓', 'Codex is now this project\'s agent ✓')));
+    } catch (err) { toast(esc(why(err))); }
+    finally { if (el) el.disabled = false; render(); }
+  }
   function readinessAction(st) {
+    if (st.id === 'agent' && st.status === 'choose') return agentChooser();
     const btn = (attrs, label, go = false) => `<button type="button" class="btn sm ${go ? 'go' : ''}" ${attrs}>${label}</button>`;
     if (readOnly && st.status !== 'done') return st.next?.command ? `<code class="ltr tw:text-xs">${esc(st.next.command)}</code>` : '';
     if (st.id === 'initialized' && st.status === 'attention') return `<code class="ltr tw:text-xs">yallaflow doctor</code>`;
@@ -308,20 +389,22 @@
       }
     }
     if (st.id === 'agent' && st.status === 'off' && agentsCanEnable) return btn('data-agents-enable', A('شغّل الوكلاء', 'Turn agents on'), true);
-    if (st.id === 'agent' && st.status === 'missing') return `<a class="btn sm" href="#/setup" data-setup-jump="agents">${A('جهّز Codex', 'Set up Codex')}</a>`;
-    if (st.id === 'runtime' && st.status !== 'done') return `<a class="btn sm ghost" href="#/setup">${st.status === 'not-configured' ? A('جهّز التشغيل', 'Set up running') : A('افتح التشغيل', 'Open Run')}</a>`;
+    if (st.id === 'agent' && st.status === 'missing') return `<a class="btn sm" href="#/settings/agents" data-setup-jump="agents">${A('جهّز Codex', 'Set up Codex')}</a>`;
+    if (st.id === 'runtime' && st.status !== 'done') return `<a class="btn sm ghost" href="#/run" data-run-next="${esc(st.status)}">${st.status === 'not-configured' ? A('جهّز تشغيل التطبيق', 'Get the app running') : st.status === 'stopped' ? A('شغّل التطبيق', 'Start the app') : A('افتح التشغيل', 'Open Run')}</a>`;
     return '';
   }
   function readinessCard({ always = false } = {}) {
     const data = readiness?.pid === pid ? readiness.data : null;
     if (!data || (!always && data.level === 'ready')) return '';
-    const shown = data.steps.filter((st) => st.status !== 'unknown' && st.status !== 'unsupported' && READY_TEXT[st.id]?.[st.status] && !(st.id === 'agent' && st.status === 'done' && data.level === 'ready'));
+    // PF-0140: one open thing at a time — an optional step (running the app) is offered only
+    // once nothing required is left, so it never competes with the step that blocks new work.
+    const shown = data.steps.filter((st) => st.status !== 'unknown' && st.status !== 'unsupported' && readyPair(st) && !(st.id === 'agent' && st.status === 'done' && data.level === 'ready') && !(st.optional && st.status !== 'done' && data.level !== 'ready'));
     const icon = (st) => (st.status === 'done' ? '<span class="tw:text-palm" aria-hidden="true">✓</span>' : st.optional ? '<span class="tw:text-muted" aria-hidden="true">○</span>' : st.status === 'attention' || st.status === 'failed' ? '<span class="tw:text-clay" aria-hidden="true">✕</span>' : '<span class="tw:text-amber" aria-hidden="true">◐</span>');
-    const left = data.steps.filter((st) => !st.optional && !['done', 'unknown'].includes(st.status) && (st.id !== 'agent' || data.steps.find((x) => x.id === 'understanding')?.status !== 'done')).length;
+    const left = data.steps.filter((st) => !st.optional && !['done', 'unknown'].includes(st.status) && (st.id !== 'agent' || st.status === 'choose' || data.steps.find((x) => x.id === 'understanding')?.status !== 'done')).length;
     const title = data.level === 'ready' ? A('المشروع جاهز', 'The project is ready') : A(`فاضل ${left === 1 ? 'خطوة واحدة' : left === 2 ? 'خطوتين' : `${left} خطوات`} قبل الشغل الجديد`, `${left} step${left === 1 ? '' : 's'} left before new work`);
     return `<section class="panel tw:mb-4 tw:px-5 tw:py-4" aria-labelledby="ready-h" data-readiness="${esc(data.level)}">
       <div class="row"><span class="chip ${data.level === 'ready' ? 'done' : data.level === 'attention' ? 'fail' : 'wait'}"><i></i>${data.level === 'ready' ? A('جاهز', 'Ready') : data.level === 'attention' ? A('محتاج انتباه', 'Needs attention') : A('بيتجهّز', 'Getting ready')}</span><h2 id="ready-h" class="tw:text-lg tw:font-semibold">${title}</h2></div>
-      <ol class="tw:mt-3 tw:grid tw:gap-1 tw:p-0 tw:list-none">${shown.map((st) => `<li class="tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:rounded-field tw:px-3 tw:py-2 ${st.status === 'done' ? '' : 'tw:bg-bg-2'}"><span class="tw:w-5 tw:text-center">${icon(st)}</span><span class="grow ${st.status === 'done' ? 'muted' : ''}">${L({ ar: READY_TEXT[st.id][st.status][0], en: READY_TEXT[st.id][st.status][1] })}${st.optional ? ` <span class="tiny muted">${A('· اختياري', '· optional')}</span>` : ''}</span>${st.status === 'done' ? '' : readinessAction(st)}</li>`).join('')}</ol>
+      <ol class="tw:mt-3 tw:grid tw:gap-1 tw:p-0 tw:list-none">${shown.map((st) => `<li class="tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:rounded-field tw:px-3 tw:py-2 ${st.status === 'done' ? '' : 'tw:bg-bg-2'} ${st.status === 'choose' ? 'ready-choose' : ''}"><span class="tw:w-5 tw:text-center">${icon(st)}</span><span class="grow ${st.status === 'done' ? 'muted' : ''}">${L({ ar: readyPair(st)[0], en: readyPair(st)[1] })}${st.optional ? ` <span class="tiny muted">${A('· اختياري', '· optional')}</span>` : ''}</span>${st.status === 'done' ? '' : readinessAction(st)}</li>`).join('')}</ol>
       ${data.steps.some((st) => st.id === 'understanding' && st.status === 'awaiting-review') ? `<p class="tiny muted tw:mt-2">${A('بعد ما تراجعها، قول للوكيل «موافق» أو اللي عايز تغيّره. الموافقة قرارك إنت بس.', 'After reviewing it, tell your agent "Approve" or what to change. Approval is only your decision.')}</p>` : ''}</section>`;
   }
   // PF-0123: the New gate's ＋ is the same Create work action as the header button (keyboard
@@ -396,11 +479,14 @@
   function queueLine(it) {
     const q = it ? queueOf(it.id) : null;
     if (!q) return '';
-    return `<p class="qline small">${A(`في طابور · ${q.position} من ${q.total}`, `In a queue · ${q.position} of ${q.total}`)} · <a href="#/agents">${A('شوف الطابور', 'See the queue')}</a></p>`;
+    return `<p class="qline small">${A(`في طابور · ${q.position} من ${q.total}`, `In a queue · ${q.position} of ${q.total}`)} · <a href="#/team">${A('شوف الطابور', 'See the queue')}</a></p>`;
   }
   function nowText(it) {
     if (it.state === 'done') return A('خلص واتأكد.', 'Done and verified.');
     if (it.routing === 'pending') return A('الوكيل هيصنّف الطلب ده (النوع والحجم) ويكمّل.', 'Your agent classifies this request (type and size) and takes it from there.');
+    // PF-0135: a project-understanding baseline follows its own steps, not workflow stages.
+    if (it.waitingFor?.kind === 'baseline') return A('مسودة فهم المشروع جاهزة ومستنية مراجعتك. راجعها، وبعدين قول للوكيل «موافق» أو اللي عايز تغيّره. الموافقة قرارك إنت بس.', 'The project understanding draft is ready and waits for your review. Review it, then tell the agent “Approve” or what to change. Approval is your decision only.');
+    if (it.baselineStep) return it.baselineStep === 'changes-requested' ? A('طلبت تعديلات على مسودة فهم المشروع. الوكيل هيعدّلها ويعرضها عليك تاني.', 'You asked for changes to the project understanding draft. The agent revises it and brings it back to you.') : it.baselineStep === 'draft' ? A('الوكيل خلّص قراية المشروع، وفاضل يسجّل مسودة الفهم ويعرضها عليك.', 'The agent finished reading the project; it still has to record the understanding draft and show it to you.') : A('الوكيل بيقرا المشروع علشان يكتب مسودة الفهم ويعرضها عليك.', 'The agent reads the project to write the understanding draft and show it to you.');
     if (it.waitingFor) return it.waitingFor.kind === 'review' ? A(`مستني مراجعتك (${it.waitingFor.gate}).`, `Waiting for your review (${it.waitingFor.gate}).`) : A(`مستني إجابتك على ${it.waitingFor.questions.join('، ')}.`, `Waiting for your answer to ${it.waitingFor.questions.join(', ')}.`);
     if (it.blocker) return blockerText(it.blocker);
     // PF-0100: the stage is finished and Core's next step is to move on.
@@ -431,6 +517,30 @@
     return t;
   }
 
+  // PF-0140: the project-understanding draft itself on the baseline's page, so "Review the
+  // draft" shows what is being approved (facts by area, what stays unresolved, what was not
+  // inspected) instead of a checkpoint summary. Read-only: approval stays with the developer.
+  const BASELINE_AREA = { project: { ar: 'الغرض', en: 'Purpose' }, 'tech-stack': { ar: 'التقنيات', en: 'Stack' }, architecture: { ar: 'المعمارية', en: 'Architecture' }, database: { ar: 'البيانات', en: 'Data' }, integration: { ar: 'التكاملات', en: 'Integrations' }, environment: { ar: 'البيئات والإعدادات', en: 'Environments and configuration' }, convention: { ar: 'طريقة الشغل في الكود', en: 'Conventions' }, 'business-rule': { ar: 'قواعد العمل', en: 'Business rules' } };
+  const BASELINE_FACT = { confirmed: ['done', { ar: 'مؤكد', en: 'confirmed' }], inferred: ['wait', { ar: 'مستنتج', en: 'inferred' }], unresolved: ['you', { ar: 'مش محسوم', en: 'unresolved' }] };
+  function baselineDraft(it, d) {
+    const b = d?.baseline;
+    if (!b?.facts?.length) return '';
+    const approved = b.status === 'approved';
+    const waiting = it.waitingFor?.kind === 'baseline';
+    const count = (status) => b.facts.filter((f) => f.status === status).length;
+    const areas = [...Object.keys(BASELINE_AREA), ...new Set(b.facts.map((f) => f.area).filter((a) => !BASELINE_AREA[a]))].map((area) => ({ area, facts: b.facts.filter((f) => f.area === area) })).filter((x) => x.facts.length);
+    const fact = (f) => { const [tone, label] = BASELINE_FACT[f.status] ?? ['todo', { ar: f.status, en: f.status }]; return `<li data-baseline-fact="${esc(f.id)}"><span class="chip ${tone}">${L(label)}</span><span class="grow"><span dir="auto">${esc(f.summary)}</span>${f.note ? `<span class="tiny muted" dir="auto"> — ${esc(f.note)}</span>` : ''}${f.evidence?.length ? `<span class="bdev tiny muted">${A('الدليل:', 'Evidence:')} <span class="ltr">${f.evidence.slice(0, 6).map(esc).join(' · ')}${f.evidence.length > 6 ? ` · +${f.evidence.length - 6}` : ''}</span></span>` : ''}</span></li>`; };
+    const chips = `<span class="chip done">${count('confirmed')} ${A('مؤكد', 'confirmed')}</span>${count('inferred') ? `<span class="chip wait">${count('inferred')} ${A('مستنتج', 'inferred')}</span>` : ''}${count('unresolved') ? `<span class="chip you">${count('unresolved')} ${A('مش محسوم', 'unresolved')}</span>` : ''}${b.limitations.length ? `<span class="chip todo">${b.limitations.length} ${A('ماتفحصش', 'not inspected')}</span>` : ''}`;
+    const lead = approved ? A('دي المعلومات اللي اعتمدتها وبقت ذاكرة المشروع.', 'These are the facts you approved; they are now project memory.')
+      : waiting ? A('دي المسودة اللي هتعتمدها: اقراها قسم قسم. «مؤكد» عليه دليل من ملفات المشروع، «مستنتج» استنتاج محتاج عينك، و«مش محسوم» هيفضل سؤال مفتوح. لو فيه حاجة غلط أو ناقصة اطلب تعديلها قبل ما توافق.', 'This is the draft you are approving: read it section by section. "Confirmed" has evidence in the project files, "inferred" is a deduction worth your eye, and "unresolved" stays an open question. Ask for changes before you approve if something is wrong or missing.')
+      : A('دي آخر مسودة سجّلها الوكيل. لسه بتتعدّل.', 'This is the last draft the agent recorded. It is still being revised.');
+    const decide = waiting && agentsOn && !readOnly ? `<div class="row bdfoot"><button class="btn go sm" data-chat-item="${esc(it.id)}">${A('خلّصت مراجعة: وافق أو اطلب تعديلات في الشات', 'Done reviewing: approve or request changes in the chat')}</button><span class="tiny muted">${A('الموافقة قرارك إنت بس، والوكيل بيسجّلها.', 'Approval is only your decision; the agent records it.')}</span></div>` : '';
+    return `<section class="panel bdraft" id="baseline-draft" data-baseline-draft="${esc(b.status)}"><div class="row"><h2 class="grow">${approved ? A('فهم المشروع المعتمد', 'Approved project understanding') : A('مسودة فهم المشروع', 'Project understanding draft')} <span class="muted">(${b.facts.length})</span></h2>${chips}</div>
+      <p class="small muted">${lead}</p>
+      ${areas.map(({ area, facts }) => `<details class="bdarea" data-sx="bd:${esc(it.id)}:${esc(area)}" ${sxOpen(`bd:${it.id}:${area}`, !approved)}><summary><b>${L(BASELINE_AREA[area] ?? { ar: area, en: area })}</b> <span class="tiny muted">${facts.length}</span></summary><ul class="aclist bdfacts">${facts.map(fact).join('')}</ul></details>`).join('')}
+      ${b.limitations.length ? `<details class="bdarea" data-sx="bd:${esc(it.id)}:limits" ${sxOpen(`bd:${it.id}:limits`, !approved)}><summary><b>${A('اللي الوكيل ماقدرش يفحصه', 'What the agent could not inspect')}</b> <span class="tiny muted">${b.limitations.length}</span></summary><ul class="aclist bdfacts">${b.limitations.map((x) => `<li><span class="grow"><span dir="auto">${esc(x.summary)}</span>${x.reason ? `<span class="tiny muted" dir="auto"> — ${esc(x.reason)}</span>` : ''}</span></li>`).join('')}</ul><p class="tiny muted">${A('دي حدود الفحص ده بس، ومابتتسجّلش كمعلومات عن المشروع.', 'These are limits of this discovery only; they are never recorded as project facts.')}</p></details>` : ''}${decide}</section>`;
+  }
+
   // ---------- item ----------
   let dtab = null; // null: Request for unclassified work, Delivery otherwise
   function viewItem(id) {
@@ -448,7 +558,7 @@
       <section class="ihead">${ring(it.completion, 132, 13)}<div><div class="row tiny muted"><span class="ltr">${esc(it.id)}</span><button type="button" class="ibtn" data-copy="${esc(it.id)}" data-copy-what="id" title="${A('انسخ رقم الشغلانة', 'Copy the work item ID')}" aria-label="${A('انسخ رقم الشغلانة', 'Copy the work item ID')}">⧉</button><span>· ${L(TYPE[it.type] ?? { ar: 'لسه متصنفش', en: 'unrouted' })}</span>${it.scope ? `<span class="ltr">· ${esc(it.scope)}</span>` : ''}${it.stage ? `<span class="ltr">· ${esc(it.stage)}</span>` : ''}</div><h1>${esc(it.title)}</h1><p style="font-size:18px;color:var(--ink-2);margin-top:4px">${headline}</p><p class="tiny muted" style="margin-top:4px">${formula()}</p></div>
 </section>
       ${queueLine(it)}${nextCard(it)}
-      ${actionBar(it)}
+      ${actionBar(it)}${baselineDraft(it, d)}
       ${agentsOn && !readOnly && it.state !== 'done' && !it.lifecycle ? '' : `<div class="row chatcue"><button class="btn sm" data-chat-toggle aria-controls="chatwin">💬 ${A('اشتغل على الشغلانة دي مع الوكيل', 'Work on this item with the agent')}</button></div>`}
       <section class="chain" id="chain"><article class="node start ${it.state === 'new' ? 'active' : 'done'}" data-st="-1" style="--hue:var(--ink-2)"><div class="st-head"><span class="st-ico" aria-hidden="true">＋</span><div class="st-name">${A('الطلب', 'Request')}</div></div><div class="st-out">${it.state === 'new' ? A('جديد', 'new') : A('اتسلّم لـ «افهم»', 'handed to Understand')}</div>
           <p class="small clamp3">${esc(d?.request?.raw ?? it.title)}</p>${(d?.sources ?? []).map((s) => `<button class="flink" data-file="${esc(s.id)}">${fileIcon(s)} <span class="ltr">${esc(s.name)}</span></button>`).join('')}<button class="flink more2" data-dtab="req" data-jump>${A('الطلب كامل ↓', 'Full request ↓')}</button>
@@ -479,6 +589,7 @@
   let agentProvider = null;
   let agentMode = 'workspace-write';
   let agentLaunch = null;
+  let agentTerminal = null; // PF-0134: { opened, terminal } or { error } after Connect
   const PROVIDER = { codex: 'Codex', claude: 'Claude Code' };
   const MODE_LABEL = {
     'read-only': { ar: 'قراءة بس، كل تغيير بيستأذن', en: 'Read-only: every change asks first' },
@@ -536,7 +647,7 @@
         <label class="small"><input type="radio" name="provider" value="codex" checked> Codex</label>
         ${execView?.lanes?.find((lane) => lane.project === pid)?.userSessions ? `<label class="small"><input type="radio" name="provider" value="claude"> Claude Code <span class="tiny muted">(${A('بمساعدتك: الكونسول مبيقدرش يشغّل Claude Code، فإنت بتبدأ كل مهمة فيه وتربطها. على حسابات Team/Enterprise رسايل الكونسول ممكن تكون مقفولة.', 'assisted: the console cannot start Claude Code, so you start and link each task there. On Team/Enterprise logins console messages may be off.')})</span></label>` : ''}</fieldset>
       <label class="small"><input type="checkbox" name="pauseBetween"> ${A('وقّف بعد كل مهمة لحد ما أقول كمّل', 'Pause after each task until I say continue')}</label>
-      <p class="tiny muted">${A(`طلبات الموافقة بتستنى ${approvalMinutes()} دقيقة وبعدين بتترفض تلقائي (تقدر تغيّرها من «الإعداد والتشغيل»).`, `Approval requests wait ${approvalMinutes()} minutes, then are denied automatically (change it in Setup & run).`)}</p>
+      <p class="tiny muted">${A(`طلبات الموافقة بتستنى ${approvalMinutes()} دقيقة وبعدين بتترفض تلقائي (تقدر تغيّرها من «المشروع» ← «الإعدادات» ← الوكلاء).`, `Approval requests wait ${approvalMinutes()} minutes, then are denied automatically (change it in Project → Settings → Agents).`)}</p>
       <label class="small"><input type="checkbox" name="confirmed" data-queue-confirm> ${A('فاهم إن الوكيل هيشتغل عليهم بالترتيب ده', 'I understand the agent works through them in this order')}</label>
       <div class="row"><button type="button" class="btn ghost" data-queue-cancel>${A('إلغاء', 'Cancel')}</button><span class="grow"></span><button class="btn go" type="submit" data-queue-start disabled>${A('ابدأ الطابور', 'Start queue')}</button></div></form>`;
     if (!d.open) d.showModal();
@@ -548,7 +659,7 @@
       await post(`/api/p/${pid}/execution/run`, JSON.stringify(body), { 'Content-Type': 'application/json' });
       document.getElementById('queuedlg')?.close();
       selecting = false; selected = [];
-      location.hash = '#/agents';
+      location.hash = '#/team';
       await loadExecution();
       render();
     } catch (err) { toast(esc(why(err))); }
@@ -590,7 +701,7 @@
       document.getElementById('paralleldlg')?.close();
       selecting = false; selected = [];
       await reloadProjects().catch(() => {});
-      location.hash = '#/agents';
+      location.hash = '#/team';
       await loadExecution();
       render();
     } catch (err) { toast(esc(why(err))); }
@@ -601,18 +712,23 @@
     return `<div class="panel sub" data-shared-panel><b class="small">${title}</b><p class="tiny muted">${reason} ${A('ده هيشغّل yallaflow shared enable؛ بعدها اعمل commit لـ .yallaflow/. أرقام الشغل والمصادر الموجودة مبتتغيرش؛ الجديدة بس بتاخد شكل PF-<tag>-####.', 'This runs yallaflow shared enable; then commit .yallaflow/. Existing work and source IDs never change; only new ones take the PF-<tag>-#### form.')}</p>${preview?.text ? `<pre class="pdetail" dir="ltr">${esc(preview.text)}</pre>` : preview?.error ? `<p class="tiny fail" dir="ltr">${esc(preview.error)}</p>` : ''}
         <label class="small"><input type="checkbox" data-shared-confirm> ${A('فاهم وموافق على التغيير ده', 'I understand and accept this change')}</label> <button type="button" class="btn sm" data-shared-enable disabled>${A('فعّل Shared Project Mode', 'Enable Shared Project Mode')}</button></div>`;
   }
-  async function openSharedSheet() {
+  // PF-0132: the same flow for the selected project or, from the New Project success step, the new one.
+  let sharedFor = null;
+  async function openSharedSheet(projectId = pid) {
+    sharedFor = projectId;
     let d = document.getElementById('shareddlg');
     if (!d) { d = document.createElement('dialog'); d.id = 'shareddlg'; d.className = 'panel'; document.body.appendChild(d); }
     d.innerHTML = `<p class="small">${A('بيحمّل…', 'Loading…')}</p>`;
     if (!d.open) d.showModal();
     let preview = null;
-    try { preview = await api(`/api/p/${pid}/shared/preview`); } catch (err) { preview = { error: why(err) }; }
+    try { preview = await api(`/api/p/${projectId}/shared/preview`); } catch (err) { preview = { error: why(err) }; }
     d.innerHTML = `<div class="wizform"><h2 style="font-size:18px">Shared Project Mode</h2>${sharedPanel(preview, A('شغّل Shared Project Mode', 'Turn on Shared Project Mode'), A('علشان الشغل اللي بيتعمل على فروع مختلفة ميخدش نفس الرقم.', 'So work created on different branches never gets the same ID.'))}<div class="row"><span class="grow"></span><button type="button" class="btn ghost" data-shared-cancel>${A('إلغاء', 'Cancel')}</button></div></div>`;
   }
   async function enableSharedNow() {
     try {
-      await post(`/api/p/${pid}/execution/shared-enable`, JSON.stringify({ confirmed: true }), { 'Content-Type': 'application/json' });
+      const target = document.getElementById('paralleldlg')?.open ? pid : sharedFor ?? pid;
+      await post(`/api/p/${target}/execution/shared-enable`, JSON.stringify({ confirmed: true }), { 'Content-Type': 'application/json' });
+      if (wiz.ready?.id === target && wiz.ready.git) wiz.ready.git = { ...wiz.ready.git, sharedMode: true, canEnableShared: false };
       const fromLanes = document.getElementById('paralleldlg')?.open;
       toast(fromLanes ? A('Shared Project Mode اتفعّل. اعمل commit لـ .yallaflow/ وبعدين ابدأ المسارات.', 'Shared Project Mode is on. Commit .yallaflow/, then start the lanes.') : A('Shared Project Mode اتفعّل. اعمل commit لـ .yallaflow/ علشان الفريق ياخده.', 'Shared Project Mode is on. Commit .yallaflow/ to share it with the team.'));
       if (fromLanes) { openParallelSheet(); return; }
@@ -749,7 +865,7 @@
   function scheduleExecution() {
     if (!agentsOn) return;
     clearTimeout(execTimer);
-    execTimer = setTimeout(async () => { await loadExecution(); if (route().v === 'agents' || bellOpen) render(); else renderBellCount(); }, 250);
+    execTimer = setTimeout(async () => { await loadExecution(); if (['projects', 'team'].includes(route().v) || bellOpen) render(); else renderBellCount(); }, 250);
   }
   function renderBellCount() {
     const bell = document.querySelector('[data-bell]');
@@ -760,7 +876,7 @@
     try { agent = { pid, ...(await api(`/api/p/${pid}/agent`)) }; agentError = null; } catch (e) { agentError = e.message; }
   }
   function onAgentEvent(projectId, event) {
-    if (projectId === pid && route().v === 'setup' && ['session.connected', 'session.disconnected', 'session.started', 'session.ended', 'mode.changed'].includes(event.type)) refreshAgentSetup();
+    if (projectId === pid && route().v === 'settings' && ['session.connected', 'session.disconnected', 'session.started', 'session.ended', 'mode.changed'].includes(event.type)) refreshAgentSetup();
     if (!agent || agent.pid !== projectId) return;
     agent.events.push(event);
     if (agent.events.length > 400) agent.events.splice(0, agent.events.length - 400);
@@ -840,7 +956,7 @@
       else if (ev.type === 'permission.resolved') { const p = out.find((x) => x.kind === 'perm' && x.requestId === ev.requestId); if (p) { p.decision = ev.decision; p.by = ev.by; } }
       else if (ev.type === 'permission.overridden') { const p = out.find((x) => x.kind === 'perm' && x.requestId === ev.requestId); out.push({ kind: 'note', warn: true, text: ev.detail }); if (p) p.overridden = true; }
       else if (ev.type === 'turn.ended') { if (ev.finalMessage && !repliedThisTurn) out.push({ kind: 'agent', text: ev.finalMessage }); if (ev.stopReason === 'cancelled') out.push({ kind: 'note', text: A('اتوقف.', 'Stopped.') }); }
-      else if (ev.type === 'session.started') out.push({ kind: 'note', text: ev.resumed ? A('الجلسة رجعت.', 'Session resumed.') : A('الجلسة بدأت.', 'Session started.') });
+      else if (ev.type === 'session.started') out.push({ kind: 'note', session: true, text: ev.resumed ? A('الجلسة رجعت.', 'Session resumed.') : A('الجلسة بدأت.', 'Session started.') });
       else if (ev.type === 'session.ended') {
         // Never a plain "ended" when processes the agent started could not be stopped.
         const left = ev.cleanup && ev.cleanup.complete === false ? ev.cleanup.survivors ?? [] : null;
@@ -850,7 +966,7 @@
           : c && c.verified === false ? A('YallaFlow وقّف الوكيل بس، وماقدرش يتأكد إن العمليات اللي بدأها وقفت. اتأكد بنفسك.', 'YallaFlow stopped the agent itself but could not check the processes it started. Check them yourself.')
           : c && (c.coverage === 'group' || ev.reason === 'crashed') ? A('العمليات اللي فصلت نفسها عن الجلسة مش بتتتبّع.', 'Processes that detached themselves from the session are not tracked.')
           : '';
-        out.push({ kind: 'note', warn: ev.reason === 'crashed' || Boolean(left), text: tail ? `${base} ${tail}` : base });
+        out.push({ kind: 'note', session: !tail && ev.reason !== 'crashed', warn: ev.reason === 'crashed' || Boolean(left), text: tail ? `${base} ${tail}` : base });
       }
       else if (ev.type === 'session.connected') out.push({ kind: 'note', text: A('Claude Code متوصّل.', 'Claude Code connected.') });
       else if (ev.type === 'session.disconnected') out.push({ kind: 'note', warn: true, text: A('Claude Code اتفصل (الجلسة أو القناة وقفت).', 'Claude Code disconnected (the session or its channel stopped).') });
@@ -865,7 +981,8 @@
         out.push({ kind: 'note', warn: true, text: `${text} \u2068(${ev.message})\u2069` });
       }
     }
-    return out.slice(-80);
+    // PF-0134: a run of plain "session started/ended" lines shows only its last one.
+    return out.filter((x, i) => !(x.session && out[i + 1]?.session)).slice(-80);
   }
   // PF-0112: what the request touches, when the provider names it (files, the command).
   function permScope(p) {
@@ -1008,15 +1125,22 @@
   // PF-0105: the message that starts or continues an item asks for the whole job, stopping only
   // for a decision the developer alone can make.
   function goText(it) {
+    // PF-0135: a baseline is not classified, planned or implemented; a drafted one waits for the developer.
+    if (it.waitingFor?.kind === 'baseline') return '';
+    if (it.baselineStep) return A(`كمّل فهم المشروع (${it.id}): اقرا المشروع، سجّل مسودة الفهم، واعرضها عليّ للمراجعة. الموافقة عليها قراري أنا.`, `Continue the project understanding (${it.id}): read the project, record the understanding draft and show it to me for review. Approving it is my decision.`);
     return A(`اشتغل على ${it.id} لحد الآخر: صنّفها، افهمها، خطّط، نفّذ، اتحقق، وقفّلها بـ yallaflow finish. ما تقفش علشان تديني تقرير عن الحالة. اقف بس لما تحتاج قرار مقدرش غيري آخده (موافقة على مراجعة، أو سؤال بيزنس مش واضح من المشروع)، واسألني ساعتها.`,
       `Work on ${it.id} to the end: classify it, understand it, plan, implement, verify, and close it with yallaflow finish. Do not stop to give me a status update. Stop only when you need a decision only I can make (approving a review, or a business question the project does not answer), and ask me then.`);
   }
+  // PF-0135: the developer's own decision on the baseline draft, in words the agent records.
+  const baselineApproveText = (it) => A(`موافق على مسودة فهم المشروع (${it.id}). اعتمدها وكمّل.`, `I approve the project understanding draft (${it.id}). Record my approval and continue.`);
+  const baselineChangesText = (it) => A(`عايز تعديلات في مسودة فهم المشروع (${it.id}): `, `I want changes to the project understanding draft (${it.id}): `);
   const goOnText = (it) => A(`كمّل ${it.id} لحد الآخر، واقف بس لو محتاج قرار مني.`, `Continue ${it.id} to the end; stop only if you need a decision from me.`);
   // PF-0105: one action for what is needed from the developer now; other suggestions folded.
   function chatAction(it, turnState) {
     if (it.project || turnState === 'working' || turnState === 'approval') return '';
     const gateName = (g) => (typeof GATE_AR === 'object' && GATE_AR[g] ? L(GATE_AR[g]) : g);
     if (it.waitingFor?.kind === 'review') return `<div class="aaction"><p class="aturn approval" role="status">✋ ${A(`مستني مراجعتك: ${gateName(it.waitingFor.gate)}.`, `Waiting for your review: ${gateName(it.waitingFor.gate)}.`)}</p><button class="btn go" data-gate="${esc(it.waitingFor.gate)}" data-gate-item="${esc(it.id)}">${A(`راجع وقرّر: ${gateName(it.waitingFor.gate)}`, `Review and decide: ${gateName(it.waitingFor.gate)}`)}</button></div>`;
+    if (it.waitingFor?.kind === 'baseline') return `<div class="aaction"><p class="aturn approval" role="status">✋ ${A('الوكيل مستني قرارك في مسودة فهم المشروع. «كمّل» مش موافقة.', 'The agent waits for your decision on the project understanding draft. “Continue” is not an approval.')}</p><div class="row"><button class="btn go" data-agent-say="${esc(baselineApproveText(it))}">${A('موافق، اعتمد المسودة', 'Approve the draft')}</button><button class="btn" data-suggest="${esc(baselineChangesText(it))}">${A('عايز تعديلات', 'Request changes')}</button></div><span class="tiny muted">${A('«موافق» بيبعت: «', '“Approve” sends: “')}${esc(baselineApproveText(it))}${A('». «عايز تعديلات» بيكتب بداية الرسالة في الخانة وانت تكمّلها وتبعتها.', '”. “Request changes” starts the message in the box; you finish and send it.')}</span></div>`;
     if (it.waitingFor?.kind === 'question') return `<div class="aaction"><p class="aturn approval" role="status">✋ ${A('الوكيل سألك سؤال ومستني إجابتك.', 'The agent asked you a question and waits for your answer.')}</p><button class="btn go" data-act="answer" data-act-item="${esc(it.id)}">${A('جاوب السؤال', 'Answer the question')}</button></div>`;
     if (turnState === 'reply' && it.state !== 'done') return `<div class="aaction"><button class="btn go" data-agent-continue>${A('كمّل', 'Continue')}</button><span class="tiny muted">${A('بيبعت: «', 'Sends: “')}${esc(goOnText(it))}${A('»', '”')}</span></div>`;
     return '';
@@ -1036,7 +1160,8 @@
   function claudeWarnings(p) {
     if (!p?.warnings?.length) return '';
     const team = /Team|Enterprise/.exec(p.warnings.join(' '))?.[0] ?? 'Team';
-    return `<div class="awarn small" role="note">⚠ ${lang === 'ar' ? `Claude Code متسجّل بحساب Claude ${team}. الرسايل من الكونسول بتوصل لـ Claude Code بس لو admin المؤسسة مفعّل الـ channels، وده مقفول افتراضيًا والرسايل بتتجاهل من غير ما يظهر خطأ. لو مش متفعّل، اكتب في ترمينال Claude Code، والكونسول هيفضل يعرض شغله.` : esc(p.warnings.join(' '))}</div>`;
+    // PF-0134: one line; the details on demand.
+    return `<details class="awarn small awarn-compact" role="note"><summary>⚠ ${A(`حساب Claude ${team}: رسايل الكونسول ممكن ما توصلش.`, `Claude ${team} account: console messages may not arrive.`)} <span class="tiny muted">${A('التفاصيل', 'Details')}</span></summary><p class="tiny">${lang === 'ar' ? `Claude Code متسجّل بحساب Claude ${team}. الرسايل من الكونسول بتوصل لـ Claude Code بس لو admin المؤسسة مفعّل الـ channels، وده مقفول افتراضيًا والرسايل بتتجاهل من غير ما يظهر خطأ. لو مش متفعّل، اكتب في ترمينال Claude Code، والكونسول هيفضل يعرض شغله.` : esc(p.warnings.join(' '))}</p></details>`;
   }
   // PF-0103: one agent per checkout, switched from the item that needs it. An idle Codex
   // session is ended here; Claude Code closes only in its terminal (unlinking would leave it
@@ -1123,17 +1248,24 @@
     const state = (h) => h.lastStop ? stopText(h.lastStop.reason) : h.status === 'running' ? A('شغّالة', 'running') : A('خلصت', 'ended');
     return `<details class="ahist"><summary class="tiny muted">${A('الجلسات على الشغلانة دي', 'Agent sessions on this item')} (${rows.length})</summary><ul class="tiny">${rows.map((h) => `<li><b>${esc(PROVIDER[h.provider] ?? h.provider)}</b> · ${ago(h.startedAt)}${h.endedAt ? ` → ${ago(h.endedAt)}` : ''} · ${esc(state(h))}</li>`).join('')}</ul></details>`;
   }
+  // PF-0134: Connect also opens Claude Code in a terminal in the project folder.
+  async function openClaudeTerminal(r) {
+    agentLaunch = r?.launch?.command ?? null;
+    agentTerminal = null;
+    if (!agentLaunch || readOnly) return;
+    try { agentTerminal = await post(`/api/p/${pid}/agents/open-terminal`, '{}', { 'Content-Type': 'application/json' }); } catch (err) { agentTerminal = { error: why(err) }; }
+  }
   async function switchAgent(to, it) {
     const stop = itemStop(it);
     if (!stop) return;
     const s = agent?.session;
     // The old session is ended (Codex) or unlinked (Claude) first: one session per checkout.
     if (s?.provider === 'codex' && !(await agentAction('end', {}))) return;
-    if (s?.provider === 'claude' && !(await agentAction('disconnect', {}, () => { agentLaunch = null; }))) return;
+    if (s?.provider === 'claude' && !(await agentAction('disconnect', {}, () => { agentLaunch = null; agentTerminal = null; }))) return;
     agentProvider = to;
     const ok = to === 'codex'
       ? await agentAction('start', { provider: 'codex', workId: it.id, mode: agentMode })
-      : await agentAction('connect', { provider: 'claude', workId: it.id }, (r) => { agentLaunch = r.launch?.command ?? null; });
+      : await agentAction('connect', { provider: 'claude', workId: it.id }, openClaudeTerminal);
     if (ok) { agentDraft = continueText(it, stop); renderAgent(); }
   }
 
@@ -1142,10 +1274,15 @@
     const claudeOff = agentsClaudeAvailable && !(agent?.providers ?? []).some((p) => p.id === 'claude');
     const notReady = (agent?.providers ?? []).some((p) => !p.ready);
     if (!claudeOff && !notReady) return '';
-    return `<p class="tiny muted">${claudeOff ? A('Claude Code (تجريبي) مقفول للمشروع ده.', 'Claude Code (experimental) is off for this project.') : A('فيه وكيل مش جاهز.', 'An agent is not ready.')} <a href="#/setup" data-setup-agents>${A('افتح الإعداد ← الوكلاء', 'Open Setup → Agents')}</a></p>`;
+    if (claudeOff && !readOnly) return `<p class="tiny muted">${A('Claude Code (تجريبي) مقفول للمشروع ده.', 'Claude Code (experimental) is off for this project.')} <button type="button" class="linkbtn" data-agent-choose="claude">${A('استخدمه للمشروع ده', 'Use it for this project')}</button></p>`;
+    return `<p class="tiny muted">${claudeOff ? A('Claude Code (تجريبي) مقفول للمشروع ده.', 'Claude Code (experimental) is off for this project.') : A('فيه وكيل مش جاهز.', 'An agent is not ready.')} <a href="#/settings/agents" data-setup-agents>${A('افتح الإعدادات ← الوكلاء', 'Open Settings → Agents')}</a></p>`;
   }
 
+  // PF-0133: the readiness agent step (status 'choose' until this project's agent is chosen).
+  const agentStep = () => (readiness?.pid === pid ? readiness.data?.steps?.find((st) => st.id === 'agent') : null);
   function agentPanel(it) {
+    // PF-0133: no agent chosen for this project yet — choose it here, first.
+    if (!readOnly && agentStep()?.status === 'choose') return `<section class="panel agent" id="agent"><div class="ahead"><h2>${A('اختار وكيل المشروع', 'Choose the project\'s agent')}</h2></div><p class="small muted">${A('أول خطوة: اختار الوكيل اللي هيشتغل على المشروع ده.', 'First step: choose the agent that works on this project.')}</p>${agentChooser()}</section>`;
     if (!agentsOn) return agentOffPanel(it);
     if (!agent || agent.pid !== pid) return `<section class="panel agent" id="agent"><p class="muted">${A('بيحمّل مساحة الوكيل…', 'Loading the agent workspace…')}</p></section>`;
     const s = agent.session;
@@ -1157,16 +1294,21 @@
     if (!s && agent.lockedBy) return `<section class="panel agent" id="agent">${head}${err}<div class="awarn" role="status">${A('جلسات الوكيل في النسخة دي من المشروع تبع كونسول YallaFlow تاني شغّال. استخدمه، أو اقفله الأول.', 'Agent sessions in this checkout belong to another running YallaFlow console. Use that console, or stop it first.')}</div><p class="tiny muted" dir="ltr">${esc(agent.lockedBy.message)}</p></section>`;
     if (!s || (s.workId && s.workId !== it.id && (s.provider === 'codex' || it.project))) {
       if (s) return `<section class="panel agent" id="agent">${head}${err}<p class="small">${A(`فيه جلسة ${PROVIDER[s.provider]} شغّالة على`, `A ${PROVIDER[s.provider]} session is active for`)} <a href="#/item/${encodeURIComponent(s.workId)}" class="ltr">${esc(s.workId)}</a>. ${A('جلسة واحدة بس في كل نسخة من المشروع.', 'Only one agent session runs per checkout.')}</p>${switchHere(it, s)}</section>`;
-      const choice = agentProvider ?? agent.providers.find((p) => p.ready)?.id ?? 'codex';
+      // PF-0134: the chat opens on the agent chosen for this project and lists only it.
+      const chosenHere = agentStep()?.status && agentStep().status !== 'choose' ? agentStep().provider : null;
+      const choice = agentProvider ?? (chosenHere && provider(chosenHere) ? chosenHere : null) ?? agent.providers.find((p) => p.ready)?.id ?? 'codex';
       const p = provider(choice);
-      const picks = agent.providers.map((x) => `<label class="apick ${x.ready ? '' : 'off'}"><input type="radio" name="agentProvider" value="${x.id}" ${x.id === choice ? 'checked' : ''}><span><b>${PROVIDER[x.id]}</b>${x.experimental ? ` <i class="exp">${A('تجريبي', 'experimental')}</i>` : ''}<small>${x.ready ? (x.id === 'codex' ? A('اشتراك ChatGPT بتاعك', 'Your ChatGPT subscription') : A(`اشتراك Claude بتاعك${x.auth?.plan ? ` (${x.auth.plan})` : ''}`, `Your Claude subscription${x.auth?.plan ? ` (${x.auth.plan})` : ''}`)) : A('مش جاهز', 'Not ready')}</small></span></label>`).join('');
+      const listed = chosenHere && provider(chosenHere) && !agentProvider ? agent.providers.filter((x) => x.id === chosenHere) : agent.providers;
+      const other = chosenHere && !agentProvider && !readOnly ? (chosenHere === 'claude' ? 'codex' : agentsClaudeAvailable ? 'claude' : null) : null;
+      const otherLink = other ? `<p class="tiny muted">${A('وكيل المشروع ده', 'This project\'s agent')}: <b>${PROVIDER[chosenHere]}</b> · <button type="button" class="linkbtn" data-agent-choose="${other}">${A(`استخدم ${PROVIDER[other]} بداله`, `Use ${PROVIDER[other]} instead`)}</button></p>` : '';
+      const picks = listed.map((x) => `<label class="apick ${x.ready ? '' : 'off'}"><input type="radio" name="agentProvider" value="${x.id}" ${x.id === choice ? 'checked' : ''}><span><b>${PROVIDER[x.id]}</b>${x.experimental ? ` <i class="exp">${A('تجريبي', 'experimental')}</i>` : ''}<small>${x.ready ? (x.id === 'codex' ? A('اشتراك ChatGPT بتاعك', 'Your ChatGPT subscription') : A(`اشتراك Claude بتاعك${x.auth?.plan ? ` (${x.auth.plan})` : ''}`, `Your Claude subscription${x.auth?.plan ? ` (${x.auth.plan})` : ''}`)) : A('مش جاهز', 'Not ready')}</small></span></label>`).join('');
       const problems = (p && !p.ready ? `<ul class="aprob">${p.problems.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : '') + claudeWarnings(p);
       let action = '';
       if (p?.ready && p.capabilities.start) action = `<div class="row"><label class="small">${A('الصلاحيات', 'Permissions')} <select data-agent-mode>${p.capabilities.modes.map((m) => `<option value="${m}" ${m === agentMode ? 'selected' : ''}>${L(MODE_LABEL[m])}</option>`).join('')}</select></label><span class="grow"></span><button class="btn go" data-agent-start ${agentBusy ? 'disabled' : ''}>${A('ابدأ جلسة Codex', 'Start Codex session')}</button></div>${agent.resumable.length ? `<div class="tiny muted">${A('جلسات سابقة:', 'Earlier sessions:')} ${agent.resumable.map((r) => `<button class="linkbtn" data-agent-resume="${esc(r.id)}">${esc(r.workId ?? '—')} · ${ago(r.startedAt)}</button>`).join(' ')}</div>` : ''}`;
       else if (p?.ready && p.id === 'claude') action = `<div class="row"><span class="small grow">${A('Claude Code بيشتغل في الترمينال بتاعك باشتراكك. YallaFlow بيتوصّل بيه بس، مش بيشغّله.', 'Claude Code runs in your terminal with your subscription. YallaFlow connects to it; it never runs it.')}</span><button class="btn go" data-agent-connect ${agentBusy ? 'disabled' : ''}>${A('وصّل Claude Code', 'Connect Claude Code')}</button></div>`;
       // PF-0072: a prepared message (for example the runtime plan request) waits for a session.
       const waiting = agentDraft.trim() ? `<div class="anote" role="status" data-draft-waiting><b class="small">${A('فيه رسالة جاهزة مستنية', 'A prepared message is waiting')}</b><p class="tiny">${A('ابدأ جلسة أو وصّل Claude Code، وهتلاقيها في خانة الكتابة تراجعها وتبعتها بنفسك. مفيش حاجة اتبعتت.', 'Start a session or connect Claude Code and it will be in the message box for you to review and send. Nothing was sent.')}</p><details><summary class="tiny">${A('اعرض الرسالة', 'Show the message')}</summary><pre class="cli small" dir="ltr" style="white-space:pre-wrap">${esc(agentDraft)}</pre></details></div>` : '';
-      return `<section class="panel agent" id="agent">${head}${err}${stopCard(it)}${waiting}<div class="apicks">${picks}</div>${problems}${action}${setupHint()}<p class="tiny muted">${A('الوكيل بيستخدم اشتراكك الموجود بس، من غير مفاتيح API. أذونات الأدوات مش موافقات YallaFlow.', 'Agents use only your existing subscription, never API keys. Tool permissions are not YallaFlow approvals.')}</p></section>`;
+      return `<section class="panel agent" id="agent">${head}${err}${stopCard(it)}${waiting}<div class="apicks">${picks}</div>${otherLink}${problems}${action}${otherLink ? '' : setupHint()}<p class="tiny muted">${A('الوكيل بيستخدم اشتراكك الموجود بس، من غير مفاتيح API. أذونات الأدوات مش موافقات YallaFlow.', 'Agents use only your existing subscription, never API keys. Tool permissions are not YallaFlow approvals.')}</p></section>`;
     }
     const cap = provider(s.provider)?.capabilities ?? {};
     const modeChip = s.mode ? `<span class="chip ${autoApproves(s.mode) ? 'wait' : 'todo'}" title="${esc(L(MODE_LABEL[s.mode] ?? { ar: esc(s.mode), en: esc(s.mode) }))}">${esc(s.mode)}</span>` : '';
@@ -1179,7 +1321,11 @@
       cap.end ? `<button class="btn sm ghost" data-agent-end>${A('اقفل الجلسة', 'End session')}</button>` : '',
       s.provider === 'claude' ? `<button class="btn sm ghost" data-agent-disconnect>${A('افصل من YallaFlow', 'Unlink')}</button>` : ''
     ].join('');
-    const launch = s.provider === 'claude' && !s.connected && agentLaunch ? `<div class="alaunch"><p class="small">${A('شغّل Claude Code بنفسك في فولدر المشروع بالأمر ده. Claude Code هيعرض تحذير القناة التجريبية والقرار ليك.', 'Start Claude Code yourself in the project folder with this command. Claude Code shows its own development-channel warning; the decision is yours.')}</p><pre class="cli" dir="ltr">${esc(agentLaunch)}</pre><button class="btn sm ghost" data-copy="${esc(agentLaunch)}">${A('انسخ', 'Copy')}</button></div>` : '';
+    const copyBlock = (text) => `<pre class="cli" dir="ltr">${esc(text)}</pre><button class="btn sm ghost" data-copy="${esc(text)}">${A('انسخ', 'Copy')}</button>`;
+    // PF-0134: Connect opens Claude Code in a terminal; the developer only confirms its prompt there.
+    const launch = s.provider === 'claude' && !s.connected && agentLaunch && agentTerminal?.opened
+      ? `<div class="alaunch"><p class="small">${A('Claude Code اتفتح في ترمينال في فولدر المشروع. وافق على تحذير القناة التجريبية هناك، والشات هنا هيتوصّل لوحده.', 'Claude Code opened in a terminal in the project folder. Accept its development-channel prompt there; this chat connects by itself.')}</p><details class="tiny"><summary class="muted">${A('ما اتفتحش؟ شغّل الأمر بنفسك', 'Did not open? Run the command yourself')}</summary>${copyBlock(agentLaunch)}</details></div>`
+      : s.provider === 'claude' && !s.connected && agentLaunch ? `<div class="alaunch">${agentTerminal?.error ? `<p class="tiny muted">${esc(agentTerminal.error)}</p>` : ''}<p class="small">${A('شغّل Claude Code بنفسك في فولدر المشروع بالأمر ده. Claude Code هيعرض تحذير القناة التجريبية والقرار ليك.', 'Start Claude Code yourself in the project folder with this command. Claude Code shows its own development-channel warning; the decision is yours.')}</p><pre class="cli" dir="ltr">${esc(agentLaunch)}</pre><button class="btn sm ghost" data-copy="${esc(agentLaunch)}">${A('انسخ', 'Copy')}</button></div>` : '';
     const toolLine = (e) => `<div class="atool ${e.status === 'failed' ? 'fail' : e.status === 'completed' ? 'done' : ''}"><span>${e.status === 'completed' ? '✓' : e.status === 'failed' ? '✕' : '●'}</span> ${esc(e.title)}</div>`;
     const entries = groupSteps(agentEntries(agent.events)).map((e) => e.kind === 'user' ? `<div class="amsg me"><p>${esc(e.text)}</p></div>` : e.kind === 'agent' ? `<div class="amsg richtext">${richText(e.text)}</div>` : e.kind === 'steps' ? stepsLine(e.steps, toolLine) : e.kind === 'tool' ? toolLine(e) : e.kind === 'perm' ? permCard(e) : `<div class="anote ${e.warn ? 'warn' : ''}">${esc(e.text)}</div>`).join('');
     const canSend = cap.send && (s.provider === 'codex' ? s.status === 'idle' : s.connected && !modePending);
@@ -1224,7 +1370,7 @@
     const list = [];
     if (snap?.project?.activeWork !== it.id) list.push('activate');
     if (it.requestEditable) list.push('revise');
-    if (it.routing !== 'pending') list.push('advance');
+    if (it.routing !== 'pending' && !it.baselineStep) list.push('advance');
     if (it.waitingFor?.kind === 'question') list.push('answer');
     list.push('hold', 'close');
     return list;
@@ -1424,6 +1570,7 @@
     if (it.lifecycle) return { ok: false, why: it.blocker ?? '' };
     const from = curIndex(it);
     if (it.state === 'done' && REOPEN_AT[target]) return { ok: true, kind: 'reopen', to: REOPEN_AT[target] };
+    if (it.baselineStep) return { ok: false, why: A('فهم المشروع مابيتنقلش بين المحطات: بيخلص لما توافق على المسودة.', 'Project understanding does not move between stations: it finishes when you approve the draft.') };
     if (it.state !== 'done' && it.routing !== 'pending' && target === from + 1) return { ok: true, kind: 'advance' };
     return { ok: false, why: it.state === 'done' ? A('الشغل المتسلّم بيتفتح بس على التنفيذ أو التحقق أو المراجعة.', 'Delivered work reopens only to implementation, verification or review.') : A('الشغل بيتحرك محطة واحدة لقدام بس، وYallaFlow هو اللي بيقرّر.', 'Work moves one station forward at a time, and YallaFlow decides.') };
   }
@@ -1585,7 +1732,7 @@
     area.select();
   }
   function copy(text, what = 'command') {
-    const done = () => toast(what === 'id' ? A('اتنسخ رقم الشغلانة ✓', 'Work ID copied ✓') : what === 'text' ? A('اتنسخ ✓', 'Copied ✓') : A('اتنسخ الأمر ✓ شغّله في الترمينال أو ادّيه للوكيل.', 'Command copied ✓ Run it in your terminal or give it to your agent.'));
+    const done = () => toast(what === 'id' ? A('اتنسخ رقم الشغلانة ✓', 'Work ID copied ✓') : what === 'path' ? A('اتنسخ المسار ✓', 'Path copied ✓') : what === 'text' ? A('اتنسخ ✓', 'Copied ✓') : A('اتنسخ الأمر ✓ شغّله في الترمينال أو ادّيه للوكيل.', 'Command copied ✓ Run it in your terminal or give it to your agent.'));
     const fallback = () => { if (selectionCopy(text)) done(); else manualCopy(text); };
     if (window.isSecureContext && navigator.clipboard?.writeText) {
       let promise;
@@ -1601,6 +1748,8 @@
     it,
     reason: it.state === 'fail'
       ? A('آخر تحقق فشل', 'the latest verification failed')
+      : it.waitingFor?.kind === 'baseline'
+        ? A('مسودة فهم المشروع مستنية موافقتك', 'the project understanding draft waits for your approval')
       : it.waitingFor?.kind === 'review'
         ? A(`مستني مراجعتك (${it.waitingFor.gate})`, `waiting for your review (${it.waitingFor.gate})`)
         : A(`مستني إجابتك على ${(it.waitingFor?.questions ?? []).join('، ')}`, `waiting for your answer to ${(it.waitingFor?.questions ?? []).join(', ')}`)
@@ -1610,7 +1759,8 @@
   function notesPanel() {
     const list = needs();
     return `<div class="notes" role="dialog" aria-label="${A('محتاج انتباهك', 'Needs your attention')}"><b>${A('محتاج انتباهك', 'Needs your attention')}</b>
-      <ul>${list.map(({ it, reason, elsewhere }) => `<li class="unread"><span class="dg-ic">${it.state === 'fail' ? '✕' : '◆'}</span><a href="${elsewhere ? '#/agents' : `#/item/${encodeURIComponent(it.id)}`}"><span class="ltr">${esc(it.id)}</span> ${esc(it.title)}<br><span class="tiny muted">${esc(reason)}</span></a></li>`).join('') || `<li class="muted">${A('مفيش حاجة مستنياك دلوقتي.', 'Nothing needs you right now.')}</li>`}</ul>
+      <ul>${list.map(({ it, reason, elsewhere }) => `<li class="unread"><span class="dg-ic">${it.state === 'fail' ? '✕' : '◆'}</span><a href="${elsewhere ? '#/projects/inbox' : `#/item/${encodeURIComponent(it.id)}`}"><span class="ltr">${esc(it.id)}</span> ${esc(it.title)}<br><span class="tiny muted">${esc(reason)}</span></a></li>`).join('') || `<li class="muted">${A('مفيش حاجة مستنياك دلوقتي.', 'Nothing needs you right now.')}</li>`}</ul>
+      <a class="tiny notes-all" href="#/projects/inbox">${agentsOn ? A('كل المشاريع والوكلاء ←', 'All projects & agents →') : A('كل المشاريع ←', 'All projects →')}</a>
       <label class="tiny"><input type="checkbox" data-alerts ${browserAlerts ? 'checked' : ''}> ${A('نبّهني من المتصفح لما حاجة جديدة تستناني', 'Alert me in the browser when something new needs me')}</label></div>`;
   }
   function alertNew(previous) {
@@ -1648,7 +1798,12 @@
   function digestCard() {
     if (!digest) return '';
     return `<section class="digest"><div class="grow"><b>🌙 ${A('من آخر مرة كنت هنا', 'Since you were last here')}</b> <span class="tiny muted">${ago(digest.since)}</span>
-      <ul>${digest.lines.map(({ it, events }) => `<li><a href="#/item/${encodeURIComponent(it.id)}"><span class="ltr">${esc(it.id)}</span> ${esc(it.title)}</a><span class="tiny"> — ${events.map((e) => `${e.ic} ${e.text} <span class="ltr muted">${esc(e.ref)}</span>`).join(' · ')}</span></li>`).join('')}</ul>
+      <ul class="digest-chips">${digest.lines.map(({ it, events }) => {
+        // PF-0130: one compact link per item — its ID and latest outcome; the title and every event in the tooltip.
+        const full = `${it.id} — ${it.title}\n${events.map((e) => `${e.ic} ${e.text} (${e.ref})`).join('\n')}`;
+        const latest = events[0];
+        return `<li><a class="digest-chip ${latest.ic === '✕' ? 'bad' : latest.ic === '↩' ? 'back' : ''}" href="#/item/${encodeURIComponent(it.id)}" title="${esc(full)}" aria-label="${esc(full)}"><b class="ltr">${esc(it.id)}</b><span>${latest.ic} ${esc(latest.text)}</span></a></li>`;
+      }).join('')}</ul>
       <div class="tiny muted">${A('كل سطر من سجل مسجّل في المشروع.', 'Every line comes from a recorded entry.')}</div></div><button class="btn sm" data-digest>${A('تمام', 'Got it')}</button></section>`;
   }
 
@@ -1721,10 +1876,11 @@
     return `<div class="awarn" role="note"><p class="small">${A(`انت على <span class="ltr">${esc(g.branch)}</span> مش على فرع الدمج <span class="ltr">${esc(g.integrationBranch)}</span>. من غير Shared Project Mode، الشغلانة اللي تتعمل هنا ممكن تاخد نفس رقم شغلانة زميلك على فرع تاني.`, `You are on <span class="ltr">${esc(g.branch)}</span>, not the integration branch <span class="ltr">${esc(g.integrationBranch)}</span>. Without Shared Project Mode, work created here can get the same ID as a teammate's on another branch.`)}</p>${g.canEnableShared && !readOnly ? `<button type="button" class="btn sm ghost" data-shared-open>${A('شغّل Shared Project Mode…', 'Turn on Shared Project Mode…')}</button>` : `<p class="tiny">${A('شغّله بـ', 'Turn it on with')} <code class="ltr">yallaflow shared enable</code></p>`}</div>`;
   }
   function viewOverview() {
-    if (!projectOverview || projectOverview.pid !== pid) return `<p class="muted" style="margin-top:30px">${A('بيقرا المشروع…', 'Reading the project…')}</p>`;
-    if (projectOverview.error) return `<section class="errbar data" role="alert"><b>${A('مقدرناش نقرا نظرة المشروع', 'The project overview could not be read')}</b><p class="small">${esc(projectOverview.error)}</p></section>`;
+    if (!projectOverview || projectOverview.pid !== pid) return projectPage('overview', `<p class="muted" style="margin-top:30px">${A('بيقرا المشروع…', 'Reading the project…')}</p>`);
+    if (projectOverview.error) return projectPage('overview', `<section class="errbar data" role="alert"><b>${A('مقدرناش نقرا نظرة المشروع', 'The project overview could not be read')}</b><p class="small">${esc(projectOverview.error)}</p></section>`);
     const o = projectOverview.data;
-    if (o.project.kind === 'greenfield' && !(o.memory?.current > 0)) return readinessCard() + gitLine(o.git) + greenfieldOverview(o);
+    // PF-0132: team mode lives in Settings and in the header, no longer on the Overview.
+    if (o.project.kind === 'greenfield' && !(o.memory?.current > 0)) return projectPage('overview', readinessCard() + greenfieldOverview(o));
     const m = o.memory;
     const facts = (area) => (o.areas[area]?.facts ?? []);
     const factList = (area, empty) => {
@@ -1757,19 +1913,72 @@
       : `${A('الجرد مش متاح:', 'Inventory unavailable:')} ${esc(cov.error ?? '')}`;
     const unread = o.stack.unread.length ? `<p class="tiny" style="margin-top:6px">${A('ماتقراش:', 'Not read:')} ${o.stack.unread.map((u) => `<span class="ltr">${esc(u.path)}</span> (${esc(u.reason)})`).join(' · ')}</p>` : '';
     const cmds = [o.understanding.command, 'yallaflow overview', 'yallaflow context status', 'yallaflow inspect'].filter(Boolean);
-    return readinessCard() + gitLine(o.git) + `<section class="pagehead"><h1 style="font-size:26px">${esc(o.project.name)}</h1><p class="muted">${A('نظرة على المشروع: إيه هو، معمول بإيه، وفهمه متسجّل لحد فين. القراءة بس — مفيش حاجة بتتغيّر من هنا.', 'The project at a glance: what it is, what it is built with, and how far its understanding is recorded. Read-only — nothing changes from here.')}</p></section>
-      ${understandingCard(o.understanding)}
-      <div class="ovgrid">
-        <section class="panel"><h2>${A('المشروع', 'Purpose')}</h2>${factList('project', A('لسه مفيش وصف معتمد للمشروع.', 'No approved project description yet.'))}</section>
-        <section class="panel"><h2>${A('ذاكرة المشروع', 'Project memory')}</h2><p class="small">${m.available ? A(`${m.current} حقيقة حالية`, `${m.current} current facts`) : ''}</p>${memLine}</section>
-        <section class="panel wide"><h2>${A('التقنيات من أدلة المستودع', 'Stack from repository evidence')}</h2><p class="tiny muted">${A('«مُعلن» معناه إن ملف بيقول كده، مش إثبات إن الكود بيستخدمه. ملفات .env مابتتقراش.', '"Declared" means a file says so, not proof the code uses it. .env files are never read.')}</p>${stackTable}${langs.length ? `<p class="small" style="margin-top:8px">${A('اللغات (مستنتجة من عدد الملفات):', 'Languages (inferred from file counts):')} ${langs.map((l) => `${esc(l.component)} <span class="muted">(${l.count})</span>`).join(' · ')}</p>` : ''}${unread}</section>
-        <section class="panel"><h2>${A('الوحدات', 'Modules')}</h2>${modules}</section>
-        <section class="panel"><h2>${A('المعمارية', 'Architecture')}</h2>${factList('architecture', A('لسه مفيش معمارية معتمدة في الذاكرة.', 'No approved architecture in memory yet.'))}</section>
-        ${facts('tech-stack').length ? `<section class="panel"><h2>${A('التقنيات في الذاكرة المعتمدة', 'Stack in approved memory')}</h2>${factList('tech-stack', '')}</section>` : ''}
-        ${facts('database').length || facts('integration').length ? `<section class="panel"><h2>${A('البيانات والتكاملات', 'Data and integrations')}</h2>${factList('database', '')}${factList('integration', '')}</section>` : ''}
-      </div>
-      <p class="tiny muted" style="margin-top:12px">${coverage}</p>
-      ${devPanel(A('أوامر نظرة المشروع', 'Overview commands'), cmds)}`;
+    // Summary and key numbers.
+    const areaKeys = Object.keys(o.areas ?? {});
+    const care = areaKeys.flatMap((area) => facts(area).filter(needsCareFact).map((f) => ({ ...f, area })));
+    const careTotal = careCount(m);
+    const purpose = String(facts('project')[0]?.summary ?? '').replace(/\s+/g, ' ').trim();
+    const u = o.understanding;
+    const ut = UNDERSTANDING_TEXT[u.state] ?? UNDERSTANDING_TEXT.PROJECT_UNDERSTANDING_UNAVAILABLE;
+    const keyN = (n, label) => `<div class="keynum"><span class="tiny muted">${label}</span><b>${n}</b></div>`;
+    const summary = `<section class="panel ovsum"><div class="row"><span class="tiny muted">${A('الغرض', 'Purpose')}</span><span class="grow"></span><span class="chip ${ut.tone}"><i></i>${L(ut.title)}</span></div>
+      <p class="ovpurpose" dir="auto">${purpose ? `${esc(purpose.slice(0, 320))}${purpose.length > 320 ? '…' : ''}` : `<span class="muted">${A('لسه مفيش وصف معتمد للمشروع.', 'No approved project description yet.')}</span>`}</p>
+      <div class="keynums">${keyN(m.available ? m.current : '—', A('معلومة في الذاكرة', 'Facts in memory'))}${keyN(o.modules.length, A('وحدات', 'Modules'))}${keyN(main.length, A('مكوّنات', 'Components'))}${keyN(careTotal, A('محتاجة مراجعة', 'Need care'))}</div></section>`;
+    const careChip = (f) => (f.state === 'disputed' ? `<span class="chip fail"><i></i>${A('عليه خلاف', 'disputed')}</span>` : f.confidence === 'unresolved' && !['may-be-stale', 'stale-evidence'].includes(f.freshness) ? `<span class="chip you">${A('مش محسوم', 'unresolved')}</span>` : `<span class="chip wait"><i></i>${L(FRESH_TEXT[f.freshness] ?? FRESH_TEXT.unknown)}</span>`);
+    const careRow = (f) => { const s = String(f.summary ?? '').replace(/\s+/g, ' '); return `<tr><td><div class="small" dir="auto">${esc(s.slice(0, 160))}${s.length > 160 ? '…' : ''}</div><span class="tiny muted ltr">${esc(f.id)}</span></td><td class="small">${L(AREA_TEXT[f.area] ?? { ar: f.area, en: f.area })}</td><td>${careChip(f)}</td></tr>`; };
+    const careSec = `<section class="ovsec" id="ov-care"><div class="ovsec-h"><h2>${A('محتاجة مراجعة', 'Needs care')}</h2><p class="tiny muted">${A('معلومات دليلها اتغيّر أو لسه مش محسومة. الوكيل بيراجعها لما الشغل يلمسها قبل ما يعتمد عليها.', 'Facts whose evidence changed or that are not settled. The agent rechecks them when work touches them, before relying on them.')}</p></div>
+      ${care.length ? `<div class="tablewrap panel flush"><table class="caretable"><thead><tr><th>${A('المعلومة', 'Fact')}</th><th>${A('المنطقة', 'Area')}</th><th>${A('الحالة', 'State')}</th></tr></thead><tbody>${care.slice(0, 5).map(careRow).join('')}</tbody></table></div>${care.length > 5 ? disclosure(`${pid}:care`, `<span>${A(`${care.length - 5} كمان`, `${care.length - 5} more`)}</span>`, `<div class="tablewrap panel flush"><table class="caretable"><tbody>${care.slice(5).map(careRow).join('')}</tbody></table></div>`, 'area-more') : ''}` : `<p class="small muted panel">${careTotal ? A('المعلومات اللي محتاجة مراجعة برا المناطق اللي ظاهرة هنا؛ شوف الأرقام تحت.', 'The facts that need care are outside the areas shown here; see the counts below.') : A('مفيش حاجة محتاجة مراجعة.', 'Nothing needs care.')}</p>`}${memLine}</section>`;
+    const areaBox = (key, title, count, careN, body) => `<details class="panel area" data-overview="${esc(key)}" ${overviewExpanded.has(key) ? 'open' : ''}><summary><b class="grow">${title}</b>${careN ? `<span class="pbadge wait" title="${esc(A('محتاجة مراجعة', 'need care'))}">${careN}</span>` : ''}<span class="pbadge">${count}</span></summary><div class="area-body">${body}</div></details>`;
+    const areasSec = `<section class="ovsec" id="ov-areas"><div class="ovsec-h"><h2>${A('المناطق', 'Areas')}</h2><p class="tiny muted">${A('اللي ذاكرة المشروع عارفاه، منطقة منطقة. افتح أي منطقة للتفاصيل.', 'What project memory knows, area by area. Open one for details.')}</p></div>
+      <div class="areas">${areaKeys.map((area) => areaBox(`${pid}:area:${area}`, L(AREA_TEXT[area] ?? { ar: area, en: area }), o.areas[area].total ?? 0, facts(area).filter(needsCareFact).length, factList(area, A('لسه مفيش معلومات معتمدة هنا.', 'No approved facts here yet.')))).join('')}${areaBox(`${pid}:area:modules`, A('الوحدات', 'Modules'), o.modules.length, 0, modules)}</div></section>`;
+    const stackSec = `<section class="ovsec" id="ov-stack"><div class="ovsec-h"><h2>${A('التقنيات', 'Stack')}</h2><p class="tiny muted">${A('من أدلة المستودع. «مُعلن» معناه إن ملف بيقول كده، مش إثبات إن الكود بيستخدمه. ملفات .env مابتتقراش.', 'From repository evidence. "Declared" means a file says so, not proof the code uses it. .env files are never read.')}</p></div><div class="panel flush">${stackTable}</div>${langs.length ? `<p class="small" style="margin-top:8px">${A('اللغات (مستنتجة من عدد الملفات):', 'Languages (inferred from file counts):')} ${langs.map((l) => `${esc(l.component)} <span class="muted">(${l.count})</span>`).join(' · ')}</p>` : ''}${unread}</section>`;
+    const freshPct = m.available && m.current ? Math.round((m.fresh / m.current) * 100) : 0;
+    const memCard = `<section class="panel sidecard"><h2>${A('ذاكرة المشروع', 'Project memory')}</h2><p class="tiny muted">${m.available ? A(`${m.current} معلومة · ${careTotal} محتاجة مراجعة`, `${m.current} facts · ${careTotal} need care`) : esc(m.error ?? '')}</p>${m.available && m.current ? `<div class="membar" role="img" aria-label="${esc(A(`${freshPct}% حديثة`, `${freshPct}% fresh`))}"><i style="width:${freshPct}%"></i></div><p class="tiny muted">${A(`${freshPct}% حديثة`, `${freshPct}% fresh`)}</p>` : ''}</section>`;
+    const side = memCard + readinessCard({ always: true });
+    const notEstablished = u.state !== 'PROJECT_UNDERSTANDING_ESTABLISHED' ? understandingCard(u) : '';
+    return projectPage('overview', `<div class="pcols"><div class="pmain">${notEstablished}${summary}${careSec}${areasSec}${stackSec}
+      <p class="tiny muted" style="margin-top:12px">${coverage} · ${A('القراءة بس — مفيش حاجة بتتغيّر من هنا.', 'Read-only — nothing changes from here.')}</p>
+      ${devPanel(A('أوامر نظرة المشروع', 'Overview commands'), cmds)}</div><aside class="pside" aria-label="${A('ملخص', 'Summary')}">${side}</aside></div>`);
+  }
+
+  // ---------- the Project destination (PF-0132): one page head and three tabs ----------
+  // Overview (project memory), Run (services) and Settings (agents, team mode, service
+  // definitions, the project folder). #/overview, #/run and #/settings; #/setup lands on Run.
+  const AREA_TEXT = { project: { ar: 'الغرض', en: 'Purpose' }, architecture: { ar: 'المعمارية', en: 'Architecture' }, 'tech-stack': { ar: 'التقنيات', en: 'Stack' }, database: { ar: 'البيانات', en: 'Data' }, integration: { ar: 'التكاملات', en: 'Integrations' }, environment: { ar: 'البيئات والإعدادات', en: 'Environments and configuration' } };
+  const needsCareFact = (f) => f.freshness === 'may-be-stale' || f.freshness === 'stale-evidence' || f.state === 'disputed' || f.confidence === 'unresolved';
+  const careCount = (m) => (m?.available ? (m.mayBeStale ?? 0) + (m.staleEvidence ?? 0) + (m.disputed ?? 0) + (m.unresolved ?? 0) : 0);
+  function projTabs(active) {
+    const o = projectOverview?.pid === pid ? projectOverview.data : null;
+    const care = careCount(o?.memory);
+    const rt = runtime?.pid === pid ? runtime.data : null;
+    const failed = (rt?.services ?? []).filter((sv) => sv.state === 'failed').length;
+    const pending = !readOnly && setupInfo?.pid === pid && !setupInfo.error && setupPending(setupInfo.record);
+    const tabs = [
+      ['overview', A('نظرة عامة', 'Overview'), care ? `<span class="pbadge wait" title="${esc(A(`${care} محتاجة مراجعة`, `${care} need care`))}">${care}</span>` : ''],
+      ['run', A('التشغيل', 'Run'), failed ? `<span class="pbadge fail" title="${esc(A(`${failed} خدمة وقعت`, `${failed} service(s) failed`))}">✕ ${failed}</span>` : ''],
+      ['settings', A('الإعدادات', 'Settings'), pending ? `<span class="pbadge todo" title="${esc(A('إعداد أول مرة لسه مخلصش', 'First-time setup is not finished'))}">!</span>` : '']
+    ];
+    return `<div class="ptabs" role="tablist" aria-label="${A('أقسام المشروع', 'Project sections')}">${tabs.map(([k, label, badge]) => `<a role="tab" id="ptab-${k}" href="#/${k}" aria-selected="${k === active}" aria-controls="ptab-panel" tabindex="${k === active ? 0 : -1}" data-ptab="${k}">${label}${badge}</a>`).join('')}</div>`;
+  }
+  function projHead() {
+    const current = projects.find((p) => p.id === pid);
+    const level = readiness?.pid === pid ? readiness.data?.level : null;
+    const levelChip = level ? `<span class="chip ${level === 'ready' ? 'done' : level === 'attention' ? 'fail' : 'wait'}"><i></i>${level === 'ready' ? A('جاهز', 'Ready') : level === 'attention' ? A('محتاج انتباه', 'Needs attention') : A('بيتجهّز', 'Getting ready')}</span>` : '';
+    const root = String(current?.root ?? '');
+    const short = root.split('/').filter(Boolean).slice(-2).join('/');
+    const name = (projectOverview?.pid === pid ? projectOverview.data?.project?.name : null) ?? snap?.project?.name ?? current?.name ?? '';
+    return `<section class="projhead"><h1>${esc(name)}</h1>${levelChip}${short ? `<span class="tiny muted ltr projhead-path" title="${esc(root)}">…/${esc(short)}</span>` : ''}</section>`;
+  }
+  // PF-0132: on the Workspace, a banner when this checkout is not on the integration branch — a
+  // warning in Solo (the New Work hint, sharedHint), a short note in Team mode.
+  function branchBanner() {
+    const g = projectGit();
+    if (!offIntegration(g)) return '';
+    if (!g.sharedMode) return `<div class="wsbanner" data-branch-banner="solo">${sharedHint()}</div>`;
+    return `<div class="wsbanner note" data-branch-banner="team" role="note"><p class="small">👥 ${A(`انت على <span class="ltr">${esc(g.branch)}</span>. في وضع الفريق الشغل هنا بياخد أرقام مبتتكررش، ومعرفة المشروع بتتجمّع على <span class="ltr">${esc(g.integrationBranch)}</span> لما الشغل يتدمج.`, `You are on <span class="ltr">${esc(g.branch)}</span>. In team mode, work here gets IDs that never collide, and project knowledge is combined on <span class="ltr">${esc(g.integrationBranch)}</span> when the work merges.`)}</p></div>`;
+  }
+  function projectPage(tab, body) {
+    return `${projHead()}${projTabs(tab)}<div class="ppanel" role="tabpanel" id="ptab-panel" aria-labelledby="ptab-${tab}">${body}</div>`;
   }
 
   // ---------- new-project Overview (1.4.0, PF-0057): a setup checklist from canonical data ----------
@@ -1791,7 +2000,7 @@
       row(goalSet ? 'done' : 'now', A('الهدف', 'Goal'), goalSet ? esc(first.title.replace(/^[^:]+:\s*/, '')) : A('لسه مااتوصفش. اوصف اللي هتبنيه في أول شغلانة.', 'Not described yet. Describe what you are building in the first work item.'), goalSet ? '' : firstLink),
       row(first && first.state !== 'new' ? 'done' : 'now', A('المتطلبات', 'Requirements'), first && first.state !== 'new' ? A('وكيلك صنّف الشغلانة وبدأ يشتغل عليها.', 'Your agent classified the work and started on it.') : A('اتفق مع وكيلك على أول متطلبات. المتطلبات والمرفقات اللي كتبتها محفوظة في أول شغلانة.', 'Agree the first requirements with your agent. The requirements and attachments you gave are kept on the first work item.'), firstLink),
       row(origin.stack?.length ? 'done' : 'todo', A('التقنية', 'Stack'), origin.stack?.length ? esc(origin.stack.join(' · ')) : A('مفيش تقنية لسه (مشروع فاضي). اختارها مع وكيلك.', 'No stack yet (an empty project). Choose it with your agent.')),
-      row(services?.length ? 'done' : envName ? 'now' : 'todo', A('بيئة التطوير', 'Development environment'), services?.length ? A(`${services.length} خدمة معرّفة.`, `${services.length} service(s) defined.`) : envName ? A(`${envName} — مخطّطة، لسه مفيش خدمات معرّفة.`, `${envName} — planned; no services defined yet.`) : A('لسه متحددتش.', 'Not decided yet.'), readOnly ? '' : `<a class="btn sm" href="#/setup">${A('اضبط التشغيل', 'Configure runtime')}</a>`),
+      row(services?.length ? 'done' : envName ? 'now' : 'todo', A('بيئة التطوير', 'Development environment'), services?.length ? A(`${services.length} خدمة معرّفة.`, `${services.length} service(s) defined.`) : envName ? A(`${envName} — مخطّطة، لسه مفيش خدمات معرّفة.`, `${envName} — planned; no services defined yet.`) : A('لسه متحددتش.', 'Not decided yet.'), readOnly ? '' : `<a class="btn sm" href="#/settings/services">${A('اضبط التشغيل', 'Configure runtime')}</a>`),
       row(gitOn ? 'done' : 'todo', 'Git', gitOn ? A('فيه Git repository.', 'A Git repository exists.') : A('مفيش Git repository لسه.', 'No Git repository yet.'), gitOn || readOnly ? '' : `<button class="btn sm" data-git-init>${A('اعمل Git repository', 'Initialize Git')}</button>`),
       row(agentsOn ? 'done' : 'todo', A('الوكيل', 'Agent'), agentsOn ? A('مساحة الوكيل مفعّلة: افتح أي شغلانة وابدأ جلسة Codex.', 'The Agent Workspace is on: open a work item and start a Codex session.') : agentInfo?.codex && !agentInfo.codex.ready ? A('Codex مش جاهز على الجهاز ده.', 'Codex is not ready on this machine.') : A('مساحة الوكيل مقفولة. تقدر تشتغل من الوكيل في الترمينال كمان.', 'The Agent Workspace is off. You can also work from your agent in a terminal.'), !agentsOn && agentsCanEnable ? `<button class="btn sm" data-agents-enable>${A('فعّل الوكلاء للجلسة دي', 'Enable agents for this session')}</button>` : '')
     ].join('');
@@ -1799,7 +2008,7 @@
     const main = o.stack.entries.filter((e) => !['language', 'lockfile', 'ecosystem', 'ci'].includes(e.kind));
     const start = startHere(first, services);
     const stack = main.length ? `<section class="panel wide"><h2>${A('اللي في الكود دلوقتي', 'What the code declares now')}</h2><p class="small">${main.map((e) => `<span class="tag">${esc(e.component)}${e.declared ? ` <span class="ltr">${esc(e.declared)}</span>` : ''}</span>`).join(' ')}</p><p class="tiny muted">${A('من ملفات المشروع؛ الكود المتولّد لسه ماتراجعش.', 'From the project files; generated code is not reviewed yet.')}</p></section>` : '';
-    return `<section class="pagehead"><h1 style="font-size:26px">${esc(o.project.name)}</h1><p class="muted">${A('مشروع جديد. ده اللي اتعمل وده اللي فاضل — مفيش حاجة ناقصة هنا تعتبر خطأ.', 'A new project. This is what was created and what remains — nothing missing here is an error.')}</p></section>
+    return `<section class="pagehead"><p class="muted">${A('مشروع جديد. ده اللي اتعمل وده اللي فاضل — مفيش حاجة ناقصة هنا تعتبر خطأ.', 'A new project. This is what was created and what remains — nothing missing here is an error.')}</p></section>
       ${start}<section class="panel"><h2>${A('تجهيز المشروع', 'Project setup')}</h2><ol class="checklist">${checklist}</ol></section>
       <div class="ovgrid" style="margin-top:16px">${firstCard}${stack}</div>
       <p class="tiny muted" style="margin-top:12px">${A('المعمارية والوحدات وذاكرة المشروع بتظهر هنا لما تتسجّل بأدلة.', 'Architecture, modules and project memory appear here once they are recorded with evidence.')}</p>`;
@@ -1811,7 +2020,7 @@
     const draft = goText(first);
     const primary = agentsOn
       ? `<button class="btn go" data-chat-item="${esc(first.id)}" data-chat-draft="${esc(draft)}">${begun ? A('كمّل مع الوكيل', 'Continue with the agent') : A('ابدأ مع الوكيل', 'Start with the agent')}</button><span class="tiny muted">${A('بيفتح أول شغلانة والشات، وانت اللي بتبدأ الجلسة.', 'Opens the first work item with the chat; you start the session.')}</span>`
-      : `<a class="btn go" href="#/setup">${A('اختار وكيل', 'Choose an agent')}</a><span class="tiny muted">${A('من «الإعداد والتشغيل» ← الوكلاء. أو كمّل من Claude Code أو Codex في الترمينال:', 'In Setup & run → Agents. Or continue from Claude Code or Codex in a terminal:')} <b dir="ltr">continue ${esc(first.id)}</b></span>`;
+      : `<a class="btn go" href="#/settings/agents">${A('اختار وكيل', 'Choose an agent')}</a><span class="tiny muted">${A('من «المشروع» ← «الإعدادات» ← الوكلاء. أو كمّل من Claude Code أو Codex في الترمينال:', 'In Project → Settings → Agents. Or continue from Claude Code or Codex in a terminal:')} <b dir="ltr">continue ${esc(first.id)}</b></span>`;
     const steps = [
       `<li class="ck done"><span class="ckmark" aria-hidden="true">✓</span><div class="grow"><b>${A('المشروع اتعمل', 'Project created')}</b></div></li>`,
       `<li class="ck now"><span class="ckmark" aria-hidden="true">▶</span><div class="grow"><b>${begun ? A('كمّل أول شغلانة', 'Continue the first work item') : A('ابدأ أول شغلانة مع الوكيل', 'Start the first work item with the agent')}</b><p class="small muted">${esc(first.title)}</p><div class="row" style="margin-top:6px">${primary}</div></div></li>`,
@@ -1854,7 +2063,8 @@
     starting: { tone: 'active', t: { ar: 'بيبدأ', en: 'starting' } },
     running: { tone: 'done', t: { ar: 'شغّال', en: 'running' } },
     failed: { tone: 'fail', t: { ar: 'وقع', en: 'failed' } },
-    unknown: { tone: 'wait', t: { ar: 'مش تحت إدارة YallaFlow', en: 'unmanaged' } }
+    unknown: { tone: 'wait', t: { ar: 'مش تحت إدارة YallaFlow', en: 'unmanaged' } },
+    outside: { tone: 'done', t: { ar: 'شغّال برا YallaFlow', en: 'running outside YallaFlow' } }
   };
   // One compact row per saved service: state, ports and actions up front; the exact
   // definition, the trust review, confirmations and logs open beneath it.
@@ -1862,36 +2072,48 @@
   function failureBlock(sv) {
     const tail = (failedTail[sv.id] ?? []).slice(-6);
     const ask = A(`الخدمة «${sv.name}» (${sv.id}) وقعت في التشغيل. دي آخر سطور السجل:\n${tail.join('\n')}\nشوف السبب واقترح التصليح.`, `The service "${sv.name}" (${sv.id}) failed. These are its last log lines:\n${tail.join('\n')}\nFind the cause and propose a fix.`);
-    return `<div class="tw:mt-1 tw:rounded-field tw:bg-clay-soft tw:px-3 tw:py-2" role="status"><p class="small"><b class="tw:text-clay">${A('وقعت.', 'It stopped.')}</b> ${tail.length ? A('آخر سطور السجل:', 'Its last log lines:') : A('مفيش سجل لسه — دوس «السجل».', 'No log yet — press Logs.')}</p>${tail.length ? `<pre class="svclog ltr tw:mt-1" tabindex="0" aria-label="${A('آخر سطور السجل', 'Last log lines')}">${tail.map(esc).join('\n')}</pre>` : ''}
-      ${readOnly ? '' : `<div class="row tw:mt-2"><button class="btn sm go" data-rt="restart" data-id="${esc(sv.id)}" ${runtimeBusy[sv.id] ? 'disabled' : ''}>${A('شغّلها تاني', 'Restart')}</button><button class="btn sm ghost" data-rt-logs="${esc(sv.id)}">${A('السجل كله', 'Full log')}</button>${agentsOn ? `<button class="btn sm ghost" data-ready-chat="${esc(ask)}">${A('اطلب من الوكيل يصلّحها', 'Ask the agent to fix it')}</button>` : `<button class="btn sm ghost" data-copy="${esc(ask)}" data-copy-what="text">${A('انسخ للوكيل', 'Copy for your agent')}</button>`}</div>`}</div>`;
+    // PF-0132: one short line instead of a large log; the log itself opens on demand.
+    const clean = (x) => String(x ?? '').replace(/\u001b\[[0-9;?]*[A-Za-z]/g, '').replace(/[\u0000-\u001f\u007f]/g, '').trim();
+    const line = clean([...tail].reverse().find((x) => clean(x)) ?? '');
+    return `<div class="svcfail" role="status"><p class="small grow"><b>✕ ${A('وقعت.', 'It stopped.')}</b> ${line ? `<span class="ltr svcfail-line" title="${esc(line)}">${esc(line.length > 160 ? `${line.slice(0, 160)}…` : line)}</span>` : `<span class="muted">${A('مفيش سجل لسه.', 'No log yet.')}</span>`}</p>
+      <div class="row svcfail-acts"><button class="btn sm ghost" data-rt-logs="${esc(sv.id)}">${runtimeLogs[sv.id] ? A('حدّث السجل', 'Refresh log') : A('اعرض السجل', 'View log')}</button>${readOnly ? '' : `${agentsOn ? `<button class="btn sm go" data-ready-chat="${esc(ask)}">${A('اطلب من الوكيل يصلّحها', 'Ask the agent to fix it')}</button>` : `<button class="btn sm ghost" data-copy="${esc(ask)}" data-copy-what="text">${A('انسخ للوكيل', 'Copy for your agent')}</button>`}<button class="btn sm" data-rt="restart" data-id="${esc(sv.id)}" ${runtimeBusy[sv.id] ? 'disabled' : ''}>${A('شغّلها تاني', 'Start again')}</button>`}</div></div>`;
   }
   function serviceCard(sv) {
-    const st = RT_STATE[sv.state] ?? RT_STATE.unknown;
     const busy = runtimeBusy[sv.id];
     const running = ['running', 'starting'].includes(sv.state);
+    // PF-0140: a stack already up outside YallaFlow is running, not "stopped": it gets its own
+    // state, and Start is off (Core never starts it again), with the reason in words.
+    const outside = runsOutside(sv);
+    const st = outside ? RT_STATE.outside : RT_STATE[sv.state] ?? RT_STATE.unknown;
+    // One approval control per service: while it waits in the approval card above, its row
+    // points there instead of offering a second "Review and trust".
+    const inCard = !readOnly && route().v === 'run' && bulkable(runtime?.pid === pid ? runtime.data : null).some((x) => x.id === sv.id);
+    const outsideWhy = A('شغّالة بالفعل من برا YallaFlow، فمفيش حاجة تتشغّل.', 'Already running outside YallaFlow, so there is nothing to start.');
     const trusted = sv.trust.trusted;
     const dis = (cond) => (readOnly || busy || cond ? 'disabled' : '');
-    const trustLine = trusted ? '' : `<span class="chip wait">${sv.trust.reason === 'changed' ? A('اتغيّر بعد التوثيق — راجعه تاني', 'changed since you trusted it — review again') : sv.trust.reason === 'blocked' ? A('متوقف لحد ما يتحل', 'blocked until resolved') : sv.trust.reason === 'moved' ? A('الفولدر اتنقل — راجعه تاني', 'folder moved — review again') : A('محتاج مراجعتك', 'needs your review')}</span>`;
+    const trustLine = trusted ? '' : `<span class="chip wait">${sv.trust.reason === 'changed' ? A('اتغيّر بعد التوثيق — راجعه تاني', 'changed since you trusted it — review again') : sv.trust.reason === 'blocked' ? A('متوقف لحد ما يتحل', 'blocked until resolved') : sv.trust.reason === 'moved' ? A('الفولدر اتنقل — راجعه تاني', 'folder moved — review again') : inCard ? A('مستنية موافقتك', 'waits for your approval') : A('محتاج مراجعتك', 'needs your review')}</span>`;
     const changed = sv.trust.reason === 'changed' && sv.trust.changed ? `<p class="small">${A('اللي اتغيّر:', 'What changed:')} ${[...(sv.trust.changed.fields ? [A('التعريف نفسه', 'the definition itself')] : []), ...sv.trust.changed.inputs.map((x) => `<span class="ltr">${esc(x)}</span>`)].join(' · ')}</p>` : '';
     const ports = sv.ports.map((p) => `<span class="tag ltr" title="${esc(p.listening ? A('بيرد', 'listening') : A('مش بيرد', 'not listening'))}">:${p.port}${p.listening ? ' ●' : ''}</span>`).join(' ');
     const logs = runtimeLogs[sv.id];
     const actions = readOnly ? '' : trusted
-      ? `<button class="btn sm go" data-rt="start" data-id="${esc(sv.id)}" ${dis(running)}>${busy === 'start' ? A('بيبدأ…', 'Starting…') : A('شغّل', 'Start')}</button>
+      ? `<button class="btn sm go" data-rt="start" data-id="${esc(sv.id)}" ${dis(running || outside)} ${outside ? `title="${esc(outsideWhy)}"` : ''}>${busy === 'start' ? A('بيبدأ…', 'Starting…') : A('شغّل', 'Start')}</button>
         <button class="btn sm" data-rt="restart" data-id="${esc(sv.id)}" ${dis(!running)}>${busy === 'restart' ? A('بيعيد…', 'Restarting…') : A('إعادة تشغيل', 'Restart')}</button>
         <button class="btn sm ghost" data-rt="stop" data-id="${esc(sv.id)}" ${dis(sv.state === 'stopped')}>${busy === 'stop' ? A('بيوقف…', 'Stopping…') : A('وقّف', 'Stop')}</button>`
+      : inCard ? `<span class="tiny muted" data-in-approve-card>${A('وافق عليها من البطاقة فوق', 'Approve it in the card above')}</span>`
       : `<button class="btn sm go" data-rt-review="${esc(sv.id)}" ${dis(false)}>${runtimeReview[sv.id] ? A('حدّث المراجعة', 'Refresh review') : A('راجع ووثّق', 'Review and trust')}</button>${sv.state !== 'stopped' ? `<button class="btn sm ghost" data-rt="stop" data-id="${esc(sv.id)}" ${dis(false)}>${busy === 'stop' ? A('بيوقف…', 'Stopping…') : A('وقّف', 'Stop')}</button>` : ''}`;
     const links = openLinks(sv);
     return `<article class="svcrow svc ${trusted ? '' : 'untrusted'}" data-service="${esc(sv.id)}" data-definition-hash="${esc(sv.definitionHash)}">
       <div class="svchead"><span class="sdot ${st.tone}" aria-hidden="true"></span>
-        <div class="svcname"><b>${esc(sv.name)}</b> <span class="tiny muted ltr">${esc(sv.id)}</span><div class="svcmeta"><span class="chip ${st.tone}" data-svc-state="${esc(sv.state)}"><i></i>${L(st.t)}</span>${trustLine}${sv.stale ? `<span class="chip wait">${A('شغّال بتعريف أقدم', 'running an older definition')}</span>` : ''}${sv.sharedMarker ? `<span class="chip fail" title="${esc(A('بتخدم مشاريع تانية كمان؛ «وقّف المشروع» مابيوقفهاش.', 'Also serves other projects; Stop project never stops it.'))}"><i></i>${A('مشترك', 'Shared')}</span>` : ''}${ports}</div></div>
-        <div class="svcacts">${actions}<button class="btn sm ghost" data-rt-logs="${esc(sv.id)}">${logs ? A('حدّث السجل', 'Refresh logs') : A('السجل', 'Logs')}</button></div></div>
-      ${links ? `<div class="row svclinks">${links}</div>` : ''}${changed}${sv.state === 'failed' ? failureBlock(sv) : ''}
-      ${sv.runningOutside?.length ? `<p class="small">${A('شغّالة برا YallaFlow:', 'Running outside YallaFlow:')} <span class="ltr">${esc(sv.runningOutside.join(', '))}</span> — ${A('YallaFlow مش هيشغّلها تاني ولا هيوقفها.', 'YallaFlow will not start it again or stop it.')}</p>` : ''}
+        <div class="svcname"><b>${esc(sv.name)}</b> <span class="tiny muted ltr">${esc(sv.id)}</span><div class="svcmeta"><span class="chip ${st.tone}" data-svc-state="${esc(outside ? 'outside' : sv.state)}"><i></i>${L(st.t)}</span>${trustLine}${sv.stale ? `<span class="chip wait">${A('شغّال بتعريف أقدم', 'running an older definition')}</span>` : ''}${sv.sharedMarker ? `<span class="chip fail" title="${esc(A('بتخدم مشاريع تانية كمان؛ «وقّف المشروع» مابيوقفهاش.', 'Also serves other projects; Stop project never stops it.'))}"><i></i>${A('مشترك', 'Shared')}</span>` : ''}${ports}</div></div>
+        <div class="svcacts">${actions}${sv.state === 'failed' ? '' : `<button class="btn sm ghost" data-rt-logs="${esc(sv.id)}">${logs ? A('حدّث السجل', 'Refresh logs') : A('السجل', 'Logs')}</button>`}</div></div>
+      ${changed}${sv.state === 'failed' ? failureBlock(sv) : ''}
+      ${sv.runningOutside?.length ? `<p class="small" data-outside>${A('شغّالة بالفعل من برا YallaFlow:', 'Already running outside YallaFlow:')} <span class="ltr">${esc(sv.runningOutside.join(', '))}</span>. ${A('افتح التطبيق من الروابط. YallaFlow مش هيشغّلها تاني ولا هيوقفها؛ لو عايزه يديرها، وقّفها من برا الأول وبعدين دوس «شغّل».', 'Open the app from its links. YallaFlow will not start it again or stop it; to let YallaFlow manage it, stop it outside first, then press Start.')}</p>` : ''}
       ${sv.reason ? `<p class="small">${esc(sv.reason)}</p>` : ''}
-      ${sv.unmanagedPorts.length ? `<p class="small" style="color:var(--clay)">${A('المنفذ ده مستخدم من برنامج YallaFlow ماشغّلوش، ومش هيتلمس:', 'This port is held by a process YallaFlow did not start; it will not be touched:')} <span class="ltr">${sv.unmanagedPorts.join(', ')}</span></p>` : ''}
+      ${sv.unmanagedPorts.length && !outside ? `<p class="small" style="color:var(--clay)">${A('المنفذ ده مستخدم من برنامج YallaFlow ماشغّلوش، ومش هيتلمس:', 'This port is held by a process YallaFlow did not start; it will not be touched:')} <span class="ltr">${sv.unmanagedPorts.join(', ')}</span></p>` : ''}
       ${!trusted ? reviewPanel(sv) : ''}${sharedConfirm(sv)}
       ${runtimeErr[sv.id] ? `<p class="small" role="alert" style="color:var(--clay);white-space:pre-wrap">${esc(runtimeErr[sv.id])}</p>` : ''}
-      ${logs ? `<pre class="svclog ltr" tabindex="0" aria-label="${A('سجل الخدمة', 'Service log')}">${logs.length ? logs.map(esc).join('\n') : esc(A('لسه مفيش مخرجات.', 'No output yet.'))}</pre><p class="tiny muted">${A('الأسرار المعروفة بتتخفي من السجل، لكن ده أفضل مجهود ومش مضمون مع أي برنامج.', 'Recognizable secrets are hidden from the log, but this is best effort and cannot be guaranteed for every program.')}</p>` : ''}
+      ${logs ? `<pre class="svclog ltr" tabindex="0" aria-label="${A('سجل الخدمة', 'Service log')}">${logs.length ? logs.map(esc).join('\n') : esc(A('لسه مفيش مخرجات.', 'No output yet.'))}</pre><div class="row"><p class="tiny muted grow">${A('الأسرار المعروفة بتتخفي من السجل، لكن ده أفضل مجهود ومش مضمون مع أي برنامج.', 'Recognizable secrets are hidden from the log, but this is best effort and cannot be guaranteed for every program.')}</p><button class="btn sm ghost" data-rt-logs-hide="${esc(sv.id)}">${A('اقفل السجل', 'Hide log')}</button></div>` : ''}
+      ${links ? `<details class="svcmore svclinks" data-sx="links:${esc(sv.id)}" ${sxOpen(`links:${sv.id}`)}><summary class="tiny">🔗 ${A(`الروابط (${(links.match(/<a /g) ?? []).length})`, `Links (${(links.match(/<a /g) ?? []).length})`)}</summary><div class="row">${links}</div></details>` : ''}
       <details class="svcmore" data-sx="svc:${esc(sv.id)}" ${sxOpen(`svc:${sv.id}`)}><summary class="tiny">${A('التعريف (الأمر، الفولدر، البيئة)', 'Definition (command, folder, environment)')}</summary>
       <dl class="svcdef"><dt>${A('الأمر', 'Command')}</dt><dd class="ltr mono" title="${esc(A('كل عنصر بين علامتين هو وسيط منفصل؛ مفيش shell.', 'Each quoted item is one separate argument; no shell is used.'))}">${esc(JSON.stringify(sv.command))}</dd><dt>${A('الفولدر', 'Folder')}</dt><dd class="ltr mono">${esc(sv.cwd)}</dd><dt>${A('متغيرات البيئة (أسماء بس)', 'Environment (names only)')}</dt><dd class="ltr mono">${sv.env.length ? esc(sv.env.join(', ')) : '—'}</dd><dt>${A('معتمد على', 'Depends on')}</dt><dd class="ltr">${sv.dependsOn?.length ? esc(sv.dependsOn.join(', ')) : '—'}</dd><dt>${A('جاهز لما', 'Ready when')}</dt><dd class="small">${sv.ready?.port ? A(`المنفذ ${sv.ready.port} يرد`, `port ${sv.ready.port} answers`) : sv.ready?.log ? `${A('السجل فيه', 'the log shows')} <span class="ltr mono">${esc(sv.ready.log)}</span>` : A('بعد ما يبدأ', 'once started')}</dd><dt>${A('الإيقاف', 'Stop')}</dt><dd class="small ltr">${esc(sv.stopSignal)} · ${sv.stopTimeoutSeconds}s</dd>${sv.overridden.length ? `<dt>${A('متعدّل محليًا', 'Overridden locally')}</dt><dd class="ltr">${esc(sv.overridden.join(', '))}</dd>` : ''}</dl>
       ${!trusted ? `<p class="tiny muted">${A('التوثيق بيغطي الأمر ده بالظبط، مش اللي جوه السكريبتات اللي بيشغّلها (زي package scripts). راجعها هي كمان.', 'Trust covers this exact definition, not what the scripts it runs do (for example package scripts). Review those too.')}</p>` : ''}</details></article>`;
@@ -1983,9 +2205,21 @@
     planPick.clear();
     for (const sv of plan?.services ?? []) if (!saved.has(sv.id) && !(sv.blocking ?? []).length) planPick.add(sv.id);
   }
-  function startAgentPlan() {
-    askAgentForPlan();
+  // PF-0136: one click. When a session can take a message now, the fixed read-only request is
+  // sent as it is; otherwise it waits in the chat box for the developer to start a session.
+  async function startAgentPlan() {
     planAwaitAgent = { pid, since: runtimePlan?.pid === pid ? runtimePlan.data?.agent?.proposedAt ?? null : null };
+    const sess = agentsOn && agent?.pid === pid ? agent.session : null;
+    const canSend = Boolean(sess) && (sess.provider === 'codex' ? sess.status === 'idle' : Boolean(sess.connected && sess.mode));
+    if (canSend) {
+      toggleChat(true); chatForceEnd = true;
+      if (await agentAction('message', { text: agentPlanRequest() })) {
+        toast(esc(A('تم إرسال الطلب للوكيل. سيظهر الاقتراح هنا تلقائيًا.', 'The request was sent to the agent. The proposal appears here by itself.')));
+        render();
+        return;
+      }
+    }
+    askAgentForPlan();
     render();
   }
   // Polled while waiting: a new proposal switches the plan to it, preselected.
@@ -1996,7 +2230,7 @@
     if (!at || at === planAwaitAgent.since) return false;
     planAwaitAgent = null; planView = 'agent'; planReplaceAsk = null;
     autoPickPlan();
-    toast(esc(A('اقتراح الوكيل وصل. راجع الخدمات المختارة واحفظها.', 'The agent\'s proposal arrived. Check the selected services and save them.')));
+    toast(esc(A('وصل اقتراح الوكيل. راجع الخدمات المحددة.', 'The agent\'s proposal arrived. Check the selected services.')));
     return true;
   }
   function planCard(sv, savedIds) {
@@ -2099,7 +2333,7 @@
     const forPid = pid;
     try { agentSetup = { pid: forPid, data: await api(`/api/p/${forPid}/agents/settings`) }; } catch { return; }
     const host = document.getElementById('setup-agents');
-    if (host && forPid === pid && route().v === 'setup') host.outerHTML = agentsSection();
+    if (host && forPid === pid && route().v === 'settings') host.outerHTML = agentsSection();
   }
   async function setupPost(pathname, body) {
     return post(`/api/p/${pid}/${pathname}`, JSON.stringify(body ?? {}), { 'Content-Type': 'application/json' });
@@ -2131,7 +2365,7 @@
         return;
       }
       const lines = () => [
-        ...r.started.map((x) => x.state === 'running-outside' ? A(`${x.id}: شغّال برا YallaFlow — ماتشغّلش وعمره ما هيتوقف من هنا`, `${x.id}: running outside YallaFlow — not started, and never stopped from here`) : A(`${x.id}: ${x.already ? 'شغّال من قبل' : 'اشتغل'}`, `${x.id}: ${x.already ? 'already running' : 'started'}`)),
+        ...r.started.map((x) => x.state === 'running-outside' ? A(`${x.id}: شغّال بالفعل من برا YallaFlow، فماتشغّلش تاني وعمره ما هيتوقف من هنا. افتحه من الروابط.`, `${x.id}: already running outside YallaFlow, so it was not started again and is never stopped from here. Open it from its links.`) : A(`${x.id}: ${x.already ? 'شغّال من قبل' : 'اشتغل'}`, `${x.id}: ${x.already ? 'already running' : 'started'}`)),
         ...r.skipped.map((x) => A(`${x.id}: ماتشغّلش — ${x.reason}. راجعه ووثّقه تحت.`, `${x.id}: not started — ${x.reason}. Review and trust it below.`)),
         ...(r.failed ? [A(`${r.failed.id} وقع، فالباقي ماتشغّلش: ${r.failed.message}`, `${r.failed.id} failed, so the rest were not started: ${r.failed.message}`)] : [])
       ];
@@ -2160,7 +2394,7 @@
     const steps = [
       { k: 'agents', t: A('جهّز الوكيل', 'Set up the agent'), d: A('من «الوكلاء» تحت: تسطيب وتسجيل دخول واختيار للمشروع ده.', 'Under Agents below: install, sign in, and choose for this project.') },
       { k: 'stack', t: A('افحص الـ stack', 'Scan the stack'), d: A('بيقرا ملفات المشروع بس، ومابيشغّلش حاجة.', 'Reads the repository files only; runs nothing.') },
-      { k: 'services', t: A('اختار الخدمات (اختياري)', 'Choose services (optional)'), d: A('لو عايز تشغّل التطبيق من هنا: من «اعرف وضيف الخدمات» تحت، حلّل المشروع أو اسأل الوكيل، واحفظ اللي محتاجه.', 'If you want to run the app from here: under "Find and add services" below, analyze the project or ask the agent, then save what you need.') }
+      { k: 'services', t: A('اختار الخدمات (اختياري)', 'Choose services (optional)'), d: A('إن أردت تشغيل التطبيق من هنا: افتح تبويب «التشغيل»، والوكيل يقترح الخدمات وأنت توافق.', 'If you want to run the app from here: open the Run tab; the agent proposes the services and you approve.') }
     ];
     const current = steps.find((x) => !rec?.steps?.[x.k])?.k;
     return `<section class="panel setupguide" aria-label="${A('إعداد المشروع', 'Project setup')}"><div class="row"><h2 style="font-size:18px" class="grow">${A('إعداد المشروع لأول مرة', 'First-time project setup')}</h2><button class="btn sm ghost" data-setup-step="skip" ${setupBusy ? 'disabled' : ''}>${A('تخطّى', 'Skip')}</button></div>
@@ -2206,29 +2440,38 @@
     return sv.ports.map((p) => `<a class="btn sm go" href="${esc(`http://127.0.0.1:${p.port}${path}`)}" target="_blank" rel="noopener noreferrer" data-open-app>${A(`افتح :${p.port}`, `Open :${p.port}`)} ↗</a>`).join(' ');
   }
   // PF-0073: the run control is the page's head once services exist: one state, Start/Stop
-  // project, the apps to open, and (from viewSetup) the service rows beneath.
-  function runSection(r, rows = '') {
+  // project, the apps to open, and (from viewRun) the service rows beneath.
+  // PF-0140: up, but not started by YallaFlow (a Compose stack someone else started).
+  function runsOutside(sv) { return Boolean(sv.runningOutside?.length) && !['running', 'starting'].includes(sv.state); }
+  function runSection(r, rows = '', { opens: showOpens = true, approving = false } = {}) {
     const all = r.services;
     const trusted = all.filter((sv) => sv.trust?.trusted);
     const live = all.filter((sv) => ['running', 'starting'].includes(sv.state) || sv.runningOutside?.length);
     const up = all.filter((sv) => sv.state === 'running' || sv.runningOutside?.length);
     const failed = all.filter((sv) => sv.state === 'failed');
     const untrusted = all.length - trusted.length;
+    // PF-0140: what Start project would really start. A service already up outside YallaFlow is
+    // never started again, so with nothing else to start the button is off and the hint says why.
+    const outside = all.filter(runsOutside);
+    const startable = trusted.filter((sv) => !['running', 'starting'].includes(sv.state) && !runsOutside(sv));
+    const nothingToStart = outside.length > 0 && trusted.length > 0 && !startable.length;
     const state = failed.length ? { tone: 'fail', t: A(`${failed.length} خدمة وقعت`, `${failed.length} service(s) failed`) }
-      : all.length && up.length === all.length ? { tone: 'done', t: A('المشروع شغّال', 'The project is running') }
+      : all.length && up.length === all.length ? { tone: 'done', t: outside.length === all.length ? A('التطبيق شغّال من برا YallaFlow', 'The app is running outside YallaFlow') : A('المشروع شغّال', 'The project is running') }
       : live.length ? { tone: 'active', t: A(`شغّال جزئياً — ${up.length} من ${all.length}`, `Partly running — ${up.length} of ${all.length}`) }
       : !trusted.length ? { tone: 'wait', t: A('مش جاهز يشتغل لسه', 'Not ready to start yet') }
       : { tone: 'todo', t: A('المشروع متوقف', 'The project is stopped') };
-    const hint = untrusted ? A(`${untrusted} من ${all.length} خدمة محتاجة مراجعتك وتوثيقك قبل ما تشتغل. دوس «راجع ووثّق» على كل واحدة تحت.`, `${untrusted} of ${all.length} service(s) need your review and trust before they can start. Press Review and trust on each one below.`)
+    const hint = approving ? (outside.length === all.length ? A('التطبيق شغّال بالفعل من برا YallaFlow. الموافقة في البطاقة فوق بتسجّل الأوامر بس، ومش هتشغّل حاجة.', 'The app already runs outside YallaFlow. Approving in the card above only records the commands; it starts nothing.') : A('وافق على الخدمات من البطاقة بالأعلى ليبدأ التشغيل.', 'Approve the services in the card above to start.'))
+      : nothingToStart ? A('التطبيق شغّال بالفعل من برا YallaFlow، فمفيش حاجة محتاجة تتشغّل من هنا: افتحه من «افتح بسرعة». YallaFlow مابيوقفش ولا بيعيد تشغيل حاجة هو ماشغّلهاش؛ لو عايزه يديرها، وقّفها من برا الأول.', 'The app already runs outside YallaFlow, so there is nothing to start here: open it from "Open quickly". YallaFlow never stops or restarts what it did not start; to let it manage the app, stop it outside first.')
+      : untrusted ? A(`${untrusted} من ${all.length} خدمة محتاجة مراجعتك وتوثيقك قبل ما تشتغل. دوس «راجع ووثّق» على كل واحدة تحت.`, `${untrusted} of ${all.length} service(s) need your review and trust before they can start. Press Review and trust on each one below.`)
       : A('«شغّل المشروع» بيشغّل الخدمات بترتيب الاعتماد ويستنى كل واحدة تجهز. «وقّف» بيوقف اللي YallaFlow شغّله بس، ومابيوقفش الخدمات المشتركة أبداً.', 'Start project starts the services in dependency order, waiting for each to be ready. Stop stops only what YallaFlow started, and never shared services.');
     const opens = up.map((sv) => openLinks(sv)).filter(Boolean);
     const msg = setupMsg ? `<p class="small runmsg ${setupMsg.tone === 'fail' ? 'warn' : ''}" role="status">${typeof setupMsg.html === 'function' ? setupMsg.html() : setupMsg.html}</p>` : '';
     const progress = all.length ? `<div class="trustbar" title="${esc(A('الموثوق', 'Trusted'))}"><i style="width:${Math.round((trusted.length / all.length) * 100)}%"></i></div><span class="tiny muted">${A(`${trusted.length}/${all.length} موثوق · ${up.length} شغّال`, `${trusted.length}/${all.length} trusted · ${up.length} running`)}</span>` : '';
     return `<section class="panel runpanel ${state.tone}" id="setup-run">
       <div class="runhead"><div class="runstate"><span class="sdot big ${state.tone}" aria-hidden="true"></span><div><h2>${state.t}</h2><div class="row runprog">${progress}</div></div></div>
-      ${readOnly ? '' : `<div class="runbtns"><button class="btn go big" data-rt-all="start" ${setupBusy || !trusted.length ? 'disabled' : ''}>${setupBusy === 'start' ? A('بيشغّل…', 'Starting…') : A('▶ شغّل المشروع', '▶ Start project')}</button><button class="btn big" data-rt-all="stop" ${setupBusy || !live.length ? 'disabled' : ''}>${setupBusy === 'stop' ? A('بيوقف…', 'Stopping…') : A('■ وقّف المشروع', '■ Stop project')}</button></div>`}</div>
+      ${readOnly ? '' : `<div class="runbtns"><button class="btn go big" data-rt-all="start" ${setupBusy || !trusted.length || nothingToStart ? 'disabled' : ''} ${nothingToStart ? `title="${esc(A('شغّال بالفعل من برا YallaFlow', 'Already running outside YallaFlow'))}"` : ''}>${setupBusy === 'start' ? A('بيشغّل…', 'Starting…') : A('▶ شغّل المشروع', '▶ Start project')}</button><button class="btn big" data-rt-all="stop" ${setupBusy || !live.some((sv) => !runsOutside(sv)) ? 'disabled' : ''}>${setupBusy === 'stop' ? A('بيوقف…', 'Stopping…') : A('■ وقّف المشروع', '■ Stop project')}</button></div>`}</div>
       <p class="tiny ${untrusted ? '' : 'muted'}">${hint}</p>${msg}
-      ${opens.length ? `<div class="runopen"><span class="tiny muted">${A('افتح:', 'Open:')}</span> ${opens.join(' ')}</div>` : ''}
+      ${showOpens && opens.length ? `<div class="runopen"><span class="tiny muted">${A('افتح:', 'Open:')}</span> ${opens.join(' ')}</div>` : ''}
       ${rows}</section>`;
   }
   // ---------- agent setup on this machine (PF-0123): install, sign in, test — each approved ----------
@@ -2332,7 +2575,7 @@
     const key = `${m.codex.cli ? 1 : 0}${m.codex.adapter ? 1 : 0}${m.codex.login.method ?? 'none'}`;
     if (store.get('agentStripDismissed', '') === key) return '';
     const text = !m.codex.installed ? A('Codex مش متسطّب على الجهاز ده.', 'Codex is not installed on this machine.') : A('Codex محتاج تسجيل دخول باشتراكك.', 'Codex needs a sign-in with your subscription.');
-    return `<div class="tw:mb-3 tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:rounded-field tw:bg-dusk-soft tw:px-4 tw:py-2" role="status"><span class="grow small">${text} ${A('الوكلاء محتاجينه عشان يشتغلوا من الكونسول.', 'Agents need it to work from the console.')}</span><a class="btn sm go" href="#/setup">${A('جهّز Codex', 'Set up Codex')}</a><button type="button" class="ibtn" data-agent-strip-dismiss="${esc(key)}" aria-label="${A('اقفل', 'Dismiss')}">✕</button></div>`;
+    return `<div class="tw:mb-3 tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:rounded-field tw:bg-dusk-soft tw:px-4 tw:py-2" role="status"><span class="grow small">${text} ${A('الوكلاء محتاجينه عشان يشتغلوا من الكونسول.', 'Agents need it to work from the console.')}</span><a class="btn sm go" href="#/settings/agents">${A('جهّز Codex', 'Set up Codex')}</a><button type="button" class="ibtn" data-agent-strip-dismiss="${esc(key)}" aria-label="${A('اقفل', 'Dismiss')}">✕</button></div>`;
   }
   function agentsSection() {
     if (!agentSetup || agentSetup.pid !== pid) return `<section class="panel setupsec" id="setup-agents"><p class="muted">${A('بيقرا الوكلاء…', 'Reading agents…')}</p></section>`;
@@ -2368,15 +2611,15 @@
     return `<div class="row" style="margin-top:10px;gap:8px;flex-wrap:wrap"><label class="small">${A('طلب الموافقة يستنى', 'An approval request waits')} <select data-approval-wait>${[5, 15, 30, 60].map((m) => `<option value="${m}" ${m === current ? 'selected' : ''}>${A(`${m} دقيقة`, `${m} minutes`)}</option>`).join('')}</select></label><span class="tiny muted">${A('بعدها بيترفض تلقائي، عمره ما بيتوافق عليه لوحده.', 'Then it is denied automatically — never approved on its own.')}</span>${d.approvalWait.error ? `<span class="tiny warn">${esc(d.approvalWait.error)}</span>` : ''}</div>`;
   }
 
-  function viewSetup() {
-    if (!runtime || runtime.pid !== pid) return `<p class="muted" style="margin-top:30px">${A('بيقرا خدمات التشغيل…', 'Reading runtime services…')}</p>`;
-    if (runtime.error) return `<section class="errbar data" role="alert"><b>${A('مقدرناش نقرا خدمات التشغيل', 'Runtime services could not be read')}</b><p class="small">${esc(runtime.error)}</p></section>`;
-    const r = runtime.data;
-    const configured = r.services.length > 0;
-    const head = `<section class="pagehead"><h1 style="font-size:26px">${A('الإعداد والتشغيل', 'Setup & run')}</h1><p class="muted">${configured ? A('شغّل ووقّف المشروع وافتح تطبيقاته. الإعدادات (الخدمات، الـ stack، الوكلاء) تحت في «الإعدادات».', 'Start and stop the project and open its apps. Configuration (services, stack, agents) is below under Configuration.') : A('جهّز الوكيل الأول. تشغيل التطبيق من هنا اختياري: اعرف خدماته، احفظها ووثّقها، وبعدها شغّل ووقّف من هنا. مفيش حاجة بتشتغل لوحدها، وYallaFlow بيوقف بس اللي هو شغّله.', 'Set up the agent first. Running the app from here is optional: find its services, save and trust them, then start and stop it here. Nothing runs on its own, and YallaFlow stops only what it started.')}</p></section>`;
-    if (!r.supported) return head + setupGuide() + stackSection() + `<section class="panel"><p>${A('مدير التشغيل مدعوم على Linux وmacOS بس.', 'The runtime manager supports Linux and macOS only.')}</p></section>` + agentsSection();
-    const profileErr = r.profile.error ? `<section class="errbar data" role="alert"><b>${A('ملف التشغيل فيه مشكلة', 'The runtime profile is invalid')}</b><p class="small">${esc(r.profile.error)}</p></section>` : '';
-    const add = readOnly ? '' : `<details class="panel setupsec" data-sx="add" ${sxOpen('add', false)}><summary><b>${A('ضيف خدمة بنفسك', 'Add a service yourself')}</b></summary>
+  // PF-0132: the former Setup & run page, split into the Run and Settings tabs of Project.
+  const RUNTIME_CMDS = ['yallaflow runtime analyze', 'yallaflow runtime plan show', 'yallaflow runtime plan save <id>...', 'yallaflow runtime review <id>', 'yallaflow runtime status', 'yallaflow runtime suggest', 'yallaflow runtime add <id> --cwd DIR --port N -- <executable> [args...]', 'yallaflow runtime trust <id>', 'yallaflow runtime start|stop|restart <id>', 'yallaflow runtime start --all', 'yallaflow runtime stop --all', 'yallaflow runtime logs <id>'];
+  const runtimeLoading = () => `<p class="muted" style="margin-top:30px">${A('بيقرا خدمات التشغيل…', 'Reading runtime services…')}</p>`;
+  const runtimeError = () => `<section class="errbar data" role="alert"><b>${A('مقدرناش نقرا خدمات التشغيل', 'Runtime services could not be read')}</b><p class="small">${esc(runtime.error)}</p></section>`;
+  const runtimeUnsupported = () => `<section class="panel"><p>${A('مدير التشغيل مدعوم على Linux وmacOS بس.', 'The runtime manager supports Linux and macOS only.')}</p></section>`;
+  const profileError = (r) => (r.profile.error ? `<section class="errbar data" role="alert"><b>${A('ملف التشغيل فيه مشكلة', 'The runtime profile is invalid')}</b><p class="small">${esc(r.profile.error)}</p></section>` : '');
+  function addServicePanel() {
+    if (readOnly) return '';
+    return `<details class="panel setupsec" data-sx="add" ${sxOpen('add', false)}><summary><b>${A('ضيف خدمة بنفسك', 'Add a service yourself')}</b></summary>
       <form class="wizform" data-rt-form data-keep="rt-${esc(pid)}" style="margin-top:10px">
         <div class="twocol"><label>${A('الاسم', 'Name')}<input name="name" required maxlength="60" placeholder="Web"></label><label>${A('المعرّف', 'Id')} <span class="tiny muted">(a-z 0-9 -)</span><input class="ltr" name="id" required pattern="[a-z][a-z0-9-]{0,31}" placeholder="web"></label></div>
         <div class="twocol"><label>${A('النوع', 'Kind')}<select name="kind"><option value="process">${A('أمر (process)', 'Command (process)')}</option><option value="docker-compose">Docker Compose</option></select></label><label>${A('فولدر التشغيل (جوه المشروع)', 'Working folder (inside the project)')}<input class="ltr" name="cwd" value="."></label></div>
@@ -2385,16 +2628,185 @@
         <label class="small"><input type="checkbox" name="local"> ${A('على الجهاز ده بس (مش متشاركة في المستودع)', 'This machine only (not shared in the repository)')}</label>
         <div class="row"><button class="btn go sm" type="submit">${A('ضيف الخدمة', 'Add the service')}</button><span class="tiny muted">${A('الإضافة مابتشغّلش حاجة.', 'Adding runs nothing.')}</span></div>
         ${runtimeErr.__add ? `<p class="small" role="alert" style="color:var(--clay);white-space:pre-wrap">${esc(runtimeErr.__add)}</p>` : ''}</form></details>`;
-    const sugg = r.suggestions.length ? `<details class="panel setupsec" data-sx="sugg" ${sxOpen('sugg')}><summary><b>${A(`اقتراحات تانية من ملفات المشروع (${r.suggestions.length})`, `Other suggestions from repository files (${r.suggestions.length})`)}</b></summary><p class="tiny muted">${A('الاقتراحات مابتشتغلش. ضيفها، راجعها، ووثّقها — التشغيل خطوة منفصلة.', 'Suggestions never run. Add one, review it, then trust it — starting is a separate step.')}</p><ul class="modules">${r.suggestions.map((x) => `<li><b>${esc(x.name)}</b> <span class="ltr mono small">${esc(x.command.join(' '))}</span> <span class="tiny muted">${A('من', 'from')} <span class="ltr">${esc(x.evidence.join(', '))}</span></span>${x.note ? `<p class="tiny muted">${esc(suggestionNote(x.note))}</p>` : ''}${readOnly ? '' : `<div class="row" style="margin-top:6px"><button class="btn sm" data-rt-suggest="${esc(x.id)}">${A('ضيف الخدمة دي', 'Add this service')}</button></div>`}</li>`).join('')}</ul></details>` : '';
-    const dev = devPanel(A('أوامر التشغيل', 'Runtime commands'), ['yallaflow runtime analyze', 'yallaflow runtime plan show', 'yallaflow runtime plan save <id>...', 'yallaflow runtime review <id>', 'yallaflow runtime status', 'yallaflow runtime suggest', 'yallaflow runtime add <id> --cwd DIR --port N -- <executable> [args...]', 'yallaflow runtime trust <id>', 'yallaflow runtime start|stop|restart <id>', 'yallaflow runtime start --all', 'yallaflow runtime stop --all', 'yallaflow runtime logs <id>']);
-    // PF-0123: agents first while the app is not set up (the plan can ask the agent); the manual
-    // add form and the stack table are advanced and stay folded.
-    const config = configured ? planSection(r) + sugg + add + stackSection() + agentsSection() : agentsSection() + planSection(r) + sugg + add + stackSection();
-    // Not configured yet: the guided flow is the page. Configured: Run first, the rest folded away.
-    if (!configured) return head + profileErr + setupGuide() + config + dev;
+  }
+  function suggestionsPanel(r) {
+    if (!r.suggestions.length) return '';
+    return `<details class="panel setupsec" data-sx="sugg" ${sxOpen('sugg')}><summary><b>${A(`اقتراحات تانية من ملفات المشروع (${r.suggestions.length})`, `Other suggestions from repository files (${r.suggestions.length})`)}</b></summary><p class="tiny muted">${A('الاقتراحات مابتشتغلش. ضيفها، راجعها، ووثّقها — التشغيل خطوة منفصلة.', 'Suggestions never run. Add one, review it, then trust it — starting is a separate step.')}</p><ul class="modules">${r.suggestions.map((x) => `<li><b>${esc(x.name)}</b> <span class="ltr mono small">${esc(x.command.join(' '))}</span> <span class="tiny muted">${A('من', 'from')} <span class="ltr">${esc(x.evidence.join(', '))}</span></span>${x.note ? `<p class="tiny muted">${esc(suggestionNote(x.note))}</p>` : ''}${readOnly ? '' : `<div class="row" style="margin-top:6px"><button class="btn sm" data-rt-suggest="${esc(x.id)}">${A('ضيف الخدمة دي', 'Add this service')}</button></div>`}</li>`).join('')}</ul></details>`;
+  }
+  // Run: Start/Stop project on top, one compact row per service, quick links and how the
+  // services were found in the side column. Opening this view never starts anything.
+  // ---------- PF-0136: one guided path on the Run tab: propose → approve → start ----------
+  // The reviews for the approve-all card are read on their own (the per-service review under
+  // a row stays the developer's explicit click). Trust is still sent per service, bound to the
+  // definition hash of the review shown on screen; Core refuses anything that changed since.
+  let bulkPid = null;
+  const bulkReview = {}; // service id -> review | { error }
+  const bulkReviewFor = {}; // service id -> the definition hash that review was read for
+  async function loadBulkReviews() {
+    const forPid = pid;
+    if (readOnly || route().v !== 'run') return;
+    const dropAll = () => { for (const id of Object.keys(bulkReview)) delete bulkReview[id]; for (const id of Object.keys(bulkReviewFor)) delete bulkReviewFor[id]; };
+    if (bulkPid !== forPid) { dropAll(); bulkPid = forPid; }
+    const list = runtime?.pid === forPid ? runtime.data?.services ?? [] : [];
+    const open = new Set(list.filter((sv) => !sv.trust?.trusted).map((sv) => sv.id));
+    for (const id of Object.keys(bulkReviewFor)) if (!open.has(id)) { delete bulkReview[id]; delete bulkReviewFor[id]; }
+    await Promise.all(list.filter((sv) => open.has(sv.id) && bulkReviewFor[sv.id] !== sv.definitionHash).map(async (sv) => {
+      bulkReviewFor[sv.id] = sv.definitionHash;
+      try { bulkReview[sv.id] = (await api(`/api/p/${forPid}/runtime/${encodeURIComponent(sv.id)}/review`)).review; } catch (e) { bulkReview[sv.id] = { error: e.message }; }
+    }));
+  }
+  // Approved together: reviewed, nothing blocking, and not shared infrastructure (a shared or
+  // blocked service keeps its own review under its row).
+  const bulkable = (r) => (r?.services ?? []).filter((sv) => { const rv = bulkReview[sv.id]; return !sv.trust?.trusted && rv && !rv.error && rv.definitionHash && !(rv.blocking ?? []).length && !rv.shared?.shared; });
+  const cmdText = (argv) => (argv ?? []).map((a) => (/[\s"']/.test(a) ? JSON.stringify(a) : a)).join(' ');
+  const runSteps = (now) => `<ol class="run3" aria-label="${A('خطوات تجهيز التشغيل', 'Steps to get it running')}">${[A('اقتراح الخدمات', 'Propose the services'), A('موافقتك', 'Your approval'), A('التشغيل', 'Start')].map((t, i) => `<li class="${i < now ? 'done' : i === now ? 'now' : ''}"><span aria-hidden="true">${i < now ? '✓' : i + 1}</span>${t}</li>`).join('')}</ol>`;
+  function proposalView() {
+    const p = runtimePlan?.pid === pid ? runtimePlan.data : null;
+    const view = currentPlanView();
+    const plan = p ? (view === 'agent' ? p.agent : p.scan) : null;
+    const sameAs = (x) => (p?.scan?.services ?? []).find((y) => y.kind === x.kind && y.cwd === x.cwd && JSON.stringify(y.command) === JSON.stringify(x.command));
+    const withScan = (x) => { if (view !== 'agent') return x; const y = sameAs(x); return y ? { ...x, shared: x.shared ?? y.shared, conflicts: y.conflicts, runningOutside: y.runningOutside, blocking: y.blocking, components: y.components } : x; };
+    return { p, view, plan, services: (plan?.services ?? []).map(withScan) };
+  }
+  let runPickKey = null;
+  function proposalCard(sv) {
+    const blocking = sv.blocking ?? [];
+    const port = sv.ports?.length ? A(`يعمل على المنفذ ${sv.ports.join('، ')}`, `Runs on port ${sv.ports.join(', ')}`) : '';
+    return `<article class="propcard" data-plan-service="${esc(sv.id)}">
+      <label class="proppick"><input type="checkbox" data-plan-pick="${esc(sv.id)}" ${planPick.has(sv.id) ? 'checked' : ''} ${blocking.length ? 'disabled' : ''}><span><b>${esc(sv.name)}</b>${port ? ` <span class="tiny muted">${port}</span>` : ''}</span></label>
+      <div class="propmeta">${sv.shared ? `<span class="chip fail" data-shared><i></i>${A('مشتركة مع مشاريع أخرى', 'Shared with other projects')}</span>` : ''}${blocking.length ? `<span class="chip fail"><i></i>${A('تحتاج حلًّا أولًا', 'Needs fixing first')}</span>` : ''}${sv.runningOutside?.length ? `<span class="chip wait"><i></i>${A('تعمل الآن خارج YallaFlow', 'Running now outside YallaFlow')}</span>` : ''}</div>
+      <p class="propcmd"><span class="tiny muted">${A('الأمر:', 'Command:')}</span> <code class="ltr mono">${esc(cmdText(sv.command))}</code></p>
+      <details class="propmore"><summary class="tiny">${A('التفاصيل', 'Details')}</summary><dl class="svcdef"><dt>${A('المجلد', 'Folder')}</dt><dd class="ltr mono">${esc(sv.cwd)}</dd><dt>${A('تعتمد على', 'Depends on')}</dt><dd class="ltr">${sv.dependsOn?.length ? esc(sv.dependsOn.join(', ')) : '—'}</dd><dt>${A('درجة التأكد', 'Confidence')}</dt><dd>${confChip(sv.confidence)}</dd></dl>
+        ${sv.shared ? `<p class="tiny">${A('خدمة مشتركة: إيقاف المشروع لا يوقفها، وإيقافها خطوة مستقلة بتأكيد.', 'Shared service: stopping the project never stops it; stopping it is its own confirmed step.')}</p>` : ''}
+        ${(sv.conflicts ?? []).map((c) => `<p class="tiny warn">${A(`المنفذ ${c.port} مستخدم من`, `Port ${c.port} is held by`)} <span class="ltr">${esc(c.owner)}</span></p>`).join('')}
+        ${blocking.length ? `<ul class="tiny warn">${blocking.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+        ${sv.notes?.length ? `<ul class="tiny muted">${sv.notes.map((x) => `<li>${esc(suggestionNote(x))}</li>`).join('')}</ul>` : ''}
+        ${sv.evidence?.length ? `<p class="tiny muted">${A('الدليل:', 'Evidence:')} <span class="ltr">${sv.evidence.map(esc).join(' · ')}</span></p>` : ''}</details>
+    </article>`;
+  }
+  // Nothing saved yet: the agent proposes (or a quick scan), the developer picks, one button.
+  function runFind(r) {
+    const { p, view, plan, services } = proposalView();
+    const waiting = planAwaitAgent?.pid === pid;
+    const msg = setupMsg ? `<p class="small runmsg ${setupMsg.tone === 'fail' ? 'warn' : ''}" role="status">${typeof setupMsg.html === 'function' ? setupMsg.html() : setupMsg.html}</p>` : '';
+    const waitLine = waiting ? `<div class="waitline" role="status"><span class="spin" aria-hidden="true"></span><span class="small grow">${A('الوكيل يجهّز الاقتراح. سيظهر هنا تلقائيًا عند وصوله.', 'The agent is preparing the proposal. It appears here by itself when it arrives.')}</span><button class="btn sm ghost" data-plan-wait-cancel>${A('إلغاء الانتظار', 'Stop waiting')}</button></div>` : '';
+    const askBtn = (primary, label) => `<button class="btn ${primary ? 'go' : 'sm ghost'}" data-rt-ask-agent ${setupBusy || waiting ? 'disabled' : ''}>${label}</button>`;
+    const scanBtn = (primary, label) => `<button class="btn ${primary ? 'go' : 'sm ghost'}" data-rt-analyze ${setupBusy ? 'disabled' : ''}>${setupBusy === 'analyze' ? A('جارٍ الفحص…', 'Scanning…') : label}</button>`;
+    const advanced = `<a class="tiny" href="#/settings/services">${A('تعديل متقدم', 'Advanced editing')} ${fwd()}</a>`;
+    if (services.length) {
+      const key = `${pid}:${view}:${plan.proposedAt ?? plan.analyzedAt ?? ''}`;
+      if (runPickKey !== key) { runPickKey = key; if (!planPick.size) autoPickPlan(); }
+      const source = view === 'agent' ? A(`اقتراح الوكيل · ${when(plan.proposedAt)}`, `Agent proposal · ${when(plan.proposedAt)}`) : A(`فحص سريع · ${when(plan.analyzedAt)}`, `Quick scan · ${when(plan.analyzedAt)}`);
+      const tabs = p?.agent && p?.scan ? `<span class="tiny">${view === 'agent' ? `<button type="button" class="linkbtn" data-plan-view="scan">${A('اعرض نتيجة الفحص السريع', 'Show the quick scan instead')}</button>` : `<button type="button" class="linkbtn" data-plan-view="agent">${A('اعرض اقتراح الوكيل', 'Show the agent proposal instead')}</button>`}</span>` : '';
+      const unresolved = plan.unresolved?.length ? `<details class="propmore"><summary class="tiny">${A(`أمور لم يمكن التأكد منها (${plan.unresolved.length})`, `Could not be verified (${plan.unresolved.length})`)}</summary><ul class="tiny">${plan.unresolved.map((x) => `<li><span class="ltr">${esc(x.item)}</span> — ${esc(x.reason)}</li>`).join('')}</ul></details>` : '';
+      return `<section class="panel runfind" id="setup-run" data-run-find="proposal">${runSteps(0)}
+        <div class="row"><h2 class="grow">${A('الخدمات المقترحة لتشغيل التطبيق', 'Proposed services to run the app')}</h2><span class="tiny muted">${source}</span></div>
+        ${view === 'agent' && plan.summary ? `<p class="small plansum" dir="auto">${esc(plan.summary)}</p>` : ''}
+        ${services.map(proposalCard).join('')}${unresolved}${waitLine}${msg}
+        <div class="row runfind-acts"><button class="btn go big" data-plan-use ${setupBusy || !planPick.size ? 'disabled' : ''}>${setupBusy === 'save' ? A('جارٍ الحفظ…', 'Saving…') : A(`استخدم الخدمات المحددة (${planPick.size})`, `Use the selected services (${planPick.size})`)}</button><span class="tiny muted">${A('لا يبدأ أي تشغيل الآن؛ الخطوة التالية موافقتك على الأوامر.', 'Nothing starts yet; the next step is your approval of the commands.')}</span></div>
+        <div class="row runfind-more">${tabs}${agentsOn ? askBtn(false, A('اطلب اقتراحًا جديدًا من الوكيل', 'Ask the agent for a new proposal')) : ''}${scanBtn(false, A('أعد الفحص السريع', 'Scan again'))}<span class="grow"></span>${advanced}</div></section>`;
+    }
+    const none = plan && !services.length ? `<p class="small" role="status">${esc(plan.nothingFound ?? A('لم يُعثر على خدمات في آخر فحص.', 'The last scan found no services.'))}</p>` : '';
+    const lead = agentsOn
+      ? A('الوكيل يقرأ المشروع ويقترح الخدمات اللازمة لتشغيله. لا يشغّل شيئًا ولا يقرأ ملفات <span class="ltr">.env</span>. بعدها توافق أنت، ثم يبدأ التشغيل.', 'The agent reads the project and proposes the services needed to run it. It runs nothing and never reads .env files. Then you approve, and the app starts.')
+      : A('فحص سريع يقرأ ملفات المشروع ويقترح الخدمات اللازمة لتشغيله. لا يشغّل شيئًا ولا يقرأ ملفات <span class="ltr">.env</span>. بعدها توافق أنت، ثم يبدأ التشغيل.', 'A quick scan reads the project files and proposes the services needed to run it. It runs nothing and never reads .env files. Then you approve, and the app starts.');
+    return `<section class="panel runfind" id="setup-run" data-run-find="start">${runSteps(0)}
+      <h2>${A('جهّز تشغيل التطبيق', 'Get the app running')}</h2><p class="small muted">${lead} ${A('تشغيل التطبيق من هنا اختياري.', 'Running the app from here is optional.')}</p>${none}${waitLine}${msg}
+      <div class="row runfind-acts">${agentsOn ? askBtn(true, A('اطلب من الوكيل تجهيز التشغيل', 'Ask the agent to set it up')) : scanBtn(true, A('افحص المشروع', 'Scan the project'))}${agentsOn ? scanBtn(false, A('أو فحص سريع بدون وكيل', 'Or a quick scan without the agent')) : `<a class="btn sm ghost" href="#/settings/agents">${A('فعّل الوكيل لاقتراح أدق', 'Turn the agent on for a better proposal')}</a>`}<span class="grow"></span>${advanced}</div></section>`;
+  }
+  // Saved but not approved: every exact command on one card, one approval, then start.
+  function runApprove(r) {
+    if (readOnly) return '';
+    const list = bulkable(r);
+    if (!list.length) return '';
+    const others = r.services.filter((sv) => !sv.trust?.trusted).length - list.length;
+    const busy = setupBusy === 'approve' || setupBusy === 'start';
+    // PF-0140: when every listed service already runs outside YallaFlow, approving starts
+    // nothing — so the card offers one honest action instead of "Approve and start".
+    const allOutside = list.every((sv) => sv.runningOutside?.length);
+    const row = (sv) => {
+      const rv = bulkReview[sv.id]; const e = rv.effective;
+      return `<article class="apvrow" data-approve-service="${esc(sv.id)}" data-approve-hash="${esc(rv.definitionHash)}"><div class="row"><b>${esc(sv.name)}</b>${e.ports?.length ? `<span class="tag ltr">:${esc(e.ports.join(', :'))}</span>` : ''}${sv.trust.reason === 'changed' ? `<span class="chip wait">${A('تغيّرت بعد موافقتك السابقة', 'changed since you approved it')}</span>` : ''}</div>
+        <p class="propcmd"><span class="tiny muted">${A('سيُشغَّل:', 'Will run:')}</span> <code class="ltr mono">${esc(cmdText(e.command))}</code></p>
+        <details class="propmore"><summary class="tiny">${A('التفاصيل', 'Details')}</summary><dl class="svcdef"><dt>${A('المجلد', 'Folder')}</dt><dd class="ltr mono">${esc(e.folder ?? e.cwd)}</dd><dt>${A('متغيرات البيئة (أسماء فقط)', 'Environment (names only)')}</dt><dd class="ltr mono">${e.env?.length ? esc(e.env.join(', ')) : '—'}</dd><dt>${A('محفوظة في', 'Saved in')}</dt><dd class="ltr mono">${esc(e.profile ?? '')}</dd></dl>
+          <p class="tiny">${A('الموافقة مرتبطة بهذه الملفات، وأي تغيير فيها يلغيها:', 'The approval is bound to these files; any change ends it:')} <span class="ltr">${rv.covered?.length ? rv.covered.map(esc).join(' · ') : A('التعريف فقط', 'the definition only')}</span></p>
+          ${rv.notCovered?.length ? `<p class="tiny">${A('غير مشمول:', 'Not covered:')} ${rv.notCovered.map((x) => `<span class="ltr">${esc(x.what)}</span> — ${esc(x.why)}`).join(' · ')}</p>` : ''}</details></article>`;
+    };
+    return `<section class="panel runapprove" data-run-approve-card>${runSteps(1)}
+      <h2>${A(list.length === 1 ? 'خدمة واحدة تنتظر موافقتك' : `${list.length} خدمات تنتظر موافقتك`, list.length === 1 ? '1 service waits for your approval' : `${list.length} services wait for your approval`)}</h2>
+      <p class="small muted">${A('هذه هي الأوامر التي ستعمل على جهازك كما هي. لن يعمل أي شيء قبل موافقتك، ولو تغيّر أمر منها لاحقًا ستُطلب موافقتك من جديد.', 'These are the exact commands that will run on your machine. Nothing runs before you approve, and if one of them changes later you are asked again.')}</p>
+      ${list.map(row).join('')}
+      ${allOutside ? `<p class="small" data-approve-outside>${A('التطبيق شغّال بالفعل من برا YallaFlow، فالموافقة مش هتشغّل حاجة: بتسجّل الأوامر دي بس علشان YallaFlow يقدر يشغّلها بعدين.', 'The app already runs outside YallaFlow, so approving starts nothing: it only records these commands so YallaFlow can start them later.')}</p>
+      <div class="row runfind-acts"><button class="btn go big" data-run-approve="only" ${setupBusy ? 'disabled' : ''}>${busy ? A('جارٍ التنفيذ…', 'Working…') : A('✓ وافق على الأوامر', '✓ Approve the commands')}</button></div>`
+      : `<div class="row runfind-acts"><button class="btn go big" data-run-approve="start" ${setupBusy ? 'disabled' : ''}>${busy ? A('جارٍ التنفيذ…', 'Working…') : A('▶ وافق وشغّل التطبيق', '▶ Approve and start the app')}</button><button class="btn" data-run-approve="only" ${setupBusy ? 'disabled' : ''}>${A('وافق بدون تشغيل', 'Approve without starting')}</button></div>`}
+      ${others > 0 ? `<p class="tiny muted">${A(`${others} خدمة أخرى تحتاج مراجعة مستقلة (مشتركة مع مشاريع أخرى أو بها ما يمنع). راجعها من القائمة بالأسفل.`, `${others} other service(s) need their own review (shared with other projects, or blocked). Review them in the list below.`)}</p>` : ''}</section>`;
+  }
+  async function approveAll(start) {
+    if (readOnly || setupBusy || runtime?.pid !== pid) return;
+    const list = bulkable(runtime.data);
+    if (!list.length) return;
+    let failed = false;
+    await setupDo('approve', async () => {
+      const errors = [];
+      for (const sv of list) {
+        try { await post(`/api/p/${pid}/runtime/${encodeURIComponent(sv.id)}/trust`, JSON.stringify({ confirmed: true, definitionHash: bulkReview[sv.id].definitionHash }), { 'Content-Type': 'application/json' }); } catch (e) { errors.push(`${sv.name}: ${e.message}`); }
+        delete bulkReview[sv.id]; delete bulkReviewFor[sv.id];
+      }
+      if (errors.length) { failed = true; throw new Error(errors.join(' · ')); }
+    });
+    await loadBulkReviews();
+    // PF-0140: say what the approval did when nothing is started after it.
+    if (!failed && !start) setupMsg = { tone: 'done', html: esc(A(`موافقتك اتسجّلت على ${list.length === 1 ? 'خدمة واحدة' : `${list.length} خدمات`}. مفيش حاجة اتشغّلت.`, `Your approval is recorded for ${list.length} service${list.length === 1 ? '' : 's'}. Nothing was started.`)) };
+    render();
+    if (start && !failed) await runProject('start');
+  }
+  async function useProposal() {
+    if (!planPick.size) return;
+    await savePlan(false);
+    if (setupMsg?.tone === 'done') setupMsg = null; // the approval card is the next step
+    await loadBulkReviews();
+    render();
+  }
+  function viewRun() {
+    if (!runtime || runtime.pid !== pid) return projectPage('run', runtimeLoading());
+    if (runtime.error) return projectPage('run', runtimeError());
+    const r = runtime.data;
+    if (!r.supported) return projectPage('run', runtimeUnsupported());
+    const dev = devPanel(A('أوامر التشغيل', 'Runtime commands'), RUNTIME_CMDS);
+    if (!r.services.length) {
+      if (!readOnly) return projectPage('run', profileError(r) + runFind(r) + dev);
+      return projectPage('run', profileError(r) + `<section class="panel runempty" id="setup-run"><h2>${A('لسه مفيش خدمات', 'No services yet')}</h2><p class="small muted">${A('تشغيل التطبيق من هنا اختياري. اعرف خدماته واحفظها ووثّقها من «الإعدادات» ← «تعريف الخدمات»، وبعدها شغّل ووقّف من هنا. مفيش حاجة بتشتغل لوحدها، وYallaFlow بيوقف بس اللي هو شغّله.', 'Running the app from here is optional. Find its services, save and trust them under Settings → Service definitions, then start and stop it here. Nothing runs on its own, and YallaFlow stops only what it started.')}</p></section>` + dev);
+    }
     const rows = `<div class="svcrows">${r.services.map(serviceCard).join('')}</div>`;
-    return head + profileErr + runSection(r, rows) + setupGuide()
-      + `<details class="cfgwrap" id="setup-config" data-sx="configure" ${sxOpen('configure')}><summary><span class="grow"><b>${A('الإعدادات', 'Configuration')}</b> <span class="tiny muted">${A('اعرف وضيف خدمات، الـ stack، الوكلاء', 'find and add services, stack, agents')}</span></span></summary>${config}</details>` + dev;
+    const opens = r.services.filter((sv) => sv.state === 'running' || sv.runningOutside?.length).map((sv) => ({ sv, html: openLinks(sv) })).filter((x) => x.html);
+    const quick = `<section class="panel sidecard"><h2>${A('افتح بسرعة', 'Open quickly')}</h2>${opens.length ? opens.map(({ sv, html }) => `<div class="quick"><b class="small">${esc(sv.name)}</b><div class="row">${html}</div></div>`).join('') : `<p class="tiny muted">${A('الروابط بتظهر هنا لما الخدمات تشتغل.', 'Links appear here once services run.')}</p>`}</section>`;
+    const shared = r.services.filter((sv) => sv.sharedMarker);
+    const sharedCard = shared.length ? `<section class="awarn sidecard" role="note"><b class="small">⚠ ${A('خدمة مشتركة', 'Shared service')}</b><p class="tiny">${A(`${shared.map((sv) => esc(sv.name)).join('، ')} بتخدم مشاريع تانية كمان. «وقّف المشروع» عمره ما بيوقفها؛ إيقافها خطوة لوحدها بتأكيد.`, `${shared.map((sv) => esc(sv.name)).join(', ')} also serve${shared.length === 1 ? 's' : ''} other projects. Stop project never stops it; stopping one is its own confirmed step.`)}</p></section>` : '';
+    const p = runtimePlan?.pid === pid ? runtimePlan.data : null;
+    const how = `<details class="panel sidecard how" data-sx="how" ${sxOpen('how')}><summary><b>${A('اتجهّز إزاي', 'How this was set up')}</b></summary>
+      ${p?.agent ? `<p class="tiny muted">${A(`اقتراح الوكيل: ${when(p.agent.proposedAt)}`, `Agent proposal: ${when(p.agent.proposedAt)}`)}</p>${p.agent.summary ? `<p class="small plansum" dir="auto">${esc(p.agent.summary)}</p>` : ''}` : ''}${p?.scan ? `<p class="tiny muted">${A(`آخر فحص سريع: ${when(p.scan.analyzedAt)}`, `Last quick scan: ${when(p.scan.analyzedAt)}`)}</p>` : ''}${!p?.agent && !p?.scan ? `<p class="tiny muted">${A('مفيش تحليل محفوظ؛ الخدمات اتضافت بنفسك أو من الاقتراحات.', 'No saved analysis; the services were added by hand or from suggestions.')}</p>` : ''}
+      <a class="tiny" href="#/settings/services">${A('عدّل تعريف الخدمات أو حلّل من جديد', 'Change the definitions or analyze again')} ${fwd()}</a></details>`;
+    return projectPage('run', profileError(r) + `<div class="pcols"><div class="pmain">${runApprove(r)}${runSection(r, rows, { opens: false, approving: !readOnly && bulkable(r).length > 0 })}${setupGuide() ? `<p class="tiny muted" style="margin-top:10px"><a href="#/settings">${A('إعداد المشروع لأول مرة لسه مخلصش', 'First-time project setup is not finished')} ${fwd()}</a></p>` : ''}</div><aside class="pside" aria-label="${A('روابط وتفاصيل', 'Links and details')}">${quick}${sharedCard}${how}</aside></div>` + dev);
+  }
+  // Settings: a section menu; Agents, Team mode, Service definitions and the project folder.
+  function viewSettings() {
+    const nav = [['setup-agents', A('الوكلاء', 'Agents')], ['set-services', A('تعديل متقدم للتشغيل', 'Advanced run setup')], ['set-team', A('وضع الفريق', 'Team mode')], ['set-project', A('المشروع', 'Project')]];
+    const menu = `<nav class="setnav" aria-label="${A('أقسام الإعدادات', 'Settings sections')}">${nav.map(([id, label]) => `<button type="button" class="setnav-item" data-scroll-to="${id}">${label}</button>`).join('')}</nav>`;
+    const g = projectGit();
+    const team = `<section class="setsec" id="set-team">${!projectOverview || projectOverview.pid !== pid ? `<p class="muted">${A('بيقرا وضع الفريق…', 'Reading team mode…')}</p>` : projectOverview.error ? `<p class="small warn">${esc(projectOverview.error)}</p>` : gitLine(g)}</section>`;
+    let services;
+    if (!runtime || runtime.pid !== pid) services = runtimeLoading();
+    else if (runtime.error) services = runtimeError();
+    else if (!runtime.data.supported) services = stackSection() + runtimeUnsupported();
+    else services = profileError(runtime.data) + planSection(runtime.data) + suggestionsPanel(runtime.data) + addServicePanel() + stackSection();
+    const servicesSec = `<section class="setsec" id="set-services"><div class="setsec-h"><h2>${A('تعديل متقدم للتشغيل', 'Advanced run setup')}</h2><p class="tiny muted">${A('المسار العادي من تبويب «التشغيل»: اقتراح، ثم موافقتك، ثم التشغيل. هنا تعديل تعريف الخدمات يدويًا، والتعديل لا يشغّل شيئًا.', 'The usual path is the Run tab: a proposal, your approval, then start. Here you edit the service definitions by hand; editing runs nothing.')} <a href="#/run">${A('افتح «التشغيل»', 'Open Run')} ${fwd()}</a></p></div>${services}</section>`;
+    const current = projects.find((x) => x.id === pid);
+    const o = projectOverview?.pid === pid ? projectOverview.data : null;
+    const projSec = `<section class="setsec" id="set-project"><div class="panel setupsec"><h2 style="font-size:18px">${A('المشروع', 'Project')}</h2>
+      <dl class="svcdef"><dt>${A('الفولدر', 'Folder')}</dt><dd class="ltr mono">${esc(current?.root ?? '')}</dd>${o ? `<dt>${A('النوع', 'Kind')}</dt><dd>${o.project.kind === 'greenfield' ? A('مشروع جديد (greenfield)', 'New project (greenfield)') : A('مشروع قايم (brownfield)', 'Existing project (brownfield)')}</dd>${o.yallaflowVersion ? `<dt>YallaFlow</dt><dd class="ltr">${esc(o.yallaflowVersion)}</dd>` : ''}` : ''}</dl>
+      <div class="row">${readOnly ? '' : `<button type="button" class="btn sm" data-open-folder="${esc(pid)}">${A('افتح الفولدر', 'Open folder')}</button>`}<button type="button" class="btn sm ghost" data-copy="${esc(current?.root ?? '')}" data-copy-what="path">${A('انسخ المسار', 'Copy path')}</button><span class="grow"></span>${readOnly || !current ? '' : `<button type="button" class="btn sm ghost danger" data-remove-project="${esc(pid)}">${A('شيل من الكونسول', 'Remove from the console')}</button>`}</div>
+      <p class="tiny muted">${A('الشيل من الكونسول مابيمسحش ولا ملف.', 'Removing it from the console deletes no files.')}</p></div></section>`;
+    return projectPage('settings', `<div class="setlayout">${menu}<div class="setbody">${setupGuide()}${agentsSection()}${servicesSec}${team}${projSec}${devPanel(A('أوامر التشغيل', 'Runtime commands'), RUNTIME_CMDS)}</div></div>`);
   }
   // The add-service form is never redrawn while the developer is using it (PF-0057).
   const rtFormBusy = () => { const form = document.querySelector('[data-rt-form]'); return Boolean(form && (form.contains(document.activeElement) || [...form.querySelectorAll('input:not([type=checkbox])')].some((x) => x.value !== x.defaultValue))); };
@@ -2439,7 +2851,9 @@
     }
     runtimeBusy[id] = action; runtimeErr[id] = null; render();
     try {
-      await post(`/api/p/${pid}/runtime/${encodeURIComponent(id)}/${action}`, JSON.stringify(body), { 'Content-Type': 'application/json' });
+      const done = await post(`/api/p/${pid}/runtime/${encodeURIComponent(id)}/${action}`, JSON.stringify(body), { 'Content-Type': 'application/json' });
+      // PF-0140: Core did not start it because it already runs outside YallaFlow — say so.
+      if (action === 'start' && (done?.state ?? done?.result?.state) === 'running-outside') toast(esc(A('شغّالة بالفعل من برا YallaFlow، فماتشغّلتش تاني.', 'It already runs outside YallaFlow, so it was not started again.')));
       if (action === 'trust') delete runtimeReview[id];
       delete sharedAsk[id];
     } catch (e) {
@@ -2455,10 +2869,11 @@
   async function loadServiceLogs(id) {
     try { runtimeLogs[id] = (await api(`/api/p/${pid}/runtime/${encodeURIComponent(id)}/logs?lines=200`)).lines; } catch (e) { runtimeErr[id] = e.message; }
   }
-  // While Setup is open, state is re-read every few seconds (a service can crash at any time).
+  // While Run or Settings is open, state is re-read every few seconds (a service can crash at any time).
+  const RUNTIME_VIEWS = ['run', 'settings'];
   function syncRuntimePolling() {
-    const want = route().v === 'setup';
-    if (want && !runtimeTimer) runtimeTimer = setInterval(async () => { if (Object.values(runtimeBusy).some(Boolean)) return; await Promise.all([loadRuntime(), checkAgentPlan()]); if (route().v === 'setup' && !document.activeElement?.matches?.('[data-trust-input], [data-shared-input], [data-plan-pick]') && !rtFormBusy()) render(); }, 3000);
+    const want = RUNTIME_VIEWS.includes(route().v);
+    if (want && !runtimeTimer) runtimeTimer = setInterval(async () => { if (Object.values(runtimeBusy).some(Boolean)) return; await Promise.all([loadRuntime(), checkAgentPlan()]); await loadBulkReviews(); if (RUNTIME_VIEWS.includes(route().v) && !document.activeElement?.matches?.('[data-trust-input], [data-shared-input], [data-plan-pick]') && !rtFormBusy()) render(); }, 3000);
     if (!want && runtimeTimer) { clearInterval(runtimeTimer); runtimeTimer = null; }
   }
 
@@ -2491,15 +2906,15 @@
   };
   const stackText = (c, key) => (lang === 'ar' && STACK_AR[c.id]?.[key]) || c[key];
   const ENV = {
-    docker: { t: { ar: 'Docker', en: 'Docker' }, d: { ar: 'هنسجّل إنك عايز تشتغل بـDocker. مفيش ملفات Docker بتتعمل دلوقتي، وهتضبطها بعدين من «التشغيل».', en: 'Records that you want to develop with Docker. No Docker files are created now; you set them up later in Setup.' }, tools: ['docker', 'docker-compose'] },
-    local: { t: { ar: 'أدوات على جهازك', en: 'Local tools' }, d: { ar: 'هتشغّل المشروع بالأدوات المتسطّبة عندك. بعد الإنشاء، «التشغيل» بيقترح أوامر من ملفات المشروع وانت بتراجعها.', en: 'Run the project with tools installed on this machine. After creation, Setup suggests commands from the project files for you to review.' }, tools: ['node', 'npm', 'php', 'composer'] },
+    docker: { t: { ar: 'Docker', en: 'Docker' }, d: { ar: 'هنسجّل إنك عايز تشتغل بـDocker. مفيش ملفات Docker بتتعمل دلوقتي، وهتضبطها بعدين من «الإعدادات».', en: 'Records that you want to develop with Docker. No Docker files are created now; you set them up later under Project → Settings.' }, tools: ['docker', 'docker-compose'] },
+    local: { t: { ar: 'أدوات على جهازك', en: 'Local tools' }, d: { ar: 'هتشغّل المشروع بالأدوات المتسطّبة عندك. بعد الإنشاء، «الإعدادات» بتقترح أوامر من ملفات المشروع وانت بتراجعها.', en: 'Run the project with tools installed on this machine. After creation, Settings suggests commands from the project files for you to review.' }, tools: ['node', 'npm', 'php', 'composer'] },
     later: { t: { ar: 'أقرر بعدين', en: 'Decide later' }, d: { ar: 'مفيش حاجة بتتسجّل للبيئة دلوقتي. تقدر تضبطها في أي وقت.', en: 'Nothing about the environment is recorded now. You can configure it at any time.' }, tools: [] }
   };
   const wizForm = () => (wiz.form ??= { name: '', description: '', requirements: '', parent: parentGuess(), stack: 'empty', environment: 'later', git: true, install: false, allowNested: false, agent: 'none' });
   // PF-0086: the agent for the new project. Personal to this machine, so it is not part of the
   // plan; it is saved for the project right after creation. No session starts on its own.
   const AGENT_CHOICE = {
-    none: { t: { ar: 'من غير وكيل دلوقتي', en: 'No agent for now' }, d: { ar: 'تقدر تختاره بعدين من «التشغيل».', en: 'You can choose one later in Setup.' } },
+    none: { t: { ar: 'من غير وكيل دلوقتي', en: 'No agent for now' }, d: { ar: 'تقدر تختاره بعدين من «الإعدادات».', en: 'You can choose one later under Project → Settings.' } },
     codex: { t: { ar: 'Codex', en: 'Codex' }, d: { ar: 'باشتراك ChatGPT بتاعك، من غير مفاتيح API. بتبدأ الجلسة من صفحة أول شغلانة.', en: 'On your ChatGPT subscription, never API keys. You start the session from the first work item.' } },
     claude: { t: { ar: 'Claude Code (تجريبي)', en: 'Claude Code (experimental)' }, d: { ar: 'باشتراكك في Claude. بتشغّله في الترمينال بالأمر اللي هيظهر، وبعدها الشات بيشتغل من الكونسول.', en: 'On your Claude subscription. You start it in a terminal with the command shown; then the chat works from the console.' } }
   };
@@ -2633,13 +3048,27 @@
         ...(agentName && wiz.ready?.agentSaved ? [A(`الوكيل: ${agentName} متربط (مفيش جلسة بدأت)`, `Agent: ${agentName} connected (no session started)`)] : [])
       ];
       result = `<section class="panel wizready" data-wiz-done style="margin-top:12px"><h2 style="font-size:20px">${A('المشروع جاهز ✓', 'The project is ready ✓')}</h2><ul class="small">${made.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>${attachLine}
-        ${reg?.ok ? (wiz.ready ? `<p class="small">${A('الخطوة الجاية: افتح المشروع، وهتلاقي «ابدأ من هنا» فوق.', 'Next: open the project; «Start here» is at the top.')}</p><div class="row"><button class="btn go" data-wiz-open="${esc(reg.id)}">${A('افتح المشروع وابدأ', 'Open the project and start')}</button></div>` : `<p class="small muted">${A('بيكمّل آخر خطوات…', 'Finishing the last steps…')}</p>`)
+        ${reg?.ok ? (wiz.ready ? `<p class="small">${A('الخطوة الجاية: افتح المشروع، وهتلاقي «ابدأ من هنا» فوق.', 'Next: open the project; «Start here» is at the top.')}</p><div class="row"><button class="btn go" data-wiz-open="${esc(reg.id)}">${A('افتح المشروع وابدأ', 'Open the project and start')}</button></div>${wizTeamStep(reg.id)}` : `<p class="small muted">${A('بيكمّل آخر خطوات…', 'Finishing the last steps…')}</p>`)
           : `<div class="errbar data" role="alert"><b>${A('المشروع اتعمل، بس مااتضافش للكونسول', 'The project exists, but it was not added to the console')}</b><p class="small">${esc(reg?.message ?? '')}</p><button class="btn sm" data-wiz-register>${A('ضيفه للكونسول', 'Add it to the console')}</button><p class="tiny muted">${A('ده بيسجّله بس، عمره ما بيعمل مشروع تاني.', 'This only registers it; it never creates a second project.')}</p></div>`}</section>`;
     } else if (outcome?.error) {
       result = `<section class="errbar" role="alert" data-wiz-failed style="margin-top:12px"><b>${A('الإنشاء وقف — مفيش حاجة اتكتب فوقها', 'Creation stopped — nothing was overwritten')}</b><p class="small" style="white-space:pre-wrap">${esc(outcome.error.message)}</p><div class="row"><button class="btn sm" data-wiz-retry>${A('حاول تاني', 'Retry')}</button><span class="tiny muted">${A('المحاولة بتكمّل من آخر خطوة خلصت، ومابتعملش مشروع تاني.', 'Retrying continues from the last finished step and never creates a second project.')}</span></div>
         <details class="small"><summary>${A('تفاصيل تقنية', 'Technical details')}</summary><code class="ltr">yallaflow new discard ${esc(plan.id)}</code></details></section>`;
     }
     return head + stepper() + (wiz.ready ? '' : summary) + `<section class="panel" style="margin-top:12px"><h2 style="font-size:18px">${A('التقدّم', 'Progress')}</h2>${bar}<ol class="wizsteps wizprog">${list}</ol>${pr?.log ? `<details><summary class="small">${A('السجل', 'Log')}</summary><pre class="svclog ltr" tabindex="0">${esc(pr.log)}</pre></details>` : ''}</section>` + result;
+  }
+  // PF-0132: an optional team-mode step after a successful creation, using the confirmed Shared
+  // enable flow. It applies only with Git and when the existing flow can run (agents on).
+  function wizTeamStep(id) {
+    const g = wiz.ready?.git;
+    if (!g || g.lane) return '';
+    if (g.sharedMode) return `<section class="wizteam on" data-wiz-team="on"><p class="small">👥 ${A('وضع الفريق شغّال للمشروع ده. اعمل commit لـ .yallaflow/ علشان الفريق ياخده.', 'Team mode is on for this project. Commit .yallaflow/ to share it with the team.')}</p></section>`;
+    if (!g.branch) return '';
+    const action = g.canEnableShared && !readOnly
+      ? `<button type="button" class="btn sm" data-shared-open data-shared-pid="${esc(id)}">${A('شغّل وضع الفريق…', 'Turn on team mode…')}</button><span class="tiny muted">${A('هتشوف اللي هيتغيّر وتأكد قبل أي حاجة. لو YallaFlow طلب، اعمل commit للمشروع الأول.', 'You see what changes and confirm first. If YallaFlow asks, commit the project first.')}</span>`
+      : `<p class="tiny muted">${A('شغّله بـ', 'Turn it on with')} <code class="ltr">yallaflow shared enable</code></p>`;
+    return `<section class="wizteam" data-wiz-team="off"><div class="row"><span aria-hidden="true">👥</span><b class="grow">${A('شغل الفريق', 'Team mode')}</b><span class="chip todo">${A('اختياري', 'Optional')}</span></div>
+      <p class="small muted">${A('لو أكتر من حد هيشتغل على المشروع ده من فروع مختلفة، شغّل وضع الفريق: أرقام الشغل مبتتكررش بين الفروع ومعرفة المشروع بتتجمّع على فرع الدمج. تقدر تشغّله بعدين من «الإعدادات» ← «وضع الفريق».', 'If more than one person will work on this project from different branches, turn on team mode: work IDs never collide across branches, and project knowledge is combined on the integration branch. You can turn it on later under Settings → Team mode.')}</p>
+      <div class="row">${action}</div></section>`;
   }
   function readStep(form) {
     const f = wizForm();
@@ -2761,10 +3190,13 @@
         await post(`/api/p/${reg.id}/setup/step`, JSON.stringify({ step: 'agents' }), { 'Content-Type': 'application/json' });
         agentsOn = true; agentSaved = true;
         await loadAgentInfo();
-      } catch (e) { toast(esc(A(`المشروع اتعمل، بس اختيار الوكيل مااتحفظش: ${e.message}. اختاره من «التشغيل».`, `The project was created, but the agent choice was not saved: ${e.message}. Choose it in Setup.`))); }
+      } catch (e) { toast(esc(A(`المشروع اتعمل، بس اختيار الوكيل مااتحفظش: ${e.message}. اختاره من «الإعدادات».`, `The project was created, but the agent choice was not saved: ${e.message}. Choose it under Project → Settings.`))); }
     }
     // PF-0090: stay on the page and show «The project is ready»; the developer opens it.
-    if (reg?.ok) wiz.ready = { id: reg.id, workId: outcome.workId ?? null, agentSaved };
+    // PF-0132: the new project's Git position decides whether the optional team-mode step applies.
+    let git = null;
+    if (reg?.ok) { try { git = (await api(`/api/p/${reg.id}/overview`)).git ?? null; } catch { git = null; } }
+    if (reg?.ok) wiz.ready = { id: reg.id, workId: outcome.workId ?? null, agentSaved, git };
   }
   function resetWizard() { wiz = { ...wiz, step: 1, form: null, files: [], plan: null, error: null, busy: false, progress: null, acknowledged: false, attach: null, registration: null, ready: null }; }
   async function wizardRegister() {
@@ -2781,7 +3213,7 @@
   // project) and 'parent' (where the New Project Wizard creates its new folder). Browsing stays
   // inside the home folder, hidden folders stay out, and every path — typed or clicked — is
   // checked by the server. Folder kinds come from file names only.
-  let folder = null; // { mode, data, error, busy, preview, previewError, previewBusy, ack, creating }
+  let folder = null; // { mode, data, error, busy, preview, previewError, previewBusy, ack, creating, sel, editPath, gitInit }
   const RECENT_KEY = 'recentFolders';
   const STACK_NAME = { laravel: 'Laravel', php: 'PHP', node: 'Node.js', python: 'Python', go: 'Go', ruby: 'Ruby', java: 'Java', rust: 'Rust', dotnet: '.NET' };
   const FOLDER_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>';
@@ -2800,18 +3232,20 @@
   const rememberFolder = (dir) => { if (dir) store.set(RECENT_KEY, [dir, ...recentFolders().filter((x) => x !== dir)].slice(0, 6)); };
   async function openFolder(mode, at) {
     const fresh = !folder || folder.mode !== mode;
-    folder = { mode, data: fresh ? null : folder.data, error: null, busy: true, preview: null, previewError: null, previewBusy: false, ack: false, creating: false };
+    folder = { mode, data: fresh ? null : folder.data, error: null, busy: true, preview: null, previewError: null, previewBusy: false, ack: false, creating: false, sel: null, editPath: false, gitInit: false };
     let d = document.getElementById('folderdlg');
     if (!d) {
       d = document.createElement('dialog'); d.id = 'folderdlg'; d.className = 'panel folderdlg';
       d.addEventListener('close', () => { folder = null; });
       d.addEventListener('input', onFolderInput);
       d.addEventListener('keydown', onFolderKey);
+      // PF-0139: like a file dialog — one click selects a folder, a double click opens it.
+      d.addEventListener('dblclick', (e) => { const row = e.target.closest('[data-folder-pick]'); if (row && folder && !folder.preview) openFolder(folder.mode, row.dataset.folderPick); });
       d.addEventListener('submit', (e) => {
         if (e.target.matches('[data-folder-pathform]')) { e.preventDefault(); const v = typedPath(e.target.path.value); if (v && folder) openFolder(folder.mode, v); }
         else if (e.target.matches('[data-folder-newform]')) { e.preventDefault(); newFolder(e.target); }
       });
-      d.addEventListener('change', (e) => { if (e.target.matches('[data-folder-ack]') && folder) { folder.ack = e.target.checked; const b = d.querySelector('[data-folder-connect]'); if (b) b.disabled = !folder.ack || folder.previewBusy; } });
+      d.addEventListener('change', (e) => { if (e.target.matches('[data-folder-gitinit]') && folder) { folder.gitInit = e.target.checked; return; } if (e.target.matches('[data-folder-ack]') && folder) { folder.ack = e.target.checked; const b = d.querySelector('[data-folder-connect]'); if (b) b.disabled = !folder.ack || folder.previewBusy; } });
       document.body.appendChild(d);
     }
     renderFolder();
@@ -2821,7 +3255,29 @@
       try { folder.data = await api('/api/fs/dirs'); folder.error = e.message; } catch (e2) { folder.error = e2.message; }
     }
     folder.busy = false; renderFolder();
-    (d.querySelector('.fpick-list [data-folder-go]') ?? d.querySelector('[data-folder-filter]'))?.focus();
+    (d.querySelector('.fpick-list .fpick-row') ?? d.querySelector('[data-folder-filter]'))?.focus();
+  }
+  // PF-0139: what the footer's button acts on — the selected folder, else the open one.
+  function folderTarget() {
+    const x = folder?.data;
+    if (!x) return null;
+    const row = folder.sel ? (x.folders ?? []).find((f) => f.path === folder.sel) : null;
+    return row ? { path: row.path, here: row, selected: true, atHome: false } : { path: x.path, here: x.here, selected: false, atHome: !x.parent };
+  }
+  // Selecting updates the rows and the footer in place: the list keeps its scroll, the filter
+  // its text, and the clicked row its focus (so a double click still lands on it).
+  function pickFolder(target) {
+    if (!folder?.data || folder.preview) return;
+    folder.sel = target;
+    const d = document.getElementById('folderdlg');
+    for (const row of d?.querySelectorAll('.fpick-list [data-folder-pick]') ?? []) { const on = row.dataset.folderPick === target; row.setAttribute('aria-pressed', String(on)); row.closest('li')?.classList.toggle('sel', on); }
+    const foot = d?.querySelector('[data-folder-foot]');
+    if (foot) foot.outerHTML = folderFooter(folder.data);
+  }
+  function folderRow(f) {
+    const k = folderKind(f);
+    const on = folder?.sel === f.path;
+    return `<li data-name="${esc(f.name.toLowerCase())}" class="${on ? 'sel' : ''}"><button type="button" class="fpick-row" data-folder-pick="${esc(f.path)}" aria-pressed="${on}"><span class="fpick-ico ${k.tone}">${k.icon}</span><span class="grow ltr fpick-name">${esc(f.name)}</span>${k.label ? `<span class="fpick-kind ${f.kind === 'yallaflow' ? 'yf' : f.kind === 'code' ? 'code' : ''}">${esc(k.label)}</span>` : ''}</button><button type="button" class="fpick-enter" data-folder-go="${esc(f.path)}" tabindex="-1" aria-label="${esc(A(`ادخل الفولدر ${f.name}`, `Open the folder ${f.name}`))}" title="${A('ادخل الفولدر (دبل كليك أو Enter)', 'Open the folder (double-click or Enter)')}">${lang === 'ar' ? '‹' : '›'}</button></li>`;
   }
   function crumbs(x) {
     if (!x) return '';
@@ -2830,19 +3286,21 @@
     return `<nav class="fpick-crumbs" aria-label="${A('المسار', 'Path')}"><ol>${parts.map((c, i) => `<li>${i === parts.length - 1 ? `<span aria-current="location">${i === 0 ? '⌂ ' : ''}${esc(c.label)}</span>` : `<button type="button" data-folder-go="${esc(c.path)}">${i === 0 ? '⌂ ' : ''}${esc(c.label)}</button>`}</li>`).join('')}</ol></nav>`;
   }
   function folderFooter(x) {
-    const here = x?.here;
+    const t = folderTarget();
+    const here = t?.here;
     const k = folderKind(here);
-    const atHome = x && !x.parent;
+    const atHome = t?.atHome;
+    const what = !t ? '' : t.selected ? A('الفولدر المحدد', 'Selected folder') : A('الفولدر المفتوح', 'Open folder');
     let action = '';
     if (folder.mode === 'parent') {
       const name = wizForm().name;
       action = `<button type="button" class="btn go" data-folder-choose ${x ? '' : 'disabled'}>${A('أنشئ المشروع هنا', 'Create the project here')}</button>`;
-      return `<div class="fpick-foot"><div class="grow tw:min-w-0"><div class="tiny muted">${A('المشروع الجديد هيتعمل في فولدر جديد جوه:', 'The new project gets a new folder inside:')}</div><div class="ltr fpick-path" title="${esc(x?.path ?? '')}">${esc(tildePath(x?.path))}${name ? `/<b>${esc(name)}</b>` : ''}</div>${here?.yallaflow ? `<div class="tiny tw:text-amber">${A('ده مشروع YallaFlow — غالباً عايز تختار فولدر برّاه.', 'This is a YallaFlow project — you probably want a folder outside it.')}</div>` : ''}</div>${action}</div>`;
+      return `<div class="fpick-foot" data-folder-foot><div class="grow tw:min-w-0"><div class="tiny muted">${A('المشروع الجديد هيتعمل في فولدر جديد جوه:', 'The new project gets a new folder inside:')}</div><div class="ltr fpick-path" title="${esc(t?.path ?? '')}">${esc(tildePath(t?.path))}${name ? `/<b>${esc(name)}</b>` : ''}</div>${here?.yallaflow ? `<div class="tiny tw:text-amber">${A('ده مشروع YallaFlow — غالباً عايز تختار فولدر برّاه.', 'This is a YallaFlow project — you probably want a folder outside it.')}</div>` : ''}</div>${action}</div>`;
     }
-    if (!x || atHome) action = `<button type="button" class="btn go" disabled>${A('اختار فولدر المشروع', 'Choose the project folder')}</button>`;
-    else if (here?.yallaflow) action = `<button type="button" class="btn go" data-folder-choose>${A('افتح المشروع', 'Open this project')}</button>`;
+    if (!t || atHome) return `<div class="fpick-foot" data-folder-foot><span class="fpick-ico tw:text-muted">${FOLDER_SVG}</span><div class="grow tw:min-w-0 small">${A('اضغط على فولدر المشروع علشان تختاره.', 'Click the project folder to select it.')}</div><button type="button" class="btn go" disabled>${A('اختار فولدر المشروع', 'Choose the project folder')}</button></div>`;
+    if (here?.yallaflow) action = `<button type="button" class="btn go" data-folder-choose>${A('افتح المشروع', 'Open this project')}</button>`;
     else action = `<button type="button" class="btn go" data-folder-preview>${here?.empty ? A('ابدأ مشروع جديد هنا', 'Start a new project here') : A('جهّز YallaFlow هنا', 'Set up YallaFlow here')}</button>`;
-    return `<div class="fpick-foot"><span class="fpick-ico ${k.tone}">${k.icon}</span><div class="grow tw:min-w-0"><div class="ltr fpick-path" title="${esc(x?.path ?? '')}">${esc(tildePath(x?.path))}</div>${k.label ? `<div class="tiny muted">${esc(k.label)}</div>` : ''}</div>${action}</div>`;
+    return `<div class="fpick-foot" data-folder-foot><span class="fpick-ico ${k.tone}">${k.icon}</span><div class="grow tw:min-w-0"><div class="tiny muted">${what}${k.label ? ` · ${esc(k.label)}` : ''}</div><div class="ltr fpick-path" title="${esc(t.path)}">${esc(tildePath(t.path))}</div></div>${action}</div>`;
   }
   function previewPanel() {
     const p = folder.preview;
@@ -2857,7 +3315,8 @@
       ${p.problems.length ? `<div class="tw:mt-3 tw:rounded-field tw:bg-clay-soft tw:px-3 tw:py-2" role="alert"><b class="tw:text-clay">${A('مش هينفع نجهّزه دلوقتي — ومفيش حاجة اتغيّرت:', 'This folder cannot be set up right now — nothing was changed:')}</b><ul class="small tw:mt-1 tw:ps-5">${p.problems.map((x) => `<li dir="auto">${esc(x.message)}</li>`).join('')}</ul></div>` : `
       <p class="small tw:mt-3"><b>${A('YallaFlow هيعمل بالظبط:', 'YallaFlow will make exactly these changes:')}</b></p>
       <ul class="fpick-plan">${p.plan.filter((x) => x.op !== 'unchanged').map((x) => `<li><span class="fpick-op ${x.op === 'create' ? 'add' : 'mod'}" aria-hidden="true">${opSign[x.op]}</span><span class="ltr">${esc(x.path)}</span><span class="tiny muted">${esc(notes[x.path] || opText[x.op])}${notes[x.path] && x.op !== 'create' ? ` · ${esc(opText[x.op])}` : ''}</span></li>`).join('')}</ul>
-      <p class="tiny muted tw:mt-2">${A('مفيش كود تطبيق هيتغيّر، ومفيش commit، ومفيش تغيير في Git.', 'No application code changes, no commit, no Git changes.')}${existing ? ` ${A('بعدها وكيلك بيجهّز فهم للمشروع وإنت توافق عليه.', 'Next, your agent prepares a project understanding for you to approve.')}` : ''}</p>
+      <p class="tiny muted tw:mt-2">${!p.git && !p.gitAbove ? A('مفيش كود تطبيق هيتغيّر، ومفيش commit، ومفيش تغيير في Git إلا لو اخترت «git init» تحت.', 'No application code changes, no commit, and no Git changes unless you tick "git init" below.') : A('مفيش كود تطبيق هيتغيّر، ومفيش commit، ومفيش تغيير في Git.', 'No application code changes, no commit, no Git changes.')}${existing ? ` ${A('بعدها وكيلك بيجهّز فهم للمشروع وإنت توافق عليه.', 'Next, your agent prepares a project understanding for you to approve.')}` : ''}</p>
+      ${!p.git && !p.gitAbove ? `<label class="small fpick-git"><input type="checkbox" data-folder-gitinit ${folder.gitInit ? 'checked' : ''}> <span><b>${A('اعمل Git repository في الفولدر ده', 'Also create a Git repository in this folder')}</b> <span class="ltr tiny muted">(git init)</span> <span class="tiny muted">· ${A('اختياري', 'optional')}</span><br><span class="tiny muted">${A('الفولدر ده مفيهوش Git. بيتعمل repository فاضي بس: من غير commit ولا remote، وملفاتك زي ما هي. Git بيخلّيك ترجع في أي تغيير، ومطلوب لشغل الفريق والـ lanes.', 'This folder has no Git. Only an empty repository is created: no commit, no remote, and your files stay as they are. Git lets you undo any change, and team work and lanes need it.')}</span></span></label>` : ''}
       <label class="small tw:mt-3 tw:flex tw:items-center tw:gap-2"><input type="checkbox" data-folder-ack ${folder.ack ? 'checked' : ''}> ${A('راجعت التغييرات دي', 'I reviewed these changes')}</label>`}
       ${folder.previewError ? `<p class="small tw:mt-2 tw:text-clay" role="alert" dir="auto" style="white-space:pre-wrap">${esc(folder.previewError)}</p>` : ''}
       <div class="row tw:mt-4"><button type="button" class="btn ghost" data-folder-back>${A('رجوع', 'Back')}</button><span class="grow"></span>${p.problems.length ? '' : `<button type="button" class="btn go" data-folder-connect ${folder.ack && !folder.previewBusy ? '' : 'disabled'}>${folder.previewBusy ? A('بيجهّز…', 'Setting up…') : existing ? A('جهّز YallaFlow', 'Set up YallaFlow') : A('ابدأ المشروع', 'Start the project')}</button>`}</div></section>`;
@@ -2874,14 +3333,14 @@
     const label = (p) => projects.find((q) => q.root === p)?.name ?? p.split('/').pop();
     const rows = x?.folders ?? [];
     d.innerHTML = `${head}
-      <div class="fpick-bar">${x?.parent ? `<button type="button" class="ibtn fpick-up" data-folder-go="${esc(x.parent)}" aria-label="${A('الفولدر الأعلى', 'Up one folder')}" title="${A('الفولدر الأعلى (Backspace)', 'Up one folder (Backspace)')}">↑</button>` : ''}${crumbs(x)}</div>
-      <form class="fpick-pathform" data-folder-pathform><label class="tw:sr-only" for="fpick-path">${A('المسار', 'Path')}</label><input id="fpick-path" class="ltr" name="path" value="${esc(tildePath(x?.path))}" spellcheck="false" autocomplete="off" placeholder="~/code/my-project"><button type="submit" class="btn sm">${A('روح', 'Go')}</button></form>
+      ${folder.editPath ? `<form class="fpick-pathform" data-folder-pathform><label class="tw:sr-only" for="fpick-path">${A('المسار', 'Path')}</label><input id="fpick-path" class="ltr" name="path" value="${esc(tildePath(x?.path))}" spellcheck="false" autocomplete="off" placeholder="~/code/my-project"><button type="submit" class="btn sm go">${A('روح', 'Go')}</button><button type="button" class="btn sm ghost" data-folder-editpath="off">${A('إلغاء', 'Cancel')}</button></form>`
+        : `<div class="fpick-bar">${x?.parent ? `<button type="button" class="ibtn fpick-up" data-folder-go="${esc(x.parent)}" aria-label="${A('الفولدر الأعلى', 'Up one folder')}" title="${A('الفولدر الأعلى (Backspace)', 'Up one folder (Backspace)')}">↑</button>` : ''}${crumbs(x)}<span class="grow"></span>${x ? `<button type="button" class="ibtn fpick-edit" data-folder-editpath="on" aria-label="${A('اكتب المسار', 'Type a path')}" title="${A('اكتب المسار بنفسك', 'Type a path yourself')}">✎</button>` : ''}</div>`}
       ${recents.length ? `<div class="fpick-recent"><span class="tiny muted">${A('أخيراً:', 'Recent:')}</span>${recents.map((p) => `<button type="button" class="fchip" data-folder-go="${esc(p)}" title="${esc(tildePath(p))}">${esc(label(p))}</button>`).join('')}</div>` : ''}
       <div class="fpick-tools"><input type="search" data-folder-filter placeholder="${A('دوّر في الفولدرات…', 'Filter folders…')}" aria-label="${A('دوّر في الفولدرات', 'Filter folders')}" autocomplete="off">${folder.mode === 'parent' && x ? (folder.creating ? `<form class="fpick-new" data-folder-newform><input name="name" maxlength="80" placeholder="${A('اسم الفولدر', 'Folder name')}" aria-label="${A('اسم الفولدر الجديد', 'New folder name')}" required><button type="submit" class="btn sm go">${A('اعمل', 'Create')}</button><button type="button" class="btn sm ghost" data-folder-newcancel>${A('إلغاء', 'Cancel')}</button></form>` : `<button type="button" class="btn sm" data-folder-new>＋ ${A('فولدر جديد', 'New folder')}</button>`) : ''}</div>
       ${folder.error ? `<p class="small tw:text-clay" role="alert" dir="auto">${esc(folder.error)}</p>` : ''}
-      ${folder.busy ? `<p class="muted small fpick-list">${A('بيقرا…', 'Reading…')}</p>` : x ? `<ul class="fpick-list" role="list" aria-label="${A('الفولدرات', 'Folders')}">${rows.map((f) => { const k = folderKind(f); return `<li data-name="${esc(f.name.toLowerCase())}"><button type="button" class="fpick-row" data-folder-go="${esc(f.path)}"><span class="fpick-ico ${k.tone}">${k.icon}</span><span class="grow ltr fpick-name">${esc(f.name)}</span>${k.label ? `<span class="fpick-kind ${f.kind === 'yallaflow' ? 'yf' : f.kind === 'code' ? 'code' : ''}">${esc(k.label)}</span>` : ''}<span class="fpick-go" aria-hidden="true">›</span></button></li>`; }).join('') || `<li class="muted small fpick-empty">${A('مفيش فولدرات هنا.', 'No folders here.')}</li>`}<li class="muted small fpick-empty" data-folder-nomatch hidden>${A('مفيش فولدر بالاسم ده.', 'No folder matches.')}</li></ul>${x.truncated ? `<p class="tiny muted">${A('أول 500 فولدر بس.', 'First 500 folders only.')}</p>` : ''}` : ''}
+      ${folder.busy ? `<p class="muted small fpick-list">${A('بيقرا…', 'Reading…')}</p>` : x ? `<ul class="fpick-list" role="list" aria-label="${A('الفولدرات', 'Folders')}">${rows.map(folderRow).join('') || `<li class="muted small fpick-empty">${A('مفيش فولدرات هنا.', 'No folders here.')}</li>`}<li class="muted small fpick-empty" data-folder-nomatch hidden>${A('مفيش فولدر بالاسم ده.', 'No folder matches.')}</li></ul>${x.truncated ? `<p class="tiny muted">${A('أول 500 فولدر بس.', 'First 500 folders only.')}</p>` : ''}` : ''}
       ${folderFooter(x)}
-      <p class="tiny muted tw:mt-2">${A('فولدرات جوه فولدر البيت بس؛ المخفية مابتظهرش.', 'Folders inside your home folder only; hidden folders are not shown.')}</p>`;
+      <p class="tiny muted fpick-hint">${A('ضغطة بتختار الفولدر · دبل كليك أو Enter بيدخله · Backspace بيرجع للأعلى. فولدرات جوه فولدر البيت بس؛ المخفية مابتظهرش.', 'Click selects a folder · double-click or Enter opens it · Backspace goes up. Folders inside your home folder only; hidden folders are not shown.')}</p>`;
   }
   // Filtering hides rows in place (no redraw, so typing keeps its focus and caret).
   function onFolderInput(e) {
@@ -2898,9 +3357,14 @@
     const rows = [...d.querySelectorAll('.fpick-list li:not([hidden]) .fpick-row')];
     const inField = e.target.matches('input');
     const at = rows.indexOf(e.target);
-    if (e.key === 'ArrowDown' && (at >= 0 || e.target.matches('[data-folder-filter]'))) { e.preventDefault(); rows[Math.min(at + 1, rows.length - 1)]?.focus(); return; }
-    if (e.key === 'ArrowUp' && at >= 0) { e.preventDefault(); (at === 0 ? d.querySelector('[data-folder-filter]') : rows[at - 1])?.focus(); return; }
-    if (e.key === 'Enter' && e.target.matches('[data-folder-filter]')) { e.preventDefault(); rows[0]?.click(); return; }
+    // PF-0139: the arrows move the selection; Enter (or the forward arrow) opens the folder.
+    const move = (row) => { if (row) { row.focus(); pickFolder(row.dataset.folderPick); } };
+    if (e.key === 'ArrowDown' && (at >= 0 || e.target.matches('[data-folder-filter]'))) { e.preventDefault(); move(rows[Math.min(at + 1, rows.length - 1)]); return; }
+    if (e.key === 'ArrowUp' && !e.altKey && at >= 0) { e.preventDefault(); if (at === 0) d.querySelector('[data-folder-filter]')?.focus(); else move(rows[at - 1]); return; }
+    if (e.key === 'Enter' && e.target.matches('[data-folder-filter]')) { e.preventDefault(); if (rows[0]) openFolder(folder.mode, rows[0].dataset.folderPick); return; }
+    const forward = lang === 'ar' ? 'ArrowLeft' : 'ArrowRight';
+    if (at >= 0 && (e.key === 'Enter' || e.key === forward)) { e.preventDefault(); openFolder(folder.mode, rows[at].dataset.folderPick); return; }
+    if (at >= 0 && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) { e.preventDefault(); if (folder.data?.parent) openFolder(folder.mode, folder.data.parent); return; }
     if ((e.key === 'Backspace' && !inField) || (e.key === 'ArrowUp' && e.altKey)) { e.preventDefault(); if (folder.data?.parent) openFolder(folder.mode, folder.data.parent); return; }
     // Typing on a row starts filtering.
     if (!inField && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey && /\S/.test(e.key)) { const f = d.querySelector('[data-folder-filter]'); if (f) { f.focus(); f.value += e.key; onFolderInput({ target: f }); e.preventDefault(); } }
@@ -2914,22 +3378,30 @@
     return v;
   }
   async function previewFolder() {
-    const x = folder?.data;
+    const x = folderTarget();
     if (!x) return;
     folder.previewBusy = true;
     try { folder.preview = await api(`/api/fs/connect-preview?path=${encodeURIComponent(x.path)}`); folder.previewError = null; } catch (e) { folder.error = e.message; }
-    folder.previewBusy = false; folder.ack = false; renderFolder();
+    folder.previewBusy = false; folder.ack = false; folder.gitInit = false; renderFolder();
   }
   async function connectFolder() {
     const p = folder?.preview;
     if (!p || !folder.ack) return;
+    const wantGit = Boolean(folder.gitInit) && !p.git && !p.gitAbove;
     folder.previewBusy = true; folder.previewError = null; renderFolder();
     try {
       const reg = await post('/api/projects/connect', JSON.stringify({ root: p.path, planHash: p.planHash, confirm: true }), { 'Content-Type': 'application/json' });
+      // PF-0139: the developer ticked "git init" in the preview — the console's own confirmed
+      // action, on the project just connected. A refusal never undoes the connect.
+      let gitNote = '';
+      if (wantGit) {
+        try { await post(`/api/p/${reg.id}/git/init`, JSON.stringify({ confirm: true }), { 'Content-Type': 'application/json' }); gitNote = A(' · Git repository اتعمل', ' · Git repository created'); }
+        catch (e) { gitNote = A(` · Git ماتعملش: ${why(e)}`, ` · Git was not created: ${why(e)}`); }
+      }
       rememberFolder(p.path.split('/').slice(0, -1).join('/'));
       document.getElementById('folderdlg')?.close();
       await reloadProjects();
-      toast(esc(A(`«${p.name}» بقى مشروع YallaFlow ✓`, `“${p.name}” is now a YallaFlow project ✓`)));
+      toast(esc(A(`«${p.name}» بقى مشروع YallaFlow ✓`, `“${p.name}” is now a YallaFlow project ✓`) + gitNote));
       await switchProject(reg.id, 'map');
     } catch (e) {
       if (e.data?.preview) { folder.preview = e.data.preview; folder.ack = false; }
@@ -2941,12 +3413,12 @@
     if (!name || !folder?.data) return;
     try {
       const data = await post('/api/fs/mkdir', JSON.stringify({ parent: folder.data.path, name }), { 'Content-Type': 'application/json' });
-      folder.data = data; folder.creating = false; folder.error = null; renderFolder();
+      folder.data = data; folder.sel = null; folder.creating = false; folder.error = null; renderFolder();
       document.querySelector('#folderdlg [data-folder-choose]')?.focus();
     } catch (e) { folder.error = why(e); renderFolder(); document.querySelector('#folderdlg [data-folder-newform] input')?.focus(); }
   }
   async function chooseFolder() {
-    const x = folder?.data;
+    const x = folderTarget();
     if (!x) return;
     if (folder.mode === 'parent') {
       wizForm().parent = x.path;
@@ -2966,7 +3438,7 @@
       // PF-0069: a project without a finished setup opens on its first-time setup.
       let firstTime = false;
       try { firstTime = Boolean((await api(`/api/p/${reg.id}/setup`)).pending); } catch { firstTime = false; }
-      await switchProject(reg.id, firstTime ? 'setup' : 'overview');
+      await switchProject(reg.id, firstTime ? 'settings' : 'overview');
     } catch (e) { folder.busy = false; folder.error = e.message; renderFolder(); }
   }
 
@@ -3099,14 +3571,20 @@
       const badge = !s.items.length ? `<span class="hico sm" aria-hidden="true">＋</span>` : openN ? ring(s.openCompletion ?? 0, 92, 9) : `<span class="hico sm done" aria-hidden="true">✓</span>`;
       const dist = ST.map((_, i) => s.items.filter((it) => curIndex(it) === i).length);
       const last = s.items.map((it) => it.lastActivityAt).filter(Boolean).sort().at(-1);
-      return `<div class="projwrap"><a class="proj panel ${project.id === pid ? 'here' : ''}" href="#/map" data-open-project="${project.id}">${badge}<div class="grow"><h2 style="font-size:20px">${esc(project.name)}</h2>
-        <div class="row tiny" style="margin-top:4px">${s.counts.you ? `<span class="chip you"><i></i>${s.counts.you} ${L(STATE.you)}</span>` : ''}${s.counts.fail ? `<span class="chip fail"><i></i>${s.counts.fail} ${L(STATE.fail)}</span>` : ''}<span class="chip todo">${s.counts.active + s.counts.paused + s.counts.new} ${A('مفتوح', 'open')}</span><span class="chip done"><i></i>${s.counts.done} ${L(STATE.done)}</span>${s.invalid?.length ? `<span class="chip wait">⚠ ${s.invalid.length} ${A('سجلات مش سليمة', 'invalid')}</span>` : ''}</div>
+      // PF-0128: a card with its own actions — open the project, open its folder, copy its path.
+      const tail = String(project.root ?? '').split('/').slice(-2).join('/');
+      return `<article class="pcard panel ${project.id === pid ? 'here' : ''}">
+        <header class="pcard-head"><div class="grow pcard-id"><a class="pcard-title" href="#/map" data-open-project="${project.id}"><h2>${esc(project.name)}</h2></a><span class="ltr tiny muted pcard-path" title="${esc(project.root ?? '')}">…/${esc(tail)}</span></div>${badge}</header>
+        <div class="row tiny pcard-chips">${s.counts.you ? `<span class="chip you"><i></i>${s.counts.you} ${L(STATE.you)}</span>` : ''}${s.counts.fail ? `<span class="chip fail"><i></i>${s.counts.fail} ${L(STATE.fail)}</span>` : ''}<span class="chip todo">${s.counts.active + s.counts.paused + s.counts.new} ${A('مفتوح', 'open')}</span><span class="chip done"><i></i>${s.counts.done} ${L(STATE.done)}</span>${s.invalid?.length ? `<span class="chip wait">⚠ ${s.invalid.length} ${A('سجلات مش سليمة', 'invalid records')}</span>` : ''}</div>
         ${!s.items.length ? `<p class="small muted">${A('لسه مفيش شغل مسجّل.', 'No work recorded yet.')}</p>` : !openN ? `<p class="small muted">${A('كل الشغل المسجّل خلص.', 'All recorded work is done.')}</p>` : ''}
         ${memoryHealth(health)}
         <div class="pflow">${dist.map((n, i) => `<span style="--hue:${ST[i].hue}" data-tip="${esc(L(ST[i].name))}: ${n}"><i style="height:${6 + n * 10}px"></i><b>${n}</b></span>`).join('')}</div>
-        <div class="tiny muted">${last ? A(`آخر نشاط مسجّل ${ago(last)}`, `last recorded activity ${ago(last)}`) : ''}</div></div></a>${projRemoveBtn(project)}</div>`;
+        <div class="tiny muted">${last ? A(`آخر نشاط مسجّل ${ago(last)}`, `last recorded activity ${ago(last)}`) : ''}</div>
+        ${cardAgents(project)}
+        <footer class="pcard-foot"><button type="button" class="btn sm go" data-open-project="${project.id}">${A('افتح', 'Open')}</button>${readOnly ? '' : `<button type="button" class="btn sm" data-open-folder="${project.id}" title="${esc(A('افتح فولدر المشروع في مدير الملفات', 'Open the project folder in your file manager'))}">${A('افتح الفولدر', 'Open folder')}</button>`}<button type="button" class="btn sm ghost" data-copy="${esc(project.root ?? '')}" data-copy-what="path">${A('انسخ المسار', 'Copy path')}</button><span class="grow"></span>${readOnly ? '' : `<button type="button" class="btn sm ghost danger" data-remove-project="${project.id}" aria-label="${esc(A(`شيل ${project.name} من الكونسول`, `Remove ${project.name} from the console`))}">${A('شيل', 'Remove')}</button>`}</footer></article>`;
     }).join('');
-    return `<section class="pagehead"><div class="row"><h1 style="font-size:26px">${A('المشاريع', 'Projects')}</h1>${readOnly ? '' : `<button class="btn sm" data-folder-open="existing" style="margin-inline-start:auto">${A('ضيف مشروع موجود', 'Add an existing project')}</button><a class="btn sm go" href="#/new">＋ ${A('مشروع جديد', 'New project')}</a>`}</div><p class="muted">${A('كل مشروع ليه مجلد .yallaflow خاص بيه، والكونسول بيقرا كل واحد لوحده.', 'Each project has its own .yallaflow; the console reads each one separately.')}</p></section>
+    return `<section class="pagehead"><div class="row"><h1 style="font-size:26px">${A('المشاريع', 'Projects')}</h1>${readOnly ? '' : `<button class="btn sm" data-folder-open="existing" style="margin-inline-start:auto">${A('ضيف مشروع موجود', 'Add an existing project')}</button><a class="btn sm go" href="#/new">＋ ${A('مشروع جديد', 'New project')}</a>`}</div><p class="muted">${agentsOn ? A('كل مشاريعك ووكلاءها في مكان واحد. كل مشروع ليه مجلد .yallaflow خاص بيه، والكونسول بيقرا كل واحد لوحده.', 'All your projects and their agents in one place. Each project has its own .yallaflow; the console reads each one separately.') : A('كل مشروع ليه مجلد .yallaflow خاص بيه، والكونسول بيقرا كل واحد لوحده.', 'Each project has its own .yallaflow; the console reads each one separately.')}</p></section>
+      ${overview.length ? inboxSection() : ''}
       ${overview.length ? `<section class="projects">${cards}</section>` : `<section class="panel"><h2 style="font-size:20px">${A('أهلاً في YallaFlow', 'Welcome to YallaFlow')}</h2><p class="small">${A('لسه مفيش مشاريع في الكونسول. ابدأ مشروع جديد، أو ضيف مشروع YallaFlow موجود.', 'There are no projects in the console yet. Start a new project, or add an existing YallaFlow project.')}</p>${readOnly ? '' : `<div class="row" style="margin-top:8px"><a class="btn go" href="#/new">＋ ${A('مشروع جديد', 'New project')}</a><button class="btn" data-folder-open="existing">${A('ضيف مشروع موجود', 'Add an existing project')}</button></div>`}</section>`}
       ${unavailable.length ? `<p class="small" style="margin-top:14px">${A('مش متاحة (الفولدر اتنقل أو اتمسح):', 'Unavailable (folder moved or deleted):')} ${unavailable.map((u) => `<span class="ltr tag">${esc(u)}${readOnly ? '' : ` <button type="button" class="tagx" data-remove-project-root="${esc(u)}" aria-label="${esc(A(`شيل ${u} من الكونسول`, `Remove ${u} from the console`))}">✕</button>`}</span>`).join(' ')}</p>` : ''}
       ${devPanel(A('إدارة قائمة المشاريع', 'Manage the project list'), ['yallaflow console add <folder>', 'yallaflow console remove <folder>', 'yallaflow console list'])}`;
@@ -3182,20 +3660,52 @@
       ${assisted ? `<p class="tiny">${A(`ابدأ ${esc(head.workId)} في Claude Code واربطه من الشات. الكونسول مبيقدرش يشغّل Claude Code بنفسه.`, `Start ${esc(head.workId)} in Claude Code and link it from the chat. The console cannot start Claude Code itself.`)}</p>` : ''}
       ${live ? `<div class="row">${run.held || run.awaitNext ? btn('next', A('كمّل الطابور', 'Continue queue'), '', 'go') : btn('pause', A('وقّف بعد الحالية', 'Pause after current'))}${run.cancelAfter ? '' : btn('cancel-after', A('ألغي بعد الحالية', 'Cancel after current'))}${btn('cancel-now', A('ألغي دلوقتي', 'Cancel now'))}${run.options?.provider !== 'claude' && lane.userSessions ? btn('switch', A('كمّل الباقي بـ Claude Code', 'Continue the rest with Claude Code'), 'data-provider="claude"') : ''}${run.options?.provider === 'claude' ? btn('switch', A('كمّل الباقي بـ Codex', 'Continue the rest with Codex'), 'data-provider="codex"') : ''}</div>` : ''}</div>`;
   }
-  function viewAgents() {
-    if (!agentsOn) return `<section class="hero calm"><span class="hico" aria-hidden="true">◎</span><div><h1>${A('الوكلاء', 'Agents')}</h1><p class="small">${A('الوكلاء مش مفعّلين في الكونسول ده. فعّلهم من «الإعداد والتشغيل».', 'Agents are not enabled in this console. Turn them on in Setup & run.')}</p></div></section>`;
-    if (!execView) return `<p class="muted" style="margin-top:40px;text-align:center">${execError ? esc(execError) : A('بيحمّل…', 'Loading…')}</p>`;
-    const inbox = execView.inbox ?? [];
-    return `<section class="hero calm"><span class="hico" aria-hidden="true">◎</span><div><h1>${A('الوكلاء', 'Agents')}</h1><p class="small">${A('كل الوكلاء في المشاريع المفتوحة هنا، واللي محتاجك في مكان واحد. كل زرار هنا بيعمل نفس اللي في الشات.', 'Every agent in this console’s projects, and everything that needs you, in one place. Each button here does the same as in the chat.')}</p></div></section>
-      ${(execView.limits ?? []).map((limit) => `<section class="errbar" role="status"><b>${A(`${limit.provider === 'codex' ? 'Codex' : 'Claude Code'} وصل لحد الاستخدام${limit.retryAt ? ` (يرجع ${esc(limit.retryAt)})` : ''}. الطوابير اللي عليه واقفة.`, `${limit.provider === 'codex' ? 'Codex' : 'Claude Code'} reached its usage limit${limit.retryAt ? ` (try again at ${esc(limit.retryAt)})` : ''}. Queues on it are paused.`)}</b><p class="small">${A('كمّل المهمة الواقفة لما الحد يرجع، أو كمّل الباقي بالوكيل التاني من كارت الطابور.', 'Resume the paused task when the limit resets, or continue the rest with the other agent from the queue card.')}</p></section>`).join('')}
-      <section class="panel"><b>${A('محتاجينك', 'Needs you')}${inbox.length ? ` (${inbox.length})` : ''}</b>${inbox.length ? inbox.map(xPermCard).join('') : `<p class="tiny muted">${A('مفيش طلبات مستنية دلوقتي.', 'Nothing is waiting for you right now.')}</p>`}</section>
-      <div class="xlanes">${(execView.lanes ?? []).filter((lane) => lane.kind !== 'lane').map((home) => xLane(home) + (execView.lanes ?? []).filter((lane) => lane.kind === 'lane' && lane.parent === home.project).map(xLane).join('')).join('')}${(execView.lanes ?? []).filter((lane) => lane.kind === 'lane' && !(execView.lanes ?? []).some((h) => h.project === lane.parent)).map(xLane).join('')}</div>`;
+  // PF-0132: the Agents page lives in Projects (the Needs-you inbox and each card's agents) and
+  // in Worktrees (this project's queues, merges and session controls). #/agents lands on the inbox.
+  function limitNotices() {
+    return (execView?.limits ?? []).map((limit) => `<section class="errbar" role="status"><b>${A(`${limit.provider === 'codex' ? 'Codex' : 'Claude Code'} وصل لحد الاستخدام${limit.retryAt ? ` (يرجع ${esc(limit.retryAt)})` : ''}. الطوابير اللي عليه واقفة.`, `${limit.provider === 'codex' ? 'Codex' : 'Claude Code'} reached its usage limit${limit.retryAt ? ` (try again at ${esc(limit.retryAt)})` : ''}. Queues on it are paused.`)}</b><p class="small">${A('كمّل المهمة الواقفة لما الحد يرجع، أو كمّل الباقي بالوكيل التاني من كارت الطابور.', 'Resume the paused task when the limit resets, or continue the rest with the other agent from the queue card.')}</p></section>`).join('');
+  }
+  function inboxSection() {
+    if (!agentsOn) return '';
+    const inbox = execView?.inbox ?? [];
+    const list = !execView ? `<p class="tiny muted">${execError ? esc(execError) : A('بيحمّل…', 'Loading…')}</p>` : inbox.length ? `<div class="inbox-list">${inbox.map(xPermCard).join('')}</div>` : `<p class="tiny muted">${A('مفيش طلبات مستنية دلوقتي.', 'Nothing is waiting for you right now.')}</p>`;
+    return `<section class="inbox ${inbox.length ? 'has' : ''}" id="inbox" aria-labelledby="inbox-h"><div class="row inbox-h"><h2 id="inbox-h">${A('محتاجك', 'Needs you')}</h2>${inbox.length ? `<span class="pbadge you">${inbox.length}</span>` : ''}<span class="tiny muted grow">${A('طلبات الوكلاء من كل المشاريع. لو محدش ردّ، الطلب بيترفض تلقائي — عمره ما بيتوافق عليه لوحده.', 'Agent requests from every project. Unanswered requests are denied automatically — never approved on their own.')}</span></div>${list}</section>${limitNotices()}`;
+  }
+  const lanesOf = (projectId) => (execView?.lanes ?? []).filter((lane) => lane.project === projectId || (lane.kind === 'lane' && lane.parent === projectId));
+  const activeRun = (lane) => lane.runs.some((run) => !['finished', 'cancelled'].includes(run.state));
+  function laneRow(lane) {
+    const s = lane.session;
+    const prov = s ? (s.provider === 'claude' ? ['c', 'Claude Code'] : ['x', 'Codex']) : null;
+    const tone = lane.pending.length ? 'you' : ['working', 'starting'].includes(s?.status) ? 'active' : s ? 'wait' : 'todo';
+    const status = !s ? (activeRun(lane) ? A('في الطابور', 'queued') : A('مفيش وكيل شغّال', 'no agent running')) : lane.pending.length ? A('محتاج موافقتك', 'needs your approval') : s.status === 'working' ? A('شغّال', 'working') : s.status === 'starting' ? A('بيبدأ', 'starting') : s.status === 'connected' ? A('متوصّل', 'connected') : A('مستنيك', 'waiting for you');
+    const work = s?.workId ?? lane.runs.flatMap((run) => run.lanes?.[0]?.tasks ?? []).find((task) => ['starting', 'working', 'needs-you', 'queued', 'paused', 'interrupted'].includes(task.state))?.workId ?? null;
+    const workedMin = lane.workingSince ? Math.floor((Date.now() - Date.parse(lane.workingSince)) / 60000) : null;
+    const detail = [lane.lastStep?.title ? esc(lane.lastStep.title) : '', workedMin !== null ? A(`بقاله ${mins(workedMin)}`, `for ${mins(workedMin)}`) : ''].filter(Boolean).join(' · ');
+    return `<li class="plane"><span class="plane-prov ${prov ? prov[0] : ''}" ${prov ? `title="${prov[1]}"` : ''} aria-hidden="true">${prov ? prov[0].toUpperCase() : '–'}</span><div class="grow plane-body"><div class="plane-top">${work ? `<a href="#" class="ltr" data-x-open="${esc(lane.project)}" data-x-work="${esc(work)}">${esc(work)}</a>` : ''}${lane.kind === 'lane' ? `<span class="tag ltr" title="${esc(A('مسار (worktree)', 'Lane (worktree)'))}">${esc(lane.name)}</span>` : ''}</div>${detail ? `<div class="tiny muted plane-step">${detail}</div>` : ''}</div><span class="chip ${tone}"><i></i>${prov ? `<span class="sr-only">${prov[1]}: </span>` : ''}${status}</span></li>`;
+  }
+  function cardAgents(project) {
+    if (!agentsOn) return '';
+    const lanes = lanesOf(project.id);
+    const live = lanes.filter((lane) => lane.session || lane.pending.length || lane.kind === 'lane' || activeRun(lane));
+    const working = live.filter((lane) => lane.session?.status === 'working').length;
+    const head = `<div class="row pagents-h"><b class="tiny">${A('الوكلاء', 'Agents')}</b><span class="grow"></span>${working ? `<span class="tiny muted">${A(`${working} شغّال`, `${working} working`)}</span>` : ''}</div>`;
+    if (!execView) return `<div class="pagents">${head}<p class="tiny muted">${A('بيحمّل…', 'Loading…')}</p></div>`;
+    if (!live.length) return `<div class="pagents">${head}<p class="tiny muted">${A('مفيش وكيل شغّال.', 'No agent running.')}</p></div>`;
+    const more = lanes.some((lane) => lane.runs.length || lane.kind === 'lane' || lane.session) ? `<button type="button" class="linkbtn tiny" data-open-project="${esc(project.id)}" data-open-view="team">${A('الطوابير والدمج والتحكم في الجلسة', 'Queues, merges and session controls')} ${fwd()}</button>` : '';
+    return `<div class="pagents">${head}<ul class="planes">${live.map(laneRow).join('')}</ul>${more}</div>`;
+  }
+  // Worktrees: this project's agent lanes in full (queues, Review & Merge, Clean up, session controls).
+  function agentLanesSection() {
+    if (!agentsOn) return '';
+    const mine = lanesOf(pid);
+    return `<section class="xlanes-sec" id="agents"><div class="pagehead" style="margin-top:22px"><h2 style="font-size:20px">${A('الوكلاء والطوابير', 'Agents and queues')}</h2><p class="small muted">${A('جلسات الوكلاء في المشروع ده ومساراته: الطوابير، الدمج، والتحكم في الجلسة. كل زرار هنا بيعمل نفس اللي في الشات. طلبات الموافقة في «المشاريع».', 'Agent sessions in this project and its lanes: queues, merges and session controls. Each button does the same as in the chat. Approval requests are on Projects.')}</p></div>${limitNotices()}
+      ${!execView ? `<p class="tiny muted">${execError ? esc(execError) : A('بيحمّل…', 'Loading…')}</p>` : `<div class="xlanes">${mine.map(xLane).join('') || `<p class="tiny muted">${A('مفيش وكيل شغّال.', 'No agent running.')}</p>`}</div>`}</section>`;
   }
 
   function viewTeam() {
     if (!team) return `<p class="muted" style="margin-top:30px">${A('بيحمّل…', 'Loading…')}</p>`;
     if (team.error) return `<section class="errbar">${esc(team.error)}</section>`;
-    if (!team.git) return `<section class="pagehead"><h1 style="font-size:26px">${A('نسخ الشغل', 'Worktrees')}</h1><p class="muted">${A('المشروع ده مش جوه Git repository لسه.', 'This project is not in a Git repository yet.')}</p></section><section class="panel"><p class="small">${A('نسخ الشغل (git worktrees) بتخليك تشغّل أكتر من وكيل على شغلانات مختلفة في نفس الوقت من غير ما يتداخلوا. محتاجة Git الأول.', 'Worktrees (git worktrees) let you run several agents on different work items at the same time without collisions. They need Git first.')}</p>${readOnly ? '' : `<button class="btn sm go" data-git-init style="margin-top:8px">${A('اعمل Git repository', 'Initialize Git')}</button><p class="tiny muted">${A('git init بس: من غير remote ولا commit ولا push.', 'git init only: no remote, commit or push.')}</p>`}</section>`;
+    if (!team.git) return `<section class="pagehead"><h1 style="font-size:26px">${A('نسخ الشغل', 'Worktrees')}</h1><p class="muted">${A('المشروع ده مش جوه Git repository لسه.', 'This project is not in a Git repository yet.')}</p></section><section class="panel"><p class="small">${A('نسخ الشغل (git worktrees) بتخليك تشغّل أكتر من وكيل على شغلانات مختلفة في نفس الوقت من غير ما يتداخلوا. محتاجة Git الأول.', 'Worktrees (git worktrees) let you run several agents on different work items at the same time without collisions. They need Git first.')}</p>${readOnly ? '' : `<button class="btn sm go" data-git-init style="margin-top:8px">${A('اعمل Git repository', 'Initialize Git')}</button><p class="tiny muted">${A('git init بس: من غير remote ولا commit ولا push.', 'git init only: no remote, commit or push.')}</p>`}</section>${agentLanesSection()}`;
     const lane = (w) => {
       const a = w.activeWork;
       const at = a ? (a.state === 'done' ? 5 : a.state === 'new' ? -1 : stIndex(a.currentStation)) : null;
@@ -3209,6 +3719,7 @@
     return `<section class="pagehead"><h1 style="font-size:26px">${A('نسخ الشغل', 'Worktrees')}</h1><p class="muted">${A('كل نسخة شغل (git worktree) من المشروع، وحالة YallaFlow المسجّلة فيها والملفات اللي اتغيّرت. الكونسول مايعرفش مين شغّال جوه كل نسخة، ومش بيعرضها كجلسات وكلاء.', 'Every Git worktree of this project, its recorded YallaFlow state and its changed files. The console cannot tell who is working in a checkout and does not present them as agent sessions.')}</p></section>
       ${(team.overlaps ?? []).map((o) => `<section class="conflict"><b>⚠ ${A('نفس الملف متغيّر في أكتر من نسخة', 'The same file is changed in more than one worktree')}:</b> <span class="ltr">${esc(o.path)}</span><div class="tiny muted ltr">${o.worktrees.map((w) => `📁 ${esc(baseName(w))}`).join(' · ')}</div></section>`).join('')}
       <section class="lanes">${team.worktrees.map(lane).join('')}</section>
+      ${agentLanesSection()}
       ${team.worktrees.length === 1 ? devPanel(A('شغّل أكتر من وكيل بأمان', 'Run more agents safely'), ['git worktree add ../<folder> -b <branch>', 'cd ../<folder>   # open your agent here, on a different work item']) : ''}`;
   }
 
@@ -3492,6 +4003,7 @@
   // Typed values, ticks and selections are properties the observer cannot see: they mark the page
   // dirty too, so a redraw meant to reset a field (a prepared message, a refused choice) is never skipped.
   for (const type of ['input', 'change']) document.addEventListener(type, (e) => { if (e.target.closest?.('#app')) domDirty = true; }, true);
+  let lastView = null; // PF-0128: entrance motion only when the page changes, never on live updates
   function render() {
     if (pointerPressed()) {
       if (!deferredRender) deferredRender = setTimeout(() => { deferredRender = null; pointerDownAt = 0; render(); }, Math.max(0, POINTER_DEFER_MS - (Date.now() - pointerDownAt)));
@@ -3510,11 +4022,13 @@
     chatForceEnd = false;
     document.title = (snap?.counts?.you ? `(${snap.counts.you}) ` : '') + 'YallaFlow' + (snap?.project?.name ? ` · ${snap.project.name}` : '');
     if (!projects.length && snap && !['new', 'projects'].includes(r.v)) { location.hash = '#/projects'; return; }
-    const views = { new: viewNew, setup: viewSetup, overview: viewOverview, item: () => viewItem(r.id), lines: viewLines, agents: viewAgents, team: viewTeam, insights: viewInsights, projects: viewProjects, map: viewMap };
+    const views = { new: viewNew, overview: viewOverview, run: viewRun, settings: viewSettings, setup: viewRun, item: () => viewItem(r.id), lines: viewLines, agents: viewProjects, team: viewTeam, insights: viewInsights, projects: viewProjects, map: viewMap };
     const body = !snap ? `<p class="muted" style="margin-top:40px;text-align:center">${error ? '' : A('بيحمّل…', 'Loading…')}</p>` : (views[r.v] ?? viewMap)();
     // Forms marked data-keep survive a redraw: typed values and focus are carried over (PF-0057).
     const kept = [...document.querySelectorAll('form[data-keep]')].map((form) => ({ key: form.dataset.keep, values: [...form.elements].filter((el) => el.name && el.type !== 'file' && (el.type === 'checkbox' || el.type === 'radio' ? el.checked !== el.defaultChecked : el.value !== el.defaultValue)).map((el) => [el.name, el.type === 'checkbox' || el.type === 'radio' ? (el.type === 'radio' ? (el.checked ? el.value : null) : el.checked) : el.value, el.type]), focus: form.contains(document.activeElement) ? document.activeElement.name : null, caret: document.activeElement?.selectionStart ?? null }));
-    const html = topbar(r) + `<main>${banner()}${snap && ['map', 'lines'].includes(r.v) ? agentStrip() + (readiness?.pid === pid ? readinessCard() : understandingStrip()) : ''}${body}</main>` + (chatCtx(r) ? agentDock(chatCtx(r)) : '');
+    const entering = !reduced && r.v !== lastView;
+    lastView = r.v;
+    const html = topbar(r) + `<main>${banner()}${snap && ['map', 'lines'].includes(r.v) ? agentStrip() + branchBanner() + (readiness?.pid === pid ? readinessCard() : understandingStrip()) : ''}${body}</main>` + (chatCtx(r) ? agentDock(chatCtx(r)) : '');
     const appEl = document.getElementById('app');
     // Nothing changed: keep the live DOM (focus, selection, open menus, hover, a click in progress).
     noteMutations(domWatch.takeRecords());
@@ -3523,6 +4037,8 @@
     const scrolls = [...appEl.querySelectorAll(SCROLL_KEEP)].map((el, i) => [i, el.scrollTop, el.scrollLeft]);
     const pageY = window.scrollY;
     appEl.innerHTML = html;
+    // Added to the live element, not the markup, so the next live redraw is not forced by it.
+    if (entering) appEl.querySelector('main')?.classList.add('enter');
     if (scrolls.length) { const now = [...appEl.querySelectorAll(SCROLL_KEEP)]; for (const [i, top, left] of scrolls) if (now[i]) { now[i].scrollTop = top; now[i].scrollLeft = left; } }
     if (window.scrollY !== pageY) window.scrollTo(window.scrollX, pageY);
     domWatch.observe(appEl, { childList: true, subtree: true, attributes: true, characterData: true });
@@ -3619,28 +4135,36 @@
     const first = moves[0];
     if (first) {
       const it = byId(first.id);
+      // PF-0131: the work ID as a link (the title in its tooltip), so the toast stays one short line.
       const title = it ? it.title : first.id;
+      const ref = `<a class="toast-id ltr" href="#/item/${encodeURIComponent(first.id)}" title="${esc(title)}" aria-label="${esc(`${first.id} — ${title}`)}">${esc(first.id)}</a>`;
       toast(first.kind === 'new'
-        ? `＋ ${A(`«${esc(title)}» دخل من «جديد»`, `"${esc(title)}" entered through New`)}`
+        ? `＋ ${A(`${ref} دخل من «جديد»`, `${ref} entered through New`)}`
         : first.kind === 'back'
-          ? `↩ ${A(`«${esc(title)}» رجع من «${stName(first.from)}» لـ«${stName(first.to)}»`, `"${esc(title)}" went back from ${stName(first.from)} to ${stName(first.to)}`)}`
-          : `✓ ${A(`«${esc(title)}» اتسلّم من «${stName(first.from)}» لـ«${stName(first.to)}»`, `"${esc(title)}" handed from ${stName(first.from)} to ${stName(first.to)}`)}`);
+          ? `↩ ${A(`${ref} رجع من «${stName(first.from)}» لـ«${stName(first.to)}»`, `${ref} went back from ${stName(first.from)} to ${stName(first.to)}`)}`
+          : `✓ ${A(`${ref} اتسلّم من «${stName(first.from)}» لـ«${stName(first.to)}»`, `${ref} handed from ${stName(first.from)} to ${stName(first.to)}`)}`);
     }
     if (moves.some((m) => m.to === 5 && m.kind === 'forward')) celebrate();
   }
 
+  // PF-0132: every project page reads the project overview once (the header's team indicator
+  // needs its Git position); Overview and Settings re-read it on each refresh.
+  const PROJECT_VIEWS = ['map', 'lines', 'item', 'overview', 'run', 'settings', 'team', 'insights', 'projects'];
   async function loadForView() {
     const v = route().v;
     if (!pid && !['new', 'projects'].includes(v)) return;
-    if (pid && (['map', 'lines', 'overview', 'setup'].includes(v) || readiness?.pid !== pid)) await loadReadiness();
-    if (!readOnly && (v === 'setup' || !machineInfo)) await loadMachine();
+    if (pid && (['map', 'lines', ...PROJECT_TABS].includes(v) || readiness?.pid !== pid)) await loadReadiness();
+    if (!readOnly && (v === 'settings' || !machineInfo)) await loadMachine();
     // Project pages load the agent state only while the chat is open (PF-0067).
     if (v === 'item' || ((chatOpen || ['map', 'lines'].includes(v)) && PROJECT_CHAT_VIEWS.includes(v))) { if (agentsOn) await loadAgent(); else await loadAgentInfo(); }
-    if (agentsOn && (v === 'agents' || !execView)) await loadExecution();
+    // Projects shows every agent and the Needs-you inbox; Worktrees shows this project's queues.
+    if (agentsOn && (['projects', 'team'].includes(v) || !execView)) await loadExecution();
+    if (pid && PROJECT_VIEWS.includes(v) && (['overview', 'settings'].includes(v) || projectOverview?.pid !== pid)) await loadProjectOverview();
     if (v === 'team') await loadTeam();
     else if (v === 'projects') await loadOverview();
-    else if (pid && (v === 'overview' || ((v === 'map' || v === 'lines') && projectOverview?.pid !== pid))) { await loadProjectOverview(); if (v === 'overview' && projectOverview?.data?.project?.kind === 'greenfield') { await loadRuntime(); if (!agentsOn) await loadAgentInfo(); } }
-    else if (v === 'setup') await Promise.all([loadRuntime(), loadSetup(), loadPlan()]);
+    else if (pid && v === 'overview') { const greenfield = projectOverview?.data?.project?.kind === 'greenfield'; if (greenfield || runtime?.pid !== pid) await loadRuntime(); if (greenfield && !agentsOn) await loadAgentInfo(); }
+    else if (pid && v === 'run') { await Promise.all([loadRuntime(), loadPlan()]); await loadBulkReviews(); }
+    else if (pid && v === 'settings') await Promise.all([loadRuntime(), loadSetup(), loadPlan()]);
     else if (v === 'new') await loadWizard();
     syncRuntimePolling();
   }
@@ -3723,6 +4247,20 @@
   }
 
   // ---------- events ----------
+  // PF-0132: the Project tabs follow the tabs pattern — the arrow keys, Home and End move between
+  // them (in reading order, so ← moves forward in Arabic); focus stays on the chosen tab.
+  let focusTab = false;
+  document.addEventListener('keydown', (e) => {
+    const tabEl = e.target.closest?.('.ptabs [role="tab"]');
+    if (!tabEl || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+    const tabs = [...tabEl.parentElement.querySelectorAll('[role="tab"]')];
+    const at = tabs.indexOf(tabEl);
+    const forward = lang === 'ar' ? 'ArrowLeft' : 'ArrowRight';
+    const next = e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : (at + (e.key === forward ? 1 : -1) + tabs.length) % tabs.length;
+    e.preventDefault();
+    tabs[next].focus();
+    if (location.hash !== tabs[next].getAttribute('href')) { focusTab = true; location.hash = tabs[next].getAttribute('href'); }
+  });
   window.addEventListener('hashchange', async () => {
     // A new console link opened in this tab: adopt its token and start over.
     const fresh = /^#token=([0-9a-f]+)/.exec(location.hash);
@@ -3734,7 +4272,8 @@
       render(); await load(); await buildDigest(); render(); listen();
       return;
     }
-    closeDrawer(); bellOpen = false; dtab = null; const v = route().v; if (v === 'item') { detail = null; render(); await load(); await loadForView(); } else if (['team', 'projects', 'overview', 'map', 'lines', 'setup', 'new', 'agents'].includes(v)) { render(); await loadForView(); } else syncRuntimePolling(); render(); scrollTo(0, 0); });
+    normalizeRoute();
+    closeDrawer(); bellOpen = false; dtab = null; const v = route().v; if (v === 'item') { detail = null; render(); await load(); await loadForView(); } else if (['team', 'projects', 'overview', 'run', 'settings', 'map', 'lines', 'new', 'insights'].includes(v)) { render(); await loadForView(); } else syncRuntimePolling(); render(); scrollTo(0, 0); landOnSection(); if (focusTab) { focusTab = false; document.querySelector('.ptabs [aria-selected="true"]')?.focus(); } });
   document.addEventListener('submit', (e) => {
     const step = e.target.closest('[data-wiz-step]');
     if (step) { e.preventDefault(); wizardNext(step); return; }
@@ -3742,7 +4281,7 @@
     if (create) { e.preventDefault(); wizardCreate(create); }
   });
   document.addEventListener('change', (e) => {
-    if (e.target.matches?.('[data-plan-pick]')) { if (e.target.checked) planPick.add(e.target.dataset.planPick); else planPick.delete(e.target.dataset.planPick); const btn = document.querySelector('[data-plan-save]'); if (btn) { btn.disabled = !planPick.size || Boolean(setupBusy); btn.textContent = A(`احفظ المختار (${planPick.size})`, `Save selected (${planPick.size})`); } return; }
+    if (e.target.matches?.('[data-plan-pick]')) { if (e.target.checked) planPick.add(e.target.dataset.planPick); else planPick.delete(e.target.dataset.planPick); const btn = document.querySelector('[data-plan-save]'); if (btn) { btn.disabled = !planPick.size || Boolean(setupBusy); btn.textContent = A(`احفظ المختار (${planPick.size})`, `Save selected (${planPick.size})`); } const use = document.querySelector('[data-plan-use]'); if (use) { use.disabled = !planPick.size || Boolean(setupBusy); use.textContent = A(`استخدم الخدمات المحددة (${planPick.size})`, `Use the selected services (${planPick.size})`); } return; }
     if (e.target.matches?.('input[name="wiz-stack"], input[name="wiz-env"], input[name="wiz-agent"]') && wiz.form) {
       const f = wiz.form;
       if (e.target.name === 'wiz-stack') { if (e.target.value === 'custom') { f.stack = 'empty'; f.customStack = f.customStack?.trim() ? f.customStack : ' '; } else { f.stack = e.target.value; f.customStack = ''; } }
@@ -3762,7 +4301,11 @@
     const unfile = e.target.closest('[data-wiz-unfile]');
     if (unfile) { const form = unfile.closest('form'); if (form) readStep(form); wiz.files.splice(Number(unfile.dataset.wizUnfile), 1); render(); return; }
     const fo = e.target.closest('[data-folder-open]');
-    if (fo) { const form = fo.closest('form'); if (form?.dataset.wizStep) readStep(form); openFolder(fo.dataset.folderOpen); return; }
+    if (fo) { fo.closest('[data-popmenu]')?.removeAttribute('open'); const form = fo.closest('form'); if (form?.dataset.wizStep) readStep(form); openFolder(fo.dataset.folderOpen); return; }
+    const fpk = e.target.closest('[data-folder-pick]');
+    if (fpk && folder) { pickFolder(fpk.dataset.folderPick); return; }
+    const fep = e.target.closest('[data-folder-editpath]');
+    if (fep && folder) { folder.editPath = fep.dataset.folderEditpath === 'on'; renderFolder(); const input = document.getElementById('fpick-path'); if (input) { input.focus(); input.select(); } return; }
     const fg = e.target.closest('[data-folder-go]');
     if (fg && folder) { openFolder(folder.mode, fg.dataset.folderGo); return; }
     if (e.target.closest('[data-folder-choose]')) { chooseFolder(); return; }
@@ -3818,6 +4361,9 @@
     const pv = e.target.closest('[data-plan-view]');
     if (pv) { planView = pv.dataset.planView; autoPickPlan(); planReplaceAsk = null; render(); return; }
     if (e.target.closest('[data-plan-save]')) { savePlan(false); return; }
+    if (e.target.closest('[data-plan-use]')) { useProposal(); return; }
+    const apv = e.target.closest('[data-run-approve]');
+    if (apv) { approveAll(apv.dataset.runApprove === 'start'); return; }
     if (e.target.closest('[data-plan-replace]')) { savePlan(true); return; }
     if (e.target.closest('[data-plan-replace-cancel]')) { planReplaceAsk = null; render(); return; }
     const rvw = e.target.closest('[data-rt-review]');
@@ -3830,6 +4376,13 @@
     if (e.target.closest('[data-agents-rescan]')) { setupDo('rescan', async () => { await loadMachine(); }, { scanAgents: true }); return; }
     const scrollTo2 = e.target.closest('[data-scroll-to]');
     if (scrollTo2) { const el = document.getElementById(scrollTo2.dataset.scrollTo); if (el) { if (el.tagName === 'DETAILS') el.open = true; el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' }); el.querySelector('button, a, input')?.focus({ preventScroll: true }); } return; }
+    // PF-0133: choose the project's agent in place; a link from the chat to another page closes the chat.
+    const ac = e.target.closest('[data-agent-choose]');
+    if (ac) { chooseAgent(ac.dataset.agentChoose, ac); return; }
+    const away = e.target.closest('#chatwin a[href^="#/"]');
+    if (away && chatOpen) toggleChat(false);
+    const of = e.target.closest('[data-open-folder]');
+    if (of) { of.disabled = true; post(`/api/p/${of.dataset.openFolder}/open-folder`, '{}', { 'Content-Type': 'application/json' }).then(() => toast(esc(A('اتفتح الفولدر في مدير الملفات', 'Opened the folder in your file manager')))).catch((err) => toast(esc(why(err)))).finally(() => { of.disabled = false; }); return; }
     // PF-0123: agent setup on this machine.
     const mo = e.target.closest('[data-machine-open]');
     if (mo) { machineUi.open = mo.dataset.machineOpen; machineUi.ack = false; machineUi.verifyError = null; render(); return; }
@@ -3842,6 +4395,8 @@
     if (sg) { addService({ fromSuggestion: sg.dataset.rtSuggest }); return; }
     const rt = e.target.closest('[data-rt]');
     if (rt) { runtimeAction(rt.dataset.rt, rt.dataset.id); return; }
+    const rth = e.target.closest('[data-rt-logs-hide]');
+    if (rth) { delete runtimeLogs[rth.dataset.rtLogsHide]; render(); return; }
     const rtl = e.target.closest('[data-rt-logs]');
     if (rtl) { loadServiceLogs(rtl.dataset.rtLogs).then(render); return; }
     // 1.4.0 work management: actions, gate review, the card menu.
@@ -3876,6 +4431,8 @@
       return;
     }
     // PF-0105: one click sends the continue message; the developer pressed it.
+    const say = e.target.closest('[data-agent-say]');
+    if (say) { const it = chatCtx(); if (it && !it.project && say.dataset.agentSay) { chatForceEnd = true; agentAction('message', { text: say.dataset.agentSay }); } return; }
     if (e.target.closest('[data-agent-continue]')) { const it = chatCtx(); if (it && !it.project) { chatForceEnd = true; agentAction('message', { text: goOnText(it) }); } return; }
     // PF-0110: end the finished item's session, start Codex here, send the whole-job message.
     const startHere = e.target.closest('[data-agent-switch-start]');
@@ -3901,10 +4458,10 @@
     if (ag) {
       const workId = route().id;
       if (ag.hasAttribute('data-agent-start')) agentAction('start', { provider: 'codex', workId, mode: agentMode });
-      else if (ag.hasAttribute('data-agent-connect')) agentAction('connect', { provider: 'claude', workId }, (r) => { agentLaunch = r.launch?.command ?? null; });
+      else if (ag.hasAttribute('data-agent-connect')) agentAction('connect', { provider: 'claude', workId }, openClaudeTerminal);
       else if (ag.hasAttribute('data-agent-cancel')) agentAction('cancel', {});
       else if (ag.hasAttribute('data-agent-end')) agentAction('end', {});
-      else if (ag.hasAttribute('data-agent-disconnect')) agentAction('disconnect', {}, () => { agentLaunch = null; });
+      else if (ag.hasAttribute('data-agent-disconnect')) agentAction('disconnect', {}, () => { agentLaunch = null; agentTerminal = null; });
       else if (ag.dataset.agentPerm) agentAction('permission', { requestId: ag.dataset.agentPerm, decision: ag.dataset.decision });
       else if (ag.dataset.agentActivate) agentAction('activate', { workId: ag.dataset.agentActivate }, () => refresh());
       else if (ag.dataset.agentResume) agentAction('resume', { recordId: ag.dataset.agentResume, mode: agentMode });
@@ -3951,7 +4508,7 @@
       if (pa.dataset.parallelOpen !== undefined) openParallelSheet();
       else if (pa.dataset.parallelCancel !== undefined) document.getElementById('paralleldlg')?.close();
       else if (pa.dataset.sharedEnable !== undefined) enableSharedNow();
-      else if (pa.dataset.sharedOpen !== undefined) openSharedSheet();
+      else if (pa.dataset.sharedOpen !== undefined) openSharedSheet(pa.dataset.sharedPid || pid);
       else if (pa.dataset.sharedCancel !== undefined) document.getElementById('shareddlg')?.close();
       else if (pa.dataset.cleanupOpen !== undefined) openCleanup(pa.dataset.home, pa.dataset.cleanupOpen);
       else if (pa.dataset.cleanupCancel !== undefined) document.getElementById('cleanupdlg')?.close();
@@ -4004,7 +4561,7 @@
     else if (x.hasAttribute('data-theme-toggle')) { const dark = theme ? theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; theme = dark ? 'light' : 'dark'; store.set('theme', theme); render(); }
     else if (x.hasAttribute('data-bell')) { bellOpen = !bellOpen; render(); }
     else if (x.hasAttribute('data-digest')) { store.set(seenKey(), new Date().toISOString()); digest = null; render(); }
-    else if (x.dataset.openProject) { e.preventDefault(); switchProject(x.dataset.openProject, x.dataset.openView ?? 'map'); }
+    else if (x.dataset.openProject) { e.preventDefault(); x.closest('[data-popmenu]')?.removeAttribute('open'); switchProject(x.dataset.openProject, x.dataset.openView ?? 'map'); }
     else if (x.hasAttribute('data-dev')) { const dev = document.getElementById('dev'); if (dev) { dev.open = true; dev.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' }); } }
     else if (x.dataset.f) { flt.st = flt.st === x.dataset.f ? 'all' : x.dataset.f; render(); }
     else if (x.dataset.moreSt) { const i = +x.dataset.moreSt; if (openSt.has(i)) openSt.delete(i); else openSt.add(i); render(); }
@@ -4077,8 +4634,22 @@
     win?.querySelector('.chatbody')?.lastElementChild?.scrollIntoView?.({ block: 'end' });
   });
   // PF-0123: the header's More menu closes with Esc (focus back on it) or a click elsewhere.
-  document.addEventListener('keydown', (e) => { const menu = document.querySelector('[data-navmore][open]'); if (e.key === 'Escape' && menu) { menu.open = false; menu.querySelector('summary')?.focus(); } });
-  document.addEventListener('click', (e) => { const menu = document.querySelector('[data-navmore][open]'); if (menu && !menu.contains(e.target)) menu.open = false; }, true);
+  document.addEventListener('keydown', (e) => {
+    const menu = document.querySelector('[data-popmenu][open]');
+    if (!menu) return;
+    if (e.key === 'Escape') { menu.open = false; menu.querySelector('summary')?.focus(); return; }
+    // Arrow keys move between the menu's items (PF-0127).
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      const items = [...menu.querySelectorAll('[role=menuitem]')];
+      if (!items.length) return;
+      e.preventDefault();
+      const at = items.indexOf(document.activeElement);
+      items[(at + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length].focus();
+    }
+  });
+  document.addEventListener('click', (e) => { for (const menu of document.querySelectorAll('[data-popmenu][open]')) if (!menu.contains(e.target)) menu.open = false; }, true);
+  // Opening one header menu closes the other.
+  document.addEventListener('toggle', (e) => { if (e.target.matches?.('[data-popmenu]') && e.target.open) for (const other of document.querySelectorAll('[data-popmenu][open]')) if (other !== e.target) other.open = false; }, true);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && chatOpen && document.getElementById('chatwin')?.contains(e.target) && !document.querySelector('dialog[open]')) { e.preventDefault(); toggleChat(false); } });
   document.addEventListener('keydown', (e) => { if (e.target.matches?.('[data-agent-input]') && e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); e.target.form.requestSubmit(); } });
   document.addEventListener('submit', (e) => {
@@ -4116,20 +4687,24 @@
     store.set('project', pid);
     snap = null; detail = null; team = null; digest = null; projectOverview = null; runtime = null;
     location.hash = `#/${view}`;
+    normalizeRoute();
     render();
     await load();
     await buildDigest();
     await loadForView();
     render();
+    landOnSection();
   }
 
   (async () => {
     if (!token) { error = Object.assign(new Error('no token'), { status: 401 }); render(); return; }
+    normalizeRoute();
     render();
     await load();
     await buildDigest();
     await loadForView();
     render();
+    landOnSection();
     listen();
   })();
 })();

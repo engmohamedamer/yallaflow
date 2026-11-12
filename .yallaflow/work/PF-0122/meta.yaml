@@ -1,0 +1,33 @@
+{
+  "id": "PF-0122",
+  "type": "investigation",
+  "scope": "architectural",
+  "routingStatus": "routed",
+  "rawRequest": "Unified v1.5.2 design direction: one high-fidelity prototype mixing A (frame, density, keyboard), B (live flow canvas, status rail) and C (onboarding, decision cards, plain Run) — simple, approachable and wow; design-approval stage, no production changes",
+  "status": "DONE",
+  "readOnly": true,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-10T23:49:35.039Z",
+  "updatedAt": "2026-11-11T08:29:43.794Z",
+  "title": "Unified v1.5.2 design direction: one high-fidelity prototype mixing A (frame, density, keyboard), B (live flow canvas, status rail) and C (onboarding, decision cards, plain Run) — simple, approachable and wow; design-approval stage, no production changes",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow investigate --scope architectural`.",
+  "routedAt": "2026-11-10T23:49:35.087Z",
+  "workflow": "investigation",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "verification"
+    ]
+  }
+}

@@ -1,0 +1,4 @@
+# pass 8
+# fail 0
+# skipped 1
+cp: cannot stat '/home/engamer/Amasi/YallaFlow/resources/console/{app.js,tw.css,tailwind.input.css,index.html}': No such file or directory

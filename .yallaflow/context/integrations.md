@@ -59,4 +59,20 @@
   - node --test test/agent-claude-experimental.test.js test/agent-bridge.test.js test/agent-continue.test.js test/console-project-chat.test.js test/console-agent-errors.test.js test/console-greenfield.test.js test/runtime-plan.test.js (passed) (runtime, PF-0102 V-002)
   - claude auth status --json reported subscriptionType team; relay I/O grew on send, 2026-11-09 (runtime)
 
+<!-- yallaflow-fact:CTX-0146 -->
+### CTX-0146 — The console installs exact, tested Codex versions — TESTED_CODEX in src/agents/detect.js (@openai/codex 0.167.0, @agentclientprotocol/codex-acp 2.5.0, tested 2026-11-11 with a real handshake) — never a range; it offers an install only when the pinned adapter is inside REQUIREMENTS.codexAcp and Node is supported, and shows when installed versions differ from the tested pair. docs/agents.md 'Tested Codex versions' describes how maintainers update the pins.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0124
+- **Knowledge ID:** K-002
+- **Promoted at:** 2026-11-11T11:48:43.314Z
+- **Verified:** 2026-11-11T11:48:43.314Z (commit 3491b3b)
+- **Evidence:**
+  - src/agents/detect.js (repository @ 3491b3b)
+  - src/agents/setup.js (repository @ 3491b3b)
+  - docs/agents.md (repository @ 3491b3b)
+  - node /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/942b198d-d9df-4a1e-8233-f78f56968ad5/scratchpad/real-codex-check.mjs (passed) (runtime, PF-0124 V-001)
+
 <!-- yallaflow-context:end -->

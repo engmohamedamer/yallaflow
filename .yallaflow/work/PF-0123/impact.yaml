@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "impacts": [
+    {
+      "id": "IM-001",
+      "status": "assessed",
+      "raisedAt": "2026-11-11T08:43:20.279Z",
+      "stageAtRaise": "SPECIFICATION",
+      "triggers": [
+        {
+          "type": "source",
+          "source": "SRC-0065",
+          "at": "2026-11-11T08:43:20.279Z"
+        },
+        {
+          "type": "requirements",
+          "changes": [
+            {
+              "id": "REQ-012",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-022",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-023",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-024",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-025",
+              "action": "added",
+              "to": "active"
+            }
+          ],
+          "at": "2026-11-11T08:43:28.742Z"
+        }
+      ],
+      "assessment": {
+        "assessedAt": "2026-11-11T08:43:36.767Z",
+        "stages": {
+          "context-discovery": {
+            "verdict": "unaffected",
+            "reason": "src/console/folders.js and the picker UI (app.js openFolder/renderFolder/chooseFolder) were already inspected; the addendum adds no new area of the codebase"
+          },
+          "requirement-clarification": {
+            "verdict": "unaffected",
+            "reason": "The addendum is explicit and raises no material business question; the security conflict rule is already a stated owner rule"
+          },
+          "design-exploration": {
+            "verdict": "affected",
+            "reason": "The picker needs its own design: breadcrumbs, filter, recent locations, kind labels from marker names, manual path entry, folder creation"
+          },
+          "specification": {
+            "verdict": "affected",
+            "reason": "REQ-012 and AC-022..AC-025, the picker security rules and the mkdir endpoint were added to the specification"
+          }
+        },
+        "applied": {
+          "revised": [
+            "design-exploration",
+            "specification"
+          ],
+          "stage": {
+            "from": "SPECIFICATION",
+            "to": "DESIGN"
+          },
+          "convergenceInvalidated": false
+        }
+      }
+    }
+  ],
+  "updatedAt": "2026-11-11T08:43:36.767Z"
+}

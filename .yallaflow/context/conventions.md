@@ -281,4 +281,64 @@
   - src/console/registry.js (repository @ d3652e8)
   - rm -rf /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/leakhome4 && mkdir -p /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/leakhome4 && HOME=/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/leakhome4 node --test test/new-project.test.js && test ! -e /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/dbb81da9-28ca-45cc-a9a2-23f8b21d5691/scratchpad/leakhome4/.config/yallaflow (passed) (runtime, PF-0094 V-001)
 
+<!-- yallaflow-fact:CTX-0145 -->
+### CTX-0145 — Console styling uses Tailwind CSS v4 utilities next to app.css: classes are prefixed tw: (e.g. tw:flex), there is no preflight reset, utilities are unlayered so they refine app.css rules, and colours/fonts/radii map to app.css variables (themes keep working). The input is resources/console/tailwind.input.css; npm run build:css writes resources/console/tw.css, which is committed and shipped as-is (nothing rebuilds it on pack or publish). A test fails when tw.css is stale; CI sets YALLAFLOW_REQUIRE_CSS_CHECK=1 so it can never skip, and the release workflow checks the packed tw.css equals the committed file. The build tools are devDependencies and need Node 20.19+; users never build.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0124
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-11T11:48:42.905Z
+- **Supersedes:** CTX-0142
+- **Verified:** 2026-11-12T14:25:18.487Z (commit 4d7c388)
+- **Evidence:**
+  - resources/console/tw.css (repository @ 4d7c388)
+  - resources/console/app.css (repository @ 4d7c388)
+  - package.json (repository @ 4d7c388)
+
+<!-- yallaflow-fact:CTX-0147 -->
+### CTX-0147 — The Node engines contract (>=20.16.0) is checked against the shipped runtime dependency tree only (packages not marked dev in package-lock.json); development-only tools are checked separately against the documented build floor, Node 20.19, which the release workflow's Node 20 job meets with the latest 20.x.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0124
+- **Knowledge ID:** K-003
+- **Promoted at:** 2026-11-11T11:48:43.692Z
+- **Verified:** 2026-11-11T11:48:43.692Z (commit 3491b3b)
+- **Evidence:**
+  - test/node-compatibility.test.js (repository @ 3491b3b)
+  - package-lock.json (repository @ 3491b3b)
+
+<!-- yallaflow-fact:CTX-0159 -->
+### CTX-0159 — Console folder picker (1.5.2, PF-0139) follows the file-dialog model: one click selects a folder row, double-click / Enter / the forward arrow / the row's arrow opens it, and the footer's primary button acts on the selected folder, or on the open folder when nothing is selected. Connecting a folder with no Git repository (none in it, none above it inside home; previewConnect reports git and gitAbove from names only, never by running Git) offers an opt-in, unticked 'git init' that runs the console's existing confirmed git init after the connect; a refusal never undoes the connect.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0139
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-12T13:54:48.696Z
+- **Verified:** 2026-11-12T13:54:48.696Z (commit 4d7c388)
+- **Evidence:**
+  - resources/console/app.js (repository @ 4d7c388)
+  - src/console/connect.js (repository @ 4d7c388)
+  - test/console-folder-picker.test.js (repository @ 4d7c388)
+  - npm test (passed) (runtime, PF-0139 V-001)
+
+<!-- yallaflow-fact:CTX-0160 -->
+### CTX-0160 — Site media file names must not contain 'yallaflow': research/site/make-ar.py maps an image URL to its file by removing every '/yallaflow' from the path, so media/real/yallaflow-flow-en.webp resolves to a missing file. The capture script research/docs-tour/capture.mjs follows the console as of 1.5.2 (wizard ready card, agent choice on Project > Overview, guided flow on Project > Run, All projects) and accepts YF_TOUR_OUT for a trial run outside docs/images/tour.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0141
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-12T15:18:03.930Z
+- **Verified:** 2026-11-12T15:18:03.930Z (commit 4d7c388)
+- **Evidence:**
+  - research/site/make-ar.py (repository @ 4d7c388)
+  - research/docs-tour/capture.mjs (repository @ 4d7c388)
+
 <!-- yallaflow-context:end -->

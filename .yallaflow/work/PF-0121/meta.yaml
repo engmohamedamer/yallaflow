@@ -1,0 +1,33 @@
+{
+  "id": "PF-0121",
+  "type": "investigation",
+  "scope": "architectural",
+  "routingStatus": "routed",
+  "rawRequest": "v1.5.2 major UI/UX overhaul: three high-fidelity interactive design directions, comparison, recommendation, design system, frontend architecture and migration plan — design approval stage, no production changes",
+  "status": "DONE",
+  "readOnly": true,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-10T22:58:26.537Z",
+  "updatedAt": "2026-11-10T23:37:15.613Z",
+  "title": "v1.5.2 major UI/UX overhaul: three high-fidelity interactive design directions, comparison, recommendation, design system, frontend architecture and migration plan — design approval stage, no production changes",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow investigate --scope architectural`.",
+  "routedAt": "2026-11-10T22:58:26.590Z",
+  "workflow": "investigation",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "verification"
+    ]
+  }
+}

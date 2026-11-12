@@ -1,0 +1,7 @@
+3098:    document.getElementById('app').innerHTML = topbar(r) + `<main>${banner()}${snap && ['map', 'lines'].includes(r.v) ? understandingStrip() : ''}${body}</main>` + (chatCtx(r) ? agentDock(chatCtx(r)) : '');
+297:      <div class="station gate start" data-st="-1" style="--hue:var(--ink-2)"><div class="st-head"><span class="st-ico" aria-hidden="true">＋</span><div class="st-name">${A('جديد', 'New')}</div><span class="st-n">${entries.length}</span></div><div class="st-out">${A('الطلبات بتدخل من هنا', 'Requests enter here')}</div>
+374:      <section class="chain" id="chain"><article class="node start ${it.state === 'new' ? 'active' : 'done'}" data-st="-1" style="--hue:var(--ink-2)"><div class="st-head"><span class="st-ico" aria-hidden="true">＋</span><div class="st-name">${A('الطلب', 'Request')}</div></div><div class="st-out">${it.state === 'new' ? A('جديد', 'new') : A('اتسلّم لـ «افهم»', 'handed to Understand')}</div>
+73:    throw new HttpError(422, 'NOT_A_YALLAFLOW_PROJECT', 'That folder has no YallaFlow workspace yet. An existing repository is set up through Brownfield onboarding (yallaflow init, then the project baseline), which is a separate step.');
+1473:    if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(done, () => toast(esc(text)));
+prototype script parses
+no other files changed

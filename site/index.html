@@ -25,12 +25,12 @@
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="YallaFlow 1.4.1: the console on a real project, with 64 work items, 216 verification runs and 61 done.">
+<meta property="og:image:alt" content="YallaFlow 1.5.2: the console on a real project, with 64 work items, 216 verification runs and 61 done.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="YallaFlow — Give AI your project, not just your prompt.">
 <meta name="twitter:description" content="Project memory, workflows sized to the work, and proof before done, for Claude Code and Codex. A local console in English and Arabic. Free and open source.">
 <meta name="twitter:image" content="https://engmohamedamer.github.io/yallaflow/og-image.jpg">
-<meta name="twitter:image:alt" content="YallaFlow 1.4.1: the console on a real project, with 64 work items, 216 verification runs and 61 done.">
+<meta name="twitter:image:alt" content="YallaFlow 1.5.2: the console on a real project, with 64 work items, 216 verification runs and 61 done.">
 
 <script type="application/ld+json">
 {
@@ -43,6 +43,8 @@
       "description": "An engineering governance layer for AI coding agents: durable project memory, adaptive workflows, and evidence-backed delivery for Claude Code and Codex.",
       "url": "https://engmohamedamer.github.io/yallaflow/",
       "applicationCategory": "DeveloperApplication",
+      "softwareVersion": "1.5.2",
+      "operatingSystem": "macOS, Linux",
       "softwareRequirements": "Node.js >= 20.16.0",
       "license": "https://opensource.org/licenses/MIT",
       "downloadUrl": "https://www.npmjs.com/package/yallaflow",
@@ -94,7 +96,7 @@
   <div class="hero">
     <div class="wrap">
       <div>
-        <a class="pill" href="#whats-new"><b>1.4.1</b>Set the project up once, then press Start →</a>
+        <a class="pill" href="#whats-new"><b>1.5.2</b>Connect a project, choose its agent, press Start →</a>
         <p class="eyebrow"><svg class="mark" aria-hidden="true"><use href="#yf-mark"/></svg>Open source · for Claude Code and Codex</p>
         <h1><span class="name">YallaFlow</span><span class="tagline">Give AI your <em>project</em>, not just your prompt.</span></h1>
         <p class="lede">YallaFlow gives your coding agent a reviewed memory of your codebase, a workflow sized to each request, and evidence before anything is called done.</p>
@@ -135,16 +137,16 @@
 
   <section class="stats-band" aria-labelledby="stats-h">
     <div class="wrap">
-      <h2 id="stats-h" class="stats-title">Seven weeks, seven releases, every change proven</h2>
+      <h2 id="stats-h" class="stats-title">Eight weeks, eleven releases, every change proven</h2>
       <ul class="stats">
-        <li><b>7</b><span>public releases on npm</span></li>
-        <li><b>78</b><span>work items, each tracked by YallaFlow itself</span></li>
-        <li><b>348</b><span>recorded verification runs</span></li>
-        <li><b>1,023</b><span>automated tests on Node 20, 22 and 24</span></li>
-        <li><b>30k</b><span>lines of plain JavaScript, no build step</span></li>
+        <li><b>11</b><span>public releases on npm</span></li>
+        <li><b>141</b><span>work items, each tracked by YallaFlow itself</span></li>
+        <li><b>465</b><span>recorded verification runs</span></li>
+        <li><b>1,246</b><span>automated tests on Node 20, 22 and 24</span></li>
+        <li><b>39k</b><span>lines of plain JavaScript, no build step</span></li>
         <li><b>4</b><span>runtime dependencies, zero telemetry</span></li>
       </ul>
-      <p class="stats-note">Counted from the repository at v1.4.1. From the first commit on 19 Sep 2026 to 1.4.1 on 8 Nov 2026.</p>
+      <p class="stats-note">Counted from the repository at v1.5.2. From the first commit on 19 Sep 2026 to 1.5.2 on 12 Nov 2026.</p>
     </div>
   </section>
 
@@ -159,7 +161,7 @@
           <figcaption><b>Done means proven</b>Every request moves through Understand, Decide, Change, Verify and Remember. YallaFlow computes the % from evidence. It never closes an item because the agent said so.</figcaption>
         </figure>
         <figure class="shot">
-          <img src="/yallaflow/media/tour/02-create-work-en.webp" alt="The Create work dialog with a request written in plain words" width="1240" height="1352" loading="lazy" decoding="async">
+          <img src="/yallaflow/media/tour/02-create-work-en.webp" alt="The Create work dialog with a request written in plain words" width="1240" height="1380" loading="lazy" decoding="async">
           <figcaption><b>Create work in your own words</b>Describe it the way you'd tell a colleague, and attach a screenshot or a BRD. No agent starts on its own.</figcaption>
         </figure>
         <figure class="shot">
@@ -168,7 +170,7 @@
         </figure>
       </div>
       <div class="console-cta">
-        <a class="btn primary" href="https://github.com/engmohamedamer/yallaflow/blob/main/docs/tour.md">Take the 12-screen tour</a>
+        <a class="btn primary" href="https://github.com/engmohamedamer/yallaflow/blob/main/docs/tour.md">Take the 13-screen tour</a>
         <a class="btn" href="https://github.com/engmohamedamer/yallaflow/blob/main/docs/tour.ar.md" hreflang="ar">الجولة بالعربي</a>
         <code>yallaflow console</code>
       </div>
@@ -227,13 +229,13 @@
   <section id="whats-new" class="new-section" aria-labelledby="new-h">
     <div class="wrap new-grid">
       <div>
-        <p class="kicker">New in 1.4.1</p>
-        <h2 id="new-h">Set the project up once. Then just press Start.</h2>
-        <p class="section-lede">Running your app is now part of the console. That includes the Docker stack in a parent folder, its database, and its <code>*.localhost</code> sites.</p>
+        <p class="kicker">New in 1.5.2</p>
+        <h2 id="new-h">Connect your project. Choose its agent. Press Start.</h2>
+        <p class="section-lede">The first hour is shorter. One Project page holds Overview, Run and Settings, and every step names what comes next.</p>
         <ol class="new-list">
-          <li><span class="n">1</span><span><h3>Ask the agent how it runs</h3><p>Your agent reads the real configuration (Compose, vhosts, the folders above the project) and proposes services, start order, ports and links. Every item carries its confidence and evidence. Its investigation is read-only and never opens <code>.env</code>.</p></span></li>
-          <li><span class="n">2</span><span><h3>Review and trust, once</h3><p>You see exactly the command, folder and files the trust is bound to, then type the service id. Any later change ends the trust until you review it again.</p></span></li>
-          <li><span class="n">3</span><span><h3>▶ Start project</h3><p>Setup becomes your Run page. It shows one state, Start and Stop, the apps to open, and a row per service with logs. Services start in dependency order.</p></span></li>
+          <li><span class="n">1</span><span><h3>Connect an existing project</h3><p>Choose the folder in a picker that works like a file dialog. Before you confirm, you see exactly what <code>yallaflow init</code> would change. Uncommitted work is never touched.</p></span></li>
+          <li><span class="n">2</span><span><h3>Choose the project's agent</h3><p>Codex, or Claude Code as experimental. The console can install Codex, sign you in and test the connection, one approved step at a time.</p></span></li>
+          <li><span class="n">3</span><span><h3>Approve once, then ▶ Start</h3><p>The agent proposes the services. One card shows every exact command, and one approval starts the app. A command that changes later asks you again.</p></span></li>
         </ol>
         <ul class="safe" aria-label="Safety rules">
           <li>Nothing runs on its own</li>
@@ -243,8 +245,12 @@
       </div>
       <div class="stack-shots">
         <figure class="shot">
-          <img src="/yallaflow/media/tour/07-setup-plan-en.webp" alt="Setup: Ask the agent is recommended; the agent's plan lists two services with confidence and evidence" width="1600" height="1550" loading="lazy" decoding="async">
-          <figcaption><b>The agent's plan, with evidence</b>The proposal arrives preselected, so saving is one click. What can't be verified is marked unresolved.</figcaption>
+          <img src="/yallaflow/media/tour/01-overview-en.webp" alt="Project Overview: one step left before new work, choosing the project's agent" width="1600" height="1012" loading="lazy" decoding="async">
+          <figcaption><b>One step left, and it is named</b>The Project page shows what is missing before new work, with its next action.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="/yallaflow/media/tour/08-setup-trust-en.webp" alt="Your approval: two services wait, each with the exact command that will run" width="1600" height="753" loading="lazy" decoding="async">
+          <figcaption><b>One approval, exact commands</b>Nothing runs before you approve. A command that changes later needs your approval again.</figcaption>
         </figure>
         <figure class="shot">
           <img src="/yallaflow/media/tour/09-setup-running-en.webp" alt="Run the project: the project is running, with Start project and Stop project buttons, Open links and one row per service" width="1600" height="1012" loading="lazy" decoding="async">
@@ -373,7 +379,7 @@
         <div class="full">
           <p class="panel-label"><span class="tag">Upgrade</span>When a new version is out, you decide when to upgrade</p>
           <ol class="pipeline" aria-label="Upgrade steps"><li>npm install -g yallaflow@latest</li><li>yallaflow upgrade status</li><li>yallaflow agent refresh</li><li>yallaflow doctor</li><li>restart the console</li></ol>
-<pre class="code" tabindex="0" aria-label="Upgrade commands"><code><span class="p">$ </span>npm install -g yallaflow@latest   <span class="c"># or an exact version: yallaflow@1.4.1</span>
+<pre class="code" tabindex="0" aria-label="Upgrade commands"><code><span class="p">$ </span>npm install -g yallaflow@latest   <span class="c"># or an exact version: yallaflow@1.5.2</span>
 <span class="p">$ </span>yallaflow upgrade status          <span class="c"># read-only: what, if anything, needs attention</span>
 <span class="p">$ </span>yallaflow agent refresh           <span class="c"># only if the agent contract is reported outdated</span>
 <span class="p">$ </span>yallaflow doctor</code></pre>
@@ -390,15 +396,23 @@
         <h2 id="built-h">YallaFlow is built with YallaFlow</h2>
         <p class="section-lede">Every change to YallaFlow goes through YallaFlow. That means a routed work item, its checkpoints, fresh verification evidence, and a knowledge review before it is called done. The records are public, in the repository's <code>.yallaflow/</code> folder.</p>
         <ul class="proof">
-          <li><b>78</b> work items, from the first prerelease to 1.4.1</li>
-          <li><b>348</b> verification runs, failures included, kept in an append-only ledger</li>
-          <li><b>77</b> current facts in its own project memory, each with evidence</li>
+          <li><b>141</b> work items, from the first prerelease to 1.5.2</li>
+          <li><b>465</b> verification runs, failures included, kept in an append-only ledger</li>
+          <li><b>96</b> current facts in its own project memory, each with evidence</li>
           <li><b>13</b> internal prereleases before the first public version</li>
         </ul>
         <p><a class="btn" href="https://github.com/engmohamedamer/yallaflow/tree/main/.yallaflow/work">Browse the work records</a></p>
+        <figure class="shot built-shot">
+          <img src="/yallaflow/media/real/self-flow-en.webp" alt="YallaFlow's own project in the console on 12 Nov 2026: the Flow with 139 work items done and the 1.5.2 release item at work" width="1600" height="1000" loading="lazy" decoding="async">
+          <figcaption><b>Captured while this release was prepared</b>YallaFlow's own Flow on 12 Nov 2026: 139 work items done, and the 1.5.2 release item still at work.</figcaption>
+        </figure>
       </div>
       <ol class="timeline" aria-label="Public releases">
-        <li class="now"><time datetime="2026-11-08">8 Nov 2026</time><b>1.4.1</b><span>Project Setup and Run: the agent proposes how it runs; you press Start</span></li>
+        <li class="now"><time datetime="2026-11-12">12 Nov 2026</time><b>1.5.2</b><span>An easier first hour: connect a project, choose its agent, one guided flow to run the app</span></li>
+        <li><time datetime="2026-11-10">10 Nov 2026</time><b>1.5.1</b><span>Steadier console</span></li>
+        <li><time datetime="2026-11-10">10 Nov 2026</time><b>1.5.0</b><span>Queue your work: one task now, or several one after another</span></li>
+        <li><time datetime="2026-11-09">9 Nov 2026</time><b>1.4.2</b><span>A console that works with you</span></li>
+        <li><time datetime="2026-11-08">8 Nov 2026</time><b>1.4.1</b><span>Project Setup and Run: the agent proposes how it runs; you press Start</span></li>
         <li><time datetime="2026-11-08">8 Nov 2026</time><b>1.4.0</b><span>Engineering workspace: New project wizard, Overview, work lifecycle</span></li>
         <li><time datetime="2026-11-07">7 Nov 2026</time><b>1.3.0</b><span>Agent Workspace: work with Codex from the console</span></li>
         <li><time datetime="2026-11-06">6 Nov 2026</time><b>1.2.0</b><span>Flow Console, read contract and workspace lock</span></li>
@@ -431,7 +445,7 @@
       <p class="kicker">Resources</p>
       <h2 id="res-h">YallaFlow documentation and links</h2>
       <ul class="links">
-        <li><a href="https://github.com/engmohamedamer/yallaflow/blob/main/docs/tour.md">Visual tour<span>12 real screens, English · <span lang="ar">العربية</span></span></a></li>
+        <li><a href="https://github.com/engmohamedamer/yallaflow/blob/main/docs/tour.md">Visual tour<span>13 real screens, English · <span lang="ar">العربية</span></span></a></li>
         <li><a href="https://github.com/engmohamedamer/yallaflow/blob/main/docs/using-yallaflow.md">Using YallaFlow<span>The end-to-end guide</span></a></li>
         <li><a href="https://github.com/engmohamedamer/yallaflow/blob/main/docs/cli.md">CLI reference<span>Every command and flag</span></a></li>
         <li><a href="https://github.com/engmohamedamer/yallaflow">GitHub repository<span>Source, README, releases</span></a></li>

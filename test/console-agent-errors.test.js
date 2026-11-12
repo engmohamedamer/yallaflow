@@ -12,6 +12,7 @@ const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&
 function actionHarness({ post }) {
   const code = cut('  async function loadAgent()', '  function onAgentEvent(') + cut('  async function agentAction(', '  // The one thing to do next');
   const context = vm.createContext({
+    readiness: null, // PF-0133: agentPanel reads the readiness agent step
     agentsOn: true, pid: 'p', agent: null, agentBusy: false, agentError: null,
     route: () => ({ v: 'item' }), chatCtx: () => ({ id: 'PF-0001' }),
     renderAgent() {},
@@ -38,6 +39,7 @@ test('a successful send reports success and leaves no error', async () => {
 function panel(session, lang = 'en', events = []) {
   const code = [cut('  function richInline(', '  const overviewExpanded'), cut('  const PROVIDER =', '  const isForbidden ='), cut('  const isForbidden =', '  async function agentPost('), cut('  function agentEntries(', '  function toggleChat('), cut('  // ---------- continuing a stopped work item', '  function agentPanel('), cut('  function agentPanel(', '  // Returns false when the action failed.')].join('\n');
   const context = vm.createContext({
+    readiness: null, // PF-0133: agentPanel reads the readiness agent step
     agentsOn: true, pid: 'p', snap: { project: { activeWork: 'PF-0001' } }, agentError: null, agentBusy: false, agentDraft: '', agentLaunch: null, agentProvider: null, agentMode: 'read-only', readOnly: false,
     agent: { pid: 'p', session, events, resumable: [], providers: [{ id: 'claude', ready: true, experimental: true, capabilities: { send: true, start: false } }] },
     A: (ar, en) => (lang === 'ar' ? ar : en), L: (value) => value?.[lang] ?? String(value ?? ''), esc, ago: () => '', route: () => ({ v: 'item' }),

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0078",
+  "sourceType": "file",
+  "sourceName": "02-project-overview-light.png",
+  "detectedFormat": "png",
+  "contentType": "image/png",
+  "contentAvailability": "original-only",
+  "capturedAt": "2026-11-11T14:13:37.524Z",
+  "original": {
+    "path": "sources/SRC-0078/02-project-overview-light.png",
+    "sha256": "f2c264d2972ae66e32dda5646cc634c2257189c096885f32dccd8a100638a87a",
+    "sizeBytes": 230139
+  },
+  "metadata": {
+    "extension": ".png",
+    "detectedFormat": "png",
+    "format": "png",
+    "width": 1440,
+    "height": 1489
+  },
+  "linkedWork": [
+    "PF-0132"
+  ]
+}

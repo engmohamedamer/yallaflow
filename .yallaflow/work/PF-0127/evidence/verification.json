@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/console-switcher.test.js test/console-refinement.test.js test/console-presentation.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/console-switcher.test.js",
+        "test/console-refinement.test.js",
+        "test/console-presentation.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/console-switcher.test.js test/console-refinement.test.js test/console-presentation.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-11T13:14:06.420Z",
+      "finishedAt": "2026-11-11T13:14:06.702Z",
+      "verifiedAt": "2026-11-11T13:14:06.702Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

@@ -4,14 +4,14 @@
   "scope": "bounded",
   "routingStatus": "routed",
   "rawRequest": "Release v1.5.1: PF-0115 page re-render loop fix, PF-0116 larger chat window, PF-0118 clearer team-mode card, PF-0117 test fix",
-  "status": "EXECUTION",
+  "status": "DONE",
   "readOnly": false,
   "knowledgePolicy": {
     "version": 1,
     "reviewRequired": true
   },
   "createdAt": "2026-11-10T14:14:59.228Z",
-  "updatedAt": "2026-11-10T14:15:01.988Z",
+  "updatedAt": "2026-11-10T14:31:05.139Z",
   "title": "Release v1.5.1: PF-0115 page re-render loop fix, PF-0116 larger chat window, PF-0118 clearer team-mode card, PF-0117 test fix",
   "routingConfidence": "high",
   "routingReason": "Explicitly classified by the user: `yallaflow release --scope bounded`.",
@@ -33,5 +33,14 @@
       "verification",
       "code-review"
     ]
-  }
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-10T14:31:05.139Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002"
+      ]
+    }
+  ]
 }

@@ -1,0 +1,315 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-11T14:48:43.720Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "Assessed after the full check V-001 (npm run check) and the browser pass recorded in impl-shots (ar light 1440, en dark 1440, ar 390: no JS errors, no horizontal scroll).",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "inboxSection() renders the existing xPermCard inbox and limit notices above the cards when agents are on; cardAgents() lists only lanesOf(project) (own lanes and child lanes); both return nothing with agents off; loadForView loads execution on #/projects.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "symbol": "inboxSection",
+              "contentHash": "sha256:e30c89f016a7f53fa4af78bd48d0543b4880b3c21f3b9de53d089d119c2d5567",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "symbol": "cardAgents",
+              "contentHash": "sha256:e30c89f016a7f53fa4af78bd48d0543b4880b3c21f3b9de53d089d119c2d5567",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-ia.test.js",
+              "contentHash": "sha256:1b47186aa7155bf81f5c366465202f1df2a56862f9631de6ffb0462fef90fb76",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0132",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "The header has no Agents tab; canonicalHash/normalizeRoute send #/agents to #/projects/inbox and landOnSection scrolls to the inbox (checked in the browser); the bell count still includes execView.inbox.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "symbol": "normalizeRoute",
+              "contentHash": "sha256:e30c89f016a7f53fa4af78bd48d0543b4880b3c21f3b9de53d089d119c2d5567",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "symbol": "landOnSection",
+              "contentHash": "sha256:e30c89f016a7f53fa4af78bd48d0543b4880b3c21f3b9de53d089d119c2d5567",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-ia.test.js",
+              "contentHash": "sha256:1b47186aa7155bf81f5c366465202f1df2a56862f9631de6ffb0462fef90fb76",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0132",
+              "verificationRunId": "V-001"
+            },
+            {
+              "type": "runtime",
+              "description": "#/agents landed on the Projects inbox in headless Chrome against the working-tree console on :4749"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "projectPage()/projHead()/projTabs() give one page head and an accessible tab bar (tablist/tab, aria-selected, arrow/Home/End keys); #/setup → #/run, legacy setup anchors → matching Settings section, #setup-run → Run.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "symbol": "projTabs",
+              "contentHash": "sha256:e30c89f016a7f53fa4af78bd48d0543b4880b3c21f3b9de53d089d119c2d5567",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "symbol": "canonicalHash",
+              "contentHash": "sha256:e30c89f016a7f53fa4af78bd48d0543b4880b3c21f3b9de53d089d119c2d5567",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-ia.test.js",
+              "contentHash": "sha256:1b47186aa7155bf81f5c366465202f1df2a56862f9631de6ffb0462fef90fb76",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0132",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "Overview regrouped into summary + key numbers, needs-care table, expandable area sections and stack table in .pcols (two columns, one at ≤1000px); no horizontal scroll at 390 px in the browser pass.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "symbol": "viewOverview",
+              "contentHash": "sha256:e30c89f016a7f53fa4af78bd48d0543b4880b3c21f3b9de53d089d119c2d5567",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.css",
+              "contentHash": "sha256:9da5078a28da1b2240ee6be983cc368f2e71c82d1ca36352765bdcfa1d9e4691",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "research/ux-1.5.2/ia/impl-shots/phone-overview.png",
+              "contentHash": "sha256:0caf67c6f96feef41ca50858c763d020a47b470e4a41a5b4d5a1db6e9a3166d9",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0132",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "A failed service shows one cleaned line with View log (data-rt-logs), Ask the agent to fix (data-ready-chat or copy) and Start again (data-rt restart); log on demand; links, definitions and the setup analysis collapsed; existing data-rt* attributes unchanged.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "symbol": "serviceCard",
+              "contentHash": "sha256:e30c89f016a7f53fa4af78bd48d0543b4880b3c21f3b9de53d089d119c2d5567",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "research/ux-1.5.2/ia/impl-shots/ar-light-run-services.png",
+              "contentHash": "sha256:fb10979333891f2059ddc812cbfcc28ac7b9a554e4bdb039ba6a64fa31809173",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-ia.test.js",
+              "contentHash": "sha256:1b47186aa7155bf81f5c366465202f1df2a56862f9631de6ffb0462fef90fb76",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0132",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "teamIndicator() shows Team/Solo + branch on every project page with an amber dot only when Solo off a known integration branch; Settings › Team mode reuses gitLine and the confirmed enable flow; wizTeamStep() offers it after creation (or the CLI hint); branchBanner() warns on the Workspace (seen on release/1.5.2 vs main).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "symbol": "teamIndicator",
+              "contentHash": "sha256:e30c89f016a7f53fa4af78bd48d0543b4880b3c21f3b9de53d089d119c2d5567",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "symbol": "branchBanner",
+              "contentHash": "sha256:e30c89f016a7f53fa4af78bd48d0543b4880b3c21f3b9de53d089d119c2d5567",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "symbol": "wizTeamStep",
+              "contentHash": "sha256:e30c89f016a7f53fa4af78bd48d0543b4880b3c21f3b9de53d089d119c2d5567",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-ia.test.js",
+              "contentHash": "sha256:1b47186aa7155bf81f5c366465202f1df2a56862f9631de6ffb0462fef90fb76",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0132",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "Header tabs are Workspace, Project, More; the switcher's 'All projects & agents' and the bell lead to Projects; all new strings use A(ar,en); light/dark via tokens; npm run check passed.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "symbol": "topbar",
+              "contentHash": "sha256:e30c89f016a7f53fa4af78bd48d0543b4880b3c21f3b9de53d089d119c2d5567",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-switcher.test.js",
+              "contentHash": "sha256:847c2f172aba02179ca0888b877b53143db9a3f747ef438ed104a61b5125b9d9",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "research/ux-1.5.2/ia/impl-shots/en-dark-settings.png",
+              "contentHash": "sha256:956ca30102522e3edd5814f43af05eb129056557a517237869b7addee87c05d5",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0132",
+              "verificationRunId": "V-001"
+            }
+          ]
+        }
+      ],
+      "unrequested": [
+        {
+          "id": "UR-001",
+          "disposition": "accepted",
+          "summary": "Queue controls, Review & Merge, Clean up and Stop/End session moved from the removed Agents page to Worktrees (#/team, agentLanesSection) and the work item's 'See the queue' link points there.",
+          "reason": "Owner approved that queue controls stay on the work item page and Worktrees; without this move they would have been lost with the Agents page.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "symbol": "agentLanesSection",
+              "contentHash": "sha256:e30c89f016a7f53fa4af78bd48d0543b4880b3c21f3b9de53d089d119c2d5567",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "modified"
+            }
+          ]
+        },
+        {
+          "id": "UR-002",
+          "disposition": "accepted",
+          "summary": "The first-time project-add redirect lands on Project › Settings (setup guide at its top) instead of the old Setup & run page.",
+          "reason": "The setup guide moved to Settings with the agents and services it configures.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:e30c89f016a7f53fa4af78bd48d0543b4880b3c21f3b9de53d089d119c2d5567",
+              "gitCommit": "4d7c38873d711efbdc9228f0170fe1e7f638562d",
+              "workingTree": "modified"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "updatedAt": "2026-11-11T14:48:43.720Z"
+}

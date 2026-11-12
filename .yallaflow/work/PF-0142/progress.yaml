@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-12T15:33:53.083Z",
+      "completedAt": "2026-11-12T15:35:13.900Z",
+      "summary": "Release state: branch release/1.5.2 is two commits ahead of origin/main (3491b3b, v1.5.1) and not on origin; package.json and src/version.js say 1.5.2; CHANGELOG 1.5.2 is dated 2026-11-12 and covers PF-0123..PF-0140; npm latest is 1.5.1; tags end at v1.5.1. The working tree holds the uncommitted console work, docs, tour, site and YallaFlow records prepared in PF-0141. release.yml publishes to npm when a GitHub Release is published and requires the tag to be on main; pages.yml deploys site/ on a push to main. The maintainer approved the release, every approval in it, and the website deployment in this session.",
+      "evidence": [
+        ".github/workflows/release.yml",
+        ".github/workflows/pages.yml",
+        "CHANGELOG.md",
+        "package.json"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-12T15:35:14.345Z",
+      "completedAt": "2026-11-12T15:35:14.345Z",
+      "summary": "Plan: 1) checklist (check, doctor, audit, pack + secret scan, isolated smoke test, tw.css freshness built in a scratch copy because node_modules here is read-only). 2) One release commit on release/1.5.2 with everything prepared except .playwright-cli/ and research/ux-1.5.2/ (untracked scratch, as in earlier releases). 3) Fast-forward main, annotated tag v1.5.2, push main and the tag as engmohamedamer. 4) GitHub Release from the CHANGELOG section; watch release.yml until npm shows 1.5.2 with provenance. 5) Confirm the Pages run deployed the site."
+    },
+    "implementation": {
+      "status": "in_progress",
+      "startedAt": "2026-11-12T15:35:14.850Z"
+    },
+    "verification": {
+      "status": "pending"
+    },
+    "code-review": {
+      "status": "pending"
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-12T15:35:14.850Z"
+}

@@ -124,6 +124,8 @@ test('overview previews keep full facts available under View more, including aft
     stack: { entries: [], unread: [] }, modules: [], coverage: { available: true, scannedEntries: 0, sourceFiles: 0, manifests: 0 }
   } };
   c.FRESH_TEXT = { fresh: 'Fresh' }; c.understandingCard = () => ''; c.devPanel = () => ''; c.gitLine = () => ''; c.readinessCard = () => ''; // PF-0123: the readiness card has its own tests
+  // PF-0132: the Overview is a tab of the Project page (its head reads these).
+  Object.assign(c, { UNDERSTANDING_TEXT: { PROJECT_UNDERSTANDING_UNAVAILABLE: { tone: 'fail', title: { en: 'Unavailable' } } }, projects: [], readiness: null, snap: null, runtime: null, setupInfo: null, readOnly: false, setupPending: () => false });
   vm.runInContext(cut('  function viewOverview()', '  // ---------- new-project Overview'), c);
   const html = c.viewOverview();
   assert.match(html, /data-overview="project:CTX-1" ><summary>/);

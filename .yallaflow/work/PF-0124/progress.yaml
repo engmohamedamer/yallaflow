@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-11T11:26:37.497Z",
+      "completedAt": "2026-11-11T11:26:37.497Z",
+      "summary": "package.json has prepack: npm run build:css (PF-0123); the freshness test skips when the Tailwind CLI is absent; the only CI is .github/workflows/release.yml (test job: npm ci + npm run check on a node matrix; publish job: npm ci, npm pack smoke test, npm publish). Console install argv is unpinned (@openai/codex, codex-acp@^2.5). This machine runs codex-cli 0.167.0 and codex-acp 2.5.0, both on npm; REQUIREMENTS.codexAcp = 2.5.0 ≤ v < 3",
+      "evidence": [
+        "package.json",
+        ".github/workflows/release.yml",
+        "src/agents/setup.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-11T11:26:37.677Z",
+      "completedAt": "2026-11-11T11:26:37.677Z",
+      "summary": "Owner instructions SRC-0066 items 2 and 3 are explicit; tested versions = the ones verified on this machine (codex-cli 0.167.0, codex-acp 2.5.0), re-validated with a real handshake-only connection test before recording",
+      "evidence": [
+        "SRC-0066"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-11T11:26:43.216Z",
+      "completedAt": "2026-11-11T11:26:43.216Z",
+      "summary": "1) remove prepack; 2) freshness test fails instead of skipping when YALLAFLOW_REQUIRE_CSS_CHECK=1; release.yml test job sets it; publish job asserts the tarball contains package/resources/console/tw.css and equals the committed file; 3) src/agents/compat.js: TESTED_CODEX = {cli 0.167.0, acp 2.5.0}, install argv pinned, status reports installed vs tested, a test checks the pins satisfy REQUIREMENTS; docs/agents.md update procedure; 4) real handshake-only validation on this machine; 5) tests",
+      "evidence": [
+        "package.json"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-11T11:48:20.145Z",
+      "completedAt": "2026-11-11T11:48:20.145Z",
+      "summary": "prepack removed (the committed tw.css ships as-is); freshness test fails instead of skipping with YALLAFLOW_REQUIRE_CSS_CHECK=1, set in release.yml's test job; release.yml pack step compares the tarball's tw.css with the committed file; TESTED_CODEX pins (@openai/codex 0.167.0, @agentclientprotocol/codex-acp 2.5.0) used by the console install with a pinnedCompatible() check before offering it and a tested-versions line in the card; docs/agents.md update procedure; CONTRIBUTING build note. Found by the isolated clean install: the Node-floor engines test scanned dev-only packages (Tailwind's wasm fallback needs Node 20.19) — it now checks the shipped runtime tree, and a new test checks dev tools against the documented 20.19 build floor",
+      "evidence": [
+        "package.json",
+        ".github/workflows/release.yml",
+        "src/agents/detect.js",
+        "test/node-compatibility.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-11T11:48:27.399Z",
+      "completedAt": "2026-11-11T11:48:27.399Z",
+      "summary": "V-001: real handshake-only check of the pinned pair on this machine (installed = pinned, ChatGPT sign-in, handshake ok, no process left). V-004: isolated clean install (npm ci with Tailwind CLI 4.3.5), npm run check with the freshness test required: 1181 tests, 1177 pass, 0 fail, 4 skipped (frozen-tag compatibility tests; no Git tags in the snapshot), freshness test executed and passed; npm pack: tw.css byte-identical to the committed file; installed tarball runs init + doctor and contains no Tailwind. V-002/V-003 failures (engines scan of dev tools; read-only rollback) were fixed before V-004",
+      "evidence": [
+        "verification:V-001",
+        "verification:V-004"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-11T11:48:27.399Z"
+}

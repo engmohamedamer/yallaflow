@@ -25,6 +25,17 @@
       "type": "array",
       "description": "Review gates and their decisions (added in 1.4.0). provenance is present only for decisions made in the web console: { via: 'console', identity: 'not verified', host, claimedGitName } — a local-user decision, never a verified identity.",
       "items": { "type": "object", "required": ["gate", "status"] }
+    },
+    "baseline": {
+      "type": "object",
+      "description": "A Repository Baseline's draft, for the developer's review (added in 1.5.2). Present only for a baseline work item that has a draft. Discovery limitations are work-scoped and never project facts.",
+      "required": ["status", "facts", "limitations"],
+      "properties": {
+        "status": { "type": "string" },
+        "draftedAt": { "type": ["string", "null"] },
+        "facts": { "type": "array", "items": { "type": "object", "required": ["id", "area", "status", "summary", "evidence"] } },
+        "limitations": { "type": "array", "items": { "type": "object", "required": ["id", "summary"] } }
+      }
     }
   }
 }

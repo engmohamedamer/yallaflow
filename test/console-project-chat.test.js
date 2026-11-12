@@ -20,6 +20,7 @@ function harness({ hash = '#/map', session = null, agentsOn = true, lang = 'en',
     cut('  function agentOffPanel(', '\n  }\n') + '\n  }\n'
   ].join('\n');
   const context = vm.createContext({
+    readiness: null, // PF-0133: agentPanel reads the readiness agent step
     location: { hash }, snap: { items, project: { activeWork: null } }, pid: 'p', readOnly: false,
     agentsOn, agentsCanEnable: true, agentsClaudeAvailable: false, agentInfo: null, agentError: null, agentBusy: false, agentDraft: '', agentLaunch: null, agentProvider: null, agentMode: 'read-only', chatOpen: true,
     agent: { pid: 'p', session, events: [], resumable: [], history: [], pending: [], providers: [{ id: 'codex', ready: true, capabilities: { start: true, send: true, modes: ['read-only'] } }] },
@@ -81,12 +82,14 @@ test('the item chat is unchanged', () => {
 });
 
 // PF-0069: the picker points to Setup → Agents when Claude Code is off here or an agent is not ready.
-test('the picker links to Setup → Agents when Claude Code is off for the project', () => {
+// PF-0132: Agents now live under Project → Settings (#/settings/agents).
+test('Claude Code off for the project is turned on in place; an agent not ready links to Settings → Agents', () => {
   const h = harness({ hash: '#/item/PF-0001' });
   vm.runInContext('agentsClaudeAvailable = true;', h);
-  assert.match(h.panel(), /Claude Code \(experimental\) is off for this project\. <a href="#\/setup" data-setup-agents>Open Setup → Agents<\/a>/);
+  // PF-0133 (owner feedback): no page change — the chat offers to use Claude Code here.
+  assert.match(h.panel(), /Claude Code \(experimental\) is off for this project\. <button type="button" class="linkbtn" data-agent-choose="claude">Use it for this project<\/button>/);
   vm.runInContext("agentsClaudeAvailable = false; agent.providers = [{ id: 'codex', ready: false, problems: ['codex-acp missing'], capabilities: { start: true, send: true, modes: ['read-only'] } }];", h);
-  assert.match(h.panel(), /An agent is not ready\. <a href="#\/setup"/);
+  assert.match(h.panel(), /An agent is not ready\. <a href="#\/settings\/agents"/);
   vm.runInContext("agent.providers = [{ id: 'codex', ready: true, capabilities: { start: true, send: true, modes: ['read-only'] } }];", h);
   assert.doesNotMatch(h.panel(), /data-setup-agents/);
 });

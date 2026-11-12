@@ -1,0 +1,57 @@
+{
+  "id": "PF-0130",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Workspace 'since you were last here' digest: show each item as its work ID linked to the item with its outcome on one compact line (title only as a tooltip) instead of the full title, to keep the notice small",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-11T13:39:56.889Z",
+  "updatedAt": "2026-11-11T13:40:46.781Z",
+  "title": "Workspace 'since you were last here' digest: show each item as its work ID linked to the item with its outcome on one compact line (title only as a tooltip) instead of the full title, to keep the notice small",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-11T13:39:56.945Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0073",
+      "type": "file",
+      "name": "Screenshot from 2026-11-11 15-38-58.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-11T13:40:07.826Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ],
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-11T13:40:46.781Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

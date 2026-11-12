@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Site media file names must not contain 'yallaflow': research/site/make-ar.py maps an image URL to its file by removing every '/yallaflow' from the path, so media/real/yallaflow-flow-en.webp resolves to a missing file. The capture script research/docs-tour/capture.mjs follows the console as of 1.5.2 (wizard ready card, agent choice on Project > Overview, guided flow on Project > Run, All projects) and accepts YF_TOUR_OUT for a trial run outside docs/images/tour.",
+      "evidence": [
+        "research/site/make-ar.py",
+        "research/docs-tour/capture.mjs"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-12T15:17:53.180Z",
+      "factId": "CTX-0160",
+      "promotedAt": "2026-11-12T15:18:03.930Z",
+      "target": "context/conventions.md"
+    }
+  ],
+  "updatedAt": "2026-11-12T15:18:03.930Z",
+  "reviewedAt": "2026-11-12T15:18:03.930Z"
+}

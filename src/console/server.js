@@ -37,6 +37,8 @@ import { FolderError, createFolder, listFolders } from './folders.js';
 import { connectFolder, previewConnect } from './connect.js';
 import { MachineSetup } from '../agents/setup.js';
 import { addProject as saveToRegistry, removeProject as forgetInRegistry } from './registry.js';
+import { openInFileManager } from './reveal.js';
+import { openTerminal, shellQuote } from '../agents/terminal.js';
 import { addRuntimeService, attachPlannedFile, createdProjectRoot, gitInit, probeTools, workspaceRoot } from './greenfield.js';
 import { CLAUDE_NOT_INCLUDED, claudeIncluded, loadClaude } from '../agents/experimental.js';
 import { readAgentSettings, readApprovalWait, writeAgentSettings, writeApprovalWait } from '../agents/settings.js';
@@ -62,7 +64,7 @@ const UI_FILES = Object.freeze({
 // 1.4.0: work-item actions and review-gate decisions (PF-0043) join Create Work.
 // 1.4.0 Greenfield journey (PF-0057): register a project, enable agents for this run, Git init,
 // add a runtime service, attach a planned file to a new project's first work item.
-const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|revision-sources|actions\/[a-z]+|gates\/[a-z]+\/decision))?|runtime\/[a-z][a-z0-9-]{0,31}\/(?:trust|start|stop|restart)|runtime\/services|runtime\/(?:start|stop)-all|runtime\/analyze|runtime\/plan\/save|agents\/(?:settings|launch-files|approval-wait)|setup\/(?:scan|step)|git\/init)$|^\/api\/new\/(?:plan|create|plans\/NP-\d{14}-[0-9a-f]{6}\/files)$|^\/api\/(?:projects|projects\/remove|projects\/connect|agents\/enable|fs\/mkdir|machine\/codex\/(?:install|login|verify)|machine\/job\/cancel)$/;
+const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|revision-sources|actions\/[a-z]+|gates\/[a-z]+\/decision))?|runtime\/[a-z][a-z0-9-]{0,31}\/(?:trust|start|stop|restart)|runtime\/services|runtime\/(?:start|stop)-all|runtime\/analyze|runtime\/plan\/save|agents\/(?:settings|launch-files|approval-wait|open-terminal)|setup\/(?:scan|step)|git\/init|open-folder)$|^\/api\/new\/(?:plan|create|plans\/NP-\d{14}-[0-9a-f]{6}\/files)$|^\/api\/(?:projects|projects\/remove|projects\/connect|agents\/enable|fs\/mkdir|machine\/codex\/(?:install|login|verify)|machine\/job\/cancel)$/;
 // Agent Interaction (v1.3.0, only with --agents): the Agent Workspace's actions.
 const AGENT_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/agent\/(start|message|permission|cancel|end|resume|connect|disconnect|activate)$/;
 // PF-0112: execution actions (queues): create a run and the developer's run/task controls.
@@ -114,7 +116,7 @@ async function projectEntry(root) {
 const PARALLEL_OFF = 'Parallel is turned off in YallaFlow 1.5.0 until a real-agent test confirms that a lane\'s agent cannot change your repository\'s shared Git settings or the agent settings the console loads. Run tasks one after another with a queue instead.';
 const parallelOn = () => process.env.YALLAFLOW_EXPERIMENTAL_PARALLEL === '1';
 
-export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', token = randomBytes(24).toString('hex'), poll = false, missing = [], readOnly = false, agents = false, experimentalClaude = false, agentEnv = process.env } = {}) {
+export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', token = randomBytes(24).toString('hex'), poll = false, missing = [], readOnly = false, agents = false, experimentalClaude = false, agentEnv = process.env, openFolder = openInFileManager, openTerminalFor = (root, command) => openTerminal(root, command, { env: agentEnv }) } = {}) {
   // Agent Interaction needs writes; --read-only keeps the console genuinely read-only.
   // Agents start on with --agents, or later for this run only by an explicit, confirmed
   // action in a non-read-only console (owner decision, PF-0057 Q-001).
@@ -269,9 +271,18 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     try { await runner.get(project.root, 'snapshot', ['snapshot', '--json']); } catch (error) { snapshotError = error.message; }
     let agent = { checked: false };
     if (!readOnly) {
-      const found = await detectProviders({ env: agentEnv, claude: false });
-      const loginProblem = machine.loginProblem();
-      agent = { checked: true, enabled: agentsOn, ready: Boolean(found.codex?.ready) && !loginProblem, problems: [...(found.codex?.problems ?? []), ...(loginProblem ? [loginProblem] : [])] };
+      // PF-0133: the agent step follows the developer's choice for this project (Codex, or the
+      // experimental Claude Code); with no saved choice the step asks for one.
+      const choice = savedChoices.get(project.id) ?? await readAgentSettings(project.root);
+      const chosen = Boolean(choice.chosen && choice.agents);
+      const provider = chosen && choice.claude && claudeIncluded() ? 'claude' : 'codex';
+      const found = await detectProviders({ env: agentEnv, claude: provider === 'claude' });
+      if (provider === 'claude') {
+        agent = { checked: true, enabled: agentsOn, chosen, provider, ready: Boolean(found.claude?.ready), problems: found.claude?.problems ?? [], warnings: found.claude?.warnings ?? [] };
+      } else {
+        const loginProblem = machine.loginProblem();
+        agent = { checked: true, enabled: agentsOn, chosen, provider, ready: Boolean(found.codex?.ready) && !loginProblem, problems: [...(found.codex?.problems ?? []), ...(loginProblem ? [loginProblem] : [])] };
+      }
     }
     let runtime = null;
     if (withRuntime) {
@@ -556,6 +567,12 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
       return send(response, 201, await addRuntimeService(project.root, await readJsonBody(request), runner));
     }
+    // PF-0128: open this project's folder in the file manager (the registered root only).
+    if (rest.length === 1 && rest[0] === 'open-folder') {
+      if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+      await readJsonBody(request);
+      return send(response, 200, await openFolder(project.root));
+    }
     if (rest.length === 2 && rest[0] === 'git' && rest[1] === 'init') {
       if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
       const body = await readJsonBody(request);
@@ -564,7 +581,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       return send(response, 200, await gitInit(project.root));
     }
     // PF-0069: save the project's agent choice and apply it now; write the launch files.
-    if (rest.length === 2 && rest[0] === 'agents' && ['settings', 'launch-files', 'approval-wait'].includes(rest[1])) {
+    if (rest.length === 2 && rest[0] === 'agents' && ['settings', 'launch-files', 'approval-wait', 'open-terminal'].includes(rest[1])) {
       if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
       const body = await readJsonBody(request);
       // PF-0112 D15: the project's approval wait (5, 15, 30 or 60 minutes); applies to new requests.
@@ -572,6 +589,18 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
         const saved = await writeApprovalWait(project.root, Number(body?.minutes));
         if (bridge) bridge.setApprovalWait(project.id, saved.minutes);
         return send(response, 200, saved);
+      }
+      // PF-0134: open a terminal in the project folder running the launch command, so the
+      // developer only answers Claude Code's own prompts. The command is built here from the
+      // detected binary and the launch files — never taken from the request.
+      if (rest[1] === 'open-terminal') {
+        if (!body || typeof body !== 'object' || Array.isArray(body) || Object.keys(body).length) return send(response, 400, { error: { code: 'BAD_REQUEST', message: 'Send an empty JSON object.' } });
+        if (!bridge?.claudeOnFor(project.id)) return send(response, 409, { error: { code: 'CLAUDE_OFF', message: 'Turn Claude Code on for this project first.' } });
+        const files = await (await loadClaude()).writeClaudeLaunchFiles(project.root);
+        const found = await detectProviders({ env: agentEnv, claude: true, maxAgeMs: 30_000 });
+        const binary = found.claude?.claude?.path;
+        const command = binary ? files.command.replace(/^claude /, `${shellQuote(binary)} `) : files.command;
+        return send(response, 200, { ...(await openTerminalFor(project.root, command)), command: files.command });
       }
       if (rest[1] === 'launch-files') {
         if (!body || typeof body !== 'object' || Array.isArray(body) || Object.keys(body).length) return send(response, 400, { error: { code: 'BAD_REQUEST', message: 'Send an empty JSON object.' } });
@@ -696,6 +725,8 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       const readiness = await readinessFor(project, { runtime: false });
       const ids = Array.isArray(body.workIds) ? body.workIds.map(String) : [];
       const onboardingOnly = Boolean(readiness.onboardingWorkId) && ids.length > 0 && ids.every((id) => id === readiness.onboardingWorkId);
+      // PF-0133: no agent chosen for this project yet — choosing it is the first step.
+      if (readiness.steps.some((step) => step.id === 'agent' && step.status === 'choose')) throw notReady('AGENT_NOT_READY', 'Choose this project\'s agent first (Codex or Claude Code).', readiness);
       if ((body.provider ?? bridge?.defaultProvider?.() ?? 'codex') === 'codex' && !readiness.allows.agentSessions) throw notReady('AGENT_NOT_READY', 'Codex is not ready in this console yet. Set it up first.', readiness);
       if (!readiness.allows.runQueue && !onboardingOnly && readiness.steps.some((step) => step.id === 'understanding' && step.status !== 'done')) throw notReady('PROJECT_UNDERSTANDING_REQUIRED', 'PROJECT_UNDERSTANDING_REQUIRED: this existing project needs an approved project understanding before work can run.', readiness);
       return send(response, 201, await execution.createRun(project.id, { workIds: body.workIds, provider: body.provider, mode: body.mode, pauseBetween: body.pauseBetween === true, lang: body.lang }));

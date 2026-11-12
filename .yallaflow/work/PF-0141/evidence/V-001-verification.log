@@ -1,0 +1,119 @@
+
+> yallaflow@1.5.2 check:syntax
+> find src test test-support -name '*.js' -print0 | xargs -0 -n1 node --check
+
+TAP version 13
+# Subtest: exposes the YallaFlow product and CLI identity
+ok 1 - exposes the YallaFlow product and CLI identity
+  ---
+  duration_ms: 128.459763
+  type: 'test'
+  ...
+# Subtest: namespace help is concise and discoverable
+ok 2 - namespace help is concise and discoverable
+  ---
+  duration_ms: 395.073642
+  type: 'test'
+  ...
+# Subtest: agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+ok 3 - agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+  ---
+  duration_ms: 7.848459
+  type: 'test'
+  ...
+# Subtest: paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+ok 4 - paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+  ---
+  duration_ms: 5.115254
+  type: 'test'
+  ...
+# Subtest: file selection and paste combine; unsupported, empty and oversized files are explained
+ok 5 - file selection and paste combine; unsupported, empty and oversized files are explained
+  ---
+  duration_ms: 2.798371
+  type: 'test'
+  ...
+# Subtest: revision partial failure keeps pending files and retries without duplicating text or successful uploads
+ok 6 - revision partial failure keeps pending files and retries without duplicating text or successful uploads
+  ---
+  duration_ms: 4.299637
+  type: 'test'
+  ...
+# Subtest: create uploads pasted files through the existing bound request endpoint
+ok 7 - create uploads pasted files through the existing bound request endpoint
+  ---
+  duration_ms: 4.047046
+  type: 'test'
+  ...
+# Subtest: overview previews keep full facts available under View more, including after redraw
+ok 8 - overview previews keep full facts available under View more, including after redraw
+  ---
+  duration_ms: 7.064757
+  type: 'test'
+  ...
+# Subtest: Greenfield is never gated: ready for work, and the first work item is created
+ok 9 - Greenfield is never gated: ready for work, and the first work item is created
+  ---
+  duration_ms: 813.569718
+  type: 'test'
+  ...
+# Subtest: Brownfield without approved understanding: readiness says so and work creation is refused before anything is written
+ok 10 - Brownfield without approved understanding: readiness says so and work creation is refused before anything is written
+  ---
+  duration_ms: 480.903922
+  type: 'test'
+  ...
+# Subtest: Brownfield while the understanding is in progress or awaiting review points at the understanding work item
+ok 11 - Brownfield while the understanding is in progress or awaiting review points at the understanding work item
+  ---
+  duration_ms: 33.917952
+  type: 'test'
+  ...
+# Subtest: Brownfield with an approved baseline is ready with no migration
+ok 12 - Brownfield with an approved baseline is ready with no migration
+  ---
+  duration_ms: 265.536658
+  type: 'test'
+  ...
+# Subtest: agent readiness blocks only agent sessions and queues; runtime is optional
+ok 13 - agent readiness blocks only agent sessions and queues; runtime is optional
+  ---
+  duration_ms: 18.44957
+  type: 'test'
+  ...
+# Subtest: a read-only console reports readiness without probing agents
+ok 14 - a read-only console reports readiness without probing agents
+  ---
+  duration_ms: 306.758713
+  type: 'test'
+  ...
+# Subtest: queue runs: refused before understanding except for the understanding item itself, and without a ready agent
+ok 15 - queue runs: refused before understanding except for the understanding item itself, and without a ready agent
+  ---
+  duration_ms: 5096.676203
+  type: 'test'
+  ...
+# Subtest: PF-0133: choosing the project agent is the first required step; it follows the chosen provider
+ok 16 - PF-0133: choosing the project agent is the first required step; it follows the chosen provider
+  ---
+  duration_ms: 29.497348
+  type: 'test'
+  ...
+# Subtest: PF-0133: a console with no saved agent choice asks for one; saving one answers it
+ok 17 - PF-0133: a console with no saved agent choice asks for one; saving one answers it
+  ---
+  duration_ms: 359.701503
+  type: 'test'
+  ...
+1..17
+# tests 17
+# suites 0
+# pass 17
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 7749.998135
+ok
+Workspace healthy.
+337 warning(s) — informational only, does not affect workspace health.

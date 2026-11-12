@@ -5,7 +5,7 @@
 **Files:** `src/agents/claude.js`, `src/agents/claude-files.js`, `src/agents/claude-detect.js`, `resources/agents/claude-channel.mjs`, `resources/agents/claude-hook.mjs` (and `test/agent-claude-experimental.test.js`). A build without them refuses with "not included in this release".
 
 **Turn it on for a project, saved:**
-- On the console's **Setup → Agents**, tick **Agents for this project** and **Also Claude Code (experimental)**, then **Save for this project**.
+- On the console's **Project → Settings → Agents**, tick **Agents for this project** and **Also Claude Code (experimental)**, then **Save for this project**.
 - The choice is kept in `.yallaflow/local/agents.json` (git-ignored, this checkout only) and applied every time the console opens. It is never applied in `--read-only`.
 - Unticking it closes that project's connection at once: a linked session is unlinked, open requests are denied, and the bridge file is removed.
 - The checklist there shows each connection step and its fix.

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0075",
+  "sourceType": "file",
+  "sourceName": "01-projects-light.png",
+  "detectedFormat": "png",
+  "contentType": "image/png",
+  "contentAvailability": "original-only",
+  "capturedAt": "2026-11-11T14:13:37.518Z",
+  "original": {
+    "path": "sources/SRC-0075/01-projects-light.png",
+    "sha256": "372ee8253e43d815f8362b361e420481af33d9e1b078ae9050963fd50215e590",
+    "sizeBytes": 245357
+  },
+  "metadata": {
+    "extension": ".png",
+    "detectedFormat": "png",
+    "format": "png",
+    "width": 1440,
+    "height": 1316
+  },
+  "linkedWork": [
+    "PF-0132"
+  ]
+}

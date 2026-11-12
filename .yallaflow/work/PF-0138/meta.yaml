@@ -1,0 +1,65 @@
+{
+  "id": "PF-0138",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console: 'Disconnect from YallaFlow' fails with 'No Claude Code session is linked' when Claude Code is connected without a linked session, so the project can never be removed ('an agent is running') until Claude Code itself is closed",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-12T11:46:04.961Z",
+  "updatedAt": "2026-11-12T11:56:57.932Z",
+  "title": "Console: 'Disconnect from YallaFlow' fails with 'No Claude Code session is linked' when Claude Code is connected without a linked session, so the project can never be removed ('an agent is running') until Claude Code itself is closed",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-11-12T11:46:05.032Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0095",
+      "type": "file",
+      "name": "Screenshot from 2026-11-12 12-53-40.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-12T11:46:24.677Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0096",
+      "type": "file",
+      "name": "Screenshot from 2026-11-12 12-53-58.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-12T11:46:24.684Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ],
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-12T11:56:57.932Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

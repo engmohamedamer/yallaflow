@@ -1,15 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://engmohamedamer.github.io/yallaflow/</loc>
+    <lastmod>2026-11-12</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://engmohamedamer.github.io/yallaflow/"/>
     <xhtml:link rel="alternate" hreflang="ar" href="https://engmohamedamer.github.io/yallaflow/ar/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://engmohamedamer.github.io/yallaflow/"/>
+    <image:image><image:loc>https://engmohamedamer.github.io/yallaflow/media/tour/05-item-done-en.webp</image:loc></image:image>
+    <image:image><image:loc>https://engmohamedamer.github.io/yallaflow/media/tour/02-create-work-en.webp</image:loc></image:image>
+    <image:image><image:loc>https://engmohamedamer.github.io/yallaflow/media/tour/03-work-board-en.webp</image:loc></image:image>
+    <image:image><image:loc>https://engmohamedamer.github.io/yallaflow/media/real/real-flow-en.webp</image:loc></image:image>
+    <image:image><image:loc>https://engmohamedamer.github.io/yallaflow/media/real/real-item-en.webp</image:loc></image:image>
+    <image:image><image:loc>https://engmohamedamer.github.io/yallaflow/media/real/real-work-en.webp</image:loc></image:image>
+    <image:image><image:loc>https://engmohamedamer.github.io/yallaflow/media/tour/01-overview-en.webp</image:loc></image:image>
+    <image:image><image:loc>https://engmohamedamer.github.io/yallaflow/media/tour/08-setup-trust-en.webp</image:loc></image:image>
+    <image:image><image:loc>https://engmohamedamer.github.io/yallaflow/media/tour/09-setup-running-en.webp</image:loc></image:image>
+    <image:image><image:loc>https://engmohamedamer.github.io/yallaflow/media/real/self-flow-en.webp</image:loc></image:image>
   </url>
   <url>
     <loc>https://engmohamedamer.github.io/yallaflow/ar/</loc>
+    <lastmod>2026-11-12</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://engmohamedamer.github.io/yallaflow/"/>
     <xhtml:link rel="alternate" hreflang="ar" href="https://engmohamedamer.github.io/yallaflow/ar/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://engmohamedamer.github.io/yallaflow/"/>
+    <image:image><image:loc>https://engmohamedamer.github.io/yallaflow/media/tour/05-item-done-ar.webp</image:loc></image:image>
+    <image:image><image:loc>https://engmohamedamer.github.io/yallaflow/media/tour/02-create-work-ar.webp</image:loc></image:image>
+    <image:image><image:loc>https://engmohamedamer.github.io/yallaflow/media/tour/03-work-board-ar.webp</image:loc></image:image>
+    <image:image><image:loc>https://engmohamedamer.github.io/yallaflow/media/real/real-flow-ar.webp</image:loc></image:image>
+    <image:image><image:loc>https://engmohamedamer.github.io/yallaflow/media/real/real-item-ar.webp</image:loc></image:image>
+    <image:image><image:loc>https://engmohamedamer.github.io/yallaflow/media/real/real-work-ar.webp</image:loc></image:image>
+    <image:image><image:loc>https://engmohamedamer.github.io/yallaflow/media/tour/01-overview-ar.webp</image:loc></image:image>
+    <image:image><image:loc>https://engmohamedamer.github.io/yallaflow/media/tour/08-setup-trust-ar.webp</image:loc></image:image>
+    <image:image><image:loc>https://engmohamedamer.github.io/yallaflow/media/tour/09-setup-running-ar.webp</image:loc></image:image>
+    <image:image><image:loc>https://engmohamedamer.github.io/yallaflow/media/real/self-flow-ar.webp</image:loc></image:image>
   </url>
 </urlset>

@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-11T08:34:24.637Z",
+      "completedAt": "2026-11-11T08:34:24.637Z",
+      "summary": "Console renders by full innerHTML rebuild on every SSE/poll (app.js render()); registration refuses folders without .yallaflow (greenfield.js workspaceRoot 422); init is transactional with bootstrap rollback (init.js initProject, agent/bootstrap.js inspectAllBootstraps); Core already refuses routing before baseline approval; Codex detection is binary-only, login checked at session start (codex.js handshake); codex CLI 0.167 offers 'login status' and 'login --device-auth'; Tailwind 4.3.5 available on npm; nav has 7 tabs with hash routes #/map #/lines #/agents #/setup #/overview #/insights #/team #/item; New-column + is a decorative span; copy() has no fallback; console-server tests fetch /app.css and /app.js",
+      "evidence": [
+        "resources/console/app.js",
+        "src/console/server.js",
+        "src/console/greenfield.js",
+        "src/commands/init.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-11T08:34:34.121Z",
+      "completedAt": "2026-11-11T08:34:34.121Z",
+      "summary": "No material business questions: the owner brief (SRC-0064) settles scope. Assumptions: baseline approval stays the developer's explicit decision given to the agent (the console guides and links to the draft, it does not approve on its own); Codex is the supported provider, Claude Code is detected and shown but its connection stays experimental (development builds only); work creation is blocked only by missing initialization/understanding, agent sessions and queues additionally need a ready agent; runtime stays optional",
+      "evidence": [
+        "SRC-0064"
+      ]
+    },
+    "design-exploration": {
+      "status": "completed",
+      "startedAt": "2026-11-11T08:43:44.966Z",
+      "completedAt": "2026-11-11T08:43:44.966Z",
+      "summary": "Revised for IM-001: added the folder-picker design (breadcrumbs, filter, recent locations, marker-name kind labels, full path + primary action by kind, validated manual path, new folder in the new-project flow, keyboard) on top of the earlier design",
+      "evidence": [
+        "src/console/folders.js",
+        "SRC-0065"
+      ]
+    },
+    "specification": {
+      "status": "completed",
+      "startedAt": "2026-11-11T08:43:45.329Z",
+      "completedAt": "2026-11-11T08:43:45.329Z",
+      "summary": "Revised for IM-001: REQ-012 and AC-022..AC-025, picker security rules (home-bounded, no hidden, symlink targets inside home, marker names only, single-segment non-recursive mkdir), POST /api/fs/mkdir, owner approval conditions recorded",
+      "evidence": [
+        "SRC-0065"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-11T08:44:00.916Z",
+      "completedAt": "2026-11-11T08:44:00.916Z",
+      "summary": "Eight-phase plan in work.md (1 redraw+clipboard, 2 Tailwind foundation, 3 navigation + real +, 4 readiness, 5 folder picker + connect existing project, 6 agent setup, 7 Setup & Run + polish, 8 verification) with per-phase tests and browser checks; owner conditions recorded",
+      "evidence": [
+        "SRC-0064",
+        "SRC-0065"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-11T08:51:47.729Z",
+      "completedAt": "2026-11-11T10:35:54.216Z",
+      "summary": "Eight phases implemented on the existing console: redraw skip/defer + honest copy; Tailwind 4.3.5 foundation (prefixed, no preflight, tokens, committed tw.css, freshness test); Workspace/More navigation and real + Create work; derived readiness with server guards; redesigned folder picker and connect via Core init; agent setup in src/agents/setup.js; clearer Setup & Run with failure recovery; Flow polish and docs/console.md",
+      "evidence": [
+        "resources/console/app.js",
+        "src/console/readiness.js",
+        "src/console/connect.js",
+        "src/agents/setup.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-11T10:36:00.937Z",
+      "completedAt": "2026-11-11T10:36:00.937Z",
+      "summary": "V-013: npm run check (syntax + full suite) 1168 tests, 1167 pass, 0 fail, 1 skipped (Tailwind freshness; runs where the CLI is installed, proven in a scratch mirror in V-003). V-014: 78 browser checks across phases 1,3,4,5,6,7 (Chromium, ar/en, light/dark, 1440 and 390 px, scratch fixtures only). Known pre-existing flake 'Queue end to end' documented with HEAD comparison",
+      "evidence": [
+        "verification:V-013",
+        "verification:V-014"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-11T10:36:07.607Z",
+      "completedAt": "2026-11-11T10:36:07.607Z",
+      "summary": "All 25 acceptance criteria satisfied with evidence (CV recorded after V-013/V-014); 4 unrequested changes accepted with reasons (empty-folder start, detectCodex missing-override check, setup guide data-shape bug fix, docs/console.md)",
+      "evidence": [
+        "verification:V-013"
+      ]
+    },
+    "code-review": {
+      "status": "completed",
+      "startedAt": "2026-11-11T11:01:34.946Z",
+      "completedAt": "2026-11-11T11:01:34.946Z",
+      "summary": "Independent review (separate agent on an isolated copy; real repo read-only). Blocking B1: CLAUDE.md/AGENTS.md symlinks (incl. dangling) let init write outside the folder and the preview hid it — fixed for the console connect path (bootstrapInitPlan refuses BOOTSTRAP_LINK_OUTSIDE; link to the other agent file inside stays allowed); the same pre-existing behaviour of CLI yallaflow init is left unchanged and raised to the owner as a separate decision. Fixed should-fix: S1 typing/changes mark the page dirty; S2 setup lock from acceptance; S3 process-group SIGTERM→SIGKILL, busy until exit; S4 proxy/CA env kept; S5 failed status probe = unknown; S6 no git command in the preview. Fixed optional: O1 link/code from full tail with escapes stripped, O2 one connect per folder + O3 recheck, O4 5 s runtime cache for readiness, O7 absolute PATH entries only, O8 bridge default provider. Not changed (owner decisions): O5 prepack rebuild, O6 package version pinning. Re-verified V-015 (1171 pass, 0 fail) and V-016 (78 browser checks)",
+      "evidence": [
+        "verification:V-015",
+        "verification:V-016"
+      ]
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Baseline before any change (HEAD 3491b3b, working tree with only PF-0119 YallaFlow records modified): npm test 1142 tests, 1141 pass, 1 fail — 'Queue end to end' (test/console-execution.test.js:107) timed out under full-suite load and passes when run alone; treated as a pre-existing timing flake, not a regression",
+      "reason": "Owner condition 6: record the baseline and distinguish existing failures from new regressions",
+      "costIfWrong": "A real queue regression could be mistaken for flakiness; mitigated by re-running that test alone after each phase",
+      "createdAt": "2026-11-11T08:44:08.439Z"
+    },
+    {
+      "decision": "Phase 1 done (REQ-009, REQ-010): render skips an identical page unless the DOM was changed directly (MutationObserver), defers only while a pointer is held (4 s safety limit, released on pointerup/cancel/dragstart/blur), keeps scroll positions; copy = Clipboard API inside the click → selection copy → manual dialog with the text selected, contextual messages. Verified V-001 (unit + 8 browser checks)",
+      "reason": "Owner condition 7: complete each phase with tests and browser checks before the next",
+      "costIfWrong": "A redraw relying on an unobserved direct change could be skipped; mitigated by treating any DOM mutation as dirty",
+      "createdAt": "2026-11-11T08:51:47.939Z"
+    },
+    {
+      "decision": "Phase 2 done (REQ-001): Tailwind 4.3.5 + @tailwindcss/cli 4.3.5 as exact devDependencies (lockfile: 65 packages added, no existing entry changed), resources/console/tailwind.input.css (prefix tw:, no preflight, unlayered utilities, colours/fonts/radii mapped to app.css variables, dark variant follows data-theme), generated resources/console/tw.css committed and served after app.css, build:css + prepack scripts, packaging and freshness tests. The repository's node_modules is read-only in this checkout (dr-xr-sr-x, apparently deliberate), so it was not changed: the lockfile was updated and tw.css was built with the identical pinned CLI in a scratch mirror; the freshness test runs where the CLI is installed (CI after npm ci) and was proven there (passes fresh, fails stale). Verified V-003 (V-002 failed only on a shell brace-expansion error in the check command)",
+      "reason": "Do not change deliberately read-only directories; keep the build reproducible in CI",
+      "costIfWrong": "If CI's Tailwind output differs from the scratch build, the freshness test fails in CI and tw.css must be rebuilt with npm run build:css",
+      "createdAt": "2026-11-11T08:55:30.192Z"
+    },
+    {
+      "decision": "Phase 3 done (REQ-006, REQ-007): header = Workspace (Flow/List switch in the Workspace page, last view remembered), Agents, Setup & run, Project, More (Insights, Worktrees; Esc/outside click close); all old routes unchanged; the New-gate + is a real Create work button (aria-label ar/en, disabled with reason when readiness blocks creation, plain icon in read-only)",
+      "reason": "Owner condition 7",
+      "costIfWrong": "Low",
+      "createdAt": "2026-11-11T09:00:05.618Z"
+    },
+    {
+      "decision": "Phase 4 done (REQ-005): src/console/readiness.js derives initialized/understanding/agent/runtime on each request; understanding uses Core's projectUnderstandingGate, so Greenfield is never gated and approved Brownfield is ready with no migration; server refuses Create work before understanding with the unchanged Core contract (422 PROJECT_UNDERSTANDING_REQUIRED, plus the readiness document), and queue runs before understanding (except the understanding item itself) or without a ready Codex (409 AGENT_NOT_READY); agent sessions, setup, runtime and reads stay open; read-only consoles report without probes. UI: readiness card on Workspace/Project only while something is missing, Create work disabled with the reason. test/console-presentation.test.js stubs the new readinessCard helper like its other helpers. Noted for Phase 6: detectCodex treats a YALLAFLOW_CODEX_BIN override pointing to a missing file as present",
+      "reason": "Owner conditions 2 and 8",
+      "costIfWrong": "Low",
+      "createdAt": "2026-11-11T09:10:07.073Z"
+    },
+    {
+      "decision": "Phase 5 done (REQ-003, REQ-012): one redesigned folder picker for adding/connecting and for the new-project location (breadcrumb + Up/Backspace, editable path with ~ expansion validated by the server, recent locations, in-place filter, arrow-key navigation, kind labels from file names only, full selected path with one primary action by kind, New folder in the location picker via POST /api/fs/mkdir: single safe name, non-recursive, home-bounded). Connect: GET /api/fs/connect-preview (read-only: stack from manifest hints, Git's uncommitted count, exact file plan from the bootstrap inspector, refusals for hand-edited/newer/broken bootstrap blocks, nested projects, lanes, home itself, outside home, hidden) and POST /api/projects/connect bound to the preview hash, running Core's yallaflow init through the runner, then the existing registration; read-only consoles refuse all three. The wizard's own destination checks are unchanged. Verified V-006 (126 console tests + 7 connect tests + 22 browser checks)",
+      "reason": "Owner conditions 5, 7; addendum SRC-0065",
+      "costIfWrong": "Low: init and registration reuse Core and existing code paths",
+      "createdAt": "2026-11-11T09:25:48.069Z"
+    },
+    {
+      "decision": "Correction: V-007 was recorded as PASSED although its test step reported 3 failures (a grep in the check command masked the test runner's exit status). The failures were real: AC-108 (provider names outside src/agent and src/agents) and two Setup & Run UI tests that check the per-project agent table. Fixed by conforming to the existing architecture — the console's agent setup moved to src/agents/setup.js and the init bootstrap plan to src/agent/bootstrap.js (bootstrapInitPlan) — and by keeping the original agent table while the machine check has not loaded (and in read-only consoles) plus a Claude sign-in row in the new card. V-001..V-006 were re-read: their test steps reported 0 failures. From V-008 on, checks use a runner that exits with the test runner's own status",
+      "reason": "Prove before claiming; report outcomes faithfully",
+      "costIfWrong": "A masked failure could have shipped; now caught and fixed",
+      "createdAt": "2026-11-11T09:44:48.338Z"
+    },
+    {
+      "decision": "Phase 6 done (REQ-004): src/agents/setup.js — machine status (Codex CLI/adapter versions, codex login status: only a ChatGPT sign-in counts, npm global prefix writability, Claude Code installed/version and whether its experimental connection is in this build), approved jobs one at a time (npm install -g of only the missing packages, bound to a planHash, argv only, no shell, never sudo, refused when the npm prefix is not writable; Codex's own login --device-auth showing only the official link and one-time code), a connection test that runs only the ACP handshake in an empty temporary folder with API keys stripped, creates no session and always ends the adapter. Console: GET /api/machine, /api/machine/job; POST codex/install|login|verify, job/cancel (token, Origin, JSON, confirmation; read-only refuses). UI: a compact On this machine card (one next step at a time: install → sign in → test) above the per-project choice, a dismissible first-open line on the Workspace, readiness counts a known non-subscription sign-in as not ready. detectCodex now reports an override path that does not exist. Verified V-009 (200 tests + 22 + 12 browser checks)",
+      "reason": "Owner condition 3 (safe agent setup) and 7",
+      "costIfWrong": "Codex CLI output formats could change; parsing is narrow and the copy fallback remains",
+      "createdAt": "2026-11-11T09:49:36.654Z"
+    },
+    {
+      "decision": "Phase 7 done (REQ-008, REQ-002): Setup & Run intro says agent first and running the app optional; first-time steps ordered Agents → Stack → Services (optional) with Go to Agents; Agents panel placed before Find and add services while no service exists; manual add-service form folded; a failed service shows its last log lines automatically with Restart, Full log and Ask the agent (or Copy for your agent); in-page jumps stop below the sticky header. Fixed an existing bug: the services step read runtime.services instead of runtime.data.services (test/project-setup.test.js updated to the approved step order and the real data shape, all assertions kept). Polish: Flow gaps/icons tightened so station names fit at 1440px; first-run chips use the language-aware arrow. Readiness guards skip the runtime read. Flake evidence: 'Queue end to end' failed V-010/V-011 under full-suite load; it passes 3/3 alone on this tree and fails 1 of 2 identical full runs on an unmodified HEAD export (git archive into scratch) — pre-existing, not a regression. Verified V-012",
+      "reason": "Owner conditions 6 and 7",
+      "costIfWrong": "Low",
+      "createdAt": "2026-11-11T10:11:43.837Z"
+    }
+  ],
+  "history": [
+    {
+      "skill": "design-exploration",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-001: The picker needs its own design: breadcrumbs, filter, recent locations, kind labels from marker names, manual path entry, folder creation",
+      "changedAt": "2026-11-11T08:43:36.767Z"
+    },
+    {
+      "skill": "specification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-001: REQ-012 and AC-022..AC-025, the picker security rules and the mkdir endpoint were added to the specification",
+      "changedAt": "2026-11-11T08:43:36.767Z"
+    }
+  ],
+  "updatedAt": "2026-11-11T11:01:34.946Z"
+}

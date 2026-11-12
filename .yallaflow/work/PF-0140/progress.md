@@ -1,0 +1,42 @@
+# Work Ledger — PF-0140
+
+Created: 2026-11-12T13:17:25.342Z
+
+- 2026-11-12T13:17:25.342Z Routing: pending
+- 2026-11-12T13:17:25.342Z Created from the YallaFlow console (local user, identity not verified)
+- 2026-11-12T13:17:25.342Z Not made the active work item (yallaflow activate PF-0140 makes it active)
+- 2026-11-12T13:17:26.314Z Source attached: SRC-0099 (screenshot-1794488802061-1.png)
+- 2026-11-12T13:17:26.326Z Source SRC-0099 attached from the YallaFlow console (local user, identity not verified)
+- 2026-11-12T13:17:26.821Z Source attached: SRC-0100 (screenshot-1794488847814-2.png)
+- 2026-11-12T13:17:26.832Z Source SRC-0100 attached from the YallaFlow console (local user, identity not verified)
+- 2026-11-12T13:17:27.319Z Source attached: SRC-0101 (screenshot-1794488965748-3.png)
+- 2026-11-12T13:17:27.330Z Source SRC-0101 attached from the YallaFlow console (local user, identity not verified)
+- 2026-11-12T13:17:27.831Z Source attached: SRC-0102 (screenshot-1794489009202-4.png)
+- 2026-11-12T13:17:27.844Z Source SRC-0102 attached from the YallaFlow console (local user, identity not verified)
+- 2026-11-12T13:17:28.299Z Source attached: SRC-0103 (screenshot-1794489070834-5.png)
+- 2026-11-12T13:17:28.312Z Source SRC-0103 attached from the YallaFlow console (local user, identity not verified)
+- 2026-11-12T13:17:28.779Z Source attached: SRC-0104 (screenshot-1794489121500-6.png)
+- 2026-11-12T13:17:28.793Z Source SRC-0104 attached from the YallaFlow console (local user, identity not verified)
+- 2026-11-12T13:17:29.306Z Source attached: SRC-0105 (screenshot-1794489136721-7.png)
+- 2026-11-12T13:17:29.319Z Source SRC-0105 attached from the YallaFlow console (local user, identity not verified)
+- 2026-11-12T13:17:29.783Z Source attached: SRC-0106 (screenshot-1794489185236-8.png)
+- 2026-11-12T13:17:29.795Z Source SRC-0106 attached from the YallaFlow console (local user, identity not verified)
+- 2026-11-12T13:17:30.305Z Source attached: SRC-0107 (screenshot-1794489219631-9.png)
+- 2026-11-12T13:17:30.318Z Source SRC-0107 attached from the YallaFlow console (local user, identity not verified)
+- 2026-11-12T13:17:30.827Z Source attached: SRC-0108 (screenshot-1794489239624-10.png)
+- 2026-11-12T13:17:30.842Z Source SRC-0108 attached from the YallaFlow console (local user, identity not verified)
+- 2026-11-12T13:17:31.308Z Source attached: SRC-0109 (screenshot-1794489323693-11.png)
+- 2026-11-12T13:17:31.322Z Source SRC-0109 attached from the YallaFlow console (local user, identity not verified)
+- 2026-11-12T13:17:31.816Z Source attached: SRC-0110 (screenshot-1794489376981-12.png)
+- 2026-11-12T13:17:31.829Z Source SRC-0110 attached from the YallaFlow console (local user, identity not verified)
+- 2026-11-12T13:18:47.795Z Routing: routed as bug + bounded (high)
+- 2026-11-12T13:18:48.105Z Activated: now the active work item
+- 2026-11-12T13:18:53.185Z Stage: INTAKE → REPRODUCE
+- 2026-11-12T13:20:56.749Z Stage: REPRODUCE → EVIDENCE
+- 2026-11-12T13:21:08.722Z Stage: EVIDENCE → TRACE
+- 2026-11-12T13:21:08.935Z Stage: TRACE → HYPOTHESIS
+- 2026-11-12T13:21:09.142Z Stage: HYPOTHESIS → ROOT_CAUSE
+- 2026-11-12T13:21:16.272Z Stage: ROOT_CAUSE → FIX_PLAN
+- 2026-11-12T13:21:16.707Z Stage: FIX_PLAN → IMPLEMENTATION
+- 2026-11-12T13:36:02.520Z Stage: IMPLEMENTATION → VERIFICATION
+- 2026-11-12T13:43:21.290Z Stage: VERIFICATION → DONE

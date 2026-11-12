@@ -1,0 +1,57 @@
+{
+  "id": "PF-0126",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Prepare the v1.5.2 release candidate locally: version 1.5.2, CHANGELOG, separate local commits (functional/UI and security), and a local acceptance package — no push, tag, publish or release",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-11T11:49:19.821Z",
+  "updatedAt": "2026-11-11T12:33:05.949Z",
+  "title": "Prepare the v1.5.2 release candidate locally: version 1.5.2, CHANGELOG, separate local commits (functional/UI and security), and a local acceptance package — no push, tag, publish or release",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-11T11:49:19.873Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0068",
+      "type": "file",
+      "name": "owner-1.5.2-closeout.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-11T11:49:20.255Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ],
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-11T12:33:05.949Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

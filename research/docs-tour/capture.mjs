@@ -1,4 +1,4 @@
-// Screens for docs/tour.md and docs/tour.ar.md (PF-0074).
+// Screens for docs/tour.md and docs/tour.ar.md (PF-0074; current console: PF-0141).
 //
 // Builds a disposable demo project ("Clinic Booking") under a temporary folder with an
 // isolated console configuration, walks one simple request from Create work to DONE through
@@ -8,7 +8,7 @@
 //
 // Usage:
 //   node research/docs-tour/capture.mjs <playwright-core dir> [browser executable]
-// Output: docs/images/tour/<name>-<en|ar>.png
+// Output: docs/images/tour/<name>-<en|ar>.png (YF_TOUR_OUT overrides the folder, for a trial run)
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import net from 'node:net';
@@ -25,7 +25,7 @@ const temp = mkdtempSync(path.join(os.tmpdir(), 'yf-docs-tour-'));
 process.env.XDG_CONFIG_HOME = path.join(temp, 'config');
 process.env.YALLAFLOW_CONSOLE_CONFIG = path.join(temp, 'registry.json');
 const { startConsoleServer } = await import(pathToFileURL(path.join(root, 'src/console/server.js')).href);
-const out = path.join(root, 'docs/images/tour');
+const out = process.env.YF_TOUR_OUT || path.join(root, 'docs/images/tour');
 mkdirSync(out, { recursive: true });
 
 const cli = (dir, args) => execFileSync(process.execPath, [path.join(root, 'src/cli.js'), ...args], { cwd: dir, env: process.env, encoding: 'utf8' });
@@ -61,6 +61,7 @@ async function shoot(name, prep, target = null) {
     await look(lang, theme);
     await prep(lang);
     await page.mouse.move(0, 0);
+    if (!target) await page.evaluate(() => window.scrollTo(0, 0));
     await page.locator('.toast').waitFor({ state: 'detached', timeout: 8000 }).catch(() => {});
     const file = path.join(out, `${name}-${lang}.png`);
     if (target) await page.locator(target).first().screenshot({ path: file, animations: 'disabled' });
@@ -98,8 +99,9 @@ await next();
 await page.locator('[data-wiz-create]').waitFor({ timeout: 30000 });
 await shoot('00b-new-project-review', async () => { await page.locator('[data-wiz-create]').waitFor(); });
 await page.locator('[data-wiz-create] button[type="submit"]').click();
-// A successful creation opens the new project's Overview.
-await page.waitForFunction(() => location.hash.startsWith('#/overview'), null, { timeout: 60000 });
+// A successful creation ends on the wizard's "The project is ready" card.
+await page.locator('[data-wiz-open]').waitFor({ timeout: 60000 });
+await page.locator('[data-wiz-open]').click();
 await page.waitForTimeout(800);
 
 // The code the developer and the agent write next (a tiny Node site and API).
@@ -130,8 +132,11 @@ await page.goto(`${server.url}#token=${server.token}`);
 await page.waitForSelector('nav.tabs');
 await go('#/overview');
 
-// 1. A new project: the setup checklist on Overview.
-await shoot('01-overview', async () => { await closeDialogs(); await go('#/overview'); });
+// 1. A new project: Project → Overview, with the one step left before new work (the agent).
+await shoot('01-overview', async () => { await closeDialogs(); await go('#/overview'); await page.locator('[data-agent-choose="codex"]').first().waitFor(); });
+// The developer chooses the project's agent; Create work opens up.
+await page.locator('[data-agent-choose="codex"]').first().click();
+await page.locator('[data-create]:not([disabled])').first().waitFor({ timeout: 15000 });
 
 // 2. Create work: the request in the developer's own words.
 const REQUEST = { en: 'Add a "work email" field to the contact form, filled in by the visitor.', ar: 'ضيف خانة «إيميل العمل» في فورم تواصل معنا، والزائر هو اللي يكتبها.' };
@@ -174,43 +179,34 @@ cli(project, ['advance', id]);
 await shoot('05-item-done', async () => { await go('#/overview'); await go(`#/item/${id}`); });
 await shoot('06-flow', async () => { await go('#/map'); });
 
-// 6. Setup, first time: the agent's proposal arrives preselected.
-// (When the agent's proposal arrives while the page waits for it, it comes preselected.)
+// 6. Project → Run, first time: the agent's proposal arrives with its services selected.
+const runTab = async () => { await go('#/run'); await page.locator('#setup-run, [data-run-approve-card]').first().waitFor(); };
 await shoot('07-setup-plan', async () => {
-  await go('#/setup'); await page.locator('#setup-plan').waitFor();
+  await runTab(); await page.locator('[data-run-find="proposal"]').waitFor();
   for (const sid of ['api', 'web']) { const box = page.locator(`[data-plan-pick="${sid}"]`); if (!(await box.isChecked())) await box.check(); }
-  await page.locator('[data-plan-save]:not([disabled])').waitFor();
-}, '#setup-plan');
-// Save the proposal (untrusted), review and trust each service, then start the project.
-await go('#/setup');
-await page.locator('[data-plan-pick="api"]').check().catch(() => {});
-await page.locator('[data-plan-pick="web"]').check().catch(() => {});
-await page.locator('[data-plan-save]').click();
-await page.locator('#setup-run').waitFor();
-// The services are chosen: the first-time guide is done for this demo.
-await page.locator('[data-setup-step="skip"]').click().catch(() => {});
-await page.waitForTimeout(800);
-await page.locator('[data-rt-review="api"]').click();
-await page.locator('[data-review="api"]').waitFor();
-await shoot('08-setup-trust', async () => { await go('#/setup'); if (!(await page.locator('[data-review="api"]').count())) { await page.locator('[data-rt-review="api"]').click(); await page.locator('[data-review="api"]').waitFor(); } }, '#setup-run');
-for (const sid of ['api', 'web']) {
-  if (!(await page.locator(`[data-review="${sid}"]`).count())) { await page.locator(`[data-rt-review="${sid}"]`).click(); await page.locator(`[data-review="${sid}"]`).waitFor(); }
-  await page.locator(`[data-trust-input="${sid}"]`).fill(sid);
-  await page.locator(`[data-review="${sid}"] [data-rt="trust"]`).click();
-  await page.locator(`[data-service="${sid}"] [data-rt="start"]`).waitFor();
-}
-await page.locator('[data-rt-all="start"]').click();
+  await page.locator('[data-plan-use]:not([disabled])').waitFor();
+}, '[data-run-find="proposal"]');
+// Use the selected services: saved, nothing runs. One card then shows every exact command.
+await page.locator('[data-plan-use]').click();
+await page.locator('[data-run-approve-card]').waitFor();
+await shoot('08-setup-trust', async () => { await runTab(); await page.locator('[data-run-approve-card]').waitFor(); }, '[data-run-approve-card]');
+// One approval for both commands, and the app starts in dependency order.
+await page.locator('[data-run-approve="start"]').click();
 await page.locator('[data-service="web"] [data-svc-state="running"]').waitFor({ timeout: 30000 });
 await page.waitForTimeout(800);
-await shoot('09-setup-running', async () => { await go('#/setup'); await page.locator('[data-service="web"] [data-svc-state="running"]').waitFor(); });
+await shoot('09-setup-running', async () => { await runTab(); await page.locator('[data-service="web"] [data-svc-state="running"]').waitFor(); });
 
 // 7. The same Run control on a phone.
 await page.setViewportSize({ width: 390, height: 844 });
-await shoot('10-setup-mobile', async () => { await go('#/setup'); await page.locator('#setup-run').waitFor(); });
+await shoot('10-setup-mobile', async () => { await runTab(); });
 
 // Stop what the demo started, then clean up.
 await page.setViewportSize({ width: 1360, height: 860 });
+
+// 8. All projects: every project on this machine, and what needs you.
+await shoot('11-projects', async () => { await go('#/projects'); });
 await look('en', 'light');
+await runTab();
 await page.locator('[data-rt-all="stop"]').click().catch(() => {});
 await page.waitForTimeout(2500);
 await browser.close();

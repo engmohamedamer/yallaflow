@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0079",
+  "sourceType": "file",
+  "sourceName": "Screenshot from 2026-11-11 15-06-07.png",
+  "detectedFormat": "png",
+  "contentType": "image/png",
+  "contentAvailability": "original-only",
+  "capturedAt": "2026-11-11T14:14:08.519Z",
+  "original": {
+    "path": "sources/SRC-0079/Screenshot from 2026-11-11 15-06-07.png",
+    "sha256": "32bd441722ce66a577be0b9e8d638c80c6355aef124c02a1d7eeaeac00631aa3",
+    "sizeBytes": 241543
+  },
+  "metadata": {
+    "extension": ".png",
+    "detectedFormat": "png",
+    "format": "png",
+    "width": 1894,
+    "height": 1007
+  },
+  "linkedWork": [
+    "PF-0132"
+  ]
+}

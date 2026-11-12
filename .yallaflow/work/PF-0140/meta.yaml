@@ -1,0 +1,177 @@
+{
+  "id": "PF-0140",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "مع  بدايه ادراج مشورع موجود قبل كدة خاص ووقف عند الخطوه دى اللى  فىىالصور\nهو فتح حاجتين  راجع المسوده   مع جهز تشغيل اتطبيق هل دة منطقى ؟\nلما ضغطت على راجع المسوده عرض الصوره اللى تحت هل دى كافى او هو كدة تمام ؟\nانا ضغطت موافق واعتمد المسوده بعدها  اختفت الخطوتين اللى كانوا مفتوحين \nبعدها رحت للصفحه نظه عامه براجع التحديث  ضغطت كمل مع الوكيل\n\nحاليا ظاهر راجع وشغل التطبيق  وتحتها  راجع ووثق  كدة مازال هيحصلل لبس هنا \nضغطت وافق وكمل المشروع ظهرت الصوره اللىتحت كدة هو عمل ايه ؟بعدها ضغط على شغل او شغل المشروع مفيش حاجه بتحصل ولما ضغطت على افتح سرعه اشتغلوا عادى ؟؟",
+  "status": "DONE",
+  "readOnly": false,
+  "attestation": {
+    "recordedVia": "console",
+    "verified": false,
+    "requestId": "bffccb9a-de2d-4e2c-8e55-b5b9292fdadf",
+    "at": "2026-11-12T13:17:25.338Z"
+  },
+  "activation": {
+    "deferred": false,
+    "keptActive": null,
+    "at": "2026-11-12T13:17:25.342Z",
+    "activatedAt": "2026-11-12T13:18:48.105Z"
+  },
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-12T13:17:25.342Z",
+  "updatedAt": "2026-11-12T13:43:21.290Z",
+  "sources": [
+    {
+      "id": "SRC-0099",
+      "type": "file",
+      "name": "screenshot-1794488802061-1.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-12T13:17:26.314Z",
+      "workStatusAtLink": "PENDING",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0100",
+      "type": "file",
+      "name": "screenshot-1794488847814-2.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-12T13:17:26.821Z",
+      "workStatusAtLink": "PENDING",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0101",
+      "type": "file",
+      "name": "screenshot-1794488965748-3.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-12T13:17:27.319Z",
+      "workStatusAtLink": "PENDING",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0102",
+      "type": "file",
+      "name": "screenshot-1794489009202-4.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-12T13:17:27.831Z",
+      "workStatusAtLink": "PENDING",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0103",
+      "type": "file",
+      "name": "screenshot-1794489070834-5.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-12T13:17:28.299Z",
+      "workStatusAtLink": "PENDING",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0104",
+      "type": "file",
+      "name": "screenshot-1794489121500-6.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-12T13:17:28.779Z",
+      "workStatusAtLink": "PENDING",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0105",
+      "type": "file",
+      "name": "screenshot-1794489136721-7.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-12T13:17:29.306Z",
+      "workStatusAtLink": "PENDING",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0106",
+      "type": "file",
+      "name": "screenshot-1794489185236-8.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-12T13:17:29.783Z",
+      "workStatusAtLink": "PENDING",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0107",
+      "type": "file",
+      "name": "screenshot-1794489219631-9.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-12T13:17:30.305Z",
+      "workStatusAtLink": "PENDING",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0108",
+      "type": "file",
+      "name": "screenshot-1794489239624-10.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-12T13:17:30.827Z",
+      "workStatusAtLink": "PENDING",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0109",
+      "type": "file",
+      "name": "screenshot-1794489323693-11.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-12T13:17:31.308Z",
+      "workStatusAtLink": "PENDING",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0110",
+      "type": "file",
+      "name": "screenshot-1794489376981-12.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-12T13:17:31.816Z",
+      "workStatusAtLink": "PENDING",
+      "relationship": "work-input"
+    }
+  ],
+  "title": "Console first-run flow: confusing baseline review and run-setup steps; Start buttons do nothing for a service already running outside YallaFlow",
+  "routingConfidence": "high",
+  "routingReason": "Owner walked an existing project through console onboarding (12 screenshots) and hit UX defects confined to the console UI: two competing next steps, a thin draft-review view, duplicated approve controls on the Run tab, and Start buttons with no effect or feedback when the service already runs outside YallaFlow. No data model, security, or contract change: bounded console presentation/behavior fix.",
+  "routedAt": "2026-11-12T13:18:47.795Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-12T13:43:21.290Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

@@ -33,7 +33,7 @@ yallaflow console --agents                       # Agent Workspace with Codex
   - YallaFlow finds it on `PATH`, or through `YALLAFLOW_CODEX_ACP`.
   - `YALLAFLOW_CODEX_BIN` selects a specific `codex`.
 
-The console can install both for you: **Setup & run → Agents → On this machine**. It shows the exact command and waits for your approval, and it never uses sudo.
+The console can install both for you: **Project → Settings → Agents → On this machine**. It shows the exact command and waits for your approval, and it never uses sudo.
 
 ### Tested Codex versions
 

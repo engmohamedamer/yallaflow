@@ -1,0 +1,103 @@
+{
+  "id": "PF-0132",
+  "type": "change",
+  "scope": "architectural",
+  "routingStatus": "routed",
+  "rawRequest": "Implement the approved console information architecture (prototype research/ux-1.5.2/ia, PF-0129): merge Agents into Projects (Needs-you inbox on top, agents inside each project card); one Project destination with Overview / Run / Settings tabs replacing Project and Setup & Run; team mode as an optional New-project step and Settings section plus a permanent header indicator (Team/Solo + current branch) and a Workspace off-integration-branch banner; header tabs Workspace · Project · More; old routes keep working",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-11T14:13:00.439Z",
+  "updatedAt": "2026-11-11T14:49:39.785Z",
+  "title": "Implement the approved console information architecture (prototype research/ux-1.5.2/ia, PF-0129): merge Agents into Projects (Needs-you inbox on top, agents inside each project card); one Project destination with Overview / Run / Settings tabs replacing Project and Setup & Run; team mode as an optional New-project step and Settings section plus a permanent header indicator (Team/Solo + current branch) and a Workspace off-integration-branch banner; header tabs Workspace · Project · More; old routes keep working",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope architectural`.",
+  "routedAt": "2026-11-11T14:13:00.487Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "brainstorm",
+    "plan",
+    "implement",
+    "verify",
+    "converge",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "design-exploration",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "delivery-convergence",
+      "code-review"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0075",
+      "type": "file",
+      "name": "01-projects-light.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-11T14:13:37.712Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0076",
+      "type": "file",
+      "name": "03-project-run-light.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-11T14:13:37.721Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0077",
+      "type": "file",
+      "name": "05-project-settings-light.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-11T14:13:37.728Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0078",
+      "type": "file",
+      "name": "02-project-overview-light.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-11T14:13:37.738Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0079",
+      "type": "file",
+      "name": "Screenshot from 2026-11-11 15-06-07.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-11T14:14:08.574Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ],
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-11T14:49:39.785Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

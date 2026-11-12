@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-11T12:59:27.377Z",
+      "completedAt": "2026-11-11T12:59:27.377Z",
+      "summary": "The header (app.js topbar) shows a native <select class=projsel data-project> (or the plain name when one project) plus a small muted 'All projects' link; change handler at app.js:4105 calls switchProject; CSS .projsel/.projpick in app.css; the More menu (PF-0123) already has a details/summary popover pattern with Esc and outside-click closing",
+      "evidence": [
+        "resources/console/app.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-11T12:59:27.578Z",
+      "completedAt": "2026-11-11T12:59:27.578Z",
+      "summary": "Owner screenshot SRC (header-feedback.png): this header part has poor UX and look and needs improvement; keep the identity",
+      "evidence": [
+        "resources/console/app.js"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-11T12:59:27.781Z",
+      "completedAt": "2026-11-11T12:59:27.781Z",
+      "summary": "One switcher button (project name, readiness dot for the current project, chevron) opening a menu: projects (current marked), then Add an existing project, New project, All projects; Esc/outside close, arrow keys, aria; replaces the select and the small link; update browser checks that read .projsel",
+      "evidence": [
+        "resources/console/app.js"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-11T13:14:06.037Z",
+      "completedAt": "2026-11-11T13:14:06.037Z",
+      "summary": "Header: native select + small All projects link replaced by one details-based switcher (current project name, readiness dot, menu of projects with path tail and current check, Add existing/New project/All projects; read-only hides writes). Shared data-popmenu behavior for More and the switcher: Esc refocus, arrow keys, outside click, one open at a time. CSS for light/dark and a full-width panel on phones. Tests: test/console-switcher.test.js."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-11T13:14:25.334Z",
+      "completedAt": "2026-11-11T13:14:25.334Z",
+      "summary": "V-001 passed: switcher, refinement and presentation console tests. The full npm run check (1188 pass, 0 fail, 1 skipped) also passed on this working tree before it was recorded under PF-0128."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-11T13:14:25.334Z"
+}

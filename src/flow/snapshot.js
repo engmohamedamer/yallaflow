@@ -27,7 +27,8 @@ import { resolveDeliveryCriteria } from '../delivery/requirements.js';
 import { convergenceRequired } from '../delivery/policy.js';
 import { loadDecomposition } from '../decomposition/store.js';
 import { PACKAGE_VERSION } from '../version.js';
-import { buildStations, itemState, stationForSkill } from './stations.js';
+import { buildStations, itemState, stationForSkill, STATION_KEYS } from './stations.js';
+import { baselineNextStep, loadBaseline } from '../baseline/store.js';
 import { lineageReferenceResolver } from '../history/lineage.js';
 
 export const SNAPSHOT_SCHEMA = 'yallaflow.snapshot/1';
@@ -176,6 +177,7 @@ async function collectItem(root, meta, state, metas = null) {
     evidence: { freshRun, converged },
     children: await childSteps(root, meta, metas)
   });
+  const baseline = meta.baseline && stage !== 'DONE' && !lifecycleState ? baselineView(meta, await baselineNextStep(root, meta), active) : null;
   return {
     ...base,
     state: itemStateValue,
@@ -188,7 +190,31 @@ async function collectItem(root, meta, state, metas = null) {
     latestVerification: latest ? { id: latest.id, success: Boolean(latest.success), at: latest.verifiedAt ?? latest.finishedAt ?? null } : null,
     verificationRuns: { total: runs.length, passed: runs.filter((run) => run.success).length },
     completedAt: stage === 'DONE' ? (meta.completionHistory?.at(-1)?.completedAt ?? null) : null,
-    lastActivityAt: lastActivity(meta, progress.ledger, latest)
+    lastActivityAt: lastActivity(meta, progress.ledger, latest),
+    ...(baseline ?? {})
+  };
+}
+
+// PF-0135: a Repository Baseline never moves through workflow stages: it stays at INTAKE
+// until the developer approves the draft, which closes it. Its position is the baseline's
+// own next step (discovery, draft, awaiting review, changes requested), so it is never
+// shown as a new request at the gate, and a drafted baseline waits for the developer.
+const BASELINE_STEPS = ['DISCOVERY', 'DRAFT', 'REVIEW'];
+function baselineView(meta, step, active) {
+  const at = { discovery: 0, draft: 1, 'changes-requested': 1, 'awaiting-review': 2 }[step?.state];
+  if (at === undefined) return null; // approved or unreadable: keep the stage's own view
+  const awaiting = step.state === 'awaiting-review';
+  const state = awaiting ? 'you' : active ? 'active' : 'paused';
+  const steps = BASELINE_STEPS.map((id, index) => ({ id, kind: 'baseline', status: index < at ? 'done' : index === at ? 'now' : 'todo' }));
+  return {
+    state,
+    baselineStep: step.state,
+    completion: Math.round(((at + 0.5) / BASELINE_STEPS.length) * 100),
+    currentStation: 'understand',
+    stations: STATION_KEYS.map((key) => (key === 'understand' ? { key, status: state, steps } : { key, status: 'na', steps: [] })),
+    waitingFor: awaiting ? { kind: 'baseline', action: `yallaflow baseline show ${meta.id}` } : null,
+    blocker: null,
+    nextAction: awaiting ? `yallaflow baseline show ${meta.id}` : step.command
   };
 }
 
@@ -235,6 +261,18 @@ async function workDetail(root, workId, meta, { now = new Date().toISOString() }
   const item = await collectItem(root, meta, state);
   const detail = { schema: WORK_SCHEMA, generatedAt: now, yallaflowVersion: PACKAGE_VERSION, item, request: { raw: meta.rawRequest ?? null, title: meta.title ?? null } };
   detail.sources = await collectSources(root, meta);
+  // PF-0140 (additive): a baseline's draft itself, so the developer reviews what they approve
+  // in the console instead of a checkpoint summary. Absent for ordinary work and before a draft.
+  if (meta.baseline) {
+    const { exists: drafted, ledger } = await loadBaseline(root, meta.id);
+    if (drafted) {
+      detail.baseline = {
+        status: ledger.status, draftedAt: ledger.draftedAt ?? null,
+        facts: (ledger.facts ?? []).map((fact) => ({ id: fact.id, area: fact.area, status: fact.status, source: fact.source ?? null, summary: fact.summary, evidence: fact.evidence ?? [], note: fact.note ?? null })),
+        limitations: (ledger.limitations ?? []).map((entry) => ({ id: entry.id, type: entry.type ?? null, area: entry.area ?? null, summary: entry.summary, reason: entry.reason ?? null }))
+      };
+    }
+  }
   if (meta.routingStatus === 'pending') return { ...detail, checkpoints: [], history: [], questions: [], requirements: [], criteria: [], verification: [], children: [], gates: [] };
 
   const progress = await loadWorkProgress(root, meta);

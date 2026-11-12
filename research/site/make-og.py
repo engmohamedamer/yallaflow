@@ -24,7 +24,7 @@ NOTO = '/usr/share/fonts/truetype/noto/'
 COPY = {
     'en': {
         'font': (NOTO + 'NotoSans-Bold.ttf', NOTO + 'NotoSans-Regular.ttf'),
-        'kicker': 'YallaFlow 1.4.1',
+        'kicker': 'YallaFlow 1.5.2',
         'title': ['Give AI your project,', 'not just your prompt.'],
         'line': 'Memory, workflow and proof for your coding agent',
         'stats': [('64', 'work items'), ('216', 'verifications'), ('61', 'done')],
@@ -33,7 +33,7 @@ COPY = {
     },
     'ar': {
         'font': (NOTO + 'NotoSansArabic-Bold.ttf', NOTO + 'NotoSansArabic-Regular.ttf'),
-        'kicker': 'YallaFlow 1.4.1',
+        'kicker': 'YallaFlow 1.5.2',
         'title': ['ادّي الذكاء الاصطناعي', 'مشروعك، مش بس طلبك.'],
         'line': 'ذاكرة وطريقة شغل وإثبات لوكلاء البرمجة',
         'stats': [('64', 'شغلانة'), ('216', 'عملية تحقّق'), ('61', 'خلصت')],

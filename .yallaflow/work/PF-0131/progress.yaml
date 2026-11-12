@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-11T13:41:13.205Z",
+      "completedAt": "2026-11-11T13:41:13.205Z",
+      "summary": "The live move toast is built in the moves handler in resources/console/app.js (~3645): «full title» + from/to stations for new/back/forward; toast() is a fixed pill (.toast in app.css ~174) whose innerHTML is that text, so long titles wrap to two lines (owner screenshot)."
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-11T13:41:13.402Z",
+      "completedAt": "2026-11-11T13:41:13.402Z",
+      "summary": "Toast shows the work ID as a link to #/item/<id> (title as tooltip/aria-label) plus the move text; same three variants (new, back, forward); nothing else changes."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-11T13:41:13.603Z",
+      "completedAt": "2026-11-11T13:41:13.603Z",
+      "summary": "Replace «title» with an <a class=toast-id> link in the three variants; small CSS for the link on the dark pill; test in test/console-polish.test.js; verify with console tests."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-11T13:41:29.390Z",
+      "completedAt": "2026-11-11T13:41:29.390Z",
+      "summary": "Move toast now shows a.toast-id link (work ID → #/item/<id>, title in title/aria-label) in the new/back/forward variants; CSS for the link; test added."
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-11T13:41:34.280Z",
+      "completedAt": "2026-11-11T13:41:34.280Z",
+      "summary": "V-001 passed: console polish (incl. new toast test), switcher, refinement and presentation tests."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-11T13:41:34.280Z"
+}

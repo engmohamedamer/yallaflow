@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Console folder picker (1.5.2, PF-0139) follows the file-dialog model: one click selects a folder row, double-click / Enter / the forward arrow / the row's arrow opens it, and the footer's primary button acts on the selected folder, or on the open folder when nothing is selected. Connecting a folder with no Git repository (none in it, none above it inside home; previewConnect reports git and gitAbove from names only, never by running Git) offers an opt-in, unticked 'git init' that runs the console's existing confirmed git init after the connect; a refusal never undoes the connect.",
+      "evidence": [
+        "resources/console/app.js",
+        "src/console/connect.js",
+        "test/console-folder-picker.test.js",
+        "verification:V-001"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-12T13:54:48.458Z",
+      "factId": "CTX-0159",
+      "promotedAt": "2026-11-12T13:54:48.696Z",
+      "target": "context/conventions.md"
+    },
+    {
+      "id": "K-002",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Console styling uses Tailwind CSS v4 utilities (prefix tw:) next to app.css, served from the prebuilt resources/console/tw.css written by npm run build:css. A tw: class that is not already in tw.css has no effect until the CSS is rebuilt, so new console markup either reuses utilities present in tw.css or is styled in app.css.",
+      "evidence": [
+        "resources/console/tw.css",
+        "resources/console/app.css",
+        "package.json"
+      ],
+      "relation": {
+        "type": "reconfirms",
+        "factId": "CTX-0145"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-12T14:25:08.765Z",
+      "factId": "CTX-0145",
+      "promotedAt": "2026-11-12T14:25:18.487Z",
+      "target": "context/conventions.md"
+    }
+  ],
+  "updatedAt": "2026-11-12T14:25:18.487Z",
+  "reviewedAt": "2026-11-12T14:25:18.487Z"
+}

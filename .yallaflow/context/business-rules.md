@@ -129,4 +129,20 @@
   - src/console/server.js (repository @ d3652e8)
   - npm test (passed) (runtime, PF-0087 V-001)
 
+<!-- yallaflow-fact:CTX-0153 -->
+### CTX-0153 — Console project readiness (src/console/readiness.js): choosing the project's agent is the first required step. Its status is 'choose' until a choice is saved in .yallaflow/local/agents.json (per project, per machine), then off/missing/done for the chosen provider (Codex, or the experimental Claude Code). An unchosen agent makes the project read 'incomplete' and blocks agent sessions and queue runs (AGENT_NOT_READY: 'Choose this project's agent first'), but never blocks creating work. The console offers the choice in place in the readiness card and as the chat panel's first screen.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0133
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-11T15:32:33.201Z
+- **Verified:** 2026-11-11T15:32:33.201Z (commit 4d7c388)
+- **Evidence:**
+  - src/console/readiness.js#computeReadiness (repository @ 4d7c388)
+  - src/console/server.js#readinessFor (repository @ 4d7c388)
+  - test/console-readiness.test.js (repository @ 4d7c388)
+  - npm run check (failed) (runtime, PF-0133 V-001)
+
 <!-- yallaflow-context:end -->
