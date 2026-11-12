@@ -4,14 +4,14 @@
   "scope": "bounded",
   "routingStatus": "routed",
   "rawRequest": "Release v1.5.2 — An easier first hour: commit, tag v1.5.2, push main and the tag, GitHub Release (npm publish through release.yml), and deploy the website",
-  "status": "EXECUTION",
+  "status": "DONE",
   "readOnly": false,
   "knowledgePolicy": {
     "version": 1,
     "reviewRequired": true
   },
   "createdAt": "2026-11-12T15:33:44.720Z",
-  "updatedAt": "2026-11-12T15:35:14.604Z",
+  "updatedAt": "2026-11-12T15:53:26.309Z",
   "title": "Release v1.5.2 — An easier first hour: commit, tag v1.5.2, push main and the tag, GitHub Release (npm publish through release.yml), and deploy the website",
   "routingConfidence": "high",
   "routingReason": "Explicitly classified by the user: `yallaflow release --scope bounded`.",
@@ -33,5 +33,13 @@
       "verification",
       "code-review"
     ]
-  }
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-12T15:53:26.309Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
 }
