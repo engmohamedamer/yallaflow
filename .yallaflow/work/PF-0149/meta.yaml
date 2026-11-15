@@ -1,0 +1,45 @@
+{
+  "id": "PF-0149",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Add project: the folder verdict says what happens next and that nothing is run, and takes an optional first request that is handed to the agent with the project-understanding ask",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-15T17:44:15.363Z",
+  "updatedAt": "2026-11-15T17:51:11.677Z",
+  "title": "Add project: the folder verdict says what happens next and that nothing is run, and takes an optional first request that is handed to the agent with the project-understanding ask",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-15T17:44:15.423Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-15T17:51:11.677Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

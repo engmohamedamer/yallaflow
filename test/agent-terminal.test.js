@@ -41,7 +41,9 @@ test('no terminal, a failed start or a missing folder is reported so the copy fa
   await assert.rejects(openTerminal(project, 'x', { platform: 'linux', env: { PATH: await fakeBin([]) }, spawnFn: fakeSpawn([]) }), { code: 'NO_TERMINAL' });
   await assert.rejects(openTerminal(project, 'x', { platform: 'linux', env: { PATH: await fakeBin(['xterm']) }, spawnFn: fakeSpawn([], true) }), { code: 'NO_TERMINAL' });
   await assert.rejects(openTerminal(path.join(project, 'gone'), 'x', { platform: 'linux', env: { PATH: '' } }), { code: 'FOLDER_MISSING' });
-  assert.equal(await terminalCommand(project, 'x', { platform: 'win32', env: {} }), null);
+  // PF-0148: Windows opens PowerShell (simulated; test/agent-windows.test.js); other systems have none.
+  assert.equal((await terminalCommand(project, 'x', { platform: 'win32', env: {} })).file, 'powershell.exe');
+  assert.equal(await terminalCommand(project, 'x', { platform: 'freebsd', env: {} }), null);
 });
 
 test('macOS uses Terminal through osascript with the folder and command quoted', async () => {
@@ -59,12 +61,12 @@ test('the server builds the command itself and needs Claude Code on for the proj
   assert.match(server, /agents\\\/\(\?:settings\|launch-files\|approval-wait\|open-terminal\)/);
 });
 
-test('the chat opens on the chosen agent, keeps the warning to one line and connects through a terminal', () => {
+test('the chat opens on the chosen agent, shows no account warning and connects through a terminal', () => {
   assert.match(app, /const listed = chosenHere && provider\(chosenHere\) && !agentProvider \? agent\.providers\.filter\(\(x\) => x\.id === chosenHere\) : agent\.providers;/);
   assert.match(app, /data-agent-choose="\$\{other\}">\$\{A\(`استخدم \$\{PROVIDER\[other\]\} بداله`, `Use \$\{PROVIDER\[other\]\} instead`\)\}/);
-  assert.match(app, /<details class="awarn small awarn-compact" role="note"><summary>⚠/);
+  assert.doesNotMatch(app, /awarn-compact" role="note"/, 'PF-0145: the connection state says it; no standing warning');
   assert.match(app, /agentAction\('connect', \{ provider: 'claude', workId \}, openClaudeTerminal\)/);
   assert.match(app, /post\(`\/api\/p\/\$\{pid\}\/agents\/open-terminal`, '\{\}'/);
   assert.match(app, /Claude Code opened in a terminal in the project folder\. Accept its development-channel prompt there/);
-  assert.match(app, /return out\.filter\(\(x, i\) => !\(x\.session && out\[i \+ 1\]\?\.session\)\)\.slice\(-80\);/);
+  assert.match(app, /const shown = out\.filter\(\(x, i\) => !\(x\.session && out\[i \+ 1\]\?\.session\)\)\.slice\(-80\);/);
 });

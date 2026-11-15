@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "testing",
+      "summary": "The greeting no longer replaying on live updates was not observed in a real browser",
+      "reason": "No browser was started; verified by code trace and source-level tests",
+      "recordedAt": "2026-11-15T20:58:14.164Z"
+    }
+  ],
+  "updatedAt": "2026-11-15T20:58:14.164Z"
+}

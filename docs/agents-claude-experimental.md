@@ -29,7 +29,7 @@ When it is on, the chat's agent picker offers **Codex** and **Claude Code (exper
 
 **Requirements:**
 - Claude Code 2.1.234 or later, logged in with your **Claude account** (claude.ai subscription);
-- on **Team/Enterprise** plans, an organization Owner must have enabled Channels (the managed setting `channelsEnabled`; it is off by default). Without it, Claude Code drops messages from the console without any error. YallaFlow cannot read that setting: when `claude auth status` reports a Team or Enterprise login, Setup → Agents and the chat show a warning, and a console message that no Claude Code hook answers within 60 seconds is reported in the chat as probably not received (`YALLAFLOW_CLAUDE_DELIVERY_TIMEOUT_MS` changes the wait). You can still type in the Claude Code terminal; the console keeps showing its work through the hooks.
+- on **Team/Enterprise** plans, an organization Owner decides whether Channels are on (the managed setting `channelsEnabled`; off by default). Without it, Claude Code drops messages from the console without any error. YallaFlow cannot read that setting and never changes it. Instead it checks each connection once (see *Connection check and Terminal mode* below) and works in Terminal mode when the check is not answered.
 
 **Connecting:**
 1. Turn it on (above), open a work item's chat, choose **Claude Code**, and press **Connect Claude Code**.
@@ -64,5 +64,16 @@ When it is on, the chat's agent picker offers **Codex** and **Claude Code (exper
 - **Replies** arrive as whole messages.
 - **No Stop from the console.** Claude Code can't be stopped from the console.
 - **Auto mode.** In Claude Code's default auto mode, Claude Code approves most actions itself, so they never reach the console.
-- **Messages wait for the mode.** The console sends nothing until a hook has reported Claude Code's permission mode. Claude Code's `SessionStart` hook does not carry it, so the launch command starts Claude Code with a short first prompt (`Run yallaflow brief…`). That prompt reports the mode at once and orients the agent. It uses one small turn of your subscription per launch.
+- **The connection check waits for the mode.** The console sends nothing, not even its connection check, until a hook has reported Claude Code's permission mode. Claude Code's `SessionStart` hook does not carry it, so the launch command starts Claude Code with a short first prompt (`Run yallaflow brief…`). That prompt reports the mode at once and orients the agent. It uses one small turn of your subscription per launch.
 - **Ambiguous prompts.** When several calls of the same tool are waiting, a console request can't be tied to one of them. The console then claims nothing about where it was answered.
+
+
+## Connection check and Terminal mode
+
+An open connection does not prove that messages arrive: Claude Code never acknowledges a channel message, and drops them silently when the organization has channels off.
+
+- **One check per connection.** When Claude Code connects and its permission mode is known, the console sends one message with a unique code. It asks for nothing except the acknowledgment: no commands, no file reads, no changes. The launch settings let the channel's own two tools (`reply`, `received`) run without a prompt. The check uses one small turn of your subscription.
+- **Send appears only after the acknowledgment.** A matching code turns on sending from the console. No answer within 60 s (`YALLAFLOW_CLAUDE_PROBE_TIMEOUT_MS`) means *unverified*, not that a message was dropped; a late answer on the same connection still turns sending on. A new connection is checked again.
+- **Terminal mode.** Until the check is answered, and whenever it is not, the chat's button is **Copy for terminal**: write the message in the console, copy it, paste it in Claude Code. The copied text ends with a short marker (`[yallaflow 1a2b3c4d]`) that ties Claude Code's work to that message. The console keeps showing the work through hooks; Terminal mode needs no channel, no API key and no extra subscription.
+- **Each message has its own state.** *Sending*, *Received*, *Answered*, or *Delivery unconfirmed* (after 60 s, `YALLAFLOW_CLAUDE_DELIVERY_TIMEOUT_MS`). A state changes only on evidence that names that message. The console never sends a message twice; an unconfirmed message offers **Copy for terminal**, and Claude Code is told never to act on the same message id twice.
+- **One session.** Hooks are accepted from one Claude Code session. A new session takes over after the old one ends (`SessionEnd`), or when it names the connection check or one of the console's messages.

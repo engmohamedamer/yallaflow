@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Claude Code connection reliability (experimental): an open channel stream is never proof of delivery. Each connection is checked once with a nonce the session must send back through the channel's reply tool; the console sends directly only on a verified channel, otherwise the chat works in Terminal mode (copy with a [yallaflow <chat id>] marker, paste in Claude Code, hooks show the work). Each message has a chat id, one fixed route, and a state (sending, received, answered, unconfirmed, copied) that changes only on evidence naming that id; nothing is ever resent. Hooks are bound to one session and rebind only after SessionEnd or on proof (the check id or a known chat id).",
+      "evidence": [
+        "src/agents/claude.js",
+        "resources/agents/claude-hook.mjs",
+        "test/agent-claude-reliability.test.js"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-15T12:53:05.232Z",
+      "factId": "CTX-0162",
+      "promotedAt": "2026-11-15T12:53:15.612Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-15T12:53:15.612Z",
+  "reviewedAt": "2026-11-15T12:53:15.612Z"
+}

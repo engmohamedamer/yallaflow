@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-13T22:09:01.810Z",
+      "completedAt": "2026-11-13T22:09:01.992Z",
+      "summary": "Read SRC-0111/SRC-0112 and the console code. B1: Settings→Agents form (app.js agentsSection) lacks data-keep, so the 3 s redraw resets ticks. B2: wizardNext step 1 accepts only absolute paths; '~' is expanded only in the folder picker (typedPath). B3: queue sheet defaults to Codex and posts form.elements.provider; the reported Claude start could not be reproduced from code; make the chosen agent explicit on Start and in the result. B4: a Codex limit whose text is not in turnText at the error is recorded as 'error'; manager maps only usage_limit/crashed stops, so the task stays 'working'. B5/I7: a Claude session connected on a DONE item blocks the queue (advance waits on glance.session) with no row signal, and agentOnItem says 'working' for any connected Claude session. G1: Laravel prerequisites probe php/composer only, not pdo_sqlite. G2: startAgentPlan does not say where the request went. G3: snapshot sends the last 200 events; a busy stream trims permission.requested while still pending, so the card disappears. G4: the answer dialog lists ids only. G5: work show has no quality summary; no QC section on the item page. G6: the minimum-version notice shows the raw CLI text.",
+      "evidence": [
+        "resources/console/app.js",
+        "src/agents/bridge.js",
+        "src/execution/manager.js",
+        "src/newproject/catalog.js",
+        "src/flow/snapshot.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-13T22:09:06.091Z",
+      "completedAt": "2026-11-13T22:09:06.281Z",
+      "summary": "Scope: fix bugs B1–B5 and gaps G1–G6 from the 1.5.2 field notes. Ideas I1–I7 are out of scope, except I7 (a DONE item's card says 'agent working on it'), which is the same signal as B5 and is fixed with it. No business ambiguity: each note gives the expected behavior."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-13T22:09:14.276Z",
+      "completedAt": "2026-11-13T22:09:14.462Z",
+      "summary": "Plan: B1 add data-keep to the Agents settings form. B2 expand ~ and ~/ to the home folder (from /api/fs/dirs) in wizard step 1; a clearer message for a relative path. B3 Start button names the chosen agent and updates on change; toast names the agent the queue started with. B4 bridge: accumulate message.done in turnText, widen the LIMIT pattern, upgrade a recent 'error' stop to usage_limit when limit text follows; manager maps an 'error' stop to turn-ended (needs-you); card shows a stopped agent. B5/I7 queue row and Workspace say when the queue waits for another session on another item (Claude: type /exit); a connected Claude session on a DONE/closed item shows 'still linked' not 'working'. G1 Laravel prerequisite 'pdo_sqlite' via php -m with an install hint, shown in the review and the CLI plan. G2 the waiting line says where the request went. G3 chat shows open pending requests even when their event was trimmed, and resolved events carry the title so a closing line appears. G4 answer dialog shows question text. G5 work show adds a quality summary (additive) and the item page shows QC runs with an Open report action (server opens report.html for that work id only). G6 console-language minimum-version notice. Tests: string/server tests in a new test/console-field-notes.test.js plus existing suites."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-13T22:09:27.108Z",
+      "completedAt": "2026-11-13T22:26:00.600Z",
+      "summary": "Implemented B1 (data-keep on the Agents form), B2 (~ expansion and clearer path message in the wizard), B3 (Start button and toast name the agent), B4 (wider usage-limit detection, late correction of an error stop, error stop maps to needs-you, stopped agent shown on the card and in the bell, limit notices on the Workspace), B5/I7 (queue wait note on the queue row and Workspace; 'linked' instead of 'working' for a DONE item's Claude Code session), G1 (pdo_sqlite prerequisite via php -m, env-step warning with install hint, note shown for missing prerequisites), G2 (Run page and project chat say where the request went), G3 (open requests survive event trimming; resolved events carry the title and print an outcome line), G4 (question text in the Answer dialog), G5 (additive work show quality summary + schema, QC tab, server route that opens only that item's report.html), G6 (console-language minimum-version notice). New test/console-field-notes.test.js; adjusted 4 existing test harnesses/shape assertions for the changed code.",
+      "evidence": [
+        "resources/console/app.js",
+        "src/agents/bridge.js",
+        "src/execution/manager.js",
+        "src/newproject/catalog.js",
+        "src/newproject/project.js",
+        "src/console/greenfield.js",
+        "src/console/server.js",
+        "src/console/reveal.js",
+        "src/flow/snapshot.js",
+        "resources/schemas/work-1.schema.json",
+        "test/console-field-notes.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-13T22:31:23.672Z",
+      "completedAt": "2026-11-13T22:31:23.843Z",
+      "summary": "V-001: npm run check (syntax check of src/test/test-support and the full node:test suite) passed, 1257 pass, 0 fail, 1 skipped, including the new test/console-field-notes.test.js (12 tests covering B1–B5, I7, G1–G6). No browser run in this session.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [
+    {
+      "decision": "B3 (queue started with Claude Code after Codex was chosen) was addressed by making the chosen agent explicit on the Start button and in the result toast; the root cause was not reproduced from the code (the sheet defaults to Codex and posts the checked radio)",
+      "reason": "Static reading found no path that turns a checked Codex radio into provider claude; no browser reproduction was run in this session",
+      "costIfWrong": "If a real defect remains, a queue can still start with the wrong agent, but the developer now sees which agent the button and the toast name before and after starting",
+      "createdAt": "2026-11-13T22:31:19.812Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-13T22:31:23.843Z"
+}

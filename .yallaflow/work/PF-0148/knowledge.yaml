@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Finding and starting agent programs (src/agents/detect.js, PF-0148): which() and isExecutable() use POSIX rules (bare name, execute bit, PATH) or Windows rules (PATH in any case, PATHEXT limited to .exe/.com/.cmd/.bat, no execute bit). Programs are always started as { file, args } without a shell: launchSpec() turns an npm .cmd/.bat shim into its target (the script with node, or its .exe) when that target is a real file inside the shim's folder, and refuses any other command script (SHIM_UNSUPPORTED). Detection records what to start (adapter.launch, codex.launch) and codex.js, setup.js probes and jobs use it. On Windows the terminal is a new PowerShell window with the project folder as working directory, and Claude hook and launch commands use double quotes and forward slashes. Windows behaviour is tested with simulated paths only and is not verified on Windows.",
+      "evidence": [
+        "src/agents/detect.js",
+        "src/agents/terminal.js",
+        "test/agent-windows.test.js"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-15T17:43:39.644Z",
+      "factId": "CTX-0165",
+      "promotedAt": "2026-11-15T17:43:39.829Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-15T17:43:39.829Z",
+  "reviewedAt": "2026-11-15T17:43:39.829Z"
+}

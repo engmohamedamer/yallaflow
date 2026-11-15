@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Console folder chooser and connect (src/console/folders.js, connect.js; PF-0146 replaced the home-only rule of PF-0057 Q-003). Browsing lists directory names and three markers only, under allowed roots: the home folder, local Windows drives, and local volumes (/Volumes by the local flag of /sbin/mount; /media/<user>, /run/media/<user>, /mnt by a known local filesystem type in /proc/mounts; unknown is not offered). A requested path must be under a root as written before any filesystem call; rules are applied again after realpath; UNC and device paths and links to network targets are refused without being followed; hidden folders never; a short Windows system-folder list is a courtesy by name, not a boundary. Connecting is a separate explicit preview (stack from manifest hints, no Git command, exact bootstrap plan, refusals for nested projects up to the containing root, lanes, unsafe bootstrap blocks and escaping links; a drive or volume root is not a project) followed by Core's yallaflow init through the runner, only with the preview's planHash and an explicit confirmation, one connect per folder at a time. Windows and macOS behaviour is not verified on those systems. Agent setup on the machine lives in src/agents/setup.js; dynamic programs are listed in test-support/git-scan.js DYNAMIC_PROGRAMS.",
+      "evidence": [
+        "src/console/folders.js",
+        "src/console/connect.js",
+        "test/console-folder-roots.test.js"
+      ],
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0144"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-15T14:40:49.406Z",
+      "factId": "CTX-0163",
+      "promotedAt": "2026-11-15T14:51:40.886Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-15T14:51:40.886Z",
+  "reviewedAt": "2026-11-15T14:51:40.886Z"
+}

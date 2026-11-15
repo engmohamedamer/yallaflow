@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-15T11:36:39.983Z",
+      "completedAt": "2026-11-15T11:36:39.983Z",
+      "summary": "Run page head is runSection() and each service row is serviceCard() in resources/console/app.js. Today Start project is always the filled primary button and Stop project a plain secondary one, whatever the state; each trusted service row always shows Start, Restart, Stop. Tests asserting these controls: test/console-first-run.test.js, test/console-ia.test.js, test/project-setup.test.js.",
+      "evidence": [
+        "resources/console/app.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-15T11:36:48.050Z",
+      "completedAt": "2026-11-15T11:36:48.050Z",
+      "summary": "U1: the highlighted project action follows the state (Stop highlighted while everything runs; Start not offered as the primary action). U2: one stateful project control, service row controls quieter (one Start/Stop, Restart only while running), colour carried by the state dot and chip. No business ambiguity; S1-S3 out of scope per ruling.",
+      "evidence": [
+        ".yallaflow/sources/SRC-0113/yallaflow-field-notes-1.5.2-part3.md"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-15T11:36:54.598Z",
+      "completedAt": "2026-11-15T11:36:54.598Z",
+      "summary": "Plan: (1) runSection() in resources/console/app.js renders only the applicable project action: Start (filled) when nothing YallaFlow manages is live, Stop (new highlighted .btn.stop style) when everything startable is up, 'Start the rest' + Stop when partly running, a disabled Start with its reason when nothing can start, and a single disabled progress button while busy. (2) serviceCard() shows one Start or Stop per trusted service, Restart only while running, none filled. (3) app.css adds .btn.stop. (4) Update the assertions in test/console-first-run.test.js, console-ia.test.js, project-setup.test.js and add state-following cases. Verify with npm test.",
+      "evidence": [
+        "resources/console/app.js"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-15T11:39:02.924Z",
+      "completedAt": "2026-11-15T11:39:02.924Z",
+      "summary": "runSection() now renders only the applicable project action (Start filled when stopped; Stop with the new solid .btn.stop style when everything runs; 'Start the rest' + plain Stop when partly up; a disabled Start with its reason when nothing can start; one disabled progress button while busy). serviceCard() shows one unfilled Start or Stop per trusted service, Restart only while running, and a quiet Stop beside Start for failed/unmanaged records. Tests updated and two state-following tests added.",
+      "evidence": [
+        "resources/console/app.js",
+        "resources/console/app.css",
+        "test/console-first-run.test.js",
+        "test/project-setup.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-15T11:51:09.687Z",
+      "completedAt": "2026-11-15T11:51:09.687Z",
+      "summary": "npm test passed in full on the second run (V-002: 1259 pass, 0 fail, 1 skipped). The first run (V-001) had one failure, the timing-based queue end-to-end test in test/console-execution.test.js ('condition not met in time'); that file passes alone (7/7) and passed in V-002, and it does not touch the Run page. Not checked in a browser: the result is verified through the render tests only.",
+      "evidence": [
+        "verification:V-002"
+      ]
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Scope is U1 and U2 (Run page) only. S1-S3 from the part 4 notes (SRC-0116: stale Claude session blocks checkout, closed item on the New gate, permission requests easy to miss) are separate topics and are not changed here.",
+      "reason": "The work item's request names the Run page only; S1-S3 touch sessions, the Flow board and notifications.",
+      "costIfWrong": "S1-S3 stay open until routed as their own work.",
+      "createdAt": "2026-11-15T11:36:40.147Z"
+    },
+    {
+      "decision": "Project control becomes stateful: only the applicable action is shown (Start when stopped, Stop highlighted when everything runs, 'Start the rest' + Stop when partly running; a disabled Start with its reason when nothing can start). Service rows show one Start/Stop button, Restart only while running, none of them filled.",
+      "reason": "Follows the developer's U1 expectation and the U2 suggestion in SRC-0113; the state chip and dot carry the colour.",
+      "costIfWrong": "Console-only presentation; reversible by editing two render functions.",
+      "createdAt": "2026-11-15T11:36:40.312Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-15T11:51:09.687Z"
+}

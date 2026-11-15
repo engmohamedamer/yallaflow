@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-15T14:03:25.873Z",
+      "completedAt": "2026-11-15T14:03:25.873Z",
+      "summary": "Read src/console/folders.js (home-bounded resolveInsideHome, listFolders, createFolder), connect.js (preview, nested and Git-above walks bounded by home), server.js folder routes and request guards (loopback, Host allowlist, Origin, bearer token), and the picker UI in resources/console/app.js (POSIX-only path splitting, fallback to Home on error). The D: failure is the OUTSIDE_HOME refusal, by design.",
+      "evidence": [
+        "src/console/folders.js",
+        "src/console/connect.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-15T14:03:26.313Z",
+      "completedAt": "2026-11-15T14:03:26.313Z",
+      "summary": "Owner decisions 2026-11-15: Windows local drives browsable read-only without terminal setup; Linux Home plus /media, /run/media, /mnt; macOS volumes only when locality is established, else fail closed; network and UNC refused; validation after canonical resolution; courtesy exclusion of system folders with stated limits; no silent fallback to Home; existing Host/Origin/token/read-only/preview-hash protections preserved and tested; Windows marked not verified until tested on Windows; Run discovery unchanged."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-15T14:03:26.772Z",
+      "completedAt": "2026-11-15T14:03:26.772Z",
+      "summary": "folders.js: roots (home, drives, volumes) with injectable platform/path/fs, resolveBrowsable validating after realpath (UNC refused before any filesystem call, root membership, hidden, system exclusions, case-insensitive on Windows), error codes by cause, listFolders returns roots, crumbs, sep. connect.js: walks bounded by the containing root, drive roots refused as projects. UI: locations row, server crumbs, error kept in place. Tests: path.win32 unit cases, POSIX integration, guard tests on folder routes. Docs and prior decision note."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-15T14:32:57.491Z",
+      "completedAt": "2026-11-15T14:32:57.491Z",
+      "summary": "folders.js: allowed roots (home, local Windows drives, local volumes under /Volumes, /media/<user>, /run/media/<user>, /mnt), lexical root check before any filesystem call, rules re-applied after realpath, UNC and device paths refused first, network links not followed, locality per resolved folder (volumes fail closed), system-folder courtesy list, error codes by cause. connect.js: walks bounded by the containing root, drive or volume root refused as a project, outsideHome note. UI: locations row, server breadcrumbs and separator, errors kept in place, hidden rows fixed. Independent security review on an isolated copy: no high finding; findings 1-8 fixed (automount and unknown filesystems, pre-resolution probing, network link targets, nested network mounts, link roots, mkdir of system names, UNC after resolve); finding 9 (larger reach for a token holder) documented. Windows and macOS behaviour is not verified on those systems.",
+      "evidence": [
+        "src/console/folders.js",
+        "test/console-folder-roots.test.js",
+        "docs/console.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-15T14:51:32.257Z",
+      "completedAt": "2026-11-15T14:51:32.257Z",
+      "summary": "npm test: 1294 tests, 1293 pass, 0 fail, 1 skipped (V-002). V-001 failed on one test outside this change: test/agent-claude-experimental.test.js lost a timing race under load (400 ms permission timeout against a spawned hook process); it passed in 6 of 6 isolated re-runs. Browser check on a temp home (Playwright): locations row with a real mounted volume, breadcrumbs, typed /etc and a missing path reported in place, English and Arabic, 390 px width without overflow, preview on explicit click only. Not run: real Windows and macOS — not verified."
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Routed as bounded although it replaces a reviewed security decision (PF-0057 Q-003, home-only chooser): the owner approved the design and the security boundaries in the session on 2026-11-15 and asked for a security review inside this item",
+      "reason": "the specification and plan were reviewed and approved in conversation; a separate spec gate would repeat that decision",
+      "costIfWrong": "a security-relevant change ships without the architectural gates; mitigated by an independent security review before finish",
+      "createdAt": "2026-11-15T14:03:25.447Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-15T14:51:32.257Z"
+}

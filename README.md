@@ -117,7 +117,7 @@ flowchart LR
 YallaFlow never updates itself and never checks the network for versions. You decide when to upgrade:
 
 ```bash
-npm install -g yallaflow@latest     # or an exact version: yallaflow@1.5.2
+npm install -g yallaflow@latest     # or an exact version: yallaflow@1.5.3
 yallaflow --version
 
 # in each project
@@ -172,6 +172,17 @@ flowchart TB
 ```
 
 The depth adapts to the work. A bounded bug fix goes from root-cause analysis straight to the fix, while architectural work gets a reviewed design, specification, or plan. Nothing is called done without fresh verification evidence, and work that carries acceptance criteria is checked against them before it closes. What was learned becomes reviewed project knowledge. [Workflows in detail →](docs/workflows.md)
+
+## What's new in 1.5.3
+
+**A clearer start.** [Changelog →](CHANGELOG.md#153---2026-11-15--a-clearer-start)
+
+- **Approve the project understanding from the console**, or request changes with a note. The agent never approves for you.
+- **Project Brief and suggested first tasks.** The understanding opens with a short plain-language brief whose every line cites its evidence, and up to three suggested first tasks. Nothing is created until you press Create.
+- **Claude Code sessions say whether the console can reach them** (experimental). When it cannot, the chat switches to Terminal mode: copy, paste, and the console follows the work.
+- **Browse local drives and mounted volumes** in the folder picker, read-only. Network paths are refused.
+- **Windows: agents are found and started.** Not yet verified on a real Windows machine.
+- **Fixes** from a real zero-to-delivery run, one Start/Stop control on the Run page, and a calmer Workspace.
 
 ## What's new in 1.5.2
 
@@ -342,7 +353,7 @@ The YallaFlow website, [engmohamedamer.github.io/yallaflow](https://engmohamedam
 
 ## Status
 
-**1.5.2** makes the first hour easier (connect a project, choose its agent, get the app running) on the console of 1.5.0, which runs work your way: one task now, or a queue of tasks one after another, with review and manual merge for lanes. Parallel execution and Automated Merge are disabled in this release. 1.0.0 was the first public, stable release. YallaFlow follows Semantic Versioning and keeps existing workspaces readable ([compatibility promise](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise)).
+**1.5.3** gives an existing project a clearer start (a Project Brief, suggested first tasks, approval from the console) after 1.5.2 made the first hour easier, on the console of 1.5.0, which runs work your way: one task now, or a queue of tasks one after another, with review and manual merge for lanes. Parallel execution and Automated Merge are disabled in this release. 1.0.0 was the first public, stable release. YallaFlow follows Semantic Versioning and keeps existing workspaces readable ([compatibility promise](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise)).
 
 - **Local-first.** There is no YallaFlow server, account, or cloud service.
 - **Agent-agnostic**, with first-party setup for Claude Code and Codex.

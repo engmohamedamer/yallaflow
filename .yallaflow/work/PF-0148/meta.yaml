@@ -1,0 +1,43 @@
+{
+  "id": "PF-0148",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Windows: agents are not detected or started (no PATHEXT, exec-bit test, PATH casing, .cmd shims refused without a shell); terminal and hook commands are POSIX-only",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-15T17:27:24.927Z",
+  "updatedAt": "2026-11-15T17:43:40.309Z",
+  "title": "Windows: agents are not detected or started (no PATHEXT, exec-bit test, PATH casing, .cmd shims refused without a shell); terminal and hook commands are POSIX-only",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-11-15T17:27:25.030Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-15T17:43:40.309Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

@@ -16,18 +16,27 @@ export const FIRST_PROMPT = 'Run yallaflow brief, then wait for messages from th
 
 // POSIX single-quote a path for a hook command line.
 const quote = (value) => `'${String(value).replace(/'/g, "'\\''")}'`;
+// Windows (PF-0148; not verified on Windows): double quotes, which Git Bash, PowerShell
+// arguments and CMD all accept. A path is written with forward slashes, so no backslash is
+// read as an escape; a file name cannot contain a double quote there.
+const winQuote = (value) => `"${String(value).replace(/"/g, '')}"`;
+const winPath = (value) => String(value).replace(/\\/g, '/');
 
-export function hookSettings(nodePath = process.execPath) {
-  const command = `${quote(nodePath)} ${quote(HOOK)}`;
+export function hookSettings(nodePath = process.execPath, { platform = process.platform, hook = HOOK } = {}) {
+  const command = platform === 'win32' ? `${winQuote(winPath(nodePath))} ${winQuote(winPath(hook))}` : `${quote(nodePath)} ${quote(hook)}`;
   const entry = (matcher) => [{ ...(matcher ? { matcher } : {}), hooks: [{ type: 'command', command, timeout: 5 }] }];
   return {
+    // PF-0145: the channel's own two tools only talk to the console; they run without a prompt,
+    // so the connection check never asks the developer for anything.
+    permissions: { allow: [`mcp__${CHANNEL_SERVER_NAME}__reply`, `mcp__${CHANNEL_SERVER_NAME}__received`] },
     hooks: {
       SessionStart: entry(),
       UserPromptSubmit: entry(),
       PreToolUse: entry('*'),
       PostToolUse: entry('*'),
       Notification: entry('*'),
-      Stop: entry()
+      Stop: entry(),
+      SessionEnd: entry()
     }
   };
 }
@@ -68,7 +77,9 @@ export async function writeClaudeLaunchFiles(root, nodePath = process.execPath) 
 // Claude Code shows its own warning, which the user decides on. The first prompt comes
 // first (--mcp-config takes several values): it makes Claude Code report its permission
 // mode at once, since SessionStart hooks carry none (PF-0069), and orients the agent.
-export function launchCommand(root, mcpFile = path.join(root, '.yallaflow', 'local', 'agent', 'claude-mcp.json'), settingsFile = path.join(root, '.yallaflow', 'local', 'agent', 'claude-settings.json')) {
-  const rel = (file) => path.relative(root, file);
-  return `claude ${quote(FIRST_PROMPT)} --mcp-config ${rel(mcpFile)} --settings ${rel(settingsFile)} --dangerously-load-development-channels server:${CHANNEL_SERVER_NAME}`;
+export function launchCommand(root, mcpFile = path.join(root, '.yallaflow', 'local', 'agent', 'claude-mcp.json'), settingsFile = path.join(root, '.yallaflow', 'local', 'agent', 'claude-settings.json'), { platform = process.platform } = {}) {
+  const p = platform === 'win32' ? path.win32 : path;
+  const rel = (file) => p.relative(root, file);
+  // The prompt is fixed text without quotes; the file names are relative and fixed.
+  return `claude ${platform === 'win32' ? winQuote(FIRST_PROMPT) : quote(FIRST_PROMPT)} --mcp-config ${rel(mcpFile)} --settings ${rel(settingsFile)} --dangerously-load-development-channels server:${CHANNEL_SERVER_NAME}`;
 }

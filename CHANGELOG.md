@@ -4,6 +4,42 @@ All notable changes to YallaFlow are documented here. The format loosely follows
 
 **1.0.0 is the first public release**, published to npm as `yallaflow`. From 1.0.0 the package follows Semantic Versioning with the compatibility promise in [`docs/releasing.md`](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise). Every earlier version below is an **internal prerelease**: git-tagged, never published to npm, and kept here as history.
 
+## [1.5.3] - 2026-11-15 — A clearer start
+
+The console of 1.5.2, with a clearer start on an existing project and steadier agent sessions. Existing workspaces load unchanged; the new baseline fields are optional.
+
+### Added
+- **Approve the project understanding from the console** (PF-0147). The draft's page has a **Your decision** form: approve it, or request changes with a note. It follows the same rules as the other review gates:
+  - only a draft that awaits review can be decided;
+  - a draft that changed since you opened it asks you to reload;
+  - gaps the draft names must be acknowledged before approval.
+
+  The agent still never approves on your behalf.
+- **Project Brief** (PF-0151, PF-0152). A baseline draft can carry a short plain-language brief: what the project is, who uses it, what it does, and what is worth knowing. Every line cites facts or limitations of the same draft, and YallaFlow refuses a line that cites nothing. The console shows the brief first in the review and, once approved, at the top of the Overview. Each line opens the facts it cites; stale or disputed facts are marked. A draft without a brief works as before.
+- **Suggested first tasks** (PF-0153). The agent may record up to three suggestions with the draft, each citing its evidence. After approval the Workspace shows them beside your own first request. Choosing one opens **Create work** filled in. Nothing is created until you press Create.
+- **Understanding progress** (PF-0150). While the project understanding is being prepared, the readiness line shows its step, the facts recorded so far, the last activity and whether an agent is working, with a way to recover when none is.
+- **A first request when you add a project** (PF-0149). The folder preview says what happens next and that no project command is run. You can write your first request there; it is handed to the agent together with the project-understanding ask.
+- **Browse local drives and mounted volumes** (PF-0146). The folder picker is no longer limited to your home folder. It lists, read-only: local Windows drives, `/media`, `/run/media` and `/mnt` on Linux, and local volumes on macOS. Network and UNC paths are refused, rules are applied again after links are resolved, and an error stays where it happened instead of sending you back to Home. See `docs/console.md` for the limits.
+- **Windows: agents are found and started** (PF-0148). Detection follows `PATH` and `PATHEXT`, npm `.cmd` shims are resolved to their target without a shell, the terminal opens PowerShell, and hook commands are written for Windows. **This is not yet verified on a real Windows machine**; macOS volume detection is equally unverified.
+- **QC results on the work item** (PF-0143). A work item with recorded QC shows a QC tab and can open its report.
+
+### Changed
+- **Claude Code sessions say whether the console can reach them** (PF-0145, experimental). Each connection is checked once. **Send** works only after Claude Code acknowledges the check, and every message shows its own delivery state. When the check gets no answer (for example an organization with channels turned off), the chat switches to **Terminal mode**: **Copy for terminal**, paste into Claude Code, and the console follows the work through hooks. No message is sent twice.
+- **One Start/Stop control on the Run page** (PF-0144). The project button follows the project's state: Start, Stop, **Start the rest**, or the reason nothing can start. Each service shows one quiet control.
+- **Fixes and gaps from a real zero-to-delivery run** (PF-0143):
+  - the Agents form keeps what you typed across live updates, and `~` works in the new-project path;
+  - Start names the agent it starts;
+  - an agent stopped by a usage limit shows as needing you, on the card, in the bell and on the Workspace;
+  - a queue says what it waits for;
+  - the Answer dialog shows the question's text;
+  - a missing PHP `pdo_sqlite` is reported as a prerequisite with an install hint.
+
+### Fixed
+- **The chat box is no longer prefilled with "work on … to the end" while the item waits for your answer or review** (PF-0154). Text you typed is kept.
+- **The Workspace greeting no longer fades in again on every live update** (PF-0155). Entrance motion plays when a page opens, not when it refreshes.
+
+Parallel execution and Automated Merge stay disabled, as in 1.5.0.
+
 ## [1.5.2] - 2026-11-12 — An easier first hour
 
 The same console, smoother and easier to set up. Everything below is in the existing design; no new framework.

@@ -19,7 +19,7 @@ import { access, mkdtemp, rm } from 'node:fs/promises';
 import { constants } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { REQUIREMENTS, TESTED_CODEX, clearDetectionCache, detectProviders, parseVersion, versionAtLeast, which } from './detect.js';
+import { REQUIREMENTS, TESTED_CODEX, clearDetectionCache, detectProviders, launchSpec, parseVersion, versionAtLeast, which } from './detect.js';
 import { CodexSession } from './codex.js';
 import { claudeIncluded } from './experimental.js';
 import { redactSecrets } from '../security/redact.js';
@@ -66,13 +66,21 @@ export function setupEnvironment(env = process.env) {
   return clean;
 }
 
-function run(file, args, { env, timeoutMs = 8000, cwd } = {}) {
+async function run(program, programArgs, { env, timeoutMs = 8000, cwd } = {}) {
+  // PF-0148: a Windows npm shim is started as its target with node, never through a shell.
+  let spec;
+  try { spec = await launchSpec(program, programArgs); } catch (error) { return { ok: false, code: error.code, probeFailed: true, stdout: '', stderr: error.message }; }
+  const { file, args } = spec;
   return new Promise((resolve) => {
-    execFile(file, args, { env, timeout: timeoutMs, cwd, maxBuffer: 1024 * 1024, shell: false }, (error, stdout, stderr) => {
-      // A probe that could not run (timeout, missing program) is not an answer.
-      const probeFailed = Boolean(error && (error.killed || typeof error.code === 'string'));
-      resolve({ ok: !error, code: error?.code ?? 0, probeFailed, stdout: String(stdout ?? ''), stderr: String(stderr ?? '') });
-    });
+    try {
+      execFile(file, args, { env, timeout: timeoutMs, cwd, maxBuffer: 1024 * 1024, shell: false, windowsHide: true }, (error, stdout, stderr) => {
+        // A probe that could not run (timeout, missing program) is not an answer.
+        const probeFailed = Boolean(error && (error.killed || typeof error.code === 'string'));
+        resolve({ ok: !error, code: error?.code ?? 0, probeFailed, stdout: String(stdout ?? ''), stderr: String(stderr ?? '') });
+      });
+    } catch (error) {
+      resolve({ ok: false, code: error.code ?? 'LAUNCH_FAILED', probeFailed: true, stdout: '', stderr: String(error.message ?? error) });
+    }
   });
 }
 
@@ -96,7 +104,10 @@ async function npmGlobal(env) {
   // npm writes packages under lib/node_modules and links under bin (Linux and macOS layout);
   // a folder that does not exist yet is created inside the prefix, so the prefix must be writable.
   const canWrite = async (target) => { try { await access(target, constants.W_OK); return true; } catch (error) { return error.code === 'ENOENT' ? canWrite(path.dirname(target)) : false; } };
-  const writable = (await canWrite(path.join(prefix, 'lib', 'node_modules'))) && (await canWrite(path.join(prefix, 'bin')));
+  // Windows keeps node_modules and the command shims in the prefix folder itself.
+  const writable = process.platform === 'win32'
+    ? (await canWrite(path.join(prefix, 'node_modules'))) && (await canWrite(prefix))
+    : (await canWrite(path.join(prefix, 'lib', 'node_modules'))) && (await canWrite(path.join(prefix, 'bin')));
   return { npm, prefix, writable };
 }
 
@@ -192,6 +203,12 @@ export class MachineSetup {
     force.unref();
   }
 
+  // PF-0148: what a job starts, never through a shell (a Windows npm shim becomes its target
+  // with node). A program that cannot be started that way is refused with its reason.
+  async launchable(program, args) {
+    try { return await launchSpec(program, args); } catch (error) { throw new SetupError(409, error.code ?? 'LAUNCH_FAILED', error.message); }
+  }
+
   startJob(kind, file, args, { timeoutMs, onLine = null, env }) {
     const job = { id: randomBytes(6).toString('hex'), kind, state: 'running', tail: '', url: null, code: null, startedAt: new Date().toISOString(), endedAt: null, exit: null };
     // Its own process group, so a cancel or timeout also ends what npm or codex started.
@@ -230,7 +247,8 @@ export class MachineSetup {
     if (plan.planHash !== body.planHash) throw Object.assign(new SetupError(409, 'PLAN_CHANGED', 'What needs installing changed. Review the command again.'), { extra: { status: current } });
     if (!plan.writable) throw Object.assign(new SetupError(409, 'NPM_PREFIX_NOT_WRITABLE', `npm installs global packages into ${plan.prefix}, which this user cannot write. YallaFlow never uses sudo. Run the command yourself with a Node.js installed for your user (for example through nvm), or set an npm prefix in your home folder.`), { extra: { status: current } });
     const npm = await which('npm', this.env);
-    return this.startJob('install', npm, plan.argv.slice(1), { timeoutMs: INSTALL_TIMEOUT_MS, env: setupEnvironment(this.env) });
+    const start = await this.launchable(npm, plan.argv.slice(1));
+    return this.startJob('install', start.file, start.args, { timeoutMs: INSTALL_TIMEOUT_MS, env: setupEnvironment(this.env) });
     });
   }
 
@@ -243,7 +261,8 @@ export class MachineSetup {
     if (!codex) throw new SetupError(409, 'CODEX_MISSING', 'Install Codex first.');
     // Codex's device sign-in prints an official link and a one-time code; the developer
     // completes it in the browser. Only those two are picked out of the output.
-    return this.startJob('login', codex, ['login', '--device-auth'], {
+    const start = await this.launchable(codex, ['login', '--device-auth']);
+    return this.startJob('login', start.file, start.args, {
       timeoutMs: LOGIN_TIMEOUT_MS,
       env: setupEnvironment(this.env),
       // Read from the whole output so far, so a link split across chunks is never kept half-way.

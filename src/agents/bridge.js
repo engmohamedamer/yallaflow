@@ -15,7 +15,11 @@ import { detectProviders } from './detect.js';
 import { acquireCheckoutLock, lockedError, readCheckoutLock } from './checkout-lock.js';
 
 const RECORD_ID = /^[0-9a-f]{12}$/;
-const LIMIT = /usage limit|rate limit|quota|try again (?:at|in)/i;
+// PF-0143 (B4): providers word it differently (usage_limit_reached, "hit your usage limit").
+const LIMIT = /usage[ _-]?limit|rate limit|quota|try again (?:at|in)/i;
+// Only a provider's own limit wording corrects an earlier error stop (never a reply that merely
+// talks about rate limiting).
+const LIMIT_AFTER = /usage[ _-]?limit|try again (?:at|in) \d/i;
 
 // Why a session stopped, saved in its record so the console can offer to continue the work
 // item with another agent even after a restart (PF-0066). The provider's text is kept short.
@@ -216,7 +220,8 @@ export class AgentBridge {
       on: project.claudeOn,
       owner: Boolean(project.owner),
       lockedBy: project.holder ? lockedError(project.holder).message : null,
-      channelConnected: Boolean(link?.connected),
+      channelConnected: Boolean(link?.streamBusy()),
+      channel: link?.channelState ?? 'none',
       lastHookAt: link?.lastHookAt ? new Date(link.lastHookAt).toISOString() : null,
       mode,
       modeState: !mode ? 'unknown' : isForbiddenMode(mode) ? 'refused' : ['auto', 'acceptEdits'].includes(mode) ? 'auto-approves' : 'allowed',
@@ -432,7 +437,9 @@ export class AgentBridge {
           project.pending.delete(requestId);
           clearTimeout(entry.timer);
           this.recordDecision(project, entry.request, decision, by);
-          this.emit(project, agentEvent('permission.resolved', { requestId, decision, by }));
+          // PF-0143 (G3): the title travels with the outcome, so a chat whose kept history no
+          // longer holds the request can still say what was decided.
+          this.emit(project, agentEvent('permission.resolved', { requestId, decision, by, title: entry.request.title ?? null }));
           resolve(decision);
           return true;
         }
@@ -550,18 +557,26 @@ export class AgentBridge {
         modes: session.provider === 'codex' ? session.impl.availableModes ?? [] : [],
         auth: session.provider === 'codex' ? (session.impl.auth?.label ?? null) : null,
         connected: session.provider === 'claude' ? project.claude.connected : true,
+        ...(session.provider === 'claude' ? this.claudeState(project.claude) : {}),
         recordId: session.record.id,
         startedAt: session.record.startedAt
       };
     }
-    if (project.claude?.connected) return { provider: 'claude', ownership: 'user-session', workId: null, status: 'connected', mode: project.claude.permissionMode, connected: true, recordId: null };
+    if (project.claude?.connected) return { provider: 'claude', ownership: 'user-session', workId: null, status: 'connected', mode: project.claude.permissionMode, connected: true, ...this.claudeState(project.claude), recordId: null };
     return null;
+  }
+
+  // PF-0145: how the console reaches this Claude Code session. `channel` is verified only after
+  // the connection check was acknowledged; anything else is Terminal Mode. `monitoring` is true
+  // while the bound session's hooks arrive.
+  claudeState(link) {
+    return { channel: link.channelState, monitoring: Boolean(link.hookLive) };
   }
 
   // ----- one session per checkout -----
   assertFree(project, provider) {
     if (project.session) throw Object.assign(new Error(`A ${project.session.provider === 'codex' ? 'Codex' : 'Claude Code'} session is already active in this checkout (${project.session.record.workId ?? 'no work item'}). End it first.`), { status: 409, code: 'SESSION_ACTIVE' });
-    if (provider === 'codex' && project.claude?.connected) throw Object.assign(new Error('A Claude Code session is connected to this checkout. Close it in your terminal first.'), { status: 409, code: 'SESSION_ACTIVE' });
+    if (provider === 'codex' && project.claude?.streamBusy()) throw Object.assign(new Error('A Claude Code session is connected to this checkout. Close it in your terminal first.'), { status: 409, code: 'SESSION_ACTIVE' });
   }
 
   // Only the modes YallaFlow offers; an empty, unknown, or full-access mode is refused.
@@ -682,9 +697,17 @@ export class AgentBridge {
         // turn's recent text is read with the error (PF-0066).
         if (event.type === 'turn.started') project.turnText = '';
         if (event.type === 'message.delta') project.turnText = `${project.turnText ?? ''}${event.text ?? ''}`.slice(-600);
+        if (event.type === 'message.done' && !String(project.turnText ?? '').includes(String(event.text ?? ''))) project.turnText = `${project.turnText ?? ''}\n${event.text ?? ''}`.slice(-600);
         if (event.type === 'error' && !project.session.starting) {
           const said = String(project.turnText ?? '');
           this.noteStop(project, LIMIT.test(said) ? stopFrom('error', said) : stopFrom('error', event.message));
+        }
+        // PF-0143 (B4): the limit text can arrive after the generic error; a recent error stop is
+        // then corrected to the usage limit it was, so the queue pauses and the console says so.
+        if (['message.delta', 'message.done'].includes(event.type) && !project.session.starting) {
+          const stop = project.session.record?.lastStop;
+          const said = String(project.turnText ?? '');
+          if (stop?.reason === 'error' && Date.now() - Date.parse(stop.at) < 120_000 && LIMIT_AFTER.test(said)) this.noteStop(project, stopFrom('error', said));
         }
         if (event.type === 'session.ended' && !project.session.starting) this.finishCodex(project, event.reason, true, event.cleanup ?? null);
       },
@@ -725,7 +748,7 @@ export class AgentBridge {
     return cleanup;
   }
 
-  async message(projectId, text) {
+  async message(projectId, text, { terminal = false, chatId = null } = {}) {
     const project = this.project(projectId);
     const value = String(text ?? '').trim();
     if (!value || value.length > 20_000) throw Object.assign(new Error('Write a message of up to 20,000 characters.'), { status: 400, code: 'BAD_MESSAGE' });
@@ -736,10 +759,16 @@ export class AgentBridge {
       return { ok: true };
     }
     if (project.claude?.connected) {
+      // PF-0145: Terminal Mode. The developer pastes the message in Claude Code; the console only
+      // records it, so the hooks can tie the work to it. Nothing goes through the channel.
+      if (terminal) {
+        project.claude.noteTerminal(value, chatId);
+        return { ok: true, route: 'terminal' };
+      }
       if (!project.claude.permissionMode) throw Object.assign(new Error('Claude Code has not reported its permission mode yet. It does when the session starts or when you type in it; try again in a moment.'), { status: 409, code: 'MODE_UNKNOWN' });
       if (isForbiddenMode(project.claude.permissionMode)) throw Object.assign(new Error(`Claude Code is in ${project.claude.permissionMode} mode, which skips every permission. YallaFlow does not send messages to a session in that mode; change the mode in Claude Code first.`), { status: 409, code: 'MODE_FORBIDDEN' });
       project.claude.send(value, project.session?.record.workId ?? null);
-      return { ok: true };
+      return { ok: true, route: 'direct' };
     }
     throw Object.assign(new Error('No agent session is active.'), { status: 409, code: 'NO_SESSION' });
   }

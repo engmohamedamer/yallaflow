@@ -1,0 +1,57 @@
+{
+  "id": "PF-0154",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console chat: do not prefill the 'work on <id> to the end' draft when the work item is waiting for the developer's answer to a question (or a review). Seen on lalaff PF-0003 waiting on Q-001: the chat box was prefilled with the start message next to the 'Answer the question' button. Cause: goText() in resources/console/app.js (~line 1303) returns '' only for waitingFor.kind === 'baseline'; the draft is seeded at ~line 1530. Check the other goText callers (~2260, 4677, 4785) before changing it.",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-15T20:17:06.643Z",
+  "updatedAt": "2026-11-15T20:58:00.769Z",
+  "title": "Console chat: do not prefill the 'work on <id> to the end' draft when the work item is waiting for the developer's answer to a question (or a review). Seen on lalaff PF-0003 waiting on Q-001: the chat box was prefilled with the start message next to the 'Answer the question' button. Cause: goText() in resources/console/app.js (~line 1303) returns '' only for waitingFor.kind === 'baseline'; the draft is seeded at ~line 1530. Check the other goText callers (~2260, 4677, 4785) before changing it.",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-11-15T20:17:06.715Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0117",
+      "type": "file",
+      "name": "Screenshot from 2026-11-15 22-10-40.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-15T20:17:15.008Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ],
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-15T20:58:00.769Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002",
+        "V-003"
+      ]
+    }
+  ]
+}

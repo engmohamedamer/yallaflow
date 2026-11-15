@@ -1,0 +1,20 @@
+# Work Ledger — PF-0144
+
+Created: 2026-11-14T12:26:17.356Z
+
+- 2026-11-14T12:26:17.356Z Routing: pending
+- 2026-11-14T12:26:17.356Z Not made the active work item (yallaflow activate PF-0144 makes it active)
+- 2026-11-14T12:26:17.801Z Source attached: SRC-0113 (yallaflow-field-notes-1.5.2-part3.md)
+- 2026-11-14T12:26:17.804Z Source attached: SRC-0114 (Screenshot from 2026-11-14 12-35-41.png)
+- 2026-11-14T12:26:17.807Z Source attached: SRC-0115 (Screenshot from 2026-11-14 12-41-08.png)
+- 2026-11-14T13:56:20.846Z Source attached: SRC-0116 (yallaflow-field-notes-1.5.2-part4.md)
+- 2026-11-15T11:36:25.379Z Routing: routed as change + bounded (high)
+- 2026-11-15T11:36:29.910Z Activated: now the active work item
+- 2026-11-15T11:36:39.805Z Stage: INTAKE → CURRENT_BEHAVIOR
+- 2026-11-15T11:36:47.880Z Stage: CURRENT_BEHAVIOR → REQUESTED_DELTA
+- 2026-11-15T11:36:54.427Z Stage: REQUESTED_DELTA → IMPACT_ANALYSIS
+- 2026-11-15T11:36:59.888Z Stage: IMPACT_ANALYSIS → ACCEPTANCE_CRITERIA
+- 2026-11-15T11:37:00.594Z Stage: ACCEPTANCE_CRITERIA → PLAN
+- 2026-11-15T11:37:01.455Z Stage: PLAN → IMPLEMENTATION
+- 2026-11-15T11:39:03.176Z Stage: IMPLEMENTATION → VERIFICATION
+- 2026-11-15T11:51:14.076Z Stage: VERIFICATION → DONE

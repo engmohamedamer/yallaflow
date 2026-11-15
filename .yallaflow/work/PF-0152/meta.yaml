@@ -1,0 +1,45 @@
+{
+  "id": "PF-0152",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Show the Project Brief first in the understanding review and at the top of the Overview, with each line opening the facts it cites and stale or disputed facts marked",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-15T18:05:58.633Z",
+  "updatedAt": "2026-11-15T18:13:58.072Z",
+  "title": "Show the Project Brief first in the understanding review and at the top of the Overview, with each line opening the facts it cites and stale or disputed facts marked",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-15T18:05:58.681Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-15T18:13:58.072Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

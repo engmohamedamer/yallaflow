@@ -26,11 +26,11 @@ export async function detectClaude(env = process.env) {
   }
   if (!result.auth.loggedIn) result.problems.push('Claude Code is not logged in. Run `claude` and sign in with your Claude account.');
   else if (result.auth.method !== 'claude.ai') result.problems.push('Claude Code is not using a Claude subscription login. YallaFlow connects only to subscription sessions; API-key sessions are not supported.');
-  // PF-0102: on Claude Team and Enterprise accounts Claude Code drops channel messages unless
-  // the organization opted in (managed setting channelsEnabled; default off). YallaFlow cannot
-  // see that setting, so this is a warning, not a problem; the chat also checks delivery.
+  // On Claude Team and Enterprise accounts the organization decides whether the console may send
+  // to Claude Code. YallaFlow cannot see that setting, so it says so once, calmly; the connection
+  // check decides when Claude Code connects (PF-0145).
   if (result.auth.loggedIn && ['team', 'enterprise'].includes(String(result.auth.plan ?? '').toLowerCase())) {
-    result.warnings.push(`This Claude Code login is a Claude ${result.auth.plan === 'team' ? 'Team' : 'Enterprise'} account. Messages from the console reach Claude Code only if your organization's admin turned channels on (channelsEnabled); by default they are off and are dropped without an error. Without it, type in the Claude Code terminal; the console still shows its work.`);
+    result.warnings.push(`This Claude Code login is a Claude ${result.auth.plan === 'team' ? 'Team' : 'Enterprise'} account. Your organization may not allow sending from the console. YallaFlow checks this when Claude Code connects; when sending is not available you write here, copy, and paste in the Claude Code terminal, and the console still shows the work.`);
   }
   result.ready = result.problems.length === 0;
   return result;

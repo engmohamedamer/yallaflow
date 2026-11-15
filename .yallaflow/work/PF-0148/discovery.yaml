@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "environment",
+      "summary": "Agent discovery, shim launch, PowerShell terminal and Claude hook commands were not run on a real Windows machine",
+      "reason": "no Windows machine in this session; Windows rules were exercised with simulated paths only",
+      "recordedAt": "2026-11-15T17:43:39.314Z"
+    },
+    {
+      "id": "DL-002",
+      "type": "insufficient-evidence",
+      "area": "architecture",
+      "summary": "The reported Failed to fetch in the Agent panel on Windows is not explained: it is a network-level failure of the page's request, no crash point was found in the code, and it was not reproduced",
+      "reason": "needs the console's terminal output from the Windows machine at the moment it happens",
+      "recordedAt": "2026-11-15T17:43:39.473Z"
+    }
+  ],
+  "updatedAt": "2026-11-15T17:43:39.473Z"
+}

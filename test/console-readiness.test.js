@@ -196,3 +196,32 @@ test('PF-0133: a console with no saved agent choice asks for one; saving one ans
     await c.close();
   }
 });
+
+// ---- PF-0150: where the understanding stands, from the baseline's own records ----
+test('the understanding step carries the baseline progress: step, facts so far, gaps and last activity', async () => {
+  const { spawnSync } = await import('node:child_process');
+  const { fileURLToPath } = await import('node:url');
+  const cli = fileURLToPath(new URL('../src/cli.js', import.meta.url));
+  const root = await project('brownfield', { app: true });
+  const read = async () => step(await computeReadiness(root, { agent: { checked: true, enabled: true, ready: true, problems: [] } }), 'understanding');
+  {
+    assert.equal((await read()).progress, undefined, 'nothing started: nothing to report');
+    const { meta } = await startBaseline(root);
+    let progress = (await read()).progress;
+    assert.deepEqual([progress.step, progress.facts, progress.unresolved, progress.notInspected], ['discovery', 0, 0, 0]);
+    assert.ok(Date.parse(progress.lastActivityAt) > 0);
+    spawnSync(process.execPath, [cli, 'checkpoint', meta.id, '--skill', 'repository-baseline', '--complete', '--summary', 'read'], { cwd: root });
+    assert.equal((await read()).progress.step, 'draft');
+    const file = path.join(await mkdtemp(path.join(os.tmpdir(), 'yf-draft-')), 'b.json');
+    await writeFile(file, JSON.stringify({ facts: [
+      { area: 'project', status: 'confirmed', summary: 'A shop.', evidence: ['package.json'], source: 'repository' },
+      { area: 'database', status: 'unresolved', summary: 'The database is not established.', evidence: ['package.json'], source: 'repository' }
+    ], limitations: [{ type: 'not-inspected', area: 'environment', summary: 'CI was not read.', reason: 'not in the repository' }] }));
+    assert.equal(spawnSync(process.execPath, [cli, 'baseline', 'draft', meta.id, '--file', file], { cwd: root }).status, 0);
+    const waiting = (await read());
+    progress = waiting.progress;
+    assert.deepEqual([waiting.status, progress.step, progress.facts, progress.unresolved, progress.notInspected], ['awaiting-review', 'awaiting-review', 2, 1, 1]);
+    spawnSync(process.execPath, [cli, 'baseline', 'feedback', meta.id, '--changes-requested', '--note', 'more'], { cwd: root });
+    assert.equal((await read()).progress.step, 'changes-requested');
+  }
+});

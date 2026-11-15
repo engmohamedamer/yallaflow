@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-15T17:44:15.857Z",
+      "completedAt": "2026-11-15T17:44:15.857Z",
+      "summary": "previewPanel in resources/console/app.js already shows the folder kind, stack, source-file count and the exact init plan; readinessAction builds the ask the developer gives the agent for project understanding. No Git command runs on an unconnected folder, so no uncommitted count exists to show.",
+      "evidence": [
+        "resources/console/app.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-15T17:44:16.251Z",
+      "completedAt": "2026-11-15T17:44:16.251Z",
+      "summary": "Approved design item 3: one sentence on what happens next and that no project command is run; an optional first-request field for existing code; the request travels with the ask to the agent (which records it as the baseline objective) and is kept only in this browser until understanding starts. No new project state."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-15T17:44:16.639Z",
+      "completedAt": "2026-11-15T17:44:16.639Z",
+      "summary": "previewPanel: sentence and input (existing code only); connectFolder stores the text under a per-project browser key; readinessAction appends it to the required ask and clears it once understanding is under way. Tests in the picker and first-run suites, both languages."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-15T17:45:20.167Z",
+      "completedAt": "2026-11-15T17:45:20.167Z",
+      "summary": "previewPanel: 'No project command is run' and an optional first-request input for existing code; connectFolder keeps the text in this browser under a per-project key; readinessAction appends it to the understanding ask (chat or copy) and clears it once understanding is in progress. Docs updated. No server or project-state change.",
+      "evidence": [
+        "resources/console/app.js",
+        "test/console-folder-picker.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-15T17:51:11.299Z",
+      "completedAt": "2026-11-15T17:51:11.299Z",
+      "summary": "npm test (V-001): 1314 tests, 1313 pass, 0 fail, 1 skipped; new cases cover the field for existing code only, storage after connect, nothing else sent, the ask with and without agents, clearing, and Arabic. The browser pass for this item is run together with items 4 to 7 at the end of the plan."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-15T17:51:11.299Z"
+}

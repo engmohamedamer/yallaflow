@@ -37,7 +37,8 @@ import { FolderError, createFolder, listFolders } from './folders.js';
 import { connectFolder, previewConnect } from './connect.js';
 import { MachineSetup } from '../agents/setup.js';
 import { addProject as saveToRegistry, removeProject as forgetInRegistry } from './registry.js';
-import { openInFileManager } from './reveal.js';
+import { openInFileManager, openReportFile } from './reveal.js';
+import { qualityDirPath } from '../quality/artifacts.js';
 import { openTerminal, shellQuote } from '../agents/terminal.js';
 import { addRuntimeService, attachPlannedFile, createdProjectRoot, gitInit, probeTools, workspaceRoot } from './greenfield.js';
 import { CLAUDE_NOT_INCLUDED, claudeIncluded, loadClaude } from '../agents/experimental.js';
@@ -64,7 +65,7 @@ const UI_FILES = Object.freeze({
 // 1.4.0: work-item actions and review-gate decisions (PF-0043) join Create Work.
 // 1.4.0 Greenfield journey (PF-0057): register a project, enable agents for this run, Git init,
 // add a runtime service, attach a planned file to a new project's first work item.
-const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|revision-sources|actions\/[a-z]+|gates\/[a-z]+\/decision))?|runtime\/[a-z][a-z0-9-]{0,31}\/(?:trust|start|stop|restart)|runtime\/services|runtime\/(?:start|stop)-all|runtime\/analyze|runtime\/plan\/save|agents\/(?:settings|launch-files|approval-wait|open-terminal)|setup\/(?:scan|step)|git\/init|open-folder)$|^\/api\/new\/(?:plan|create|plans\/NP-\d{14}-[0-9a-f]{6}\/files)$|^\/api\/(?:projects|projects\/remove|projects\/connect|agents\/enable|fs\/mkdir|machine\/codex\/(?:install|login|verify)|machine\/job\/cancel)$/;
+const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|revision-sources|actions\/[a-z]+|gates\/[a-z]+\/decision|quality-report))?|runtime\/[a-z][a-z0-9-]{0,31}\/(?:trust|start|stop|restart)|runtime\/services|runtime\/(?:start|stop)-all|runtime\/analyze|runtime\/plan\/save|agents\/(?:settings|launch-files|approval-wait|open-terminal)|setup\/(?:scan|step)|git\/init|open-folder)$|^\/api\/new\/(?:plan|create|plans\/NP-\d{14}-[0-9a-f]{6}\/files)$|^\/api\/(?:projects|projects\/remove|projects\/connect|agents\/enable|fs\/mkdir|machine\/codex\/(?:install|login|verify)|machine\/job\/cancel)$/;
 // Agent Interaction (v1.3.0, only with --agents): the Agent Workspace's actions.
 const AGENT_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/agent\/(start|message|permission|cancel|end|resume|connect|disconnect|activate)$/;
 // PF-0112: execution actions (queues): create a run and the developer's run/task controls.
@@ -116,7 +117,7 @@ async function projectEntry(root) {
 const PARALLEL_OFF = 'Parallel is turned off in YallaFlow 1.5.0 until a real-agent test confirms that a lane\'s agent cannot change your repository\'s shared Git settings or the agent settings the console loads. Run tasks one after another with a queue instead.';
 const parallelOn = () => process.env.YALLAFLOW_EXPERIMENTAL_PARALLEL === '1';
 
-export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', token = randomBytes(24).toString('hex'), poll = false, missing = [], readOnly = false, agents = false, experimentalClaude = false, agentEnv = process.env, openFolder = openInFileManager, openTerminalFor = (root, command) => openTerminal(root, command, { env: agentEnv }) } = {}) {
+export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', token = randomBytes(24).toString('hex'), poll = false, missing = [], readOnly = false, agents = false, experimentalClaude = false, agentEnv = process.env, openFolder = openInFileManager, openReport = openReportFile, openTerminalFor = (root, command) => openTerminal(root, command, { env: agentEnv }) } = {}) {
   // Agent Interaction needs writes; --read-only keeps the console genuinely read-only.
   // Agents start on with --agents, or later for this run only by an explicit, confirmed
   // action in a non-read-only console (owner decision, PF-0057 Q-001).
@@ -338,7 +339,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     if (parts.length === 2 && parts[1] === 'projects') {
       return send(response, 200, { projects: projects.map(({ id, name, root, kind, parent, laneId }) => ({ id, name, root, kind: kind ?? 'main', ...(kind === 'lane' ? { parent, laneId } : {}) })), unavailable: missing, readOnly, agents: { enabled: agentsOn, claude: claudeOn, canEnable: !readOnly && !agentsOn, claudeAvailable: claudeIncluded() } });
     }
-    // 1.4.0 (PF-0057) reads: folders inside home, tool availability, agent readiness.
+    // 1.4.0 (PF-0057) reads: folders under the allowed roots (PF-0146), tool availability, agent readiness.
     if (parts.length === 3 && parts[1] === 'fs' && parts[2] === 'dirs') {
       if (readOnly) return send(response, 405, { error: { code: 'READ_ONLY', message: 'This console was started with --read-only; it does not choose folders.' } });
       try {
@@ -469,7 +470,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       if (keys.length !== 1 || !['planId', 'root'].includes(keys[0]) || typeof body[keys[0]] !== 'string' || !body[keys[0]]) return send(response, 400, { error: { code: 'BAD_REQUEST', message: 'Send { planId } or { root }.' } });
       if (body.planId) return send(response, 200, await registerRoot((await createdProjectRoot(body.planId)).root));
       try {
-        const listed = await listFolders(body.root); // home-bounded, real folder
+        const listed = await listFolders(body.root); // a real local folder under an allowed root
         return send(response, 200, await registerRoot(listed.path));
       } catch (error) {
         if (error instanceof FolderError) return send(response, error.status, { error: { code: error.code, message: error.message } });
@@ -567,6 +568,12 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
       return send(response, 201, await addRuntimeService(project.root, await readJsonBody(request), runner));
     }
+    // PF-0143 (G5): open a work item's QC report; the path comes from the project and the work id.
+    if (rest.length === 3 && rest[0] === 'work' && isWorkId(rest[1]) && rest[2] === 'quality-report') {
+      if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+      await readJsonBody(request);
+      return send(response, 200, await openReport(path.join(qualityDirPath(project.root, rest[1]), 'report.html'), project.root));
+    }
     // PF-0128: open this project's folder in the file manager (the registered root only).
     if (rest.length === 1 && rest[0] === 'open-folder') {
       if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
@@ -599,7 +606,9 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
         const files = await (await loadClaude()).writeClaudeLaunchFiles(project.root);
         const found = await detectProviders({ env: agentEnv, claude: true, maxAgeMs: 30_000 });
         const binary = found.claude?.claude?.path;
-        const command = binary ? files.command.replace(/^claude /, `${shellQuote(binary)} `) : files.command;
+        // On Windows the plain `claude` is kept: the new PowerShell window finds it on PATH
+        // itself, and no machine path is placed inside the command text (PF-0148).
+        const command = binary && process.platform !== 'win32' ? files.command.replace(/^claude /, `${shellQuote(binary)} `) : files.command;
         return send(response, 200, { ...(await openTerminalFor(project.root, command)), command: files.command });
       }
       if (rest[1] === 'launch-files') {
@@ -853,7 +862,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       case 'resume':
         return send(response, 201, await bridge.resumeCodex(project.id, String(body.recordId ?? ''), { mode: 'mode' in body ? body.mode : undefined }));
       case 'message':
-        return send(response, 202, await bridge.message(project.id, body.text));
+        return send(response, 202, await bridge.message(project.id, body.text, { terminal: body.terminal === true, chatId: body.chatId }));
       case 'permission':
         return send(response, 200, bridge.answerPermission(project.id, String(body.requestId ?? ''), String(body.decision ?? '')));
       case 'cancel':

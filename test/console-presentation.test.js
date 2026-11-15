@@ -11,7 +11,7 @@ const cut = (from, to) => {
   return app.slice(start, end);
 };
 const formatCode = cut('  const esc =', '  // ---------- token:');
-const fileCode = cut('  const ACCEPT =', '  function openCreate()');
+const fileCode = cut('  const ACCEPT =', '  function openCreate(');
 function harness() {
   const revoked = [], calls = [];
   const context = vm.createContext({ lang: 'en', File, URL: { createObjectURL: (f) => `blob:${f.name}`, revokeObjectURL: (u) => revoked.push(u) },

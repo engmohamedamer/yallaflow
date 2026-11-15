@@ -42,7 +42,9 @@ const TOOLS = Object.freeze([
   { id: 'node', argv: ['node', '--version'] },
   { id: 'npm', argv: ['npm', '--version'] },
   { id: 'php', argv: ['php', '--version'] },
-  { id: 'composer', argv: ['composer', '--no-plugins', '--version'] }
+  { id: 'composer', argv: ['composer', '--no-plugins', '--version'] },
+  // PF-0143 (G1): Laravel's generated .env uses SQLite; `php -m` lists the PHP modules.
+  { id: 'pdo_sqlite', argv: ['php', '-m'], module: 'pdo_sqlite' }
 ]);
 let toolCache = null;
 
@@ -50,6 +52,10 @@ export async function probeTools({ maxAgeMs = 30_000 } = {}) {
   if (toolCache && Date.now() - toolCache.at < maxAgeMs) return toolCache.value;
   const tools = await Promise.all(TOOLS.map(async (tool) => {
     const result = await runQuiet(tool.argv[0], tool.argv.slice(1));
+    if (tool.module) {
+      const found = result.ok && result.stdout.split('\n').some((line) => line.trim().toLowerCase() === tool.module);
+      return { id: tool.id, found, version: found ? 'enabled' : '' };
+    }
     const version = result.ok ? `${result.stdout}`.split('\n').map((line) => line.trim()).find((line) => /\d/.test(line)) ?? '' : '';
     return { id: tool.id, found: result.ok, version: version.slice(0, 120) };
   }));

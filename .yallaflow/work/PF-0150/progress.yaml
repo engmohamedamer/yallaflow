@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-15T17:51:28.452Z",
+      "completedAt": "2026-11-15T17:51:28.452Z",
+      "summary": "src/console/readiness.js builds the understanding step from the gate state and the baseline id only; the baseline's own step (discovery, draft, changes requested, awaiting review), fact count and last update are in its records (baselineNextStep, baseline.yaml, meta). readinessCard in app.js renders one line per step.",
+      "evidence": [
+        "src/console/readiness.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-15T17:51:28.830Z",
+      "completedAt": "2026-11-15T17:51:28.830Z",
+      "summary": "Approved design item 4: no new page; the existing readiness line shows the current step, facts so far, last activity and whether an agent is working, and offers recovery when nobody is. Read from existing records only."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-15T17:51:29.229Z",
+      "completedAt": "2026-11-15T17:51:29.229Z",
+      "summary": "baselineProgress() in baseline/store.js (read-only); readiness.js attaches it to the understanding step; readinessCard adds one detail line and updates the review hint to the console decision. Tests for the data and the line in both languages."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-15T17:52:49.664Z",
+      "completedAt": "2026-11-15T17:52:49.664Z",
+      "summary": "baselineProgress() reads a baseline's step, fact count, unresolved count, limitations and last update; readiness.js attaches it to the understanding step; readinessCard shows one detail line (step, facts, gaps, last activity, agent working or not) and the review hint now names the console decision. Read-only; no stored state.",
+      "evidence": [
+        "src/console/readiness.js",
+        "resources/console/app.js",
+        "test/console-readiness.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-15T17:58:27.668Z",
+      "completedAt": "2026-11-15T17:58:27.668Z",
+      "summary": "npm test (V-001): 1316 tests, 1315 pass, 0 fail, 1 skipped; new cases cover the progress data across discovery, draft, awaiting review and changes requested, and the detail line in English and Arabic with and without a working agent. The browser pass is run with items 5 to 7 at the end of the plan."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-15T17:58:27.668Z"
+}

@@ -687,21 +687,6 @@ print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_commo
   - src/console/server.js (repository @ 3491b3b)
   - test/console-readiness.test.js (repository @ 3491b3b)
 
-<!-- yallaflow-fact:CTX-0144 -->
-### CTX-0144 — Connecting a folder from the console (src/console/connect.js) is a read-only preview (home-bounded path, stack from manifest hints, no Git command, the exact bootstrap plan from bootstrapInitPlan in src/agent/bootstrap.js, refusals for nested projects, lanes, hand-edited/newer/broken bootstrap blocks and CLAUDE.md/AGENTS.md links leaving the folder) followed by Core's yallaflow init through the runner, only with the preview's planHash and an explicit confirmation, one connect per folder at a time. Agent setup on the machine lives in src/agents/setup.js (provider knowledge stays in src/agent and src/agents, AC-108); its dynamic programs (npm, codex) are listed in test-support/git-scan.js DYNAMIC_PROGRAMS.
-
-- **State:** current
-- **Confidence:** confirmed
-- **Provenance:** repository
-- **Source work:** PF-0123
-- **Knowledge ID:** K-004
-- **Promoted at:** 2026-11-11T11:02:19.116Z
-- **Verified:** 2026-11-11T11:02:19.116Z (commit 3491b3b)
-- **Evidence:**
-  - src/console/connect.js (repository @ 3491b3b)
-  - src/agents/setup.js (repository @ 3491b3b)
-  - test-support/git-scan.js (repository @ 3491b3b)
-
 <!-- yallaflow-fact:CTX-0148 -->
 ### CTX-0148 — Files YallaFlow manages but a repository may already contain — the agent bootstrap files CLAUDE.md/AGENTS.md and the agent contract .yallaflow/AGENT.md — go through src/agent/managed-files.js: every folder on the way must be a real folder (no linked .yallaflow), and the file may only be absent, a regular file, or a link to a regular file in the same folder (CLAUDE.md -> AGENTS.md). Anything else is the unsafe-link state, refused before any write by init, agent setup, agent refresh and the console connect. Writes re-check, use an exclusive temporary file with the final permissions and a rename (never following a link), keep read-only files read-only, and the init rollback restores only the recorded real paths. init also refuses a linked .yallaflow. Other .yallaflow write paths (context render, PROJECT.md, state) are not yet covered (follow-up).
 
@@ -859,5 +844,113 @@ print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_commo
   - src/console/readiness.js (repository @ 4d7c388)
   - test/console-first-run.test.js (repository @ 4d7c388)
   - npm test (passed) (runtime, PF-0140 V-001)
+
+<!-- yallaflow-fact:CTX-0161 -->
+### CTX-0161 — Since 1.5.3 (PF-0143), 'yallaflow work show --json' adds an optional quality object when the item has AI QC runs: qc.runs (per run: id, planId, at, tool, origin, summary, passed/failed/blocked/notRun counts, scenarios with plan title, status, note) and report (the repository-relative path of report.html, or null). The console shows these on the item page as a QC tab. Its 'Open the report' action POSTs /api/p/<pid>/work/<id>/quality-report. The server derives the file from the registered project and a validated work id, never from the request, and opens it only when it is a regular file inside the project. QC stays advisory and separate from verification.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0143
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-13T22:31:41.093Z
+- **Verified:** 2026-11-13T22:31:41.093Z (commit 92356b3)
+- **Evidence:**
+  - src/flow/snapshot.js (repository @ 92356b3)
+  - resources/schemas/work-1.schema.json (repository @ 92356b3)
+  - src/console/server.js (repository @ 92356b3)
+  - src/console/reveal.js (repository @ 92356b3)
+  - npm run check (passed) (runtime, PF-0143 V-001)
+
+<!-- yallaflow-fact:CTX-0162 -->
+### CTX-0162 — Claude Code connection reliability (experimental): an open channel stream is never proof of delivery. Each connection is checked once with a nonce the session must send back through the channel's reply tool; the console sends directly only on a verified channel, otherwise the chat works in Terminal mode (copy with a [yallaflow <chat id>] marker, paste in Claude Code, hooks show the work). Each message has a chat id, one fixed route, and a state (sending, received, answered, unconfirmed, copied) that changes only on evidence naming that id; nothing is ever resent. Hooks are bound to one session and rebind only after SessionEnd or on proof (the check id or a known chat id).
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0145
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-15T12:53:15.612Z
+- **Verified:** 2026-11-15T12:53:15.612Z (commit 92356b3)
+- **Evidence:**
+  - src/agents/claude.js (repository @ 92356b3)
+  - resources/agents/claude-hook.mjs (repository @ 92356b3)
+  - test/agent-claude-reliability.test.js (repository @ 92356b3)
+
+<!-- yallaflow-fact:CTX-0163 -->
+### CTX-0163 — Console folder chooser and connect (src/console/folders.js, connect.js; PF-0146 replaced the home-only rule of PF-0057 Q-003). Browsing lists directory names and three markers only, under allowed roots: the home folder, local Windows drives, and local volumes (/Volumes by the local flag of /sbin/mount; /media/<user>, /run/media/<user>, /mnt by a known local filesystem type in /proc/mounts; unknown is not offered). A requested path must be under a root as written before any filesystem call; rules are applied again after realpath; UNC and device paths and links to network targets are refused without being followed; hidden folders never; a short Windows system-folder list is a courtesy by name, not a boundary. Connecting is a separate explicit preview (stack from manifest hints, no Git command, exact bootstrap plan, refusals for nested projects up to the containing root, lanes, unsafe bootstrap blocks and escaping links; a drive or volume root is not a project) followed by Core's yallaflow init through the runner, only with the preview's planHash and an explicit confirmation, one connect per folder at a time. Windows and macOS behaviour is not verified on those systems. Agent setup on the machine lives in src/agents/setup.js; dynamic programs are listed in test-support/git-scan.js DYNAMIC_PROGRAMS.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0146
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-15T14:51:40.886Z
+- **Supersedes:** CTX-0144
+- **Verified:** 2026-11-15T14:51:40.886Z (commit 92356b3)
+- **Evidence:**
+  - src/console/folders.js (repository @ 92356b3)
+  - src/console/connect.js (repository @ 92356b3)
+  - test/console-folder-roots.test.js (repository @ 92356b3)
+
+<!-- yallaflow-fact:CTX-0164 -->
+### CTX-0164 — Console baseline decision (PF-0147): the project-understanding draft is approved or sent back from the baseline item page through gates/baseline in src/console/actions.js, which runs Core's baseline approve or baseline feedback. It decides only a draft awaiting review whose digest (baselineReviewDigest in src/baseline/store.js, exposed as detail.baseline.digest with coverage and gaps) matches the one shown; gaps (uninspected areas, unresolved facts, undeclared coverage) need a second acknowledgment and never block. Structured console provenance stays refused on the baseline and reconciliation gates (src/reviews/store.js, src/core/integrity.js); a console baseline decision states its origin in the decision note (identity not verified, host, claimed Git name).
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0147
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-15T16:45:25.118Z
+- **Verified:** 2026-11-15T16:45:25.118Z (commit 92356b3)
+- **Evidence:**
+  - src/console/actions.js (repository @ 92356b3)
+  - src/baseline/store.js (repository @ 92356b3)
+  - test/console-baseline-decision.test.js (repository @ 92356b3)
+
+<!-- yallaflow-fact:CTX-0165 -->
+### CTX-0165 — Finding and starting agent programs (src/agents/detect.js, PF-0148): which() and isExecutable() use POSIX rules (bare name, execute bit, PATH) or Windows rules (PATH in any case, PATHEXT limited to .exe/.com/.cmd/.bat, no execute bit). Programs are always started as { file, args } without a shell: launchSpec() turns an npm .cmd/.bat shim into its target (the script with node, or its .exe) when that target is a real file inside the shim's folder, and refuses any other command script (SHIM_UNSUPPORTED). Detection records what to start (adapter.launch, codex.launch) and codex.js, setup.js probes and jobs use it. On Windows the terminal is a new PowerShell window with the project folder as working directory, and Claude hook and launch commands use double quotes and forward slashes. Windows behaviour is tested with simulated paths only and is not verified on Windows.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0148
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-15T17:43:39.829Z
+- **Verified:** 2026-11-15T17:43:39.829Z (commit 92356b3)
+- **Evidence:**
+  - src/agents/detect.js (repository @ 92356b3)
+  - src/agents/terminal.js (repository @ 92356b3)
+  - test/agent-windows.test.js (repository @ 92356b3)
+
+<!-- yallaflow-fact:CTX-0166 -->
+### CTX-0166 — Project Brief (PF-0151): a baseline draft may carry an optional brief (summary, users, capabilities, components, worthKnowing) validated by normalizeBrief in src/baseline/store.js. Every line cites facts of the same draft (BF ids by order), worthKnowing may cite discovery limitations (DL ids), and unresolved facts may be stated only under worthKnowing. The brief is part of the review digest, stays in baseline.yaml and is never promoted: only facts become project memory, and brief lines are read through the facts they cite. Technologies and coverage are not authored in it. The agent learns the format from the baseline CLI output (start, and a hint after a draft without one), not from a new skill version.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0151
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-15T18:05:55.883Z
+- **Verified:** 2026-11-15T18:05:55.883Z (commit 92356b3)
+- **Evidence:**
+  - src/baseline/store.js (repository @ 92356b3)
+  - src/commands/baseline.js (repository @ 92356b3)
+  - test/baseline-brief.test.js (repository @ 92356b3)
+
+<!-- yallaflow-fact:CTX-0167 -->
+### CTX-0167 — Suggested first tasks (PF-0153): a baseline draft may carry up to three suggestions (title, why, optional type) validated in src/baseline/store.js; each must cite facts (BF ids) or discovery limitations (DL ids) of the same draft. They stay in baseline.yaml and are never promoted. After approval src/overview/collect.js exposes firstTasks: the developer's own first request (pendingOriginalRequest) and the suggestions read through current project-memory facts, dropping any with nothing current behind it. The console's Start here panel only prefills Create Work (openCreate(prefill)); nothing is created from a suggestion.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0153
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-15T19:20:15.723Z
+- **Verified:** 2026-11-15T19:20:15.723Z (commit 92356b3)
+- **Evidence:**
+  - src/baseline/store.js (repository @ 92356b3)
+  - src/overview/collect.js (repository @ 92356b3)
+  - resources/console/app.js (repository @ 92356b3)
 
 <!-- yallaflow-context:end -->

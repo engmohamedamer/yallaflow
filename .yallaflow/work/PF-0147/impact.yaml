@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "impacts": [
+    {
+      "id": "IM-001",
+      "status": "assessed",
+      "raisedAt": "2026-11-15T16:45:09.552Z",
+      "stageAtRaise": "VERIFICATION",
+      "triggers": [
+        {
+          "type": "requirements",
+          "changes": [
+            {
+              "id": "AC-003",
+              "action": "revised",
+              "from": "active",
+              "to": "active"
+            }
+          ],
+          "at": "2026-11-15T16:45:09.552Z"
+        }
+      ],
+      "assessment": {
+        "assessedAt": "2026-11-15T16:45:43.210Z",
+        "stages": {
+          "context-discovery": {
+            "verdict": "unaffected",
+            "reason": "The criterion's wording now matches what was built and tested (origin in the decision note); nothing in this stage changes."
+          },
+          "requirement-clarification": {
+            "verdict": "unaffected",
+            "reason": "The change is recorded as a ruling in the ledger; the owner's requirement (keep audit integrity) is unchanged."
+          },
+          "implementation": {
+            "verdict": "unaffected",
+            "reason": "The criterion's wording now matches what was built and tested (origin in the decision note); nothing in this stage changes."
+          },
+          "verification": {
+            "verdict": "unaffected",
+            "reason": "V-002 already covers the note-based record."
+          },
+          "delivery-convergence": {
+            "verdict": "affected",
+            "reason": "AC-003 changed, so its finding is assessed against the revised wording."
+          }
+        },
+        "applied": {
+          "revised": [],
+          "convergenceInvalidated": true
+        }
+      }
+    }
+  ],
+  "updatedAt": "2026-11-15T16:45:43.210Z"
+}

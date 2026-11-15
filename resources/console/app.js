@@ -10,6 +10,10 @@
     get(k, d) { try { const v = localStorage.getItem('yfc.' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
     set(k, v) { try { localStorage.setItem('yfc.' + k, JSON.stringify(v)); } catch { /* unavailable */ } }
   };
+  // PF-0149: the first request typed when the project was added (this browser only). It is
+  // given to the agent with the understanding ask and forgotten once understanding is under way.
+  const firstRequestKey = (id) => `first-request:${id}`;
+  const firstRequest = () => { const text = store.get(firstRequestKey(pid), null); return typeof text === 'string' && text.trim() ? text.trim().slice(0, 300) : null; };
   let lang = store.get('lang', 'ar');
   let theme = store.get('theme', null);
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -138,14 +142,22 @@
   let detail = null; // work show of the open item
   let error = null;
 
+  // PF-0148: no answer at all (the browser's "Failed to fetch") means the console process is
+  // not reachable. It is said in plain words; with no status it is still the offline case.
+  async function reach(send) {
+    try { return await send(); } catch (cause) {
+      throw Object.assign(new Error(A('الكونسول غير متاح: لم يصل أي رد. تأكد أن yallaflow console ما زال يعمل في الترمينال، ثم أعد تحميل الصفحة.', 'The console is not reachable: no answer arrived. Check that yallaflow console is still running in its terminal, then reload this page.')), { code: 'OFFLINE', cause });
+    }
+  }
   async function api(pathname, as = 'json') {
-    const response = await fetch(pathname, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' });
+    const response = await reach(() => fetch(pathname, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' }));
     if (!response.ok) {
       let body = null;
       try { body = await response.json(); } catch { /* not json */ }
       const failure = new Error(body?.error?.message ?? `HTTP ${response.status}`);
       failure.messageAr = body?.error?.messageAr ?? null;
       failure.status = response.status;
+      failure.code = body?.error?.code ?? null;
       failure.command = body?.error?.command;
       throw failure;
     }
@@ -230,7 +242,7 @@
     const level = readiness?.pid === pid ? readiness.data?.level : null;
     const levelText = { ready: A('جاهز', 'Ready'), incomplete: A('محتاج خطوات', 'Needs setup'), attention: A('محتاج انتباه', 'Needs attention') };
     const dot = level ? `<span class="projdot ${level}" aria-hidden="true"></span>` : '';
-    const folderTail = (root) => String(root ?? '').split('/').slice(-2).join('/');
+    const folderTail = (root) => String(root ?? '').split(/[\\/]/).filter(Boolean).slice(-2).join('/');
     const picker = !projects.length ? '' : `<details class="projmenu" data-popmenu><summary aria-haspopup="menu" aria-label="${A('المشروع', 'Project')}: ${esc(current?.name ?? '')}${level ? ` — ${esc(levelText[level])}` : ''}" title="${esc(current?.root ?? '')}">${dot}<span class="projmenu-name">${esc(snap?.project?.name ?? current?.name ?? '')}</span><span class="projmenu-chev" aria-hidden="true">▾</span></summary>
       <div class="projmenu-panel" role="menu"><div class="projmenu-h tiny muted">${A('المشاريع', 'Projects')}</div>
         ${projects.map((p) => `<a role="menuitem" href="#/map" data-open-project="${esc(p.id)}" class="projmenu-item" ${p.id === pid ? 'aria-current="true"' : ''}><span class="projmenu-check" aria-hidden="true">${p.id === pid ? '✓' : ''}</span><span class="grow"><b>${esc(p.name)}</b><span class="tiny muted ltr projmenu-path">${esc(folderTail(p.root))}</span></span></a>`).join('')}
@@ -356,7 +368,7 @@
     if (readOnly) return '';
     const card = (id, name, sub, extra = '') => `<button type="button" class="agentpick-opt" data-agent-choose="${id}"><b>${name}</b><span class="tiny muted">${sub}</span>${extra}</button>`;
     const claude = agentsClaudeAvailable
-      ? card('claude', `Claude Code <span class="chip wait tiny">${A('تجريبي', 'experimental')}</span>`, A('اشتراك Claude بتاعك', 'Your Claude subscription'), `<span class="tiny agentpick-warn">${A('على حسابات Claude Team أو Enterprise، رسايل الكونسول مش بتوصل إلا لو المؤسسة مفعّلة الـ channels. ساعتها اشتغل من ترمينال Claude Code.', 'On Claude Team or Enterprise accounts, console messages reach Claude Code only if your organization enabled channels; otherwise work in the Claude Code terminal.')}</span>`)
+      ? card('claude', `Claude Code <span class="chip wait tiny">${A('تجريبي', 'experimental')}</span>`, A('اشتراك Claude بتاعك', 'Your Claude subscription'), '')
       : '';
     return `<div class="agentpick" role="group" aria-label="${A('اختار وكيل المشروع', 'Choose the project\'s agent')}">${card('codex', 'Codex', A('اشتراك ChatGPT بتاعك · الموصى بيه', 'Your ChatGPT subscription · recommended'))}${claude}</div>
       <p class="tiny muted agentpick-note">${A('الاختيار بيتحفظ للمشروع ده على جهازك بس، وتقدر تغيّره من الإعدادات ← الوكلاء. الوكيل بيستخدم اشتراكك، من غير مفاتيح API.', 'The choice is saved for this project on this machine only; change it under Settings → Agents. The agent uses your subscription, never API keys.')}</p>`;
@@ -382,7 +394,9 @@
     if (st.id === 'understanding') {
       if (st.status === 'awaiting-review' && st.baselineId) return `<a class="btn sm go" href="#/item/${encodeURIComponent(st.baselineId)}">${A('راجع المسودة', 'Review the draft')}</a>`;
       if (st.status === 'required' || st.status === 'in-progress') {
-        const ask = st.status === 'required' ? A('جهّز فهم للمشروع ده بأدلة من المستودع، وبعدها اعرضه عليّا عشان أوافق.', 'Establish project understanding for this repository, then show it to me for approval.') : A('كمّل تجهيز فهم المشروع.', 'Continue the project-understanding discovery.');
+        const first = st.status === 'required' ? firstRequest() : null;
+        if (st.status !== 'required' && firstRequest()) store.set(firstRequestKey(pid), null);
+        const ask = st.status === 'required' ? A('جهّز فهم للمشروع ده بأدلة من المستودع، وبعدها اعرضه عليّا عشان أوافق.', 'Establish project understanding for this repository, then show it to me for approval.') + (first ? A(` أول طلب لي بعدها: «${first}».`, ` My first request after that: "${first}".`) : '') : A('كمّل تجهيز فهم المشروع.', 'Continue the project-understanding discovery.');
         const ready = agentsOn && readiness?.data?.allows?.agentSessions;
         return ready ? btn(`data-ready-chat="${esc(ask)}"`, st.status === 'required' ? A('ابدأ مع الوكيل', 'Start with the agent') : A('كمّل مع الوكيل', 'Continue with the agent'), true)
           : `<button type="button" class="btn sm" data-copy="${esc(ask)}" data-copy-what="text" title="${esc(ask)}">${A('انسخ الطلب لوكيلك', 'Copy the request for your agent')}</button>`;
@@ -392,6 +406,22 @@
     if (st.id === 'agent' && st.status === 'missing') return `<a class="btn sm" href="#/settings/agents" data-setup-jump="agents">${A('جهّز Codex', 'Set up Codex')}</a>`;
     if (st.id === 'runtime' && st.status !== 'done') return `<a class="btn sm ghost" href="#/run" data-run-next="${esc(st.status)}">${st.status === 'not-configured' ? A('جهّز تشغيل التطبيق', 'Get the app running') : st.status === 'stopped' ? A('شغّل التطبيق', 'Start the app') : A('افتح التشغيل', 'Open Run')}</a>`;
     return '';
+  }
+  // PF-0150: where the understanding stands, from the baseline's own records: its step, the
+  // facts recorded so far, the last activity, and whether an agent is working on it now.
+  function understandingProgress(st) {
+    const g = st.progress;
+    if (!g || st.status === 'done') return '';
+    const step = { discovery: A('الوكيل يقرأ المشروع', 'The agent is reading the project'), draft: A('القراءة انتهت، والمسودة تُكتب', 'Reading is finished; the draft is being written'), 'changes-requested': A('الوكيل يعدّل المسودة حسب ملاحظاتك', 'The agent is revising the draft after your changes'), 'awaiting-review': A('المسودة جاهزة لمراجعتك', 'The draft is ready for your review') }[g.step];
+    if (!step) return '';
+    const parts = [step];
+    if (g.facts) parts.push(A(`${g.facts} معلومة مسجّلة`, `${g.facts} fact${g.facts === 1 ? '' : 's'} recorded`) + (g.unresolved ? A(`، منها ${g.unresolved} غير محسومة`, `, ${g.unresolved} not settled`) : ''));
+    if (g.notInspected) parts.push(A(`${g.notInspected} جزء لم يُفحص`, `${g.notInspected} area${g.notInspected === 1 ? '' : 's'} not inspected`));
+    if (g.lastActivityAt) parts.push(A(`آخر نشاط ${ago(g.lastActivityAt)}`, `last activity ${ago(g.lastActivityAt)}`));
+    const session = agent?.pid === pid ? agent.session : null;
+    const working = session?.status === 'working';
+    const who = g.step === 'awaiting-review' ? '' : working ? A('الوكيل يعمل الآن.', 'An agent is working now.') : A('لا يعمل عليها أي وكيل الآن.', 'No agent is working on this right now.');
+    return `<p class="tiny muted ready-progress" data-understanding-progress="${esc(g.step)}">${parts.map(esc).join(' · ')}${who ? ` · <span class="${working ? '' : 'warn'}">${who}</span>` : ''}</p>`;
   }
   function readinessCard({ always = false } = {}) {
     const data = readiness?.pid === pid ? readiness.data : null;
@@ -404,8 +434,8 @@
     const title = data.level === 'ready' ? A('المشروع جاهز', 'The project is ready') : A(`فاضل ${left === 1 ? 'خطوة واحدة' : left === 2 ? 'خطوتين' : `${left} خطوات`} قبل الشغل الجديد`, `${left} step${left === 1 ? '' : 's'} left before new work`);
     return `<section class="panel tw:mb-4 tw:px-5 tw:py-4" aria-labelledby="ready-h" data-readiness="${esc(data.level)}">
       <div class="row"><span class="chip ${data.level === 'ready' ? 'done' : data.level === 'attention' ? 'fail' : 'wait'}"><i></i>${data.level === 'ready' ? A('جاهز', 'Ready') : data.level === 'attention' ? A('محتاج انتباه', 'Needs attention') : A('بيتجهّز', 'Getting ready')}</span><h2 id="ready-h" class="tw:text-lg tw:font-semibold">${title}</h2></div>
-      <ol class="tw:mt-3 tw:grid tw:gap-1 tw:p-0 tw:list-none">${shown.map((st) => `<li class="tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:rounded-field tw:px-3 tw:py-2 ${st.status === 'done' ? '' : 'tw:bg-bg-2'} ${st.status === 'choose' ? 'ready-choose' : ''}"><span class="tw:w-5 tw:text-center">${icon(st)}</span><span class="grow ${st.status === 'done' ? 'muted' : ''}">${L({ ar: readyPair(st)[0], en: readyPair(st)[1] })}${st.optional ? ` <span class="tiny muted">${A('· اختياري', '· optional')}</span>` : ''}</span>${st.status === 'done' ? '' : readinessAction(st)}</li>`).join('')}</ol>
-      ${data.steps.some((st) => st.id === 'understanding' && st.status === 'awaiting-review') ? `<p class="tiny muted tw:mt-2">${A('بعد ما تراجعها، قول للوكيل «موافق» أو اللي عايز تغيّره. الموافقة قرارك إنت بس.', 'After reviewing it, tell your agent "Approve" or what to change. Approval is only your decision.')}</p>` : ''}</section>`;
+      <ol class="tw:mt-3 tw:grid tw:gap-1 tw:p-0 tw:list-none">${shown.map((st) => `<li class="tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:rounded-field tw:px-3 tw:py-2 ${st.status === 'done' ? '' : 'tw:bg-bg-2'} ${st.status === 'choose' ? 'ready-choose' : ''}"><span class="tw:w-5 tw:text-center">${icon(st)}</span><span class="grow ${st.status === 'done' ? 'muted' : ''}">${L({ ar: readyPair(st)[0], en: readyPair(st)[1] })}${st.optional ? ` <span class="tiny muted">${A('· اختياري', '· optional')}</span>` : ''}</span>${st.status === 'done' ? '' : readinessAction(st)}${st.id === 'understanding' ? understandingProgress(st) : ''}</li>`).join('')}</ol>
+      ${data.steps.some((st) => st.id === 'understanding' && st.status === 'awaiting-review') ? `<p class="tiny muted tw:mt-2">${A('راجعها ثم وافق عليها أو اطلب تعديلات من صفحتها، أو من الشات مع وكيلك. الموافقة قرارك أنت فقط.', 'Review it, then approve it or request changes on its page, or in the chat with your agent. Approval is only your decision.')}</p>` : ''}</section>`;
   }
   // PF-0123: the New gate's ＋ is the same Create work action as the header button (keyboard
   // reachable, named in both languages). While the project is not ready it stays visible but
@@ -435,7 +465,8 @@
   function pchip(it) {
     const old = isOld(it);
     const ag = agentOnItem(it);
-    const agLine = ag ? `<div class="pagent ${ag}">${ag === 'approval' ? `✋ ${A('الوكيل مستني إذنك', 'The agent needs your approval')}` : ag === 'reply' ? `💬 ${A('الوكيل خلّص ومستني ردّك', 'The agent finished; your turn')}` : `<i></i> ${A('الوكيل شغّال عليها', 'The agent is working on it')}`}</div>` : '';
+    const stopped = ag === 'reply' ? agentAttention()?.stop : null;
+    const agLine = ag ? `<div class="pagent ${ag}">${ag === 'approval' ? `✋ ${A('الوكيل مستني إذنك', 'The agent needs your approval')}` : stopped ? `⏸ ${esc(PROVIDER[stopped.provider] ?? stopped.provider)} ${esc(stopText(stopped.reason))}${stopped.retryAt ? ` · ${A('يرجع', 'back at')} <span class="ltr">${esc(stopped.retryAt)}</span>` : ''}` : ag === 'reply' ? `💬 ${A('الوكيل خلّص ومستني ردّك', 'The agent finished; your turn')}` : ag === 'linked' ? `${A('Claude Code لسه متوصّل بيها — اكتب /exit في الترمينال لما تخلص', 'Claude Code is still linked to it — type /exit in its terminal when you are done')}` : `<i></i> ${A('الوكيل شغّال عليها', 'The agent is working on it')}`}</div>` : '';
     return `<article class="pchip ${it.state} ${old ? 'old' : ''} ${ag ? `agent-${ag}` : ''}" data-w="${esc(it.id)}" ${readOnly ? '' : 'draggable="true"'}><a class="pbody" href="#/item/${encodeURIComponent(it.id)}" draggable="false"><span class="pid ltr wid" title="${esc(it.id)}">${esc(it.id)}</span><div class="tt">${esc(it.title)}</div>${agLine}
       <div class="meta">${chip(it.state)}<span class="grow"></span><b>${it.completion}%</b></div><div class="mini"><i style="width:${it.completion}%"></i></div>
       <div class="badges">${it.lastActivityAt && it.state !== 'done' ? `<span class="bdg ${old ? 'old' : ''}">⏱ ${ago(it.lastActivityAt)}</span>` : ''}${it.sourceCount ? `<span class="bdg">📎 ${it.sourceCount}</span>` : ''}</div></a>
@@ -534,11 +565,131 @@
     const lead = approved ? A('دي المعلومات اللي اعتمدتها وبقت ذاكرة المشروع.', 'These are the facts you approved; they are now project memory.')
       : waiting ? A('دي المسودة اللي هتعتمدها: اقراها قسم قسم. «مؤكد» عليه دليل من ملفات المشروع، «مستنتج» استنتاج محتاج عينك، و«مش محسوم» هيفضل سؤال مفتوح. لو فيه حاجة غلط أو ناقصة اطلب تعديلها قبل ما توافق.', 'This is the draft you are approving: read it section by section. "Confirmed" has evidence in the project files, "inferred" is a deduction worth your eye, and "unresolved" stays an open question. Ask for changes before you approve if something is wrong or missing.')
       : A('دي آخر مسودة سجّلها الوكيل. لسه بتتعدّل.', 'This is the last draft the agent recorded. It is still being revised.');
-    const decide = waiting && agentsOn && !readOnly ? `<div class="row bdfoot"><button class="btn go sm" data-chat-item="${esc(it.id)}">${A('خلّصت مراجعة: وافق أو اطلب تعديلات في الشات', 'Done reviewing: approve or request changes in the chat')}</button><span class="tiny muted">${A('الموافقة قرارك إنت بس، والوكيل بيسجّلها.', 'Approval is only your decision; the agent records it.')}</span></div>` : '';
+    const decide = waiting && !readOnly ? baselineDecision(it, b) : '';
+    const statusById = new Map(b.facts.map((f) => [f.id, f.status]));
+    const briefHtml = b.brief ? briefBlock(b.brief, { statusOf: (id) => statusById.get(id), factAttr: (id) => `data-brief-fact="${esc(id)}"`, wrong: waiting && !readOnly, built: builtWith(), coverage: { declared: b.gaps ? b.gaps.coverageDeclared : Boolean(b.coverage), inspected: b.coverage?.inspected?.length ?? 0, sampled: b.coverage?.sampled?.length ?? 0, notInspected: b.limitations.length } }) : '';
+    const areasHtml = `${areas.map(({ area, facts }) => `<details class="bdarea" data-sx="bd:${esc(it.id)}:${esc(area)}" ${sxOpen(`bd:${it.id}:${area}`, !approved)}><summary><b>${L(BASELINE_AREA[area] ?? { ar: area, en: area })}</b> <span class="tiny muted">${facts.length}</span></summary><ul class="aclist bdfacts">${facts.map(fact).join('')}</ul></details>`).join('')}`;
+    const limitsHtml = `${b.limitations.length ? `<details class="bdarea" data-sx="bd:${esc(it.id)}:limits" ${sxOpen(`bd:${it.id}:limits`, !approved)}><summary><b>${A('اللي الوكيل ماقدرش يفحصه', 'What the agent could not inspect')}</b> <span class="tiny muted">${b.limitations.length}</span></summary><ul class="aclist bdfacts">${b.limitations.map((x) => `<li><span class="grow"><span dir="auto">${esc(x.summary)}</span>${x.reason ? `<span class="tiny muted" dir="auto"> — ${esc(x.reason)}</span>` : ''}</span></li>`).join('')}</ul><p class="tiny muted">${A('دي حدود الفحص ده بس، ومابتتسجّلش كمعلومات عن المشروع.', 'These are limits of this discovery only; they are never recorded as project facts.')}</p></details>` : ''}`;
+    const allFacts = `${areasHtml}${limitsHtml}`;
+    // PF-0153: what the agent proposes to start with is part of what is reviewed.
+    const proposed = !approved && b.suggestions?.length ? `<div class="bdsugg" data-draft-suggestions><h4>${A('مهام أولى مقترحة (تظهر لك بعد الموافقة؛ لا يُنشأ منها شيء تلقائيًا)', 'Suggested first tasks (offered to you after approval; nothing is created automatically)')}</h4><ul class="brieflist">${b.suggestions.map((x) => `<li><span class="grow" dir="auto"><b>${esc(x.title)}</b> <span class="tiny muted">${A('السبب:', 'Why:')} ${esc(x.why)}</span></span><span class="briefrefs">${(x.facts ?? []).map((id) => `<button type="button" class="briefref ltr" data-brief-fact="${esc(id)}">${esc(id)}</button>`).join('')}${(x.limitations ?? []).map((id) => `<span class="briefref ltr off">${esc(id)}</span>`).join('')}</span></li>`).join('')}</ul></div>` : '';
     return `<section class="panel bdraft" id="baseline-draft" data-baseline-draft="${esc(b.status)}"><div class="row"><h2 class="grow">${approved ? A('فهم المشروع المعتمد', 'Approved project understanding') : A('مسودة فهم المشروع', 'Project understanding draft')} <span class="muted">(${b.facts.length})</span></h2>${chips}</div>
       <p class="small muted">${lead}</p>
-      ${areas.map(({ area, facts }) => `<details class="bdarea" data-sx="bd:${esc(it.id)}:${esc(area)}" ${sxOpen(`bd:${it.id}:${area}`, !approved)}><summary><b>${L(BASELINE_AREA[area] ?? { ar: area, en: area })}</b> <span class="tiny muted">${facts.length}</span></summary><ul class="aclist bdfacts">${facts.map(fact).join('')}</ul></details>`).join('')}
-      ${b.limitations.length ? `<details class="bdarea" data-sx="bd:${esc(it.id)}:limits" ${sxOpen(`bd:${it.id}:limits`, !approved)}><summary><b>${A('اللي الوكيل ماقدرش يفحصه', 'What the agent could not inspect')}</b> <span class="tiny muted">${b.limitations.length}</span></summary><ul class="aclist bdfacts">${b.limitations.map((x) => `<li><span class="grow"><span dir="auto">${esc(x.summary)}</span>${x.reason ? `<span class="tiny muted" dir="auto"> — ${esc(x.reason)}</span>` : ''}</span></li>`).join('')}</ul><p class="tiny muted">${A('دي حدود الفحص ده بس، ومابتتسجّلش كمعلومات عن المشروع.', 'These are limits of this discovery only; they are never recorded as project facts.')}</p></details>` : ''}${decide}</section>`;
+      ${briefHtml ? `${briefHtml}${proposed}<details class="bdall" data-brief-all data-sx="bd:${esc(it.id)}:all" ${sxOpen(`bd:${it.id}:all`, false)}><summary><b>${A(`كل المعلومات مع أدلتها (${b.facts.length})`, `All ${b.facts.length} facts with their evidence`)}</b></summary>${allFacts}</details>` : `${proposed}${allFacts}`}${decide}</section>`;
+  }
+
+  // PF-0152: the Project Brief — what the developer reads first. It is a view of facts: every
+  // line names the facts it rests on (opened with one click), a line resting only on inferred
+  // facts says so, and a line whose facts need care in project memory is marked.
+  const BRIEF_TITLE = { users: { ar: 'من يستخدمه', en: 'Who uses it' }, capabilities: { ar: 'ما يفعله اليوم', en: 'What it does today' }, components: { ar: 'أجزاؤه الرئيسية', en: 'Its major parts' }, worthKnowing: { ar: 'يستحق أن تعرفه', en: 'Worth knowing' } };
+  // brief: { summary, users, capabilities, components, worthKnowing }; opts.statusOf(id) → the
+  // cited fact's status in a draft; opts.factHref(id) → where a fact opens; opts.wrong: offer
+  // "this is wrong" (while the draft waits for the developer's decision).
+  function briefBlock(brief, { statusOf = null, factAttr = () => '', wrong = false, built = [], coverage = null, heading = null } = {}) {
+    if (!brief?.summary && !Object.keys(BRIEF_TITLE).some((k) => brief?.[k]?.length)) return '';
+    const cites = (line) => (line.facts ?? []).map((id) => `<button type="button" class="briefref ltr" ${factAttr(id)} title="${A('افتح المعلومة والدليل', 'Open the fact and its evidence')}">${esc(id)}</button>`).join('') + (Array.isArray(line.limitations) ? line.limitations.map((id) => `<span class="briefref ltr off">${esc(id)}</span>`).join('') : line.limitations ? `<span class="tiny muted">${A('من حدود الفحص', 'from the discovery limits')}</span>` : '');
+    const tags = (line) => {
+      const inferred = statusOf && (line.facts ?? []).length && line.facts.every((id) => statusOf(id) === 'inferred');
+      return `${inferred ? `<span class="chip wait tiny" title="${A('مبني على استنتاج، وليس على دليل مباشر', 'Rests on a deduction, not on direct evidence')}">${A('مستنتج', 'inferred')}</span>` : ''}${line.care === 'disputed' ? `<span class="chip you tiny">${A('عليه خلاف', 'disputed')}</span>` : line.care === 'may-be-stale' ? `<span class="chip wait tiny" title="${A('الملفات التي تثبته تغيّرت؛ قد يحتاج مراجعة', 'The files that back it changed; it may need a second look')}">${A('قد يكون قديمًا', 'may be out of date')}</span>` : ''}`;
+    };
+    const line = (entry) => `<span class="grow" dir="auto">${esc(entry.text)}</span>${tags(entry)}<span class="briefrefs">${cites(entry)}</span>${wrong ? `<button type="button" class="linkbtn tiny" data-brief-wrong="${esc(entry.text)}">${A('غير صحيح؟', 'Not right?')}</button>` : ''}`;
+    const list = (key) => (brief[key]?.length ? `<div class="briefsec"><h4>${L(BRIEF_TITLE[key])}</h4><ul class="brieflist">${brief[key].map((entry) => `<li>${line(entry)}</li>`).join('')}</ul></div>` : '');
+    const cover = coverage ? `<p class="tiny muted briefcover" data-brief-coverage>${coverage.declared === false ? A('الوكيل لم يحدد ما قرأه من المشروع.', 'The agent did not declare what it read.') : A(`قُرئ ${coverage.inspected} جزء مباشرة · ${coverage.sampled} بالعيّنة`, `${coverage.inspected} area${coverage.inspected === 1 ? '' : 's'} read directly · ${coverage.sampled} sampled`)}${coverage.notInspected ? ` · <b>${A(`${coverage.notInspected} لم يُفحص`, `${coverage.notInspected} not inspected`)}</b>` : ''}</p>` : '';
+    return `<div class="brief" data-brief>${heading ? `<h3 class="briefhead">${heading}</h3>` : ''}
+      ${brief.summary ? `<p class="briefsum">${line(brief.summary)}</p>` : ''}
+      <div class="briefgrid">${list('users')}${list('capabilities')}${list('components')}${list('worthKnowing')}</div>
+      ${built.length ? `<p class="small briefbuilt"><span class="muted">${A('مبني بـ', 'Built with')}:</span> <span class="ltr">${built.map(esc).join(' · ')}</span> <span class="tiny muted">${A('(من ملفات المشروع)', '(from the project files)')}</span></p>` : ''}${cover}</div>`;
+  }
+  // The main stack names, from repository evidence (never written in the brief).
+  const builtWith = () => (projectOverview?.pid === pid ? (projectOverview.data?.stack?.entries ?? []).filter((e) => ['framework', 'runtime', 'database', 'service'].includes(e.kind)).map((e) => `${e.component}${e.declared ? ` ${String(e.declared).replace(/^[\^~>=<\s]+/, '').split('.')[0]}` : ''}`).filter((v, i, all) => all.indexOf(v) === i).slice(0, 6) : []);
+
+  // PF-0153: what to start with once the understanding is approved — the developer's own first
+  // request, then up to three suggestions the agent recorded with the understanding, each with
+  // its reason and the facts it rests on. A click only fills Create Work. A suggestion that
+  // matches existing work is not shown; with nothing reliable to suggest it says so.
+  const sameTask = (a, b) => { const norm = (v) => String(v ?? '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim(); const x = norm(a); const y = norm(b); return Boolean(x) && (x === y || (x.length > 12 && (y.startsWith(x) || x.startsWith(y)))); };
+  function firstTasksPanel({ always = false } = {}) {
+    const ft = projectOverview?.pid === pid ? projectOverview.data?.firstTasks : null;
+    if (!ft || readOnly) return '';
+    const others = items().filter((it) => it.id !== ft.baselineId);
+    // On the Workspace it is a first-hour help: it steps aside once other work exists.
+    if (!always && others.length) return '';
+    const taken = (text) => others.some((it) => sameTask(it.title, text));
+    const request = ft.request && !taken(ft.request) ? ft.request : null;
+    const list = (ft.suggestions ?? []).filter((x) => !taken(x.title) && !(request && sameTask(request, x.title)));
+    const blocked = createBlockedReason();
+    const go = (text, label) => `<button type="button" class="btn sm ${label ? '' : 'go'}" data-first-task="${esc(text)}" ${blocked ? `disabled title="${esc(blocked)}"` : ''}>${label ?? A('أنشئ', 'Create…')}</button>`;
+    const care = (x) => (x.care === 'disputed' ? `<span class="chip you tiny">${A('عليه خلاف', 'disputed')}</span>` : x.care === 'may-be-stale' ? `<span class="chip wait tiny">${A('قد يكون قديمًا', 'may be out of date')}</span>` : '');
+    const refs = (x) => `${(x.facts ?? []).map((id) => `<span class="briefref ltr">${esc(id)}</span>`).join('')}${x.limitations ? `<span class="tiny muted">${A('من حدود الفحص', 'from the discovery limits')}</span>` : ''}`;
+    const rows = [
+      request ? `<li data-first-request><span class="grow"><b dir="auto">${esc(request)}</b><span class="tiny muted ftwhy">${A('طلبك الأول عند إضافة المشروع.', 'Your own first request, from when you added the project.')}</span></span>${go(request)}</li>` : '',
+      ...list.map((x) => `<li data-first-suggestion><span class="grow"><b dir="auto">${esc(x.title)}</b>${care(x)}<span class="tiny muted ftwhy" dir="auto">${A('السبب:', 'Why:')} ${esc(x.why)} <span class="briefrefs">${refs(x)}</span></span></span>${go(`${x.title}\n\n${x.why}`)}</li>`)
+    ].filter(Boolean);
+    const own = `<button type="button" class="btn sm ghost" data-first-task="" ${blocked ? `disabled title="${esc(blocked)}"` : ''}>${A('اكتب مهمتك أنت', 'Write your own task')}</button>`;
+    return `<section class="panel firsttasks" data-first-tasks aria-labelledby="ft-h"><h2 id="ft-h">${A('ابدأ من هنا', 'Start here')}</h2>
+      ${rows.length ? `<p class="small muted">${A('اقتراحات مبنية على ما وُجد في المشروع. الضغط يملأ نموذج «شغل جديد» فقط؛ لا يُنشأ شيء قبل أن تراجعه وتضغط إنشاء.', 'Suggestions based on what was found in the project. A click only fills the Create work form; nothing is created until you review it and press Create.')}</p><ol class="ftlist">${rows.join('')}</ol>`
+        : `<p class="small muted" data-first-empty>${A('لا توجد اقتراحات موثوقة من فهم المشروع. ابدأ بالمهمة التي تريدها.', 'There are no reliable suggestions from the project understanding. Start with the task you have in mind.')}</p>`}
+      <div class="row">${own}</div></section>`;
+  }
+
+  // PF-0147: approve the project understanding, or ask for changes, here. The decision is
+  // Core's own `baseline approve|feedback`; the draft's digest travels with it, so a draft that
+  // changed, or one already decided elsewhere, is refused with nothing recorded.
+  let bdecide = null; // { id, note, confirmed, ack, error, stale, busy, requestId }
+  const newDecision = (id) => ({ id, note: '', confirmed: false, ack: false, error: null, stale: false, busy: false, requestId: newRequestId() });
+  function baselineGapText(b) {
+    const g = b.gaps ?? {};
+    const parts = [];
+    if (g.notInspected) parts.push(A(`${g.notInspected} جزء لم يُفحص`, `${g.notInspected} area(s) were not inspected`));
+    if (g.unresolved) parts.push(A(`${g.unresolved} معلومة غير محسومة`, `${g.unresolved} fact(s) are not settled`));
+    if (g.coverageDeclared === false) parts.push(A('الوكيل لم يحدد ما قرأه من المشروع', 'the agent did not declare what it read'));
+    return parts.join(A('، و', ', and '));
+  }
+  function baselineDecision(it, b) {
+    if (!bdecide || bdecide.id !== it.id) bdecide = newDecision(it.id);
+    const st = bdecide;
+    const gaps = baselineGapText(b);
+    const ready = st.note.trim() && st.confirmed && !st.busy;
+    return `<form class="bdecide" data-baseline-form data-baseline-item="${esc(it.id)}" data-digest="${esc(b.digest ?? '')}" ${gaps ? 'data-gaps' : ''}>
+      <h3>${A('قرارك', 'Your decision')}</h3>
+      ${gaps ? `<p class="small bdgaps" role="note">${A('هذه المسودة غير مكتملة:', 'This draft is not complete:')} ${esc(gaps)}. ${A('يمكنك الموافقة عليها كما هي، أو طلب استكمالها.', 'You can approve it as it is, or ask for it to be completed.')}</p>` : ''}
+      <label class="fld">${A('ملاحظة القرار (مطلوبة)', 'Decision note (required)')}<textarea name="note" rows="2" maxlength="10000" required>${esc(st.note)}</textarea></label>
+      <label class="small optin"><input type="checkbox" name="confirmed" ${st.confirmed ? 'checked' : ''}> <b>${A('راجعت فهم المشروع، وهذا قراري', 'I reviewed this project understanding, and this is my decision')}</b></label>
+      ${gaps ? `<label class="small optin"><input type="checkbox" name="ack" ${st.ack ? 'checked' : ''}> ${A(`أوافق مع العلم بأن ${esc(gaps)}`, `I approve knowing that ${esc(gaps)}`)}</label>` : ''}
+      <p class="tiny muted">${A('يُسجَّل كقرار من الكونسول: الهوية غير متحقق منها. الموافقة تجعل هذه المعلومات ذاكرة المشروع.', 'Recorded as a console decision: identity not verified. Approving makes these facts the project memory.')}</p>
+      ${st.error ? `<div class="errbar small" role="alert"><pre>${esc(st.error)}</pre>${st.stale ? `<button type="button" class="btn sm" data-baseline-reload>${A('حمّل المسودة من جديد', 'Reload the draft')}</button>` : ''}</div>` : ''}
+      <div class="row bdfoot"><button type="button" class="btn go" data-baseline-decide="approve" ${ready && (!gaps || st.ack) ? '' : 'disabled'}>${st.busy ? A('جارٍ التسجيل…', 'Recording…') : A('وافق على فهم المشروع', 'Approve understanding')}</button><button type="button" class="btn" data-baseline-decide="request_changes" ${ready ? '' : 'disabled'}>${A('اطلب تعديلات', 'Request changes')}</button><span class="grow"></span>${agentsOn ? `<button type="button" class="linkbtn" data-chat-item="${esc(it.id)}">${A('أو ناقشها مع الوكيل', 'Or discuss it with the agent')}</button>` : ''}</div></form>`;
+  }
+  // Typing and ticking keep their state across re-renders, and only the buttons are updated.
+  function baselineInput(form) {
+    if (!bdecide) return;
+    bdecide.note = form.querySelector('[name="note"]').value;
+    bdecide.confirmed = form.querySelector('[name="confirmed"]').checked;
+    bdecide.ack = Boolean(form.querySelector('[name="ack"]')?.checked);
+    const ready = bdecide.note.trim() && bdecide.confirmed && !bdecide.busy;
+    form.querySelector('[data-baseline-decide="approve"]').disabled = !(ready && (!form.hasAttribute('data-gaps') || bdecide.ack));
+    form.querySelector('[data-baseline-decide="request_changes"]').disabled = !ready;
+  }
+  async function submitBaseline(form, decision) {
+    const st = bdecide;
+    if (!st || st.busy) return;
+    const id = form.dataset.baselineItem;
+    st.busy = true; st.error = null; st.stale = false; render();
+    try {
+      await post(`/api/p/${pid}/work/${encodeURIComponent(id)}/gates/baseline/decision`, JSON.stringify({ decision, note: st.note, confirmed: true, acknowledgedGaps: st.ack, digest: form.dataset.digest, requestId: st.requestId }), { 'Content-Type': 'application/json' });
+      const note = st.note.trim();
+      bdecide = null;
+      toast(`✓ ${decision === 'approve' ? A('تمت الموافقة على فهم المشروع، وأصبح ذاكرة المشروع.', 'Project understanding approved; it is now the project memory.') : A('تم تسجيل طلب التعديلات.', 'Changes requested.')} <span class="tiny">${A('(من الكونسول، الهوية غير متحقق منها)', '(console, identity not verified)')}</span>`);
+      await refresh();
+      // The agent ended its turn before this decision: a ready message tells it to revise.
+      // Nothing is sent until the developer presses Send.
+      if (decision === 'request_changes' && agentsOn && !readOnly) {
+        agentDraft = A(`طلبت تعديلات على مسودة فهم المشروع: ${note}\nعدّلها واعرضها عليّ للمراجعة.`, `I requested changes to the project-understanding draft: ${note}\nRevise it and bring it back for review.`);
+        toggleChat(true);
+      }
+    } catch (e) {
+      st.busy = false; st.error = why(e); st.stale = e.code === 'STALE'; render();
+    }
   }
 
   // ---------- item ----------
@@ -558,7 +709,7 @@
       <section class="ihead">${ring(it.completion, 132, 13)}<div><div class="row tiny muted"><span class="ltr">${esc(it.id)}</span><button type="button" class="ibtn" data-copy="${esc(it.id)}" data-copy-what="id" title="${A('انسخ رقم الشغلانة', 'Copy the work item ID')}" aria-label="${A('انسخ رقم الشغلانة', 'Copy the work item ID')}">⧉</button><span>· ${L(TYPE[it.type] ?? { ar: 'لسه متصنفش', en: 'unrouted' })}</span>${it.scope ? `<span class="ltr">· ${esc(it.scope)}</span>` : ''}${it.stage ? `<span class="ltr">· ${esc(it.stage)}</span>` : ''}</div><h1>${esc(it.title)}</h1><p style="font-size:18px;color:var(--ink-2);margin-top:4px">${headline}</p><p class="tiny muted" style="margin-top:4px">${formula()}</p></div>
 </section>
       ${queueLine(it)}${nextCard(it)}
-      ${actionBar(it)}${baselineDraft(it, d)}
+      ${actionBar(it)}${baselineDraft(it, d)}${d?.baseline?.status === 'approved' ? firstTasksPanel({ always: true }) : ''}
       ${agentsOn && !readOnly && it.state !== 'done' && !it.lifecycle ? '' : `<div class="row chatcue"><button class="btn sm" data-chat-toggle aria-controls="chatwin">💬 ${A('اشتغل على الشغلانة دي مع الوكيل', 'Work on this item with the agent')}</button></div>`}
       <section class="chain" id="chain"><article class="node start ${it.state === 'new' ? 'active' : 'done'}" data-st="-1" style="--hue:var(--ink-2)"><div class="st-head"><span class="st-ico" aria-hidden="true">＋</span><div class="st-name">${A('الطلب', 'Request')}</div></div><div class="st-out">${it.state === 'new' ? A('جديد', 'new') : A('اتسلّم لـ «افهم»', 'handed to Understand')}</div>
           <p class="small clamp3">${esc(d?.request?.raw ?? it.title)}</p>${(d?.sources ?? []).map((s) => `<button class="flink" data-file="${esc(s.id)}">${fileIcon(s)} <span class="ltr">${esc(s.name)}</span></button>`).join('')}<button class="flink more2" data-dtab="req" data-jump>${A('الطلب كامل ↓', 'Full request ↓')}</button>
@@ -649,15 +800,18 @@
       <label class="small"><input type="checkbox" name="pauseBetween"> ${A('وقّف بعد كل مهمة لحد ما أقول كمّل', 'Pause after each task until I say continue')}</label>
       <p class="tiny muted">${A(`طلبات الموافقة بتستنى ${approvalMinutes()} دقيقة وبعدين بتترفض تلقائي (تقدر تغيّرها من «المشروع» ← «الإعدادات» ← الوكلاء).`, `Approval requests wait ${approvalMinutes()} minutes, then are denied automatically (change it in Project → Settings → Agents).`)}</p>
       <label class="small"><input type="checkbox" name="confirmed" data-queue-confirm> ${A('فاهم إن الوكيل هيشتغل عليهم بالترتيب ده', 'I understand the agent works through them in this order')}</label>
-      <div class="row"><button type="button" class="btn ghost" data-queue-cancel>${A('إلغاء', 'Cancel')}</button><span class="grow"></span><button class="btn go" type="submit" data-queue-start disabled>${A('ابدأ الطابور', 'Start queue')}</button></div></form>`;
+      <div class="row"><button type="button" class="btn ghost" data-queue-cancel>${A('إلغاء', 'Cancel')}</button><span class="grow"></span><button class="btn go" type="submit" data-queue-start disabled>${queueStartLabel('codex')}</button></div></form>`;
     if (!d.open) d.showModal();
   }
+  // PF-0143 (B3): the Start button names the agent the queue will start with, so the choice sent is the one seen.
+  const queueStartLabel = (provider) => (provider === 'claude' ? A('ابدأ الطابور بـ Claude Code', 'Start the queue with Claude Code') : A('ابدأ الطابور بـ Codex', 'Start the queue with Codex'));
   const approvalMinutes = () => (agentSetup?.pid === pid ? agentSetup.data?.approvalWait?.minutes : null) ?? Math.round((agent?.permissionTimeoutMs ?? 300000) / 60000);
   async function startQueue(form) {
     const body = { workIds: selected, provider: form.elements.provider?.value ?? 'codex', pauseBetween: form.elements.pauseBetween.checked, confirmed: form.elements.confirmed.checked, lang, mode: 'workspace-write' };
     try {
       await post(`/api/p/${pid}/execution/run`, JSON.stringify(body), { 'Content-Type': 'application/json' });
       document.getElementById('queuedlg')?.close();
+      toast(esc(body.provider === 'claude' ? A('الطابور بدأ بـ Claude Code.', 'The queue started with Claude Code.') : A('الطابور بدأ بـ Codex.', 'The queue started with Codex.')));
       selecting = false; selected = [];
       location.hash = '#/team';
       await loadExecution();
@@ -876,7 +1030,7 @@
     try { agent = { pid, ...(await api(`/api/p/${pid}/agent`)) }; agentError = null; } catch (e) { agentError = e.message; }
   }
   function onAgentEvent(projectId, event) {
-    if (projectId === pid && route().v === 'settings' && ['session.connected', 'session.disconnected', 'session.started', 'session.ended', 'mode.changed'].includes(event.type)) refreshAgentSetup();
+    if (projectId === pid && route().v === 'settings' && ['session.connected', 'session.disconnected', 'session.started', 'session.ended', 'mode.changed', 'channel.state'].includes(event.type)) refreshAgentSetup();
     if (!agent || agent.pid !== projectId) return;
     agent.events.push(event);
     if (agent.events.length > 400) agent.events.splice(0, agent.events.length - 400);
@@ -889,7 +1043,7 @@
       agentProvider = 'codex';
       switchWanted = null;
     }
-    if (['session.started', 'session.ended', 'session.stopped', 'session.connected', 'session.disconnected', 'turn.started', 'turn.ended', 'mode.changed', 'work.activated', 'error'].includes(event.type)) {
+    if (['session.started', 'session.ended', 'session.stopped', 'session.connected', 'session.disconnected', 'turn.started', 'turn.ended', 'mode.changed', 'channel.state', 'work.activated', 'error'].includes(event.type)) {
       // PF-0106: the board and work list show the agent's call on the item's card.
       loadAgent().then(() => (['map', 'lines'].includes(route().v) ? render() : renderAgent()));
       return;
@@ -948,12 +1102,19 @@
     for (const ev of events) {
       if (ev.type === 'message.delta') { if (!bubble) { bubble = { kind: 'agent', text: '' }; out.push(bubble); } bubble.text += ev.text; continue; }
       bubble = null;
-      if (ev.type === 'message.sent') { out.push({ kind: 'user', text: ev.text }); repliedThisTurn = false; }
+      if (ev.type === 'message.sent') { out.push({ kind: 'user', text: ev.text, chatId: ev.chatId, state: ev.state }); repliedThisTurn = false; }
+      // PF-0145: a Claude Code message's state follows evidence that names it (never a guess).
+      else if (ev.type === 'message.state') { const m = out.find((x) => x.kind === 'user' && x.chatId === ev.chatId); if (m) m.state = ev.state; }
       else if (ev.type === 'message.done') { out.push({ kind: 'agent', text: ev.text }); repliedThisTurn = true; }
       else if (ev.type === 'tool.started') out.push({ kind: 'tool', id: ev.toolCallId, title: ev.title, status: ev.status });
       else if (ev.type === 'tool.updated') { const t = [...out].reverse().find((x) => x.kind === 'tool' && x.id === ev.toolCallId); if (t) t.status = ev.status ?? t.status; }
       else if (ev.type === 'permission.requested') out.push({ ...ev, toolKind: ev.kind, kind: 'perm' });
-      else if (ev.type === 'permission.resolved') { const p = out.find((x) => x.kind === 'perm' && x.requestId === ev.requestId); if (p) { p.decision = ev.decision; p.by = ev.by; } }
+      else if (ev.type === 'permission.resolved') {
+        const p = out.find((x) => x.kind === 'perm' && x.requestId === ev.requestId);
+        if (p) { p.decision = ev.decision; p.by = ev.by; }
+        // PF-0143 (G3): the request scrolled out of the kept history; its outcome is still said.
+        else if (ev.title) out.push({ kind: 'note', warn: ev.decision === 'deny', text: permOutcome(ev) });
+      }
       else if (ev.type === 'permission.overridden') { const p = out.find((x) => x.kind === 'perm' && x.requestId === ev.requestId); out.push({ kind: 'note', warn: true, text: ev.detail }); if (p) p.overridden = true; }
       else if (ev.type === 'turn.ended') { if (ev.finalMessage && !repliedThisTurn) out.push({ kind: 'agent', text: ev.finalMessage }); if (ev.stopReason === 'cancelled') out.push({ kind: 'note', text: A('اتوقف.', 'Stopped.') }); }
       else if (ev.type === 'session.started') out.push({ kind: 'note', session: true, text: ev.resumed ? A('الجلسة رجعت.', 'Session resumed.') : A('الجلسة بدأت.', 'Session started.') });
@@ -969,8 +1130,7 @@
         out.push({ kind: 'note', session: !tail && ev.reason !== 'crashed', warn: ev.reason === 'crashed' || Boolean(left), text: tail ? `${base} ${tail}` : base });
       }
       else if (ev.type === 'session.connected') out.push({ kind: 'note', text: A('Claude Code متوصّل.', 'Claude Code connected.') });
-      else if (ev.type === 'session.disconnected') out.push({ kind: 'note', warn: true, text: A('Claude Code اتفصل (الجلسة أو القناة وقفت).', 'Claude Code disconnected (the session or its channel stopped).') });
-      else if (ev.type === 'delivery.unconfirmed') out.push({ kind: 'note', warn: true, text: A('Claude Code ما بدأش يشتغل على الرسالة دي، والغالب إنها ما وصلتلوش. لو حسابك Claude Team أو Enterprise، الرسايل من الكونسول بتتجاهل لحد ما admin المؤسسة يفعّل الـ channels. اكتب في ترمينال Claude Code بدلها؛ الكونسول هيفضل يعرض شغله.', ev.detail ?? 'Claude Code did not start on this message.') });
+      else if (ev.type === 'session.disconnected') out.push({ kind: 'note', warn: true, text: A('انقطع الاتصال بـ Claude Code.', 'Claude Code disconnected.') });
       else if (ev.type === 'work.activated') out.push({ kind: 'note', text: A(`${ev.workId} بقت الشغلانة النشطة.`, `${ev.workId} is now the active work item.`) });
       else if (ev.type === 'error') {
         // Plain words first; the provider's own text stays as a detail (PF-0059).
@@ -982,13 +1142,25 @@
       }
     }
     // PF-0134: a run of plain "session started/ended" lines shows only its last one.
-    return out.filter((x, i) => !(x.session && out[i + 1]?.session)).slice(-80);
+    const shown = out.filter((x, i) => !(x.session && out[i + 1]?.session)).slice(-80);
+    // PF-0143 (G3): an open request stays answerable even when a busy stream pushed its event out
+    // of the kept history (the server sends the last 200 events; the chat shows the last 80 entries).
+    if (events === agent?.events) for (const p of agent.pending ?? []) if (!shown.some((x) => x.kind === 'perm' && x.requestId === p.requestId)) shown.push({ ...p, toolKind: p.kind, kind: 'perm' });
+    return shown;
   }
   // PF-0112: what the request touches, when the provider names it (files, the command).
   function permScope(p) {
     const cmd = p.command ? `<pre class="pdetail" dir="ltr" style="white-space:pre-wrap;word-break:break-all">$ ${esc(p.command)}</pre>${p.commandCut ? `<p class="tiny fail">${A(`⚠ الأمر أطول من كده بـ ${Number(p.commandCut)} حرف مش ظاهرين. ارفض لو مش متأكد.`, `⚠ The command continues for ${Number(p.commandCut)} more characters not shown. Deny if unsure.`)}</p>` : ''}` : '';
     const files = p.paths?.length ? `<div class="tiny pfiles" dir="ltr">${p.paths.map((f) => `<code>${esc(f)}</code>`).join(' ')}${p.morePaths ? ` <b>+${Number(p.morePaths)}</b>` : ''}</div>` : '';
     return cmd + files;
+  }
+  // PF-0143 (G3): one line for a request whose card is no longer in the chat.
+  function permOutcome(ev) {
+    const what = `«${ev.title}»`;
+    if (ev.by === 'timeout') return A(`طلب الإذن ${what} اترفض تلقائي لأن محدش ردّ في الوقت.`, `The permission request ${what} was denied automatically: no answer in time.`);
+    if (ev.decision === 'elsewhere') return A(`طلب الإذن ${what} اتجاوب عليه في Claude Code.`, `The permission request ${what} was answered in Claude Code.`);
+    if (ev.by && ev.by !== 'user') return A(`طلب الإذن ${what} اتقفل من غير رد (${ev.by}).`, `The permission request ${what} was closed without an answer (${ev.by}).`);
+    return ev.decision === 'deny' ? A(`طلب الإذن ${what} اترفض.`, `The permission request ${what} was denied.`) : A(`طلب الإذن ${what} اتسمح.`, `The permission request ${what} was allowed.`);
   }
   function permCard(p) {
     const open = !p.decision;
@@ -1012,6 +1184,8 @@
     const held = byId(s.workId);
     if (held && (held.state === 'done' || held.lifecycle?.state === 'closed') && !(agent.pending ?? []).length) return null;
     if ((agent.pending ?? []).length) return { workId: s.workId, kind: 'approval', label: A(`${s.workId}: الوكيل مستني إذنك`, `${s.workId}: the agent needs your approval`) };
+    // PF-0143 (B4): an agent that stopped (usage limit, error) waits for the developer, seen from any page.
+    if (held) { const stop = itemStop(held); if (stop?.live && ['usage_limit', 'error'].includes(stop.reason)) return { workId: s.workId, kind: 'reply', stop, label: A(`${s.workId}: ${PROVIDER[stop.provider] ?? stop.provider} ${stopText(stop.reason)}`, `${s.workId}: ${PROVIDER[stop.provider] ?? stop.provider} ${stopText(stop.reason)}`) }; }
     const idle = s.provider === 'codex' ? s.status === 'idle' : s.connected && s.status !== 'working';
     if (idle && agentEntries(agent.events).at(-1)?.kind === 'agent') return { workId: s.workId, kind: 'reply', label: A(`${s.workId}: الوكيل خلّص ومستني ردّك`, `${s.workId}: the agent finished and waits for you`) };
     return null;
@@ -1021,6 +1195,8 @@
     const a = agentAttention();
     if (a && a.workId === it.id) return a.kind;
     const s = agentsOn && agent?.pid === pid ? agent.session : null;
+    // PF-0143 (I7, B5): a finished item's still-connected Claude Code session is linked, not working.
+    if (s?.workId === it.id && s.provider === 'claude' && s.connected && s.status !== 'working' && (it.state === 'done' || it.lifecycle?.state === 'closed')) return 'linked';
     if (s?.workId === it.id && (s.status === 'working' || (s.provider === 'claude' && s.connected))) return 'working';
     return null;
   }
@@ -1084,12 +1260,12 @@
     let start = null;
     let last = null;
     for (const ev of events) {
-      if (ev.type === 'message.sent') start = ev.at;
+      if (ev.type === 'message.sent' && !ev.chatId) start = ev.at;
       else if (ev.type === 'turn.started' && !start) start = ev.at;
       if (ev.type === 'tool.started' || ev.type === 'tool.updated') last = { at: ev.at, what: ev.title || A('أداة', 'a tool') };
       else if (ev.type === 'message.delta') last = { at: ev.at, what: A('بيكتب الرد', 'writing the reply') };
       else if (ev.type === 'permission.resolved') last = { at: ev.at, what: A('اتردّ على طلب إذن', 'a permission answered') };
-      else if (ev.type === 'message.sent') last = { at: ev.at, what: A('استلم رسالتك', 'received your message') };
+      else if ((ev.type === 'message.sent' && !ev.chatId) || (ev.type === 'message.state' && ev.state === 'received')) last = { at: ev.at, what: A('استلم رسالتك', 'received your message') };
     }
     return { since: agoMin(start), lastWhat: last?.what ?? null, lastAgo: agoMin(last?.at) };
   }
@@ -1156,12 +1332,26 @@
     const box = document.querySelector('[data-agent-input]');
     if (box) { box.value = text; box.focus(); box.setSelectionRange(text.length, text.length); }
   }
-  // PF-0102: Claude Team/Enterprise accounts drop console messages unless channels are on.
+  // PF-0145: on Claude Team/Enterprise accounts the organization may not allow sending from the
+  // console. Said once, calmly, in Settings; the connection check decides when Claude Code connects.
   function claudeWarnings(p) {
     if (!p?.warnings?.length) return '';
     const team = /Team|Enterprise/.exec(p.warnings.join(' '))?.[0] ?? 'Team';
-    // PF-0134: one line; the details on demand.
-    return `<details class="awarn small awarn-compact" role="note"><summary>⚠ ${A(`حساب Claude ${team}: رسايل الكونسول ممكن ما توصلش.`, `Claude ${team} account: console messages may not arrive.`)} <span class="tiny muted">${A('التفاصيل', 'Details')}</span></summary><p class="tiny">${lang === 'ar' ? `Claude Code متسجّل بحساب Claude ${team}. الرسايل من الكونسول بتوصل لـ Claude Code بس لو admin المؤسسة مفعّل الـ channels، وده مقفول افتراضيًا والرسايل بتتجاهل من غير ما يظهر خطأ. لو مش متفعّل، اكتب في ترمينال Claude Code، والكونسول هيفضل يعرض شغله.` : esc(p.warnings.join(' '))}</p></details>`;
+    return `<p class="tiny muted" role="note">${A(`حساب Claude ${team}: قد لا تسمح مؤسستك بالإرسال من الكونسول. YallaFlow يتحقق من ذلك عند اتصال Claude Code؛ وإن لم يكن الإرسال متاحًا، تكتب رسالتك هنا وتنسخها وتلصقها في ترمينال Claude Code، ويستمر الكونسول في عرض العمل.`, `Claude ${team} account: your organization may not allow sending from the console. YallaFlow checks this when Claude Code connects; when sending is not available you write here, copy, and paste in the Claude Code terminal, and the console still shows the work.`)}</p>`;
+  }
+  // PF-0145: a message copied for the terminal carries a short marker, so Claude Code's hooks can
+  // tie the work to it (and the same message is never done twice).
+  const terminalText = (text, chatId) => `${text}\n\n[yallaflow ${chatId}]`;
+  const newChatId = () => Array.from(crypto.getRandomValues(new Uint8Array(4)), (b) => b.toString(16).padStart(2, '0')).join('');
+  function messageState(e) {
+    if (!e.chatId || !e.state) return '';
+    const again = (label) => `<button type="button" class="linkbtn" data-copy="${esc(terminalText(e.text, e.chatId))}" data-copy-what="terminal">${label}</button>`;
+    const line = e.state === 'sending' ? A('جارٍ الإرسال…', 'Sending…')
+      : e.state === 'received' ? A('تم الاستلام ✓', 'Received ✓')
+      : e.state === 'answered' ? A('تم الرد ✓', 'Answered ✓')
+      : e.state === 'copied' ? `${A('تم النسخ. الصقها في ترمينال Claude Code.', 'Copied. Paste it in the Claude Code terminal.')} ${again(A('انسخ مرة أخرى', 'Copy again'))}`
+      : `${A('لم يتأكد وصولها، ولم تُرسل مرة أخرى. قد يكون Claude Code مشغولًا.', 'Delivery unconfirmed, and it was not sent again. Claude Code may be busy.')} ${again(A('انسخ للترمينال', 'Copy for terminal'))}`;
+    return `<span class="amsg-state tiny ${e.state === 'unconfirmed' ? 'warn' : 'muted'}" data-msg-state="${esc(e.state)}">${line}</span>`;
   }
   // PF-0103: one agent per checkout, switched from the item that needs it. An idle Codex
   // session is ended here; Claude Code closes only in its terminal (unlinking would leave it
@@ -1293,7 +1483,7 @@
     const err = agentError ? `<div class="errbar data small">${esc(agentError)}</div>` : '';
     if (!s && agent.lockedBy) return `<section class="panel agent" id="agent">${head}${err}<div class="awarn" role="status">${A('جلسات الوكيل في النسخة دي من المشروع تبع كونسول YallaFlow تاني شغّال. استخدمه، أو اقفله الأول.', 'Agent sessions in this checkout belong to another running YallaFlow console. Use that console, or stop it first.')}</div><p class="tiny muted" dir="ltr">${esc(agent.lockedBy.message)}</p></section>`;
     if (!s || (s.workId && s.workId !== it.id && (s.provider === 'codex' || it.project))) {
-      if (s) return `<section class="panel agent" id="agent">${head}${err}<p class="small">${A(`فيه جلسة ${PROVIDER[s.provider]} شغّالة على`, `A ${PROVIDER[s.provider]} session is active for`)} <a href="#/item/${encodeURIComponent(s.workId)}" class="ltr">${esc(s.workId)}</a>. ${A('جلسة واحدة بس في كل نسخة من المشروع.', 'Only one agent session runs per checkout.')}</p>${switchHere(it, s)}</section>`;
+      if (s) return `<section class="panel agent" id="agent">${head}${err}<p class="small">${A(`فيه جلسة ${PROVIDER[s.provider]} شغّالة على`, `A ${PROVIDER[s.provider]} session is active for`)} <a href="#/item/${encodeURIComponent(s.workId)}" class="ltr">${esc(s.workId)}</a>. ${A('جلسة واحدة بس في كل نسخة من المشروع.', 'Only one agent session runs per checkout.')}</p>${planAwaitAgent?.pid === pid && planAwaitAgent.sentTo ? `<p class="small" role="status">${A(`طلب تجهيز التشغيل اتبعت للجلسة دي على ${esc(s.workId)}. الاقتراح هيظهر في صفحة «التشغيل» لوحده، والرد في شات ${esc(s.workId)}.`, `The run setup request was sent to this session on ${esc(s.workId)}. The proposal appears on the Run page by itself; the reply is in ${esc(s.workId)}'s chat.`)}</p>` : ''}${switchHere(it, s)}</section>`;
       // PF-0134: the chat opens on the agent chosen for this project and lists only it.
       const chosenHere = agentStep()?.status && agentStep().status !== 'choose' ? agentStep().provider : null;
       const choice = agentProvider ?? (chosenHere && provider(chosenHere) ? chosenHere : null) ?? agent.providers.find((p) => p.ready)?.id ?? 'codex';
@@ -1302,7 +1492,7 @@
       const other = chosenHere && !agentProvider && !readOnly ? (chosenHere === 'claude' ? 'codex' : agentsClaudeAvailable ? 'claude' : null) : null;
       const otherLink = other ? `<p class="tiny muted">${A('وكيل المشروع ده', 'This project\'s agent')}: <b>${PROVIDER[chosenHere]}</b> · <button type="button" class="linkbtn" data-agent-choose="${other}">${A(`استخدم ${PROVIDER[other]} بداله`, `Use ${PROVIDER[other]} instead`)}</button></p>` : '';
       const picks = listed.map((x) => `<label class="apick ${x.ready ? '' : 'off'}"><input type="radio" name="agentProvider" value="${x.id}" ${x.id === choice ? 'checked' : ''}><span><b>${PROVIDER[x.id]}</b>${x.experimental ? ` <i class="exp">${A('تجريبي', 'experimental')}</i>` : ''}<small>${x.ready ? (x.id === 'codex' ? A('اشتراك ChatGPT بتاعك', 'Your ChatGPT subscription') : A(`اشتراك Claude بتاعك${x.auth?.plan ? ` (${x.auth.plan})` : ''}`, `Your Claude subscription${x.auth?.plan ? ` (${x.auth.plan})` : ''}`)) : A('مش جاهز', 'Not ready')}</small></span></label>`).join('');
-      const problems = (p && !p.ready ? `<ul class="aprob">${p.problems.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : '') + claudeWarnings(p);
+      const problems = (p && !p.ready ? `<ul class="aprob">${p.problems.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : '');
       let action = '';
       if (p?.ready && p.capabilities.start) action = `<div class="row"><label class="small">${A('الصلاحيات', 'Permissions')} <select data-agent-mode>${p.capabilities.modes.map((m) => `<option value="${m}" ${m === agentMode ? 'selected' : ''}>${L(MODE_LABEL[m])}</option>`).join('')}</select></label><span class="grow"></span><button class="btn go" data-agent-start ${agentBusy ? 'disabled' : ''}>${A('ابدأ جلسة Codex', 'Start Codex session')}</button></div>${agent.resumable.length ? `<div class="tiny muted">${A('جلسات سابقة:', 'Earlier sessions:')} ${agent.resumable.map((r) => `<button class="linkbtn" data-agent-resume="${esc(r.id)}">${esc(r.workId ?? '—')} · ${ago(r.startedAt)}</button>`).join(' ')}</div>` : ''}`;
       else if (p?.ready && p.id === 'claude') action = `<div class="row"><span class="small grow">${A('Claude Code بيشتغل في الترمينال بتاعك باشتراكك. YallaFlow بيتوصّل بيه بس، مش بيشغّله.', 'Claude Code runs in your terminal with your subscription. YallaFlow connects to it; it never runs it.')}</span><button class="btn go" data-agent-connect ${agentBusy ? 'disabled' : ''}>${A('وصّل Claude Code', 'Connect Claude Code')}</button></div>`;
@@ -1313,9 +1503,16 @@
     const cap = provider(s.provider)?.capabilities ?? {};
     const modeChip = s.mode ? `<span class="chip ${autoApproves(s.mode) ? 'wait' : 'todo'}" title="${esc(L(MODE_LABEL[s.mode] ?? { ar: esc(s.mode), en: esc(s.mode) }))}">${esc(s.mode)}</span>` : '';
     const warn = isForbidden(s.mode) ? `<div class="awarn" role="alert">⛔ ${esc(L(MODE_LABEL.bypassPermissions))}. ${A('غيّر الوضع من Claude Code.', 'Change the mode in Claude Code.')}</div>` : autoApproves(s.mode) ? `<div class="awarn">⚠ ${esc(L(MODE_LABEL[s.mode]))}. ${A('مش كل فعل هيظهر هنا كطلب إذن.', 'Not every action will appear here as a permission request.')}</div>` : '';
-    // Claude Code takes messages only once a hook has reported its permission mode (PF-0065).
-    const modePending = s.provider === 'claude' && s.connected && !s.mode;
-    const state = s.provider === 'claude' && !s.connected ? A('مستني Claude Code', 'Waiting for Claude Code') : modePending ? A('مستني وضع الأذونات', 'Waiting for the permission mode') : s.status === 'working' ? A('شغّال…', 'Working…') : s.status === 'starting' ? A('بيبدأ…', 'Starting…') : A('جاهز', 'Ready');
+    // PF-0145: one connection state. The console sends to Claude Code itself only after the
+    // connection check was acknowledged; otherwise it is Terminal mode, a normal way to work.
+    const claude = s.provider === 'claude';
+    const terminal = claude && s.connected && s.channel !== 'verified';
+    const checking = terminal && s.channel === 'checking';
+    const working = s.status === 'working';
+    const state = claude && !s.connected ? A('في انتظار Claude Code', 'Waiting for Claude Code')
+      : checking ? A('جارٍ التحقق من الاتصال…', 'Checking the connection…')
+      : terminal ? (working ? A('وضع الترمينال · يعمل…', 'Terminal mode · working…') : A('وضع الترمينال', 'Terminal mode'))
+      : working ? A('شغّال…', 'Working…') : s.status === 'starting' ? A('بيبدأ…', 'Starting…') : A('جاهز', 'Ready');
     const controls = [
       cap.stop && s.status === 'working' ? `<button class="btn sm ghost" data-agent-cancel>${A('وقّف', 'Stop')}</button>` : '',
       cap.end ? `<button class="btn sm ghost" data-agent-end>${A('اقفل الجلسة', 'End session')}</button>` : '',
@@ -1327,17 +1524,23 @@
       ? `<div class="alaunch"><p class="small">${A('Claude Code اتفتح في ترمينال في فولدر المشروع. وافق على تحذير القناة التجريبية هناك، والشات هنا هيتوصّل لوحده.', 'Claude Code opened in a terminal in the project folder. Accept its development-channel prompt there; this chat connects by itself.')}</p><details class="tiny"><summary class="muted">${A('ما اتفتحش؟ شغّل الأمر بنفسك', 'Did not open? Run the command yourself')}</summary>${copyBlock(agentLaunch)}</details></div>`
       : s.provider === 'claude' && !s.connected && agentLaunch ? `<div class="alaunch">${agentTerminal?.error ? `<p class="tiny muted">${esc(agentTerminal.error)}</p>` : ''}<p class="small">${A('شغّل Claude Code بنفسك في فولدر المشروع بالأمر ده. Claude Code هيعرض تحذير القناة التجريبية والقرار ليك.', 'Start Claude Code yourself in the project folder with this command. Claude Code shows its own development-channel warning; the decision is yours.')}</p><pre class="cli" dir="ltr">${esc(agentLaunch)}</pre><button class="btn sm ghost" data-copy="${esc(agentLaunch)}">${A('انسخ', 'Copy')}</button></div>` : '';
     const toolLine = (e) => `<div class="atool ${e.status === 'failed' ? 'fail' : e.status === 'completed' ? 'done' : ''}"><span>${e.status === 'completed' ? '✓' : e.status === 'failed' ? '✕' : '●'}</span> ${esc(e.title)}</div>`;
-    const entries = groupSteps(agentEntries(agent.events)).map((e) => e.kind === 'user' ? `<div class="amsg me"><p>${esc(e.text)}</p></div>` : e.kind === 'agent' ? `<div class="amsg richtext">${richText(e.text)}</div>` : e.kind === 'steps' ? stepsLine(e.steps, toolLine) : e.kind === 'tool' ? toolLine(e) : e.kind === 'perm' ? permCard(e) : `<div class="anote ${e.warn ? 'warn' : ''}">${esc(e.text)}</div>`).join('');
-    const canSend = cap.send && (s.provider === 'codex' ? s.status === 'idle' : s.connected && !modePending);
+    const entries = groupSteps(agentEntries(agent.events)).map((e) => e.kind === 'user' ? `<div class="amsg me"><p>${esc(e.text)}</p>${messageState(e)}</div>` : e.kind === 'agent' ? `<div class="amsg richtext">${richText(e.text)}</div>` : e.kind === 'steps' ? stepsLine(e.steps, toolLine) : e.kind === 'tool' ? toolLine(e) : e.kind === 'perm' ? permCard(e) : `<div class="anote ${e.warn ? 'warn' : ''}">${esc(e.text)}</div>`).join('');
+    const canSend = cap.send && (s.provider === 'codex' ? s.status === 'idle' : s.connected);
     // PF-0105: before the first message on an item, the box holds the whole-job instruction.
-    if (canSend && !it.project && it.state !== 'done' && !agentDraft && !agentEntries(agent.events).some((e) => e.kind === 'user')) agentDraft = goText(it);
-    const modeHint = modePending ? `<div class="awarn" role="status">${A('Claude Code متوصّل، بس لسه ما بلّغش بوضع الأذونات بتاعه، فالرسايل مش هتتبعت لحد ما يبلّغ. بيبلّغ لما تكتب حاجة في Claude Code أو لما يستخدم أداة.', 'Claude Code is connected but has not reported its permission mode yet, so messages cannot be sent until it does. It reports it when you type in Claude Code or when it uses a tool.')}</div>` : '';
+    // PF-0154: an item waiting for the developer's answer or review is not started again:
+    // no whole-job draft is seeded, and one seeded earlier and left untouched is dropped.
+    if (it.waitingFor && !it.project && agentDraft === goText(it)) agentDraft = '';
+    if (canSend && !it.project && !it.waitingFor && it.state !== 'done' && !agentDraft && !agentEntries(agent.events).some((e) => e.kind === 'user')) agentDraft = goText(it);
+    const how = !claude || !s.connected ? ''
+      : checking ? A('جارٍ التحقق من إمكانية الإرسال من الكونسول. إلى أن ينتهي، اكتب رسالتك وانسخها والصقها في ترمينال Claude Code.', 'Checking whether the console can send to Claude Code. Until then, write your message, copy it, and paste it in the Claude Code terminal.')
+      : terminal ? `${A('اكتب رسالتك هنا، انسخها، ثم الصقها في ترمينال Claude Code.', 'Write your message here, copy it, then paste it in the Claude Code terminal.')} ${s.monitoring ? A('الكونسول يعرض العمل أولًا بأول.', 'The console shows the work as it happens.') : A('سيظهر العمل هنا عندما يبدأ Claude Code.', 'The work appears here once Claude Code starts.')}`
+      : A('الإيقاف والإنهاء بيتعملوا من Claude Code نفسه (Esc). الردود بتوصل كرسايل كاملة.', 'Stop and end happen in Claude Code itself (Esc). Replies arrive as whole messages.');
     return `<section class="panel agent" id="agent">${head}${err}
       <div class="abar"><b>${PROVIDER[s.provider]}</b>${s.provider === 'claude' ? ` <i class="exp">${A('تجريبي', 'experimental')}</i>` : ''}<span class="chip active"><i></i>${esc(state)}</span>${s.auth ? `<span class="chip todo">${esc(s.auth)}</span>` : ''}${modeChip}<span class="grow"></span>${controls}</div>
-      ${!it.project && !s.workId ? `<p class="tiny muted">${A('دي جلسة شات المشروع، مش مربوطة بالشغلانة دي.', 'This is the project chat session; it is not tied to this work item.')}</p>` : ''}${s.provider === 'claude' && !it.project ? switchHere(it, s) : ''}${warn}${modeHint}${stopCard(it)}${launch}
+      ${!it.project && !s.workId ? `<p class="tiny muted">${A('دي جلسة شات المشروع، مش مربوطة بالشغلانة دي.', 'This is the project chat session; it is not tied to this work item.')}</p>` : ''}${s.provider === 'claude' && !it.project ? switchHere(it, s) : ''}${warn}${stopCard(it)}${launch}
       <div class="astream" aria-live="polite">${entries || `<p class="tiny muted">${it.project ? A('اسأل الوكيل عن المشروع، مثلاً: «إيه اللي مستنيني؟».', 'Ask the agent about the project, for example: "What is waiting for me?".') : A(`اكتب للوكيل، مثلاً: «كمّل ${it.id}».`, `Message the agent, for example: "Continue ${it.id}".`)}</p>`}</div>
-      ${sessionHistory(it)}${suggestionChips(it, (agent.pending ?? []).length ? 'approval' : s.status === 'working' ? 'working' : canSend && agentEntries(agent.events).at(-1)?.kind === 'agent' ? 'reply' : null)}<form class="acompose" data-agent-form><textarea data-agent-input rows="2" maxlength="20000" placeholder="${A(`اكتب لـ ${PROVIDER[s.provider]}…`, `Message ${PROVIDER[s.provider]}…`)}" ${canSend ? '' : 'disabled'}>${esc(agentDraft)}</textarea><button class="btn go" type="submit" ${canSend && !agentBusy ? '' : 'disabled'}>${A('ابعت', 'Send')}</button></form>
-      ${s.provider === 'claude' ? `<p class="tiny muted">${A('الإيقاف والإنهاء بيتعملوا من Claude Code نفسه (Esc). الردود بتوصل كرسايل كاملة.', 'Stop and end happen in Claude Code itself (Esc). Replies arrive as whole messages.')}</p>` : ''}</section>`;
+      ${sessionHistory(it)}${suggestionChips(it, (agent.pending ?? []).length ? 'approval' : s.status === 'working' ? 'working' : canSend && agentEntries(agent.events).at(-1)?.kind === 'agent' ? 'reply' : null)}<form class="acompose" data-agent-form ${terminal ? 'data-terminal' : ''}><textarea data-agent-input rows="2" maxlength="20000" placeholder="${A(`اكتب لـ ${PROVIDER[s.provider]}…`, `Message ${PROVIDER[s.provider]}…`)}" ${canSend ? '' : 'disabled'}>${esc(agentDraft)}</textarea><button class="btn go" type="submit" ${canSend && !agentBusy ? '' : 'disabled'}>${terminal ? A('انسخ للترمينال', 'Copy for terminal') : A('ابعت', 'Send')}</button></form>
+      ${how ? `<p class="tiny muted" data-agent-how>${how}</p>` : ''}</section>`;
   }
   // Returns false when the action failed. Its error survives the state reload that follows
   // (loadAgent clears agentError on success), so a refused send is never silent (PF-0065).
@@ -1399,7 +1602,13 @@
     if (kind === 'hold') return area('reason', A('السبب', 'Reason'));
     if (kind === 'resume') return area('note', A('ملاحظة (اختياري)', 'Note (optional)'), false);
     if (kind === 'revise') return `<p class="small muted">${A('تقدر تعدّل الطلب طالما الشغل لسه ما بدأش. النسخة القديمة والمرفقات هيفضلوا محفوظين.', 'You can edit the request until work starts. Previous versions and attachments are kept.')}</p><label class="fld">${A('الطلب بعد التعديل', 'Revised request')}<textarea name="text" rows="6" maxlength="20000" required>${esc(request)}</textarea></label>${area('reason', A('السبب', 'Reason'))}${attachmentFields()}`;
-    if (kind === 'answer') return `<label class="fld">${A('السؤال', 'Question')}<select name="question">${(it.waitingFor?.questions ?? []).map((q) => `<option>${esc(q)}</option>`).join('')}</select></label>${area('answer', A('الإجابة', 'Answer'))}`;
+    if (kind === 'answer') {
+      // PF-0143 (G4): each question is shown with its text, not only its id.
+      const known = detail?.item?.id === it.id ? detail.questions ?? [] : [];
+      const text = (q) => known.find((x) => x.id === q)?.question ?? '';
+      const ids = it.waitingFor?.questions ?? [];
+      return `<label class="fld">${A('السؤال', 'Question')}<select name="question" data-answer-pick>${ids.map((q) => `<option value="${esc(q)}">${esc(q)}${text(q) ? ` — ${esc(text(q).length > 90 ? `${text(q).slice(0, 89)}…` : text(q))}` : ''}</option>`).join('')}</select></label><div class="brief small" data-answer-text dir="auto">${esc(text(ids[0]) || A('بيحمّل نص السؤال…', 'Loading the question…'))}</div>${area('answer', A('الإجابة', 'Answer'))}`;
+    }
     if (kind === 'close') return `<label class="fld">${A('النتيجة', 'Outcome')}<select name="outcome"><option value="cancelled">${A('اتلغت', 'Cancelled')}</option><option value="superseded">${A('اتبدّلت بشغلانة تانية', 'Superseded by another item')}</option><option value="duplicate">${A('مكررة', 'Duplicate of another item')}</option></select></label><label class="fld">${A('الشغلانة البديلة (للمستبدلة أو المكررة)', 'The other item (for superseded or duplicate)')}<input name="by" class="ltr" placeholder="PF-0000" pattern="PF-[A-Za-z0-9-]+"></label>${area('reason', A('السبب', 'Reason'))}<p class="tiny muted">${A('الشغل المقفول عمره ما بيتحسب متسلّم ولا متحقق منه.', 'Closed work is never counted as delivered or verified.')}</p>`;
     if (kind === 'reopen') return `${it.state === 'done' ? `<label class="fld">${A('افتحها على', 'Reopen to')}<select name="to"><option value="implementation">${A('التنفيذ', 'Implementation')}</option><option value="verification">${A('التحقق', 'Verification')}</option><option value="review">${A('المراجعة', 'Review')}</option></select></label>` : ''}${area('reason', A('السبب', 'Reason'))}`;
     return `<p>${A('YallaFlow هيشغّل الأمر ده دلوقتي.', 'YallaFlow runs this command now.')}</p>`;
@@ -1414,6 +1623,23 @@
     d.innerHTML = `<form data-act-form="${esc(kind)}" data-act-item="${esc(id)}" novalidate><div class="row"><h2 id="act-h" class="grow">${L(ACTION_LABEL[kind])}</h2><button type="button" class="btn ghost sm" data-act-cancel>${A('إلغاء', 'Cancel')}</button></div><p class="tiny muted ltr">${esc(id)} — ${esc(it.title)}</p>${actionFields(kind, it)}<div class="confirm" hidden></div><div class="errbar small" role="alert" hidden></div><div class="row"><span class="grow"></span><button class="btn go" type="submit">${L(ACTION_LABEL[kind]).replace('…', '')}</button></div></form>`;
     document.body.appendChild(d);
     d.addEventListener('close', () => d.remove());
+    if (kind === 'answer') {
+      // PF-0143 (G4): the question texts come from the item's own record (work show).
+      const pick = d.querySelector('[data-answer-pick]');
+      const box = d.querySelector('[data-answer-text]');
+      let questions = detail?.item?.id === id ? detail.questions ?? [] : null;
+      const show = () => { const q = (questions ?? []).find((x) => x.id === pick.value); box.textContent = q?.question ?? (questions ? A('النص مش متاح؛ اقراه في تبويب «الأسئلة والقرارات».', 'The text is not available; read it in the Questions & decisions tab.') : A('بيحمّل نص السؤال…', 'Loading the question…')); };
+      pick.addEventListener('change', show);
+      if (!questions) {
+        const projectId = pid;
+        api(`/api/p/${projectId}/work/${encodeURIComponent(id)}`).then((current) => {
+          if (!d.isConnected || pid !== projectId) return;
+          questions = current.questions ?? [];
+          for (const option of pick.options) { const q = questions.find((x) => x.id === option.value); if (q?.question) option.textContent = `${q.id} — ${q.question.length > 90 ? `${q.question.slice(0, 89)}…` : q.question}`; }
+          show();
+        }).catch(() => { questions = []; if (d.isConnected) show(); });
+      }
+    }
     if (kind === 'revise') {
       initRequestFiles(d.querySelector('form'));
       const field = d.querySelector('[name="text"]');
@@ -1471,7 +1697,8 @@
       if (e.code === 'CONFIRM_MINIMUM_VERSION') {
         const box = form.querySelector('.confirm');
         box.hidden = false;
-        box.innerHTML = `<pre class="warn small">${esc(e.message)}</pre><label class="small"><input type="checkbox" name="confirmMinimumVersion"> ${A('موافق: المشروع هيحتاج YallaFlow 1.4.0 أو أحدث.', 'I confirm: this project will require YallaFlow 1.4.0 or newer.')}</label>`;
+        // PF-0143 (G6): said in the console's words; the CLI's own text stays in the CLI.
+        box.innerHTML = `<p class="warn small">${A('دي أول مرة شغلانة في المشروع ده تتوقف أو تتقفل. سجلّ التوقيف أو القفل بيخلّي المشروع يحتاج YallaFlow 1.4.0 أو أحدث، فأي حد بنسخة أقدم هيتطلب منه يحدّث. علّم على الموافقة تحت ودوس الزرار تاني.', 'This is the first time work in this project is held or closed. Its record makes the project require YallaFlow 1.4.0 or newer, so anyone on an older version is asked to update. Tick the confirmation below and press the button again.')}</p><label class="small"><input type="checkbox" name="confirmMinimumVersion"> ${A('موافق: المشروع هيحتاج YallaFlow 1.4.0 أو أحدث.', 'I confirm: this project will require YallaFlow 1.4.0 or newer.')}</label>`;
       } else {
         err.hidden = false;
         err.innerHTML = `<pre>${esc(why(e))}</pre>`;
@@ -1623,8 +1850,19 @@
     const conv = { satisfied: ['done', A('متحقق', 'satisfied')], partial: ['paused', A('جزئي', 'partial')], missing: ['fail', A('ناقص', 'missing')], contradicts: ['fail', A('بيعارض', 'contradicts')], 'not-assessed': ['todo', A('لسه', 'not yet')] };
     const satisfied = d.criteria.filter((c) => c.convergence === 'satisfied' && !c.stale).length;
     const tabs = [['delivery', `${A('التسليم', 'Delivery')} <b>${satisfied}/${d.criteria.length}</b>`], ['req', A('الطلب', 'Request')], ['files', `${A('المرفقات', 'Attachments')} <b>${d.sources.length}</b>`], ['q', `${A('الأسئلة والقرارات', 'Questions & decisions')} <b>${d.questions.length}</b>`]];
+    // PF-0143 (G5): optional AI QC runs, with the local report, on the item page.
+    if (d.quality) tabs.push(['qc', `${A('فحص الجودة', 'QC')} <b>${d.quality.qc.runs.length}</b>`]);
     const evidence = (c) => (c.evidence ?? []).filter((e) => e && e.ref).map((e) => `<span class="ltr tag" title="${esc(e.text)}">${esc(e.ref.split('/').pop())}</span>`).join(' ');
+    const qcTone = { passed: ['done', A('نجح', 'passed')], failed: ['fail', A('فشل', 'failed')], blocked: ['paused', A('متعطّل', 'blocked')], 'not-run': ['todo', A('ماتشغّلش', 'not run')] };
+    const qcPanel = () => {
+      const q = d.quality;
+      if (!q) return '';
+      const runs = q.qc.runs.slice(-5).reverse().map((run) => `<li><div class="row"><span class="ltr tag">${esc(run.id)}</span><span class="grow small">${A(`${run.passed} نجح · ${run.failed} فشل · ${run.blocked} متعطّل · ${run.notRun} ماتشغّلش`, `${run.passed} passed · ${run.failed} failed · ${run.blocked} blocked · ${run.notRun} not run`)}</span><span class="tiny muted">${run.at ? ago(run.at) : ''}</span></div>${run.summary ? `<p class="small" dir="auto">${esc(run.summary)}</p>` : ''}<details class="small"><summary>${A('السيناريوهات', 'Scenarios')}</summary><ul class="aclist">${run.scenarios.map((sc) => `<li><span class="ltr tag">${esc(sc.id)}</span><span class="grow" dir="auto">${esc(sc.title ?? '')}${sc.note ? `<br><span class="tiny muted">${esc(sc.note)}</span>` : ''}</span><span class="chip ${(qcTone[sc.status] ?? qcTone['not-run'])[0]}"><i></i>${(qcTone[sc.status] ?? qcTone['not-run'])[1]}</span></li>`).join('')}</ul></details></li>`).join('');
+      return `<p class="tiny muted">${A('فحص الجودة اختياري واستشاري: منفصل عن التحقق، ونتايجه مش بتمنع التسليم.', 'QC is optional and advisory: separate from verification, and its results do not block delivery.')}</p>${q.qc.error ? `<p class="small warn">${esc(q.qc.error)}</p>` : ''}<ul class="aclist" style="margin-top:8px">${runs}</ul>
+        <div class="row" style="margin-top:10px">${q.report ? `${readOnly ? '' : `<button class="btn sm" data-qc-report="${esc(it.id)}">${A('افتح التقرير', 'Open the report')}</button>`}<span class="tiny muted ltr">${esc(q.report)}</span>` : `<span class="tiny muted">${A('مفيش تقرير متولّد على الجهاز ده.', 'No report has been generated on this machine.')}</span>`}</div>`;
+    };
     const panel = {
+      qc: qcPanel(),
       delivery: `${d.criteria.length ? `<ul class="aclist">${d.criteria.map((c) => `<li><span class="ltr tag">${esc(c.id)}</span><span class="grow">${esc(c.statement)} <span class="tiny muted">· <span class="ltr">${esc(c.requirement)}</span></span></span>${evidence(c)}${c.stale ? `<span class="chip paused">${A('محتاج إعادة تقييم', 'stale')}</span>` : ''}<span class="chip ${(conv[c.convergence] ?? conv['not-assessed'])[0]}"><i></i>${(conv[c.convergence] ?? conv['not-assessed'])[1]}</span></li>`).join('')}</ul>` : `<p class="muted">${A('مفيش معايير قبول لسه.', 'No acceptance criteria yet.')}</p>`}
         <h3 style="font-size:16px;margin-top:16px">${A('تشغيلات التحقق', 'Verification runs')}</h3>${d.verification.length ? `<ul class="aclist" style="margin-top:8px">${d.verification.slice(-8).reverse().map((v) => `<li><span class="ltr tag">${esc(v.id)}</span><span class="grow ltr small">${esc(v.command ?? '')}</span><span class="tiny muted">${ago(v.at)}</span><span class="chip ${v.success ? 'done' : 'fail'}"><i></i>${v.success ? A('نجح', 'passed') : A('فشل', 'failed')}</span></li>`).join('')}</ul>` : `<p class="muted small">${A('لسه مفيش تحقق مسجّل.', 'No verification recorded yet.')}</p>`}`,
       req: `${(d.request.raw ?? '').length > 600 ? `<div class="brief clamp"><p>${esc(d.request.raw)}</p></div><button class="btn ghost sm" data-more>${A('اقرأ الطلب كله ↓', 'Read the whole request ↓')}</button>` : `<div class="brief"><p>${esc(d.request.raw ?? it.title)}</p></div>`}
@@ -1732,7 +1970,7 @@
     area.select();
   }
   function copy(text, what = 'command') {
-    const done = () => toast(what === 'id' ? A('اتنسخ رقم الشغلانة ✓', 'Work ID copied ✓') : what === 'path' ? A('اتنسخ المسار ✓', 'Path copied ✓') : what === 'text' ? A('اتنسخ ✓', 'Copied ✓') : A('اتنسخ الأمر ✓ شغّله في الترمينال أو ادّيه للوكيل.', 'Command copied ✓ Run it in your terminal or give it to your agent.'));
+    const done = () => toast(what === 'id' ? A('اتنسخ رقم الشغلانة ✓', 'Work ID copied ✓') : what === 'path' ? A('اتنسخ المسار ✓', 'Path copied ✓') : what === 'text' ? A('اتنسخ ✓', 'Copied ✓') : what === 'terminal' ? A('تم النسخ ✓ الصقها في ترمينال Claude Code.', 'Copied ✓ Paste it in the Claude Code terminal.') : A('اتنسخ الأمر ✓ شغّله في الترمينال أو ادّيه للوكيل.', 'Command copied ✓ Run it in your terminal or give it to your agent.'));
     const fallback = () => { if (selectionCopy(text)) done(); else manualCopy(text); };
     if (window.isSecureContext && navigator.clipboard?.writeText) {
       let promise;
@@ -1744,7 +1982,9 @@
   function celebrate() { if (reduced) return; const c = document.createElement('div'); c.className = 'celebrate'; const cols = ['#3d8bfd', '#8a63e8', '#0fae9d', '#f1a131', '#1d9a5a']; c.innerHTML = Array.from({ length: 40 }, (_, k) => `<i style="left:${Math.random() * 100}%;background:${cols[k % 5]};animation-delay:${Math.random() * 0.4}s"></i>`).join(''); document.body.appendChild(c); setTimeout(() => c.remove(), 2200); }
 
   // ---------- attention: what needs a person (from Core's state; nothing is inferred) ----------
-  const needs = () => [...(agent?.pid === pid ? agent.pending.map((p) => ({ it: byId(route().id) ?? { id: '', title: '' }, agentPerm: true, reason: A(`إذن للوكيل: ${p.title}`, `Agent permission: ${p.title}`) })) : []), ...(execView?.inbox ?? []).filter((p) => p.project !== pid || agent?.pid !== pid).map((p) => ({ it: { id: p.workId ?? '', title: p.name ?? '' }, agentPerm: true, elsewhere: true, reason: A(`إذن للوكيل: ${p.title}`, `Agent permission: ${p.title}`) })), ...items().filter((it) => it.state === 'you' || it.state === 'fail').map((it) => ({
+  // PF-0143 (B4): a stopped agent (usage limit, error) counts in the bell, like an open request.
+  const stopNeed = () => { const a = agentAttention(); return a?.stop ? [{ it: byId(a.workId) ?? { id: a.workId, title: '' }, agentStop: true, reason: a.label }] : []; };
+  const needs = () => [...stopNeed(), ...(agent?.pid === pid ? agent.pending.map((p) => ({ it: byId(route().id) ?? { id: '', title: '' }, agentPerm: true, reason: A(`إذن للوكيل: ${p.title}`, `Agent permission: ${p.title}`) })) : []), ...(execView?.inbox ?? []).filter((p) => p.project !== pid || agent?.pid !== pid).map((p) => ({ it: { id: p.workId ?? '', title: p.name ?? '' }, agentPerm: true, elsewhere: true, reason: A(`إذن للوكيل: ${p.title}`, `Agent permission: ${p.title}`) })), ...items().filter((it) => it.state === 'you' || it.state === 'fail').map((it) => ({
     it,
     reason: it.state === 'fail'
       ? A('آخر تحقق فشل', 'the latest verification failed')
@@ -1766,8 +2006,8 @@
   function alertNew(previous) {
     if (!previous || !browserAlerts || typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
     const before = new Set(previous.items.filter((it) => it.state === 'you' || it.state === 'fail').map((it) => it.id));
-    for (const { it, reason } of needs()) {
-      if (before.has(it.id)) continue;
+    for (const { it, reason, agentStop } of needs()) {
+      if (before.has(it.id) || agentStop) continue;
       const note = new Notification(`YallaFlow · ${it.id}`, { body: `${it.title}\n${reason}`, tag: `yf-${it.id}` });
       note.onclick = () => { window.focus(); location.hash = `#/item/${encodeURIComponent(it.id)}`; note.close(); };
     }
@@ -1936,7 +2176,10 @@
     const memCard = `<section class="panel sidecard"><h2>${A('ذاكرة المشروع', 'Project memory')}</h2><p class="tiny muted">${m.available ? A(`${m.current} معلومة · ${careTotal} محتاجة مراجعة`, `${m.current} facts · ${careTotal} need care`) : esc(m.error ?? '')}</p>${m.available && m.current ? `<div class="membar" role="img" aria-label="${esc(A(`${freshPct}% حديثة`, `${freshPct}% fresh`))}"><i style="width:${freshPct}%"></i></div><p class="tiny muted">${A(`${freshPct}% حديثة`, `${freshPct}% fresh`)}</p>` : ''}</section>`;
     const side = memCard + readinessCard({ always: true });
     const notEstablished = u.state !== 'PROJECT_UNDERSTANDING_ESTABLISHED' ? understandingCard(u) : '';
-    return projectPage('overview', `<div class="pcols"><div class="pmain">${notEstablished}${summary}${careSec}${areasSec}${stackSec}
+    // PF-0152: the approved brief, read through project memory; its facts open the record.
+    const ob = o.brief;
+    const briefCard = ob ? `<section class="panel ovbrief" data-overview-brief><div class="row"><h2 class="grow" style="font-size:18px">${A('ملخص المشروع', 'Project brief')}</h2><a class="tiny" href="#/item/${encodeURIComponent(ob.baselineId)}">${A('الفهم المعتمد وكل أدلته', 'The approved understanding and all its evidence')}</a></div>${briefBlock(ob, { factAttr: (id) => `data-overview-fact="${esc(id)}"`, built: builtWith(), coverage: ob.coverage })}<p class="tiny muted">${A('ملخص مبني على معلومات ذاكرة المشروع أدناه؛ إذا تغيّرت معلومة، يُعلَّم سطرها.', 'A summary built on the project-memory facts below; when a fact changes, its line is marked.')}</p></section>` : '';
+    return projectPage('overview', `<div class="pcols"><div class="pmain">${notEstablished}${briefCard}${summary}${careSec}${areasSec}${stackSec}
       <p class="tiny muted" style="margin-top:12px">${coverage} · ${A('القراءة بس — مفيش حاجة بتتغيّر من هنا.', 'Read-only — nothing changes from here.')}</p>
       ${devPanel(A('أوامر نظرة المشروع', 'Overview commands'), cmds)}</div><aside class="pside" aria-label="${A('ملخص', 'Summary')}">${side}</aside></div>`);
   }
@@ -1965,7 +2208,7 @@
     const level = readiness?.pid === pid ? readiness.data?.level : null;
     const levelChip = level ? `<span class="chip ${level === 'ready' ? 'done' : level === 'attention' ? 'fail' : 'wait'}"><i></i>${level === 'ready' ? A('جاهز', 'Ready') : level === 'attention' ? A('محتاج انتباه', 'Needs attention') : A('بيتجهّز', 'Getting ready')}</span>` : '';
     const root = String(current?.root ?? '');
-    const short = root.split('/').filter(Boolean).slice(-2).join('/');
+    const short = root.split(/[\\/]/).filter(Boolean).slice(-2).join('/');
     const name = (projectOverview?.pid === pid ? projectOverview.data?.project?.name : null) ?? snap?.project?.name ?? current?.name ?? '';
     return `<section class="projhead"><h1>${esc(name)}</h1>${levelChip}${short ? `<span class="tiny muted ltr projhead-path" title="${esc(root)}">…/${esc(short)}</span>` : ''}</section>`;
   }
@@ -2017,7 +2260,7 @@
   function startHere(first, services) {
     if (readOnly || !first || first.state === 'done') return '';
     const begun = first.state !== 'new';
-    const draft = goText(first);
+    const draft = first.waitingFor ? '' : goText(first); // PF-0154
     const primary = agentsOn
       ? `<button class="btn go" data-chat-item="${esc(first.id)}" data-chat-draft="${esc(draft)}">${begun ? A('كمّل مع الوكيل', 'Continue with the agent') : A('ابدأ مع الوكيل', 'Start with the agent')}</button><span class="tiny muted">${A('بيفتح أول شغلانة والشات، وانت اللي بتبدأ الجلسة.', 'Opens the first work item with the chat; you start the session.')}</span>`
       : `<a class="btn go" href="#/settings/agents">${A('اختار وكيل', 'Choose an agent')}</a><span class="tiny muted">${A('من «المشروع» ← «الإعدادات» ← الوكلاء. أو كمّل من Claude Code أو Codex في الترمينال:', 'In Project → Settings → Agents. Or continue from Claude Code or Codex in a terminal:')} <b dir="ltr">continue ${esc(first.id)}</b></span>`;
@@ -2096,9 +2339,15 @@
     const ports = sv.ports.map((p) => `<span class="tag ltr" title="${esc(p.listening ? A('بيرد', 'listening') : A('مش بيرد', 'not listening'))}">:${p.port}${p.listening ? ' ●' : ''}</span>`).join(' ');
     const logs = runtimeLogs[sv.id];
     const actions = readOnly ? '' : trusted
-      ? `<button class="btn sm go" data-rt="start" data-id="${esc(sv.id)}" ${dis(running || outside)} ${outside ? `title="${esc(outsideWhy)}"` : ''}>${busy === 'start' ? A('بيبدأ…', 'Starting…') : A('شغّل', 'Start')}</button>
-        <button class="btn sm" data-rt="restart" data-id="${esc(sv.id)}" ${dis(!running)}>${busy === 'restart' ? A('بيعيد…', 'Restarting…') : A('إعادة تشغيل', 'Restart')}</button>
-        <button class="btn sm ghost" data-rt="stop" data-id="${esc(sv.id)}" ${dis(sv.state === 'stopped')}>${busy === 'stop' ? A('بيوقف…', 'Stopping…') : A('وقّف', 'Stop')}</button>`
+      ? (() => {
+        // PF-0144: one Start/Stop per service that follows its state, never filled: the state chip
+        // carries the colour. Restart exists only while it runs; a failed or unmanaged record
+        // keeps a quiet Stop beside Start, since stopping is how its record is cleared.
+        const start = `<button class="btn sm" data-rt="start" data-id="${esc(sv.id)}" ${dis(outside)} ${outside ? `title="${esc(outsideWhy)}"` : ''}>${busy === 'start' ? A('بيبدأ…', 'Starting…') : A('شغّل', 'Start')}</button>`;
+        const stop = (cls) => `<button class="btn sm ${cls}" data-rt="stop" data-id="${esc(sv.id)}" ${dis(false)}>${busy === 'stop' ? A('بيوقف…', 'Stopping…') : A('وقّف', 'Stop')}</button>`;
+        if (running) return `${stop('')}<button class="btn sm ghost" data-rt="restart" data-id="${esc(sv.id)}" ${dis(false)}>${busy === 'restart' ? A('بيعيد…', 'Restarting…') : A('إعادة تشغيل', 'Restart')}</button>`;
+        return sv.state === 'stopped' || outside ? start : `${start}${stop('ghost')}`;
+      })()
       : inCard ? `<span class="tiny muted" data-in-approve-card>${A('وافق عليها من البطاقة فوق', 'Approve it in the card above')}</span>`
       : `<button class="btn sm go" data-rt-review="${esc(sv.id)}" ${dis(false)}>${runtimeReview[sv.id] ? A('حدّث المراجعة', 'Refresh review') : A('راجع ووثّق', 'Review and trust')}</button>${sv.state !== 'stopped' ? `<button class="btn sm ghost" data-rt="stop" data-id="${esc(sv.id)}" ${dis(false)}>${busy === 'stop' ? A('بيوقف…', 'Stopping…') : A('وقّف', 'Stop')}</button>` : ''}`;
     const links = openLinks(sv);
@@ -2214,6 +2463,8 @@
     if (canSend) {
       toggleChat(true); chatForceEnd = true;
       if (await agentAction('message', { text: agentPlanRequest() })) {
+        // PF-0143 (G2): where the request went, said on the Run page while it waits.
+        planAwaitAgent.sentTo = { provider: sess.provider, workId: sess.workId ?? null };
         toast(esc(A('تم إرسال الطلب للوكيل. سيظهر الاقتراح هنا تلقائيًا.', 'The request was sent to the agent. The proposal appears here by itself.')));
         render();
         return;
@@ -2467,9 +2718,22 @@
     const opens = up.map((sv) => openLinks(sv)).filter(Boolean);
     const msg = setupMsg ? `<p class="small runmsg ${setupMsg.tone === 'fail' ? 'warn' : ''}" role="status">${typeof setupMsg.html === 'function' ? setupMsg.html() : setupMsg.html}</p>` : '';
     const progress = all.length ? `<div class="trustbar" title="${esc(A('الموثوق', 'Trusted'))}"><i style="width:${Math.round((trusted.length / all.length) * 100)}%"></i></div><span class="tiny muted">${A(`${trusted.length}/${all.length} موثوق · ${up.length} شغّال`, `${trusted.length}/${all.length} trusted · ${up.length} running`)}</span>` : '';
+    // PF-0144: the project control follows the state: only the action that makes sense now is
+    // offered, and it is the highlighted one. Stopped: Start. Everything up: Stop. Partly up:
+    // "Start the rest" with Stop beside it. Nothing to start or stop: Start, off, with the reason.
+    const canStart = trusted.length > 0 && startable.length > 0;
+    const canStop = live.some((sv) => !runsOutside(sv));
+    const off = setupBusy ? 'disabled' : '';
+    const startBtn = (label) => `<button class="btn go big" data-rt-all="start" ${setupBusy || !canStart ? 'disabled' : ''} ${nothingToStart ? `title="${esc(A('شغّال بالفعل من برا YallaFlow', 'Already running outside YallaFlow'))}"` : ''}>${setupBusy === 'start' ? A('بيشغّل…', 'Starting…') : label}</button>`;
+    const stopBtn = (cls) => `<button class="btn ${cls} big" data-rt-all="stop" ${off}>${setupBusy === 'stop' ? A('بيوقف…', 'Stopping…') : A('■ وقّف المشروع', '■ Stop project')}</button>`;
+    const runBtns = setupBusy === 'start' ? startBtn('')
+      : setupBusy === 'stop' ? stopBtn('stop')
+      : canStart && canStop ? `${startBtn(A('▶ شغّل الباقي', '▶ Start the rest'))}${stopBtn('')}`
+      : canStop ? stopBtn('stop')
+      : startBtn(A('▶ شغّل المشروع', '▶ Start project'));
     return `<section class="panel runpanel ${state.tone}" id="setup-run">
       <div class="runhead"><div class="runstate"><span class="sdot big ${state.tone}" aria-hidden="true"></span><div><h2>${state.t}</h2><div class="row runprog">${progress}</div></div></div>
-      ${readOnly ? '' : `<div class="runbtns"><button class="btn go big" data-rt-all="start" ${setupBusy || !trusted.length || nothingToStart ? 'disabled' : ''} ${nothingToStart ? `title="${esc(A('شغّال بالفعل من برا YallaFlow', 'Already running outside YallaFlow'))}"` : ''}>${setupBusy === 'start' ? A('بيشغّل…', 'Starting…') : A('▶ شغّل المشروع', '▶ Start project')}</button><button class="btn big" data-rt-all="stop" ${setupBusy || !live.some((sv) => !runsOutside(sv)) ? 'disabled' : ''}>${setupBusy === 'stop' ? A('بيوقف…', 'Stopping…') : A('■ وقّف المشروع', '■ Stop project')}</button></div>`}</div>
+      ${readOnly ? '' : `<div class="runbtns">${runBtns}</div>`}</div>
       <p class="tiny ${untrusted ? '' : 'muted'}">${hint}</p>${msg}
       ${showOpens && opens.length ? `<div class="runopen"><span class="tiny muted">${A('افتح:', 'Open:')}</span> ${opens.join(' ')}</div>` : ''}
       ${rows}</section>`;
@@ -2590,12 +2854,12 @@
       ${tick(Boolean(d.claude?.ready), A('Claude Code جاهز (متثبّت، إصدار مناسب، تسجيل دخول بالاشتراك)', 'Claude Code ready (installed, recent enough, subscription login)'), A('شوف المشاكل فوق.', 'See the problems above.'))}
       ${tick(c.owner, A('الكونسول ده ماسك المشروع', 'This console owns the checkout'), esc(c.lockedBy ?? A('اقفل الكونسول التاني.', 'Close the other console.')))}
       ${tick(c.launchFiles, A('ملفات التشغيل مكتوبة', 'Launch files written'), A('دوس «اكتب ملفات التشغيل».', 'Press Write launch files.'))}
-      ${tick(c.channelConnected, A('القناة متوصّلة', 'Channel connected'), c.launchFiles ? A('شغّل الأمر تحت في ترمينال في فولدر المشروع.', 'Run the command below in a terminal in the project folder.') : A('اكتب ملفات التشغيل الأول.', 'Write the launch files first.'))}
+      ${tick(c.channelConnected, A('Claude Code متصل', 'Claude Code connected'), c.launchFiles ? A('شغّل الأمر تحت في ترمينال في فولدر المشروع.', 'Run the command below in a terminal in the project folder.') : A('اكتب ملفات التشغيل الأول.', 'Write the launch files first.'))}
       ${tick(Boolean(c.lastHookAt), A('الـ hooks بتبلّغ', 'Hooks reporting'), A('بيحصل أول ما Claude Code يبدأ بالرسالة الأولى.', 'Happens as soon as Claude Code starts with its first message.'))}
       ${tick(modeOk, c.mode ? A(`وضع الأذونات: ${esc(c.mode)}${c.modeState === 'auto-approves' ? ' (بيوافق لوحده على أغلب الأفعال)' : ''}`, `Permission mode: ${esc(c.mode)}${c.modeState === 'auto-approves' ? ' (approves most actions itself)' : ''}`) : A('وضع الأذونات معروف', 'Permission mode known'), c.modeState === 'refused' ? A('وضع بيتخطّى كل الأذونات، غيّره في Claude Code.', 'A mode that skips every permission; change it in Claude Code.') : A('بيتعرف من أول رسالة.', 'Known from the first message.'))}
-      </ul>${readOnly ? '' : `<div class="row" style="margin-top:8px"><button class="btn sm ${c.launchFiles ? 'ghost' : 'go'}" data-agents-launch ${setupBusy ? 'disabled' : ''}>${c.launchFiles ? A('اكتب ملفات التشغيل تاني', 'Rewrite launch files') : A('اكتب ملفات التشغيل', 'Write launch files')}</button></div>`}
+      </ul>${c.channelConnected ? `<p class="tiny muted" data-channel-mode>${c.channel === 'verified' ? A('الرسائل: تُرسل من الكونسول مباشرة.', 'Messages: sent from the console.') : c.channel === 'checking' ? A('الرسائل: جارٍ التحقق من إمكانية الإرسال من الكونسول…', 'Messages: checking whether the console can send…') : A('الرسائل: وضع الترمينال. تنسخ رسالتك من الكونسول وتلصقها في Claude Code، والكونسول يعرض العمل.', 'Messages: Terminal mode. You copy your message from the console and paste it in Claude Code; the console shows the work.')}</p>` : ''}${readOnly ? '' : `<div class="row" style="margin-top:8px"><button class="btn sm ${c.launchFiles ? 'ghost' : 'go'}" data-agents-launch ${setupBusy ? 'disabled' : ''}>${c.launchFiles ? A('اكتب ملفات التشغيل تاني', 'Rewrite launch files') : A('اكتب ملفات التشغيل', 'Write launch files')}</button></div>`}
       ${launch && !c.channelConnected ? `<p class="small" style="margin-top:8px">${A('شغّل الأمر ده في ترمينال جوه فولدر المشروع، ومتكتبش حاجة بعده:', 'Run this in a terminal inside the project folder, and type nothing after it:')}</p>` : ''}${launch ? `<pre class="cli" dir="ltr">${esc(launch)}</pre><button class="btn sm ghost" data-copy="${esc(launch)}">${A('انسخ', 'Copy')}</button>` : ''}` : '');
-    const form = readOnly ? `<p class="small muted">${A('الكونسول ده للقراءة بس.', 'This console is read-only.')}</p>` : `<form class="wizform" data-agents-settings style="margin-top:8px">
+    const form = readOnly ? `<p class="small muted">${A('الكونسول ده للقراءة بس.', 'This console is read-only.')}</p>` : `<form class="wizform" data-agents-settings data-keep="agents-${esc(pid)}" style="margin-top:8px">
       <label class="small"><input type="checkbox" name="agents" ${d.saved?.agents || (!d.saved?.chosen && d.applied?.agents) ? 'checked' : ''}> <b>${A('الوكلاء للمشروع ده (Codex)', 'Agents for this project (Codex)')}</b></label>
       ${d.claudeAvailable ? `<label class="small"><input type="checkbox" name="claude" ${d.saved?.claude || d.applied?.claude ? 'checked' : ''}> <b>${A('كمان Claude Code (تجريبي)', 'Also Claude Code (experimental)')}</b> <span class="tiny muted">${A('بتشغّله بنفسك في الترمينال؛ مفيش Stop من الكونسول؛ موافقة Anthropic المكتوبة لسه مستنيينها.', 'You start it yourself in a terminal; no Stop from the console; Anthropic\'s written answer is still pending.')}</span></label>` : ''}
       <div class="row"><button class="btn go sm" type="submit" ${setupBusy ? 'disabled' : ''}>${setupBusy === 'agents' ? A('بيحفظ…', 'Saving…') : A('احفظ للمشروع ده', 'Save for this project')}</button><span class="tiny muted">${A('بيتحفظ في .yallaflow/local (مش بيتعمله commit) وبيتطبّق كل ما الكونسول يفتح. قفل الوكلاء بيتطبّق من التشغيل الجاي للكونسول؛ قفل Claude Code بيتطبّق على طول.', 'Saved in .yallaflow/local (not committed) and applied whenever the console opens. Turning agents off applies from the next console start; turning Claude Code off applies at once.')}</span></div>
@@ -2689,7 +2953,9 @@
     const { p, view, plan, services } = proposalView();
     const waiting = planAwaitAgent?.pid === pid;
     const msg = setupMsg ? `<p class="small runmsg ${setupMsg.tone === 'fail' ? 'warn' : ''}" role="status">${typeof setupMsg.html === 'function' ? setupMsg.html() : setupMsg.html}</p>` : '';
-    const waitLine = waiting ? `<div class="waitline" role="status"><span class="spin" aria-hidden="true"></span><span class="small grow">${A('الوكيل يجهّز الاقتراح. سيظهر هنا تلقائيًا عند وصوله.', 'The agent is preparing the proposal. It appears here by itself when it arrives.')}</span><button class="btn sm ghost" data-plan-wait-cancel>${A('إلغاء الانتظار', 'Stop waiting')}</button></div>` : '';
+    const sentTo = waiting ? planAwaitAgent.sentTo : null;
+    const where = sentTo ? (sentTo.workId ? A(`الطلب اتبعت لجلسة ${PROVIDER[sentTo.provider] ?? esc(sentTo.provider)} الشغّالة على <a href="#/item/${encodeURIComponent(sentTo.workId)}" class="ltr">${esc(sentTo.workId)}</a>، وبيرد بعد ما يخلّص اللي في إيده. ممكن ياخد دقيقة أو اتنين.`, `The request went to the running ${PROVIDER[sentTo.provider] ?? esc(sentTo.provider)} session on <a href="#/item/${encodeURIComponent(sentTo.workId)}" class="ltr">${esc(sentTo.workId)}</a>; it answers when it is free. This can take a minute or two.`) : A(`الطلب اتبعت لجلسة ${PROVIDER[sentTo.provider] ?? esc(sentTo.provider)} الشغّالة. ممكن ياخد دقيقة أو اتنين.`, `The request went to the running ${PROVIDER[sentTo.provider] ?? esc(sentTo.provider)} session. This can take a minute or two.`)) : A('الطلب مستنيك في شات المشروع: ابدأ جلسة وابعته.', 'The request waits in the project chat: start a session and send it.');
+    const waitLine = waiting ? `<div class="waitline" role="status"><span class="spin" aria-hidden="true"></span><span class="small grow">${A('الوكيل يجهّز الاقتراح. سيظهر هنا تلقائيًا عند وصوله.', 'The agent is preparing the proposal. It appears here by itself when it arrives.')} <span class="tiny muted" data-plan-where>${where}</span></span><button class="btn sm ghost" data-plan-wait-cancel>${A('إلغاء الانتظار', 'Stop waiting')}</button></div>` : '';
     const askBtn = (primary, label) => `<button class="btn ${primary ? 'go' : 'sm ghost'}" data-rt-ask-agent ${setupBusy || waiting ? 'disabled' : ''}>${label}</button>`;
     const scanBtn = (primary, label) => `<button class="btn ${primary ? 'go' : 'sm ghost'}" data-rt-analyze ${setupBusy ? 'disabled' : ''}>${setupBusy === 'analyze' ? A('جارٍ الفحص…', 'Scanning…') : label}</button>`;
     const advanced = `<a class="tiny" href="#/settings/services">${A('تعديل متقدم', 'Advanced editing')} ${fwd()}</a>`;
@@ -2974,8 +3240,11 @@
       const tool = (id) => wiz.tools?.tools.find((t) => t.id === id);
       const toolChips = (ids) => ids.map((id) => { const t = tool(id); return !wiz.tools ? `<span class="tag">${esc(id)} …</span>` : `<span class="chip ${t?.found ? 'done' : 'wait'}" title="${esc(t?.version ?? '')}"><i></i>${esc(id)} ${t?.found ? `<span class="ltr tiny">${esc((/\d+(?:\.\d+){1,2}/.exec(t.version) ?? [A('موجود', 'found')])[0])}</span>` : A('مش موجود', 'not found')}</span>`; }).join(' ');
       const envs = ['docker', 'local', 'later'].map((k) => `<label class="stackcard ${f.environment === k ? 'on' : ''}"><input type="radio" name="wiz-env" value="${k}" ${f.environment === k ? 'checked' : ''}><b>${L(ENV[k].t)}</b><span class="small">${L(ENV[k].d)}</span>${ENV[k].tools.length ? `<span class="row tiny">${toolChips(ENV[k].tools)}</span>` : ''}</label>`).join('');
+      // PF-0143 (G1): Laravel needs PHP's SQLite driver for its generated .env, checked before creation.
+      const sqlite = st?.id === 'laravel' && wiz.tools && tool('php')?.found ? tool('pdo_sqlite') : null;
+      const laravelNote = sqlite ? `<p class="small" style="margin-top:6px">${toolChips(['php', 'composer', 'pdo_sqlite'])}</p>${sqlite.found ? '' : `<p class="small warn">${A('PHP عندك مفيهوش درايفر SQLite (pdo_sqlite)، وملف .env اللي Laravel بيعمله بيستخدم SQLite، فأول migration هتفشل بـ «could not find driver». سطّبه الأول لو هتشتغل محلي:', 'Your PHP has no SQLite driver (pdo_sqlite), and the .env Laravel generates uses SQLite, so the first migration fails with "could not find driver". Install it first if you work locally:')} <span class="ltr mono">sudo apt install php-sqlite3</span> <span class="tiny muted">(${A('Debian/Ubuntu؛ غيّرها حسب نظامك', 'Debian/Ubuntu; adjust for your system')})</span></p>`}` : '';
       return head + stepper() + err + `<form class="panel wizform" data-wiz-step="3" data-keep="wiz-3">
-        <fieldset><legend>${A('بيئة التطوير', 'Development environment')}</legend><div class="stackgrid">${envs}</div><p class="tiny muted">${A('YallaFlow بيفحص الأدوات بس، مابيسطّبش ولا بيشغّل حاجة.', 'YallaFlow only checks for tools; it installs and runs nothing.')}</p></fieldset>
+        <fieldset><legend>${A('بيئة التطوير', 'Development environment')}</legend><div class="stackgrid">${envs}</div>${laravelNote}<p class="tiny muted">${A('YallaFlow بيفحص الأدوات بس، مابيسطّبش ولا بيشغّل حاجة.', 'YallaFlow only checks for tools; it installs and runs nothing.')}</p></fieldset>
         <fieldset><legend>Git</legend><label class="small"><input type="checkbox" name="git" ${f.git ? 'checked' : ''}> ${A('اعمل Git repository محلي', 'Initialize a local Git repository')} ${toolChips(['git'])}</label>
           <p class="tiny muted">${A('بيعمل git init بس: من غير remote ولا commit ولا push. ربطه بـGitHub أو غيره خطوة منفصلة بتعملها انت.', 'Runs git init only: no remote, no commit, no push. Connecting it to GitHub or another remote is a separate step you take yourself.')}</p></fieldset>
         ${st?.install ? `<fieldset><legend>${A('المكتبات', 'Dependencies')}</legend><label class="small"><input type="checkbox" name="install" ${f.install ? 'checked' : ''}> ${A('سطّب المكتبات بعد الإنشاء', 'Install dependencies after creation')} <span class="ltr tiny mono">${esc(st.install.join(' '))}</span></label><p class="tiny muted">${A('بيحتاج إنترنت وبيشغّل سكريبتات الحزم، فهتأكد عليه قبل الإنشاء.', 'Needs the network and runs package scripts, so you will confirm it before creation.')}</p></fieldset>` : ''}
@@ -2998,7 +3267,7 @@
     ];
     const wont = [A('مفيش حاجة موجودة بتتكتب فوقها', 'Nothing existing is overwritten'), A('مفيش remote ولا commit ولا push', 'No remote, commit or push'), (wizForm().agent ?? 'none') === 'none' ? A('مفيش خدمات بتشتغل ولا وكيل بيبدأ', 'No services run and no agent starts') : A('مفيش خدمات بتشتغل، والوكيل بيتربط بس ومابيبدأش جلسة لوحده', 'No services run; the agent is connected but starts no session on its own'), ...(b.environment === 'docker' ? [A('مفيش ملفات Docker لسه', 'No Docker files yet')] : [])];
     const steps = b.steps.map((st) => st.argv ? `<li><span class="ltr mono">${esc(JSON.stringify(st.argv))}</span> ${st.network ? `<span class="chip wait">${A('إنترنت', 'network')}</span>` : ''}${st.installsDependencies ? `<span class="chip wait">${A('بيسطّب مكتبات', 'installs dependencies')}</span>` : ''}${st.runsPackageScripts ? `<span class="chip wait">${A('بيشغّل سكريبتات', 'runs scripts')}</span>` : ''}</li>` : `<li class="muted">${esc(st.note ?? st.id)}</li>`).join('');
-    const prereq = b.prerequisites.map((p) => `<li>${esc(p.name)}: ${p.found ? `<span class="ltr">${esc(p.version || 'found')}</span>` : `<b style="color:var(--clay)">${A('مش موجود — سطّبه الأول', 'not found — install it first')}</b>`}</li>`).join('');
+    const prereq = b.prerequisites.map((p) => `<li>${esc(p.name)}: ${p.found ? `<span class="ltr">${esc(p.version || 'found')}</span>` : `<b style="color:var(--clay)">${A('مش موجود — سطّبه الأول', 'not found — install it first')}</b>${p.note ? ` <span class="tiny muted ltr">${esc(p.note)}</span>` : ''}`}</li>`).join('');
     const summary = `<section class="panel"><h2 style="font-size:18px">${A('ملخص', 'Summary')}</h2>
       <dl class="svcdef"><dt>${A('المشروع', 'Project')}</dt><dd class="ltr">${esc(b.name)}</dd>
       <dt>${A('الهدف', 'Purpose')}</dt><dd>${b.intent?.description ? esc(b.intent.description) : `<span class="muted">${A('لسه مااتوصفش — هتحدده مع وكيلك', 'not described yet — you will define it with your agent')}</span>`}</dd>
@@ -3098,7 +3367,12 @@
     wiz.error = null;
     if (wiz.step === 1) {
       if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/.test(f.name)) { wiz.error = A('اسم المشروع لازم يبدأ بحرف أو رقم، ومن غير مسافات (حروف إنجليزي وأرقام و . _ -).', 'The project name must start with a letter or digit, without spaces (letters, digits, . _ -).'); return render(); }
-      if (!f.parent.startsWith('/') && !/^[A-Za-z]:[\\/]/.test(f.parent)) { wiz.error = A('اختار الفولدر اللي هيتعمل جواه المشروع.', 'Choose the folder the project will be created in.'); return render(); }
+      // PF-0143 (B2): "~" and "~/…" mean the home folder here too, as in the folder picker.
+      if (f.parent === '~' || f.parent.startsWith('~/')) {
+        try { const home = (await api('/api/fs/dirs')).home; if (home) f.parent = f.parent === '~' ? home : `${home.replace(/\/$/, '')}/${f.parent.slice(2)}`; } catch { /* the check below explains */ }
+      }
+      if (!f.parent.trim()) { wiz.error = A('اختار الفولدر اللي هيتعمل جواه المشروع.', 'Choose the folder the project will be created in.'); return render(); }
+      if (!f.parent.startsWith('/') && !/^[A-Za-z]:[\\/]/.test(f.parent)) { wiz.error = A('اكتب مسار كامل يبدأ بـ / أو ~/ (مثلاً ~/code)، أو اختار الفولدر بزرار «اختار فولدر».', 'Type a full path that starts with / or ~/ (for example ~/code), or use Choose folder.'); return render(); }
       wiz.step = 2; return render();
     }
     if (wiz.step === 2) {
@@ -3227,7 +3501,24 @@
     return { icon: FOLDER_SVG, label: '', tone: 'tw:text-muted' };
   }
   // Paths inside home are shown as ~/…: short, and the folder's own name is never cut off.
-  const tildePath = (p, home = folder?.data?.home) => (home && p && (p === home || p.startsWith(`${home}/`)) ? `~${p.slice(home.length)}` : p ?? '');
+  // PF-0146: paths come from the server with their own separator; the page never assumes "/".
+  const folderSep = () => folder?.data?.sep ?? '/';
+  const tildePath = (p, home = folder?.data?.home) => (home && p && (p === home || p.startsWith(`${home}${folderSep()}`)) ? `~${p.slice(home.length)}` : p ?? '');
+  const parentPath = (p) => String(p ?? '').replace(/[\\/][^\\/]+[\\/]?$/, '');
+  const lastName = (p) => String(p ?? '').split(/[\\/]/).filter(Boolean).at(-1) ?? String(p ?? '');
+  // Why a folder could not be opened, in the reader's language (the server's own text otherwise).
+  function folderWhy(e) {
+    const known = {
+      OUTSIDE_ALLOWED: A('الفولدر ده مش متاح للتصفح: المتاح فولدر البيت والأقراص أو الوحدات المحلية بس.', 'This folder cannot be browsed: only your home folder and local drives or volumes are available.'),
+      NETWORK_PATH: A('فولدرات الشبكة مش مدعومة في النسخة دي. اختار فولدر على قرص محلي.', 'Network folders are not supported in this version. Choose a folder on a local drive.'),
+      DRIVE_UNAVAILABLE: A('القرص ده مش متاح دلوقتي.', 'This drive is not available right now.'),
+      UNREADABLE: A('مفيش صلاحية لفتح الفولدر ده.', 'You do not have permission to open this folder.'),
+      SYSTEM_FOLDER: A('فولدرات النظام مش بتتعرض هنا.', 'System folders are not browsed.'),
+      HIDDEN_FOLDER: A('الفولدرات المخفية مش بتتعرض هنا.', 'Hidden folders are not browsed.'),
+      NOT_FOUND: A('الفولدر ده مش موجود.', 'That folder does not exist.')
+    };
+    return known[e?.code] ?? e?.message ?? String(e);
+  }
   const recentFolders = () => { const list = store.get(RECENT_KEY, []); return Array.isArray(list) ? list.filter((x) => typeof x === 'string').slice(0, 6) : []; };
   const rememberFolder = (dir) => { if (dir) store.set(RECENT_KEY, [dir, ...recentFolders().filter((x) => x !== dir)].slice(0, 6)); };
   async function openFolder(mode, at) {
@@ -3251,8 +3542,15 @@
     renderFolder();
     if (!d.open) d.showModal();
     const start = at ?? (mode === 'parent' ? wizForm().parent : '') ?? '';
+    // PF-0146: a folder that cannot be opened is said, with its reason, and the picker stays
+    // where it was. Only when nothing is open yet does it show Home, and it says so.
     try { folder.data = await api(`/api/fs/dirs?path=${encodeURIComponent(start)}`); } catch (e) {
-      try { folder.data = await api('/api/fs/dirs'); folder.error = e.message; } catch (e2) { folder.error = e2.message; }
+      const reason = folderWhy(e);
+      const shown = start && start.length > 60 ? `…${start.slice(-58)}` : start;
+      if (folder.data) folder.error = A(`مقدرناش نفتح «${shown}»: ${reason}`, `Could not open “${shown}”: ${reason}`);
+      else {
+        try { folder.data = await api('/api/fs/dirs'); folder.error = A(`مقدرناش نفتح «${shown}»: ${reason} معروض فولدر البيت بداله.`, `Could not open “${shown}”: ${reason} Showing your home folder instead.`); } catch (e2) { folder.error = folderWhy(e2); }
+      }
     }
     folder.busy = false; renderFolder();
     (d.querySelector('.fpick-list .fpick-row') ?? d.querySelector('[data-folder-filter]'))?.focus();
@@ -3281,9 +3579,14 @@
   }
   function crumbs(x) {
     if (!x) return '';
-    const rel = x.path === x.home ? [] : x.path.slice(x.home.length + 1).split('/');
-    const parts = [{ label: A('البيت', 'Home'), path: x.home }, ...rel.map((name, i) => ({ label: name, path: `${x.home}/${rel.slice(0, i + 1).join('/')}` }))];
-    return `<nav class="fpick-crumbs" aria-label="${A('المسار', 'Path')}"><ol>${parts.map((c, i) => `<li>${i === parts.length - 1 ? `<span aria-current="location">${i === 0 ? '⌂ ' : ''}${esc(c.label)}</span>` : `<button type="button" data-folder-go="${esc(c.path)}">${i === 0 ? '⌂ ' : ''}${esc(c.label)}</button>`}</li>`).join('')}</ol></nav>`;
+    const parts = (x.crumbs ?? [{ name: 'Home', path: x.home, root: 'home' }]).map((c) => ({ label: c.root === 'home' ? A('البيت', 'Home') : c.name, path: c.path, icon: c.root === 'home' ? '⌂ ' : c.root ? '🖴 ' : '' }));
+    return `<nav class="fpick-crumbs" aria-label="${A('المسار', 'Path')}"><ol>${parts.map((c, i) => `<li>${i === parts.length - 1 ? `<span aria-current="location">${c.icon}${esc(c.label)}</span>` : `<button type="button" data-folder-go="${esc(c.path)}">${c.icon}${esc(c.label)}</button>`}</li>`).join('')}</ol></nav>`;
+  }
+  // PF-0146: where browsing can start — Home and the local drives or volumes of this machine.
+  function folderRoots(x) {
+    const roots = x?.roots ?? [];
+    if (roots.length < 2) return '';
+    return `<div class="fpick-recent fpick-roots" data-folder-roots><span class="tiny muted">${A('الأماكن:', 'Locations:')}</span>${roots.map((r) => `<button type="button" class="fchip ${r.path === x.root ? 'on' : ''}" data-folder-go="${esc(r.path)}" ${r.path === x.root ? 'aria-current="true"' : ''}><span class="ltr">${r.kind === 'home' ? `⌂ ${A('البيت', 'Home')}` : esc(r.label)}</span></button>`).join('')}</div>`;
   }
   function folderFooter(x) {
     const t = folderTarget();
@@ -3295,7 +3598,7 @@
     if (folder.mode === 'parent') {
       const name = wizForm().name;
       action = `<button type="button" class="btn go" data-folder-choose ${x ? '' : 'disabled'}>${A('أنشئ المشروع هنا', 'Create the project here')}</button>`;
-      return `<div class="fpick-foot" data-folder-foot><div class="grow tw:min-w-0"><div class="tiny muted">${A('المشروع الجديد هيتعمل في فولدر جديد جوه:', 'The new project gets a new folder inside:')}</div><div class="ltr fpick-path" title="${esc(t?.path ?? '')}">${esc(tildePath(t?.path))}${name ? `/<b>${esc(name)}</b>` : ''}</div>${here?.yallaflow ? `<div class="tiny tw:text-amber">${A('ده مشروع YallaFlow — غالباً عايز تختار فولدر برّاه.', 'This is a YallaFlow project — you probably want a folder outside it.')}</div>` : ''}</div>${action}</div>`;
+      return `<div class="fpick-foot" data-folder-foot><div class="grow tw:min-w-0"><div class="tiny muted">${A('المشروع الجديد هيتعمل في فولدر جديد جوه:', 'The new project gets a new folder inside:')}</div><div class="ltr fpick-path" title="${esc(t?.path ?? '')}">${esc(tildePath(t?.path))}${name ? `${esc(folderSep())}<b>${esc(name)}</b>` : ''}</div>${here?.yallaflow ? `<div class="tiny tw:text-amber">${A('ده مشروع YallaFlow — غالباً عايز تختار فولدر برّاه.', 'This is a YallaFlow project — you probably want a folder outside it.')}</div>` : ''}</div>${action}</div>`;
     }
     if (!t || atHome) return `<div class="fpick-foot" data-folder-foot><span class="fpick-ico tw:text-muted">${FOLDER_SVG}</span><div class="grow tw:min-w-0 small">${A('اضغط على فولدر المشروع علشان تختاره.', 'Click the project folder to select it.')}</div><button type="button" class="btn go" disabled>${A('اختار فولدر المشروع', 'Choose the project folder')}</button></div>`;
     if (here?.yallaflow) action = `<button type="button" class="btn go" data-folder-choose>${A('افتح المشروع', 'Open this project')}</button>`;
@@ -3311,12 +3614,13 @@
     return `<section class="fpick-preview" aria-labelledby="fpv-h">
       <h3 id="fpv-h" class="tw:text-lg tw:font-semibold">${existing ? A(`جهّز YallaFlow في «${esc(p.name)}»`, `Set up YallaFlow in “${esc(p.name)}”`) : A(`مشروع جديد في «${esc(p.name)}»`, `A new project in “${esc(p.name)}”`)}</h3>
       <p class="small tw:mt-1">${existing ? `${A('كود موجود', 'Existing codebase')}${p.stack?.length ? ` · <span class="ltr">${esc(p.stack.join(' · '))}</span>` : ''}${p.sourceFiles ? ` · ${A(`${p.sourceFiles} ملف كود`, `${p.sourceFiles} source files`)}` : ''}` : A('فولدر فاضي — المشروع هيبدأ من فكرتك ومتطلباتك.', 'An empty folder — the project starts from your idea and requirements.')}</p>
-      ${p.git ? `<p class="small tw:mt-1">✓ ${A('أي تغييرات عندك مش متعملها commit مش هتتلمس، ومفيش commit هيتعمل.', 'Any uncommitted changes you have stay untouched, and nothing is committed.')}</p>` : ''}
+      ${p.outsideHome ? `<p class="small tw:mt-1" data-outside-home>${A('الفولدر ده برّه فولدر البيت بتاعك:', 'This folder is outside your home folder:')} <span class="ltr">${esc(p.path)}</span></p>` : ''}${p.git ? `<p class="small tw:mt-1">✓ ${A('أي تغييرات عندك مش متعملها commit مش هتتلمس، ومفيش commit هيتعمل.', 'Any uncommitted changes you have stay untouched, and nothing is committed.')}</p>` : ''}
       ${p.problems.length ? `<div class="tw:mt-3 tw:rounded-field tw:bg-clay-soft tw:px-3 tw:py-2" role="alert"><b class="tw:text-clay">${A('مش هينفع نجهّزه دلوقتي — ومفيش حاجة اتغيّرت:', 'This folder cannot be set up right now — nothing was changed:')}</b><ul class="small tw:mt-1 tw:ps-5">${p.problems.map((x) => `<li dir="auto">${esc(x.message)}</li>`).join('')}</ul></div>` : `
       <p class="small tw:mt-3"><b>${A('YallaFlow هيعمل بالظبط:', 'YallaFlow will make exactly these changes:')}</b></p>
       <ul class="fpick-plan">${p.plan.filter((x) => x.op !== 'unchanged').map((x) => `<li><span class="fpick-op ${x.op === 'create' ? 'add' : 'mod'}" aria-hidden="true">${opSign[x.op]}</span><span class="ltr">${esc(x.path)}</span><span class="tiny muted">${esc(notes[x.path] || opText[x.op])}${notes[x.path] && x.op !== 'create' ? ` · ${esc(opText[x.op])}` : ''}</span></li>`).join('')}</ul>
-      <p class="tiny muted tw:mt-2">${!p.git && !p.gitAbove ? A('مفيش كود تطبيق هيتغيّر، ومفيش commit، ومفيش تغيير في Git إلا لو اخترت «git init» تحت.', 'No application code changes, no commit, and no Git changes unless you tick "git init" below.') : A('مفيش كود تطبيق هيتغيّر، ومفيش commit، ومفيش تغيير في Git.', 'No application code changes, no commit, no Git changes.')}${existing ? ` ${A('بعدها وكيلك بيجهّز فهم للمشروع وإنت توافق عليه.', 'Next, your agent prepares a project understanding for you to approve.')}` : ''}</p>
+      <p class="tiny muted tw:mt-2">${!p.git && !p.gitAbove ? A('مفيش كود تطبيق هيتغيّر، ومفيش commit، ومفيش تغيير في Git إلا لو اخترت «git init» تحت.', 'No application code changes, no commit, and no Git changes unless you tick "git init" below.') : A('مفيش كود تطبيق هيتغيّر، ومفيش commit، ومفيش تغيير في Git.', 'No application code changes, no commit, no Git changes.')}${existing ? ` ${A('لا يُشغَّل أي أمر من أوامر المشروع.', 'No project command is run.')} ${A('بعدها وكيلك بيجهّز فهم للمشروع وإنت توافق عليه.', 'Next, your agent prepares a project understanding for you to approve.')}` : ''}</p>
       ${!p.git && !p.gitAbove ? `<label class="small fpick-git"><input type="checkbox" data-folder-gitinit ${folder.gitInit ? 'checked' : ''}> <span><b>${A('اعمل Git repository في الفولدر ده', 'Also create a Git repository in this folder')}</b> <span class="ltr tiny muted">(git init)</span> <span class="tiny muted">· ${A('اختياري', 'optional')}</span><br><span class="tiny muted">${A('الفولدر ده مفيهوش Git. بيتعمل repository فاضي بس: من غير commit ولا remote، وملفاتك زي ما هي. Git بيخلّيك ترجع في أي تغيير، ومطلوب لشغل الفريق والـ lanes.', 'This folder has no Git. Only an empty repository is created: no commit, no remote, and your files stay as they are. Git lets you undo any change, and team work and lanes need it.')}</span></span></label>` : ''}
+      ${existing ? `<label class="small fpick-first">${A('ما أول شيء تريد عمله في هذا المشروع؟', 'What do you want to do first in this project?')} <span class="tiny muted">· ${A('اختياري', 'optional')}</span><input type="text" data-folder-first maxlength="300" value="${esc(folder.first ?? '')}" placeholder="${A('مثال: إضافة الدفع الإلكتروني للحجوزات', 'Example: add online payment for bookings')}" autocomplete="off"><span class="tiny muted">${A('يُعطى لوكيلك مع طلب فهم المشروع، ليتعمق في الأجزاء المتعلقة به. لا يُنشأ أي عمل تلقائيًا.', 'It goes to your agent with the project-understanding request, so it looks deeper where it matters. No work is created automatically.')}</span></label>` : ''}
       <label class="small tw:mt-3 tw:flex tw:items-center tw:gap-2"><input type="checkbox" data-folder-ack ${folder.ack ? 'checked' : ''}> ${A('راجعت التغييرات دي', 'I reviewed these changes')}</label>`}
       ${folder.previewError ? `<p class="small tw:mt-2 tw:text-clay" role="alert" dir="auto" style="white-space:pre-wrap">${esc(folder.previewError)}</p>` : ''}
       <div class="row tw:mt-4"><button type="button" class="btn ghost" data-folder-back>${A('رجوع', 'Back')}</button><span class="grow"></span>${p.problems.length ? '' : `<button type="button" class="btn go" data-folder-connect ${folder.ack && !folder.previewBusy ? '' : 'disabled'}>${folder.previewBusy ? A('بيجهّز…', 'Setting up…') : existing ? A('جهّز YallaFlow', 'Set up YallaFlow') : A('ابدأ المشروع', 'Start the project')}</button>`}</div></section>`;
@@ -3329,21 +3633,22 @@
     d.setAttribute('aria-labelledby', 'fpick-h');
     const head = `<div class="row"><h2 id="fpick-h" class="grow tw:text-lg tw:font-semibold">${title}</h2><button type="button" class="ibtn" data-folder-close aria-label="${A('اقفل', 'Close')}">✕</button></div>`;
     if (folder.preview) { d.innerHTML = head + previewPanel(); d.querySelector('[data-folder-ack], [data-folder-back]')?.focus(); return; }
-    const recents = [...new Set([...(folder.mode === 'existing' ? projects.map((p) => p.root) : []), ...recentFolders()])].filter((p) => x && p.startsWith(x.home) && p !== x.path).slice(0, 6);
-    const label = (p) => projects.find((q) => q.root === p)?.name ?? p.split('/').pop();
+    const recents = [...new Set([...(folder.mode === 'existing' ? projects.map((p) => p.root) : []), ...recentFolders()])].filter((p) => x && (x.roots ?? [{ path: x.home }]).some((r) => p.startsWith(r.path)) && p !== x.path).slice(0, 6);
+    const label = (p) => projects.find((q) => q.root === p)?.name ?? lastName(p);
     const rows = x?.folders ?? [];
     d.innerHTML = `${head}
       ${folder.editPath ? `<form class="fpick-pathform" data-folder-pathform><label class="tw:sr-only" for="fpick-path">${A('المسار', 'Path')}</label><input id="fpick-path" class="ltr" name="path" value="${esc(tildePath(x?.path))}" spellcheck="false" autocomplete="off" placeholder="~/code/my-project"><button type="submit" class="btn sm go">${A('روح', 'Go')}</button><button type="button" class="btn sm ghost" data-folder-editpath="off">${A('إلغاء', 'Cancel')}</button></form>`
         : `<div class="fpick-bar">${x?.parent ? `<button type="button" class="ibtn fpick-up" data-folder-go="${esc(x.parent)}" aria-label="${A('الفولدر الأعلى', 'Up one folder')}" title="${A('الفولدر الأعلى (Backspace)', 'Up one folder (Backspace)')}">↑</button>` : ''}${crumbs(x)}<span class="grow"></span>${x ? `<button type="button" class="ibtn fpick-edit" data-folder-editpath="on" aria-label="${A('اكتب المسار', 'Type a path')}" title="${A('اكتب المسار بنفسك', 'Type a path yourself')}">✎</button>` : ''}</div>`}
-      ${recents.length ? `<div class="fpick-recent"><span class="tiny muted">${A('أخيراً:', 'Recent:')}</span>${recents.map((p) => `<button type="button" class="fchip" data-folder-go="${esc(p)}" title="${esc(tildePath(p))}">${esc(label(p))}</button>`).join('')}</div>` : ''}
+      ${folderRoots(x)}${recents.length ? `<div class="fpick-recent"><span class="tiny muted">${A('أخيراً:', 'Recent:')}</span>${recents.map((p) => `<button type="button" class="fchip" data-folder-go="${esc(p)}" title="${esc(tildePath(p))}">${esc(label(p))}</button>`).join('')}</div>` : ''}
       <div class="fpick-tools"><input type="search" data-folder-filter placeholder="${A('دوّر في الفولدرات…', 'Filter folders…')}" aria-label="${A('دوّر في الفولدرات', 'Filter folders')}" autocomplete="off">${folder.mode === 'parent' && x ? (folder.creating ? `<form class="fpick-new" data-folder-newform><input name="name" maxlength="80" placeholder="${A('اسم الفولدر', 'Folder name')}" aria-label="${A('اسم الفولدر الجديد', 'New folder name')}" required><button type="submit" class="btn sm go">${A('اعمل', 'Create')}</button><button type="button" class="btn sm ghost" data-folder-newcancel>${A('إلغاء', 'Cancel')}</button></form>` : `<button type="button" class="btn sm" data-folder-new>＋ ${A('فولدر جديد', 'New folder')}</button>`) : ''}</div>
       ${folder.error ? `<p class="small tw:text-clay" role="alert" dir="auto">${esc(folder.error)}</p>` : ''}
       ${folder.busy ? `<p class="muted small fpick-list">${A('بيقرا…', 'Reading…')}</p>` : x ? `<ul class="fpick-list" role="list" aria-label="${A('الفولدرات', 'Folders')}">${rows.map(folderRow).join('') || `<li class="muted small fpick-empty">${A('مفيش فولدرات هنا.', 'No folders here.')}</li>`}<li class="muted small fpick-empty" data-folder-nomatch hidden>${A('مفيش فولدر بالاسم ده.', 'No folder matches.')}</li></ul>${x.truncated ? `<p class="tiny muted">${A('أول 500 فولدر بس.', 'First 500 folders only.')}</p>` : ''}` : ''}
       ${folderFooter(x)}
-      <p class="tiny muted fpick-hint">${A('ضغطة بتختار الفولدر · دبل كليك أو Enter بيدخله · Backspace بيرجع للأعلى. فولدرات جوه فولدر البيت بس؛ المخفية مابتظهرش.', 'Click selects a folder · double-click or Enter opens it · Backspace goes up. Folders inside your home folder only; hidden folders are not shown.')}</p>`;
+      <p class="tiny muted fpick-hint">${A('ضغطة بتختار الفولدر · دبل كليك أو Enter بيدخله · Backspace بيرجع للأعلى. المتاح: فولدر البيت والأقراص المحلية؛ فولدرات الشبكة والمخفية مابتظهرش.', 'Click selects a folder · double-click or Enter opens it · Backspace goes up. Your home folder and local drives; network and hidden folders are not shown.')}</p>`;
   }
   // Filtering hides rows in place (no redraw, so typing keeps its focus and caret).
   function onFolderInput(e) {
+    if (e.target.matches('[data-folder-first]')) { if (folder) folder.first = e.target.value; return; }
     if (!e.target.matches('[data-folder-filter]')) return;
     const q = e.target.value.trim().toLowerCase();
     let shown = 0;
@@ -3374,14 +3679,14 @@
     const v = String(value ?? '').trim();
     const home = folder?.data?.home ?? '';
     if (v === '~') return home;
-    if (v.startsWith('~/')) return `${home}/${v.slice(2)}`;
+    if (/^~[\\/]/.test(v)) return `${home}${folderSep()}${v.slice(2)}`;
     return v;
   }
   async function previewFolder() {
     const x = folderTarget();
     if (!x) return;
     folder.previewBusy = true;
-    try { folder.preview = await api(`/api/fs/connect-preview?path=${encodeURIComponent(x.path)}`); folder.previewError = null; } catch (e) { folder.error = e.message; }
+    try { folder.preview = await api(`/api/fs/connect-preview?path=${encodeURIComponent(x.path)}`); folder.previewError = null; } catch (e) { folder.error = folderWhy(e); }
     folder.previewBusy = false; folder.ack = false; folder.gitInit = false; renderFolder();
   }
   async function connectFolder() {
@@ -3398,7 +3703,10 @@
         try { await post(`/api/p/${reg.id}/git/init`, JSON.stringify({ confirm: true }), { 'Content-Type': 'application/json' }); gitNote = A(' · Git repository اتعمل', ' · Git repository created'); }
         catch (e) { gitNote = A(` · Git ماتعملش: ${why(e)}`, ` · Git was not created: ${why(e)}`); }
       }
-      rememberFolder(p.path.split('/').slice(0, -1).join('/'));
+      rememberFolder(parentPath(p.path));
+      // PF-0149: the first request stays in this browser only, until the agent is asked.
+      const first = String(folder.first ?? '').replace(/\s+/g, ' ').trim().slice(0, 300);
+      if (first && p.kind === 'existing-code') store.set(firstRequestKey(reg.id), first);
       document.getElementById('folderdlg')?.close();
       await reloadProjects();
       toast(esc(A(`«${p.name}» بقى مشروع YallaFlow ✓`, `“${p.name}” is now a YallaFlow project ✓`) + gitNote));
@@ -3431,7 +3739,7 @@
     folder.busy = true; renderFolder();
     try {
       const reg = await post('/api/projects', JSON.stringify({ root: x.path }), { 'Content-Type': 'application/json' });
-      rememberFolder(x.path.split('/').slice(0, -1).join('/'));
+      rememberFolder(parentPath(x.path));
       document.getElementById('folderdlg')?.close();
       folder = null;
       await reloadProjects();
@@ -3572,7 +3880,7 @@
       const dist = ST.map((_, i) => s.items.filter((it) => curIndex(it) === i).length);
       const last = s.items.map((it) => it.lastActivityAt).filter(Boolean).sort().at(-1);
       // PF-0128: a card with its own actions — open the project, open its folder, copy its path.
-      const tail = String(project.root ?? '').split('/').slice(-2).join('/');
+      const tail = String(project.root ?? '').split(/[\\/]/).filter(Boolean).slice(-2).join('/');
       return `<article class="pcard panel ${project.id === pid ? 'here' : ''}">
         <header class="pcard-head"><div class="grow pcard-id"><a class="pcard-title" href="#/map" data-open-project="${project.id}"><h2>${esc(project.name)}</h2></a><span class="ltr tiny muted pcard-path" title="${esc(project.root ?? '')}">…/${esc(tail)}</span></div>${badge}</header>
         <div class="row tiny pcard-chips">${s.counts.you ? `<span class="chip you"><i></i>${s.counts.you} ${L(STATE.you)}</span>` : ''}${s.counts.fail ? `<span class="chip fail"><i></i>${s.counts.fail} ${L(STATE.fail)}</span>` : ''}<span class="chip todo">${s.counts.active + s.counts.paused + s.counts.new} ${A('مفتوح', 'open')}</span><span class="chip done"><i></i>${s.counts.done} ${L(STATE.done)}</span>${s.invalid?.length ? `<span class="chip wait">⚠ ${s.invalid.length} ${A('سجلات مش سليمة', 'invalid records')}</span>` : ''}</div>
@@ -3657,8 +3965,32 @@
         ].join('');
         return `<li><span class="chip ${taskTone(task.state)}"><i></i>${L(TASK_LABEL[task.state] ?? { ar: esc(task.state), en: esc(task.state) })}</span> <a href="#" data-x-open="${esc(lane.project)}" data-x-work="${esc(task.workId)}" class="ltr">${esc(task.workId)}</a>${task.provider === 'claude' ? ' <span class="tiny muted">Claude Code</span>' : ''}${task.reason && REASON_LABEL[task.reason] ? ` <span class="tiny muted">${L(REASON_LABEL[task.reason])}${task.retryAt ? ` · ${A('يرجع', 'retry')} ${esc(task.retryAt)}` : ''}</span>` : ''}${acts ? `<span class="xacts">${acts}</span>` : ''}</li>`;
       }).join('')}</ol>
-      ${assisted ? `<p class="tiny">${A(`ابدأ ${esc(head.workId)} في Claude Code واربطه من الشات. الكونسول مبيقدرش يشغّل Claude Code بنفسه.`, `Start ${esc(head.workId)} in Claude Code and link it from the chat. The console cannot start Claude Code itself.`)}</p>` : ''}
+      ${assisted ? `<p class="tiny">${A(`ابدأ ${esc(head.workId)} في Claude Code واربطه من الشات. الكونسول مبيقدرش يشغّل Claude Code بنفسه.`, `Start ${esc(head.workId)} in Claude Code and link it from the chat. The console cannot start Claude Code itself.`)}</p>` : ''}${queueWaitNote(lane, run)}
       ${live ? `<div class="row">${run.held || run.awaitNext ? btn('next', A('كمّل الطابور', 'Continue queue'), '', 'go') : btn('pause', A('وقّف بعد الحالية', 'Pause after current'))}${run.cancelAfter ? '' : btn('cancel-after', A('ألغي بعد الحالية', 'Cancel after current'))}${btn('cancel-now', A('ألغي دلوقتي', 'Cancel now'))}${run.options?.provider !== 'claude' && lane.userSessions ? btn('switch', A('كمّل الباقي بـ Claude Code', 'Continue the rest with Claude Code'), 'data-provider="claude"') : ''}${run.options?.provider === 'claude' ? btn('switch', A('كمّل الباقي بـ Codex', 'Continue the rest with Codex'), 'data-provider="codex"') : ''}</div>` : ''}</div>`;
+  }
+  // PF-0143 (B5): a queue whose next task cannot start because another session holds the
+  // checkout says so, with what the developer can do (Claude Code has no Stop in the console).
+  function queueBlock(lane, run) {
+    if (['finished', 'cancelled'].includes(run.state) || run.held || run.awaitNext) return null;
+    const list = run.lanes[0].tasks;
+    if (list.some((task) => ['starting', 'working', 'needs-you'].includes(task.state))) return null;
+    const head = list.find((task) => task.state === 'queued');
+    const s = lane.session;
+    if (!head || head.provider === 'claude' || !s || s.workId === head.workId) return null;
+    return { head, session: s };
+  }
+  function queueWaitNote(lane, run) {
+    const b = queueBlock(lane, run);
+    if (!b) return '';
+    const who = PROVIDER[b.session.provider] ?? esc(b.session.provider);
+    const on = b.session.workId ? A(` على ${esc(b.session.workId)}`, ` on ${esc(b.session.workId)}`) : '';
+    const how = b.session.provider === 'claude' ? A('اكتب /exit في ترمينال Claude Code عشان يقفل؛ الطابور هيكمّل لوحده.', 'Type /exit in the Claude Code terminal to close it; the queue continues by itself.') : A('اقفل الجلسة دي من الشات بتاعها؛ الطابور هيكمّل لوحده.', 'End that session from its chat; the queue continues by itself.');
+    return `<p class="tiny warn" role="status" data-queue-wait>⏸ ${A(`الطابور مستني جلسة ${who}${on} تقفل قبل ما يبدأ ${esc(b.head.workId)}.`, `The queue waits for the ${who} session${on} to close before it starts ${esc(b.head.workId)}.`)} ${how}</p>`;
+  }
+  // The same signal on the Workspace, for this project's queues.
+  function queueStrip() {
+    const notes = (execView?.lanes ?? []).filter((lane) => lane.project === pid).flatMap((lane) => lane.runs.map((run) => queueWaitNote(lane, run))).filter(Boolean);
+    return notes.length ? `<section class="panel" style="margin-bottom:12px">${notes.join('')}</section>` : '';
   }
   // PF-0132: the Agents page lives in Projects (the Needs-you inbox and each card's agents) and
   // in Worktrees (this project's queues, merges and session controls). #/agents lands on the inbox.
@@ -3757,7 +4089,7 @@
   let cw = null; // { requestId, pid, created, files, failed }
   const newRequestId = () => (crypto.randomUUID ? crypto.randomUUID() : Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, '0')).join(''));
   async function post(pathname, body, headers) {
-    const response = await fetch(pathname, { method: 'POST', headers: { Authorization: `Bearer ${token}`, ...headers }, body, cache: 'no-store' });
+    const response = await reach(() => fetch(pathname, { method: 'POST', headers: { Authorization: `Bearer ${token}`, ...headers }, body, cache: 'no-store' }));
     let data = null;
     try { data = await response.json(); } catch { /* not json */ }
     if (!response.ok) throw Object.assign(new Error(data?.error?.message ?? `HTTP ${response.status}`), { status: response.status, code: data?.error?.code, data, messageAr: data?.error?.messageAr ?? null });
@@ -3862,7 +4194,7 @@
     return state.entries.every((entry) => entry.uploaded);
   }
 
-  function openCreate() {
+  function openCreate(prefill = null) {
     if (readOnly) return;
     const blocked = createBlockedReason();
     if (blocked) { toast(esc(blocked)); return; }
@@ -3876,6 +4208,9 @@
     initRequestFiles(d.querySelector('form'));
     d.addEventListener('close', () => { d.remove(); });
     d.showModal();
+    // PF-0153: a suggestion or the developer's first request only fills the form. The developer
+    // reads it, changes it and presses Create themselves; nothing is created by opening it.
+    if (typeof prefill === 'string' && prefill.trim()) { const box = d.querySelector('textarea[name="request"]'); if (box) { box.value = prefill.trim().slice(0, 20000); box.dispatchEvent(new Event('input', { bubbles: true })); } }
     d.querySelector('textarea').focus();
     if (projectOverview?.pid !== pid) loadProjectOverview().then(() => { const h = d.querySelector('[data-shared-hint]'); if (h && d.isConnected && cw.pid === pid) h.innerHTML = sharedHint(); });
   }
@@ -4027,8 +4362,9 @@
     // Forms marked data-keep survive a redraw: typed values and focus are carried over (PF-0057).
     const kept = [...document.querySelectorAll('form[data-keep]')].map((form) => ({ key: form.dataset.keep, values: [...form.elements].filter((el) => el.name && el.type !== 'file' && (el.type === 'checkbox' || el.type === 'radio' ? el.checked !== el.defaultChecked : el.value !== el.defaultValue)).map((el) => [el.name, el.type === 'checkbox' || el.type === 'radio' ? (el.type === 'radio' ? (el.checked ? el.value : null) : el.checked) : el.value, el.type]), focus: form.contains(document.activeElement) ? document.activeElement.name : null, caret: document.activeElement?.selectionStart ?? null }));
     const entering = !reduced && r.v !== lastView;
-    lastView = r.v;
-    const html = topbar(r) + `<main>${banner()}${snap && ['map', 'lines'].includes(r.v) ? agentStrip() + branchBanner() + (readiness?.pid === pid ? readinessCard() : understandingStrip()) : ''}${body}</main>` + (chatCtx(r) ? agentDock(chatCtx(r)) : '');
+    // PF-0155: the first paint with data is an entrance too; the loading placeholder is not a view.
+    lastView = snap ? r.v : null;
+    const html = topbar(r) + `<main>${banner()}${snap && ['map', 'lines'].includes(r.v) ? agentStrip() + queueStrip() + limitNotices() + branchBanner() + (readiness?.pid === pid ? readinessCard() : understandingStrip()) + firstTasksPanel() : ''}${body}</main>` + (chatCtx(r) ? agentDock(chatCtx(r)) : '');
     const appEl = document.getElementById('app');
     // Nothing changed: keep the live DOM (focus, selection, open menus, hover, a click in progress).
     noteMutations(domWatch.takeRecords());
@@ -4091,6 +4427,7 @@
       return;
     }
     if (e.target.matches?.('[data-queue-confirm]')) { const b = document.querySelector('[data-queue-start]'); if (b) b.disabled = !e.target.checked; }
+    if (e.target.matches?.('[data-queue-form] [name="provider"]')) { const b = document.querySelector('[data-queue-start]'); if (b) b.textContent = queueStartLabel(e.target.value); }
     if (e.target.matches?.('[data-parallel-confirm]')) { const b = document.querySelector('[data-parallel-start]'); if (b) b.disabled = !e.target.checked || b.hasAttribute('data-blocked'); }
     if (e.target.matches?.('[data-shared-confirm]')) { const b = e.target.closest('[data-shared-panel]')?.querySelector('[data-shared-enable]'); if (b) b.disabled = !e.target.checked; }
     if (e.target.matches?.('[data-cleanup-confirm]')) { const b = document.querySelector('[data-cleanup-start]'); if (b) b.disabled = !e.target.checked; }
@@ -4116,6 +4453,10 @@
     const before = new Map([...document.querySelectorAll('.pchip')].map((c) => [c.dataset.w, c.getBoundingClientRect()]));
     const previous = await load();
     alertNew(previous);
+    // PF-0153: the cached project overview is read again while the understanding is not
+    // established there yet, so an approval (here, in a terminal or by the agent) shows the
+    // brief and the first tasks without a reload.
+    if (projectOverview?.pid === pid && projectOverview.data && projectOverview.data.understanding?.state !== 'PROJECT_UNDERSTANDING_ESTABLISHED' && projectOverview.data.project?.kind !== 'greenfield') await loadProjectOverview();
     await loadForView();
     const moves = previous ? diff(previous, snap) : [];
     const flights = moves.filter((m) => m.kind !== 'new');
@@ -4337,7 +4678,9 @@
       const id = ask.dataset.chatItem;
       // PF-0105: open with the whole job, not a status question.
       // An explicit empty draft (a call-out, 'See what it needs') keeps the box as it is.
-      agentDraft = ask.hasAttribute('data-chat-draft') ? (ask.dataset.chatDraft || agentDraft) : goText(byId(id) ?? { id });
+      // PF-0154: an item waiting for the developer keeps the box as it is.
+      const asked = byId(id) ?? { id };
+      agentDraft = ask.hasAttribute('data-chat-draft') ? (ask.dataset.chatDraft || agentDraft) : asked.waitingFor ? agentDraft : goText(asked);
       const target = `#/item/${encodeURIComponent(id)}`;
       // Already on that item (the next-step button, PF-0092): open the chat in place.
       if (location.hash === target) { toggleChat(true); return; }
@@ -4357,6 +4700,8 @@
     if (e.target.closest('[data-rt-ask-agent]')) { startAgentPlan(); return; }
     // PF-0073: waiting for the agent's proposal, and the way to the Agents settings.
     if (e.target.closest('[data-plan-wait-cancel]')) { planAwaitAgent = null; render(); return; }
+    const qcOpen = e.target.closest('[data-qc-report]');
+    if (qcOpen) { qcOpen.disabled = true; post(`/api/p/${pid}/work/${encodeURIComponent(qcOpen.dataset.qcReport)}/quality-report`, '{}', { 'Content-Type': 'application/json' }).then(() => toast(esc(A('التقرير اتفتح.', 'The report opened.')))).catch((err) => toast(esc(why(err)))).finally(() => { qcOpen.disabled = false; }); return; }
     if (e.target.closest('[data-goto-agents]')) { setupOpen.set('configure', true); render(); document.getElementById('setup-agents')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
     const pv = e.target.closest('[data-plan-view]');
     if (pv) { planView = pv.dataset.planView; autoPickPlan(); planReplaceAsk = null; render(); return; }
@@ -4572,7 +4917,49 @@
     else if (x.dataset.copy) copy(x.dataset.copy, x.dataset.copyWhat);
   });
   document.addEventListener('toggle', (e) => { const key = e.target.dataset?.overview; if (key && e.target.isConnected) { if (e.target.open) overviewExpanded.add(key); else overviewExpanded.delete(key); } const sx = e.target.dataset?.sx; if (sx && e.target.isConnected) setupOpen.set(sx, e.target.open); }, true);
-  document.addEventListener('input', (e) => { if (e.target.closest('[data-gate-form]')) gateReady(e.target.closest('[data-gate-form]')); });
+  document.addEventListener('input', (e) => { if (e.target.closest('[data-gate-form]')) gateReady(e.target.closest('[data-gate-form]')); else if (e.target.closest('[data-baseline-form]')) baselineInput(e.target.closest('[data-baseline-form]')); });
+  document.addEventListener('change', (e) => { if (e.target.closest?.('[data-baseline-form]')) baselineInput(e.target.closest('[data-baseline-form]')); });
+  document.addEventListener('click', (e) => {
+    const decide = e.target.closest?.('[data-baseline-decide]');
+    if (decide && !decide.disabled) { submitBaseline(decide.closest('[data-baseline-form]'), decide.dataset.baselineDecide); return; }
+    if (e.target.closest?.('[data-baseline-reload]')) { bdecide = null; refresh(); return; }
+    const firstTask = e.target.closest?.('[data-first-task]');
+    if (firstTask && !firstTask.disabled) { openCreate(firstTask.dataset.firstTask); return; }
+    // PF-0152: a brief line opens the fact it cites, with its evidence.
+    const ref = e.target.closest?.('[data-brief-fact]');
+    if (ref) {
+      const fact = document.querySelector(`#baseline-draft [data-baseline-fact="${CSS.escape(ref.dataset.briefFact)}"]`);
+      if (fact) {
+        for (let node = fact.parentElement; node && node.id !== 'baseline-draft'; node = node.parentElement) if (node.tagName === 'DETAILS') node.open = true;
+        fact.scrollIntoView({ block: 'center', behavior: reduced ? 'auto' : 'smooth' });
+        fact.classList.add('flash'); setTimeout(() => fact.classList.remove('flash'), 1600);
+      }
+      return;
+    }
+    // On the Overview the cited fact is a project-memory fact listed on the same page.
+    const memoryRef = e.target.closest?.('[data-overview-fact]');
+    if (memoryRef) {
+      const fact = [...document.querySelectorAll('.facts li')].find((li) => li.querySelector('.fact-meta .ltr')?.textContent === memoryRef.dataset.overviewFact);
+      if (fact) {
+        for (let node = fact.parentElement; node && node !== document.body; node = node.parentElement) if (node.tagName === 'DETAILS') node.open = true;
+        fact.scrollIntoView({ block: 'center', behavior: reduced ? 'auto' : 'smooth' });
+        fact.classList.add('flash'); setTimeout(() => fact.classList.remove('flash'), 1600);
+      } else toast(esc(A(`${memoryRef.dataset.overviewFact} موجودة في ذاكرة المشروع، وليست ضمن المعروض هنا.`, `${memoryRef.dataset.overviewFact} is in project memory but not among the facts listed here.`)));
+      return;
+    }
+    // "Not right?" on a brief line starts the change request with that line quoted.
+    const wrong = e.target.closest?.('[data-brief-wrong]');
+    if (wrong) {
+      const form = document.querySelector('[data-baseline-form]');
+      const box = form?.querySelector('[name="note"]');
+      if (box) {
+        const quote = A(`«${wrong.dataset.briefWrong}» غير صحيح: `, `"${wrong.dataset.briefWrong}" is not right: `);
+        box.value = box.value.trim() ? `${box.value.trim()}\n${quote}` : quote;
+        baselineInput(form);
+        box.focus(); box.setSelectionRange(box.value.length, box.value.length);
+      }
+    }
+  });
   document.addEventListener('change', (e) => { if (e.target.matches?.('[data-gate-form] [name="confirmed"], [data-gate-form] [name="decision"]')) gateReady(e.target.closest('[data-gate-form]')); });
   // PF-0101: a trust or shared-service button waits for its box to be ticked.
   document.addEventListener('change', (e) => {
@@ -4660,7 +5047,7 @@
     if (e.target.matches('[data-agents-form]')) { e.preventDefault(); confirmAgents(e.target); return; }
     if (e.target.matches('[data-remove-project-form]')) { e.preventDefault(); confirmRemoveProject(); return; }
     if (e.target.matches('[data-create-form]')) { e.preventDefault(); submitCreate(e.target); }
-    else if (e.target.matches('[data-agent-form]')) { e.preventDefault(); const text = agentDraft.trim(); if (!text) return; agentDraft = ''; chatForceEnd = true; agentAction('message', { text }).then((sent) => { if (!sent && !agentDraft) { agentDraft = text; renderAgent(); } }); }
+    else if (e.target.matches('[data-agent-form]')) { e.preventDefault(); const text = agentDraft.trim(); if (!text) return; agentDraft = ''; chatForceEnd = true; const viaTerminal = e.target.hasAttribute('data-terminal'); const chatId = viaTerminal ? newChatId() : null; if (viaTerminal) copy(terminalText(text, chatId), 'terminal'); agentAction('message', viaTerminal ? { text, terminal: true, chatId } : { text }).then((sent) => { if (!sent && !agentDraft) { agentDraft = text; renderAgent(); } }); }
   });
   document.addEventListener('change', async (e) => {
     if (e.target.matches('[name="acknowledgeScripts"]')) { wiz.acknowledged = e.target.checked; const go = document.querySelector('[data-wiz-create-btn]'); if (go) go.disabled = wiz.busy || !wiz.acknowledged; return; }

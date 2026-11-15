@@ -1,0 +1,302 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-15T16:44:56.774Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+        "verificationRunIds": [
+          "V-002"
+        ]
+      },
+      "summary": "Assessed after V-002 (npm test) and the browser pass on a temp brownfield project.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "The baseline panel renders a decision form with a mandatory note and a tick; the server runs Core's baseline approve or baseline feedback and the facts become project memory (tested end to end and in the browser).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/actions.js",
+              "symbol": "decideBaseline",
+              "contentHash": "sha256:75f93c35e0e2fc396fd30e84db22813337b9b75e6f4bf59c1a9707888209f1b7",
+              "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "symbol": "baselineDecision",
+              "contentHash": "sha256:409ce0cc17124a43a07338e0bed2585a6f4b77f73f54bf3fc52cd09fb14109b2",
+              "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-baseline-decision.test.js",
+              "contentHash": "sha256:f84e9d26c7905514d5b7b147d2570ba305df222b9528bb4a5a8ca46524d799f3",
+              "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0147",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "decideBaseline refuses a changed digest, a draft not awaiting review (CLI or agent decided, or being revised), and repeats by request id; the form is not rendered and the routes refuse in a read-only console. Each case is tested with nothing recorded.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/actions.js",
+              "symbol": "decideBaseline",
+              "contentHash": "sha256:75f93c35e0e2fc396fd30e84db22813337b9b75e6f4bf59c1a9707888209f1b7",
+              "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-baseline-decision.test.js",
+              "contentHash": "sha256:f84e9d26c7905514d5b7b147d2570ba305df222b9528bb4a5a8ca46524d799f3",
+              "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0147",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "partial",
+          "reason": "The origin is recorded in the decision note (console, identity not verified, host, claimed Git name), not as structured provenance: Core's integrity check, also in released versions, rejects structured provenance on the baseline gate. CLI decisions are unchanged and reconciliation still refuses console provenance.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/actions.js",
+              "symbol": "decideBaseline",
+              "contentHash": "sha256:75f93c35e0e2fc396fd30e84db22813337b9b75e6f4bf59c1a9707888209f1b7",
+              "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/core/integrity.js",
+              "contentHash": "sha256:3753ea54a3345578d15c3010a87e857289a49e8078d49262696d72a2024ac48f",
+              "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-baseline-decision.test.js",
+              "contentHash": "sha256:f84e9d26c7905514d5b7b147d2570ba305df222b9528bb4a5a8ca46524d799f3",
+              "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+              "workingTree": "untracked"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "With uninspected areas, unresolved facts or undeclared coverage the server answers GAPS unless acknowledgedGaps is sent, and the form names the gaps and adds a second tick; approval then succeeds.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/actions.js",
+              "symbol": "decideBaseline",
+              "contentHash": "sha256:75f93c35e0e2fc396fd30e84db22813337b9b75e6f4bf59c1a9707888209f1b7",
+              "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "symbol": "baselineDecision",
+              "contentHash": "sha256:409ce0cc17124a43a07338e0bed2585a6f4b77f73f54bf3fc52cd09fb14109b2",
+              "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-baseline-decision.test.js",
+              "contentHash": "sha256:f84e9d26c7905514d5b7b147d2570ba305df222b9528bb4a5a8ca46524d799f3",
+              "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0147",
+              "verificationRunId": "V-002"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    },
+    {
+      "id": "CV-002",
+      "recordedAt": "2026-11-15T16:45:43.405Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 2,
+        "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+        "verificationRunIds": [
+          "V-002"
+        ]
+      },
+      "summary": "Assessed after V-002 (npm test) and the browser pass on a temp brownfield project.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "The baseline panel renders a decision form with a mandatory note and a tick; the server runs Core's baseline approve or baseline feedback and the facts become project memory (tested end to end and in the browser).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/actions.js",
+              "symbol": "decideBaseline",
+              "contentHash": "sha256:75f93c35e0e2fc396fd30e84db22813337b9b75e6f4bf59c1a9707888209f1b7",
+              "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "symbol": "baselineDecision",
+              "contentHash": "sha256:409ce0cc17124a43a07338e0bed2585a6f4b77f73f54bf3fc52cd09fb14109b2",
+              "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-baseline-decision.test.js",
+              "contentHash": "sha256:f84e9d26c7905514d5b7b147d2570ba305df222b9528bb4a5a8ca46524d799f3",
+              "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0147",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "decideBaseline refuses a changed digest, a draft not awaiting review (CLI or agent decided, or being revised), and repeats by request id; the form is not rendered and the routes refuse in a read-only console. Each case is tested with nothing recorded.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/actions.js",
+              "symbol": "decideBaseline",
+              "contentHash": "sha256:75f93c35e0e2fc396fd30e84db22813337b9b75e6f4bf59c1a9707888209f1b7",
+              "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-baseline-decision.test.js",
+              "contentHash": "sha256:f84e9d26c7905514d5b7b147d2570ba305df222b9528bb4a5a8ca46524d799f3",
+              "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0147",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "The origin is recorded in the decision note (console, identity not verified, host, claimed Git name), not as structured provenance: Core's integrity check, also in released versions, rejects structured provenance on the baseline gate. CLI decisions are unchanged and reconciliation still refuses console provenance.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/actions.js",
+              "symbol": "decideBaseline",
+              "contentHash": "sha256:75f93c35e0e2fc396fd30e84db22813337b9b75e6f4bf59c1a9707888209f1b7",
+              "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/core/integrity.js",
+              "contentHash": "sha256:3753ea54a3345578d15c3010a87e857289a49e8078d49262696d72a2024ac48f",
+              "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-baseline-decision.test.js",
+              "contentHash": "sha256:f84e9d26c7905514d5b7b147d2570ba305df222b9528bb4a5a8ca46524d799f3",
+              "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0147",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "With uninspected areas, unresolved facts or undeclared coverage the server answers GAPS unless acknowledgedGaps is sent, and the form names the gaps and adds a second tick; approval then succeeds.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/actions.js",
+              "symbol": "decideBaseline",
+              "contentHash": "sha256:75f93c35e0e2fc396fd30e84db22813337b9b75e6f4bf59c1a9707888209f1b7",
+              "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "symbol": "baselineDecision",
+              "contentHash": "sha256:409ce0cc17124a43a07338e0bed2585a6f4b77f73f54bf3fc52cd09fb14109b2",
+              "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-baseline-decision.test.js",
+              "contentHash": "sha256:f84e9d26c7905514d5b7b147d2570ba305df222b9528bb4a5a8ca46524d799f3",
+              "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm test (passed)",
+              "workId": "PF-0147",
+              "verificationRunId": "V-002"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-15T16:45:43.405Z"
+}

@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-15T14:53:08.766Z",
+      "completedAt": "2026-11-15T14:53:08.766Z",
+      "summary": "Baseline approval runs approveBaseline (src/baseline/store.js): facts promoted to context, ledger approved, gate set through setGateStatus, item DONE. setGateStatus refuses console provenance for the baseline and reconciliation gates (tested in test/console-actions.test.js). Console gate decisions go through decideGate in src/console/actions.js with a material digest and requestedAt. The baseline item page shows the draft (baselineDraft in app.js) and sends the developer to the chat to approve.",
+      "evidence": [
+        "src/baseline/store.js",
+        "src/reviews/store.js",
+        "src/console/actions.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-15T14:53:09.391Z",
+      "completedAt": "2026-11-15T14:53:09.391Z",
+      "summary": "Owner-approved design (2026-11-15, item 2): approve or request changes in the console, reuse the gate conventions, prevent stale or mismatched decisions, coexist with CLI and agent decisions, show incomplete coverage and require acknowledgment without blocking. This lifts the earlier rule that console provenance never applies to the baseline gate; reconciliation stays refused."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-15T14:58:33.873Z",
+      "completedAt": "2026-11-15T14:58:33.873Z",
+      "summary": "baseline/store.js: baselineReviewDigest and baselineGaps; approveBaseline refuses structured console provenance before promoting anything. snapshot.js: detail.baseline gains coverage, gaps and digest (schema updated). actions.js: gates/baseline review and decision (awaiting-review only, digest match, gap acknowledgment, idempotent request id, Core's baseline approve/feedback, origin in the note). app.js: Your decision form under the draft with note, tick, named gap acknowledgment, stale reload, state kept across re-renders. Docs updated.",
+      "evidence": [
+        "src/console/actions.js",
+        "src/baseline/store.js",
+        "test/console-baseline-decision.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-15T16:44:56.559Z",
+      "completedAt": "2026-11-15T16:44:56.559Z",
+      "summary": "npm test (V-002): 1301 tests, 1300 pass, 0 fail, 1 skipped. V-001 failed on two draft-panel tests that asserted the old chat-only decision; they were updated. Browser check (Playwright, temp brownfield project): Arabic and English form, note and tick enable Request changes, the named acknowledgment enables Approve, state kept across a language switch, 390 px without overflow, approval recorded by Core with the console note and the item reached Done."
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-15T16:45:43.922Z",
+      "completedAt": "2026-11-15T16:45:43.922Z",
+      "summary": "All four criteria satisfied against V-002; AC-003 was reworded to the note-based record after the ruling."
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Console provenance is now accepted for the baseline gate (it was refused by design); reconciliation stays refused",
+      "reason": "the owner approved console baseline approval in the session on 2026-11-15 as item 2 of the Project Understanding design",
+      "costIfWrong": "a holder of the console link can approve a project understanding; the same actor can already approve other gates, and the record says identity not verified",
+      "createdAt": "2026-11-15T14:53:09.594Z"
+    },
+    {
+      "decision": "The console decision on the baseline is recorded through the baseline's note (Decided in the YallaFlow console by the local user, identity not verified, host, claimed Git name), not as structured provenance; the earlier ruling to accept console provenance on the baseline gate is withdrawn and that rule is unchanged",
+      "reason": "Core's integrity check, also in released versions, reports structured provenance on the baseline gate as an integrity problem, so a Shared Project with a teammate on an older YallaFlow would fail doctor; the note is the convention baseline approvals already use",
+      "costIfWrong": "the origin of a console baseline decision is text in a note rather than a structured field",
+      "createdAt": "2026-11-15T14:58:33.636Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-15T16:45:43.922Z"
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "environment",
+      "summary": "Folder picker behaviour on real Windows and macOS filesystems was not run",
+      "reason": "no Windows or macOS machine in this session; only path.win32 rules and parsers were exercised",
+      "recordedAt": "2026-11-15T14:40:49.082Z"
+    },
+    {
+      "id": "DL-002",
+      "type": "out-of-scope",
+      "area": "architecture",
+      "summary": "Run discovery still scans parent folders inside the home folder only, so a project on another drive gets no parent-folder scan",
+      "reason": "owner decision 2026-11-15: unchanged in this release, recorded for a future improvement",
+      "recordedAt": "2026-11-15T14:40:49.225Z"
+    }
+  ],
+  "updatedAt": "2026-11-15T14:40:49.225Z"
+}

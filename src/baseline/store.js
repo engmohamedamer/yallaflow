@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { exists } from '../utils/fs.js';
 import { readYaml, writeYaml } from '../core/yaml.js';
@@ -6,7 +7,7 @@ import { loadWorkProgress } from '../core/progress.js';
 import { appliedTransition, loadContextLedger, mutateContextLedger } from '../context/ledger.js';
 import { normalizeEvidenceRefs } from '../context/evidence.js';
 import { nextLimitationId, normalizeLimitation, sameStatement, validateLimitation } from '../limitations/store.js';
-import { invalidateGateIfApproved, setGateStatus } from '../reviews/store.js';
+import { decisionProvenance, invalidateGateIfApproved, setGateStatus } from '../reviews/store.js';
 import { KNOWLEDGE_POLICY_VERSION } from '../knowledge/constants.js';
 import { REGISTRY_VERSION } from '../skills/constants.js';
 import { recordWorkMemoryBase } from '../shared/memory.js';
@@ -130,6 +131,10 @@ export async function draftBaseline(root, workId, input, now = new Date().toISOS
     const clash = limitations.find((entry) => sameStatement(entry.summary, fact.summary));
     if (clash) errors.push(`fact ${fact.id} repeats discovery limitation ${clash.id}; a discovery limitation is not a project fact — keep it only under limitations.`);
   }
+  // The brief (PF-0151): a plain-language view of this draft's own facts. Optional.
+  const brief = normalizeBrief(input.brief, facts, limitations, errors);
+  // Suggested first tasks (PF-0153): proposals for the developer, each resting on this draft.
+  const suggestions = normalizeSuggestions(input.suggestions, facts, limitations, errors);
   if (errors.length) throw new Error(`Baseline draft for ${workId} is invalid:\n${errors.map((entry) => `- ${entry}`).join('\n')}`);
 
   const ledger = {
@@ -138,6 +143,8 @@ export async function draftBaseline(root, workId, input, now = new Date().toISOS
     facts,
     ...(limitations.length ? { limitations } : {}),
     ...(coverage ? { coverage } : {}),
+    ...(brief ? { brief } : {}),
+    ...(suggestions?.length ? { suggestions } : {}),
     history: [...(existing.exists ? existing.ledger.history : []), { action: 'drafted', at: now, factCount: facts.length }],
     draftedAt: now,
     updatedAt: now
@@ -147,6 +154,41 @@ export async function draftBaseline(root, workId, input, now = new Date().toISOS
     await invalidateGateIfApproved(root, workId, 'baseline', 'baseline draft revised', now);
   }
   return { meta, ledger };
+}
+
+// PF-0147: what a reviewer is shown and decides on. A console decision carries this digest
+// and is refused when the draft is no longer the one that was shown.
+export function baselineReviewDigest(ledger) {
+  const shown = { status: ledger.status, draftedAt: ledger.draftedAt ?? null, facts: ledger.facts ?? [], limitations: ledger.limitations ?? [], coverage: ledger.coverage ?? null, brief: ledger.brief ?? null, suggestions: ledger.suggestions ?? null };
+  return createHash('sha256').update(JSON.stringify(shown)).digest('hex');
+}
+// What the draft itself says it does not know: shown at review and acknowledged, never a block.
+export function baselineGaps(ledger) {
+  return {
+    notInspected: (ledger.limitations ?? []).length,
+    unresolved: (ledger.facts ?? []).filter((fact) => fact.status === 'unresolved').length,
+    coverageDeclared: Boolean(ledger.coverage)
+  };
+}
+
+// PF-0150: where a baseline stands, for the console's readiness line. Read-only, from the
+// baseline's own records; null when they cannot be read.
+export async function baselineProgress(root, workId) {
+  try {
+    const meta = await loadMeta(root, workId);
+    if (!meta.baseline) return null;
+    const step = await baselineNextStep(root, meta);
+    const { exists: drafted, ledger } = await loadBaseline(root, workId);
+    return {
+      step: step.state,
+      facts: drafted ? (ledger.facts ?? []).length : 0,
+      unresolved: drafted ? (ledger.facts ?? []).filter((fact) => fact.status === 'unresolved').length : 0,
+      notInspected: drafted ? (ledger.limitations ?? []).length : 0,
+      lastActivityAt: (drafted ? ledger.updatedAt : null) ?? meta.updatedAt ?? meta.createdAt ?? null
+    };
+  } catch {
+    return null;
+  }
 }
 
 export function summarizeBaseline(ledger) {
@@ -166,6 +208,10 @@ export async function approveBaseline(root, workId, note, now = new Date().toISO
   const { exists: hasBaseline, ledger } = await loadBaseline(root, workId);
   if (!hasBaseline) throw new Error(`${workId} has no baseline draft to approve. Run \`yallaflow baseline draft\` first.`);
   if (ledger.status === 'approved') throw new Error(`${workId}'s baseline is already approved.`);
+  // Structured console provenance never applies to the baseline gate (reviews/store.js). It
+  // is refused here, before anything is promoted, not half-way through the approval. A console
+  // decision on the baseline says where it came from in its note (PF-0147).
+  if (decisionProvenance()) throw new Error('Console provenance does not apply to the baseline gate; no decision was recorded.');
 
   // Idempotent on retry: facts a previous, partially completed approval already
   // introduced are not introduced again (their projection is re-rendered).
@@ -221,6 +267,125 @@ export async function feedbackBaseline(root, workId, note, now = new Date().toIS
   ledger.updatedAt = now;
   await writeYaml(baselineFilePath(root, workId), ledger);
   return { meta, ledger };
+}
+
+// The Project Brief (PF-0151). Optional, additive baseline.yaml field (no schema bump:
+// earlier readers ignore it; a draft without one is as valid as before).
+//
+//   brief: {
+//     summary:      { text, facts: ['BF-001'] }            what the project is (required)
+//     users:        [{ text, facts }]                       who uses it
+//     capabilities: [{ text, facts }]                       what it does today
+//     components:   [{ text, facts }]                       its major parts
+//     worthKnowing: [{ text, facts?, limitations? }]        risks, unknowns, limits
+//   }
+//
+// It is a VIEW of the draft, never a second store of knowledge: every line must cite at
+// least one fact of the same draft by its id (BF-001 is the first fact given, BF-002 the
+// second, …); a worthKnowing line may cite discovery limitations instead (DL-001 is the first
+// limitation given). What is not established (an unresolved fact) may only be said under
+// worthKnowing. Only facts are promoted to project memory on approval; the brief stays with
+// the baseline and is read through the facts it cites. YallaFlow checks the references and
+// the shape; it never judges whether a sentence says what its facts say — the reviewer does.
+export const BRIEF_LISTS = Object.freeze(['users', 'capabilities', 'components', 'worthKnowing']);
+export const BRIEF_LIMITS = Object.freeze({ text: 280, lines: 6, refs: 8 });
+
+function normalizeBrief(raw, facts, limitations, errors) {
+  if (raw === undefined || raw === null) return null;
+  if (typeof raw !== 'object' || Array.isArray(raw)) {
+    errors.push('brief must be an object: { "summary": { "text", "facts" }, "users": [...], "capabilities": [...], "components": [...], "worthKnowing": [...] }.');
+    return null;
+  }
+  const unknown = Object.keys(raw).filter((key) => key !== 'summary' && !BRIEF_LISTS.includes(key));
+  if (unknown.length) errors.push(`brief has unknown field(s): ${unknown.join(', ')} (allowed: summary, ${BRIEF_LISTS.join(', ')}). Technologies and coverage are not written in the brief; they are shown from the stack and the declared coverage.`);
+  const factById = new Map(facts.map((fact) => [fact.id, fact]));
+  const limitationIds = new Set(limitations.map((entry) => entry.id));
+  const line = (value, label, { worthKnowing = false } = {}) => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) { errors.push(`${label} must be an object: { "text", "facts": ["BF-001"] }.`); return null; }
+    const extra = Object.keys(value).filter((key) => !['text', 'facts', ...(worthKnowing ? ['limitations'] : [])].includes(key));
+    if (extra.length) errors.push(`${label} has unknown field(s): ${extra.join(', ')}.`);
+    const text = isNonEmptyString(value.text) ? value.text.trim().replace(/\s+/g, ' ') : null;
+    if (!text) errors.push(`${label}: text must be a non-empty string.`);
+    else if (text.length > BRIEF_LIMITS.text) errors.push(`${label}: text is limited to ${BRIEF_LIMITS.text} characters (it has ${text.length}); a brief line is one plain sentence.`);
+    const refs = (list, name, known, example) => {
+      if (list === undefined) return [];
+      if (!Array.isArray(list) || list.some((id) => typeof id !== 'string') || list.length > BRIEF_LIMITS.refs) { errors.push(`${label}: ${name} must be a list of at most ${BRIEF_LIMITS.refs} ids like ${example}.`); return []; }
+      const ids = [...new Set(list.map((id) => id.trim()))];
+      for (const id of ids) if (!known(id)) errors.push(`${label}: ${name} cites ${id}, which is not in this draft.`);
+      return ids;
+    };
+    const cited = refs(value.facts, 'facts', (id) => factById.has(id), 'BF-001');
+    const limits = worthKnowing ? refs(value.limitations, 'limitations', (id) => limitationIds.has(id), 'DL-001') : [];
+    if (!cited.length && !limits.length) errors.push(`${label}: every brief line must cite at least one fact of this draft${worthKnowing ? ' or one discovery limitation' : ''}; a claim without evidence does not belong in the brief.`);
+    if (!worthKnowing) {
+      const unsettled = cited.filter((id) => factById.get(id)?.status === 'unresolved');
+      if (unsettled.length) errors.push(`${label}: ${unsettled.join(', ')} is unresolved; what is not established is said under worthKnowing, never as what the project is or does.`);
+    }
+    return { text, facts: cited, ...(limits.length ? { limitations: limits } : {}) };
+  };
+  const brief = {};
+  if (raw.summary === undefined) errors.push('brief.summary is required: one or two plain sentences saying what the project is.');
+  else brief.summary = line(raw.summary, 'brief.summary');
+  for (const name of BRIEF_LISTS) {
+    if (raw[name] === undefined) continue;
+    if (!Array.isArray(raw[name]) || raw[name].length > BRIEF_LIMITS.lines) { errors.push(`brief.${name} must be a list of at most ${BRIEF_LIMITS.lines} lines.`); continue; }
+    brief[name] = raw[name].map((entry, index) => line(entry, `brief.${name}[${index + 1}]`, { worthKnowing: name === 'worthKnowing' })).filter(Boolean);
+  }
+  return brief;
+}
+
+// Suggested first tasks (PF-0153). Optional, additive baseline.yaml field.
+//
+//   suggestions: [{ title, why, type?, facts?: ['BF-001'], limitations?: ['DL-001'] }]   (at most 3)
+//
+// A suggestion is a proposal to the developer, never work: nothing is created from it unless
+// the developer creates it. Each one must say why, and cite at least one fact or discovery
+// limitation of the same draft, so it comes from what was actually found (an unresolved fact,
+// a gap, a risk, an evidenced missing capability) and not from a generic checklist. They are
+// never promoted to project memory.
+export const SUGGESTION_LIMITS = Object.freeze({ count: 3, title: 100, why: 240, refs: 8 });
+export const SUGGESTION_TYPES = Object.freeze(['feature', 'bug', 'change', 'investigation']);
+
+function normalizeSuggestions(raw, facts, limitations, errors) {
+  if (raw === undefined || raw === null) return null;
+  if (!Array.isArray(raw) || raw.length > SUGGESTION_LIMITS.count) {
+    errors.push(`suggestions must be a list of at most ${SUGGESTION_LIMITS.count} first tasks: [{ "title", "why", "facts": ["BF-001"] }]. Suggest fewer, or none, rather than padding the list.`);
+    return null;
+  }
+  const factIds = new Set(facts.map((fact) => fact.id));
+  const limitationIds = new Set(limitations.map((entry) => entry.id));
+  const seen = new Set();
+  return raw.map((value, index) => {
+    const label = `suggestions[${index + 1}]`;
+    if (!value || typeof value !== 'object' || Array.isArray(value)) { errors.push(`${label} must be an object: { "title", "why", "facts": ["BF-001"] }.`); return null; }
+    const extra = Object.keys(value).filter((key) => !['title', 'why', 'type', 'facts', 'limitations'].includes(key));
+    if (extra.length) errors.push(`${label} has unknown field(s): ${extra.join(', ')}.`);
+    const text = (field, max) => {
+      const clean = isNonEmptyString(value[field]) ? value[field].trim().replace(/\s+/g, ' ') : null;
+      if (!clean) errors.push(`${label}: ${field} must be a non-empty string.`);
+      else if (clean.length > max) errors.push(`${label}: ${field} is limited to ${max} characters (it has ${clean.length}).`);
+      return clean;
+    };
+    const title = text('title', SUGGESTION_LIMITS.title);
+    const why = text('why', SUGGESTION_LIMITS.why);
+    if (title) {
+      const key = title.toLowerCase();
+      if (seen.has(key)) errors.push(`${label}: the same title is suggested twice.`);
+      seen.add(key);
+    }
+    if (value.type !== undefined && !SUGGESTION_TYPES.includes(value.type)) errors.push(`${label}: type must be one of: ${SUGGESTION_TYPES.join(', ')} (or leave it out).`);
+    const refs = (list, name, known, example) => {
+      if (list === undefined) return [];
+      if (!Array.isArray(list) || list.some((id) => typeof id !== 'string') || list.length > SUGGESTION_LIMITS.refs) { errors.push(`${label}: ${name} must be a list of at most ${SUGGESTION_LIMITS.refs} ids like ${example}.`); return []; }
+      const ids = [...new Set(list.map((id) => id.trim()))];
+      for (const id of ids) if (!known.has(id)) errors.push(`${label}: ${name} cites ${id}, which is not in this draft.`);
+      return ids;
+    };
+    const cited = refs(value.facts, 'facts', factIds, 'BF-001');
+    const limits = refs(value.limitations, 'limitations', limitationIds, 'DL-001');
+    if (!cited.length && !limits.length) errors.push(`${label}: a suggested task must cite at least one fact or discovery limitation of this draft; a task that nothing in the project supports is not suggested.`);
+    return { title, why, ...(value.type ? { type: value.type } : {}), facts: cited, ...(limits.length ? { limitations: limits } : {}) };
+  }).filter(Boolean);
 }
 
 // Optional, additive baseline.yaml field (no schema bump: earlier readers ignore it).

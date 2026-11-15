@@ -41,11 +41,12 @@ yallaflow console list
 
 **All projects → New project** creates a new project in four steps: idea (name, description, requirements, attachments, location from a home-folder chooser), stack, environment (Docker, local tools or later; Git on by default) and review & create. **Create the project** is bound to the exact plan you reviewed; a plan that installs dependencies also asks for the project name. Progress, the log (collapsed) and failure recovery are shown on the page. When it finishes, the project is added to the console and its Overview opens. **All projects → Add an existing project** opens the folder picker:
 - **Browsing.** It works like a file dialog: one click selects a folder, a double click opens it, the arrows move the selection and Enter opens. There is a breadcrumb with Up (Backspace), a path field (`~/…` works), recent locations, and a filter. Each folder is labelled from file names only: YallaFlow project, existing code (with a hint such as Laravel or Node.js), or empty.
-- **The action follows the folder.** A YallaFlow project opens. For existing code or an empty folder, **Set up YallaFlow here** first shows exactly what `yallaflow init` would change: `.yallaflow/`, plus a managed block added to `CLAUDE.md`/`AGENTS.md` with your text kept. It also shows the detected stack and how many uncommitted changes Git reports; those are never touched.
+- **The action follows the folder.** A YallaFlow project opens. For existing code or an empty folder, **Set up YallaFlow here** first shows exactly what `yallaflow init` would change: `.yallaflow/`, plus a managed block added to `CLAUDE.md`/`AGENTS.md` with your text kept. It also shows the detected stack. No Git command runs on a folder that is not connected yet, so uncommitted changes are not counted; they are never touched.
+- **Your first request (optional).** For existing code, the preview asks what you want to do first. It is handed to your agent with the project-understanding request, so the agent looks deeper where it matters. It is kept in this browser only until then; no work item is created, and no project command is run.
 - **Confirming.** After you tick *I reviewed these changes*, the console runs the same `yallaflow init`, with its rollback, and the project opens. For an existing codebase, its next step is project understanding.
 - **Refused folders.** A hand-edited bootstrap block, a folder inside another YallaFlow project, or a lane is refused, and nothing is written.
 
-The same picker chooses a new project's location, and can create a new folder there. Browsing stays inside your home folder and never shows hidden folders. The console starts without any saved project, so the first one can be created here. See [`new-project.md`](new-project.md).
+The same picker chooses a new project's location, and can create a new folder there. Browsing covers your home folder and this machine's local drives or volumes (see below), and never shows hidden folders. The console starts without any saved project, so the first one can be created here. See [`new-project.md`](new-project.md).
 
 ### Navigation (1.5.2)
 
@@ -114,6 +115,8 @@ See [`runtime.md`](runtime.md).
 The **Overview** tab shows the project itself, read-only:
 
 - **Project understanding.** Whether it is needed (an existing codebase without approved understanding), in progress, awaiting your review, established, or, for a new project, growing from your intent. It names the request to give your agent. The Workspace shows the readiness card until understanding is established. Viewing it never starts discovery, writes a draft or approves anything: approval stays your explicit decision through your agent or `yallaflow baseline approve`.
+- **Project brief.** When the approved understanding has a brief, it is shown first: what the project is, who uses it, what it does today, its major parts and what is worth knowing, plus what the project is built with (from the project files) and how much was read. Each line names the project-memory facts it rests on and opens them; a line whose fact may be out of date or is disputed is marked. The same brief is at the top of the draft when you review it, with the full fact list folded beneath and **Not right?** on each line to start a change request.
+- **Start here.** After you approve the understanding, the Workspace shows your own first request (the one you typed when adding the project, or gave your agent) and up to three first tasks your agent suggested with the understanding. Each suggestion says why and names the facts it rests on. A click only fills **Create work**; nothing is created until you press Create. A suggestion that matches existing work is hidden, **Write your own task** is always there, and when the agent recorded no suggestion the panel says so. It leaves the Workspace once other work exists and stays on the understanding's own page.
 - **Purpose, architecture, stack, data and integrations** from approved project memory. Each fact shows its ID, confidence and freshness. "May be stale" means an evidence file changed, not that the fact is wrong.
 - **Stack from repository evidence.** Frameworks, runtimes, package managers, lockfiles, Docker images and source languages. Each row shows the file it came from and its basis: *declared* (a file says so, which is not proof the code uses it), *detected* (a file is present) or *inferred* (counted, not read). `.env` files and compose `environment` values are never read.
 - **Modules** by manifest folder. Several Node.js lockfiles in one module are flagged as a conflict.
@@ -281,7 +284,13 @@ When a gate waits for review (for example the specification or the plan), the it
   - the gate was decided or re-requested since you opened the review;
   - its material changed since then;
   - you submit the same decision twice.
-- **Not available here:** the project-understanding baseline and legacy reconciliation keep their own commands.
+- **Project understanding (the baseline).** On the baseline's page, under the draft, **Your decision** offers **Approve understanding** and **Request changes**, with a mandatory note and the same tick.
+  - It runs YallaFlow's own `baseline approve` / `baseline feedback --changes-requested`. Approving makes the facts the project memory.
+  - When the draft has areas that were not inspected, facts that are not settled, or no declared coverage, the form names them and asks for a second tick before approving. It is never blocked for that.
+  - Refused, with nothing recorded, when the draft changed since it was shown, or it is no longer waiting for review (decided in a terminal, by your agent or in another tab).
+  - The record says where it came from in the decision note: *Decided in the YallaFlow console by the local user (identity not verified; host …; claimed Git name …)*. YallaFlow keeps the structured console provenance off the baseline gate, so a project shared with teammates on an older version stays valid.
+  - Approving in the chat with your agent, or with `yallaflow baseline approve`, works as before.
+- **Not available here:** legacy reconciliation keeps its own commands.
 
 > **Limitation.** This is an explicit local-user decision, not a verified identity.
 > - Anyone holding this console's per-run link on this machine can record a decision.
@@ -349,7 +358,19 @@ A finished lane offers **Review & merge**: readiness checks, the files to commit
 - **No cross-site writes.** The token travels in an `Authorization` header, never a cookie, so another website can't send a request as you.
 - **No shell.** Your text reaches YallaFlow as a single argument, never through a shell.
 - **Uploaded files.** They are written to a private temporary folder (mode 0700), handed to `intake add`, and the folder is removed afterwards, even on failure.
-- Data is addressed by ID only. No request path is resolved into the file system, and a source's preserved original is served only from inside its own source folder. The one exception is the folder chooser (`GET /api/fs/dirs`, not in `--read-only`): it lists directories inside your home folder only, never files, hidden folders or links that lead outside home.
+- Data is addressed by ID only. No request path is resolved into the file system, and a source's preserved original is served only from inside its own source folder. The one exception is the folder chooser (`GET /api/fs/dirs`, not in `--read-only`). It lists directory names only, never files, and only under these roots (this replaces the earlier home-only rule):
+  - your home folder;
+  - **Windows:** local drives (`C:`, `D:`, …). *Not verified on real Windows yet.*
+  - **macOS:** volumes under `/Volumes` that `mount` reports as local. If that cannot be read, no volume is offered.
+  - **Linux:** real folders (not links) under `/media/<user>`, `/run/media/<user>` and `/mnt` whose filesystem is a known local type in `/proc/mounts` (ext4, xfs, btrfs, exfat, ntfs, …). Anything else, including FUSE mounts, automount points and WSL's `/mnt/c`, is not offered.
+  - **Never:** network locations. A UNC path (`\\server\share`) is refused before the file system is touched, and a mapped network drive is not offered.
+  - A requested path must already be, as written, under one of these roots; nothing else on the machine is touched or probed. Every rule is then applied again to the resolved path, so a link or a Windows junction is judged by where it leads, and a link whose target is a network path is not followed. A folder inside your home folder that sits on a known network filesystem is refused too. Hidden folders are never browsed.
+  - A short list of system folders at a Windows drive root (`Windows`, `Program Files`, `ProgramData`, `$Recycle.Bin`, …) is left out. **This is a courtesy by name, not a security boundary:** any other folder on a local drive is listed by name, and access to other users' folders is left to the operating system.
+  - Browsing reads nothing from a project. The preview (stack, files that would change) runs only when you press **Set up YallaFlow here** on one folder, and nothing is written without the reviewed preview and your tick.
+  - A folder that cannot be opened is reported with its cause (not found, drive not available, no permission, network folder, system folder); the picker stays where it was.
+  - What a holder of the console link can now do that they could not before: list folder names on local drives and volumes, ask for the preview of one such folder (stack names, manifest file names, a file count), and connect a project there. They could already read every project's records and message a running agent.
+  - Why the change: the console's protection against other websites is its request checks (loopback only, its own `Host`, its own `Origin`, the per-run token in a header), which are unchanged and tested on these routes. The home-only rule was an extra limit on what a holder of the console link could list; it made projects on another drive impossible to add from the console.
+  - Unchanged: **Run** discovery still scans up to 3 parent folders *inside your home folder* only, so for a project on another drive the parent folders are not scanned.
 - The page loads nothing from other origins. Scripts run under `script-src 'self'`, and previews are served with a sandbox policy and `nosniff`.
 - The console reads through the same `yallaflow snapshot --json` and `work show --json` commands your agent uses, so it sees exactly what YallaFlow reports.
 

@@ -106,6 +106,14 @@ test('the entrance motion runs only when the page changes and respects reduced m
   assert.match(app, /if \(entering\) appEl\.querySelector\('main'\)\?\.classList\.add\('enter'\);/);
   assert.doesNotMatch(app, /<main class="\$\{entering/, 'the class never changes the redraw markup');
   assert.match(css, /main\.enter > \* \{ animation: enter/);
+  // PF-0155: a live redraw recreates the elements, so no element carries its own unconditional entrance.
+  for (const selector of ['.hero', '.digest', '.lane', '.conflict', '.tl li']) {
+    const rule = css.split('\n').find((line) => line.startsWith(`${selector} {`));
+    assert.ok(rule, selector);
+    assert.doesNotMatch(rule, /animation:/, `${selector} replays on every live update`);
+  }
+  assert.match(css, /main\.enter \.lane \{ animation: rise/);
+  assert.match(app, /lastView = snap \? r\.v : null;/, 'the first paint with data is an entrance');
   assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{ \*, \*::before, \*::after \{ animation: none !important;/);
 });
 
@@ -129,7 +137,7 @@ test('PF-0133: the agent is chosen in place â€” readiness card and chat panel â€
   assert.match(app, /data-agent-choose="\$\{id\}"/);
   assert.match(app, /card\('codex', 'Codex'/);
   assert.match(app, /agentsClaudeAvailable\s*\? card\('claude'/);
-  assert.match(app, /Claude Team or Enterprise accounts, console messages reach Claude Code only if your organization enabled channels/);
+  assert.doesNotMatch(app, /agentpick-warn/, 'PF-0145: no account warning on the chooser; the connection check decides');
   assert.match(app, /await post\(`\/api\/p\/\$\{pid\}\/agents\/settings`, JSON\.stringify\(\{ agents: true, claude: provider === 'claude' \}\)/);
   assert.match(app, /if \(!readOnly && agentStep\(\)\?\.status === 'choose'\) return `<section class="panel agent" id="agent">/);
   assert.match(app, /<button type="button" class="linkbtn" data-agent-choose="claude">/, 'Claude is turned on in place, not by leaving the page');

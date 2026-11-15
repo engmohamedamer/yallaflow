@@ -21,6 +21,7 @@ function harness({ hash = '#/map', session = null, agentsOn = true, lang = 'en',
   ].join('\n');
   const context = vm.createContext({
     readiness: null, // PF-0133: agentPanel reads the readiness agent step
+    planAwaitAgent: null, // PF-0143: the project chat says where a run setup request went
     location: { hash }, snap: { items, project: { activeWork: null } }, pid: 'p', readOnly: false,
     agentsOn, agentsCanEnable: true, agentsClaudeAvailable: false, agentInfo: null, agentError: null, agentBusy: false, agentDraft: '', agentLaunch: null, agentProvider: null, agentMode: 'read-only', chatOpen: true,
     agent: { pid: 'p', session, events: [], resumable: [], history: [], pending: [], providers: [{ id: 'codex', ready: true, capabilities: { start: true, send: true, modes: ['read-only'] } }] },
@@ -186,6 +187,33 @@ test('chat: whole-job first message, one action (review, answer, continue), step
   assert.match(stepsHtml, /<details class="atools">/);
   assert.match(stepsHtml, /3 steps/);
   assert.match(stepsHtml, /<details class="asugg-more">/, 'other suggestions are folded');
+});
+
+// PF-0154: an item waiting for the developer's answer or review is not started again.
+test('chat: no whole-job draft while the item waits for an answer or a review', () => {
+  const session = { provider: 'codex', workId: 'PF-0001', status: 'idle' };
+  const waiting = (waitingFor) => harness({ hash: '#/item/PF-0001', session, items: [{ id: 'PF-0001', title: 'One', state: 'you', currentStation: 'understand', waitingFor }] });
+  for (const waitingFor of [{ kind: 'question', questions: ['Q-001'] }, { kind: 'review', gate: 'specification' }]) {
+    // The session was driven from a terminal: the agent spoke, the console sent nothing yet.
+    const h = waiting(waitingFor);
+    h.agent.events = [{ type: 'message.done', role: 'agent', text: 'Which currency?' }];
+    assert.doesNotMatch(h.panel(), /Work on PF-0001 to the end/, waitingFor.kind);
+    assert.equal(h.agentDraft, '', waitingFor.kind);
+  }
+  // A draft seeded before the item started waiting, and left untouched, is dropped.
+  const seeded = harness({ hash: '#/item/PF-0001', session });
+  seeded.panel();
+  assert.match(seeded.agentDraft, /^Work on PF-0001 to the end/);
+  seeded.snap.items[0].waitingFor = { kind: 'question', questions: ['Q-001'] };
+  assert.doesNotMatch(seeded.panel(), /Work on PF-0001 to the end/);
+  assert.equal(seeded.agentDraft, '');
+  // What the developer typed stays.
+  const typed = waiting({ kind: 'question', questions: ['Q-001'] });
+  typed.agentDraft = 'One account for now.';
+  assert.match(typed.panel(), /One account for now\./);
+  assert.equal(typed.agentDraft, 'One account for now.');
+  assert.match(app, /asked\.waitingFor \? agentDraft : goText\(asked\)/, 'the Continue button keeps the box for a waiting item');
+  assert.match(app, /const draft = first\.waitingFor \? '' : goText\(first\);/);
 });
 
 // PF-0106: a call from the agent is visible from project pages and leads to the item's chat.

@@ -13810,7 +13810,7 @@
     {
       "id": "CTX-0144",
       "area": "architecture",
-      "state": "current",
+      "state": "superseded",
       "confidence": "confirmed",
       "summary": "Connecting a folder from the console (src/console/connect.js) is a read-only preview (home-bounded path, stack from manifest hints, no Git command, the exact bootstrap plan from bootstrapInitPlan in src/agent/bootstrap.js, refusals for nested projects, lanes, hand-edited/newer/broken bootstrap blocks and CLAUDE.md/AGENTS.md links leaving the folder) followed by Core's yallaflow init through the runner, only with the preview's planHash and an explicit confirmation, one connect per folder at a time. Agent setup on the machine lives in src/agents/setup.js (provider knowledge stays in src/agent and src/agents, AC-108); its dynamic programs (npm, codex) are listed in test-support/git-scan.js DYNAMIC_PROGRAMS.",
       "provenance": "repository",
@@ -13844,17 +13844,24 @@
       "verifiedAt": "2026-11-11T11:02:19.116Z",
       "verifiedAtCommit": "3491b3b0b302e8e527fca8abdc348453f91b3461",
       "supersedes": [],
-      "supersededBy": null,
+      "supersededBy": "CTX-0163",
       "history": [
         {
           "action": "introduced",
           "at": "2026-11-11T11:02:19.116Z",
           "workId": "PF-0123",
           "candidateId": "K-004"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-11-15T14:51:40.886Z",
+          "supersededBy": "CTX-0163",
+          "workId": "PF-0146",
+          "candidateId": "K-001"
         }
       ],
       "createdAt": "2026-11-11T11:02:19.116Z",
-      "updatedAt": "2026-11-11T11:02:19.116Z"
+      "updatedAt": "2026-11-15T14:51:40.886Z"
     },
     {
       "id": "CTX-0145",
@@ -14730,7 +14737,366 @@
       ],
       "createdAt": "2026-11-12T15:18:03.930Z",
       "updatedAt": "2026-11-12T15:18:03.930Z"
+    },
+    {
+      "id": "CTX-0161",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Since 1.5.3 (PF-0143), 'yallaflow work show --json' adds an optional quality object when the item has AI QC runs: qc.runs (per run: id, planId, at, tool, origin, summary, passed/failed/blocked/notRun counts, scenarios with plan title, status, note) and report (the repository-relative path of report.html, or null). The console shows these on the item page as a QC tab. Its 'Open the report' action POSTs /api/p/<pid>/work/<id>/quality-report. The server derives the file from the registered project and a validated work id, never from the request, and opens it only when it is a regular file inside the project. QC stays advisory and separate from verification.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0143",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/flow/snapshot.js",
+          "contentHash": "sha256:557dec812f73053ea3f17ae1b30b8f04fe932e7f27741f1a79ae1c71a0795914",
+          "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "resources/schemas/work-1.schema.json",
+          "contentHash": "sha256:41ab33454dd8e98e3c3c1d4d625fbce7bdf8873c1f5ff7d67bb403af18acec53",
+          "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/console/server.js",
+          "contentHash": "sha256:a2693ecbd802206c599d8e30489d89577bdca15b06ed8730a8774518f7974b70",
+          "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/console/reveal.js",
+          "contentHash": "sha256:67c21a306a086c7e74b855159170e6605b80c2b0564dacf198a9b3b9d347b5fe",
+          "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "runtime",
+          "description": "npm run check (passed)",
+          "workId": "PF-0143",
+          "verificationRunId": "V-001"
+        }
+      ],
+      "verifiedAt": "2026-11-13T22:31:41.093Z",
+      "verifiedAtCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-13T22:31:41.093Z",
+          "workId": "PF-0143",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-13T22:31:41.093Z",
+      "updatedAt": "2026-11-13T22:31:41.093Z"
+    },
+    {
+      "id": "CTX-0162",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Claude Code connection reliability (experimental): an open channel stream is never proof of delivery. Each connection is checked once with a nonce the session must send back through the channel's reply tool; the console sends directly only on a verified channel, otherwise the chat works in Terminal mode (copy with a [yallaflow <chat id>] marker, paste in Claude Code, hooks show the work). Each message has a chat id, one fixed route, and a state (sending, received, answered, unconfirmed, copied) that changes only on evidence naming that id; nothing is ever resent. Hooks are bound to one session and rebind only after SessionEnd or on proof (the check id or a known chat id).",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0145",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/agents/claude.js",
+          "contentHash": "sha256:f1625cb573baeb3cff32bd923830eeb39170a4a4b352cfded6b3a7bfd35fdbb8",
+          "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "resources/agents/claude-hook.mjs",
+          "contentHash": "sha256:c40453fb160fbd823460ac20f4da9cda394094d51d9907afcabb198a790c646b",
+          "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/agent-claude-reliability.test.js",
+          "contentHash": "sha256:f57359c872e131df10ff8edb2e56eacc728a1e1636a7dd1256c2fc60cc195d3b",
+          "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-15T12:53:15.612Z",
+      "verifiedAtCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-15T12:53:15.612Z",
+          "workId": "PF-0145",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-15T12:53:15.612Z",
+      "updatedAt": "2026-11-15T12:53:15.612Z"
+    },
+    {
+      "id": "CTX-0163",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Console folder chooser and connect (src/console/folders.js, connect.js; PF-0146 replaced the home-only rule of PF-0057 Q-003). Browsing lists directory names and three markers only, under allowed roots: the home folder, local Windows drives, and local volumes (/Volumes by the local flag of /sbin/mount; /media/<user>, /run/media/<user>, /mnt by a known local filesystem type in /proc/mounts; unknown is not offered). A requested path must be under a root as written before any filesystem call; rules are applied again after realpath; UNC and device paths and links to network targets are refused without being followed; hidden folders never; a short Windows system-folder list is a courtesy by name, not a boundary. Connecting is a separate explicit preview (stack from manifest hints, no Git command, exact bootstrap plan, refusals for nested projects up to the containing root, lanes, unsafe bootstrap blocks and escaping links; a drive or volume root is not a project) followed by Core's yallaflow init through the runner, only with the preview's planHash and an explicit confirmation, one connect per folder at a time. Windows and macOS behaviour is not verified on those systems. Agent setup on the machine lives in src/agents/setup.js; dynamic programs are listed in test-support/git-scan.js DYNAMIC_PROGRAMS.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0146",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/console/folders.js",
+          "contentHash": "sha256:485abf1d513edb0114f5b89f0c8b12dda8b94f58d11b1d348b943f149c34630c",
+          "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/console/connect.js",
+          "contentHash": "sha256:e022bef3887c6cfdb9d9b6c6d82d2139ad43a58bacce2b53ffcb29887acfc0c0",
+          "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/console-folder-roots.test.js",
+          "contentHash": "sha256:e30df4cd548828d6687a0ecbed4b22d0cadb12785fdcf399aba918cd981640f2",
+          "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-15T14:51:40.886Z",
+      "verifiedAtCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+      "supersedes": [
+        "CTX-0144"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-15T14:51:40.886Z",
+          "workId": "PF-0146",
+          "candidateId": "K-001",
+          "supersedes": "CTX-0144"
+        }
+      ],
+      "createdAt": "2026-11-15T14:51:40.886Z",
+      "updatedAt": "2026-11-15T14:51:40.886Z"
+    },
+    {
+      "id": "CTX-0164",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Console baseline decision (PF-0147): the project-understanding draft is approved or sent back from the baseline item page through gates/baseline in src/console/actions.js, which runs Core's baseline approve or baseline feedback. It decides only a draft awaiting review whose digest (baselineReviewDigest in src/baseline/store.js, exposed as detail.baseline.digest with coverage and gaps) matches the one shown; gaps (uninspected areas, unresolved facts, undeclared coverage) need a second acknowledgment and never block. Structured console provenance stays refused on the baseline and reconciliation gates (src/reviews/store.js, src/core/integrity.js); a console baseline decision states its origin in the decision note (identity not verified, host, claimed Git name).",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0147",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/console/actions.js",
+          "contentHash": "sha256:75f93c35e0e2fc396fd30e84db22813337b9b75e6f4bf59c1a9707888209f1b7",
+          "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/baseline/store.js",
+          "contentHash": "sha256:5001b61cd7a0d88360ee149aff86ea9495ba46eaf3601029575eb661ed2ef4be",
+          "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/console-baseline-decision.test.js",
+          "contentHash": "sha256:f84e9d26c7905514d5b7b147d2570ba305df222b9528bb4a5a8ca46524d799f3",
+          "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-15T16:45:25.118Z",
+      "verifiedAtCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-15T16:45:25.118Z",
+          "workId": "PF-0147",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-15T16:45:25.118Z",
+      "updatedAt": "2026-11-15T16:45:25.118Z"
+    },
+    {
+      "id": "CTX-0165",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Finding and starting agent programs (src/agents/detect.js, PF-0148): which() and isExecutable() use POSIX rules (bare name, execute bit, PATH) or Windows rules (PATH in any case, PATHEXT limited to .exe/.com/.cmd/.bat, no execute bit). Programs are always started as { file, args } without a shell: launchSpec() turns an npm .cmd/.bat shim into its target (the script with node, or its .exe) when that target is a real file inside the shim's folder, and refuses any other command script (SHIM_UNSUPPORTED). Detection records what to start (adapter.launch, codex.launch) and codex.js, setup.js probes and jobs use it. On Windows the terminal is a new PowerShell window with the project folder as working directory, and Claude hook and launch commands use double quotes and forward slashes. Windows behaviour is tested with simulated paths only and is not verified on Windows.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0148",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/agents/detect.js",
+          "contentHash": "sha256:ebf419b9274197fad000d1ef3bac75f447673d2092c15cee562241b60cc6c0f2",
+          "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/agents/terminal.js",
+          "contentHash": "sha256:46220ac11c879f18975c0e57bb1b0ae73cd871a218bfa355ea93a1279681a63b",
+          "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/agent-windows.test.js",
+          "contentHash": "sha256:9b2005d176b4c3087a51d2787af4c8e14772d3f40b2d043c3ae3ff10907543ee",
+          "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-15T17:43:39.829Z",
+      "verifiedAtCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-15T17:43:39.829Z",
+          "workId": "PF-0148",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-15T17:43:39.829Z",
+      "updatedAt": "2026-11-15T17:43:39.829Z"
+    },
+    {
+      "id": "CTX-0166",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Project Brief (PF-0151): a baseline draft may carry an optional brief (summary, users, capabilities, components, worthKnowing) validated by normalizeBrief in src/baseline/store.js. Every line cites facts of the same draft (BF ids by order), worthKnowing may cite discovery limitations (DL ids), and unresolved facts may be stated only under worthKnowing. The brief is part of the review digest, stays in baseline.yaml and is never promoted: only facts become project memory, and brief lines are read through the facts they cite. Technologies and coverage are not authored in it. The agent learns the format from the baseline CLI output (start, and a hint after a draft without one), not from a new skill version.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0151",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/baseline/store.js",
+          "contentHash": "sha256:9d0b4aab9f59ab7cb2c967fdbfb138e64055a5c2653c2f90b02037b3b746fe7d",
+          "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/commands/baseline.js",
+          "contentHash": "sha256:f06dc79463c0caa3bd77898474d905d51f63eb6787645c6a14197e5f093be424",
+          "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/baseline-brief.test.js",
+          "contentHash": "sha256:8daa5ad1371540c7451a498e01ecf5d28b9dada2c0fe3ad8ddad5b97769acbba",
+          "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-15T18:05:55.883Z",
+      "verifiedAtCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-15T18:05:55.883Z",
+          "workId": "PF-0151",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-15T18:05:55.883Z",
+      "updatedAt": "2026-11-15T18:05:55.883Z"
+    },
+    {
+      "id": "CTX-0167",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Suggested first tasks (PF-0153): a baseline draft may carry up to three suggestions (title, why, optional type) validated in src/baseline/store.js; each must cite facts (BF ids) or discovery limitations (DL ids) of the same draft. They stay in baseline.yaml and are never promoted. After approval src/overview/collect.js exposes firstTasks: the developer's own first request (pendingOriginalRequest) and the suggestions read through current project-memory facts, dropping any with nothing current behind it. The console's Start here panel only prefills Create Work (openCreate(prefill)); nothing is created from a suggestion.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0153",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/baseline/store.js",
+          "contentHash": "sha256:2485c040e2aeb9badac21c916f4babc422bec21ad0f627c1f077ab6d70e78269",
+          "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/overview/collect.js",
+          "contentHash": "sha256:8e27446299b66fae3b1dcc96444d9f5a7a6a13fdbc0ea8aadba3442abbe7df38",
+          "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "resources/console/app.js",
+          "contentHash": "sha256:b35b6537af907ec9d7749b56711c357bf42a5eebf4780c24d9c5ccd46ba2048b",
+          "gitCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+          "workingTree": "modified"
+        }
+      ],
+      "verifiedAt": "2026-11-15T19:20:15.723Z",
+      "verifiedAtCommit": "92356b373adf661d24c02494b3082e741b1fdc8d",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-15T19:20:15.723Z",
+          "workId": "PF-0153",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-15T19:20:15.723Z",
+      "updatedAt": "2026-11-15T19:20:15.723Z"
     }
   ],
-  "updatedAt": "2026-11-12T15:18:03.930Z"
+  "updatedAt": "2026-11-15T19:20:15.723Z"
 }

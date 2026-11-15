@@ -1,0 +1,45 @@
+{
+  "id": "PF-0150",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Readiness line: while the project understanding is being prepared, show its step, facts recorded so far, last activity and whether an agent is working, with recovery when nobody is",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-15T17:51:14.305Z",
+  "updatedAt": "2026-11-15T17:58:28.008Z",
+  "title": "Readiness line: while the project understanding is being prepared, show its step, facts recorded so far, last activity and whether an agent is working, with recovery when nobody is",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-15T17:51:14.357Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-15T17:58:28.008Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

@@ -169,7 +169,7 @@ test('AC-006: the header shows Team or Solo with the branch, amber when Solo off
   assert.match(at(git({ sharedMode: true })).banner(), /data-branch-banner="team"[\s\S]*combined on <span class="ltr">main<\/span>/);
   assert.equal(at(git({ branch: 'main' })).banner(), '');
   assert.equal(at(git({ lane: true })).banner(), '');
-  assert.match(app, /agentStrip\(\) \+ branchBanner\(\) \+/, 'the banner is on the Workspace (Flow and List)');
+  assert.match(app, /agentStrip\(\) \+ queueStrip\(\) \+ limitNotices\(\) \+ branchBanner\(\) \+/, 'the banner is on the Workspace (Flow and List)');
   // Settings: the Team mode section with the existing confirmed flow.
   const settings = cut('  function viewSettings() {', '  // The add-service form is never redrawn');
   assert.match(settings, /<section class="setsec" id="set-team">[^\n]*gitLine\(g\)/);

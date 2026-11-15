@@ -1,0 +1,73 @@
+{
+  "id": "PF-0143",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Field notes from a real zero-to-delivery run of 1.5.2 (console + Codex + Claude Code, Arabic UI): 2 bugs (Claude Code tick reverts on live refresh before Save; wizard advanced path rejects ~), 3 gaps (Laravel PHP extension readiness, Run page agent request feedback, a permission request that vanished), 5 ideas. Details and steps in the attached notes.",
+  "status": "DONE",
+  "readOnly": false,
+  "activation": {
+    "deferred": false,
+    "keptActive": null,
+    "at": "2026-11-13T14:14:22.576Z",
+    "activatedAt": "2026-11-13T22:04:02.480Z"
+  },
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-13T14:14:22.576Z",
+  "updatedAt": "2026-11-13T22:31:41.525Z",
+  "sources": [
+    {
+      "id": "SRC-0111",
+      "type": "file",
+      "name": "yallaflow-field-notes-1.5.2.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-13T14:14:29.105Z",
+      "workStatusAtLink": "PENDING",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0112",
+      "type": "file",
+      "name": "yallaflow-field-notes-1.5.2-part2.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-13T17:45:18.025Z",
+      "workStatusAtLink": "PENDING",
+      "relationship": "work-input"
+    }
+  ],
+  "title": "Console fixes from the 1.5.2 field notes: bugs B1–B5 and gaps G1–G6",
+  "routingConfidence": "high",
+  "routingReason": "The request ('solve the recent problems') asks to fix the bugs and gaps in the 1.5.2 field notes (SRC-0111, SRC-0112). They are local console UI, readiness and status-display fixes. None touches security, data model, public CLI contract or financial invariants. Ideas I1–I7 are out of scope.",
+  "routedAt": "2026-11-13T22:03:59.275Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-13T22:31:41.525Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

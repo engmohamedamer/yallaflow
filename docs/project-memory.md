@@ -208,3 +208,16 @@ In a [Shared Project](shared-projects.md) there is still exactly one canonical l
   - blocks updates whose referenced fact changed, or that compete with another work's update — never guessing.
 - **Provenance.** Fact → origin work and candidate → `memory.yaml` (actor, memory base, integration record).
 - **Purpose is not memory.** A discovery purpose and preservation intent (`purpose.yaml`) are work intent and never enter the ledger or its projection.
+
+## The Project Brief
+
+A baseline draft may carry a **brief**: a few plain sentences the developer reads before the fact list (what the project is, who uses it, what it does today, its major parts, what is worth knowing).
+
+- **A view, not knowledge.** Every line cites facts of the same draft by id (`BF-001` is the first fact given), or, under *worth knowing*, a discovery limitation (`DL-001`). YallaFlow rejects a line that cites nothing or cites an id that is not in the draft, and a line that states an unresolved fact anywhere but *worth knowing*.
+- **Only facts are promoted.** On approval the facts become project memory as before. The brief stays with the baseline and is read through the facts it cites, so it can never disagree with project memory for long: when a cited fact is stale or disputed, its line is marked.
+- **Not written in the brief:** technologies (shown from the stack) and coverage (shown from what the discovery declared it read).
+- **Optional.** A draft without a brief is valid; the review then shows the fact list.
+- **Corrections** go through *Request changes* on the draft, not by editing the text.
+- **What YallaFlow checks:** the references and the shape. Whether a sentence says what its facts say is for the reviewer.
+
+`yallaflow baseline start` tells the agent how to write it; `yallaflow baseline show` prints it first.

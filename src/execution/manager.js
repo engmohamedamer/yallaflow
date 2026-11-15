@@ -198,11 +198,16 @@ export class ExecutionManager {
     switch (event.type) {
       case 'permission.requested': return { type: 'permission' };
       case 'permission.resolved': return { type: 'permission-resolved', pending: this.bridge.glance(projectId)?.pending.length ?? 0 };
-      case 'turn.started':
-      case 'message.sent': return { type: 'turn-started' };
+      case 'turn.started': return { type: 'turn-started' };
+      // PF-0145: a message tracked by chat id starts nothing by being sent or copied;
+      // the turn's own hook says when work began.
+      case 'message.sent': return event.chatId ? null : { type: 'turn-started' };
       case 'session.stopped':
         if (event.stop?.reason === 'usage_limit') return { type: 'usage-limit', retryAt: event.stop.retryAt ?? null };
         if (event.stop?.reason === 'crashed') return { type: 'crashed', reason: 'crashed' };
+        // PF-0143 (B4): the agent stopped on an error but its session is still up: the task is no
+        // longer working; it waits for the developer (a later usage-limit stop still pauses it).
+        if (event.stop?.reason === 'error') return { type: 'turn-ended' };
         return null;
       // A crashed adapter reports session.ended (reason crashed) before the bridge's session.stopped.
       case 'session.ended': return event.reason === 'crashed' ? { type: 'crashed', reason: 'crashed' } : { type: 'session-ended', cleanup: event.cleanup ?? null };

@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "revision": 2,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "A project-understanding draft that waits for review can be approved, or sent back with requested changes, from the console.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-15T14:53:08.972Z",
+      "updatedAt": "2026-11-15T14:53:08.972Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "A console decision on the understanding keeps the lifecycle and audit rules of other review gates and never conflicts with a CLI or agent decision.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-15T14:53:08.972Z",
+      "updatedAt": "2026-11-15T14:53:08.972Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "On a baseline item awaiting review, the console offers Approve understanding and Request changes with a mandatory note and an explicit confirmation; approval runs Core's own baseline approve and the facts become project memory; request changes runs Core's baseline feedback.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-15T14:53:08.972Z",
+      "updatedAt": "2026-11-15T14:53:08.972Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-002",
+      "statement": "A decision is refused, with nothing recorded, when the draft changed since it was shown, when it is no longer awaiting review (already decided by the CLI, an agent or another tab), when it is submitted twice, or in a read-only console.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-15T14:53:08.972Z",
+      "updatedAt": "2026-11-15T14:53:08.972Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-002",
+      "statement": "The decision record says it came from the console with identity not verified (in the decision note, because Core keeps structured provenance off the baseline gate); CLI decisions are recorded as before; a reconciliation decision still refuses console provenance.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-15T14:53:08.972Z",
+      "updatedAt": "2026-11-15T16:45:09.552Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-001",
+      "statement": "When the draft has uninspected areas, unresolved facts or no declared coverage, approval requires a second explicit acknowledgment that names them; it is shown, never blocked.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-15T14:53:08.972Z",
+      "updatedAt": "2026-11-15T14:53:08.972Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-15T14:53:08.972Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-15T14:53:08.972Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-15T14:53:08.972Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-15T14:53:08.972Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-15T14:53:08.972Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-11-15T14:53:08.972Z",
+      "revision": 1
+    },
+    {
+      "action": "revised",
+      "id": "AC-003",
+      "at": "2026-11-15T16:45:09.552Z",
+      "revision": 2,
+      "previous": {
+        "id": "AC-003",
+        "requirement": "REQ-002",
+        "statement": "The decision is recorded with console provenance (identity not verified); CLI decisions are recorded as before; a reconciliation decision still refuses console provenance.",
+        "provenance": [
+          {
+            "type": "request"
+          }
+        ],
+        "status": "active"
+      }
+    }
+  ],
+  "updatedAt": "2026-11-15T16:45:09.552Z"
+}

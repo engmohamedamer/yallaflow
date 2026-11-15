@@ -7,7 +7,7 @@ import { inventoryRepository } from '../inventory/inventory.js';
 import { gitWorkingTreeStates } from '../core/git.js';
 import { WORKING_TREE_LABELS } from '../context/evidence.js';
 import { shellQuote } from '../security/redact.js';
-import { approveBaseline, baselineNextStep, draftBaseline, feedbackBaseline, findBaselineWork, loadBaseline, pendingOriginalRequest, repositoryPathOf, startBaseline, summarizeBaseline, summarizeCoverage } from '../baseline/store.js';
+import { BRIEF_LISTS, approveBaseline, baselineNextStep, draftBaseline, feedbackBaseline, findBaselineWork, loadBaseline, pendingOriginalRequest, repositoryPathOf, startBaseline, summarizeBaseline, summarizeCoverage } from '../baseline/store.js';
 
 // `purpose` (v0.3.10, optional): what the understanding is for — a discovery lens on
 // top of the canonical core baseline, stored as work intent (purpose.yaml), never as a
@@ -32,8 +32,22 @@ export async function baselineStartCommand(purpose) {
   console.log(`  yallaflow intake add ${meta.id} <document>   (material documents; read extracted text with \`yallaflow source show SRC-#### --content\`)`);
   console.log(`  yallaflow checkpoint ${meta.id} --skill repository-baseline --complete --summary "..."`);
   console.log(`  yallaflow baseline draft ${meta.id} --file <baseline.json>`);
+  console.log(BRIEF_GUIDANCE);
   console.log(`A human then reviews (yallaflow baseline show ${meta.id}) and approves (yallaflow baseline approve ${meta.id}).`);
 }
+
+// PF-0151: how the agent writes the Project Brief, said where the draft is written.
+const BRIEF_GUIDANCE = [
+  'Add a Project Brief to the draft: what the developer reads first, in plain words. In the baseline JSON:',
+  '  "brief": { "summary": { "text": "...", "facts": ["BF-001"] }, "users": [{ "text", "facts" }], "capabilities": [...], "components": [...], "worthKnowing": [{ "text", "facts" or "limitations": ["DL-001"] }] }',
+  '  - Facts are numbered in the order given (BF-001 is the first fact, DL-001 the first limitation). Every line cites at least one; a line without evidence is rejected.',
+  '  - One short sentence per line (280 characters, 6 lines per list), in the language the developer uses. No file paths, IDs or jargon in the text.',
+  '  - What is not established (an unresolved fact, something not inspected) goes under worthKnowing only. Do not list technologies or coverage: they are shown from the stack and the declared coverage.',
+  '  - The brief is a view of the facts, never a place for new claims: write the fact first, then the line that cites it.',
+  'You may also suggest up to three first tasks: "suggestions": [{ "title": "...", "why": "...", "type": "feature|bug|change|investigation", "facts": ["BF-007"] or "limitations": ["DL-001"] }]',
+  '  - Only tasks that something you found supports (an unresolved fact, a gap, a risk, a missing capability the code shows). No generic tasks; fewer or none is better than padding.',
+  '  - They are proposals shown to the developer after approval. Nothing is created from them unless the developer creates it.'
+].join('\n');
 
 async function readBaselineFile(filePath) {
   if (!filePath) throw new Error('Usage: yallaflow baseline draft <work-id> --file <baseline.json>');
@@ -63,6 +77,8 @@ export async function baselineDraftCommand(workId, input) {
   }
   if (summary.limitations.length) console.log(`discovery limitations: ${summary.limitations.length} (work-scoped, never promoted)`);
   printCoverage(await summarizeCoverage(root, ledger), await inventoryTotals(root), { brief: true });
+  if (ledger.brief) console.log(`Project Brief: recorded (${1 + BRIEF_LISTS.reduce((count, name) => count + (ledger.brief[name]?.length ?? 0), 0)} line(s), each citing this draft's facts).`);
+  else console.log(`\nNo Project Brief in this draft. The developer then reviews the fact list only.\n${BRIEF_GUIDANCE}`);
   console.log(`\nNext: present the draft to the developer (yallaflow baseline show ${workId}) and ask them to review it. Only after they explicitly approve, record it: \`yallaflow baseline approve ${workId} --note "<their approval>"\` (changes: \`baseline feedback ${workId} --changes-requested\`). The Agent never approves on its own judgment.`);
 }
 
@@ -108,6 +124,18 @@ export async function baselineShowCommand(requestedWorkId) {
     return;
   }
   console.log(`${workId} — baseline draft (${ledger.status})`);
+  if (ledger.brief) {
+    // The brief first: it is what the developer reads; each line names the facts it rests on.
+    const cite = (entry) => ` [${[...(entry.facts ?? []), ...(entry.limitations ?? [])].join(', ')}]`;
+    console.log('\nProject Brief (a view of the facts below; only facts become project memory)');
+    if (ledger.brief.summary) console.log(`  ${ledger.brief.summary.text}${cite(ledger.brief.summary)}`);
+    const titles = { users: 'Who uses it', capabilities: 'What it does today', components: 'Major parts', worthKnowing: 'Worth knowing' };
+    for (const name of BRIEF_LISTS) {
+      if (!ledger.brief[name]?.length) continue;
+      console.log(`  ${titles[name]}:`);
+      for (const entry of ledger.brief[name]) console.log(`    - ${entry.text}${cite(entry)}`);
+    }
+  }
   const coverage = await summarizeCoverage(root, ledger);
   // Working-tree provenance of the cited files, observed now (provenance only — the
   // recorded content hash decides freshness after approval).

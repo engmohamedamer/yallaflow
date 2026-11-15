@@ -124,3 +124,15 @@ The work lives in the work item, not in the chat, so another agent can pick it u
   - **This is not isolation.** It doesn't protect against a process running as you outside the agent's sandbox, which can change these files directly.
 - **Codex modes.** Codex sessions use only the modes the panel offers. If Codex switches itself to a full-access mode, YallaFlow ends the session.
 - **Provider limits apply.** What an agent may do without asking is decided by the provider's own permission mode, which the console shows; YallaFlow cannot enforce more than the provider allows.
+
+## Windows (not verified on a real Windows machine)
+
+YallaFlow finds and starts agents on Windows without a shell:
+
+- **Finding.** `claude`, `codex`, `codex-acp` and `npm` are looked up in each `PATH` folder (the variable may be named `Path`) with the `PATHEXT` extensions YallaFlow can start: `.exe`, `.com`, `.cmd`, `.bat`. A file needs no execute bit.
+- **Starting.** A native `.exe` is started directly. An npm `.cmd` shim is read and the program it points to is started instead: its script with `node`, or its own `.exe`. The target must be a real file inside the shim's folder. Any other command script is refused with a plain reason; YallaFlow never runs `cmd.exe` for it.
+- **Terminal.** **Connect** opens a new PowerShell window in the project folder with the launch command. The folder is the window's working directory and is never part of the command text.
+- **Claude Code hooks and launch command** are written with double quotes and forward slashes.
+- **Not covered.** The adapter still receives the Codex shim's path in `CODEX_PATH`; ending a session on Windows stops the adapter process only (no process group).
+
+These rules are tested with simulated Windows paths only. Treat Windows as unverified until it is run there.

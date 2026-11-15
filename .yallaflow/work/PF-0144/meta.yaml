@@ -1,0 +1,94 @@
+{
+  "id": "PF-0144",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Run page UX from the developer's review of the recorded run: the primary button should follow the project state (Stop highlighted while running, Start inactive), and the Start/Stop/per-service controls after Stop need a UX pass. Notes and two screenshots attached.",
+  "status": "DONE",
+  "readOnly": false,
+  "activation": {
+    "deferred": false,
+    "keptActive": null,
+    "at": "2026-11-14T12:26:17.356Z",
+    "activatedAt": "2026-11-15T11:36:29.910Z"
+  },
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-14T12:26:17.356Z",
+  "updatedAt": "2026-11-15T11:51:14.076Z",
+  "sources": [
+    {
+      "id": "SRC-0113",
+      "type": "file",
+      "name": "yallaflow-field-notes-1.5.2-part3.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-14T12:26:17.801Z",
+      "workStatusAtLink": "PENDING",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0114",
+      "type": "file",
+      "name": "Screenshot from 2026-11-14 12-35-41.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-14T12:26:17.804Z",
+      "workStatusAtLink": "PENDING",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0115",
+      "type": "file",
+      "name": "Screenshot from 2026-11-14 12-41-08.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-14T12:26:17.807Z",
+      "workStatusAtLink": "PENDING",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0116",
+      "type": "file",
+      "name": "yallaflow-field-notes-1.5.2-part4.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-14T13:56:20.846Z",
+      "workStatusAtLink": "PENDING",
+      "relationship": "work-input"
+    }
+  ],
+  "title": "Run page UX: one stateful Start/Stop control that follows project state; quieter per-service controls (U1, U2)",
+  "routingConfidence": "high",
+  "routingReason": "Console-only UX change on the Run page (button emphasis and visibility per runtime state); no data model, security, or API contract change.",
+  "routedAt": "2026-11-15T11:36:25.379Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-15T11:51:14.076Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Console baseline decision (PF-0147): the project-understanding draft is approved or sent back from the baseline item page through gates/baseline in src/console/actions.js, which runs Core's baseline approve or baseline feedback. It decides only a draft awaiting review whose digest (baselineReviewDigest in src/baseline/store.js, exposed as detail.baseline.digest with coverage and gaps) matches the one shown; gaps (uninspected areas, unresolved facts, undeclared coverage) need a second acknowledgment and never block. Structured console provenance stays refused on the baseline and reconciliation gates (src/reviews/store.js, src/core/integrity.js); a console baseline decision states its origin in the decision note (identity not verified, host, claimed Git name).",
+      "evidence": [
+        "src/console/actions.js",
+        "src/baseline/store.js",
+        "test/console-baseline-decision.test.js"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-15T16:45:24.940Z",
+      "factId": "CTX-0164",
+      "promotedAt": "2026-11-15T16:45:25.118Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-15T16:45:25.118Z",
+  "reviewedAt": "2026-11-15T16:45:25.118Z"
+}

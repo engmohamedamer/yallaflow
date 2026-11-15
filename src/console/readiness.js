@@ -11,6 +11,7 @@
 // - runtime        optional: blocks nothing but "Start project".
 //
 // `allows` is what the server enforces (see server.js); the console only explains it.
+import { baselineProgress } from '../baseline/store.js';
 import { assessProjectUnderstanding, projectUnderstandingGate, UNDERSTANDING } from '../baseline/understanding.js';
 
 export const READINESS_SCHEMA = 'yallaflow.console.readiness/1';
@@ -55,9 +56,12 @@ export async function computeReadiness(root, { snapshotError = null, agent, runt
   if (!gate) steps.push({ id: 'understanding', status: 'done' });
   else {
     const status = STATUS_BY_UNDERSTANDING[gate.state] ?? 'required';
+    // PF-0150: the baseline's own step, facts so far and last activity, from its records.
+    const progress = understanding?.baselineId ? await baselineProgress(root, understanding.baselineId) : null;
     steps.push({
       id: 'understanding',
       status,
+      ...(progress ? { progress } : {}),
       blocks: ['createWork', 'runQueue'],
       baselineId: understanding?.baselineId ?? null,
       next: status === 'awaiting-review'

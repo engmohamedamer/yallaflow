@@ -56,6 +56,24 @@
         "error": { "type": ["string", "null"] }
       }
     },
+    "brief": {
+      "type": "object",
+      "description": "The approved baseline's Project Brief read through project memory (optional; absent when the baseline has no brief). Each line lists the current project-memory facts it cites; care is 'may-be-stale' or 'disputed' when a cited fact needs care; a line with no current fact left is omitted.",
+      "required": ["baselineId", "coverage"],
+      "properties": {
+        "baselineId": { "type": "string" },
+        "approvedAt": { "type": ["string", "null"] },
+        "summary": { "type": ["object", "null"] },
+        "users": { "type": "array" }, "capabilities": { "type": "array" }, "components": { "type": "array" }, "worthKnowing": { "type": "array" },
+        "coverage": { "type": "object" }
+      }
+    },
+    "firstTasks": {
+      "type": "object",
+      "description": "After the baseline is approved: the developer's own first request (null once later work exists) and the agent's suggested first tasks read through current project-memory facts. Proposals only; nothing is created from them.",
+      "required": ["baselineId", "suggestions"],
+      "properties": { "baselineId": { "type": "string" }, "request": { "type": ["string", "null"] }, "suggestions": { "type": "array" } }
+    },
     "areas": {
       "type": "object",
       "description": "Current facts per memory area (project, architecture, tech-stack, database, integration, environment), at most 12 listed per area.",

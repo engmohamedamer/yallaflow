@@ -12,8 +12,12 @@ import { createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypt
 const SUPPORTED_PROTOCOLS = ['2025-06-18', '2025-03-26', '2024-11-05'];
 const INSTRUCTIONS =
   'Messages from the YallaFlow console arrive as <channel source="yallaflow" chat_id="..." work_id="...">. ' +
-  'Treat them as messages from the user at the console. Do what they ask under your normal rules, then answer ' +
-  'with the reply tool, passing the chat_id from the tag. Keep replies concise.';
+  'Treat them as messages from the user at the console. When one arrives, first call the received tool with its ' +
+  'chat_id, then do what it asks under your normal rules, then answer with the reply tool, passing the same chat_id. ' +
+  'Keep replies concise. A line "[yallaflow <chat_id>]" at the end of a message typed in the terminal marks that ' +
+  'same console message: never act on one chat_id twice; if it arrives again, do nothing and say it was already handled. ' +
+  'A message with kind="connection_check" is not a task: run no commands, read no files, change nothing, and only ' +
+  'call the reply tool with its chat_id and the text "ok".';
 
 function send(message) {
   process.stdout.write(`${JSON.stringify({ jsonrpc: '2.0', ...message })}\n`);
@@ -153,9 +157,17 @@ async function handle(message) {
       name: 'reply',
       description: 'Send a message back to the YallaFlow console',
       inputSchema: { type: 'object', properties: { chat_id: { type: 'string' }, text: { type: 'string' } }, required: ['chat_id', 'text'] }
+    }, {
+      name: 'received',
+      description: 'Tell the YallaFlow console that its message arrived, before working on it',
+      inputSchema: { type: 'object', properties: { chat_id: { type: 'string' } }, required: ['chat_id'] }
     }] } });
   }
   if (method === 'tools/call') {
+    if (params?.name === 'received') {
+      const noted = current ? await post(current, { type: 'received', chat_id: String(params.arguments?.chat_id ?? '') }) : false;
+      return send({ id, result: { content: [{ type: 'text', text: noted ? 'noted' : 'The YallaFlow console is not connected.' }] } });
+    }
     if (params?.name !== 'reply') return send({ id, error: { code: -32602, message: `Unknown tool ${params?.name}` } });
     const text = String(params.arguments?.text ?? '');
     const delivered = current ? await post(current, { type: 'reply', chat_id: String(params.arguments?.chat_id ?? ''), text }) : false;

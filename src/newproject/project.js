@@ -75,6 +75,11 @@ export function planHash(body) {
 function probePrerequisite(prereq) {
   const result = spawnSync(prereq.argv[0], prereq.argv.slice(1), { encoding: 'utf8', timeout: PREREQ_TIMEOUT_MS, shell: false, env: scrubbedEnv() });
   if (result.error || result.status !== 0) return { name: prereq.name, found: false, note: prereq.note ?? null };
+  // A PHP module is found when `php -m` lists it (PF-0143).
+  if (prereq.module) {
+    const found = `${result.stdout}`.split('\n').some((line) => line.trim().toLowerCase() === prereq.module);
+    return { name: prereq.name, found, ...(found ? { version: 'enabled' } : {}), module: true, note: prereq.note ?? null };
+  }
   const version = `${result.stdout}`.split('\n').map((line) => line.trim()).find((line) => /\d/.test(line)) ?? '';
   return { name: prereq.name, found: true, version: version.slice(0, 120), note: prereq.note ?? null };
 }

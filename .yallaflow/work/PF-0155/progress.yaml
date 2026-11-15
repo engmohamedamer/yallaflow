@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-15T20:30:57.014Z",
+      "completedAt": "2026-11-15T20:30:57.014Z",
+      "summary": "render() replaces #app innerHTML on every changed snapshot, recreating the hero. .hero (app.css line 64) and .digest carry their own 'rise' entrance animation, independent of the PF-0128 main.enter class that is added only when the view changes; .lane, .conflict and .tl li have the same pattern on other pages.",
+      "evidence": [
+        "resources/console/app.css",
+        "resources/console/app.js"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-15T20:31:09.549Z",
+      "completedAt": "2026-11-15T20:31:09.549Z",
+      "summary": "Symptom traced by code, not reproduced in a browser (no browser was started): any snapshot change (e.g. an item starts waiting) makes render() set #app innerHTML, which creates a new .hero element; .hero has 'animation: rise .7s both' unconditionally, so the browser replays it. The page-change entrance (main.enter > *, PF-0128) is separate and correctly gated by lastView. Root cause: per-element entrance animations on elements recreated by live redraws (.hero, .digest on the board; .lane, .conflict, .tl li elsewhere). Fix direction: these entrances play only under main.enter; main.enter must also apply to the first paint with data (lastView is set while the page still shows Loading).",
+      "evidence": [
+        "resources/console/app.css",
+        "resources/console/app.js"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-15T20:32:03.426Z",
+      "completedAt": "2026-11-15T20:32:03.426Z",
+      "summary": "resources/console/app.css: removed the unconditional entrance animation from .hero, .digest, .conflict, .lane and .tl li; .lane and .tl li keep theirs under main.enter only. resources/console/app.js: lastView is set only once data is shown, so the first paint with data gets the page entrance. Regression assertions added in test/console-polish.test.js.",
+      "evidence": [
+        "resources/console/app.css",
+        "resources/console/app.js",
+        "test/console-polish.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-15T20:58:00.081Z",
+      "completedAt": "2026-11-15T20:58:00.081Z",
+      "summary": "npm test passed (V-001: 1333 pass, 0 fail), including the new console-polish assertions. Not checked in a browser.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-15T20:58:00.081Z"
+}

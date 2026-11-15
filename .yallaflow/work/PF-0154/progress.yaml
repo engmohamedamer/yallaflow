@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-15T20:30:56.609Z",
+      "completedAt": "2026-11-15T20:30:56.609Z",
+      "summary": "goText() in resources/console/app.js returns '' only for waitingFor.kind 'baseline'. Two paths put the whole-job text in the chat box: agentPanel seeds agentDraft before the first console message (and a seeded, unsent draft stays when the item later starts waiting), and the item's 'Continue with the agent here' button (data-chat-item without data-chat-draft) sets agentDraft = goText. Other goText callers (startHere, Codex switch-start) start a session and are not the chat box seed.",
+      "evidence": [
+        "resources/console/app.js"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-15T20:31:09.338Z",
+      "completedAt": "2026-11-15T20:31:09.338Z",
+      "summary": "Reproduced with the chat panel harness: an item waiting on Q-001 with an agent message and no console message renders the 'Answer the question' action AND the box prefilled with 'Work on PF-0001 to the end'. Root cause: the first-message seed (agentPanel) and the Continue button handler call goText() without regard to waitingFor (only kind 'baseline' is excluded), and a seeded unsent draft is never cleared once the item starts waiting. Fix direction: no whole-job draft while the item waits for the developer (question or review); drop an untouched seeded draft when it starts waiting; keep text the developer typed; leave session-starting callers unchanged.",
+      "evidence": [
+        "resources/console/app.js"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-15T20:32:03.232Z",
+      "completedAt": "2026-11-15T20:32:03.232Z",
+      "summary": "resources/console/app.js: the first-message seed skips an item with waitingFor and drops an untouched seeded whole-job draft once the item waits; the item's Continue button and the new-project Start button keep the box as it is for a waiting item. Typed text is kept. Session-starting callers of goText are unchanged. Regression test added in test/console-project-chat.test.js.",
+      "evidence": [
+        "resources/console/app.js",
+        "test/console-project-chat.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-15T20:57:59.889Z",
+      "completedAt": "2026-11-15T20:57:59.889Z",
+      "summary": "npm test passed (V-003: 1333 pass, 0 fail). V-001 and V-002 failed on unrelated tests that pass alone and differed between runs: new-project.test.js (a transient Git folder in /tmp) and console-execution.test.js queue end-to-end (timing under machine load).",
+      "evidence": [
+        "verification:V-003"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-15T20:57:59.889Z"
+}

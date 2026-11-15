@@ -28,8 +28,10 @@ import { convergenceRequired } from '../delivery/policy.js';
 import { loadDecomposition } from '../decomposition/store.js';
 import { PACKAGE_VERSION } from '../version.js';
 import { buildStations, itemState, stationForSkill, STATION_KEYS } from './stations.js';
-import { baselineNextStep, loadBaseline } from '../baseline/store.js';
+import { baselineGaps, baselineNextStep, baselineReviewDigest, loadBaseline } from '../baseline/store.js';
 import { lineageReferenceResolver } from '../history/lineage.js';
+import { loadQcLedger } from '../quality/qc.js';
+import { qualityDirPath } from '../quality/artifacts.js';
 
 export const SNAPSHOT_SCHEMA = 'yallaflow.snapshot/1';
 export const WORK_SCHEMA = 'yallaflow.work/1';
@@ -269,7 +271,16 @@ async function workDetail(root, workId, meta, { now = new Date().toISOString() }
       detail.baseline = {
         status: ledger.status, draftedAt: ledger.draftedAt ?? null,
         facts: (ledger.facts ?? []).map((fact) => ({ id: fact.id, area: fact.area, status: fact.status, source: fact.source ?? null, summary: fact.summary, evidence: fact.evidence ?? [], note: fact.note ?? null })),
-        limitations: (ledger.limitations ?? []).map((entry) => ({ id: entry.id, type: entry.type ?? null, area: entry.area ?? null, summary: entry.summary, reason: entry.reason ?? null }))
+        limitations: (ledger.limitations ?? []).map((entry) => ({ id: entry.id, type: entry.type ?? null, area: entry.area ?? null, summary: entry.summary, reason: entry.reason ?? null })),
+        // PF-0147 (additive): what the discovery declared it read, what it does not know, and
+        // the digest a console decision must carry.
+        coverage: ledger.coverage ? { inspected: ledger.coverage.inspected ?? [], sampled: ledger.coverage.sampled ?? [] } : null,
+        // PF-0152 (additive): the plain-language brief, each line citing facts of this draft.
+        brief: ledger.brief ?? null,
+        // PF-0153 (additive): first tasks the agent proposes, each citing this draft.
+        suggestions: ledger.suggestions ?? [],
+        gaps: baselineGaps(ledger),
+        digest: baselineReviewDigest(ledger)
       };
     }
   }
@@ -316,9 +327,32 @@ async function workDetail(root, workId, meta, { now = new Date().toISOString() }
     gate, status: entry.status, requestedAt: entry.requestedAt ?? null, respondedAt: entry.respondedAt ?? null, note: entry.note ?? null, provenance: entry.provenance ?? null,
     history: (entry.history ?? []).map((event) => ({ status: event.status, at: event.at ?? null, note: event.note ?? null, reason: event.reason ?? null, provenance: event.provenance ?? null }))
   }));
+  // PF-0143 (additive, 1.5.3): the optional AI QC runs, so the console shows them on the item
+  // page. Advisory records, separate from verification; absent when the item has none.
+  const quality = await qualitySummary(root, meta.id);
+  if (quality) detail.quality = quality;
   const decomposition = await loadDecomposition(root, meta.id);
   detail.children = decomposition.exists ? decomposition.ledger.children.map((child) => ({ key: child.key, workId: child.workId ?? null, title: child.title, required: child.required !== false })) : [];
   return detail;
+}
+
+async function qualitySummary(root, workId) {
+  let loaded;
+  try {
+    loaded = await loadQcLedger(root, workId);
+  } catch (error) {
+    return { qc: { runs: [], error: String(error.message ?? error).split('\n')[0] }, report: null };
+  }
+  if (!loaded.exists || !loaded.ledger.runs.length) return null;
+  const titleOf = (planId, id) => loaded.ledger.plans.find((plan) => plan.id === planId)?.scenarios.find((entry) => entry.id === id)?.title ?? null;
+  const count = (run, status) => (run.scenarios ?? []).filter((entry) => entry.status === status).length;
+  const runs = loaded.ledger.runs.map((run) => ({
+    id: run.id, planId: run.planId, at: run.recordedAt ?? null, tool: run.tool ?? null, origin: run.origin ?? null, summary: run.summary ?? null,
+    passed: count(run, 'passed'), failed: count(run, 'failed'), blocked: count(run, 'blocked'), notRun: count(run, 'not-run'),
+    scenarios: (run.scenarios ?? []).map((entry) => ({ id: entry.id, title: titleOf(run.planId, entry.id), status: entry.status, note: entry.actual ?? entry.reason ?? entry.notes ?? null }))
+  }));
+  const report = await exists(path.join(qualityDirPath(root, workId), 'report.html')) ? `${path.relative(root, qualityDirPath(root, workId)).split(path.sep).join('/')}/report.html` : null;
+  return { qc: { runs }, report };
 }
 
 // A convergence finding's evidence as a stable, display-ready shape: `ref` is the

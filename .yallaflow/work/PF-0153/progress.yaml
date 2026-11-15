@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-15T18:14:23.673Z",
+      "completedAt": "2026-11-15T18:14:23.673Z",
+      "summary": "Create Work is openCreate()/createForm() in app.js (one dialog, Core's start command, nothing activates). After a baseline approval the original request is available through pendingOriginalRequest (purpose.yaml objective). The Workspace shows a first-run panel while all items are new; the Overview data is loaded on Workspace pages.",
+      "evidence": [
+        "resources/console/app.js",
+        "src/baseline/store.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-15T18:14:24.036Z",
+      "completedAt": "2026-11-15T18:14:24.036Z",
+      "summary": "Approved design item 7: up to three suggestions written by the agent with the draft, each citing facts or limitations and saying why; shown after approval with the developer's own first request first; a click only prefills Create Work; duplicates of existing work hidden; write-your-own always offered; a plain empty state when there is nothing reliable to suggest."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-15T18:14:24.420Z",
+      "completedAt": "2026-11-15T18:14:24.420Z",
+      "summary": "store.js validates draft suggestions (cited, sized, max three); collect.js exposes firstTasks after approval (own request, suggestions resolved to current facts, dropped when unsupported); app.js renders the panel on the Workspace while there is no other work and on the approved baseline page, and openCreate accepts a prefill; tests for validation, data, rendering, duplicates, empty state and that nothing is posted."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-15T18:57:57.980Z",
+      "completedAt": "2026-11-15T18:57:57.980Z",
+      "summary": "store.js validates optional draft suggestions (max 3, title and why, optional type, each citing BF or DL ids of the draft, no duplicates) and stores them with the baseline; baseline CLI guidance explains them; snapshot.js exposes them for review; collect.js adds firstTasks after approval (own request via pendingOriginalRequest, suggestions through current facts, unsupported ones dropped); app.js: Start here panel on the Workspace while no other work exists and on the approved baseline page, duplicates hidden, empty state, write-your-own, openCreate(prefill), proposed tasks listed in the draft review, overview re-read after an approval. Nothing is created without the developer pressing Create. Docs and schemas updated.",
+      "evidence": [
+        "resources/console/app.js",
+        "src/baseline/store.js",
+        "src/overview/collect.js",
+        "test/baseline-brief.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-15T19:20:15.343Z",
+      "completedAt": "2026-11-15T19:20:15.343Z",
+      "summary": "npm test (V-003): 1333 tests, 1332 pass, 0 fail, 1 skipped. V-001 failed on a test harness that sliced on the old openCreate() signature (updated). V-002 failed once on the queue end-to-end test (a wait timed out under full-suite load; it passed 4 of 4 isolated runs and in V-003). Browser journey on a temp brownfield project (Playwright): readiness progress line, brief first in Arabic and English, a citation opens its fact, Not right? fills the note, approval, Start here with the own request and two suggestions, a click prefills Create work and creates nothing, Overview brief opening a memory fact, 390 px without overflow, no page errors."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-15T19:20:15.343Z"
+}

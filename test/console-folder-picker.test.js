@@ -28,11 +28,11 @@ const listing = (over = {}) => ({
 });
 
 function picker({ mode = 'existing', data = listing(), lang = 'en', posts = {} } = {}) {
-  const calls = { api: [], post: [], opened: [], toasts: [], switched: [] };
+  const calls = { api: [], post: [], opened: [], toasts: [], switched: [], stored: [] };
   const dialog = { innerHTML: '', open: true, close() {}, setAttribute() {}, querySelector: () => null, querySelectorAll: () => [] };
   const context = vm.createContext({
     A: (ar, en) => (lang === 'ar' ? ar : en), esc, lang, encodeURIComponent, JSON, Object, Set, String, Boolean, Math, Promise,
-    store: { get: (_key, dflt) => dflt, set() {} }, projects: [], wizForm: () => ({ name: 'newapp', parent: '' }), why: (e) => e.message,
+    store: { get: (_key, dflt) => dflt, set(key, value) { calls.stored.push([key, value]); } }, firstRequestKey: (id) => `first-request:${id}`, projects: [], wizForm: () => ({ name: 'newapp', parent: '' }), why: (e) => e.message,
     document: { getElementById: (id) => (id === 'folderdlg' ? dialog : null), querySelector: () => null, querySelectorAll: () => [] },
     api: async (url) => { calls.api.push(url); return { path: `${HOME}/clinic`, name: 'clinic', kind: 'existing-code', action: 'init', git: false, gitAbove: false, stack: ['Laravel 13'], sourceFiles: 108, plan: [{ path: '.yallaflow/', op: 'create' }], problems: [], planHash: 'h1' }; },
     post: async (url, body) => { calls.post.push({ url, body: JSON.parse(body) }); if (posts[url]) throw new Error(posts[url]); return { id: 'p9' }; },
@@ -189,4 +189,121 @@ test('previewConnect reports a Git repository above the folder without running G
   assert.deepEqual([(await previewConnect(alone, { home: dir })).git, (await previewConnect(alone, { home: dir })).gitAbove], [false, false]);
   assert.deepEqual([(await previewConnect(inner, { home: dir })).git, (await previewConnect(inner, { home: dir })).gitAbove], [false, true]);
   assert.deepEqual([(await previewConnect(own, { home: dir })).git, (await previewConnect(own, { home: dir })).gitAbove], [true, false]);
+});
+
+// ---- PF-0146: local drives and volumes; Windows-style paths come from the server ----
+// These use Windows-shaped data in the page code only. Real Windows is NOT VERIFIED here.
+const WIN_HOME = 'C:\\Users\\Mona';
+const winListing = (over = {}) => ({
+  path: 'D:\\Work', parent: 'D:\\', home: WIN_HOME, root: 'D:\\', sep: '\\', here: { kind: 'folder' }, truncated: false,
+  roots: [{ path: WIN_HOME, label: 'Home', kind: 'home' }, { path: 'C:\\', label: 'C:', kind: 'drive' }, { path: 'D:\\', label: 'D:', kind: 'drive' }],
+  crumbs: [{ name: 'D:', path: 'D:\\', root: 'drive' }, { name: 'Work', path: 'D:\\Work' }],
+  folders: [{ name: 'my shop', path: 'D:\\Work\\my shop', kind: 'code', stack: 'node', git: true, yallaflow: false, empty: false }],
+  ...over
+});
+
+test('the locations row lists Home and the local drives, and marks the current one', () => {
+  const { fx, dialog } = picker({ data: winListing() });
+  fx.renderFolder();
+  const row = /<div class="fpick-recent fpick-roots" data-folder-roots>[\s\S]*?<\/div>/.exec(dialog.innerHTML)[0];
+  assert.match(row, /Locations:/);
+  assert.match(row, /data-folder-go="C:\\Users\\Mona" ><span class="ltr">⌂ Home</);
+  assert.match(row, /class="fchip on" data-folder-go="D:\\" aria-current="true"><span class="ltr">D:</);
+  assert.match(row, /data-folder-go="C:\\" ><span class="ltr">C:</);
+  assert.match(dialog.innerHTML, /Your home folder and local drives; network and hidden folders are not shown\./);
+  // a single root (home only) shows no locations row, as before
+  const single = picker();
+  single.fx.renderFolder();
+  assert.doesNotMatch(single.dialog.innerHTML, /data-folder-roots/);
+});
+
+test('breadcrumbs, the footer path and the typed path use the server\'s separator, never "/"', () => {
+  const { fx, dialog } = picker({ data: winListing() });
+  fx.renderFolder();
+  assert.match(dialog.innerHTML, /<nav class="fpick-crumbs"[^>]*><ol><li><button type="button" data-folder-go="D:\\">🖴 D:<\/button><\/li><li><span aria-current="location">Work<\/span><\/li><\/ol>/);
+  fx.pickFolder('D:\\Work\\my shop');
+  assert.match(fx.folderFooter(fx.state().data), /class="ltr fpick-path" title="D:\\Work\\my shop">D:\\Work\\my shop</);
+  const inHome = picker({ data: winListing({ path: `${WIN_HOME}\\code`, parent: WIN_HOME, root: WIN_HOME, crumbs: [{ name: 'Home', path: WIN_HOME, root: 'home' }, { name: 'code', path: `${WIN_HOME}\\code` }], folders: [] }) });
+  inHome.fx.state().editPath = true;
+  inHome.fx.renderFolder();
+  assert.match(inHome.dialog.innerHTML, /value="~\\code"/, 'home is shortened with the Windows separator');
+  assert.match(app, /if \(\/\^~\[\\\\\/\]\/\.test\(v\)\) return `\$\{home\}\$\{folderSep\(\)\}\$\{v\.slice\(2\)\}`;/);
+  assert.match(app, /rememberFolder\(parentPath\(p\.path\)\);/);
+  // the Arabic page shows the same structure
+  const ar = picker({ data: winListing(), lang: 'ar' });
+  ar.fx.renderFolder();
+  assert.match(ar.dialog.innerHTML, /الأماكن:/);
+  assert.match(ar.dialog.innerHTML, /⌂ البيت/);
+});
+
+test('a folder that cannot be opened is said with its reason; the picker stays where it was', async () => {
+  const fails = (codeName, message) => Object.assign(new Error(message), { code: codeName, status: 403 });
+  const run = async ({ lang = 'en', data = winListing(), error }) => {
+    const calls = [];
+    const dialog = { innerHTML: '', open: true, close() {}, setAttribute() {}, querySelector: () => null, querySelectorAll: () => [], addEventListener() {} };
+    const context = vm.createContext({
+      A: (ar, en) => (lang === 'ar' ? ar : en), esc, lang, encodeURIComponent, JSON, Object, Set, String, Boolean, Math, Promise,
+      store: { get: (_key, dflt) => dflt, set() {} }, projects: [], wizForm: () => ({ name: '', parent: '' }), why: (e) => e.message,
+      document: { getElementById: () => dialog, querySelector: () => null, querySelectorAll: () => [] },
+      api: async (url) => { calls.push(url); if (url.includes('?path=')) throw error; return listing(); }
+    });
+    vm.runInContext(`${code}\nfolder = ${data ? `{ mode: 'existing', data: ${JSON.stringify(data)} }` : 'null'};\nthis.go = async (at) => { await openFolder('existing', at); return folder; };`, context);
+    const state = await context.go('Z:\\Team');
+    return { state, calls, html: dialog.innerHTML };
+  };
+  const kept = await run({ error: fails('NETWORK_PATH', 'Network folders are not supported in this version.') });
+  assert.equal(kept.state.data.path, 'D:\\Work', 'no redirect: the open folder is unchanged');
+  assert.deepEqual(kept.calls.length, 1, 'home is not requested behind the user\'s back');
+  assert.match(kept.html, /role="alert"[^>]*>Could not open “Z:\\Team”: Network folders are not supported in this version\. Choose a folder on a local drive\./);
+  const drive = await run({ error: fails('DRIVE_UNAVAILABLE', 'The drive Z: is not available.') });
+  assert.match(drive.html, /This drive is not available right now\./);
+  const denied = await run({ lang: 'ar', error: fails('UNREADABLE', 'You do not have permission to open this folder.') });
+  assert.match(denied.html, /مفيش صلاحية لفتح الفولدر ده\./);
+  // nothing open yet: Home is shown, and the page says that it is a substitute and why
+  const first = await run({ data: null, error: fails('NOT_FOUND', 'That folder does not exist.') });
+  assert.equal(first.state.data.path, HOME);
+  assert.match(first.html, /Could not open “Z:\\Team”: That folder does not exist\. Showing your home folder instead\./);
+});
+
+test('the preview of a project outside home says so', () => {
+  const { fx } = picker();
+  fx.state().preview = { path: 'D:\\Work\\my shop', name: 'my shop', kind: 'existing-code', action: 'init', outsideHome: true, git: true, gitAbove: false, stack: ['Node.js'], sourceFiles: 12, plan: [{ path: '.yallaflow/', op: 'create' }], problems: [], planHash: 'h' };
+  assert.match(fx.previewPanel(), /data-outside-home>This folder is outside your home folder: <span class="ltr">D:\\Work\\my shop<\/span>/);
+  fx.state().preview.outsideHome = false;
+  assert.doesNotMatch(fx.previewPanel(), /data-outside-home/);
+});
+
+// ---- PF-0149: what happens next, and an optional first request ----
+test('the verdict for existing code says nothing is run and takes an optional first request', async () => {
+  const { fx, calls } = picker();
+  fx.pickFolder(`${HOME}/clinic`);
+  await fx.previewFolder();
+  const html = fx.previewPanel();
+  assert.match(html, /No project command is run\. Next, your agent prepares/);
+  assert.match(html, /What do you want to do first in this project\?[\s\S]*optional[\s\S]*data-folder-first maxlength="300" value=""/);
+  assert.match(html, /No work is created automatically\./);
+  // typed text survives a re-render and is stored for this project only after the connect
+  fx.state().first = '  Add online   payment <b>  ';
+  assert.match(fx.previewPanel(), /value="  Add online   payment &lt;b&gt;  "/);
+  fx.state().ack = true;
+  await fx.connectFolder();
+  assert.deepEqual(calls.stored.filter(([key]) => key.startsWith('first-request:')), [['first-request:p9', 'Add online payment <b>']]);
+  assert.deepEqual(calls.post.map((c) => c.url), ['/api/projects/connect'], 'nothing else is sent: no work item is created');
+});
+
+test('an empty folder gets no first-request field, and an empty field stores nothing', async () => {
+  const { fx, calls } = picker();
+  fx.state().preview = { path: `${HOME}/blank`, name: 'blank', kind: 'empty', action: 'init', git: false, gitAbove: false, stack: [], sourceFiles: 0, plan: [{ path: '.yallaflow/', op: 'create' }], problems: [], planHash: 'h' };
+  assert.doesNotMatch(fx.previewPanel(), /data-folder-first|No project command is run/);
+  const second = picker();
+  second.fx.pickFolder(`${HOME}/clinic`);
+  await second.fx.previewFolder();
+  second.fx.state().ack = true; second.fx.state().first = '   ';
+  await second.fx.connectFolder();
+  assert.equal(second.calls.stored.some(([key]) => key.startsWith('first-request:')), false);
+  const ar = picker({ lang: 'ar' });
+  ar.fx.pickFolder(`${HOME}/clinic`);
+  await ar.fx.previewFolder();
+  assert.match(ar.fx.previewPanel(), /ما أول شيء تريد عمله في هذا المشروع؟/);
+  assert.equal(calls.stored.length >= 0, true);
 });

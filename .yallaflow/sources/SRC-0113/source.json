@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0113",
+  "sourceType": "file",
+  "sourceName": "yallaflow-field-notes-1.5.2-part3.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-11-14T12:26:17.659Z",
+  "original": {
+    "path": "sources/SRC-0113/yallaflow-field-notes-1.5.2-part3.md",
+    "sha256": "e13643dc666f731dc8d58f9850a5334645c30ed112f4902b6f06148787d4ed25",
+    "sizeBytes": 1349
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0144"
+  ],
+  "rawText": "# YallaFlow 1.5.2 — field notes, part 3 (developer review of the recording, 2026-11-14)\n\nThe developer (channel owner) watched the recorded run and flagged two console UX points on the Run page.\n\n### U1. Run page: the primary button does not follow the project state\n- When the project is running («المشروع شغّال», 1/1 running), «▶ شغّل المشروع» keeps the filled primary style and «■ وقّف المشروع» is the plain secondary one. The developer expected the opposite: the action that makes sense now should be the highlighted one (Stop while running), and Start should look inactive/disabled when everything already runs.\n- Evidence: frame from the recording at the moment the app was running (Project → Run).\n\n### U2. Run page after Stop\n- After «وقّف المشروع», the page shows «المشروع متوقف» with the green filled «▶ شغّل المشروع» and a disabled-looking «وقّف المشروع». The developer said this part needs a UX review: state, colour and wording of the two buttons and the per-service row (شغّل / إعادة تشغيل / وقّف) read as three competing controls.\n- Suggestion: one stateful control (Start ↔ Stop) for the project, the per-service buttons folded or secondary, and the state chip carrying the colour instead of the Start button.\n"
+}

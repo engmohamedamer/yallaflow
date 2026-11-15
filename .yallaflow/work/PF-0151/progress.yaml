@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-15T17:59:03.052Z",
+      "completedAt": "2026-11-15T17:59:03.052Z",
+      "summary": "draftBaseline in src/baseline/store.js validates facts (ids BF-### by order), limitations (L-### by order) and coverage, and writes baseline.yaml; the baseline CLI prints guidance at start and after a draft. Skill instructions are versioned and immutable per registry version (src/skills/instructions.js), so changing the repository-baseline text means a new skill version and a registry bump.",
+      "evidence": [
+        "src/baseline/store.js",
+        "src/skills/instructions.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-15T17:59:03.384Z",
+      "completedAt": "2026-11-15T17:59:03.384Z",
+      "summary": "Approved design item 5: brief = summary, users, capabilities, components, worthKnowing; each line cites facts of the same draft (worthKnowing may cite limitations); lines citing an unresolved fact only under worthKnowing; size limits; optional (older drafts stay valid); a view of the facts, never promoted to project memory; no user editing; technologies and coverage are computed, not authored."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-15T17:59:03.891Z",
+      "completedAt": "2026-11-15T17:59:03.891Z",
+      "summary": "store.js: normalizeBrief with validation against the draft's fact and limitation ids, stored as ledger.brief; baseline.js: guidance at start, brief printed first by baseline show, hint after a draft without a brief; docs/project-memory.md; unit tests for every rule and for backward compatibility."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-15T18:00:53.580Z",
+      "completedAt": "2026-11-15T18:00:53.580Z",
+      "summary": "store.js: normalizeBrief validates an optional brief (summary required; users, capabilities, components, worthKnowing; text 280, 6 lines, 8 refs; every line cites this draft's BF ids, worthKnowing may cite DL ids; unresolved facts only under worthKnowing; unknown fields rejected) and stores it as ledger.brief; it is part of the review digest and is never promoted. baseline.js: guidance at start, hint after a draft without a brief, brief printed first by baseline show. docs/project-memory.md.",
+      "evidence": [
+        "src/baseline/store.js",
+        "src/commands/baseline.js",
+        "test/baseline-brief.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-15T18:05:55.568Z",
+      "completedAt": "2026-11-15T18:05:55.568Z",
+      "summary": "npm test (V-001): 1320 tests, 1319 pass, 0 fail, 1 skipped; new cases cover a valid brief, every rejection rule with nothing written, backward compatibility of drafts without a brief, no brief text in project memory, and the CLI guidance and output."
+    }
+  },
+  "rulings": [
+    {
+      "decision": "The agent is told about the brief through the baseline CLI's own guidance (baseline start, and a hint after a draft without one), not by a new version of the repository-baseline skill",
+      "reason": "skill text is immutable per registry version; a new skill version means a registry bump with upgrade and compatibility consequences that the approved design did not weigh. The CLI guidance reaches every agent at the moment it drafts and needs no registry change",
+      "costIfWrong": "an agent that reads only the skill text and ignores CLI output writes no brief; the review then shows the fact list as today. The owner can still ask for a skill version later",
+      "createdAt": "2026-11-15T17:59:03.539Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-15T18:05:55.568Z"
+}

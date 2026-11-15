@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-15T17:27:41.006Z",
+      "completedAt": "2026-11-15T17:27:41.006Z",
+      "summary": "src/agents/detect.js which()/isExecutable() look for an extensionless name with POSIX execute bits and read env.PATH; execFile/spawn without a shell are used in detect.js, setup.js and acp.js (via codex.js) and cannot start .cmd shims on current Node; terminal.js supports only macOS and Linux; claude-files.js quotes the launch and hook commands for POSIX shells only. The console page reports a network-level fetch failure as the raw browser text.",
+      "evidence": [
+        "src/agents/detect.js",
+        "src/agents/terminal.js",
+        "src/agents/claude-files.js"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-15T17:27:57.450Z",
+      "completedAt": "2026-11-15T17:27:57.450Z",
+      "summary": "Root cause (from the code; not reproduced on Windows): which() tries only the bare name, isExecutable() requires POSIX execute bits that Windows files do not carry, and PATH is read as env.PATH, so no agent is ever found on Windows; a found .cmd shim could still not be started because Node refuses .cmd/.bat without a shell. Separate, unresolved: the Failed to fetch report is a network-level failure of the page's request (the server answers every handled error with JSON); no crash point was found in the code and it was not reproduced.",
+      "evidence": [
+        "src/agents/detect.js"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-15T17:37:16.044Z",
+      "completedAt": "2026-11-15T17:37:16.044Z",
+      "summary": "detect.js: envValue (PATH in any case on Windows), programExtensions (PATHEXT limited to .exe/.com/.cmd/.bat), which() and isExecutable() with Windows rules and no execute-bit test, launchSpec() resolving an npm .cmd/.bat shim to its target (script with node, or .exe) inside the shim folder, refusing anything else (SHIM_UNSUPPORTED), run() never throwing. Detection records what to start (adapter.launch, codex.launch); codex.js starts the adapter from it; setup.js probes and jobs use launchSpec; Windows npm prefix layout. terminal.js opens PowerShell on Windows with the folder as cwd; claude-files.js writes Windows hook and launch commands with double quotes and forward slashes; the server keeps machine paths out of the Windows command. Console page says plainly when no answer arrives. No shell is used anywhere.",
+      "evidence": [
+        "src/agents/detect.js",
+        "test/agent-windows.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-15T17:43:39.158Z",
+      "completedAt": "2026-11-15T17:43:39.158Z",
+      "summary": "npm test (V-001): 1311 tests, 1310 pass, 0 fail, 1 skipped. Windows cases are simulated (platform win32, path.win32, injected file table): native .exe, npm .cmd shims including npm.cmd, PATHEXT order, PATH casing, spaces and Arabic folders, missing programs, broken or foreign command scripts refused, terminal and hook command text. POSIX behaviour unchanged (existing agent suites pass). Browser: with the console process stopped, the page shows the plain not-reachable message. Not run: any real Windows machine. Unresolved: the reported Failed to fetch was not reproduced and no crash point was found."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-15T17:43:39.158Z"
+}

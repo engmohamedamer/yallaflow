@@ -2,8 +2,9 @@
 // becomes a YallaFlow project through Core's own `yallaflow init` (its read-only bootstrap
 // check and byte-exact rollback), never through console writes.
 //
-// - previewConnect: read-only. The folder is resolved with the folder chooser's rules (inside
-//   home, not hidden, real directory). It reports what the folder is (YallaFlow project /
+// - previewConnect: read-only, and only on the developer's explicit action for one folder
+//   (browsing never previews). The folder is resolved with the folder chooser's rules (under
+//   an allowed root, local, not hidden, real directory; PF-0146). It reports what the folder is (YallaFlow project /
 //   existing code / empty), the detected stack (manifest hints, size-capped, no symlinks
 //   followed), whether it is a Git repository (no Git command runs; uncommitted work is never
 //   touched), exactly
@@ -18,31 +19,38 @@ import { bootstrapInitPlan } from '../agent/bootstrap.js';
 import { classifyProject, inventoryRepository } from '../inventory/inventory.js';
 import { laneIdentity } from '../execution/lanes.js';
 import { HttpError } from './create.js';
-import { homeRoot, resolveInsideHome } from './folders.js';
+import { insidePath, resolveBrowsable } from './folders.js';
 
 const isDir = async (target) => { try { return (await lstat(target)).isDirectory(); } catch { return false; } };
 const present = async (target) => { try { await lstat(target); return true; } catch { return false; } };
 
-// The closest YallaFlow workspace above the folder (inside home), if any.
-async function enclosingProject(folder, home) {
-  let current = path.dirname(folder);
-  while (current.startsWith(home) && current !== path.dirname(current)) {
-    if (await isDir(path.join(current, '.yallaflow'))) return current;
-    if (current === home) break;
-    current = path.dirname(current);
+// The folders above a folder, up to and including its allowed root (never beyond it).
+function* above(folder, base) {
+  for (let current = path.dirname(folder); insidePath(base, current) && current !== path.dirname(current); current = path.dirname(current)) {
+    yield current;
+    if (insidePath(current, base)) break;
   }
+}
+// The closest YallaFlow workspace above the folder (inside its root), if any.
+async function enclosingProject(folder, base) {
+  for (const current of above(folder, base)) if (await isDir(path.join(current, '.yallaflow'))) return current;
   return null;
 }
 
-export async function previewConnect(requested, { home } = {}) {
-  const base = await homeRoot(home);
+export async function previewConnect(requested, options = {}) {
   let folder;
+  let root;
   try {
-    folder = await resolveInsideHome(requested, base);
+    ({ real: folder, root } = await resolveBrowsable(requested, options));
   } catch (error) {
     throw new HttpError(error.status ?? 400, error.code ?? 'BAD_PATH', error.message);
   }
-  if (folder === base) throw new HttpError(400, 'HOME_FOLDER', 'Choose a project folder inside your home folder, not the home folder itself.');
+  const base = root.path;
+  if (insidePath(folder, base)) {
+    throw root.kind === 'home'
+      ? new HttpError(400, 'HOME_FOLDER', 'Choose a project folder inside your home folder, not the home folder itself.')
+      : new HttpError(400, 'ROOT_FOLDER', 'Choose a project folder on this drive, not the drive itself.');
+  }
   const name = path.basename(folder);
   const problems = [];
   const lane = await laneIdentity(folder).catch(() => null);
@@ -63,10 +71,7 @@ export async function previewConnect(requested, { home } = {}) {
   // PF-0139: a Git repository in a folder above this one (inside home) — found by name only,
   // no Git command — so the console never offers `git init` inside an existing repository.
   let gitAbove = false;
-  for (let current = path.dirname(folder); !git && current.startsWith(base) && current !== path.dirname(current); current = path.dirname(current)) {
-    if (await present(path.join(current, '.git'))) { gitAbove = true; break; }
-    if (current === base) break;
-  }
+  if (!git) for (const current of above(folder, base)) if (await present(path.join(current, '.git'))) { gitAbove = true; break; }
   // The agent files init's bootstrap step writes (and why it would refuse) come from Core.
   const bootstrap = await bootstrapInitPlan(folder);
   const plan = [{ path: '.yallaflow/', op: 'create' }, ...bootstrap.plan];
@@ -74,6 +79,7 @@ export async function previewConnect(requested, { home } = {}) {
   return finish({
     path: folder,
     name,
+    outsideHome: root.kind !== 'home',
     kind: classification.kind === 'brownfield' ? 'existing-code' : empty ? 'empty' : 'folder',
     projectKind: classification.kind,
     action: 'init',
@@ -97,12 +103,12 @@ function finish(preview) {
 }
 
 // Runs Core's init after the developer confirmed this exact preview. Returns the folder to register.
-export async function connectFolder(body, runner, { home } = {}) {
+export async function connectFolder(body, runner, options = {}) {
   const keys = body && typeof body === 'object' && !Array.isArray(body) ? Object.keys(body).sort() : [];
   if (keys.join(',') !== 'confirm,planHash,root' || body.confirm !== true || typeof body.root !== 'string' || typeof body.planHash !== 'string') {
     throw new HttpError(400, 'CONFIRMATION_REQUIRED', 'Send { root, planHash, confirm: true } after reviewing the preview.');
   }
-  const preview = await previewConnect(body.root, { home });
+  const preview = await previewConnect(body.root, options);
   if (preview.planHash !== body.planHash) throw Object.assign(new HttpError(409, 'PREVIEW_CHANGED', 'The folder changed since you reviewed it. Review the new preview.'), { extra: { preview } });
   if (preview.problems.length) throw Object.assign(new HttpError(409, preview.problems[0].code, preview.problems.map((problem) => problem.message).join(' ')), { extra: { preview } });
   if (preview.action === 'open') return { root: preview.path, initialized: false, preview };

@@ -1,0 +1,46 @@
+{
+  "id": "PF-0146",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Folder picker: browse local drives and mounted volumes read-only (replaces the home-only rule), post-resolution path validation, network paths refused, clear errors without falling back to Home",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-15T14:03:25.142Z",
+  "updatedAt": "2026-11-15T14:51:41.397Z",
+  "title": "Folder picker: browse local drives and mounted volumes read-only (replaces the home-only rule), post-resolution path validation, network paths refused, clear errors without falling back to Home",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-15T14:03:25.203Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-15T14:51:41.397Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-15T18:06:19.792Z",
+      "completedAt": "2026-11-15T18:06:19.792Z",
+      "summary": "detail.baseline (src/flow/snapshot.js) feeds baselineDraft in app.js; the Overview data comes from src/overview/collect.js (facts per area with freshness) and is rendered by viewOverview. Approved facts keep origin { workId, baselineFactId }, which links a brief line to project memory.",
+      "evidence": [
+        "src/flow/snapshot.js",
+        "src/overview/collect.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-15T18:06:20.122Z",
+      "completedAt": "2026-11-15T18:06:20.122Z",
+      "summary": "Approved design item 6: brief on top of the review with the fact list folded beneath, each line opening its facts, inferred lines tagged, coverage shown honestly, a per-line way to say it is wrong; the same brief at the top of the Overview after approval, read through project memory so stale or disputed facts mark their line and superseded ones drop it. No new page."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-15T18:06:20.452Z",
+      "completedAt": "2026-11-15T18:06:20.452Z",
+      "summary": "snapshot.js exposes brief; collect.js resolves the approved brief through fact origins with live freshness; app.js renders briefBlock in the draft panel and the Overview; tests for data and rendering in both languages; older drafts unchanged."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-15T18:08:45.191Z",
+      "completedAt": "2026-11-15T18:08:45.191Z",
+      "summary": "snapshot.js exposes detail.baseline.brief; collect.js adds the approved brief read through project memory (CTX ids via fact origin, care flags from freshness and disputes, lines with no current fact dropped, coverage counts); app.js briefBlock renders it at the top of the draft (citations open the fact, inferred tag, built-with from the stack, coverage, Not right? into the decision note, fact list folded) and as a card at the top of the Overview. Schemas and docs updated; drafts without a brief render as before.",
+      "evidence": [
+        "resources/console/app.js",
+        "src/overview/collect.js",
+        "test/baseline-brief.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-15T18:13:57.670Z",
+      "completedAt": "2026-11-15T18:13:57.670Z",
+      "summary": "npm test (V-001): 1326 tests, 1325 pass, 0 fail, 1 skipped; new cases cover the draft brief on the review page, the approved brief resolved to project-memory facts with stale marking, a baseline without a brief, rendering in English and Arabic, and unchanged rendering of older drafts. The browser pass is run with item 7 at the end of the plan."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-15T18:13:57.670Z"
+}

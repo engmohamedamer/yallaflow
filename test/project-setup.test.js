@@ -244,7 +244,7 @@ const cut = (from, to) => { const start = app.indexOf(from); assert.ok(start >= 
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 function ui({ setupInfo = null, agentSetup = null, readOnly = false, lang = 'en', runtime = null, calls = [] } = {}) {
   // PF-0102: Setup → Agents also shows the Claude Team/Enterprise warning (claudeWarnings).
-  const code = cut('  // ---------- project setup: Stack, Run, Agents', '  // PF-0132: the former Setup & run page') + cut('  // PF-0102: Claude Team/Enterprise accounts', '  // PF-0103: one agent per checkout');
+  const code = cut('  // ---------- project setup: Stack, Run, Agents', '  // PF-0132: the former Setup & run page') + cut('  // PF-0145: on Claude Team/Enterprise accounts', '  // PF-0103: one agent per checkout');
   const context = vm.createContext({ pid: 'p', readOnly, lang, runtime, agentsOn: false, A: (ar, en) => (lang === 'ar' ? ar : en), esc, toast() {}, render() {}, api: async (url) => { calls.push(url); return {}; }, post: async () => ({}), loadRuntime: async () => {}, loadPlan: async () => {} });
   vm.runInContext(`${code}\nsetupInfo = ${JSON.stringify(setupInfo)}; agentSetup = ${JSON.stringify(agentSetup)};\nthis.guide = setupGuide; this.stack = stackSection; this.runS = runSection; this.agents = agentsSection; this.links = openLinks;`, context);
   return context;
@@ -277,14 +277,16 @@ test('UI: Stack lists the scan with what changed; Run links running services to 
   assert.match(h.links({ state: 'running', ports: [{ port: 8000 }], open: '//evil.example' }), /href="http:\/\/127\.0\.0\.1:8000\/"/, 'a bad path falls back to /');
   assert.equal(h.links({ state: 'stopped', ports: [{ port: 8000 }] }), '');
   const runHtml = h.runS({ services: [{ id: 'web', name: 'Web', state: 'running', ports: [{ port: 8000 }], open: '/' }] });
-  assert.match(runHtml, /data-rt-all="start"/);
+  // PF-0144: the project control follows the state: this service runs, so Stop is the one offered.
+  assert.match(runHtml, /class="btn stop big" data-rt-all="stop"/);
+  assert.doesNotMatch(runHtml, /data-rt-all="start"/);
   assert.match(runHtml, /Open :8000/);
 });
 
 // PF-0077: the Start/Stop/Save message follows the language the page is shown in now.
 test('UI: the run message is re-rendered in the current language after a switch', async () => {
   // PF-0102: Setup → Agents also shows the Claude Team/Enterprise warning (claudeWarnings).
-  const code = cut('  // ---------- project setup: Stack, Run, Agents', '  // PF-0132: the former Setup & run page') + cut('  // PF-0102: Claude Team/Enterprise accounts', '  // PF-0103: one agent per checkout');
+  const code = cut('  // ---------- project setup: Stack, Run, Agents', '  // PF-0132: the former Setup & run page') + cut('  // PF-0145: on Claude Team/Enterprise accounts', '  // PF-0103: one agent per checkout');
   const context = vm.createContext({
     pid: 'p', readOnly: false, lang: 'en', runtime: null, agentsOn: false, esc, toast() {}, render() {},
     api: async () => ({}), loadRuntime: async () => {}, loadPlan: async () => {},
@@ -349,9 +351,13 @@ test('session fix: the launch command shows once the files are current; Codex lo
   assert.match(html, /checked when a session starts/);
   const connected = ui({ agentSetup: { pid: 'p', data: { ...data, checklist: { ...data.checklist, channelConnected: true } } } }).agents();
   assert.doesNotMatch(connected, /Run this in a terminal/);
+  // PF-0145: how messages travel is one plain line, never an error
+  assert.match(connected, /data-channel-mode>Messages: Terminal mode\./);
+  assert.match(ui({ agentSetup: { pid: 'p', data: { ...data, checklist: { ...data.checklist, channelConnected: true, channel: 'verified' } } } }).agents(), /data-channel-mode>Messages: sent from the console\./);
+  assert.doesNotMatch(html, /data-channel-mode/);
   const noFiles = ui({ agentSetup: { pid: 'p', data: { ...data, launchCommand: null, checklist: { ...data.checklist, launchFiles: false } } } }).agents();
   assert.doesNotMatch(noFiles, /<pre class="cli"/);
-  assert.match(noFiles, /Channel connected<span class="tiny muted"> — Write the launch files first\./);
+  assert.match(noFiles, /Claude Code connected<span class="tiny muted"> — Write the launch files first\./);
   const ar = ui({ lang: 'ar' });
   assert.equal(vm.runInContext("suggestionNote('A package script can run any command; review what it does before trusting it.')", ar), 'سكريبت الـ package ممكن يشغّل أي أمر؛ راجع بيعمل إيه قبل ما توثّقه.');
   assert.equal(vm.runInContext("suggestionNote('Something new.')", ar), 'Something new.');

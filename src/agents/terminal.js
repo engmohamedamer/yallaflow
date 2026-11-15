@@ -34,6 +34,10 @@ export async function terminalCommand(cwd, command, { platform = process.platfor
     const script = `tell application "Terminal" to do script ${appleString(`cd ${shellQuote(cwd)} && ${command}`)}`;
     return { file: 'osascript', argv: ['-e', script, '-e', 'tell application "Terminal" to activate'] };
   }
+  // Windows (PF-0148; not verified on Windows): a new PowerShell window in the project folder.
+  // The folder is the process's working directory, never part of the command text, and the
+  // command is the one the console built (a fixed prompt and relative file names).
+  if (platform === 'win32') return { file: 'powershell.exe', argv: ['-NoLogo', '-NoExit', '-Command', command] };
   if (platform !== 'linux') return null;
   for (const terminal of LINUX_TERMINALS) {
     const file = await onPath(terminal.bin, env);
@@ -49,7 +53,7 @@ export async function openTerminal(cwd, command, { platform = process.platform, 
   if (!found) throw Object.assign(new Error('No terminal app was found on this machine. Copy the command and run it in your terminal.'), { code: 'NO_TERMINAL', status: 501 });
   await new Promise((resolve, reject) => {
     let child;
-    try { child = spawnFn(found.file, found.argv, { cwd, env, detached: true, stdio: 'ignore', shell: false }); } catch (error) { reject(error); return; }
+    try { child = spawnFn(found.file, found.argv, { cwd, env, detached: true, stdio: 'ignore', shell: false, windowsHide: false }); } catch (error) { reject(error); return; }
     child.once('error', () => reject(Object.assign(new Error('The terminal could not be opened. Copy the command and run it in your terminal.'), { code: 'NO_TERMINAL', status: 501 })));
     child.once('spawn', () => { child.unref?.(); resolve(); });
   });

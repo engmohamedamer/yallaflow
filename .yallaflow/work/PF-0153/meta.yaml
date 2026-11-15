@@ -1,0 +1,47 @@
+{
+  "id": "PF-0153",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Suggested first tasks: up to three evidence-based suggestions recorded with the baseline draft, shown after approval beside the developer's own first request, each prefilling Create Work; nothing is created automatically",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-15T18:14:00.829Z",
+  "updatedAt": "2026-11-15T19:20:16.253Z",
+  "title": "Suggested first tasks: up to three evidence-based suggestions recorded with the baseline draft, shown after approval beside the developer's own first request, each prefilling Create Work; nothing is created automatically",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-15T18:14:00.903Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-15T19:20:16.253Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002",
+        "V-003"
+      ]
+    }
+  ]
+}

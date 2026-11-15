@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Since 1.5.3 (PF-0143), 'yallaflow work show --json' adds an optional quality object when the item has AI QC runs: qc.runs (per run: id, planId, at, tool, origin, summary, passed/failed/blocked/notRun counts, scenarios with plan title, status, note) and report (the repository-relative path of report.html, or null). The console shows these on the item page as a QC tab. Its 'Open the report' action POSTs /api/p/<pid>/work/<id>/quality-report. The server derives the file from the registered project and a validated work id, never from the request, and opens it only when it is a regular file inside the project. QC stays advisory and separate from verification.",
+      "evidence": [
+        "src/flow/snapshot.js",
+        "resources/schemas/work-1.schema.json",
+        "src/console/server.js",
+        "src/console/reveal.js",
+        "verification:V-001"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-13T22:31:34.166Z",
+      "factId": "CTX-0161",
+      "promotedAt": "2026-11-13T22:31:41.093Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-13T22:31:41.093Z",
+  "reviewedAt": "2026-11-13T22:31:41.093Z"
+}

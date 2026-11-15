@@ -15,7 +15,12 @@ export const CATALOG = Object.freeze([
     label: 'Laravel',
     stack: ['PHP', 'Laravel 13', 'Composer'],
     generator: { tool: 'composer create-project', package: 'laravel/laravel', version: '13.11.0' },
-    prerequisites: [{ name: 'php', argv: ['php', '--version'], note: 'PHP 8.3 or newer' }, { name: 'composer', argv: ['composer', '--version'] }],
+    prerequisites: [
+      { name: 'php', argv: ['php', '--version'], note: 'PHP 8.3 or newer' },
+      { name: 'composer', argv: ['composer', '--version'] },
+      // PF-0143 (G1): the generated .env uses SQLite, and creation runs its first migration.
+      { name: 'pdo_sqlite', argv: ['php', '-m'], module: 'pdo_sqlite', note: 'PHP SQLite driver (the generated .env uses SQLite). Debian/Ubuntu: sudo apt install php-sqlite3; Fedora: sudo dnf install php-pdo; macOS (Homebrew PHP): included' }
+    ],
     argv: (name) => ['composer', 'create-project', 'laravel/laravel:13.11.0', name, '--no-interaction', '--prefer-dist'],
     network: true,
     installsDependencies: true,

@@ -268,6 +268,8 @@ pairs = [
  ('<h4>Reopened, re-assessed, done again</h4>', '<h4>اتفتحت تاني، واتراجع أثرها، وخلصت تاني</h4>'),
  ('<p>After review, a finished item was reopened with a reason. YallaFlow raised an impact assessment, the requirements were revised first, and the item was re-verified and closed again.</p>', '<p>بعد المراجعة، شغلانة خلصانة اتفتحت تاني بسبب مكتوب. YallaFlow طلّع تقييم أثر، والمتطلبات اتعدّلت الأول، وبعدها الشغلانة اتحقّقت تاني واتقفلت.</p>'),
  ('<p class="note">The stories come from a technical showcase recorded inside DmagAI (work item PF-0051). The figures were counted from DmagAI\'s own YallaFlow records on 8 November 2026.</p>', '<p class="note">القصص دي من عرض تقني اتسجّل جوه DmagAI (الشغلانة PF-0051)، والأرقام محسوبة من سجلات YallaFlow بتاعة DmagAI نفسه يوم ٨ نوفمبر ٢٠٢٦.</p>'),
+ # PF-0156: 1.5.3
+ ('<time datetime="2026-11-15">15 Nov 2026</time><b>1.5.3</b><span>A clearer start: a Project Brief, suggested first tasks, approval from the console</span>', '<time datetime="2026-11-15">١٥ نوفمبر ٢٠٢٦</time><b>1.5.3</b><span>بداية أوضح: ملخّص للمشروع، اقتراحات لأول مهام، والموافقة من الكونسول</span>'),
  # PF-0141: 1.5.2
  ('<time datetime="2026-11-12">12 Nov 2026</time><b>1.5.2</b><span>An easier first hour: connect a project, choose its agent, one guided flow to run the app</span>', '<time datetime="2026-11-12">١٢ نوفمبر ٢٠٢٦</time><b>1.5.2</b><span>أول ساعة أسهل: وصّل مشروع، اختار وكيله، ومسار واحد لتشغيل التطبيق</span>'),
  ('<time datetime="2026-11-10">10 Nov 2026</time><b>1.5.1</b><span>Steadier console</span>', '<time datetime="2026-11-10">١٠ نوفمبر ٢٠٢٦</time><b>1.5.1</b><span>كونسول أثبت</span>'),

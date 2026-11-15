@@ -86,13 +86,29 @@ test('claude (simulated): channel server registers, relays chat, replies, permis
     await hook({ hook_event_name: 'UserPromptSubmit', cwd: root, session_id: 'sess-9999-other', permission_mode: 'bypassPermissions' });
     await sleep(150);
     assert.equal(c.events.some((e) => e.mode === 'bypassPermissions'), false, 'a foreign session cannot change the linked mode');
+    // PF-0145: an open stream is not proof. The connection is checked once with a nonce, and
+    // the console sends nothing itself until the session sends that nonce back.
+    const check = await mcp.waitFor((m) => m.method === 'notifications/claude/channel' && m.params.meta.kind === 'connection_check');
+    assert.match(check.params.meta.chat_id, /^check-[0-9a-f]{16}$/);
+    assert.equal(c.events.some((e) => e.type === 'message.sent'), false, 'the check is never shown as a chat message');
+    const unverified = await c.post('message', { text: 'before the check is answered' });
+    assert.equal(unverified.status, 409);
+    assert.equal((await unverified.json()).error.code, 'CHANNEL_UNVERIFIED');
+    mcp.send({ id: 30, method: 'tools/call', params: { name: 'reply', arguments: { chat_id: check.params.meta.chat_id, text: 'ok' } } });
+    await c.waitFor((e) => e.type === 'channel.state' && e.state === 'verified');
+    assert.equal(c.events.some((e) => e.type === 'message.done'), false, 'the acknowledgment is not a chat reply');
     await c.post('message', { text: 'Continue the work' });
-    const pushed = await mcp.waitFor((m) => m.method === 'notifications/claude/channel');
+    const pushed = await mcp.waitFor((m) => m.method === 'notifications/claude/channel' && m.params.content === 'Continue the work');
+    assert.match(pushed.params.meta.chat_id, /^[0-9a-f]{8}$/);
+    assert.equal(c.events.find((e) => e.type === 'message.sent').state, 'sending');
+    mcp.send({ id: 31, method: 'tools/call', params: { name: 'received', arguments: { chat_id: pushed.params.meta.chat_id } } });
+    assert.equal((await c.waitFor((e) => e.type === 'message.state' && e.state === 'received')).chatId, pushed.params.meta.chat_id);
     assert.equal(pushed.params.content, 'Continue the work');
     assert.equal(pushed.params.meta.work_id, workId);
     mcp.send({ id: 3, method: 'tools/call', params: { name: 'reply', arguments: { chat_id: pushed.params.meta.chat_id, text: 'On it.' } } });
     assert.equal((await mcp.waitFor((m) => m.id === 3)).result.content[0].text, 'sent');
     assert.equal((await c.waitFor((e) => e.type === 'message.done')).text, 'On it.');
+    assert.equal((await c.waitFor((e) => e.type === 'message.state' && e.state === 'answered')).chatId, pushed.params.meta.chat_id);
 
     // permission relay: deny from the console (tied to the tool call whose PreToolUse preceded it)
     await hook({ hook_event_name: 'PreToolUse', cwd: root, tool_name: 'Bash', tool_use_id: 'tu-1', session_id: 'sess-0001-abcd', permission_mode: 'default' });
@@ -320,9 +336,9 @@ test('review: Claude detection runs only after opt-in; a failed Claude enable le
   }
 });
 
-// PF-0102: a Claude Team/Enterprise login gets a warning (channels are off unless the org
-// opts in), and a console message that no hook ever answers is reported as not delivered.
-test('Claude Team accounts get a channel warning; an unanswered console message is reported', { skip }, async () => {
+// A Claude Team/Enterprise login gets one calm note (the organization may not allow sending
+// from the console); the connection check decides (PF-0145, test/agent-claude-reliability.test.js).
+test('Claude Team accounts get one plain note that does not block', { skip }, async () => {
   const { writeFile, chmod } = await import('node:fs/promises');
   const { detectClaude } = await import('../src/agents/claude-detect.js');
   const bin = await mkdtemp(path.join(os.tmpdir(), 'yf-fake-claude-team-'));
@@ -331,25 +347,9 @@ test('Claude Team accounts get a channel warning; an unanswered console message 
   await chmod(path.join(bin, 'claude'), 0o755);
   const team = await detectClaude({ ...process.env, PATH: `${bin}:${process.env.PATH}` });
   assert.equal(team.ready, true, 'a warning does not block');
-  assert.match(team.warnings.join(' '), /Claude Team account.*channels/);
+  assert.match(team.warnings.join(' '), /Claude Team account.*may not allow sending from the console/);
   await writeFile(path.join(bin, 'claude'), fake('max'));
   const max = await detectClaude({ ...process.env, PATH: `${bin}:${process.env.PATH}` });
   assert.deepEqual(max.warnings, [], 'personal plans get no warning');
 
-  const { ClaudeLink } = await import('../src/agents/claude.js');
-  const events = [];
-  const link = new ClaudeLink({ emit: (event) => events.push(event) });
-  link.deliveryTimeoutMs = 50;
-  link.stream = { write() {}, destroyed: false, writableEnded: false, end() {} };
-  link.connected = true;
-  link.send('hello', 'PF-0001');
-  await sleep(120);
-  assert.equal(events.at(-1).type, 'delivery.unconfirmed');
-  assert.equal(link.status, 'connected', 'no longer shown as working');
-  events.length = 0;
-  link.send('again', 'PF-0001');
-  link.onHook({ session_id: 'sess-12345678', hook_event_name: 'UserPromptSubmit' });
-  await sleep(120);
-  assert.equal(events.some((event) => event.type === 'delivery.unconfirmed'), false, 'a hook after sending confirms delivery');
-  link.detach();
 });

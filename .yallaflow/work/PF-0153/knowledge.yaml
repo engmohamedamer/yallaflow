@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Suggested first tasks (PF-0153): a baseline draft may carry up to three suggestions (title, why, optional type) validated in src/baseline/store.js; each must cite facts (BF ids) or discovery limitations (DL ids) of the same draft. They stay in baseline.yaml and are never promoted. After approval src/overview/collect.js exposes firstTasks: the developer's own first request (pendingOriginalRequest) and the suggestions read through current project-memory facts, dropping any with nothing current behind it. The console's Start here panel only prefills Create Work (openCreate(prefill)); nothing is created from a suggestion.",
+      "evidence": [
+        "src/baseline/store.js",
+        "src/overview/collect.js",
+        "resources/console/app.js"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-15T19:20:15.538Z",
+      "factId": "CTX-0167",
+      "promotedAt": "2026-11-15T19:20:15.723Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-15T19:20:15.723Z",
+  "reviewedAt": "2026-11-15T19:20:15.723Z"
+}

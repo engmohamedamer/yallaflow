@@ -40,6 +40,17 @@ function summary(input) {
   return null;
 }
 
+// PF-0145: which console message a hook belongs to, when the event names it: the marker the
+// console adds to a message copied for the terminal, the channel tag of a console message, or
+// the chat_id given to the channel's own tools. Only the id is forwarded, never the prompt.
+function chatId(input) {
+  if (input.hook_event_name === 'UserPromptSubmit' && typeof input.prompt === 'string') {
+    const found = /\[yallaflow ([0-9a-f]{8})\]/.exec(input.prompt) ?? /<channel\b[^>]*\bsource="yallaflow"[^>]*\bchat_id="([A-Za-z0-9-]{1,40})"/.exec(input.prompt);
+    return found ? found[1] : null;
+  }
+  if (/^mcp__yallaflow__(reply|received)$/.test(String(input.tool_name ?? '')) && typeof input.tool_input?.chat_id === 'string') return short(input.tool_input.chat_id, 40) || null;
+  return null;
+}
 
 // The console proves it knows the bridge token before anything is sent (security review,
 // PF-0060): a stale bridge file's port may now belong to another program or user. The
@@ -87,6 +98,7 @@ process.stdin.on('end', async () => {
     tool_name: short(input.tool_name, 80) || null,
     tool_use_id: short(input.tool_use_id, 80) || null,
     summary: summary(input),
+    chat_id: chatId(input),
     notification_type: short(input.notification_type, 40) || null,
     message: short(input.message, 200) || null,
     last_assistant_message: input.hook_event_name === 'Stop' && typeof input.last_assistant_message === 'string' ? input.last_assistant_message.slice(0, 20_000) : null

@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Project Brief (PF-0151): a baseline draft may carry an optional brief (summary, users, capabilities, components, worthKnowing) validated by normalizeBrief in src/baseline/store.js. Every line cites facts of the same draft (BF ids by order), worthKnowing may cite discovery limitations (DL ids), and unresolved facts may be stated only under worthKnowing. The brief is part of the review digest, stays in baseline.yaml and is never promoted: only facts become project memory, and brief lines are read through the facts they cite. Technologies and coverage are not authored in it. The agent learns the format from the baseline CLI output (start, and a hint after a draft without one), not from a new skill version.",
+      "evidence": [
+        "src/baseline/store.js",
+        "src/commands/baseline.js",
+        "test/baseline-brief.test.js"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-15T18:05:55.726Z",
+      "factId": "CTX-0166",
+      "promotedAt": "2026-11-15T18:05:55.883Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-15T18:05:55.883Z",
+  "reviewedAt": "2026-11-15T18:05:55.883Z"
+}

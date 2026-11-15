@@ -10,6 +10,7 @@ import { loadContextLedger } from '../context/ledger.js';
 import { factFreshness } from '../context/freshness.js';
 import { FRESHNESS } from '../context/constants.js';
 import { assessProjectUnderstanding, UNDERSTANDING } from '../baseline/understanding.js';
+import { BRIEF_LISTS, findBaselineWork, loadBaseline, pendingOriginalRequest } from '../baseline/store.js';
 import { classifyProject, inventoryRepository } from '../inventory/inventory.js';
 import { detectStack } from '../inventory/stack.js';
 
@@ -59,6 +60,8 @@ export async function collectOverview(root, { now = new Date().toISOString() } =
     command: understanding.command ?? guidance.command
   };
 
+  // PF-0152: baseline fact id → the project-memory fact it became, with its live freshness.
+  const fromBaseline = new Map();
   const memory = { available: true, current: 0, fresh: 0, mayBeStale: 0, staleEvidence: 0, unknown: 0, disputed: 0, unresolved: 0, error: null };
   const areas = Object.fromEntries(SUMMARY_AREAS.map((area) => [area, { total: 0, facts: [] }]));
   try {
@@ -66,6 +69,7 @@ export async function collectOverview(root, { now = new Date().toISOString() } =
     for (const fact of ledger.facts) {
       if (fact.state === 'superseded') continue;
       const freshness = (await factFreshness(root, fact)).status;
+      if (fact.origin?.baselineFactId) fromBaseline.set(`${fact.origin.workId}:${fact.origin.baselineFactId}`, { id: fact.id, state: fact.state, freshness });
       memory.current += 1;
       if (fact.state === 'disputed') memory.disputed += 1;
       if (fact.confidence === 'unresolved') memory.unresolved += 1;
@@ -85,6 +89,8 @@ export async function collectOverview(root, { now = new Date().toISOString() } =
   }
 
   const stack = inventory ? await detectStack(root, inventory) : { entries: [], modules: [], unread: [] };
+  const brief = memory.available ? await approvedBrief(root, fromBaseline).catch(() => null) : null;
+  const firstTasks = memory.available ? await firstTasksAfterApproval(root, fromBaseline).catch(() => null) : null;
 
   return {
     schema: OVERVIEW_SCHEMA,
@@ -100,6 +106,8 @@ export async function collectOverview(root, { now = new Date().toISOString() } =
     },
     understanding,
     memory,
+    ...(brief ? { brief } : {}),
+    ...(firstTasks ? { firstTasks } : {}),
     areas,
     stack: { entries: stack.entries, unread: stack.unread },
     modules: stack.modules,
@@ -119,4 +127,60 @@ export async function collectOverview(root, { now = new Date().toISOString() } =
         }
       : { available: false, error: inventoryError }
   };
+}
+
+// PF-0152: the approved baseline's brief, read through project memory. The brief itself is
+// never a second source of truth: each line is shown with the current facts it cites. A line
+// whose cited facts changed (evidence may be stale, or the fact is disputed) is marked; a line
+// whose cited facts were all superseded is left out, because nothing current supports it.
+async function approvedBrief(root, fromBaseline) {
+  const work = await findBaselineWork(root);
+  if (!work) return null;
+  const { exists, ledger } = await loadBaseline(root, work.id);
+  if (!exists || ledger.status !== 'approved' || !ledger.brief) return null;
+  const stale = new Set([FRESHNESS.MAY_BE_STALE, FRESHNESS.STALE_EVIDENCE]);
+  const view = (line) => {
+    if (!line) return null;
+    const current = (line.facts ?? []).map((id) => fromBaseline.get(`${work.id}:${id}`)).filter(Boolean);
+    const limitations = (line.limitations ?? []).length;
+    if (!current.length && !limitations) return null;
+    return {
+      text: line.text,
+      facts: current.map((fact) => fact.id),
+      ...(limitations ? { limitations } : {}),
+      ...(current.some((fact) => fact.state === 'disputed') ? { care: 'disputed' } : current.some((fact) => stale.has(fact.freshness)) ? { care: 'may-be-stale' } : {})
+    };
+  };
+  const lists = Object.fromEntries(BRIEF_LISTS.map((name) => [name, (ledger.brief[name] ?? []).map(view).filter(Boolean)]));
+  return {
+    baselineId: work.id,
+    approvedAt: ledger.approvedAt ?? null,
+    summary: view(ledger.brief.summary),
+    ...lists,
+    coverage: { declared: Boolean(ledger.coverage), inspected: ledger.coverage?.inspected?.length ?? 0, sampled: ledger.coverage?.sampled?.length ?? 0, notInspected: (ledger.limitations ?? []).length }
+  };
+}
+
+// PF-0153: what the developer can start with once the understanding is approved: their own
+// first request (recorded as the baseline's objective), then the agent's suggestions, each
+// read through the current facts it cites. A suggestion with nothing current behind it is
+// left out. These are proposals only; the console creates work only when the developer does.
+async function firstTasksAfterApproval(root, fromBaseline) {
+  const work = await findBaselineWork(root);
+  if (!work) return null;
+  const { exists, ledger } = await loadBaseline(root, work.id);
+  if (!exists || ledger.status !== 'approved') return null;
+  const stale = new Set([FRESHNESS.MAY_BE_STALE, FRESHNESS.STALE_EVIDENCE]);
+  const suggestions = (ledger.suggestions ?? []).map((entry) => {
+    const current = (entry.facts ?? []).map((id) => fromBaseline.get(`${work.id}:${id}`)).filter(Boolean);
+    const limitations = (entry.limitations ?? []).length;
+    if (!current.length && !limitations) return null;
+    return {
+      title: entry.title, why: entry.why, type: entry.type ?? null, facts: current.map((fact) => fact.id),
+      ...(limitations ? { limitations } : {}),
+      ...(current.some((fact) => fact.state === 'disputed') ? { care: 'disputed' } : current.some((fact) => stale.has(fact.freshness)) ? { care: 'may-be-stale' } : {})
+    };
+  }).filter(Boolean);
+  const original = await pendingOriginalRequest(root).catch(() => null);
+  return { baselineId: work.id, request: original?.objective ?? null, suggestions };
 }

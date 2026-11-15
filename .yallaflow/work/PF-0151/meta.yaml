@@ -1,0 +1,45 @@
+{
+  "id": "PF-0151",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Project Brief: an optional plain-language brief in the baseline draft whose every line cites the draft's own facts or limitations; validated by Core, shown by baseline show, explained to the agent at baseline start",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-15T17:58:50.647Z",
+  "updatedAt": "2026-11-15T18:05:56.309Z",
+  "title": "Project Brief: an optional plain-language brief in the baseline draft whose every line cites the draft's own facts or limitations; validated by Core, shown by baseline show, explained to the agent at baseline start",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-15T17:58:50.700Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-15T18:05:56.309Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

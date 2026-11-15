@@ -26,6 +26,15 @@
       "description": "Review gates and their decisions (added in 1.4.0). provenance is present only for decisions made in the web console: { via: 'console', identity: 'not verified', host, claimedGitName } — a local-user decision, never a verified identity.",
       "items": { "type": "object", "required": ["gate", "status"] }
     },
+    "quality": {
+      "type": "object",
+      "description": "Optional AI QC runs recorded for this work item (added in 1.5.3). Advisory quality records, separate from verification evidence. Present only when the item has QC runs. report is the repository-relative path of the generated report.html, or null.",
+      "required": ["qc", "report"],
+      "properties": {
+        "qc": { "type": "object", "required": ["runs"], "properties": { "runs": { "type": "array", "items": { "type": "object", "required": ["id", "passed", "failed", "blocked", "notRun", "scenarios"] } }, "error": { "type": "string" } } },
+        "report": { "type": ["string", "null"] }
+      }
+    },
     "baseline": {
       "type": "object",
       "description": "A Repository Baseline's draft, for the developer's review (added in 1.5.2). Present only for a baseline work item that has a draft. Discovery limitations are work-scoped and never project facts.",
@@ -34,7 +43,12 @@
         "status": { "type": "string" },
         "draftedAt": { "type": ["string", "null"] },
         "facts": { "type": "array", "items": { "type": "object", "required": ["id", "area", "status", "summary", "evidence"] } },
-        "limitations": { "type": "array", "items": { "type": "object", "required": ["id", "summary"] } }
+        "limitations": { "type": "array", "items": { "type": "object", "required": ["id", "summary"] } },
+        "coverage": { "type": ["object", "null"], "description": "What the discovery declared it read: { inspected, sampled } (added with the console baseline decision)." },
+        "brief": { "type": ["object", "null"], "description": "The draft's Project Brief: { summary, users, capabilities, components, worthKnowing }, each line { text, facts: [BF ids], limitations?: [DL ids] }." },
+        "suggestions": { "type": "array", "description": "First tasks the agent proposes with the draft: [{ title, why, type?, facts: [BF ids], limitations?: [DL ids] }], at most 3. Proposals only." },
+        "gaps": { "type": "object", "description": "What the draft itself does not know: { notInspected, unresolved, coverageDeclared }." },
+        "digest": { "type": "string", "description": "sha256 of the reviewed draft; a console decision carries it and is refused when the draft changed." }
       }
     }
   }

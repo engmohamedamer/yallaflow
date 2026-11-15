@@ -71,7 +71,9 @@ export class CodexSession {
     const env = adapterEnvironment(this.env, this.detection.codex?.path);
     let authResolve;
     this.authReport = new Promise((resolve) => { authResolve = resolve; });
-    this.conn = new AcpConnection(adapter, [], {
+    // PF-0148: what detection resolved to start (on Windows an npm shim's target with node).
+    const launch = this.detection.adapter.launch ?? { file: adapter, args: [] };
+    this.conn = new AcpConnection(launch.file, launch.args, {
       cwd: this.root,
       env,
       onNotification: (method, params) => this.onNotification(method, params, authResolve),

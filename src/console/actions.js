@@ -153,8 +153,66 @@ async function gateMaterial(root, workId, gate, read) {
   return { ...material, digest };
 }
 
+// ---------------------------------------------------------------- PF-0147: the baseline
+// The project-understanding draft is decided with Core's own `baseline approve|feedback`.
+// Core keeps structured console provenance off the baseline gate (and older versions report
+// it as an integrity problem), so the decision says where it came from the way baseline
+// decisions always have: in its note ("Approved by … in the agent session: …").
+// The material is the draft itself (facts, limitations, coverage), read through
+// `work show --json`; its digest is Core's (baselineReviewDigest), so the page, the check
+// here and the CLI all mean the same draft.
+export const BASELINE_NOTE_MARK = 'Decided in the YallaFlow console by the local user';
+async function baselineMaterial(workId, read) {
+  const detail = await read(['work', 'show', workId, '--json']);
+  if (detail.status !== 0) throw new HttpError(404, 'NOT_FOUND', cliText(detail));
+  const work = JSON.parse(detail.stdout);
+  if (!work.baseline) throw new HttpError(409, 'STALE', 'This work item has no project-understanding draft to decide. Nothing was recorded.');
+  return {
+    workId, gate: 'baseline', title: work.item?.title ?? workId, step: work.item?.baselineStep ?? null, status: work.baseline.status,
+    draftedAt: work.baseline.draftedAt ?? null, facts: work.baseline.facts, limitations: work.baseline.limitations,
+    coverage: work.baseline.coverage ?? null, gaps: work.baseline.gaps, digest: work.baseline.digest
+  };
+}
+
+async function decideBaseline(root, workId, input, runner) {
+  const body = input && typeof input === 'object' && !Array.isArray(input) ? input : {};
+  const decision = oneOf(body.decision, ['approve', 'request_changes'], 'The decision');
+  const requestId = String(body.requestId ?? '');
+  if (!/^[A-Za-z0-9-]{8,64}$/.test(requestId)) throw new HttpError(422, 'INVALID', 'A request id is required.');
+  if (body.confirmed !== true) throw new HttpError(422, 'CONFIRMATION', 'Confirm that you reviewed the project understanding and that this is your decision.');
+  const note = text(body.note, 'A decision note');
+  const digest = String(body.digest ?? '');
+  const key = JSON.stringify([root, workId, 'baseline', requestId]);
+  if (decided.has(key)) return { ...decided.get(key), duplicate: true };
+  return runner.exclusive(root, async (exec) => {
+    if (decided.has(key)) return { ...decided.get(key), duplicate: true };
+    const current = await baselineMaterial(workId, exec);
+    // Only a draft that waits for review is decided here: a draft still being written, one
+    // already sent back, and an approved one have nothing to decide.
+    if (current.status !== 'draft' || current.step !== 'awaiting-review') throw new HttpError(409, 'STALE', 'The project understanding is no longer waiting for your review (it was decided or is being revised). Reload to see its current state; nothing was recorded.');
+    if (current.digest !== digest) throw new HttpError(409, 'STALE', 'The project-understanding draft changed since you reviewed it. Reload and review it again; nothing was recorded.');
+    // What the draft does not know is acknowledged by name, never silently approved.
+    const gaps = current.gaps ?? {};
+    if (decision === 'approve' && (gaps.notInspected || gaps.unresolved || !gaps.coverageDeclared) && body.acknowledgedGaps !== true) {
+      throw new HttpError(422, 'GAPS', 'This draft has areas that were not inspected or facts that are not settled. Confirm that you are approving it with them.');
+    }
+    const who = claimedGitName(root);
+    const recorded = `${note.trim()}\n\n${BASELINE_NOTE_MARK} (identity not verified; host ${os.hostname().replace(/\s+/g, ' ').slice(0, 255)}${who ? `; claimed Git name ${who.replace(/\s+/g, ' ')}` : ''}).`;
+    const args = decision === 'approve'
+      ? ['baseline', 'approve', workId, opt('note', recorded)]
+      : ['baseline', 'feedback', workId, '--changes-requested', opt('note', recorded)];
+    const result = await exec(args);
+    if (result.status !== 0) throw new HttpError(409, 'REFUSED', cliText(result));
+    const outcome = { ok: true, decision, gate: 'baseline', workId, recorded: 'console, identity not verified', output: result.stdout.trim().split('\n').filter(Boolean) };
+    decided.set(key, outcome);
+    if (decided.size > 500) decided.delete(decided.keys().next().value);
+    return outcome;
+  });
+}
+
 export async function gateReview(root, workId, gate, runner) {
   if (!isWorkId(workId)) throw new HttpError(400, 'BAD_WORK', 'Invalid work item.');
+  if (gate === 'baseline') return runner.exclusive(root, (exec) => baselineMaterial(workId, exec));
   oneOf(gate, CONSOLE_GATES, 'The gate');
   // The same step and the same builder a decision uses, so the digest shown is the one checked.
   return runner.exclusive(root, (exec) => gateMaterial(root, workId, gate, exec));
@@ -169,6 +227,7 @@ export function claimedGitName(root) {
 
 export async function decideGate(root, workId, gate, input, runner) {
   if (!isWorkId(workId)) throw new HttpError(400, 'BAD_WORK', 'Invalid work item.');
+  if (gate === 'baseline') return decideBaseline(root, workId, input, runner);
   oneOf(gate, CONSOLE_GATES, 'The gate');
   const body = input && typeof input === 'object' && !Array.isArray(input) ? input : {};
   // Everything is validated before a repeated request is recognized, and a repeat is

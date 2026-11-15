@@ -153,7 +153,7 @@ test('new folder for a project location: one safe name, inside home, never reuse
   assert.equal(listed.path, path.join(dir, 'code', 'new-app'));
   await assert.rejects(createFolder(path.join(dir, 'code'), 'new-app', { home: dir }), { code: 'EXISTS' });
   for (const bad of ['..', '.hidden', 'a/b', '', ' lead', 'x'.repeat(90), 'bad\u0000name', 'trail.']) await assert.rejects(createFolder(path.join(dir, 'code'), bad, { home: dir }), { code: 'BAD_NAME' }, JSON.stringify(bad));
-  await assert.rejects(createFolder(os.tmpdir(), 'x', { home: dir }), { code: 'OUTSIDE_HOME' });
+  await assert.rejects(createFolder(os.tmpdir(), 'x', { home: dir }), { code: 'OUTSIDE_ALLOWED' });
   assert.ok((await createFolder(path.join(dir, 'code'), 'مشروع جديد', { home: dir })).path.endsWith('مشروع جديد'), 'Arabic names are fine');
 });
 

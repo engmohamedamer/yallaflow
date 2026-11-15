@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-15T12:08:09.008Z",
+      "completedAt": "2026-11-15T12:08:09.008Z",
+      "summary": "Read src/agents/claude.js (ClaudeLink: stream, send, watchDelivery, onHook first-seen session binding), resources/agents/claude-channel.mjs and claude-hook.mjs, claude-files.js (launch files), claude-detect.js (Team warning), bridge.js (message, sessionSummary, claudeChecklist), server.js bridge routes, and the chat panel in resources/console/app.js. Today a send is allowed as soon as the stream is open and a mode is known; delivery is guessed from any later hook of the bound session (PF-0102, 60 s); messages carry a counter chat_id; the Team warning is shown in several places; hooks are bound to the first session seen and never rebound.",
+      "evidence": [
+        "src/agents/claude.js",
+        "resources/agents/claude-channel.mjs",
+        "resources/agents/claude-hook.mjs",
+        "resources/console/app.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-15T12:09:45.250Z",
+      "completedAt": "2026-11-15T12:09:45.250Z",
+      "summary": "Requirements are the owner's five groups in the request: (1) one-time nonce probe per connection, no project work, direct messaging only after a matching acknowledgment, timeout means unverified, late acks/reconnects/session changes handled; (2) per-chat_id states Sending/Received/Answered/Delivery unconfirmed, no claim from an open stream or unrelated hooks, no automatic resend, no duplicate execution across modes; (3) Terminal Mode as a normal workflow with Copy for terminal, hook monitoring verified and tied to the right session, no channel errors, no API keys; (4) existing design, one connection state, plain words, Codex unchanged; (5) regression tests, Arabic and English, nothing committed. No business ambiguity."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-15T12:09:45.583Z",
+      "completedAt": "2026-11-15T12:09:45.583Z",
+      "summary": "Plan: ClaudeLink gets a per-connection channel state (checking/verified/unverified) with a nonce probe answered through the channel's reply tool; per-chat records with random chat ids, a fixed route (direct or terminal) and states driven only by chat-specific evidence (a received tool call, a hook carrying the chat id, the reply); hook forwarder forwards only a chat id found in the prompt marker or the yallaflow tool input, plus SessionEnd; hooks rebind on proof and unbind on SessionEnd; hook-only sessions count as connected in Terminal Mode. Bridge routes a message as direct only when verified, otherwise records a terminal copy. Console shows one connection chip, per-message status lines and a Copy for terminal composer; the Team warning and delivery.unconfirmed note are retired. Documented basis: Claude Code does not acknowledge channel notifications and drops blocked ones silently (channels reference)."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-15T12:46:28.694Z",
+      "completedAt": "2026-11-15T12:46:28.694Z",
+      "summary": "ClaudeLink: nonce connection check per stream, channel state none/checking/verified/unverified, per-chat records with random ids, a fixed route and evidence-only states, hook rebinding on proof and unbinding on SessionEnd, hook-only sessions connected. Channel server: received tool and connection-check instructions. Hook forwarder: forwards only a chat id (marker, channel tag or own tool input) and SessionEnd. Launch settings allow the two channel tools and add SessionEnd. Bridge/server: terminal route, CHANNEL_UNVERIFIED. Console: one connection chip, per-message state lines, Copy for terminal, Team warning reduced to one note in Settings. Docs updated. Existing tests updated; new test/agent-claude-reliability.test.js.",
+      "evidence": [
+        "src/agents/claude.js",
+        "test/agent-claude-reliability.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-15T12:52:51.485Z",
+      "completedAt": "2026-11-15T12:52:51.485Z",
+      "summary": "npm test: 1273 tests, 1272 pass, 0 fail, 1 skipped. Browser check (Playwright, simulated Claude side, temp project): Arabic Terminal mode with Copy for terminal, received and answered through hooks only; English verified connection after a late acknowledgment, Sending/Received/Answered, Delivery unconfirmed after the timeout with no resend, channel drop falling back to Terminal mode on the next hook; no console errors. Not run: a real Claude Code session on the owner's Team account."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-15T12:52:51.485Z"
+}

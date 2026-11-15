@@ -1,0 +1,55 @@
+{
+  "id": "PF-0155",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console board: the greeting header (hero) flashes/fades in again whenever an agent-needs-attention notification arrives. Seen on the lalaff board when PF-0003 started waiting for a reply. Likely cause (not yet verified): .hero in resources/console/app.css line 64 has an entrance animation (rise .7s both) and the board re-render on a new snapshot recreates the hero element, replaying it. The entrance animation should play only on first paint, not on live updates.",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-15T20:17:07.060Z",
+  "updatedAt": "2026-11-15T20:58:03.898Z",
+  "title": "Console board: the greeting header (hero) flashes/fades in again whenever an agent-needs-attention notification arrives. Seen on the lalaff board when PF-0003 started waiting for a reply. Likely cause (not yet verified): .hero in resources/console/app.css line 64 has an entrance animation (rise .7s both) and the board re-render on a new snapshot recreates the hero element, replaying it. The entrance animation should play only on first paint, not on live updates.",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-11-15T20:17:07.122Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0118",
+      "type": "file",
+      "name": "Screenshot from 2026-11-15 22-14-28.png",
+      "detectedFormat": "png",
+      "contentAvailability": "original-only",
+      "linkedAt": "2026-11-15T20:17:15.370Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    }
+  ],
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-15T20:58:03.898Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}
