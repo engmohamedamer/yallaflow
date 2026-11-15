@@ -4,14 +4,14 @@
   "scope": "bounded",
   "routingStatus": "routed",
   "rawRequest": "Release v1.5.3: version bump, changelog, README, tour and website for PF-0143 to PF-0155; commit, tag v1.5.3, push main and the tag, GitHub Release (npm publish through release.yml), website deploy",
-  "status": "VERIFICATION",
+  "status": "DONE",
   "readOnly": false,
   "knowledgePolicy": {
     "version": 1,
     "reviewRequired": true
   },
   "createdAt": "2026-11-15T21:01:21.801Z",
-  "updatedAt": "2026-11-15T21:03:58.575Z",
+  "updatedAt": "2026-11-15T21:17:34.240Z",
   "title": "Release v1.5.3: version bump, changelog, README, tour and website for PF-0143 to PF-0155; commit, tag v1.5.3, push main and the tag, GitHub Release (npm publish through release.yml), website deploy",
   "routingConfidence": "high",
   "routingReason": "Explicitly classified by the user: `yallaflow release --scope bounded`.",
@@ -33,5 +33,13 @@
       "verification",
       "code-review"
     ]
-  }
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-15T21:17:34.240Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
 }

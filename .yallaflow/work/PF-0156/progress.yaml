@@ -45,7 +45,14 @@
       "summary": "Reviewed the release diff: version strings agree in package.json, lockfile, src/version.js, tests, README and site; the CHANGELOG section names every item PF-0143 to PF-0155 and each claim was checked against the items' recorded implementation; Windows and macOS volume support is labelled not verified; no unrelated change; untracked .playwright-cli/ and research/ux-1.5.2/ stay out of the commit. No blocking issue found. Optional: the site's 'New in 1.5.2' section and tour screenshots still show 1.5.2 and were left as captured."
     }
   },
-  "rulings": [],
+  "rulings": [
+    {
+      "decision": "Released 1.5.3: commit 5b761c7 on main, annotated tag v1.5.3, GitHub Release by engmohamedamer, release.yml run 43762365730 green (guard, test on Node 20/22/24, publish with provenance), tarball shasum c3482f36b91399d7ab9ad26bb56edc0550023c65 identical to the local pack; Pages run 43762194208 failed once on a transient artifact lookup and deployed on re-run, live site reports 1.5.3",
+      "reason": "The owner chose version 1.5.3 and a full release in one go in the agent session on 2026-11-15",
+      "costIfWrong": "A published npm version cannot be unpublished or reused; a fix needs 1.5.4",
+      "createdAt": "2026-11-15T21:17:33.878Z"
+    }
+  ],
   "history": [],
-  "updatedAt": "2026-11-15T21:10:11.172Z"
+  "updatedAt": "2026-11-15T21:17:33.878Z"
 }
