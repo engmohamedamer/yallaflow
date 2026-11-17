@@ -1,0 +1,598 @@
+TAP version 13
+# Subtest: first run: the welcome panel offers Create, Manage and Monitor in plain words, in Arabic and English
+ok 1 - first run: the welcome panel offers Create, Manage and Monitor in plain words, in Arabic and English
+  ---
+  duration_ms: 18.231184
+  type: 'test'
+  ...
+# Subtest: first run: the agent state is shown with Create and Manage; its setup opens in place; a ready agent shows no setup
+ok 2 - first run: the agent state is shown with Create and Manage; its setup opens in place; a ready agent shows no setup
+  ---
+  duration_ms: 11.950129
+  type: 'test'
+  ...
+# Subtest: first run: the intent is saved and routes: Create to the wizard, Manage and Monitor to the folder chooser
+ok 3 - first run: the intent is saved and routes: Create to the wizard, Manage and Monitor to the folder chooser
+  ---
+  duration_ms: 9.074027
+  type: 'test'
+  ...
+# Subtest: wizard stack step: planning with the agent is the usual path; fixed templates are a labeled Advanced section
+ok 4 - wizard stack step: planning with the agent is the usual path; fixed templates are a labeled Advanced section
+  ---
+  duration_ms: 24.889616
+  type: 'test'
+  ...
+# Subtest: wizard agent step: an agent-planned project needs a chosen, ready agent; the way around it is a labeled Advanced tick
+ok 5 - wizard agent step: an agent-planned project needs a chosen, ready agent; the way around it is a labeled Advanced tick
+  ---
+  duration_ms: 39.2087
+  type: 'test'
+  ...
+# Subtest: wizard agent step: a fixed template needs no agent; a returning user with a ready usual agent sees no setup
+ok 6 - wizard agent step: a fixed template needs no agent; a returning user with a ready usual agent sees no setup
+  ---
+  duration_ms: 34.909451
+  type: 'test'
+  ...
+# Subtest: layout: the intent cards wrap on narrow screens and use the theme tokens (light and dark)
+ok 7 - layout: the intent cards wrap on narrow screens and use the theme tokens (light and dark)
+  ---
+  duration_ms: 1.707826
+  type: 'test'
+  ...
+# Subtest: work detail carries the baseline draft once it is drafted, and only for a baseline
+ok 8 - work detail carries the baseline draft once it is drafted, and only for a baseline
+  ---
+  duration_ms: 687.186433
+  type: 'test'
+  ...
+# Subtest: Review the draft shows the facts by area, what is unresolved and what was not inspected
+ok 9 - Review the draft shows the facts by area, what is unresolved and what was not inspected
+  ---
+  duration_ms: 15.577607
+  type: 'test'
+  ...
+# Subtest: the draft panel: nothing without a draft, no decision when read-only, folded once approved
+ok 10 - the draft panel: nothing without a draft, no decision when read-only, folded once approved
+  ---
+  duration_ms: 12.861201
+  type: 'test'
+  ...
+# Subtest: while a required step is open, the optional run step is not offered beside it
+ok 11 - while a required step is open, the optional run step is not offered beside it
+  ---
+  duration_ms: 5.831428
+  type: 'test'
+  ...
+# Subtest: once nothing required is left, the Overview card offers running the app, marked optional once
+ok 12 - once nothing required is left, the Overview card offers running the app, marked optional once
+  ---
+  duration_ms: 2.827935
+  type: 'test'
+  ...
+# Subtest: readiness counts a stack running outside YallaFlow as running
+ok 13 - readiness counts a stack running outside YallaFlow as running
+  ---
+  duration_ms: 37.497635
+  type: 'test'
+  ...
+# Subtest: a trusted service already running outside YallaFlow reads as running, with Start off and why
+ok 14 - a trusted service already running outside YallaFlow reads as running, with Start off and why
+  ---
+  duration_ms: 8.363349
+  type: 'test'
+  ...
+# Subtest: a stopped trusted service keeps Start; a foreign port is still warned about
+ok 15 - a stopped trusted service keeps Start; a foreign port is still warned about
+  ---
+  duration_ms: 6.373227
+  type: 'test'
+  ...
+# Subtest: the project control follows the state: Start when stopped, Stop when running, both when partly up
+ok 16 - the project control follows the state: Start when stopped, Stop when running, both when partly up
+  ---
+  duration_ms: 15.633595
+  type: 'test'
+  ...
+# Subtest: a service row offers one Start or Stop that follows its state; Restart only while it runs
+ok 17 - a service row offers one Start or Stop that follows its state; Restart only while it runs
+  ---
+  duration_ms: 10.029465
+  type: 'test'
+  ...
+# Subtest: a service waiting in the approval card has no second Review and trust on its row
+ok 18 - a service waiting in the approval card has no second Review and trust on its row
+  ---
+  duration_ms: 8.62331
+  type: 'test'
+  ...
+# Subtest: approving a stack that already runs outside YallaFlow is one action that starts nothing
+ok 19 - approving a stack that already runs outside YallaFlow is one action that starts nothing
+  ---
+  duration_ms: 7.393159
+  type: 'test'
+  ...
+# Subtest: a stopped service keeps Approve and start, and starting reports through Start project
+ok 20 - a stopped service keeps Approve and start, and starting reports through Start project
+  ---
+  duration_ms: 3.066282
+  type: 'test'
+  ...
+# Subtest: the understanding ask carries the first request, and it is forgotten once understanding is under way
+ok 21 - the understanding ask carries the first request, and it is forgotten once understanding is under way
+  ---
+  duration_ms: 7.858645
+  type: 'test'
+  ...
+# Subtest: the understanding line shows its step, facts so far, last activity and whether an agent is working
+ok 22 - the understanding line shows its step, facts so far, last activity and whether an agent is working
+  ---
+  duration_ms: 10.917256
+  type: 'test'
+  ...
+# Subtest: the review shows the brief first, with citations, an inferred tag, honest coverage, and the fact list folded beneath
+ok 23 - the review shows the brief first, with citations, an inferred tag, honest coverage, and the fact list folded beneath
+  ---
+  duration_ms: 10.112988
+  type: 'test'
+  ...
+# Subtest: a draft without a brief looks exactly as before
+ok 24 - a draft without a brief looks exactly as before
+  ---
+  duration_ms: 3.722914
+  type: 'test'
+  ...
+# Subtest: the page opens a cited fact and starts a change request from a line
+ok 25 - the page opens a cited fact and starts a change request from a line
+  ---
+  duration_ms: 1.11192
+  type: 'test'
+  ...
+# Subtest: on the Overview the brief cites project-memory facts and marks lines whose facts need care
+ok 26 - on the Overview the brief cites project-memory facts and marks lines whose facts need care
+  ---
+  duration_ms: 4.216195
+  type: 'test'
+  ...
+# Subtest: Start here: the own request first, then suggestions with their reason and facts; a click only fills Create work
+ok 27 - Start here: the own request first, then suggestions with their reason and facts; a click only fills Create work
+  ---
+  duration_ms: 8.133927
+  type: 'test'
+  ...
+# Subtest: suggestions that match existing work are hidden; the Workspace panel steps aside once other work exists
+ok 28 - suggestions that match existing work are hidden; the Workspace panel steps aside once other work exists
+  ---
+  duration_ms: 8.070551
+  type: 'test'
+  ...
+# Subtest: nothing reliable to suggest: a plain empty state and the own-task action; hidden in read-only and before approval
+ok 29 - nothing reliable to suggest: a plain empty state and the own-task action; hidden in read-only and before approval
+  ---
+  duration_ms: 10.481098
+  type: 'test'
+  ...
+# Subtest: the draft review lists the proposed first tasks, read-only
+ok 30 - the draft review lists the proposed first tasks, read-only
+  ---
+  duration_ms: 4.086079
+  type: 'test'
+  ...
+# Subtest: an approval is seen without a reload: the cached overview is read again until understanding is established
+ok 31 - an approval is seen without a reload: the cached overview is read again until understanding is established
+  ---
+  duration_ms: 0.516479
+  type: 'test'
+  ...
+# Subtest: a row is one select button plus an open arrow; nothing in the list navigates on a single click
+ok 32 - a row is one select button plus an open arrow; nothing in the list navigates on a single click
+  ---
+  duration_ms: 18.214297
+  type: 'test'
+  ...
+# Subtest: at home with nothing selected the footer says what to do; selecting makes the button act on that folder
+ok 33 - at home with nothing selected the footer says what to do; selecting makes the button act on that folder
+  ---
+  duration_ms: 6.361084
+  type: 'test'
+  ...
+# Subtest: with nothing selected inside a folder, the button acts on the open folder
+ok 34 - with nothing selected inside a folder, the button acts on the open folder
+  ---
+  duration_ms: 5.994124
+  type: 'test'
+  ...
+# Subtest: choosing and previewing use the selected folder
+ok 35 - choosing and previewing use the selected folder
+  ---
+  duration_ms: 13.799576
+  type: 'test'
+  ...
+# Subtest: keys: arrows move the selection, Enter or the forward arrow opens, the back arrow goes up
+ok 36 - keys: arrows move the selection, Enter or the forward arrow opens, the back arrow goes up
+  ---
+  duration_ms: 27.88368
+  type: 'test'
+  ...
+# Subtest: the path bar is the breadcrumb, with the typed path one click away
+ok 37 - the path bar is the breadcrumb, with the typed path one click away
+  ---
+  duration_ms: 7.664582
+  type: 'test'
+  ...
+# Subtest: the preview offers git init only for a folder with no Git repository, unticked
+ok 38 - the preview offers git init only for a folder with no Git repository, unticked
+  ---
+  duration_ms: 6.490927
+  type: 'test'
+  ...
+# Subtest: connect runs git init only when ticked, after the connect, with the confirmed action
+ok 39 - connect runs git init only when ticked, after the connect, with the confirmed action
+  ---
+  duration_ms: 8.850925
+  type: 'test'
+  ...
+# Subtest: a refused git init is reported and never undoes the connect
+ok 40 - a refused git init is reported and never undoes the connect
+  ---
+  duration_ms: 4.881436
+  type: 'test'
+  ...
+# Subtest: previewConnect reports a Git repository above the folder without running Git
+ok 41 - previewConnect reports a Git repository above the folder without running Git
+  ---
+  duration_ms: 163.517873
+  type: 'test'
+  ...
+# Subtest: the locations row lists Home and the local drives, and marks the current one
+ok 42 - the locations row lists Home and the local drives, and marks the current one
+  ---
+  duration_ms: 10.092581
+  type: 'test'
+  ...
+# Subtest: breadcrumbs, the footer path and the typed path use the server's separator, never "/"
+ok 43 - breadcrumbs, the footer path and the typed path use the server's separator, never "/"
+  ---
+  duration_ms: 11.01111
+  type: 'test'
+  ...
+# Subtest: a folder that cannot be opened is said with its reason; the picker stays where it was
+ok 44 - a folder that cannot be opened is said with its reason; the picker stays where it was
+  ---
+  duration_ms: 18.80466
+  type: 'test'
+  ...
+# Subtest: the preview of a project outside home says so
+ok 45 - the preview of a project outside home says so
+  ---
+  duration_ms: 1.721147
+  type: 'test'
+  ...
+# Subtest: the verdict for existing code says nothing is run and takes an optional first request
+ok 46 - the verdict for existing code says nothing is run and takes an optional first request
+  ---
+  duration_ms: 3.060623
+  type: 'test'
+  ...
+# Subtest: an empty folder gets no first-request field, and an empty field stores nothing
+ok 47 - an empty folder gets no first-request field, and an empty field stores nothing
+  ---
+  duration_ms: 6.729029
+  type: 'test'
+  ...
+# Subtest: folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+ok 48 - folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+  ---
+  duration_ms: 216.162322
+  type: 'test'
+  ...
+# Subtest: registration: an existing YallaFlow project inside home is added once, live; others are refused
+ok 49 - registration: an existing YallaFlow project inside home is added once, live; others are refused
+  ---
+  duration_ms: 471.476768
+  type: 'test'
+  ...
+# Subtest: stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+ok 50 - stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+  ---
+  duration_ms: 1194.81303
+  type: 'test'
+  ...
+# Subtest: a plan that installs dependencies needs an explicit acknowledgement (PF-0085)
+ok 51 - a plan that installs dependencies needs an explicit acknowledgement (PF-0085)
+  ---
+  duration_ms: 348.398738
+  type: 'test'
+  ...
+# Subtest: Git init: explicit, once, never inside another repository; refused read-only
+ok 52 - Git init: explicit, once, never inside another repository; refused read-only
+  ---
+  duration_ms: 111.582663
+  type: 'test'
+  ...
+# Subtest: runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+ok 53 - runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+  ---
+  duration_ms: 689.852916
+  type: 'test'
+  ...
+# Subtest: agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+ok 54 - agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+  ---
+  duration_ms: 49.766957
+  type: 'test'
+  ...
+# Subtest: review: parallel registrations add a project once and lose none from the saved list
+ok 55 - review: parallel registrations add a project once and lose none from the saved list
+  ---
+  duration_ms: 90.37573
+  type: 'test'
+  ...
+# Subtest: review: hidden folders are refused even by path; read-only consoles probe no tools
+ok 56 - review: hidden folders are refused even by path; read-only consoles probe no tools
+  ---
+  duration_ms: 12.548539
+  type: 'test'
+  ...
+# Subtest: review: plans that run package scripts need an acknowledgement; control characters and NUL are refused
+ok 57 - review: plans that run package scripts need an acknowledgement; control characters and NUL are refused
+  ---
+  duration_ms: 539.961587
+  type: 'test'
+  ...
+# Subtest: review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+ok 58 - review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+  ---
+  duration_ms: 413.512683
+  type: 'test'
+  ...
+# Subtest: a registration failure after creation is reported as partial success, never as a failed creation
+ok 59 - a registration failure after creation is reported as partial success, never as a failed creation
+  ---
+  duration_ms: 498.456807
+  type: 'test'
+  ...
+# Subtest: Claude Code: off unless chosen explicitly when enabling agents; never read-only
+ok 60 - Claude Code: off unless chosen explicitly when enabling agents; never read-only
+  ---
+  duration_ms: 71.000346
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): a project leaves the running console and the saved list; its files stay
+ok 61 - removal (PF-0081): a project leaves the running console and the saved list; its files stay
+  ---
+  duration_ms: 55.400518
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): refused while an agent session is live in the project
+ok 62 - removal (PF-0081): refused while an agent session is live in the project
+  ---
+  duration_ms: 2.059469
+  type: 'test'
+  ...
+# Subtest: AC-002/AC-007: header tabs are exactly Workspace · Project · More; no Agents or Setup & run tab
+ok 63 - AC-002/AC-007: header tabs are exactly Workspace · Project · More; no Agents or Setup & run tab
+  ---
+  duration_ms: 9.383332
+  type: 'test'
+  ...
+# Subtest: AC-002/AC-003: old routes and in-page anchors land on their new home
+ok 64 - AC-002/AC-003: old routes and in-page anchors land on their new home
+  ---
+  duration_ms: 38.386124
+  type: 'test'
+  ...
+# Subtest: AC-002: the bell still counts agent requests and leads to the Projects inbox
+ok 65 - AC-002: the bell still counts agent requests and leads to the Projects inbox
+  ---
+  duration_ms: 1.57512
+  type: 'test'
+  ...
+# Subtest: AC-001: Projects shows the Needs-you inbox above the cards and each card lists only its own lanes
+ok 66 - AC-001: Projects shows the Needs-you inbox above the cards and each card lists only its own lanes
+  ---
+  duration_ms: 9.46415
+  type: 'test'
+  ...
+# Subtest: AC-003: one Project page with an accessible tab bar and badges
+ok 67 - AC-003: one Project page with an accessible tab bar and badges
+  ---
+  duration_ms: 6.1229
+  type: 'test'
+  ...
+# Subtest: AC-004: Overview is summary, needs care, areas and stack in two columns, one on phones
+ok 68 - AC-004: Overview is summary, needs care, areas and stack in two columns, one on phones
+  ---
+  duration_ms: 1.164782
+  type: 'test'
+  ...
+# Subtest: AC-005: a failed service is one line with View log, Ask the agent to fix and Start again
+ok 69 - AC-005: a failed service is one line with View log, Ask the agent to fix and Start again
+  ---
+  duration_ms: 15.060576
+  type: 'test'
+  ...
+# Subtest: AC-006: the header shows Team or Solo with the branch, amber when Solo off the integration branch
+ok 70 - AC-006: the header shows Team or Solo with the branch, amber when Solo off the integration branch
+  ---
+  duration_ms: 23.291118
+  type: 'test'
+  ...
+# Subtest: AC-006: the New Project success step offers team mode as optional, with the confirmed flow
+ok 71 - AC-006: the New Project success step offers team mode as optional, with the confirmed flow
+  ---
+  duration_ms: 14.102984
+  type: 'test'
+  ...
+# Subtest: AC-007: every new label has Arabic and English; light and dark use the shared tokens
+ok 72 - AC-007: every new label has Arabic and English; light and dark use the shared tokens
+  ---
+  duration_ms: 3.375718
+  type: 'test'
+  ...
+# Subtest: Codex: installed, signed in and connection are three separate states with one next step
+ok 73 - Codex: installed, signed in and connection are three separate states with one next step
+  ---
+  duration_ms: 6.855388
+  type: 'test'
+  ...
+# Subtest: Claude Code: experimental everywhere, never "verified" ahead of a session, and shown on every system
+ok 74 - Claude Code: experimental everywhere, never "verified" ahead of a session, and shown on every system
+  ---
+  duration_ms: 1.961061
+  type: 'test'
+  ...
+# Subtest: a saved preferred agent is a wish: offered only when available, with the readiness computed now
+ok 75 - a saved preferred agent is a wish: offered only when available, with the readiness computed now
+  ---
+  duration_ms: 1.187649
+  type: 'test'
+  ...
+# Subtest: console: /api/machine carries the readiness; nothing is written; never in a read-only console
+ok 76 - console: /api/machine carries the readiness; nothing is written; never in a read-only console
+  ---
+  duration_ms: 238.441981
+  type: 'test'
+  ...
+# Subtest: the page: Claude Code on simulated Windows is shown, marked Experimental and not verified, with three separate states
+ok 77 - the page: Claude Code on simulated Windows is shown, marked Experimental and not verified, with three separate states
+  ---
+  duration_ms: 10.980094
+  type: 'test'
+  ...
+# Subtest: the page: the usual agent is listed first and marked, and still needs the click that enables it
+ok 78 - the page: the usual agent is listed first and marked, and still needs the click that enables it
+  ---
+  duration_ms: 7.945142
+  type: 'test'
+  ...
+# Subtest: registry: the mode is a field of one entry; absent means managed; older entries are untouched
+ok 79 - registry: the mode is a field of one entry; absent means managed; older entries are untouched
+  ---
+  duration_ms: 134.948943
+  type: 'test'
+  ...
+# Subtest: server boundary: a monitored project refuses every write, agent and execution action, and nothing in it changes
+ok 80 - server boundary: a monitored project refuses every write, agent and execution action, and nothing in it changes
+  ---
+  duration_ms: 1254.182164
+  type: 'test'
+  ...
+# Subtest: opening an existing YallaFlow project for monitoring: saved as monitored, nothing written, no agent needed
+ok 81 - opening an existing YallaFlow project for monitoring: saved as monitored, nothing written, no agent needed
+  ---
+  duration_ms: 108.582774
+  type: 'test'
+  ...
+# Subtest: the page: the mode is per project; a monitored project reads as read-only, the others and the project list do not
+ok 82 - the page: the mode is per project; a monitored project reads as read-only, the others and the project list do not
+  ---
+  duration_ms: 8.565981
+  type: 'test'
+  ...
+# Subtest: the page: the banner names the mode and its limits, in both languages; the switch asks first
+ok 83 - the page: the banner names the mode and its limits, in both languages; the switch asks first
+  ---
+  duration_ms: 7.299581
+  type: 'test'
+  ...
+# Subtest: the page: an existing YallaFlow project offers Monitor only beside Open; a plain repository is told why it cannot be monitored
+ok 84 - the page: an existing YallaFlow project offers Monitor only beside Open; a plain repository is told why it cannot be monitored
+  ---
+  duration_ms: 3.047482
+  type: 'test'
+  ...
+# Subtest: Open folder opens only the registered project root, behind the token and Origin
+ok 85 - Open folder opens only the registered project root, behind the token and Origin
+  ---
+  duration_ms: 134.232138
+  type: 'test'
+  ...
+# Subtest: a read-only console refuses Open folder
+ok 86 - a read-only console refuses Open folder
+  ---
+  duration_ms: 62.839747
+  type: 'test'
+  ...
+# Subtest: the file manager is started without a shell, per platform, and a missing folder is reported
+ok 87 - the file manager is started without a shell, per platform, and a missing folder is reported
+  ---
+  duration_ms: 38.35726
+  type: 'test'
+  ...
+# Subtest: project cards carry Open, Open folder, Copy path and Remove; read-only hides the writes
+ok 88 - project cards carry Open, Open folder, Copy path and Remove; read-only hides the writes
+  ---
+  duration_ms: 4.277209
+  type: 'test'
+  ...
+# Subtest: the Workspace greeting is one slim row whose counts filter the work
+ok 89 - the Workspace greeting is one slim row whose counts filter the work
+  ---
+  duration_ms: 4.454043
+  type: 'test'
+  ...
+# Subtest: the entrance motion runs only when the page changes and respects reduced motion
+ok 90 - the entrance motion runs only when the page changes and respects reduced motion
+  ---
+  duration_ms: 5.213701
+  type: 'test'
+  ...
+# Subtest: PF-0130: the "since you were last here" notice shows each item as its ID and latest outcome, title in the tooltip
+ok 91 - PF-0130: the "since you were last here" notice shows each item as its ID and latest outcome, title in the tooltip
+  ---
+  duration_ms: 0.953922
+  type: 'test'
+  ...
+# Subtest: PF-0131: the live move toast names the item by its linked ID, the title only in the tooltip
+ok 92 - PF-0131: the live move toast names the item by its linked ID, the title only in the tooltip
+  ---
+  duration_ms: 1.79584
+  type: 'test'
+  ...
+# Subtest: PF-0133: the agent is chosen in place — readiness card and chat panel — and links from the chat close it
+ok 93 - PF-0133: the agent is chosen in place — readiness card and chat panel — and links from the chat close it
+  ---
+  duration_ms: 4.026838
+  type: 'test'
+  ...
+# Subtest: PF-0137: the all-done box is slim, with the filter chips and a small New work button
+ok 94 - PF-0137: the all-done box is slim, with the filter chips and a small New work button
+  ---
+  duration_ms: 27.090145
+  type: 'test'
+  ...
+# Subtest: the switcher shows the current project with its readiness and lists every project
+ok 95 - the switcher shows the current project with its readiness and lists every project
+  ---
+  duration_ms: 2.976943
+  type: 'test'
+  ...
+# Subtest: project actions live in the same menu; read-only hides Add and New
+ok 96 - project actions live in the same menu; read-only hides Add and New
+  ---
+  duration_ms: 0.736398
+  type: 'test'
+  ...
+# Subtest: header menus: Esc closes and refocuses, arrows move, outside click and opening another close it
+ok 97 - header menus: Esc closes and refocuses, arrows move, outside click and opening another close it
+  ---
+  duration_ms: 2.263463
+  type: 'test'
+  ...
+# Subtest: switcher styles cover readiness, focus, dark mode and phone width
+ok 98 - switcher styles cover readiness, focus, dark mode and phone width
+  ---
+  duration_ms: 1.42413
+  type: 'test'
+  ...
+1..98
+# tests 98
+# suites 0
+# pass 98
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5344.313397

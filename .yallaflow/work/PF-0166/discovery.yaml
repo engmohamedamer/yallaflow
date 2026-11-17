@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "integration",
+      "summary": "Dependents of a moved port are found only in the runtime profile (other services' command, links, readiness check); project files such as proxy.conf.json, vite/webpack configs or .env are not read.",
+      "reason": "Reading and interpreting arbitrary project configuration would be guesswork; the port-change message says these files were not read.",
+      "recordedAt": "2026-11-17T09:12:40.203Z"
+    },
+    {
+      "id": "DL-002",
+      "type": "runtime-unavailable",
+      "area": "testing",
+      "summary": "Try Anyway, the three readiness states and port-change refusals were exercised on Linux only (tests and a browser run on a scratch project); pnpm, Yarn and Bun dev-server behavior with '--' was not run, and Windows/macOS were not run.",
+      "reason": "No Windows or macOS machine and no pnpm/Yarn/Bun projects in this session; the refusal for those managers is deliberate because their behavior differs by version.",
+      "recordedAt": "2026-11-17T09:12:40.578Z"
+    }
+  ],
+  "updatedAt": "2026-11-17T09:12:40.578Z"
+}

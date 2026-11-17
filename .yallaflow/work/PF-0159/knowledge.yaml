@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "User-level console preferences live in preferences.json beside console.json (src/console/preferences.js; GET/POST /api/preferences): preferred agent, language, theme, last-used folder and onboarding intent/completed. It is a separate file because saveRegistry rewrites console.json and drops unknown top-level keys. Only enumerated or path-typed fields are accepted (no free-form value, so no credential); agent install/sign-in state is never stored; keys from a newer version are preserved; a missing or invalid file means defaults; the browser's localStorage is only a first-paint copy.",
+      "evidence": [
+        "src/console/preferences.js",
+        "test/console-preferences.test.js"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-16T17:01:48.091Z",
+      "factId": "CTX-0170",
+      "promotedAt": "2026-11-16T17:01:48.241Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-16T17:01:48.241Z",
+  "reviewedAt": "2026-11-16T17:01:48.241Z"
+}

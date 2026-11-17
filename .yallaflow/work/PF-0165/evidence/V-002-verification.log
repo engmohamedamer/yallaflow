@@ -1,0 +1,400 @@
+TAP version 13
+# Subtest: versions, forbidden modes, ACP normalization, and API keys stripped from the adapter env
+ok 1 - versions, forbidden modes, ACP normalization, and API keys stripped from the adapter env
+  ---
+  duration_ms: 7.797689
+  type: 'test'
+  ...
+# Subtest: detection: adapter missing, unsupported version, and ready
+ok 2 - detection: adapter missing, unsupported version, and ready
+  ---
+  duration_ms: 109.68458
+  type: 'test'
+  ...
+# Subtest: codex: start, stream, follow-up, permissions (allow, deny, timeout), one session per checkout, no activation
+ok 3 - codex: start, stream, follow-up, permissions (allow, deny, timeout), one session per checkout, no activation
+  ---
+  duration_ms: 5714.929557
+  type: 'test'
+  ...
+# Subtest: codex: cancel, crash, resume after a console restart, explicit activation through Core
+ok 4 - codex: cancel, crash, resume after a console restart, explicit activation through Core
+  ---
+  duration_ms: 9072.083903
+  type: 'test'
+  ...
+# Subtest: codex: ending a session while a permission is pending denies it and never crashes the console
+ok 5 - codex: ending a session while a permission is pending denies it and never crashes the console
+  ---
+  duration_ms: 4691.003383
+  type: 'test'
+  ...
+# Subtest: codex: a non-subscription login is refused and no session starts
+ok 6 - codex: a non-subscription login is refused and no session starts
+  ---
+  duration_ms: 4338.154517
+  type: 'test'
+  ...
+# Subtest: security: opt-in, token, Origin, content type, read-only, unsupported controls
+ok 7 - security: opt-in, token, Origin, content type, read-only, unsupported controls
+  ---
+  duration_ms: 270.097084
+  type: 'test'
+  ...
+# Subtest: security review regressions: start race, modes, symlinks
+ok 8 - security review regressions: start race, modes, symlinks
+  ---
+  duration_ms: 8546.293545
+  type: 'test'
+  ...
+# Subtest: codex: an adapter that cannot be spawned fails the start promptly and frees the checkout
+ok 9 - codex: an adapter that cannot be spawned fails the start promptly and frees the checkout
+  ---
+  duration_ms: 4246.329044
+  type: 'test'
+  ...
+# Subtest: stabilization: Allow for session is session-scoped only; nothing persists or carries to another session
+ok 10 - stabilization: Allow for session is session-scoped only; nothing persists or carries to another session
+  ---
+  duration_ms: 4716.262515
+  type: 'test'
+  ...
+# Subtest: stabilization: ending a Codex session ends what it started, and an incomplete cleanup is never reported as a clean stop
+ok 11 - stabilization: ending a Codex session ends what it started, and an incomplete cleanup is never reported as a clean stop
+  ---
+  duration_ms: 8061.251565
+  type: 'test'
+  ...
+# Subtest: stabilization: one agent console per checkout across separate console processes
+ok 12 - stabilization: one agent console per checkout across separate console processes
+  ---
+  duration_ms: 4950.139451
+  type: 'test'
+  ...
+# Subtest: stabilization: a directory swapped for a link after the check cannot redirect a local write
+ok 13 - stabilization: a directory swapped for a link after the check cannot redirect a local write
+  ---
+  duration_ms: 8.765964
+  type: 'test'
+  ...
+# Subtest: stabilization review: hard links, End while starting, overlapping lock claims, crash cleanup
+ok 14 - stabilization review: hard links, End while starting, overlapping lock claims, crash cleanup
+  ---
+  duration_ms: 2703.508414
+  type: 'test'
+  ...
+# Subtest: CLI: agents detect is read-only; console flag combinations are validated
+ok 15 - CLI: agents detect is read-only; console flag combinations are validated
+  ---
+  duration_ms: 2001.467487
+  type: 'test'
+  ...
+# Subtest: clearing deletes only this project's saved chat; another project, a lane and the rest of the checkout keep theirs
+ok 16 - clearing deletes only this project's saved chat; another project, a lane and the rest of the checkout keep theirs
+  ---
+  duration_ms: 353.446346
+  type: 'test'
+  ...
+# Subtest: clearing removes a planted link itself and never the file it points to
+ok 17 - clearing removes a planted link itself and never the file it points to
+  ---
+  duration_ms: 36.142765
+  type: 'test'
+  ...
+# Subtest: with saving off nothing new is written, what was saved stays and is still shown, and it can still be deleted
+ok 18 - with saving off nothing new is written, what was saved stays and is still shown, and it can still be deleted
+  ---
+  duration_ms: 70.421953
+  type: 'test'
+  ...
+# Subtest: a reply is saved whole or not at all when saving is switched in the middle of it
+ok 19 - a reply is saved whole or not at all when saving is switched in the middle of it
+  ---
+  duration_ms: 13.279153
+  type: 'test'
+  ...
+# Subtest: rotation happens only where an entry starts: no saved message is ever cut at the retention limit
+ok 20 - rotation happens only where an entry starts: no saved message is ever cut at the retention limit
+  ---
+  duration_ms: 116.149883
+  type: 'test'
+  ...
+# Subtest: streaming stays cheap per chunk: 50,000 chunks are merged and broadcast without a write per chunk
+ok 21 - streaming stays cheap per chunk: 50,000 chunks are merged and broadcast without a write per chunk
+  ---
+  duration_ms: 333.847711
+  type: 'test'
+  ...
+# Subtest: the preference is typed, off means false only, and the server applies it and guards Clear
+ok 22 - the preference is typed, off means false only, and the server applies it and guards Clear
+  ---
+  duration_ms: 303.602926
+  type: 'test'
+  ...
+# Subtest: the first terminal app on PATH is used, in the project folder, without a shell
+ok 23 - the first terminal app on PATH is used, in the project folder, without a shell
+  ---
+  duration_ms: 48.733244
+  type: 'test'
+  ...
+# Subtest: no terminal, a failed start or a missing folder is reported so the copy fallback shows
+ok 24 - no terminal, a failed start or a missing folder is reported so the copy fallback shows
+  ---
+  duration_ms: 31.297621
+  type: 'test'
+  ...
+# Subtest: macOS uses Terminal through osascript with the folder and command quoted
+ok 25 - macOS uses Terminal through osascript with the folder and command quoted
+  ---
+  duration_ms: 1.426375
+  type: 'test'
+  ...
+# Subtest: the server builds the command itself and needs Claude Code on for the project
+ok 26 - the server builds the command itself and needs Claude Code on for the project
+  ---
+  duration_ms: 0.689835
+  type: 'test'
+  ...
+# Subtest: the chat opens on the chosen agent, shows no account warning and connects through a terminal
+ok 27 - the chat opens on the chosen agent, shows no account warning and connects through a terminal
+  ---
+  duration_ms: 8.672955
+  type: 'test'
+  ...
+# Subtest: a long streamed reply is one entry: the question above it is never pushed out
+ok 28 - a long streamed reply is one entry: the question above it is never pushed out
+  ---
+  duration_ms: 184.326301
+  type: 'test'
+  ...
+# Subtest: the conversation is saved (private, secrets redacted) and comes back after a console restart
+ok 29 - the conversation is saved (private, secrets redacted) and comes back after a console restart
+  ---
+  duration_ms: 136.427731
+  type: 'test'
+  ...
+# Subtest: older messages load a page at a time: no gap, no repeat, and an honest end
+ok 30 - older messages load a page at a time: no gap, no repeat, and an honest end
+  ---
+  duration_ms: 2302.355397
+  type: 'test'
+  ...
+# Subtest: the saved history is bounded and the bound is real: one older file is kept; a damaged file loses only its bad lines
+ok 31 - the saved history is bounded and the bound is real: one older file is kept; a damaged file loses only its bad lines
+  ---
+  duration_ms: 23.568498
+  type: 'test'
+  ...
+# Subtest: merging: only consecutive chunks of the same kind join; anything between them starts a new entry
+ok 32 - merging: only consecutive chunks of the same kind join; anything between them starts a new entry
+  ---
+  duration_ms: 0.793527
+  type: 'test'
+  ...
+# Subtest: the page merges a state reload into what it shows: nothing disappears, nothing repeats, late events are kept
+ok 33 - the page merges a state reload into what it shows: nothing disappears, nothing repeats, late events are kept
+  ---
+  duration_ms: 6.905879
+  type: 'test'
+  ...
+# Subtest: the page loads older messages before its earliest one; a failure is said and can be retried
+ok 34 - the page loads older messages before its earliest one; a failure is said and can be retried
+  ---
+  duration_ms: 5.367828
+  type: 'test'
+  ...
+# Subtest: every loaded message is shown whole; only tool steps fold, and an opened group stays open
+ok 35 - every loaded message is shown whole; only tool steps fold, and an opened group stays open
+  ---
+  duration_ms: 5.895903
+  type: 'test'
+  ...
+# Subtest: the reader is told which case applies: not loaded yet, loading, could not load, or the declared limit
+ok 36 - the reader is told which case applies: not loaded yet, loading, could not load, or the declared limit
+  ---
+  duration_ms: 4.990934
+  type: 'test'
+  ...
+# Subtest: the panel keeps the conversation readable without a session, offers a retry on a failed load, and never pulls a reader down
+ok 37 - the panel keeps the conversation readable without a session, offers a retry on a failed load, and never pulls a reader down
+  ---
+  duration_ms: 2.256967
+  type: 'test'
+  ...
+# Subtest: owner review: the panel says where the chat is kept, offers the save setting and a confirmed delete, and never claims perfect redaction
+ok 38 - owner review: the panel says where the chat is kept, offers the save setting and a confirmed delete, and never claims perfect redaction
+  ---
+  duration_ms: 5.054127
+  type: 'test'
+  ...
+# Subtest: registry: the mode is a field of one entry; absent means managed; older entries are untouched
+ok 39 - registry: the mode is a field of one entry; absent means managed; older entries are untouched
+  ---
+  duration_ms: 158.519443
+  type: 'test'
+  ...
+# Subtest: server boundary: a monitored project refuses every write, agent and execution action, and nothing in it changes
+ok 40 - server boundary: a monitored project refuses every write, agent and execution action, and nothing in it changes
+  ---
+  duration_ms: 1393.919497
+  type: 'test'
+  ...
+# Subtest: opening an existing YallaFlow project for monitoring: saved as monitored, nothing written, no agent needed
+ok 41 - opening an existing YallaFlow project for monitoring: saved as monitored, nothing written, no agent needed
+  ---
+  duration_ms: 111.017568
+  type: 'test'
+  ...
+# Subtest: the page: the mode is per project; a monitored project reads as read-only, the others and the project list do not
+ok 42 - the page: the mode is per project; a monitored project reads as read-only, the others and the project list do not
+  ---
+  duration_ms: 8.199782
+  type: 'test'
+  ...
+# Subtest: the page: the banner names the mode and its limits, in both languages; the switch asks first
+ok 43 - the page: the banner names the mode and its limits, in both languages; the switch asks first
+  ---
+  duration_ms: 7.989702
+  type: 'test'
+  ...
+# Subtest: the page: an existing YallaFlow project offers Monitor only beside Open; a plain repository is told why it cannot be monitored
+ok 44 - the page: an existing YallaFlow project offers Monitor only beside Open; a plain repository is told why it cannot be monitored
+  ---
+  duration_ms: 3.360449
+  type: 'test'
+  ...
+# Subtest: the file lives beside console.json on Linux, macOS and Windows (simulated environment values)
+ok 45 - the file lives beside console.json on Linux, macOS and Windows (simulated environment values)
+  ---
+  duration_ms: 5.6222
+  type: 'test'
+  ...
+# Subtest: missing, invalid, oversized or linked files mean defaults; reading never throws
+ok 46 - missing, invalid, oversized or linked files mean defaults; reading never throws
+  ---
+  duration_ms: 49.463565
+  type: 'test'
+  ...
+# Subtest: only known, typed fields can be saved: no free-form value, so no credential
+ok 47 - only known, typed fields can be saved: no free-form value, so no credential
+  ---
+  duration_ms: 4.525947
+  type: 'test'
+  ...
+# Subtest: saving merges, is private (0600), keeps keys a newer version wrote, and leaves console.json alone
+ok 48 - saving merges, is private (0600), keeps keys a newer version wrote, and leaves console.json alone
+  ---
+  duration_ms: 225.404854
+  type: 'test'
+  ...
+# Subtest: console API: read anywhere, write only as JSON with the token and Origin, never read-only
+ok 49 - console API: read anywhere, write only as JSON with the token and Origin, never read-only
+  ---
+  duration_ms: 306.496092
+  type: 'test'
+  ...
+# Subtest: the page: saved preferences win over the browser copy; a browser choice is carried over once; read-only saves nothing
+ok 50 - the page: saved preferences win over the browser copy; a browser choice is carried over once; read-only saves nothing
+  ---
+  duration_ms: 36.956901
+  type: 'test'
+  ...
+# Subtest: every project page gets the project chat; a work item page gets its own; new-project pages get none
+ok 51 - every project page gets the project chat; a work item page gets its own; new-project pages get none
+  ---
+  duration_ms: 69.570898
+  type: 'test'
+  ...
+# Subtest: the project chat is labelled, starts no work item and suggests project questions
+ok 52 - the project chat is labelled, starts no work item and suggests project questions
+  ---
+  duration_ms: 19.756537
+  type: 'test'
+  ...
+# Subtest: a running item session shows on project pages as a link to that item
+ok 53 - a running item session shows on project pages as a link to that item
+  ---
+  duration_ms: 17.945123
+  type: 'test'
+  ...
+# Subtest: a project session shows on an item page labelled as the project chat
+ok 54 - a project session shows on an item page labelled as the project chat
+  ---
+  duration_ms: 10.602927
+  type: 'test'
+  ...
+# Subtest: with agents off the project chat explains how to turn them on without naming an item
+ok 55 - with agents off the project chat explains how to turn them on without naming an item
+  ---
+  duration_ms: 5.044986
+  type: 'test'
+  ...
+# Subtest: the item chat is unchanged
+ok 56 - the item chat is unchanged
+  ---
+  duration_ms: 7.449472
+  type: 'test'
+  ...
+# Subtest: Claude Code off for the project is turned on in place; an agent not ready links to Settings → Agents
+ok 57 - Claude Code off for the project is turned on in place; an agent not ready links to Settings → Agents
+  ---
+  duration_ms: 6.867992
+  type: 'test'
+  ...
+# Subtest: blocker texts read in Arabic; suggestions say they only fill the box; your turn after a reply
+ok 58 - blocker texts read in Arabic; suggestions say they only fill the box; your turn after a reply
+  ---
+  duration_ms: 23.57458
+  type: 'test'
+  ...
+# Subtest: the chat says when the agent is working, waiting for an approval, or waiting for a reply
+ok 59 - the chat says when the agent is working, waiting for an approval, or waiting for a reply
+  ---
+  duration_ms: 19.000348
+  type: 'test'
+  ...
+# Subtest: suggestions follow the stage: move on after an approval, plan and design wording
+ok 60 - suggestions follow the stage: move on after an approval, plan and design wording
+  ---
+  duration_ms: 22.305495
+  type: 'test'
+  ...
+# Subtest: switch agent: end an idle Codex session elsewhere; hand over from Claude Code to Codex; wait while working
+ok 61 - switch agent: end an idle Codex session elsewhere; hand over from Claude Code to Codex; wait while working
+  ---
+  duration_ms: 23.17148
+  type: 'test'
+  ...
+# Subtest: chat: whole-job first message, one action (review, answer, continue), steps grouped
+ok 62 - chat: whole-job first message, one action (review, answer, continue), steps grouped
+  ---
+  duration_ms: 23.795997
+  type: 'test'
+  ...
+# Subtest: chat: no whole-job draft while the item waits for an answer or a review
+ok 63 - chat: no whole-job draft while the item waits for an answer or a review
+  ---
+  duration_ms: 19.883524
+  type: 'test'
+  ...
+# Subtest: attention: a pending permission or a finished turn on an item shows on project pages and opens that chat
+ok 64 - attention: a pending permission or a finished turn on an item shows on project pages and opens that chat
+  ---
+  duration_ms: 14.95188
+  type: 'test'
+  ...
+# Subtest: a finished item holding the session: one Start button here, and no "waits for you" call-out
+ok 65 - a finished item holding the session: one Start button here, and no "waits for you" call-out
+  ---
+  duration_ms: 11.028489
+  type: 'test'
+  ...
+1..65
+# tests 65
+# suites 0
+# pass 65
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 60009.395368

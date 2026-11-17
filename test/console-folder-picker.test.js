@@ -36,6 +36,7 @@ function picker({ mode = 'existing', data = listing(), lang = 'en', posts = {} }
     document: { getElementById: (id) => (id === 'folderdlg' ? dialog : null), querySelector: () => null, querySelectorAll: () => [] },
     api: async (url) => { calls.api.push(url); return { path: `${HOME}/clinic`, name: 'clinic', kind: 'existing-code', action: 'init', git: false, gitAbove: false, stack: ['Laravel 13'], sourceFiles: 108, plan: [{ path: '.yallaflow/', op: 'create' }], problems: [], planHash: 'h1' }; },
     post: async (url, body) => { calls.post.push({ url, body: JSON.parse(body) }); if (posts[url]) throw new Error(posts[url]); return { id: 'p9' }; },
+    savePrefs: async () => null, // PF-0159: the last folder is also saved to the user's preferences
     reloadProjects: async () => {}, switchProject: async (id, view) => { calls.switched.push([id, view]); }, toast: (html) => { calls.toasts.push(html); }, render() {}
   });
   vm.runInContext(`${code}\nfolder = { mode: ${JSON.stringify(mode)}, data: ${JSON.stringify(data)}, error: null, busy: false, preview: null, previewError: null, previewBusy: false, ack: false, creating: false, sel: null, editPath: false, gitInit: false };

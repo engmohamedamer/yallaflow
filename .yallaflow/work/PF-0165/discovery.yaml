@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "testing",
+      "summary": "The reporting user's own chat session in the other project was not available; the loss was reproduced from the code path with a long streamed reply, not from their data",
+      "reason": "No access to that project's console run",
+      "recordedAt": "2026-11-16T19:38:29.264Z"
+    },
+    {
+      "id": "DL-002",
+      "type": "insufficient-evidence",
+      "area": "security",
+      "summary": "Secret redaction of the saved chat is best effort: a secret in an unrecognized form, or split across two saved pieces of one streamed reply, can be written as it is.",
+      "reason": "Redaction is pattern based and runs per saved line; documented in docs/agents.md and in the chat panel, which says it does not guarantee every secret is caught.",
+      "recordedAt": "2026-11-17T09:12:40.949Z"
+    }
+  ],
+  "updatedAt": "2026-11-17T09:12:40.949Z"
+}

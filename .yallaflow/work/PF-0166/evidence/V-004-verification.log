@@ -1,0 +1,292 @@
+TAP version 13
+# Subtest: AC-002/AC-007: header tabs are exactly Workspace · Project · More; no Agents or Setup & run tab
+ok 1 - AC-002/AC-007: header tabs are exactly Workspace · Project · More; no Agents or Setup & run tab
+  ---
+  duration_ms: 7.617385
+  type: 'test'
+  ...
+# Subtest: AC-002/AC-003: old routes and in-page anchors land on their new home
+ok 2 - AC-002/AC-003: old routes and in-page anchors land on their new home
+  ---
+  duration_ms: 21.156282
+  type: 'test'
+  ...
+# Subtest: AC-002: the bell still counts agent requests and leads to the Projects inbox
+ok 3 - AC-002: the bell still counts agent requests and leads to the Projects inbox
+  ---
+  duration_ms: 1.228575
+  type: 'test'
+  ...
+# Subtest: AC-001: Projects shows the Needs-you inbox above the cards and each card lists only its own lanes
+ok 4 - AC-001: Projects shows the Needs-you inbox above the cards and each card lists only its own lanes
+  ---
+  duration_ms: 7.428268
+  type: 'test'
+  ...
+# Subtest: AC-003: one Project page with an accessible tab bar and badges
+ok 5 - AC-003: one Project page with an accessible tab bar and badges
+  ---
+  duration_ms: 5.544412
+  type: 'test'
+  ...
+# Subtest: AC-004: Overview is summary, needs care, areas and stack in two columns, one on phones
+ok 6 - AC-004: Overview is summary, needs care, areas and stack in two columns, one on phones
+  ---
+  duration_ms: 1.076946
+  type: 'test'
+  ...
+# Subtest: AC-005: a failed service is one line with View log, Ask the agent to fix and Start again
+ok 7 - AC-005: a failed service is one line with View log, Ask the agent to fix and Start again
+  ---
+  duration_ms: 14.412195
+  type: 'test'
+  ...
+# Subtest: AC-006: the header shows Team or Solo with the branch, amber when Solo off the integration branch
+ok 8 - AC-006: the header shows Team or Solo with the branch, amber when Solo off the integration branch
+  ---
+  duration_ms: 20.573734
+  type: 'test'
+  ...
+# Subtest: AC-006: the New Project success step offers team mode as optional, with the confirmed flow
+ok 9 - AC-006: the New Project success step offers team mode as optional, with the confirmed flow
+  ---
+  duration_ms: 14.140814
+  type: 'test'
+  ...
+# Subtest: AC-007: every new label has Arabic and English; light and dark use the shared tokens
+ok 10 - AC-007: every new label has Arabic and English; light and dark use the shared tokens
+  ---
+  duration_ms: 3.473709
+  type: 'test'
+  ...
+# Subtest: registry: the mode is a field of one entry; absent means managed; older entries are untouched
+ok 11 - registry: the mode is a field of one entry; absent means managed; older entries are untouched
+  ---
+  duration_ms: 96.978402
+  type: 'test'
+  ...
+# Subtest: server boundary: a monitored project refuses every write, agent and execution action, and nothing in it changes
+ok 12 - server boundary: a monitored project refuses every write, agent and execution action, and nothing in it changes
+  ---
+  duration_ms: 1010.063932
+  type: 'test'
+  ...
+# Subtest: opening an existing YallaFlow project for monitoring: saved as monitored, nothing written, no agent needed
+ok 13 - opening an existing YallaFlow project for monitoring: saved as monitored, nothing written, no agent needed
+  ---
+  duration_ms: 105.465149
+  type: 'test'
+  ...
+# Subtest: the page: the mode is per project; a monitored project reads as read-only, the others and the project list do not
+ok 14 - the page: the mode is per project; a monitored project reads as read-only, the others and the project list do not
+  ---
+  duration_ms: 7.729039
+  type: 'test'
+  ...
+# Subtest: the page: the banner names the mode and its limits, in both languages; the switch asks first
+ok 15 - the page: the banner names the mode and its limits, in both languages; the switch asks first
+  ---
+  duration_ms: 7.175539
+  type: 'test'
+  ...
+# Subtest: the page: an existing YallaFlow project offers Monitor only beside Open; a plain repository is told why it cannot be monitored
+ok 16 - the page: an existing YallaFlow project offers Monitor only beside Open; a plain repository is told why it cannot be monitored
+  ---
+  duration_ms: 3.191374
+  type: 'test'
+  ...
+# Subtest: console routes: edit and port need a save location, take fields (never a command line), and report where they saved
+ok 17 - console routes: edit and port need a save location, take fields (never a command line), and report where they saved
+  ---
+  duration_ms: 1662.800832
+  type: 'test'
+  ...
+# Subtest: the card says what is missing, shows the exact command first, and installs only after a tick on a trusted service
+ok 18 - the card says what is missing, shows the exact command first, and installs only after a tick on a trusted service
+  ---
+  duration_ms: 13.559049
+  type: 'test'
+  ...
+# Subtest: a taken port: the owner by name, a free port, one consistent change, and where it is saved
+ok 19 - a taken port: the owner by name, a free port, one consistent change, and where it is saved
+  ---
+  duration_ms: 10.793427
+  type: 'test'
+  ...
+# Subtest: the edit form sends only what changed, with rarely used fields under Advanced
+ok 20 - the edit form sends only what changed, with rarely used fields under Advanced
+  ---
+  duration_ms: 5.457827
+  type: 'test'
+  ...
+# Subtest: a failure shows the cause line and says what it means; the text for the agent starts from it
+ok 21 - a failure shows the cause line and says what it means; the text for the agent starts from it
+  ---
+  duration_ms: 3.952477
+  type: 'test'
+  ...
+# Subtest: one place for run setup: Run holds the analysis and suggestions; Settings only defines a service by hand
+ok 22 - one place for run setup: Run holds the analysis and suggestions; Settings only defines a service by hand
+  ---
+  duration_ms: 3.996684
+  type: 'test'
+  ...
+# Subtest: owner review: NEEDS_SETUP offers an Advanced "try anyway" (trusted services only); UNKNOWN is a note, never a block; a local change can be undone
+ok 23 - owner review: NEEDS_SETUP offers an Advanced "try anyway" (trusted services only); UNKNOWN is a note, never a block; a local change can be undone
+  ---
+  duration_ms: 12.30992
+  type: 'test'
+  ...
+# Subtest: nothing saved, no proposal: one primary action asks the agent; a quick scan is the fallback
+ok 24 - nothing saved, no proposal: one primary action asks the agent; a quick scan is the fallback
+  ---
+  duration_ms: 10.438097
+  type: 'test'
+  ...
+# Subtest: a proposal shows each service with its command, preselected, and one button to use them
+ok 25 - a proposal shows each service with its command, preselected, and one button to use them
+  ---
+  duration_ms: 6.546837
+  type: 'test'
+  ...
+# Subtest: saved services are approved together from their reviewed commands; shared and blocked ones are left out
+ok 26 - saved services are approved together from their reviewed commands; shared and blocked ones are left out
+  ---
+  duration_ms: 6.375554
+  type: 'test'
+  ...
+# Subtest: approval without starting, and a refused approval, start nothing
+ok 27 - approval without starting, and a refused approval, start nothing
+  ---
+  duration_ms: 6.753546
+  type: 'test'
+  ...
+# Subtest: nothing to approve shows no card; a read-only console never offers approval
+ok 28 - nothing to approve shows no card; a read-only console never offers approval
+  ---
+  duration_ms: 5.185905
+  type: 'test'
+  ...
+# Subtest: the Run tab hosts the flow; Overview names the next run step; Settings keeps advanced editing
+ok 29 - the Run tab hosts the flow; Overview names the next run step; Settings keeps advanced editing
+  ---
+  duration_ms: 2.342386
+  type: 'test'
+  ...
+# Subtest: the real case: landing/node_modules is missing, and the fix is npm ci --include=dev in landing
+ok 30 - the real case: landing/node_modules is missing, and the fix is npm ci --include=dev in landing
+  ---
+  duration_ms: 41.764779
+  type: 'test'
+  ...
+# Subtest: the install command follows the package manager and its lockfile; without a lockfile it says one is created
+ok 31 - the install command follows the package manager and its lockfile; without a lockfile it says one is created
+  ---
+  duration_ms: 26.659109
+  type: 'test'
+  ...
+# Subtest: only certain cases are reported: hoisted installs, Plug'n'Play, unknown commands and packages without dependencies are left alone
+ok 32 - only certain cases are reported: hoisted installs, Plug'n'Play, unknown commands and packages without dependencies are left alone
+  ---
+  duration_ms: 27.006964
+  type: 'test'
+  ...
+# Subtest: diagnosis: the line that states the cause, not the end of the stack trace; a missing project file is not "missing dependencies"
+ok 33 - diagnosis: the line that states the cause, not the end of the stack trace; a missing project file is not "missing dependencies"
+  ---
+  duration_ms: 6.259567
+  type: 'test'
+  ...
+# Subtest: moving a port changes the command, the port, the readiness check and the links together, or nothing
+ok 34 - moving a port changes the command, the port, the readiness check and the links together, or nothing
+  ---
+  duration_ms: 13.943903
+  type: 'test'
+  ...
+# Subtest: an edit keeps every other field, says where it was saved, and never touches the shared file for a local change
+ok 35 - an edit keeps every other field, says where it was saved, and never touches the shared file for a local change
+  ---
+  duration_ms: 120.175525
+  type: 'test'
+  ...
+# Subtest: start: a missing requirement is said before anything runs; a taken port names the owning service and a free port
+ok 36 - start: a missing requirement is said before anything runs; a taken port names the owning service and a free port
+  ---
+  duration_ms: 1511.846714
+  type: 'test'
+  ...
+# Subtest: install: only for a trusted service, only the confirmed command, and the lockfile is not rewritten by a frozen install
+ok 37 - install: only for a trusted service, only the confirmed command, and the lockfile is not rewritten by a frozen install
+  ---
+  duration_ms: 138.898723
+  type: 'test'
+  ...
+# Subtest: a failed start reports the cause line, redacted, in the error and in the status
+ok 38 - a failed start reports the cause line, redacted, in the error and in the status
+  ---
+  duration_ms: 166.374182
+  type: 'test'
+  ...
+# Subtest: three states: READY, NEEDS_SETUP with its fix, UNKNOWN with its reason
+ok 39 - three states: READY, NEEDS_SETUP with its fix, UNKNOWN with its reason
+  ---
+  duration_ms: 52.46116
+  type: 'test'
+  ...
+# Subtest: unknown environments are UNKNOWN, never blocked: other commands, Compose, missing or outside folders, no package.json
+ok 40 - unknown environments are UNKNOWN, never blocked: other commands, Compose, missing or outside folders, no package.json
+  ---
+  duration_ms: 9.021712
+  type: 'test'
+  ...
+# Subtest: custom setups are not called missing: Yarn Plug'n'Play and a service that sets NODE_PATH
+ok 41 - custom setups are not called missing: Yarn Plug'n'Play and a service that sets NODE_PATH
+  ---
+  duration_ms: 8.778142
+  type: 'test'
+  ...
+# Subtest: monorepos: a hoisted install counts; a tool in a sibling package does not; a nested package is checked in its own folder
+ok 42 - monorepos: a hoisted install counts; a tool in a sibling package does not; a nested package is checked in its own folder
+  ---
+  duration_ms: 41.321056
+  type: 'test'
+  ...
+# Subtest: try anyway skips only the dependency check: trust, a dependency's own check and the port pre-flight still apply
+ok 43 - try anyway skips only the dependency check: trust, a dependency's own check and the port pre-flight still apply
+  ---
+  duration_ms: 1511.645288
+  type: 'test'
+  ...
+# Subtest: UNKNOWN never blocks a start, and a path outside the repository is refused whatever the setup check
+ok 44 - UNKNOWN never blocks a start, and a path outside the repository is refused whatever the setup check
+  ---
+  duration_ms: 1297.060909
+  type: 'test'
+  ...
+# Subtest: the console sends try anyway only as an explicit start or restart; anything else is refused
+ok 45 - the console sends try anyway only as an explicit start or restart; anything else is refused
+  ---
+  duration_ms: 8.912873
+  type: 'test'
+  ...
+# Subtest: port changes: no partial or uncertain rewrite, and other services that mention the old port are reported, not changed
+ok 46 - port changes: no partial or uncertain rewrite, and other services that mention the old port are reported, not changed
+  ---
+  duration_ms: 20.794396
+  type: 'test'
+  ...
+# Subtest: a local port change keeps the shared file byte for byte and every other field, and can be undone
+ok 47 - a local port change keeps the shared file byte for byte and every other field, and can be undone
+  ---
+  duration_ms: 39.881658
+  type: 'test'
+  ...
+1..47
+# tests 47
+# suites 0
+# pass 47
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3345.9776

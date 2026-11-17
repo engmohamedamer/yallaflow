@@ -15096,7 +15096,613 @@
       ],
       "createdAt": "2026-11-15T19:20:15.723Z",
       "updatedAt": "2026-11-15T19:20:15.723Z"
+    },
+    {
+      "id": "CTX-0168",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Developer tools the console and the New Project wizard run (composer, npx, npm, php, git, docker) are found and started through src/utils/command.js: resolveCommand looks the name up on the child's own PATH with detect.js which(), and starts a Windows .cmd/.bat shim's own program directly via launchSpec (npm shims with node; Composer's installer shim as php.exe with composer.phar); safeEnvironment is the allow-listed child environment, adding Windows system variables on win32. No shell is used. Windows and macOS behavior is simulated in tests only.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0157",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/utils/command.js",
+          "contentHash": "sha256:8b5dc8fa50d095ab6cabf8c4f219af6346ec41ff0cb914e6a49c5897179ff540",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "test/command-platform.test.js",
+          "contentHash": "sha256:1880ab8583b6b0317b9aec1e687340cad28a1977b80929d5aa926a90fea43a7f",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-16T16:54:44.278Z",
+      "verifiedAtCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-16T16:54:44.278Z",
+          "workId": "PF-0157",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-16T16:54:44.278Z",
+      "updatedAt": "2026-11-16T16:54:44.278Z"
+    },
+    {
+      "id": "CTX-0169",
+      "area": "business-rule",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "The New Project wizard never starts a generator while a required tool is missing: createFromPlan checks prerequisites fresh (checkPrerequisites) before creating anything and refuses with NEW_PROJECT_PREREQUISITES; the console's create route checks first too. The override (CLI --allow-missing-tools, console overrideMissingTools) is honored only when the generator's own program is present and never replaces the plan-hash confirmation, script acknowledgement or catalog verification. Per-OS install guidance is display-only data in src/newproject/guidance.js; YallaFlow installs none of these tools.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0158",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/newproject/project.js",
+          "contentHash": "sha256:1b0ac678f82d66d3bba28a5c531ce53b3d64cd09ea89a7da1f3d28517c23d5a6",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/newproject/guidance.js",
+          "contentHash": "sha256:491f83eae5cd71b040dfa4d8f260680d2911cd98bbf33cdc2dc4c61ba7841d11",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "test/new-project-prerequisites.test.js",
+          "contentHash": "sha256:1e40992e82714cf1eeac9483c45496004e3c02ae3101f9517cd8e9136dcca57b",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-16T16:58:54.472Z",
+      "verifiedAtCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-16T16:58:54.472Z",
+          "workId": "PF-0158",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-16T16:58:54.472Z",
+      "updatedAt": "2026-11-16T16:58:54.472Z"
+    },
+    {
+      "id": "CTX-0170",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "User-level console preferences live in preferences.json beside console.json (src/console/preferences.js; GET/POST /api/preferences): preferred agent, language, theme, last-used folder and onboarding intent/completed. It is a separate file because saveRegistry rewrites console.json and drops unknown top-level keys. Only enumerated or path-typed fields are accepted (no free-form value, so no credential); agent install/sign-in state is never stored; keys from a newer version are preserved; a missing or invalid file means defaults; the browser's localStorage is only a first-paint copy.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0159",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/console/preferences.js",
+          "contentHash": "sha256:eea5ced007437c493cadb2371df6fdce0b36ce411f1260adb871549cd783dd56",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "test/console-preferences.test.js",
+          "contentHash": "sha256:d33236f9ccb9637f310a821c288778749790f96dc7ffb21d7bc003f2cdaaaee5",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-16T17:01:48.241Z",
+      "verifiedAtCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-16T17:01:48.241Z",
+          "workId": "PF-0159",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-16T17:01:48.241Z",
+      "updatedAt": "2026-11-16T17:01:48.241Z"
+    },
+    {
+      "id": "CTX-0171",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Machine readiness is derived, never stored: src/agents/machine-readiness.js computeMachineReadiness(MachineSetup.status(), preferences) is returned as readiness on GET /api/machine. Per agent it keeps installed, authenticated (subscription only) and connection apart (Codex: handshake test this console run; Claude Code: session-only, never verified ahead), plus support (supported on linux/darwin, not-verified elsewhere) and stability (Claude Code experimental). The saved preferred agent is only preselected and marked; a project's agent is enabled only by the developer's own click.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0160",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/agents/machine-readiness.js",
+          "contentHash": "sha256:14a6e0a6707526bc286d91106f27cb7d5cd0548d4f730f124b1dc0721cdd0e22",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "test/console-machine-readiness.test.js",
+          "contentHash": "sha256:a51a998a3d8c711994cbc1b6ec3b3a2fdd719147bc013b747826b5399cf6e524",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-16T17:09:52.309Z",
+      "verifiedAtCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-16T17:09:52.309Z",
+          "workId": "PF-0160",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-16T17:09:52.309Z",
+      "updatedAt": "2026-11-16T17:09:52.309Z"
+    },
+    {
+      "id": "CTX-0172",
+      "area": "business-rule",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Monitor Only is a per-project mode saved in the user's console list (console.json entry mode: 'monitor'; absent = managed), never in the project, and only for folders that already hold .yallaflow. The server is the boundary: one guard ahead of every route refuses any POST addressed to a monitored project (405 MONITOR_ONLY) except the confirmed switch POST /api/p/<id>/mode; a monitored project gets no agent-settings read, agent probe, bridge or execution entry, setup scan or merge recovery, so opening and reading it writes nothing inside it. A lane follows its home project. Switching to Monitor is refused while an agent session is live.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0161",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/console/server.js",
+          "contentHash": "sha256:51be90353140887cb7bda9c23bfd49c2a19a5ae53822866198af68e38ed972b6",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/console/registry.js",
+          "contentHash": "sha256:b3144e4bea0d6cf1589f9e6b0a2bf8e811fb0fe19d389f5e71312161226e43ed",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/console-monitor-mode.test.js",
+          "contentHash": "sha256:afe6679ba36f434b9347d2e6c92fc020fcf8b2ce9d10b69a83d77c88449df3a2",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-16T17:17:31.547Z",
+      "verifiedAtCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-16T17:17:31.547Z",
+          "workId": "PF-0161",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-16T17:17:31.547Z",
+      "updatedAt": "2026-11-16T17:17:31.547Z"
+    },
+    {
+      "id": "CTX-0173",
+      "area": "business-rule",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Console first-run journey: with no projects the Projects page shows a welcome panel that routes by intent (Create, Manage, Monitor; saved as onboarding.intent in preferences). Create and Manage are agent-first: in the New Project wizard the agent-planned (empty) project is the default path and needs a chosen, ready agent, with the machine agent setup card shown in place; the pinned generator templates and creating without a ready agent are labeled Advanced options (a template needs no agent). Monitor needs no agent. These are page rules only: the server does not require an agent to create a project.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0162",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "resources/console/app.js",
+          "contentHash": "sha256:a47578d5197e6583361d051bb88b07cc31814ba5d01222ebfcc1ff73559acf69",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/console-first-journey.test.js",
+          "contentHash": "sha256:80256a760b353dce682cd39e389fd64d024f167a6d80e796051040743eaf3bc2",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-16T17:24:37.932Z",
+      "verifiedAtCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-16T17:24:37.932Z",
+          "workId": "PF-0162",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-16T17:24:37.932Z",
+      "updatedAt": "2026-11-16T17:24:37.932Z"
+    },
+    {
+      "id": "CTX-0174",
+      "area": "convention",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "The New Project wizard keeps a draft in the browser (localStorage yfc.wizardDraft): bounded typed choices, the step, and the plan id only while a creation runs; never file contents or the plan hash. A creation whose plan has no outcome and is not running is treated as interrupted; continuing posts the same confirmed plan, and createFromPlan skips finished steps, so resuming needs no server-side resume logic.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0163",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "resources/console/app.js",
+          "contentHash": "sha256:c572a049e56c6c3577b244baed22e6c74800be4e8bd417e8af86a202e6ad5f1d",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/console-wizard-resume.test.js",
+          "contentHash": "sha256:c46c9ff13c6ad134152826beac4817134ee3e5b1c3c0b1b5c58c4083112c7ef1",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-16T17:26:49.964Z",
+      "verifiedAtCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-16T17:26:49.964Z",
+          "workId": "PF-0163",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-16T17:26:49.964Z",
+      "updatedAt": "2026-11-16T17:26:49.964Z"
+    },
+    {
+      "id": "CTX-0175",
+      "area": "business-rule",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "When a New Project plan initializes Git (--git), Git is one of its prerequisites: it is checked with the stack's tools before anything is created, and a missing Git is never overridable (the developer installs Git or plans without it).",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0158",
+        "candidateId": "K-002"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/newproject/project.js",
+          "contentHash": "sha256:18c188a6d78d9d977fe93e2847e2866cee3b83206798c7dac03ce352d291a16d",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/new-project-prerequisites.test.js",
+          "contentHash": "sha256:2f8050e7c65fbfb1163d987910748cd07afb683bc7063e1bd4cbff518a8ff0b6",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-16T18:31:16.486Z",
+      "verifiedAtCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-16T18:31:16.486Z",
+          "workId": "PF-0158",
+          "candidateId": "K-002"
+        }
+      ],
+      "createdAt": "2026-11-16T18:31:16.486Z",
+      "updatedAt": "2026-11-16T18:31:16.486Z"
+    },
+    {
+      "id": "CTX-0176",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Console chat transcript: src/agents/transcript.js numbers every agent event (n, growing across console restarts), merges consecutive streamed chunks into one entry, keeps the newest 400 merged entries in memory and journals everything to .yallaflow/local/agent-chat/transcript.jsonl (git-ignored, 0600, secret-looking values redacted, rotated once at 8 MB). AgentBridge.status returns the newest 200 with transcript.hasOlder; GET /api/p/<id>/agent/transcript?before=n pages older events from memory or disk. The page merges a reload by n (never replaces), shows every loaded entry and folds only tool steps. This replaces the earlier rule that YallaFlow keeps no chat messages.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0165",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/agents/transcript.js",
+          "contentHash": "sha256:50cd03f0fcc8c33abe82c6757c20ad73f86a5d7b840729ba6da9bcc211f065b6",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "test/agent-transcript.test.js",
+          "contentHash": "sha256:f8d26540a53f1aa403e4bb9b773e0a7c0010d02b2176fe3b3b3b1d6df7c91304",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "docs/agents.md",
+          "contentHash": "sha256:4ec8c0145df747be6e0bc18a0b34c583509343be0178db35e23b35e14b12e863",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "modified"
+        }
+      ],
+      "verifiedAt": "2026-11-16T19:38:13.042Z",
+      "verifiedAtCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-16T19:38:13.042Z",
+          "workId": "PF-0165",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-16T19:38:13.042Z",
+      "updatedAt": "2026-11-16T19:38:13.042Z"
+    },
+    {
+      "id": "CTX-0177",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Runtime fixes: before a service starts, src/runtime/prerequisites.js checks from files only whether a Node package manager service has its dependencies (or the script's declared local tool) installed and names the install command by lockfile; runtimeStatus carries prerequisites and, for a failed service, failure (src/runtime/diagnose.js: the log line that states the cause). startOne refuses RUNTIME_PREREQUISITES before spawning; PORT_IN_USE carries ownerService, owner and a free suggestion. runtime install runs the named command only for a trusted service with the hash of that command. runtime port (src/runtime/ports.js) changes command, ports, ready.port and links together or refuses (RUNTIME_PORT_COMMAND). profile.updateService edits fields of an existing service keeping the rest, in the local override (--local) or the shared file (--shared); runtime edit has no default scope. In the console these live on the service card in the Run tab; Settings only defines a service manually.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0166",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/runtime/prerequisites.js",
+          "contentHash": "sha256:aa1c8a384a6854cacd5911ff6b232aa5f08b5b24c37ed130359fad87d1a66301",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/runtime/ports.js",
+          "contentHash": "sha256:f9b79c233971333b5e62950f666f8ff38484becb1866ead46fd1693e559577f6",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/runtime/profile.js",
+          "contentHash": "sha256:0db9cab0c5b82f957882c67d9e29cb9bb0f3db510a4ef159ee624732d8c4b467",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "test/runtime-fixes.test.js",
+          "contentHash": "sha256:7405e492cb83538ed7c0b43761581137fbad939a7503077176bbde839ed64a65",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-17T07:19:46.243Z",
+      "verifiedAtCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-17T07:19:46.243Z",
+          "workId": "PF-0166",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-17T07:19:46.243Z",
+      "updatedAt": "2026-11-17T07:19:46.243Z"
+    },
+    {
+      "id": "CTX-0178",
+      "area": "business-rule",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "The console agent chat is saved per checkout in .yallaflow/local/agent-chat by default; the developer can turn saving off for every project on the machine (preferences.json saveChatHistory: false), which stops new entries and keeps what was saved, and can delete one project's saved chat after a confirmation; a message is saved whole or not at all and rotation happens only where an entry starts.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0165",
+        "candidateId": "K-002"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/agents/transcript.js",
+          "contentHash": "sha256:9f24aa76c3b323010d22f6e5919538703c69b026733276e3f128364bdee048fa",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/console/preferences.js",
+          "contentHash": "sha256:1dbe7e954e9051f536e07fb24b71461edb7ed819d6f06b24ab2ab6048d86e8bc",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "node --import ./test-support/isolate-user-config.js --test test/agent-chat-history.test.js test/agent-transcript.test.js test/agent-bridge.test.js test/console-preferences.test.js test/console-monitor-mode.test.js test/console-project-chat.test.js test/agent-terminal.test.js (passed)",
+          "workId": "PF-0165",
+          "verificationRunId": "V-002"
+        }
+      ],
+      "verifiedAt": "2026-11-17T09:22:41.661Z",
+      "verifiedAtCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-17T09:22:41.661Z",
+          "workId": "PF-0165",
+          "candidateId": "K-002"
+        }
+      ],
+      "createdAt": "2026-11-17T09:22:41.661Z",
+      "updatedAt": "2026-11-17T09:22:41.661Z"
+    },
+    {
+      "id": "CTX-0179",
+      "area": "business-rule",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Runtime dependency readiness is READY, NEEDS_SETUP or UNKNOWN. Only NEEDS_SETUP refuses a start, and the developer can start anyway (runtime start|restart --skip-setup-check, console Advanced action), which skips only that check for the named service; trust, folder protection, port pre-flight and Monitor Only still apply. A local port change is a personal override that runtime reset removes without touching the shared file; uncertain command rewrites are refused and other services that mention the old port are reported, never changed.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0166",
+        "candidateId": "K-002"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/runtime/prerequisites.js",
+          "contentHash": "sha256:aac5cbca0ceeb16a040e4d435adae892bb085ecfafff26b291476ed7f5fd851f",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/runtime/supervisor.js",
+          "contentHash": "sha256:a974522ba1a525bee05cbce188bc615755de78c7694afd6f83f7b10a882c925b",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/runtime/ports.js",
+          "contentHash": "sha256:6f7f83f36371b563bd859a08d75a5612479b895396d5fc44d90634d24be269ba",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js (passed)",
+          "workId": "PF-0166",
+          "verificationRunId": "V-002"
+        }
+      ],
+      "verifiedAt": "2026-11-17T09:23:50.553Z",
+      "verifiedAtCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-17T09:23:50.553Z",
+          "workId": "PF-0166",
+          "candidateId": "K-002"
+        }
+      ],
+      "createdAt": "2026-11-17T09:23:50.553Z",
+      "updatedAt": "2026-11-17T09:23:50.553Z"
+    },
+    {
+      "id": "CTX-0180",
+      "area": "business-rule",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Owner decision (2026-11-17): undoing a local runtime change is, for now, a full reset of that service's local override (runtime reset / 'Remove all local changes and return to the shared definition'); the card and the confirmation must say that all local changes to the service are removed, listing them, not only the port. A field-level undo is not provided.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0166",
+        "candidateId": "K-003"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "resources/console/app.js",
+          "contentHash": "sha256:da325f4c28b0893002393052265e176fb9dfe7550e9dd07e186632def98553cf",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/runtime/profile.js",
+          "contentHash": "sha256:1ea8a700cfab419879f8908d1514aa0588a7ff47115643af5f1e38e30a42e9e9",
+          "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+          "workingTree": "modified"
+        },
+        {
+          "type": "runtime",
+          "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js (passed)",
+          "workId": "PF-0166",
+          "verificationRunId": "V-004"
+        }
+      ],
+      "verifiedAt": "2026-11-17T09:54:57.215Z",
+      "verifiedAtCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-17T09:54:57.215Z",
+          "workId": "PF-0166",
+          "candidateId": "K-003"
+        }
+      ],
+      "createdAt": "2026-11-17T09:54:57.215Z",
+      "updatedAt": "2026-11-17T09:54:57.215Z"
     }
   ],
-  "updatedAt": "2026-11-15T19:20:15.723Z"
+  "updatedAt": "2026-11-17T09:54:57.215Z"
 }

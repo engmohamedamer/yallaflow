@@ -1331,3 +1331,68 @@ button.briefref:hover { color: var(--ink); border-color: var(--ink-2); }
 .fpick-hint { margin: 0; }
 .fpick-git { display: flex; align-items: flex-start; gap: 8px; margin-top: 12px; padding: 10px 12px; border-radius: 12px; background: var(--bg-2); }
 .fpick-git input { margin-top: 4px; }
+
+/* PF-0158: missing tools on the wizard's review step. */
+.toolsblock .toolslist { list-style: none; padding: 0; margin: 8px 0; display: grid; gap: 10px; }
+.toolsblock .toolslist li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.toolsblock .toolhow { flex-basis: 100%; display: grid; gap: 4px; justify-items: start; }
+.toolsblock .toolhow code { overflow-wrap: anywhere; }
+
+/* PF-0161: Monitor only. */
+.monitorbar { display: grid; gap: 6px; margin-bottom: 14px; }
+.monitorbar details ul { margin: 6px 0 0; padding-inline-start: 20px; }
+.modeask { display: grid; gap: 8px; margin-top: 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
+.fpick-note { margin-top: 4px; max-width: 60ch; }
+
+/* PF-0162: the first screen: what do you want to do? */
+.welcome .intentgrid { display: grid; gap: 12px; margin: 12px 0; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.intentcard { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; padding: 14px 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); }
+.intentcard h3 { font-size: 17px; margin: 0; }
+.intentcard .intent-ico { font-size: 22px; line-height: 1; }
+.intentcard .btn { margin-top: 4px; }
+.advstacks { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
+.advstacks > summary { cursor: pointer; }
+.wizagentsetup { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
+
+/* PF-0163: restored wizard choices. */
+.wizrestored { margin-bottom: 10px; }
+.wizrestored .linkbtn { background: none; border: 0; color: var(--nile-2); text-decoration: underline; cursor: pointer; font: inherit; padding: 0 2px; }
+:root[data-theme="dark"] .wizrestored .linkbtn { color: var(--nile); }
+
+/* PF-0165: chat history controls. */
+.chatkeep { margin: 6px 0 2px; }
+.chatkeep > div { display: grid; gap: 6px; padding: 6px 0 2px; justify-items: start; }
+.chatkeep p { margin: 0; overflow-wrap: anywhere; }
+.chatolder { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; justify-content: center; text-align: center; padding: 4px 0 8px; }
+.agent .apast { margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.chatbody .agent .apast .astream { flex: none; }
+.chatjump { position: sticky; bottom: 76px; align-self: center; z-index: 2; margin: 0 auto; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; font-size: 13px; cursor: pointer; box-shadow: 0 4px 14px rgba(0, 0, 0, .14); }
+.chatjump.fresh { border-color: var(--nile-2); font-weight: 600; }
+.chatjump[hidden] { display: none; }
+/* Arabic text with English commands and paths: code keeps its own direction and scrolls inside
+   its own box, so a long line never widens the chat on a small screen. */
+.agent .amsg.richtext pre { max-width: 100%; overflow-x: auto; direction: ltr; text-align: left; unicode-bidi: isolate; }
+.agent .amsg.richtext code { overflow-wrap: anywhere; }
+.agent .amsg.richtext pre code { overflow-wrap: normal; }
+.agent .amsg.me p { unicode-bidi: plaintext; overflow-wrap: anywhere; }
+.agent .atool, .agent .anote { overflow-wrap: anywhere; }
+
+/* PF-0166: fixes on the service card. */
+.svcneed, .svcport, .svcedit { display: grid; gap: 8px; margin: 10px 0; padding: 12px 14px; border-radius: 14px; border: 1px solid color-mix(in srgb, var(--amber) 50%, transparent); background: var(--amber-soft); }
+.svcedit { border-color: var(--line); background: var(--bg-2); }
+.svcedit label, .svcport label { display: grid; gap: 4px; }
+.svcedit input, .svcedit select { max-width: 100%; }
+.svcedit-adv { display: grid; gap: 8px; }
+.svcedit-adv[open] > label { margin-top: 8px; }
+.svcneed code.cli { overflow-wrap: anywhere; }
+.svcneed-notes { margin: 0; padding-inline-start: 18px; display: grid; gap: 2px; }
+.svcanyway summary { cursor: pointer; }
+.svcanyway p { margin: 4px 0 6px; }
+.scopepick { display: grid; gap: 6px; border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; background: var(--card); }
+.scopenote { margin: 0; }
+.svcfail-line { overflow-wrap: anywhere; }
+.runmore { margin-top: 14px; }
+.runmore > summary { cursor: pointer; }
+/* A start error carries log lines with long paths: it wraps inside the card on a small screen. */
+.svcrow > * { min-width: 0; }
+.svcrow > p[role="alert"] { overflow-wrap: anywhere; }

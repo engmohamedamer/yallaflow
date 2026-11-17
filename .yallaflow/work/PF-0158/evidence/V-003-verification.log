@@ -1,0 +1,202 @@
+TAP version 13
+# Subtest: folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+ok 1 - folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+  ---
+  duration_ms: 149.690379
+  type: 'test'
+  ...
+# Subtest: registration: an existing YallaFlow project inside home is added once, live; others are refused
+ok 2 - registration: an existing YallaFlow project inside home is added once, live; others are refused
+  ---
+  duration_ms: 383.918892
+  type: 'test'
+  ...
+# Subtest: stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+ok 3 - stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+  ---
+  duration_ms: 1199.448957
+  type: 'test'
+  ...
+# Subtest: a plan that installs dependencies needs an explicit acknowledgement (PF-0085)
+ok 4 - a plan that installs dependencies needs an explicit acknowledgement (PF-0085)
+  ---
+  duration_ms: 366.072474
+  type: 'test'
+  ...
+# Subtest: Git init: explicit, once, never inside another repository; refused read-only
+ok 5 - Git init: explicit, once, never inside another repository; refused read-only
+  ---
+  duration_ms: 96.24259
+  type: 'test'
+  ...
+# Subtest: runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+ok 6 - runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+  ---
+  duration_ms: 642.513261
+  type: 'test'
+  ...
+# Subtest: agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+ok 7 - agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+  ---
+  duration_ms: 46.296659
+  type: 'test'
+  ...
+# Subtest: review: parallel registrations add a project once and lose none from the saved list
+ok 8 - review: parallel registrations add a project once and lose none from the saved list
+  ---
+  duration_ms: 97.250606
+  type: 'test'
+  ...
+# Subtest: review: hidden folders are refused even by path; read-only consoles probe no tools
+ok 9 - review: hidden folders are refused even by path; read-only consoles probe no tools
+  ---
+  duration_ms: 10.992469
+  type: 'test'
+  ...
+# Subtest: review: plans that run package scripts need an acknowledgement; control characters and NUL are refused
+ok 10 - review: plans that run package scripts need an acknowledgement; control characters and NUL are refused
+  ---
+  duration_ms: 572.379337
+  type: 'test'
+  ...
+# Subtest: review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+ok 11 - review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+  ---
+  duration_ms: 345.00221
+  type: 'test'
+  ...
+# Subtest: a registration failure after creation is reported as partial success, never as a failed creation
+ok 12 - a registration failure after creation is reported as partial success, never as a failed creation
+  ---
+  duration_ms: 492.493181
+  type: 'test'
+  ...
+# Subtest: Claude Code: off unless chosen explicitly when enabling agents; never read-only
+ok 13 - Claude Code: off unless chosen explicitly when enabling agents; never read-only
+  ---
+  duration_ms: 100.942078
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): a project leaves the running console and the saved list; its files stay
+ok 14 - removal (PF-0081): a project leaves the running console and the saved list; its files stay
+  ---
+  duration_ms: 90.165852
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): refused while an agent session is live in the project
+ok 15 - removal (PF-0081): refused while an agent session is live in the project
+  ---
+  duration_ms: 2.139629
+  type: 'test'
+  ...
+# Subtest: the check says what is missing and whether an override is possible
+ok 16 - the check says what is missing and whether an override is possible
+  ---
+  duration_ms: 7.609198
+  type: 'test'
+  ...
+# Subtest: guidance exists for Windows, macOS and Linux for every tool the catalog and the console check; it is display only
+ok 17 - guidance exists for Windows, macOS and Linux for every tool the catalog and the console check; it is display only
+  ---
+  duration_ms: 1.362126
+  type: 'test'
+  ...
+# Subtest: creation is refused before anything is created; the override needs the generator itself
+ok 18 - creation is refused before anything is created; the override needs the generator itself
+  ---
+  duration_ms: 564.780829
+  type: 'test'
+  ...
+# Subtest: console: the plan carries the tool check, create is refused with it, Recheck is a read, never read-only
+ok 19 - console: the plan carries the tool check, create is refused with it, Recheck is a read, never read-only
+  ---
+  duration_ms: 802.141566
+  type: 'test'
+  ...
+# Subtest: plan: validated name, absent destination, no nesting, catalog-only stacks; nothing is created
+ok 20 - plan: validated name, absent destination, no nesting, catalog-only stacks; nothing is created
+  ---
+  duration_ms: 345.870963
+  type: 'test'
+  ...
+# Subtest: create: hash confirmation, staging, promotion, Core init with provenance → Greenfield, first work item
+ok 21 - create: hash confirmation, staging, promotion, Core init with provenance → Greenfield, first work item
+  ---
+  duration_ms: 970.374183
+  type: 'test'
+  ...
+# Subtest: existing projects keep the gate: no provenance, no Greenfield; a copied origin on a brownfield workspace is ignored
+ok 22 - existing projects keep the gate: no provenance, no Greenfield; a copied origin on a brownfield workspace is ignored
+  ---
+  duration_ms: 40.765007
+  type: 'test'
+  ...
+# Subtest: failures: generator error, missing marker, destination appearing; staging and diagnostics kept, nothing overwritten
+ok 23 - failures: generator error, missing marker, destination appearing; staging and diagnostics kept, nothing overwritten
+  ---
+  duration_ms: 194.960402
+  type: 'test'
+  ...
+# Subtest: a plan edited outside YallaFlow cannot run a different command
+ok 24 - a plan edited outside YallaFlow cannot run a different command
+  ---
+  duration_ms: 8.501416
+  type: 'test'
+  ...
+# Subtest: CLI: catalog, recommend, plan, create (empty stack), discard
+ok 25 - CLI: catalog, recommend, plan, create (empty stack), discard
+  ---
+  duration_ms: 1188.382044
+  type: 'test'
+  ...
+# Subtest: console: wizard routes are guarded, need the hash confirmation, and are refused read-only
+ok 26 - console: wizard routes are guarded, need the hash confirmation, and are refused read-only
+  ---
+  duration_ms: 974.477102
+  type: 'test'
+  ...
+# Subtest: review: staging is npm's project root, so a parent .npmrc or node_modules cannot shadow the generator
+ok 27 - review: staging is npm's project root, so a parent .npmrc or node_modules cannot shadow the generator
+  ---
+  duration_ms: 381.161938
+  type: 'test'
+  ...
+# Subtest: review: a retry never labels or installs into a folder that replaced the created one; failure text is redacted
+ok 28 - review: a retry never labels or installs into a folder that replaced the created one; failure text is redacted
+  ---
+  duration_ms: 170.387458
+  type: 'test'
+  ...
+# Subtest: review: a parent npm workspace that would capture staging stops the generator before it runs
+ok 29 - review: a parent npm workspace that would capture staging stops the generator before it runs
+  ---
+  duration_ms: 327.316379
+  type: 'test'
+  ...
+# Subtest: plan carries intent, environment, git and attachments; creation initializes Git and words the first work from the goal
+ok 30 - plan carries intent, environment, git and attachments; creation initializes Git and words the first work from the goal
+  ---
+  duration_ms: 124.595414
+  type: 'test'
+  ...
+# Subtest: custom stack (PF-0087): only with the empty project; recorded in the plan, origin and first work item; nothing runs
+ok 31 - custom stack (PF-0087): only with the empty project; recorded in the plan, origin and first work item; nothing runs
+  ---
+  duration_ms: 926.442763
+  type: 'test'
+  ...
+# Subtest: isolation (PF-0094): plans and registrations stay in this run's own config folder
+ok 32 - isolation (PF-0094): plans and registrations stay in this run's own config folder
+  ---
+  duration_ms: 0.565471
+  type: 'test'
+  ...
+1..32
+# tests 32
+# suites 0
+# pass 32
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6020.185536

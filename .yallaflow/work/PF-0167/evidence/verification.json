@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/cli.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/cli.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/cli.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-17T09:55:45.084Z",
+      "finishedAt": "2026-11-17T09:55:45.780Z",
+      "verifiedAt": "2026-11-17T09:55:45.780Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/cli.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/cli.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/cli.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-17T10:03:33.459Z",
+      "finishedAt": "2026-11-17T10:03:34.127Z",
+      "verifiedAt": "2026-11-17T10:03:34.127Z",
+      "log": "V-002-verification.log"
+    }
+  ]
+}

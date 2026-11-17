@@ -68,5 +68,7 @@ test('the chat opens on the chosen agent, shows no account warning and connects 
   assert.match(app, /agentAction\('connect', \{ provider: 'claude', workId \}, openClaudeTerminal\)/);
   assert.match(app, /post\(`\/api\/p\/\$\{pid\}\/agents\/open-terminal`, '\{\}'/);
   assert.match(app, /Claude Code opened in a terminal in the project folder\. Accept its development-channel prompt there/);
-  assert.match(app, /const shown = out\.filter\(\(x, i\) => !\(x\.session && out\[i \+ 1\]\?\.session\)\)\.slice\(-80\);/);
+  // PF-0165: a run of session lines still shows only its last one; the 80-entry cut is gone (it hid messages).
+  assert.match(app, /const shown = out\.filter\(\(x, i\) => !\(x\.session && out\[i \+ 1\]\?\.session\)\);/);
+  assert.doesNotMatch(app, /\.slice\(-80\)/);
 });

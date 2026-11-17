@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-16T19:18:01.258Z",
+      "completedAt": "2026-11-16T19:18:01.258Z",
+      "summary": "Read the whole path: AgentBridge.emit/status (src/agents/bridge.js), fromAcpUpdate (src/agents/events.js), the Claude path (src/agents/claude.js), the SSE stream (src/console/server.js) and the page (loadAgent, onAgentEvent, renderAgent, agentEntries, agentPanel in resources/console/app.js). There is no virtualization and no pagination. The only folding is tool-step groups.",
+      "evidence": [
+        "src/agents/bridge.js",
+        "src/agents/events.js",
+        "resources/console/app.js"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-16T19:18:01.626Z",
+      "completedAt": "2026-11-16T19:18:01.626Z",
+      "summary": "Reproduced with a script against the real AgentBridge: one user message then 450 message.delta events leaves 400 events in memory, status() returns 200, the user message is absent and the reply text starts at chunk 250. Proven causes: (1) real loss: each streamed chunk is one event in a 400-event per-project memory cap, dropped silently; (2) the server sends only the last 200 and the page REPLACES its list on every turn start/end, reload and reconnect, so text the page already showed disappears; (3) the page renders only the last 80 entries with no way to open the rest; (4) nothing is written to disk, so a console restart loses the conversation; (5) with no active session the panel shows the start picker without the conversation; (6) a first load failure shows 'Loading' forever with no retry; (7) notice events are never rendered and opened tool groups close on every chunk. Not reproduced: duplication (the list is replaced, so none); a replay of old text on session resume depends on the adapter and was not observed.",
+      "evidence": [
+        "src/agents/bridge.js:327-329",
+        "src/agents/bridge.js:543",
+        "resources/console/app.js",
+        "runtime:repro script: kept 400, sent 200, questionSent false, reply starts at w250"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-17T08:50:42.940Z",
+      "completedAt": "2026-11-17T09:21:15.107Z",
+      "summary": "Owner review follow-up: Clear chat history (confirmed; deletes only this project's two transcript files and its memory, tells open pages), a user-level saveChatHistory preference (default on; off stops writing new entries, keeps and still shows what was saved), per-entry save decision so a reply is saved whole or not at all, rotation only where an entry starts, a read-size problem reported instead of skipped silently, and panel copy that says redaction is not a guarantee. Browser run on the simulated agent: saving off left the transcript byte-identical through a new question and reply; cancel deleted nothing; confirm removed only the transcript; saving back on wrote the next message; no overflow at 390px.",
+      "evidence": [
+        "src/agents/transcript.js",
+        "src/agents/bridge.js",
+        "src/console/server.js",
+        "src/console/preferences.js",
+        "resources/console/app.js",
+        "test/agent-chat-history.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-17T09:22:41.190Z",
+      "completedAt": "2026-11-17T09:22:41.190Z",
+      "summary": "Focused tests pass (V-002: 65/65, including 7 new history tests and 1 new panel test); syntax check passes (V-003). Full suite: 1417 tests, 1415 pass, 1 skipped, 1 failure in the Claude channel test under load (unrelated path; passes 3/3 alone). Browser verification on Linux with the simulated agent.",
+      "evidence": [
+        "verification:V-002",
+        "verification:V-003"
+      ]
+    }
+  },
+  "rulings": [
+    {
+      "decision": "The console now saves the chat transcript in .yallaflow/local/agent-chat (git-ignored, 0600, secrets redacted, about 16 MB kept). docs/agents.md said YallaFlow never keeps messages; that rule is changed and the doc updated.",
+      "reason": "The owner's request asks that reopening a session restores its saved history and that real data loss be fixed; with memory-only storage a console restart loses the whole conversation.",
+      "costIfWrong": "If the owner prefers no chat text on disk, the journal (Transcript dirFor/readDir in src/agents/bridge.js entry()) must be turned off or made opt-in; the in-memory merge fix stays valid either way.",
+      "createdAt": "2026-11-16T19:37:01.686Z"
+    },
+    {
+      "decision": "The 'save chat history' setting is one user-level preference (saveChatHistory in the console's preferences.json) that applies to every project on this machine, not a per-project setting.",
+      "reason": "The owner asked for a setting to disable future disk persistence; a machine-wide privacy choice is what a developer expects, and preferences.json is already the typed, credential-free place for personal choices.",
+      "costIfWrong": "A developer who wants saving off for only one project cannot express it; a per-project override would be added later.",
+      "createdAt": "2026-11-17T09:12:21.461Z"
+    },
+    {
+      "decision": "Saving is decided when a chat entry starts: a reply already being saved finishes on disk, and a reply already arriving when saving is turned on is not saved half.",
+      "reason": "The owner required that retention never truncates a message in the middle; a per-chunk switch would save half replies.",
+      "costIfWrong": "A reply that was in progress when saving was turned off is still written to disk in full.",
+      "createdAt": "2026-11-17T09:12:22.082Z"
+    },
+    {
+      "decision": "Delete chat history removes only this project's transcript.jsonl and transcript.1.jsonl and empties its memory; it is allowed while a session runs, which continues.",
+      "reason": "Narrowest deletion that satisfies the request and cannot touch other projects, lanes, session records or settings.",
+      "costIfWrong": "A developer expecting session link records to be deleted too would find them still in .yallaflow/local/agent-sessions.",
+      "createdAt": "2026-11-17T09:12:22.746Z"
+    }
+  ],
+  "history": [
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Owner review (2026-11-17): add Clear Chat History with confirmation, a setting to stop saving future chat to disk (existing history kept unless deleted separately), tests for deletion/disabled saving/no cross-project deletion, and verify streaming stays responsive and retention never cuts a message in the middle.",
+      "changedAt": "2026-11-17T08:50:42.940Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Owner review (2026-11-17): add Clear Chat History with confirmation, a setting to stop saving future chat to disk (existing history kept unless deleted separately), tests for deletion/disabled saving/no cross-project deletion, and verify streaming stays responsive and retention never cuts a message in the middle.",
+      "changedAt": "2026-11-17T08:50:42.940Z"
+    }
+  ],
+  "updatedAt": "2026-11-17T09:22:41.190Z"
+}

@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-16T17:18:25.026Z",
+      "completedAt": "2026-11-16T17:18:25.026Z",
+      "summary": "The welcome panel (viewProjects, no projects) offers New project and Add an existing project. The wizard (viewNew) lists every stack equally, defaults to the empty project and to no agent, and never requires one. The machine agent card (agentSetupCard) is console-level (GET /api/machine) but shown only in a project's Settings. Manage already asks for the project's agent first (readiness step, PF-0133).",
+      "evidence": [
+        "resources/console/app.js",
+        "src/console/readiness.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-16T17:18:25.531Z",
+      "completedAt": "2026-11-16T17:18:25.531Z",
+      "summary": "Owner decision 2 (2026-11-16): for normal Create and Manage journeys an AI Agent is required; deterministic project generation is preserved as an explicitly labeled Advanced option; Monitor Only needs no agent. Phase 1 deliverables: first-run routing by intent, guided agent setup, returning-user fast path. No new orchestrator (decision 1).",
+      "evidence": [
+        "user:Owner approval of Phase 1 decisions, items 1 and 2"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-16T17:24:30.833Z",
+      "completedAt": "2026-11-16T17:24:30.833Z",
+      "summary": "Page only (no new server state): welcomePanel with Create / Manage / Monitor (intent saved to preferences; Monitor opens the folder chooser with Monitor only as the main action) and the machine's agent state with setup in place; wizard stack step puts the agent-planned project first and the fixed templates under a labeled Advanced section; the agent step requires a chosen, ready agent for an agent-planned project unless the labeled Advanced tick is used, and shows the machine setup card in place when the chosen agent is not ready.",
+      "evidence": [
+        "resources/console/app.js",
+        "resources/console/app.css",
+        "test/console-first-journey.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-16T17:24:36.962Z",
+      "completedAt": "2026-11-16T17:24:36.962Z",
+      "summary": "Focused page tests pass (V-001). The whole console test set passed in this session except one known load-sensitive queue timing test, which passed when rerun alone.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-16T17:24:37.545Z",
+      "completedAt": "2026-11-16T17:24:37.545Z",
+      "summary": "All three criteria satisfied (CV-001).",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-16T17:24:37.545Z"
+}

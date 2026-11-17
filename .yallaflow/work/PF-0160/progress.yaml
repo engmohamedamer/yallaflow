@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-16T17:02:28.652Z",
+      "completedAt": "2026-11-16T17:02:28.652Z",
+      "summary": "MachineSetup.status() (src/agents/setup.js) reports Codex CLI/adapter/login/verified and Claude installed/auth; supportedPlatform is linux/darwin. The Settings card (agentSetupCard) shows Codex rows and Claude rows without a connection row or platform note. Agent choice is per project (.yallaflow/local/agents.json); nothing remembers a usual agent.",
+      "evidence": [
+        "src/agents/setup.js",
+        "src/agents/claude-detect.js",
+        "resources/console/app.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-16T17:02:29.182Z",
+      "completedAt": "2026-11-16T17:02:29.182Z",
+      "summary": "Owner decisions 5 and 6 (2026-11-16): preselect the saved preferred agent but require confirmation before enabling it for a new project, revalidate readiness; Claude Code on Windows is shown, marked Experimental / Not Verified, with installed, authenticated and integration states separate.",
+      "evidence": [
+        "user:Owner approval of Phase 1 decisions, items 5 and 6"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-16T17:09:47.351Z",
+      "completedAt": "2026-11-16T17:09:47.351Z",
+      "summary": "src/agents/machine-readiness.js (computeMachineReadiness, pure and derived) rides on GET /api/machine with the saved preference revalidated. Page: Claude Code card shows program, sign-in and console connection separately, marked Experimental and not verified on systems outside Linux/macOS; choosing an agent saves it as the preferred agent; the chooser lists it first and marks it, the wizard starts from it; enabling still needs the developer's click. Provider names stay in src/agents (AC-108).",
+      "evidence": [
+        "src/agents/machine-readiness.js",
+        "src/console/server.js",
+        "resources/console/app.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-16T17:09:51.515Z",
+      "completedAt": "2026-11-16T17:09:51.515Z",
+      "summary": "Focused tests pass (V-001); the whole console and agent test set (370) also passed in this session. Windows and macOS are simulated platform values.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-16T17:09:51.995Z",
+      "completedAt": "2026-11-16T17:09:51.995Z",
+      "summary": "All three criteria satisfied (CV-001).",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-16T17:09:51.995Z"
+}

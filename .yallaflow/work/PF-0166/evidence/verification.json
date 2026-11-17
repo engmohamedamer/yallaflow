@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "npm run check:syntax && node --import ./test-support/isolate-user-config.js --test test/runtime-fixes.test.js test/console-run-fixes.test.js test/runtime.test.js test/runtime-plan.test.js test/console-run-flow.test.js test/console-ia.test.js test/shared-project.test.js && git diff --check",
+      "executionMode": "shell",
+      "executable": "npm run check:syntax && node --import ./test-support/isolate-user-config.js --test test/runtime-fixes.test.js test/console-run-fixes.test.js test/runtime.test.js test/runtime-plan.test.js test/console-run-flow.test.js test/console-ia.test.js test/shared-project.test.js && git diff --check",
+      "args": [],
+      "displayCommand": "npm run check:syntax && node --import ./test-support/isolate-user-config.js --test test/runtime-fixes.test.js test/console-run-fixes.test.js test/runtime.test.js test/runtime-plan.test.js test/console-run-flow.test.js test/console-ia.test.js test/shared-project.test.js && git diff --check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-17T07:18:26.972Z",
+      "finishedAt": "2026-11-17T07:19:44.910Z",
+      "verifiedAt": "2026-11-17T07:19:44.910Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/runtime-readiness.test.js",
+        "test/runtime-fixes.test.js",
+        "test/console-run-fixes.test.js",
+        "test/console-monitor-mode.test.js",
+        "test/console-ia.test.js",
+        "test/console-run-flow.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-17T09:22:57.258Z",
+      "finishedAt": "2026-11-17T09:23:00.948Z",
+      "verifiedAt": "2026-11-17T09:23:00.948Z",
+      "log": "V-002-verification.log"
+    },
+    {
+      "id": "V-003",
+      "command": "npm run check:syntax",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check:syntax"
+      ],
+      "displayCommand": "npm run check:syntax",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-17T09:23:01.156Z",
+      "finishedAt": "2026-11-17T09:23:20.448Z",
+      "verifiedAt": "2026-11-17T09:23:20.448Z",
+      "log": "V-003-verification.log"
+    },
+    {
+      "id": "V-004",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/runtime-readiness.test.js",
+        "test/runtime-fixes.test.js",
+        "test/console-run-fixes.test.js",
+        "test/console-monitor-mode.test.js",
+        "test/console-ia.test.js",
+        "test/console-run-flow.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-17T09:54:41.286Z",
+      "finishedAt": "2026-11-17T09:54:44.705Z",
+      "verifiedAt": "2026-11-17T09:54:44.705Z",
+      "log": "V-004-verification.log"
+    }
+  ]
+}

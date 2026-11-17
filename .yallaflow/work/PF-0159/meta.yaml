@@ -1,0 +1,45 @@
+{
+  "id": "PF-0159",
+  "type": "feature",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "User-level preferences: a separate preferences.json beside the console project list (preferred agent, language, theme, last-used folder, onboarding), with an API and console use; no credentials, backward compatible",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-16T16:59:13.643Z",
+  "updatedAt": "2026-11-16T17:01:48.659Z",
+  "title": "User-level preferences: a separate preferences.json beside the console project list (preferred agent, language, theme, last-used folder, onboarding), with an API and console use; no credentials, backward compatible",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope bounded`.",
+  "routedAt": "2026-11-16T16:59:13.691Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "implement",
+    "verify",
+    "converge"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation",
+      "verification",
+      "delivery-convergence"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-16T17:01:48.659Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

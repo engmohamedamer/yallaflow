@@ -341,4 +341,18 @@
   - research/site/make-ar.py (repository @ 4d7c388)
   - research/docs-tour/capture.mjs (repository @ 4d7c388)
 
+<!-- yallaflow-fact:CTX-0174 -->
+### CTX-0174 — The New Project wizard keeps a draft in the browser (localStorage yfc.wizardDraft): bounded typed choices, the step, and the plan id only while a creation runs; never file contents or the plan hash. A creation whose plan has no outcome and is not running is treated as interrupted; continuing posts the same confirmed plan, and createFromPlan skips finished steps, so resuming needs no server-side resume logic.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0163
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-16T17:26:49.964Z
+- **Verified:** 2026-11-16T17:26:49.964Z (commit f33eaec)
+- **Evidence:**
+  - resources/console/app.js (repository @ f33eaec)
+  - test/console-wizard-resume.test.js (repository @ f33eaec)
+
 <!-- yallaflow-context:end -->

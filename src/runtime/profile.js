@@ -276,6 +276,64 @@ export async function addService(root, service, { local = false } = {}) {
   return loadRuntimeProfiles(root);
 }
 
+// PF-0166: changes some fields of an existing service and keeps every other field as it is
+// (its links, what it depends on, its readiness check). Nothing runs; a changed command,
+// port or folder changes the definition hash, so the service must be reviewed and trusted again.
+//
+// - local = true: saved for this machine only (.yallaflow/local/runtime.yaml, git-ignored).
+//   For a shared service this is a personal override of just these fields.
+// - local = false: the shared file (.yallaflow/runtime.yaml). It reaches teammates only after
+//   it is committed and pushed; saving uploads nothing.
+export async function updateService(root, id, patch, { local = false } = {}) {
+  if (!patch || typeof patch !== 'object' || Array.isArray(patch)) throw invalid('The change must be an object of fields.');
+  const fields = Object.keys(patch);
+  const notAllowed = fields.filter((key) => !OVERRIDABLE.includes(key));
+  if (!fields.length) throw invalid('Nothing to change.');
+  if (notAllowed.length) throw invalid(`These fields cannot be edited this way: ${notAllowed.join(', ')}.`);
+  const { shared, local: localDoc } = await loadRuntimeProfiles(root);
+  const inShared = (shared?.services ?? []).find((entry) => entry.id === id) ?? null;
+  const inLocal = (localDoc?.services ?? []).find((entry) => entry.id === id) ?? null;
+  if (!inShared && !inLocal) throw Object.assign(new Error(`No service ${id} in the runtime profile.`), { code: 'RUNTIME_UNKNOWN_SERVICE' });
+  let masked = [];
+  if (local) {
+    const doc = localDoc ?? { schemaVersion: RUNTIME_PROFILE_SCHEMA, services: [] };
+    const entry = { ...(inLocal ?? { id }), ...patch, id };
+    validateService(entry, { partial: Boolean(inShared), personal: true });
+    doc.services = [...doc.services.filter((other) => other.id !== id), entry];
+    const dir = await localRuntimeDir(root);
+    await safeWriteFile(dir, 'runtime.yaml', `${JSON.stringify(doc, null, 2)}\n`, 0o600);
+  } else {
+    if (!inShared) throw invalid(`Service ${id} is defined on this machine only; it has no shared definition to change.`);
+    const entry = { ...inShared, ...patch, id };
+    validateService(entry);
+    shared.services = shared.services.map((other) => (other.id === id ? entry : other));
+    validateFile(shared, '.yallaflow/runtime.yaml', false);
+    await writeYaml(sharedProfilePath(root), shared);
+    // A personal override of the same field still wins on this machine: said, never removed silently.
+    masked = inLocal ? fields.filter((key) => key in inLocal) : [];
+  }
+  const profiles = await loadRuntimeProfiles(root);
+  return { id, savedTo: local ? 'local' : 'shared', file: local ? '.yallaflow/local/runtime.yaml' : '.yallaflow/runtime.yaml', changed: fields, masked, service: profiles.services.find((entry) => entry.id === id) };
+}
+
+// Owner review (2026-11-17): drops this machine's override of a shared service (every field it
+// changed, which the console lists before asking), so the shared definition applies again. The
+// shared file is not touched. A personal service (no shared definition) is refused.
+export async function resetLocalOverride(root, id) {
+  const { shared, local: localDoc } = await loadRuntimeProfiles(root);
+  const inShared = (shared?.services ?? []).find((entry) => entry.id === id);
+  const inLocal = (localDoc?.services ?? []).find((entry) => entry.id === id);
+  if (!inShared && !inLocal) throw Object.assign(new Error(`No service ${id} in the runtime profile.`), { code: 'RUNTIME_UNKNOWN_SERVICE' });
+  if (!inShared) throw invalid(`Service ${id} is defined on this machine only; there is no shared definition to return to. To delete it: yallaflow runtime remove ${id} --local`);
+  if (!inLocal) throw Object.assign(new Error(`Service ${id} has no local change on this machine.`), { code: 'RUNTIME_NOTHING_TO_RESET' });
+  const reset = Object.keys(inLocal).filter((key) => key !== 'id');
+  localDoc.services = localDoc.services.filter((entry) => entry.id !== id);
+  const dir = await localRuntimeDir(root);
+  await safeWriteFile(dir, 'runtime.yaml', `${JSON.stringify(localDoc, null, 2)}\n`, 0o600);
+  const profiles = await loadRuntimeProfiles(root);
+  return { id, reset, file: '.yallaflow/local/runtime.yaml', service: profiles.services.find((entry) => entry.id === id) };
+}
+
 export async function removeService(root, id, { local = false } = {}) {
   const { shared, local: localDoc } = await loadRuntimeProfiles(root);
   const doc = local ? localDoc : shared;

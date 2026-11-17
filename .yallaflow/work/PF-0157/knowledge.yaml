@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Developer tools the console and the New Project wizard run (composer, npx, npm, php, git, docker) are found and started through src/utils/command.js: resolveCommand looks the name up on the child's own PATH with detect.js which(), and starts a Windows .cmd/.bat shim's own program directly via launchSpec (npm shims with node; Composer's installer shim as php.exe with composer.phar); safeEnvironment is the allow-listed child environment, adding Windows system variables on win32. No shell is used. Windows and macOS behavior is simulated in tests only.",
+      "evidence": [
+        "src/utils/command.js",
+        "test/command-platform.test.js"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-16T16:54:30.056Z",
+      "factId": "CTX-0168",
+      "promotedAt": "2026-11-16T16:54:44.278Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-16T16:54:44.278Z",
+  "reviewedAt": "2026-11-16T16:54:44.278Z"
+}

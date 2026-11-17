@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "business-rule",
+      "source": "implementation-runtime",
+      "summary": "Monitor Only is a per-project mode saved in the user's console list (console.json entry mode: 'monitor'; absent = managed), never in the project, and only for folders that already hold .yallaflow. The server is the boundary: one guard ahead of every route refuses any POST addressed to a monitored project (405 MONITOR_ONLY) except the confirmed switch POST /api/p/<id>/mode; a monitored project gets no agent-settings read, agent probe, bridge or execution entry, setup scan or merge recovery, so opening and reading it writes nothing inside it. A lane follows its home project. Switching to Monitor is refused while an agent session is live.",
+      "evidence": [
+        "src/console/server.js",
+        "src/console/registry.js",
+        "test/console-monitor-mode.test.js"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-16T17:17:31.303Z",
+      "factId": "CTX-0172",
+      "promotedAt": "2026-11-16T17:17:31.547Z",
+      "target": "context/business-rules.md"
+    }
+  ],
+  "updatedAt": "2026-11-16T17:17:31.547Z",
+  "reviewedAt": "2026-11-16T17:17:31.547Z"
+}

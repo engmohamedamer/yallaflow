@@ -1,0 +1,17 @@
+# Work Ledger — PF-0167
+
+Created: 2026-11-17T09:55:03.090Z
+
+- 2026-11-17T09:55:03.090Z Routing: pending
+- 2026-11-17T09:55:03.146Z Routing: routed as change + bounded (high)
+- 2026-11-17T09:55:12.169Z Stage: INTAKE → CURRENT_BEHAVIOR
+- 2026-11-17T09:55:12.667Z Stage: CURRENT_BEHAVIOR → REQUESTED_DELTA
+- 2026-11-17T09:55:13.112Z Stage: REQUESTED_DELTA → IMPACT_ANALYSIS
+- 2026-11-17T09:55:13.566Z Stage: IMPACT_ANALYSIS → ACCEPTANCE_CRITERIA
+- 2026-11-17T09:55:17.582Z Stage: ACCEPTANCE_CRITERIA → PLAN
+- 2026-11-17T09:55:34.185Z Stage: PLAN → IMPLEMENTATION
+- 2026-11-17T09:55:44.914Z Stage: IMPLEMENTATION → VERIFICATION
+- 2026-11-17T09:55:46.426Z Stage: VERIFICATION → DONE
+- 2026-11-17T10:03:32.738Z Reopened: DONE → IMPLEMENTATION (The final full run (2026-11-17) failed a second known-intermittent test instead (console-execution Queue end to end: 'condition not met in time' under load, passes 3/3 alone); the known-issues note must cover both and give the latest result.)
+- 2026-11-17T10:03:33.292Z Stage: IMPLEMENTATION → VERIFICATION
+- 2026-11-17T10:03:34.778Z Stage: VERIFICATION → DONE

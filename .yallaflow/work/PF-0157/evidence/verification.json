@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/command-platform.test.js test/agent-windows.test.js test/new-project.test.js test/console-greenfield.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/command-platform.test.js",
+        "test/agent-windows.test.js",
+        "test/new-project.test.js",
+        "test/console-greenfield.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/command-platform.test.js test/agent-windows.test.js test/new-project.test.js test/console-greenfield.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-16T16:54:12.537Z",
+      "finishedAt": "2026-11-16T16:54:21.885Z",
+      "verifiedAt": "2026-11-16T16:54:21.885Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

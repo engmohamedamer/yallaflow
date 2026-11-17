@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/console-wizard-resume.test.js test/console-first-journey.test.js test/new-project.test.js test/new-project-prerequisites.test.js test/console-greenfield.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/console-wizard-resume.test.js",
+        "test/console-first-journey.test.js",
+        "test/new-project.test.js",
+        "test/new-project-prerequisites.test.js",
+        "test/console-greenfield.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/console-wizard-resume.test.js test/console-first-journey.test.js test/new-project.test.js test/new-project-prerequisites.test.js test/console-greenfield.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-16T17:26:43.412Z",
+      "finishedAt": "2026-11-16T17:26:49.415Z",
+      "verifiedAt": "2026-11-16T17:26:49.415Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

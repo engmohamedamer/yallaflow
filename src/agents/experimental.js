@@ -1,7 +1,8 @@
-// The experimental Claude Code connection (v1.3.0) is not part of published releases:
-// Anthropic has not confirmed that a third-party tool may distribute it. Its files live only
-// in development builds. Shared code loads them on demand and refuses clearly when they are
-// absent, so a release can never connect to Claude Code.
+// The experimental Claude Code connection (v1.3.0) is kept in its own files and loaded on
+// demand. Shared code refuses clearly when they are absent, so a build that leaves them out
+// can never connect to Claude Code. The package currently lists these files (see
+// `npm pack --dry-run`); whether a release ships them is the owner's decision, and the
+// connection stays experimental, off until the developer chooses it for a project.
 import { existsSync } from 'node:fs';
 
 const FILES = ['./claude.js', './claude-files.js', './claude-detect.js', '../../resources/agents/claude-channel.mjs', '../../resources/agents/claude-hook.mjs'];

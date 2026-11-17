@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-16T17:17:30.608Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "Assessed after V-001 passed.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "The mode is a field of the project's entry in console.json (absent = managed, managed entries are byte-identical to before); two projects in one console report monitor and manage independently.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/registry.js",
+              "symbol": "setProjectMode",
+              "contentHash": "sha256:b3144e4bea0d6cf1589f9e6b0a2bf8e811fb0fe19d389f5e71312161226e43ed",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-monitor-mode.test.js",
+              "contentHash": "sha256:afe6679ba36f434b9347d2e6c92fc020fcf8b2ce9d10b69a83d77c88449df3a2",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/console-*.test.js test/agent-*.test.js (passed)",
+              "workId": "PF-0161",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "A single guard ahead of all routes answers 405 MONITOR_ONLY to 25 write, agent and execution routes; agent settings, agent status and readiness run no probe; a content fingerprint of the project is identical after opening, reading and the refused writes.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:51be90353140887cb7bda9c23bfd49c2a19a5ae53822866198af68e38ed972b6",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-monitor-mode.test.js",
+              "contentHash": "sha256:afe6679ba36f434b9347d2e6c92fc020fcf8b2ce9d10b69a83d77c88449df3a2",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/console-*.test.js test/agent-*.test.js (passed)",
+              "workId": "PF-0161",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "POST /api/p/<id>/mode needs { mode, confirm: true } with the console Origin; to Monitor goes through bridge.removeProject, which refuses while a session is live; the banner lists what monitoring does not do, the folder dialog explains that a folder without YallaFlow records cannot be monitored, and the server refuses it with NOT_A_YALLAFLOW_PROJECT.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:51be90353140887cb7bda9c23bfd49c2a19a5ae53822866198af68e38ed972b6",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:cb385b08909a80a7b4edb575c74c1226de59927520584d13d6895426b91da451",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-monitor-mode.test.js",
+              "contentHash": "sha256:afe6679ba36f434b9347d2e6c92fc020fcf8b2ce9d10b69a83d77c88449df3a2",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/console-*.test.js test/agent-*.test.js (passed)",
+              "workId": "PF-0161",
+              "verificationRunId": "V-001"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-16T17:17:30.608Z"
+}

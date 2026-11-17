@@ -28,6 +28,9 @@ import { localRuntimeDir } from './local.js';
 import { readState, stateDir, writeState } from './state.js';
 import { composeIdentity, sharedNow } from './discover.js';
 import { observeContainers, observeRuntime, portOwner, runningContainersOf } from './observe.js';
+import { realpath } from 'node:fs/promises';
+import { checkPrerequisites, UNKNOWN } from './prerequisites.js';
+import { diagnoseLog, sinceLastStart } from './diagnose.js';
 
 export const LOG_CAP_BYTES = 5 * 1024 * 1024;
 const LOCK_WAIT_MS = 60_000;
@@ -181,6 +184,48 @@ async function readiness(root, service, run) {
   return log.includes(service.ready.log) ? 'running' : 'starting';
 }
 
+// PF-0166: what the service needs before it can start, from the files on disk (nothing runs).
+// A check that cannot be made is UNKNOWN, never a refusal.
+async function prerequisitesOf(root, service) {
+  try {
+    const cwd = await resolveServiceCwd(root, service);
+    const top = path.isAbsolute(service.cwd) ? cwd : await realpath(root);
+    return await checkPrerequisites(service, { cwd, top });
+  } catch {
+    return { state: UNKNOWN, ok: true, problems: [], reason: 'folder-missing' };
+  }
+}
+
+// PF-0166: the line of the last run's log that explains a failure (redacted by serviceLogs).
+async function failureOf(root, id) {
+  try { return diagnoseLog(sinceLastStart(await serviceLogs(root, id, { lines: 400 }))); } catch { return null; }
+}
+
+// PF-0166: who holds a port, as far as it can be told: another service of this project (by
+// its recorded process), else what the observation says (a container, a process).
+async function portHolder(root, services, port, exceptProject) {
+  const observation = await observeRuntime();
+  const listener = observation.ports.listeners.find((entry) => entry.port === port);
+  let service = null;
+  for (const other of services) {
+    const run = await readRun(root, other.id).catch(() => null);
+    if (!run || run.stoppedAt || ownership(run) !== 'ours') continue;
+    const sameGroup = listener?.pid && (listener.pid === run.pid || processGroupOf(listener.pid) === run.pgid);
+    if (sameGroup || (!listener?.pid && other.ports.includes(port))) { service = { id: other.id, name: other.name }; break; }
+  }
+  // A service defined on this port that YallaFlow did not start is named as the likely owner.
+  const declared = service ? null : services.find((other) => other.ports.includes(port)) ?? null;
+  return { owner: portOwner(observation, port, { exceptProject }), service, declared: declared ? { id: declared.id, name: declared.name } : null };
+}
+
+// The next port nothing listens on and no service of this project is defined on.
+async function freePortNear(port, taken) {
+  for (let candidate = port + 1; candidate <= Math.min(65535, port + 200); candidate++) {
+    if (!taken.has(candidate) && !(await portListening(candidate))) return candidate;
+  }
+  return null;
+}
+
 export async function runtimeStatus(root) {
   const profiles = await loadRuntimeProfiles(root);
   const services = [];
@@ -208,6 +253,9 @@ export async function runtimeStatus(root) {
       trust,
       links: service.links, sharedMarker: service.shared,
       runningOutside,
+      // PF-0166: what is missing before it can start, and why its last run failed.
+      prerequisites: ours ? { state: UNKNOWN, ok: true, problems: [], reason: 'not-checked' } : await prerequisitesOf(root, service),
+      ...(state.state === 'failed' ? { failure: await failureOf(root, service.id) } : {}),
       ...state,
       pid: ours ? run.pid : null,
       startedAt: run && !run.stoppedAt ? run.startedAt : null,
@@ -243,7 +291,11 @@ function startOrder(profiles, id, seen = new Set(), stack = new Set(), order = [
   return order;
 }
 
-export async function startService(root, id, { startedBy = 'cli' } = {}) {
+// skipSetupCheck (owner review, 2026-11-17: "Try anyway"): the developer chose to start this
+// one service although its dependency check says NEEDS_SETUP. It skips that check only, and
+// only for the service named (its dependencies are still checked). Trust, the folder and link
+// checks, the port pre-flight, Compose observation and the Monitor Only boundary all still apply.
+export async function startService(root, id, { startedBy = 'cli', skipSetupCheck = false } = {}) {
   assertSupported();
   const profiles = await loadRuntimeProfiles(root);
   const order = startOrder(profiles, id);
@@ -256,11 +308,11 @@ export async function startService(root, id, { startedBy = 'cli' } = {}) {
     }
   }
   let result;
-  for (const service of order) result = await startOne(root, service, startedBy);
+  for (const service of order) result = await startOne(root, service, startedBy, { skipSetupCheck: skipSetupCheck && service.id === id });
   return result;
 }
 
-async function startOne(root, service, startedBy) {
+async function startOne(root, service, startedBy, { skipSetupCheck = false } = {}) {
   const id = service.id;
   return withServiceLock(root, id, async () => {
     const run = await readRun(root, id);
@@ -280,11 +332,23 @@ async function startOne(root, service, startedBy) {
     }
     for (const port of service.ports) {
       if (await portListening(port)) {
-        const owner = portOwner(await observeRuntime(), port, { exceptProject: identity?.project ?? null });
-        throw new RuntimeError('PORT_IN_USE', `Port ${port} on 127.0.0.1 is already in use by ${owner ?? 'a process YallaFlow did not start'}; ${id} was not started and nothing was stopped.`, { port, owner });
+        // PF-0166: the same pre-flight, now naming the owning service where it can and
+        // offering a free port. Nothing is stopped and nothing is changed here.
+        const others = (await loadRuntimeProfiles(root)).services.filter((entry) => entry.id !== id);
+        const holder = await portHolder(root, others, port, identity?.project ?? null);
+        const suggestion = await freePortNear(port, new Set([...others.flatMap((entry) => entry.ports), ...service.ports]));
+        const who = holder.service ? `the service ${holder.service.id} of this project` : holder.owner ?? 'a process YallaFlow did not start';
+        throw new RuntimeError('PORT_IN_USE', `Port ${port} on 127.0.0.1 is already in use by ${who}; ${id} was not started and nothing was stopped.${suggestion ? ` Port ${suggestion} is free.` : ''}`, { port, owner: holder.owner, ownerService: holder.service, declaredBy: holder.declared, suggestion });
       }
     }
     const cwd = await resolveServiceCwd(root, service);
+    // PF-0166: a known missing requirement is said before anything runs, with its fix.
+    const needs = await prerequisitesOf(root, service);
+    if (!needs.ok && !skipSetupCheck) {
+      const first = needs.problems[0];
+      throw new RuntimeError('RUNTIME_PREREQUISITES', `${first.message} Install them with: ${first.fix.display}. Nothing was started. To start it anyway (this skips only the dependency check): yallaflow runtime start ${id} --skip-setup-check`, { problems: needs.problems, state: needs.state });
+    }
+    const skipped = !needs.ok && skipSetupCheck ? needs.problems : null;
     const trusted = await trustState(root, service);
     if (!trusted.trusted) throw new RuntimeError('RUNTIME_UNTRUSTED', `Service ${id} changed before start; review and trust it again.`);
     const trustedHash = trusted.definitionHash;
@@ -292,6 +356,7 @@ async function startOne(root, service, startedBy) {
     const offset = (await log.stat()).size;
     const startedAt = new Date().toISOString();
     await log.write(`\n--- yallaflow runtime: starting ${id} at ${startedAt} (${startedBy}) ---\n`);
+    if (skipped) await log.write(`--- yallaflow runtime: dependency check skipped at the developer's request (${skipped.map((problem) => problem.code).join(', ')}) ---\n`);
     let child;
     try {
       child = spawn(service.command[0], service.command.slice(1), { cwd, env: serviceEnvironment(service.env), detached: true, shell: false, stdio: ['ignore', log.fd, log.fd] });
@@ -326,7 +391,9 @@ async function startOne(root, service, startedBy) {
       record.exitCode = exited.code; record.signal = exited.signal;
       await writeRun(root, record);
       const tail = (await serviceLogs(root, id, { lines: 20 })).join('\n');
-      throw new RuntimeError('RUNTIME_START_FAILED', `Service ${id} exited during start (${exited.code !== null ? `code ${exited.code}` : exited.signal}). Last log lines:\n${tail}`);
+      // PF-0166: the line that explains it comes first; the last lines follow.
+      const failure = await failureOf(root, id);
+      throw new RuntimeError('RUNTIME_START_FAILED', `Service ${id} exited during start (${exited.code !== null ? `code ${exited.code}` : exited.signal}).${failure ? ` Cause: ${failure.line}` : ''} Last log lines:\n${tail}`, { failure });
     }
     // D2/S2: the configuration must still be the trusted one once the service is up. If it
     // changed meanwhile, only the process group YallaFlow just started (verified as ours) is
@@ -342,7 +409,50 @@ async function startOne(root, service, startedBy) {
       throw new RuntimeError('RUNTIME_CHANGED_DURING_START', `The configuration of ${id} changed while it was starting, so the process YallaFlow had just started was stopped; nothing else was touched. Review it and trust it again.`);
     }
     if (state === 'running' && service.ready) { record.readyAt = new Date().toISOString(); await writeRun(root, record); }
-    return { id, state, pid: child.pid };
+    return { id, state, pid: child.pid, ...(skipped ? { setupCheckSkipped: skipped.map((problem) => problem.code) } : {}) };
+  });
+}
+
+// PF-0166: installs a service's missing dependencies with the command the check named. It
+// runs only for a trusted service and only when `confirm` is the hash of that exact command
+// (the developer saw it). argv only, the service's own environment, its output in the
+// service's log. YallaFlow never chooses to run this on its own.
+const INSTALL_TIMEOUT_MS = 15 * 60 * 1000;
+export async function installPrerequisites(root, id, { confirm, startedBy = 'cli' } = {}) {
+  assertSupported();
+  const profiles = await loadRuntimeProfiles(root);
+  const service = serviceById(profiles, id);
+  const trusted = await trustState(root, service);
+  if (!trusted.trusted) throw new RuntimeError('RUNTIME_UNTRUSTED', `Service ${id} is not trusted; review and trust it before installing its dependencies (an install runs the packages' own scripts).`);
+  return withServiceLock(root, id, async () => {
+    const needs = await prerequisitesOf(root, service);
+    const fix = needs.problems[0]?.fix;
+    if (!fix) throw new RuntimeError('RUNTIME_NOTHING_TO_INSTALL', `Nothing is missing for ${id}; no install was run.`);
+    if (typeof confirm !== 'string' || confirm !== fix.hash) throw new RuntimeError('RUNTIME_INSTALL_CONFIRM', `Confirm the exact command first: ${fix.display}`, { problems: needs.problems });
+    const base = path.isAbsolute(service.cwd) ? await resolveServiceCwd(root, service) : await realpath(root);
+    const cwd = path.resolve(base, fix.cwd);
+    const log = await openServiceLog(root, id);
+    await log.write(`\n--- yallaflow runtime: installing dependencies for ${id} at ${new Date().toISOString()} (${startedBy}) ---\n$ ${fix.display}\n`);
+    const result = await new Promise((resolve) => {
+      let child;
+      try {
+        child = spawn(fix.argv[0], fix.argv.slice(1), { cwd, env: { ...serviceEnvironment(service.env), CI: '1' }, detached: true, shell: false, stdio: ['ignore', log.fd, log.fd] });
+      } catch (error) {
+        return resolve({ code: null, error: error.message });
+      }
+      const timer = setTimeout(() => { try { process.kill(-child.pid, 'SIGKILL'); } catch { child.kill('SIGKILL'); } }, INSTALL_TIMEOUT_MS);
+      child.once('error', (error) => { clearTimeout(timer); resolve({ code: null, error: error.code === 'ENOENT' ? `${fix.argv[0]} was not found on PATH` : error.message }); });
+      child.once('exit', (code, signal) => { clearTimeout(timer); resolve({ code, signal }); });
+    });
+    await log.close();
+    if (result.code !== 0) {
+      const lines = await serviceLogs(root, id, { lines: 200 });
+      const at = lines.map((line, index) => (/^--- yallaflow runtime: installing dependencies /.test(line) ? index : -1)).filter((index) => index >= 0).at(-1) ?? 0;
+      const failure = diagnoseLog(lines.slice(at + 1));
+      throw new RuntimeError('RUNTIME_INSTALL_FAILED', `The install did not finish (${result.error ?? (result.code !== null ? `code ${result.code}` : result.signal)}).${failure ? ` Cause: ${failure.line}` : ''} The full output is in the service's log.`, { failure });
+    }
+    const after = await prerequisitesOf(root, service);
+    return { id, installed: true, command: fix.display, cwd: fix.cwd, changesLockfile: fix.changesLockfile, ready: after.ok, problems: after.problems };
   });
 }
 
@@ -410,10 +520,10 @@ async function terminateOwned(root, service, run, reason) {
   }
 }
 
-export async function restartService(root, id, { startedBy = 'cli', confirmShared = false } = {}) {
+export async function restartService(root, id, { startedBy = 'cli', confirmShared = false, skipSetupCheck = false } = {}) {
   const stopped = await stopService(root, id, { reason: 'restart', confirmShared });
   if (stopped.survivors?.length) throw new RuntimeError('RUNTIME_STOP_INCOMPLETE', `Service ${id} did not stop cleanly (still running: ${stopped.survivors.join(', ')}); not restarted.`);
-  return startService(root, id, { startedBy });
+  return startService(root, id, { startedBy, skipSetupCheck });
 }
 
 // Start project (PF-0069): every service whose whole dependency chain is trusted, in

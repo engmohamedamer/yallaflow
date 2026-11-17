@@ -6,8 +6,9 @@
 // the background, the page follows the progress the plan records, and the finished project
 // is registered in the console by the server (so it happens even if the page was closed).
 import { HttpError } from './create.js';
-import { loadPlan } from '../newproject/project.js';
+import { checkPrerequisites, loadPlan } from '../newproject/project.js';
 import { redactSecrets } from '../security/redact.js';
+import { toolGuidance } from '../newproject/guidance.js';
 import { constants } from 'node:fs';
 import { open } from 'node:fs/promises';
 import { inLocalDir, safeLocalDir } from '../agents/local-files.js';
@@ -55,12 +56,35 @@ export async function wizardPlan(root, body, runner) {
     ...attachments.map((a) => `--attachment=${a.sha256}:${a.size}:${a.name}`), '--json'];
   const parsed = parseCli(await runner.runAside(root, args));
   if (parsed.error) throw new HttpError(422, parsed.error.code ?? 'NEW_PROJECT_REFUSED', parsed.error.message);
-  return parsed;
+  // PF-0158: what the stack still needs on this machine, beside the plan (never inside its hash).
+  return { ...parsed, tools: toolsView(parsed.body) };
+}
+
+// The plan's own check, as the review step shows it: what is missing, how to get it on this
+// system, and whether an override is possible (the generator itself is present).
+function toolsView(body) {
+  const tools = body.prerequisites ?? [];
+  const missing = tools.filter((tool) => !tool.found).map((tool) => ({ name: tool.name, note: tool.note ?? null, problem: tool.problem ?? null, guidance: toolGuidance(tool.name) }));
+  const program = body.steps.find((step) => step.id === 'generate')?.argv?.[0] ?? null;
+  const programMissing = tools.some((tool) => !tool.module && !tool.found && (tool.name === 'git' || (Boolean(program) && tool.name === program)));
+  return { platform: process.platform, ready: missing.length === 0, missing, overridable: missing.length > 0 && !programMissing };
+}
+
+// Recheck (PF-0158): a fresh check of one stack's tools. Nothing is created or changed.
+export async function wizardTools(stack, { git = false } = {}) {
+  if (typeof stack !== 'string' || !/^[a-z][a-z0-9-]{0,31}$/.test(stack)) throw new HttpError(400, 'BAD_REQUEST', 'stack is required.');
+  try {
+    const { platform, ready, missing, overridable, checkedAt, tools } = await checkPrerequisites(stack, { git });
+    return { platform, ready, overridable, checkedAt, tools: tools.map(({ name, found, version }) => ({ name, found, version: version ?? null })), missing: missing.map(({ name, note, problem, guidance }) => ({ name, note: note ?? null, problem: problem ?? null, guidance })) };
+  } catch (error) {
+    throw new HttpError(422, error.code ?? 'NEW_PROJECT_STACK', error.message);
+  }
 }
 
 // Starts creation in the background after checking the confirmation synchronously.
 export async function wizardCreate(root, body, runner, { register = null } = {}) {
-  exactObject(body, ['planId', 'confirm', 'acknowledgeScripts', 'confirmName'], ['planId', 'confirm']);
+  exactObject(body, ['planId', 'confirm', 'acknowledgeScripts', 'confirmName', 'overrideMissingTools'], ['planId', 'confirm']);
+  if ('overrideMissingTools' in body && typeof body.overrideMissingTools !== 'boolean') throw new HttpError(400, 'BAD_REQUEST', 'overrideMissingTools must be true or false.');
   let plan;
   try {
     plan = await loadPlan(body.planId);
@@ -73,12 +97,23 @@ export async function wizardCreate(root, body, runner, { register = null } = {})
   // Higher risk: installing dependencies runs package scripts. It needs one explicit
   // acknowledgement (PF-0085: a ticked checkbox; the typed project name is still accepted).
   if (needsTypedName(plan) && body.acknowledgeScripts !== true && body.confirmName !== plan.body.name) throw new HttpError(422, 'NEW_PROJECT_ACKNOWLEDGE', 'This plan installs dependencies or runs package scripts on this machine. Confirm that you accept this to create it.');
+  // PF-0158: a generator is not started while a tool it needs is missing. Checked here so the
+  // page hears it at once (Core checks again when it runs). The override is an explicit choice,
+  // possible only when the generator itself is present, and it replaces none of the checks above.
+  const generates = plan.body.steps.some((step) => step.id === 'generate' && Array.isArray(step.argv)) && plan.progress.steps.generate?.status !== 'done';
+  const needsGit = Boolean(plan.body.git) && plan.progress.steps.promote?.status !== 'done';
+  if (generates || needsGit) {
+    const readiness = await wizardTools(plan.body.stack, { git: needsGit });
+    if (!readiness.ready && !(body.overrideMissingTools === true && readiness.overridable)) {
+      throw Object.assign(new HttpError(422, 'NEW_PROJECT_PREREQUISITES', `${plan.body.stackLabel} needs ${readiness.missing.map((tool) => tool.name).join(', ')} on this machine. Nothing was created.`), { extra: { tools: readiness } });
+    }
+  }
   const existing = jobs.get(plan.id);
   if (!existing || existing.done) {
     // One creation per plan at a time; a finished or failed one can be retried (it skips done steps).
     const job = { done: null };
     jobs.set(plan.id, job);
-    runner.runAside(root, ['new', 'create', plan.id, '--confirm', body.confirm, '--json'], { timeoutMs: CREATE_TIMEOUT_MS, env: { YALLAFLOW_NEW_VIA: 'console' } })
+    runner.runAside(root, ['new', 'create', plan.id, '--confirm', body.confirm, ...(body.overrideMissingTools === true ? ['--allow-missing-tools'] : []), '--json'], { timeoutMs: CREATE_TIMEOUT_MS, env: { YALLAFLOW_NEW_VIA: 'console' } })
       .then((result) => parseCli(result))
       .catch((error) => ({ error: { code: error.code ?? 'CLI_FAILED', message: error.message } }))
       .then(async (result) => {

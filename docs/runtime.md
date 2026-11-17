@@ -171,6 +171,94 @@ yallaflow runtime stop web          # or: yallaflow runtime stop --all
   - Log files that are symbolic or hard links are refused, and showing logs never writes, truncates or rotates anything.
   - Recognizable secrets are redacted when the log is shown. This is best effort, since an arbitrary program can print secrets in forms no pattern recognizes.
 
+## Fixing a service that does not start (unreleased)
+
+These fixes are offered where the service fails: on its card in the console's Run tab, and as commands.
+
+### What it needs before it starts
+
+`runtime status`, the Run tab and `runtime start` check the files on disk first. Nothing is run for the check.
+
+The answer has one of three states (`prerequisites.state` in `runtime status --json`):
+
+| State | Meaning | Start |
+|---|---|---|
+| `READY` | Checked, nothing is missing (or the package declares no dependencies). | Starts. |
+| `NEEDS_SETUP` | One of the problems below, with its fix. | Refused with the fix, unless you choose **try anyway**. |
+| `UNKNOWN` | The check cannot tell, with a reason. | Never blocked. |
+
+- **NEEDS_SETUP:** a service started by `npm`, `pnpm`, `yarn`, `bun` or `npx` whose `package.json` declares dependencies while none are installed (no `node_modules` in the package folder or above it, inside the repository); or a script whose first word is a tool the package declares (for example `ng` from `@angular/cli`) that is not installed locally. In a monorepo an install hoisted to a folder above the package counts; a tool installed only in a sibling package does not.
+- **UNKNOWN** (reason in `prerequisites.reason`): a command YallaFlow does not recognize as a package manager (`unsupported-command`; the Run tab says nothing for it), a Compose service (`not-checked`), no or an unreadable `package.json` (`no-package-json`), Yarn Plug'n'Play (`yarn-pnp`), a service that passes `NODE_PATH` (`custom-module-path`), a package folder outside the project (`outside-project`) or one that does not exist (`folder-missing`). The Run tab says why it could not tell; nothing is offered or required.
+- **A tool the package does not declare is not called missing** (it may be global).
+- **Try anyway.** When the check is wrong for your setup (the dependencies come from another folder, a container or a custom loader), start without it:
+
+```bash
+yallaflow runtime start <id> --skip-setup-check
+yallaflow runtime restart <id> --skip-setup-check
+```
+
+  In the Run tab it is **Advanced: start it anyway** under the missing-dependency notice, for a trusted service. It skips only the dependency check, and only for the service you named (a service it depends on is still checked). Monitor Only, trust and its definition hash, the folder and link protections, the Compose check and the port pre-flight all still apply. The service log records that the check was skipped. If the service then fails, the failure line says why.
+- **The fix is named, not run.** The install command follows the lockfile beside `package.json`:
+
+| Lockfile | Command |
+|---|---|
+| `package-lock.json`, `npm-shrinkwrap.json` | `npm ci --include=dev` |
+| `pnpm-lock.yaml` | `pnpm install --frozen-lockfile` |
+| `yarn.lock` | `yarn install --frozen-lockfile` (`--immutable` when `packageManager` says Yarn 2 or later) |
+| `bun.lock`, `bun.lockb` | `bun install --frozen-lockfile` |
+| none | `<manager> install`, and you are told it creates a lockfile |
+
+```bash
+yallaflow runtime install <id>                     # shows the cause and the command; runs nothing
+yallaflow runtime install <id> --confirm <hash>    # runs that exact command
+```
+
+- **Running it is your decision.** It runs only for a trusted service, only with the hash of the command you were shown, from a terminal or the console's confirmed button. It uses argv (no shell) and the service's own environment, in the package folder, and writes its output to the service log.
+- **A frozen install changes neither `package.json` nor the lockfile.** What it installs stays on your machine; each teammate installs on theirs.
+- **A `MODULE_NOT_FOUND` is not always missing dependencies.** When the missing module is a file of the project, the failure is reported as a wrong path, and no install is suggested.
+
+### A port that is taken
+
+The existing start pre-flight now also says who holds the port and offers a free one. Nothing is stopped.
+
+- **Owner:** another service of this project by name when YallaFlow started it, otherwise the container or process the system reports.
+- **Suggestion:** the next port that nothing listens on and no service of this project is defined on.
+
+```bash
+yallaflow runtime port <id> --from 4200 --to 4202            # this machine only (the default)
+yallaflow runtime port <id> --from 4200 --to 4202 --shared   # the shared file
+```
+
+- **Changed together, or not at all:** the port, the readiness check on that port, links that open that port, and the port argument of the command.
+- **The command is changed only when YallaFlow understands it:** an explicit port argument (`--port 4200`, `--port=4200`, `-p 4200`, `127.0.0.1:4200`), or a package script that starts a known dev server (`ng serve`, `vite`, `next dev`, `nuxt dev`, `astro dev`, `webpack serve`, `vue-cli-service serve`), which gets `-- --port N`. Anything else is refused with the reason, and you edit the command yourself. A Compose service is refused too: its ports are in its Compose file.
+- **Refused when it would be a guess:** the command mentions the old port in more than one place and only some are recognizable as the port; the script already sets a port or runs more than one command (`&&`, `;`, `|`); or the service runs its script with pnpm, Yarn or Bun (they pass `--` and extra arguments differently by version, so only `npm run` gets `-- --port N`).
+- **Other services are reported, never changed.** A service whose command, links or readiness check still mention the old port is listed after the change (for example a reverse proxy or a frontend link to an API), so you decide. Project files such as a proxy config (`proxy.conf.json`) or `.env` are not read, and the message says so.
+- **A local change can be undone.** It is saved as a personal override; the shared file is not touched. To return to the shared definition:
+
+```bash
+yallaflow runtime reset <id>
+```
+
+  In the console: **Edit** → **Remove all local changes and return to the shared definition**. The card and the confirmation both say that **all** of your local changes to that service are removed (they are listed), not only the port. Another personal service is never removed. A service defined only on this machine has nothing to return to and is refused (`runtime remove <id> --local` deletes it).
+- **Nothing is stopped.** A port held by another service or process is never freed by stopping it.
+- A changed port needs a new review and trust before the service starts.
+
+### Editing a service
+
+```bash
+yallaflow runtime edit <id> --local|--shared [--name …] [--port N]… [--cwd …] [--ready-port N | --ready-log TEXT | --no-ready] [--open /path] [--env NAME]… [-- <command…>]
+```
+
+- **Only what you name changes.** Every other field stays as it is, including links and the services it depends on.
+- **You say where it is saved; there is no default.**
+  - `--local`: this machine only (`.yallaflow/local/runtime.yaml`, ignored by Git). For a shared service it is a personal override of just those fields.
+  - `--shared`: the repository file (`.yallaflow/runtime.yaml`). Teammates get it only after you commit and push it. Saving uploads nothing.
+- If your personal override already covers a field you change in the shared file, the override still wins on your machine, and the command says so.
+
+### Why it failed
+
+A failed start, `runtime status --json` (`failure`) and the Run tab give the line of the log that states the cause, for example the `Cannot find module …` line with the missing file, instead of the last lines of the stack trace. The full log is still `runtime logs <id>`. Log lines are redacted (best effort) before they are shown or prepared for the agent.
+
 ## Console
 
 The **Setup** tab runs the steps above. Asking the agent is offered first (it analyzes and proposes); Analyze is the quick fallback. Once services are saved, the page leads with the run control: the overall state, **Start project** / **Stop project**, Open links, and a compact row per service (state, trust, ports; Review and trust, or Start, Restart and Stop; Logs; the definition on demand). The plan, suggestions, add form, stack and agents fold into a Configuration section beneath. A proposal that arrives while the page waits for it is preselected (new, unblocked services only); selecting saves nothing. [Screens →](tour.md#part-3--set-the-project-up-once-then-just-press-start)

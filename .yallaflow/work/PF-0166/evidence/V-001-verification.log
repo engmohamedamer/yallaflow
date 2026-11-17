@@ -1,0 +1,578 @@
+
+> yallaflow@1.5.3 check:syntax
+> find src test test-support -name '*.js' -print0 | xargs -0 -n1 node --check
+
+TAP version 13
+# Subtest: AC-002/AC-007: header tabs are exactly Workspace · Project · More; no Agents or Setup & run tab
+ok 1 - AC-002/AC-007: header tabs are exactly Workspace · Project · More; no Agents or Setup & run tab
+  ---
+  duration_ms: 7.195956
+  type: 'test'
+  ...
+# Subtest: AC-002/AC-003: old routes and in-page anchors land on their new home
+ok 2 - AC-002/AC-003: old routes and in-page anchors land on their new home
+  ---
+  duration_ms: 25.142475
+  type: 'test'
+  ...
+# Subtest: AC-002: the bell still counts agent requests and leads to the Projects inbox
+ok 3 - AC-002: the bell still counts agent requests and leads to the Projects inbox
+  ---
+  duration_ms: 1.511877
+  type: 'test'
+  ...
+# Subtest: AC-001: Projects shows the Needs-you inbox above the cards and each card lists only its own lanes
+ok 4 - AC-001: Projects shows the Needs-you inbox above the cards and each card lists only its own lanes
+  ---
+  duration_ms: 8.793796
+  type: 'test'
+  ...
+# Subtest: AC-003: one Project page with an accessible tab bar and badges
+ok 5 - AC-003: one Project page with an accessible tab bar and badges
+  ---
+  duration_ms: 5.932818
+  type: 'test'
+  ...
+# Subtest: AC-004: Overview is summary, needs care, areas and stack in two columns, one on phones
+ok 6 - AC-004: Overview is summary, needs care, areas and stack in two columns, one on phones
+  ---
+  duration_ms: 1.075362
+  type: 'test'
+  ...
+# Subtest: AC-005: a failed service is one line with View log, Ask the agent to fix and Start again
+ok 7 - AC-005: a failed service is one line with View log, Ask the agent to fix and Start again
+  ---
+  duration_ms: 14.821827
+  type: 'test'
+  ...
+# Subtest: AC-006: the header shows Team or Solo with the branch, amber when Solo off the integration branch
+ok 8 - AC-006: the header shows Team or Solo with the branch, amber when Solo off the integration branch
+  ---
+  duration_ms: 23.467257
+  type: 'test'
+  ...
+# Subtest: AC-006: the New Project success step offers team mode as optional, with the confirmed flow
+ok 9 - AC-006: the New Project success step offers team mode as optional, with the confirmed flow
+  ---
+  duration_ms: 12.483469
+  type: 'test'
+  ...
+# Subtest: AC-007: every new label has Arabic and English; light and dark use the shared tokens
+ok 10 - AC-007: every new label has Arabic and English; light and dark use the shared tokens
+  ---
+  duration_ms: 3.064897
+  type: 'test'
+  ...
+# Subtest: console routes: edit and port need a save location, take fields (never a command line), and report where they saved
+ok 11 - console routes: edit and port need a save location, take fields (never a command line), and report where they saved
+  ---
+  duration_ms: 2003.666
+  type: 'test'
+  ...
+# Subtest: the card says what is missing, shows the exact command first, and installs only after a tick on a trusted service
+ok 12 - the card says what is missing, shows the exact command first, and installs only after a tick on a trusted service
+  ---
+  duration_ms: 14.845038
+  type: 'test'
+  ...
+# Subtest: a taken port: the owner by name, a free port, one consistent change, and where it is saved
+ok 13 - a taken port: the owner by name, a free port, one consistent change, and where it is saved
+  ---
+  duration_ms: 10.971255
+  type: 'test'
+  ...
+# Subtest: the edit form sends only what changed, with rarely used fields under Advanced
+ok 14 - the edit form sends only what changed, with rarely used fields under Advanced
+  ---
+  duration_ms: 6.791235
+  type: 'test'
+  ...
+# Subtest: a failure shows the cause line and says what it means; the text for the agent starts from it
+ok 15 - a failure shows the cause line and says what it means; the text for the agent starts from it
+  ---
+  duration_ms: 4.941882
+  type: 'test'
+  ...
+# Subtest: one place for run setup: Run holds the analysis and suggestions; Settings only defines a service by hand
+ok 16 - one place for run setup: Run holds the analysis and suggestions; Settings only defines a service by hand
+  ---
+  duration_ms: 5.045928
+  type: 'test'
+  ...
+# Subtest: nothing saved, no proposal: one primary action asks the agent; a quick scan is the fallback
+ok 17 - nothing saved, no proposal: one primary action asks the agent; a quick scan is the fallback
+  ---
+  duration_ms: 9.665753
+  type: 'test'
+  ...
+# Subtest: a proposal shows each service with its command, preselected, and one button to use them
+ok 18 - a proposal shows each service with its command, preselected, and one button to use them
+  ---
+  duration_ms: 6.666665
+  type: 'test'
+  ...
+# Subtest: saved services are approved together from their reviewed commands; shared and blocked ones are left out
+ok 19 - saved services are approved together from their reviewed commands; shared and blocked ones are left out
+  ---
+  duration_ms: 6.880316
+  type: 'test'
+  ...
+# Subtest: approval without starting, and a refused approval, start nothing
+ok 20 - approval without starting, and a refused approval, start nothing
+  ---
+  duration_ms: 6.533291
+  type: 'test'
+  ...
+# Subtest: nothing to approve shows no card; a read-only console never offers approval
+ok 21 - nothing to approve shows no card; a read-only console never offers approval
+  ---
+  duration_ms: 4.704454
+  type: 'test'
+  ...
+# Subtest: the Run tab hosts the flow; Overview names the next run step; Settings keeps advanced editing
+ok 22 - the Run tab hosts the flow; Overview names the next run step; Settings keeps advanced editing
+  ---
+  duration_ms: 2.386932
+  type: 'test'
+  ...
+# Subtest: the real case: landing/node_modules is missing, and the fix is npm ci --include=dev in landing
+ok 23 - the real case: landing/node_modules is missing, and the fix is npm ci --include=dev in landing
+  ---
+  duration_ms: 58.554789
+  type: 'test'
+  ...
+# Subtest: the install command follows the package manager and its lockfile; without a lockfile it says one is created
+ok 24 - the install command follows the package manager and its lockfile; without a lockfile it says one is created
+  ---
+  duration_ms: 28.890993
+  type: 'test'
+  ...
+# Subtest: only certain cases are reported: hoisted installs, Plug'n'Play, unknown commands and packages without dependencies are left alone
+ok 25 - only certain cases are reported: hoisted installs, Plug'n'Play, unknown commands and packages without dependencies are left alone
+  ---
+  duration_ms: 32.84295
+  type: 'test'
+  ...
+# Subtest: diagnosis: the line that states the cause, not the end of the stack trace; a missing project file is not "missing dependencies"
+ok 26 - diagnosis: the line that states the cause, not the end of the stack trace; a missing project file is not "missing dependencies"
+  ---
+  duration_ms: 5.042275
+  type: 'test'
+  ...
+# Subtest: moving a port changes the command, the port, the readiness check and the links together, or nothing
+ok 27 - moving a port changes the command, the port, the readiness check and the links together, or nothing
+  ---
+  duration_ms: 15.323151
+  type: 'test'
+  ...
+# Subtest: an edit keeps every other field, says where it was saved, and never touches the shared file for a local change
+ok 28 - an edit keeps every other field, says where it was saved, and never touches the shared file for a local change
+  ---
+  duration_ms: 180.07889
+  type: 'test'
+  ...
+# Subtest: start: a missing requirement is said before anything runs; a taken port names the owning service and a free port
+ok 29 - start: a missing requirement is said before anything runs; a taken port names the owning service and a free port
+  ---
+  duration_ms: 1652.372711
+  type: 'test'
+  ...
+# Subtest: install: only for a trusted service, only the confirmed command, and the lockfile is not rewritten by a frozen install
+ok 30 - install: only for a trusted service, only the confirmed command, and the lockfile is not rewritten by a frozen install
+  ---
+  duration_ms: 131.58806
+  type: 'test'
+  ...
+# Subtest: a failed start reports the cause line, redacted, in the error and in the status
+ok 31 - a failed start reports the cause line, redacted, in the error and in the status
+  ---
+  duration_ms: 186.875729
+  type: 'test'
+  ...
+# Subtest: Analyze finds the parent Compose stack, its vhost domains and its shared scope; reads no .env and keeps no environment values
+ok 32 - Analyze finds the parent Compose stack, its vhost domains and its shared scope; reads no .env and keeps no environment values
+  ---
+  duration_ms: 728.122616
+  type: 'test'
+  ...
+# Subtest: R5: what cannot be inspected is unresolved, never confirmed; an empty scan says where it looked
+ok 33 - R5: what cannot be inspected is unresolved, never confirmed; an empty scan says where it looked
+  ---
+  duration_ms: 722.556748
+  type: 'test'
+  ...
+# Subtest: the Compose reader fails closed on what it cannot read with certainty
+ok 34 - the Compose reader fails closed on what it cannot read with certainty
+  ---
+  duration_ms: 7.162261
+  type: 'test'
+  ...
+# Subtest: agent proposals are validated and stored beside the scan; they never touch the profile or trust
+ok 35 - agent proposals are validated and stored beside the scan; they never touch the profile or trust
+  ---
+  duration_ms: 2068.122303
+  type: 'test'
+  ...
+# Subtest: the agent request is prepared in the chat, never sent
+ok 36 - the agent request is prepared in the chat, never sent
+  ---
+  duration_ms: 15.8221
+  type: 'test'
+  ...
+# Subtest: R4: saving a plan grants no execution; only a person can save; outside folders go to the personal file only
+ok 37 - R4: saving a plan grants no execution; only a person can save; outside folders go to the personal file only
+  ---
+  duration_ms: 1863.19723
+  type: 'test'
+  ...
+# Subtest: AC-006: an outside folder is allowed only in the personal file and only inside home
+ok 38 - AC-006: an outside folder is allowed only in the personal file and only inside home
+  ---
+  duration_ms: 2235.884885
+  type: 'test'
+  ...
+# Subtest: R1: changing a trusted Compose file, override, Dockerfile, package script or shell script blocks execution
+ok 39 - R1: changing a trusted Compose file, override, Dockerfile, package script or shell script blocks execution
+  ---
+  duration_ms: 4297.006043
+  type: 'test'
+  ...
+# Subtest: R6: a change between review and trust is refused; console runtime writes cannot interleave
+ok 40 - R6: a change between review and trust is refused; console runtime writes cannot interleave
+  ---
+  duration_ms: 5834.027534
+  type: 'test'
+  ...
+# Subtest: R2: Stop project never stops shared infrastructure; stopping it needs a typed confirmation (S3: evidence, not the marker)
+ok 41 - R2: Stop project never stops shared infrastructure; stopping it needs a typed confirmation (S3: evidence, not the marker)
+  ---
+  duration_ms: 4843.880658
+  type: 'test'
+  ...
+# Subtest: R3: a stack already running outside YallaFlow is never started or stopped; a busy port is reported with its owner and nothing is killed
+ok 42 - R3: a stack already running outside YallaFlow is never started or stopped; a busy port is reported with its owner and nothing is killed
+  ---
+  duration_ms: 2895.447329
+  type: 'test'
+  ...
+# Subtest: without Docker the analysis says so and continues; a read-only console views the plan but changes nothing
+ok 43 - without Docker the analysis says so and continues; a read-only console views the plan but changes nothing
+  ---
+  duration_ms: 324.337992
+  type: 'test'
+  ...
+# Subtest: UI: the plan shows confidence, shared scope, unresolved items and coverage; Save starts disabled; the review shows what trust covers
+ok 44 - UI: the plan shows confidence, shared scope, unresolved items and coverage; Save starts disabled; the review shows what trust covers
+  ---
+  duration_ms: 43.439756
+  type: 'test'
+  ...
+# Subtest: review 1: escaped or unknown Compose keys block trust instead of hiding include/extends/build
+ok 45 - review 1: escaped or unknown Compose keys block trust instead of hiding include/extends/build
+  ---
+  duration_ms: 985.427913
+  type: 'test'
+  ...
+# Subtest: review 3/4: a parent Compose file that cannot be read is unresolved and blocking, never "nothing found"; a mounted .env is never opened
+ok 46 - review 3/4: a parent Compose file that cannot be read is unresolved and blocking, never "nothing found"; a mounted .env is never opened
+  ---
+  duration_ms: 459.024313
+  type: 'test'
+  ...
+# Subtest: review 5: shared and running-outside checks see override files and every -f/-p spelling
+ok 47 - review 5: shared and running-outside checks see override files and every -f/-p spelling
+  ---
+  duration_ms: 41.498099
+  type: 'test'
+  ...
+# Subtest: review 6/7: editing .env ends the trust (its content is never read); without docker ps, a Compose service is not started
+ok 48 - review 6/7: editing .env ends the trust (its content is never read); without docker ps, a Compose service is not started
+  ---
+  duration_ms: 1331.164526
+  type: 'test'
+  ...
+# Subtest: review 8/9: Replace never deletes a shared definition; shell -c, missing evidence and scan-only fields are refused
+ok 49 - review 8/9: Replace never deletes a shared definition; shell -c, missing evidence and scan-only fields are refused
+  ---
+  duration_ms: 669.632317
+  type: 'test'
+  ...
+# Subtest: an agent service matching the scanned one carries the scan's shared scope into Review and Save
+ok 50 - an agent service matching the scanned one carries the scan's shared scope into Review and Save
+  ---
+  duration_ms: 662.472432
+  type: 'test'
+  ...
+# Subtest: profiles: argv only, repository-relative cwd, names not values; secrets and unknown fields refused without echo
+ok 51 - profiles: argv only, repository-relative cwd, names not values; secrets and unknown fields refused without echo
+  ---
+  duration_ms: 1605.30944
+  type: 'test'
+  ...
+# Subtest: trust: required before start, personal, and renewed after any material change (shared or override)
+ok 52 - trust: required before start, personal, and renewed after any material change (shared or override)
+  ---
+  duration_ms: 1880.527256
+  type: 'test'
+  ...
+# Subtest: start/stop/logs: readiness, minimal environment, redacted logs, graceful stop; nothing auto-starts
+ok 53 - start/stop/logs: readiness, minimal environment, redacted logs, graceful stop; nothing auto-starts
+  ---
+  duration_ms: 3021.086739
+  type: 'test'
+  ...
+# Subtest: a port held by someone else refuses start and that process is never touched
+ok 54 - a port held by someone else refuses start and that process is never touched
+  ---
+  duration_ms: 990.68172
+  type: 'test'
+  ...
+# Subtest: crash recovery: a service killed outside YallaFlow reads failed; a reused PID is unmanaged and never signalled
+ok 55 - crash recovery: a service killed outside YallaFlow reads failed; a reused PID is unmanaged and never signalled
+  ---
+  duration_ms: 2900.122227
+  type: 'test'
+  ...
+# Subtest: concurrency: five simultaneous starts start one process; restart replaces it; stop --all stops owned services only
+ok 56 - concurrency: five simultaneous starts start one process; restart replaces it; stop --all stops owned services only
+  ---
+  duration_ms: 3776.461686
+  type: 'test'
+  ...
+# Subtest: start failures are reported with the log tail; a cwd escaping through a symlink is refused
+ok 57 - start failures are reported with the log tail; a cwd escaping through a symlink is refused
+  ---
+  duration_ms: 2071.796476
+  type: 'test'
+  ...
+# Subtest: suggestions come from repository evidence and never run
+ok 58 - suggestions come from repository evidence and never run
+  ---
+  duration_ms: 556.56277
+  type: 'test'
+  ...
+# Subtest: console: runtime routes are token/Origin/JSON guarded, trust needs the typed id, read-only refuses
+ok 59 - console: runtime routes are token/Origin/JSON guarded, trust needs the typed id, read-only refuses
+  ---
+  duration_ms: 2432.906201
+  type: 'test'
+  ...
+# Subtest: review: trust and run records planted inside the repository are ignored; trust needs the reviewed definition
+ok 60 - review: trust and run records planted inside the repository are ignored; trust needs the reviewed definition
+  ---
+  duration_ms: 1080.373874
+  type: 'test'
+  ...
+# Subtest: review: a run record whose process no longer leads its own group is unmanaged and never signalled
+ok 61 - review: a run record whose process no longer leads its own group is unmanaged and never signalled
+  ---
+  duration_ms: 979.242082
+  type: 'test'
+  ...
+# Subtest: review: log symlinks and hard links are refused; reading logs never writes, truncates or rotates
+ok 62 - review: log symlinks and hard links are refused; reading logs never writes, truncates or rotates
+  ---
+  duration_ms: 1141.369646
+  type: 'test'
+  ...
+# Subtest: review: an untrusted dependency starts nothing; control and bidi characters are refused
+ok 63 - review: an untrusted dependency starts nothing; control and bidi characters are refused
+  ---
+  duration_ms: 1266.276428
+  type: 'test'
+  ...
+# Subtest: review: CLI trust is a human decision — refused when not interactive
+ok 64 - review: CLI trust is a human decision — refused when not interactive
+  ---
+  duration_ms: 792.185307
+  type: 'test'
+  ...
+# Subtest: review: a FIFO planted as the log never hangs reads
+ok 65 - review: a FIFO planted as the log never hangs reads
+  ---
+  duration_ms: 437.780525
+  type: 'test'
+  ...
+# Subtest: trust: script edits reject stale confirmation and start, while application edits retain trust
+ok 66 - trust: script edits reject stale confirmation and start, while application edits retain trust
+  ---
+  duration_ms: 1700.398321
+  type: 'test'
+  ...
+# Subtest: trust: a service changing its inputs during startup is stopped (only its own process) and the start fails (PF-0072 D2/R6)
+ok 67 - trust: a service changing its inputs during startup is stopped (only its own process) and the start fails (PF-0072 D2/R6)
+  ---
+  duration_ms: 2025.551463
+  type: 'test'
+  ...
+# Subtest: 8/9/11. shared enable is explicit, records policy and version, never commits or pushes
+ok 68 - 8/9/11. shared enable is explicit, records policy and version, never commits or pushes
+  ---
+  duration_ms: 2446.725245
+  type: 'test'
+  ...
+# Subtest: 10. an unhealthy or non-Git workspace cannot enable sharing, and nothing changes
+ok 69 - 10. an unhealthy or non-Git workspace cannot enable sharing, and nothing changes
+  ---
+  duration_ms: 856.396642
+  type: 'test'
+  ...
+# Subtest: 11. an incompatible YallaFlow stops before any project-state mutation; read-only orientation still explains why
+ok 70 - 11. an incompatible YallaFlow stops before any project-state mutation; read-only orientation still explains why
+  ---
+  duration_ms: 2439.03213
+  type: 'test'
+  ...
+# Subtest: 12/52. a single-user workspace is unchanged until sharing is enabled: same IDs, no memory records, reads write nothing
+ok 71 - 12/52. a single-user workspace is unchanged until sharing is enabled: same IDs, no memory records, reads write nothing
+  ---
+  duration_ms: 2782.328238
+  type: 'test'
+  ...
+# Subtest: 13/14/16. two branches from the same base create work and sources without ID or path collision, and merge cleanly
+ok 72 - 13/14/16. two branches from the same base create work and sources without ID or path collision, and merge cleanly
+  ---
+  duration_ms: 2695.850094
+  type: 'test'
+  ...
+# Subtest: 15. legacy PF-\#\#\#\# and SRC-\#\#\#\# stay readable and keep allocating in single-user mode; both forms coexist
+ok 73 - 15. legacy PF-\#\#\#\# and SRC-\#\#\#\# stay readable and keep allocating in single-user mode; both forms coexist
+  ---
+  duration_ms: 1023.907827
+  type: 'test'
+  ...
+# Subtest: checkout tags: 10 Crockford-base32 characters, an unbiased byte mapping, drawn from crypto.randomBytes
+ok 74 - checkout tags: 10 Crockford-base32 characters, an unbiased byte mapping, drawn from crypto.randomBytes
+  ---
+  duration_ms: 4.640031
+  type: 'test'
+  ...
+# Subtest: high-volume deterministic non-reuse: one checkout allocating thousands of IDs across branch switches never repeats a number
+ok 75 - high-volume deterministic non-reuse: one checkout allocating thousands of IDs across branch switches never repeats a number
+  ---
+  duration_ms: 3374.397572
+  type: 'test'
+  ...
+# Subtest: a copied checkout gets a fresh clone tag; the identity is local, gitignored, and needs no join command
+ok 76 - a copied checkout gets a fresh clone tag; the identity is local, gitignored, and needs no join command
+  ---
+  duration_ms: 2198.343962
+  type: 'test'
+  ...
+# Subtest: one checkout never reuses an ID across branch switches or stashes
+ok 77 - one checkout never reuses an ID across branch switches or stashes
+  ---
+  duration_ms: 1377.84873
+  type: 'test'
+  ...
+# Subtest: 17. every global namespace is branch-safe after a multi-branch merge; work-scoped IDs are safe by scope
+ok 78 - 17. every global namespace is branch-safe after a multi-branch merge; work-scoped IDs are safe by scope
+  ---
+  duration_ms: 2739.555433
+  type: 'test'
+  ...
+# Subtest: 18/19/20/21. work captures its memory base; unchanged, unrelated, and referenced changes are told apart
+ok 79 - 18/19/20/21. work captures its memory base; unchanged, unrelated, and referenced changes are told apart
+  ---
+  duration_ms: 1374.513851
+  type: 'test'
+  ...
+# Subtest: 22. without Git the memory base is still a deterministic content fingerprint
+ok 80 - 22. without Git the memory base is still a deterministic content fingerprint
+  ---
+  duration_ms: 87.109932
+  type: 'test'
+  ...
+# Subtest: 23/24/25/26. on a feature branch knowledge is staged work-locally; canonical memory is untouched; DONE and handoff stay coherent
+ok 81 - 23/24/25/26. on a feature branch knowledge is staged work-locally; canonical memory is untouched; DONE and handoff stay coherent
+  ---
+  duration_ms: 2764.820738
+  type: 'test'
+  ...
+# Subtest: a relation proposed against a fact that changes before promotion is refused at staging (revalidate first)
+ok 82 - a relation proposed against a fact that changes before promotion is refused at staging (revalidate first)
+  ---
+  duration_ms: 1275.097865
+  type: 'test'
+  ...
+# Subtest: 27/28/29/30/35. safe new facts, reconfirmations, supersessions, and exact duplicates integrate with full provenance
+ok 83 - 27/28/29/30/35. safe new facts, reconfirmations, supersessions, and exact duplicates integrate with full provenance
+  ---
+  duration_ms: 4468.26574
+  type: 'test'
+  ...
+# Subtest: 31/40. conflicting parallel supersessions block, never overwrite, and memory stays healthy until reconciled
+ok 84 - 31/40. conflicting parallel supersessions block, never overwrite, and memory stays healthy until reconciled
+  ---
+  duration_ms: 4171.642736
+  type: 'test'
+  ...
+# Subtest: 32. a stale base on a feature branch is detected before push, with developer-facing guidance
+ok 85 - 32. a stale base on a feature branch is detected before push, with developer-facing guidance
+  ---
+  duration_ms: 3032.007904
+  type: 'test'
+  ...
+# Subtest: 33/34. integration retry is idempotent and an interrupted or failed integration is never half-applied
+ok 86 - 33/34. integration retry is idempotent and an interrupted or failed integration is never half-applied
+  ---
+  duration_ms: 3183.280053
+  type: 'test'
+  ...
+# Subtest: integration is deterministic: two maintainers integrating the same merge produce identical files
+ok 87 - integration is deterministic: two maintainers integrating the same merge produce identical files
+  ---
+  duration_ms: 1914.077346
+  type: 'test'
+  ...
+# Subtest: doctor detects unsafe shared state: legacy IDs after sharing, local state committed or misplaced, bad metadata, missing CTX, missing provenance
+ok 88 - doctor detects unsafe shared state: legacy IDs after sharing, local state committed or misplaced, bad metadata, missing CTX, missing provenance
+  ---
+  duration_ms: 2419.443691
+  type: 'test'
+  ...
+# Subtest: 47/48/49/50/51. shared check is read-only, provider-neutral, passes a safe branch, and fails a stale one with actionable output
+ok 89 - 47/48/49/50/51. shared check is read-only, provider-neutral, passes a safe branch, and fails a stale one with actionable output
+  ---
+  duration_ms: 2190.759714
+  type: 'test'
+  ...
+# Subtest: 51b/git-scan: the Git scan catches every invocation form, every forbidden subcommand, and git-ops shapes outside the approved set
+ok 90 - 51b/git-scan: the Git scan catches every invocation form, every forbidden subcommand, and git-ops shapes outside the approved set
+  ---
+  duration_ms: 8.967655
+  type: 'test'
+  ...
+# Subtest: 51/no-network: YallaFlow source never invokes mutating or network Git subcommands and calls no LLM provider
+ok 91 - 51/no-network: YallaFlow source never invokes mutating or network Git subcommands and calls no LLM provider
+  ---
+  duration_ms: 223.348132
+  type: 'test'
+  ...
+# Subtest: 42/43/44/45. the adapter orients automatically; finish speaks outcome language and keeps the audit in --verbose
+ok 92 - 42/43/44/45. the adapter orients automatically; finish speaks outcome language and keeps the audit in --verbose
+  ---
+  duration_ms: 2193.529794
+  type: 'test'
+  ...
+# Subtest: 53/54. single-user baseline, freshness, reconciliation helpers and durable sources behave as before
+ok 93 - 53/54. single-user baseline, freshness, reconciliation helpers and durable sources behave as before
+  ---
+  duration_ms: 921.408925
+  type: 'test'
+  ...
+# Subtest: read commands never write in a Shared Project — not even a fresh clone's local identity
+ok 94 - read commands never write in a Shared Project — not even a fresh clone's local identity
+  ---
+  duration_ms: 7926.59462
+  type: 'test'
+  ...
+1..94
+# tests 94
+# suites 0
+# pass 94
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 60429.69927

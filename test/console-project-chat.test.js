@@ -184,7 +184,7 @@ test('chat: whole-job first message, one action (review, answer, continue), step
   const steps = harness({ hash: '#/item/PF-0001', session });
   steps.agent.events = [{ type: 'message.sent', text: 'go' }, ...['a', 'b', 'c'].map((id) => ({ type: 'tool.started', toolCallId: id, title: `yallaflow ${id}`, status: 'completed' })), { type: 'message.done', role: 'agent', text: 'Done.' }];
   const stepsHtml = steps.panel();
-  assert.match(stepsHtml, /<details class="atools">/);
+  assert.match(stepsHtml, /<details class="atools" data-steps="a" >/, 'PF-0165: the group carries a key so it stays open while the chat updates');
   assert.match(stepsHtml, /3 steps/);
   assert.match(stepsHtml, /<details class="asugg-more">/, 'other suggestions are folded');
 });

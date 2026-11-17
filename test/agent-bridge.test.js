@@ -491,7 +491,7 @@ test('stabilization review: hard links, End while starting, overlapping lock cla
 
   // A crash: what the adapter started in its group is ended, and the event carries the result.
   await b.message('p1', 'SPAWN then CRASH');
-  const crashed = await (async () => { for (let i = 0; i < 300; i++) { const e = (await b.status('p1')).events.find((event) => event.type === 'session.ended'); if (e) return e; await sleep(20); } return null; })();
+  const crashed = await (async () => { for (let i = 0; i < 300; i++) { const e = (await b.status('p1')).events.find((event) => event.type === 'session.ended' && !event.restored); if (e) return e; await sleep(20); } return null; })(); // PF-0165: the saved history of the earlier bridges in this checkout is restored, marked
   assert.ok(crashed?.cleanup, 'the crash report carries a cleanup result');
   assert.equal(crashed.cleanup.coverage, process.platform === 'linux' ? 'tracked' : 'group');
   const command = (await stateLines(tools.state)).filter((line) => line.command).at(-1).command;

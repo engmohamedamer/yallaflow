@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "npm run check:syntax && node --import ./test-support/isolate-user-config.js --test test/agent-claude-experimental.test.js test/agent-bootstrap.test.js test/shared-project.test.js && git diff --check",
+      "executionMode": "shell",
+      "executable": "npm run check:syntax && node --import ./test-support/isolate-user-config.js --test test/agent-claude-experimental.test.js test/agent-bootstrap.test.js test/shared-project.test.js && git diff --check",
+      "args": [],
+      "displayCommand": "npm run check:syntax && node --import ./test-support/isolate-user-config.js --test test/agent-claude-experimental.test.js test/agent-bootstrap.test.js test/shared-project.test.js && git diff --check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-16T18:29:37.396Z",
+      "finishedAt": "2026-11-16T18:31:08.331Z",
+      "verifiedAt": "2026-11-16T18:31:08.331Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

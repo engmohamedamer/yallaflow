@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/agent-*.test.js test/console-project-chat.test.js test/console-agent-errors.test.js test/console-field-notes.test.js test/console-polish.test.js",
+      "executionMode": "shell",
+      "executable": "node --import ./test-support/isolate-user-config.js --test test/agent-*.test.js test/console-project-chat.test.js test/console-agent-errors.test.js test/console-field-notes.test.js test/console-polish.test.js",
+      "args": [],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/agent-*.test.js test/console-project-chat.test.js test/console-agent-errors.test.js test/console-field-notes.test.js test/console-polish.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-16T19:37:02.290Z",
+      "finishedAt": "2026-11-16T19:38:01.703Z",
+      "verifiedAt": "2026-11-16T19:38:01.703Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/agent-chat-history.test.js test/agent-transcript.test.js test/agent-bridge.test.js test/console-preferences.test.js test/console-monitor-mode.test.js test/console-project-chat.test.js test/agent-terminal.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/agent-chat-history.test.js",
+        "test/agent-transcript.test.js",
+        "test/agent-bridge.test.js",
+        "test/console-preferences.test.js",
+        "test/console-monitor-mode.test.js",
+        "test/console-project-chat.test.js",
+        "test/agent-terminal.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/agent-chat-history.test.js test/agent-transcript.test.js test/agent-bridge.test.js test/console-preferences.test.js test/console-monitor-mode.test.js test/console-project-chat.test.js test/agent-terminal.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-17T09:21:15.550Z",
+      "finishedAt": "2026-11-17T09:22:15.656Z",
+      "verifiedAt": "2026-11-17T09:22:15.656Z",
+      "log": "V-002-verification.log"
+    },
+    {
+      "id": "V-003",
+      "command": "npm run check:syntax",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check:syntax"
+      ],
+      "displayCommand": "npm run check:syntax",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-17T09:22:22.027Z",
+      "finishedAt": "2026-11-17T09:22:40.986Z",
+      "verifiedAt": "2026-11-17T09:22:40.986Z",
+      "log": "V-003-verification.log"
+    }
+  ]
+}

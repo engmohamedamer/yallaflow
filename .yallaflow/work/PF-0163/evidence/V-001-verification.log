@@ -1,0 +1,274 @@
+TAP version 13
+# Subtest: first run: the welcome panel offers Create, Manage and Monitor in plain words, in Arabic and English
+ok 1 - first run: the welcome panel offers Create, Manage and Monitor in plain words, in Arabic and English
+  ---
+  duration_ms: 18.905782
+  type: 'test'
+  ...
+# Subtest: first run: the agent state is shown with Create and Manage; its setup opens in place; a ready agent shows no setup
+ok 2 - first run: the agent state is shown with Create and Manage; its setup opens in place; a ready agent shows no setup
+  ---
+  duration_ms: 11.66492
+  type: 'test'
+  ...
+# Subtest: first run: the intent is saved and routes: Create to the wizard, Manage and Monitor to the folder chooser
+ok 3 - first run: the intent is saved and routes: Create to the wizard, Manage and Monitor to the folder chooser
+  ---
+  duration_ms: 9.715766
+  type: 'test'
+  ...
+# Subtest: wizard stack step: planning with the agent is the usual path; fixed templates are a labeled Advanced section
+ok 4 - wizard stack step: planning with the agent is the usual path; fixed templates are a labeled Advanced section
+  ---
+  duration_ms: 20.51061
+  type: 'test'
+  ...
+# Subtest: wizard agent step: an agent-planned project needs a chosen, ready agent; the way around it is a labeled Advanced tick
+ok 5 - wizard agent step: an agent-planned project needs a chosen, ready agent; the way around it is a labeled Advanced tick
+  ---
+  duration_ms: 32.259615
+  type: 'test'
+  ...
+# Subtest: wizard agent step: a fixed template needs no agent; a returning user with a ready usual agent sees no setup
+ok 6 - wizard agent step: a fixed template needs no agent; a returning user with a ready usual agent sees no setup
+  ---
+  duration_ms: 26.946515
+  type: 'test'
+  ...
+# Subtest: layout: the intent cards wrap on narrow screens and use the theme tokens (light and dark)
+ok 7 - layout: the intent cards wrap on narrow screens and use the theme tokens (light and dark)
+  ---
+  duration_ms: 1.853829
+  type: 'test'
+  ...
+# Subtest: folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+ok 8 - folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+  ---
+  duration_ms: 154.898307
+  type: 'test'
+  ...
+# Subtest: registration: an existing YallaFlow project inside home is added once, live; others are refused
+ok 9 - registration: an existing YallaFlow project inside home is added once, live; others are refused
+  ---
+  duration_ms: 366.949447
+  type: 'test'
+  ...
+# Subtest: stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+ok 10 - stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+  ---
+  duration_ms: 1184.933868
+  type: 'test'
+  ...
+# Subtest: a plan that installs dependencies needs an explicit acknowledgement (PF-0085)
+ok 11 - a plan that installs dependencies needs an explicit acknowledgement (PF-0085)
+  ---
+  duration_ms: 386.301332
+  type: 'test'
+  ...
+# Subtest: Git init: explicit, once, never inside another repository; refused read-only
+ok 12 - Git init: explicit, once, never inside another repository; refused read-only
+  ---
+  duration_ms: 109.592684
+  type: 'test'
+  ...
+# Subtest: runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+ok 13 - runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+  ---
+  duration_ms: 714.393299
+  type: 'test'
+  ...
+# Subtest: agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+ok 14 - agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+  ---
+  duration_ms: 53.68869
+  type: 'test'
+  ...
+# Subtest: review: parallel registrations add a project once and lose none from the saved list
+ok 15 - review: parallel registrations add a project once and lose none from the saved list
+  ---
+  duration_ms: 100.851911
+  type: 'test'
+  ...
+# Subtest: review: hidden folders are refused even by path; read-only consoles probe no tools
+ok 16 - review: hidden folders are refused even by path; read-only consoles probe no tools
+  ---
+  duration_ms: 14.293338
+  type: 'test'
+  ...
+# Subtest: review: plans that run package scripts need an acknowledgement; control characters and NUL are refused
+ok 17 - review: plans that run package scripts need an acknowledgement; control characters and NUL are refused
+  ---
+  duration_ms: 620.985347
+  type: 'test'
+  ...
+# Subtest: review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+ok 18 - review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+  ---
+  duration_ms: 329.261717
+  type: 'test'
+  ...
+# Subtest: a registration failure after creation is reported as partial success, never as a failed creation
+ok 19 - a registration failure after creation is reported as partial success, never as a failed creation
+  ---
+  duration_ms: 479.292112
+  type: 'test'
+  ...
+# Subtest: Claude Code: off unless chosen explicitly when enabling agents; never read-only
+ok 20 - Claude Code: off unless chosen explicitly when enabling agents; never read-only
+  ---
+  duration_ms: 74.042107
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): a project leaves the running console and the saved list; its files stay
+ok 21 - removal (PF-0081): a project leaves the running console and the saved list; its files stay
+  ---
+  duration_ms: 59.344169
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): refused while an agent session is live in the project
+ok 22 - removal (PF-0081): refused while an agent session is live in the project
+  ---
+  duration_ms: 2.45084
+  type: 'test'
+  ...
+# Subtest: the draft holds typed choices only, each bounded; anything else in storage is ignored
+ok 23 - the draft holds typed choices only, each bounded; anything else in storage is ignored
+  ---
+  duration_ms: 9.880787
+  type: 'test'
+  ...
+# Subtest: choices are saved as the developer goes and restored after a reload, without the reviewed plan
+ok 24 - choices are saved as the developer goes and restored after a reload, without the reviewed plan
+  ---
+  duration_ms: 9.616608
+  type: 'test'
+  ...
+# Subtest: a creation that was running is found again: still running, finished, interrupted, or gone
+ok 25 - a creation that was running is found again: still running, finished, interrupted, or gone
+  ---
+  duration_ms: 12.600145
+  type: 'test'
+  ...
+# Subtest: the page offers the right next step for an interrupted creation, and points to it from Projects
+ok 26 - the page offers the right next step for an interrupted creation, and points to it from Projects
+  ---
+  duration_ms: 2.85979
+  type: 'test'
+  ...
+# Subtest: server side: continuing an interrupted creation repeats no finished step and creates no second project
+ok 27 - server side: continuing an interrupted creation repeats no finished step and creates no second project
+  ---
+  duration_ms: 219.088665
+  type: 'test'
+  ...
+# Subtest: the check says what is missing and whether an override is possible
+ok 28 - the check says what is missing and whether an override is possible
+  ---
+  duration_ms: 7.114705
+  type: 'test'
+  ...
+# Subtest: guidance exists for Windows, macOS and Linux for every tool the catalog and the console check; it is display only
+ok 29 - guidance exists for Windows, macOS and Linux for every tool the catalog and the console check; it is display only
+  ---
+  duration_ms: 1.717822
+  type: 'test'
+  ...
+# Subtest: creation is refused before anything is created; the override needs the generator itself
+ok 30 - creation is refused before anything is created; the override needs the generator itself
+  ---
+  duration_ms: 582.436111
+  type: 'test'
+  ...
+# Subtest: console: the plan carries the tool check, create is refused with it, Recheck is a read, never read-only
+ok 31 - console: the plan carries the tool check, create is refused with it, Recheck is a read, never read-only
+  ---
+  duration_ms: 610.180343
+  type: 'test'
+  ...
+# Subtest: plan: validated name, absent destination, no nesting, catalog-only stacks; nothing is created
+ok 32 - plan: validated name, absent destination, no nesting, catalog-only stacks; nothing is created
+  ---
+  duration_ms: 335.526155
+  type: 'test'
+  ...
+# Subtest: create: hash confirmation, staging, promotion, Core init with provenance → Greenfield, first work item
+ok 33 - create: hash confirmation, staging, promotion, Core init with provenance → Greenfield, first work item
+  ---
+  duration_ms: 936.785165
+  type: 'test'
+  ...
+# Subtest: existing projects keep the gate: no provenance, no Greenfield; a copied origin on a brownfield workspace is ignored
+ok 34 - existing projects keep the gate: no provenance, no Greenfield; a copied origin on a brownfield workspace is ignored
+  ---
+  duration_ms: 42.011068
+  type: 'test'
+  ...
+# Subtest: failures: generator error, missing marker, destination appearing; staging and diagnostics kept, nothing overwritten
+ok 35 - failures: generator error, missing marker, destination appearing; staging and diagnostics kept, nothing overwritten
+  ---
+  duration_ms: 214.943862
+  type: 'test'
+  ...
+# Subtest: a plan edited outside YallaFlow cannot run a different command
+ok 36 - a plan edited outside YallaFlow cannot run a different command
+  ---
+  duration_ms: 8.314214
+  type: 'test'
+  ...
+# Subtest: CLI: catalog, recommend, plan, create (empty stack), discard
+ok 37 - CLI: catalog, recommend, plan, create (empty stack), discard
+  ---
+  duration_ms: 1270.294321
+  type: 'test'
+  ...
+# Subtest: console: wizard routes are guarded, need the hash confirmation, and are refused read-only
+ok 38 - console: wizard routes are guarded, need the hash confirmation, and are refused read-only
+  ---
+  duration_ms: 954.929541
+  type: 'test'
+  ...
+# Subtest: review: staging is npm's project root, so a parent .npmrc or node_modules cannot shadow the generator
+ok 39 - review: staging is npm's project root, so a parent .npmrc or node_modules cannot shadow the generator
+  ---
+  duration_ms: 324.724083
+  type: 'test'
+  ...
+# Subtest: review: a retry never labels or installs into a folder that replaced the created one; failure text is redacted
+ok 40 - review: a retry never labels or installs into a folder that replaced the created one; failure text is redacted
+  ---
+  duration_ms: 172.557995
+  type: 'test'
+  ...
+# Subtest: review: a parent npm workspace that would capture staging stops the generator before it runs
+ok 41 - review: a parent npm workspace that would capture staging stops the generator before it runs
+  ---
+  duration_ms: 274.762153
+  type: 'test'
+  ...
+# Subtest: plan carries intent, environment, git and attachments; creation initializes Git and words the first work from the goal
+ok 42 - plan carries intent, environment, git and attachments; creation initializes Git and words the first work from the goal
+  ---
+  duration_ms: 95.807709
+  type: 'test'
+  ...
+# Subtest: custom stack (PF-0087): only with the empty project; recorded in the plan, origin and first work item; nothing runs
+ok 43 - custom stack (PF-0087): only with the empty project; recorded in the plan, origin and first work item; nothing runs
+  ---
+  duration_ms: 822.209043
+  type: 'test'
+  ...
+# Subtest: isolation (PF-0094): plans and registrations stay in this run's own config folder
+ok 44 - isolation (PF-0094): plans and registrations stay in this run's own config folder
+  ---
+  duration_ms: 0.489687
+  type: 'test'
+  ...
+1..44
+# tests 44
+# suites 0
+# pass 44
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5917.824011

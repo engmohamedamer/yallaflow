@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-16T17:09:51.676Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "Assessed after V-001 passed.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "GET /api/machine returns readiness (schema yallaflow.console.machine-readiness/1) with installed, authenticated, connection, support and next per agent; computeMachineReadiness is pure and the config folder is unchanged after the request.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agents/machine-readiness.js",
+              "symbol": "computeMachineReadiness",
+              "contentHash": "sha256:14a6e0a6707526bc286d91106f27cb7d5cd0548d4f730f124b1dc0721cdd0e22",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:1ce297f8a97d21a4189666954415abca26ff10af71dd46ab3c24622bb038c171",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/console-machine-readiness.test.js test/console-preferences.test.js test/console-polish.test.js test/console-folder-picker.test.js test/agent-bootstrap.test.js test/console-machine.test.js (passed)",
+              "workId": "PF-0160",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "The Claude Code card is rendered on a simulated Windows status with the chip Experimental · not verified on Windows, three separate rows, and a connection described as checked only when a session starts; it is never reported as verified.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:1dcae2e24b48165f9f1ec5bfc500f0fde84c8165f00556c81e8676fca412015a",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-machine-readiness.test.js",
+              "contentHash": "sha256:a51a998a3d8c711994cbc1b6ec3b3a2fdd719147bc013b747826b5399cf6e524",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/console-machine-readiness.test.js test/console-preferences.test.js test/console-polish.test.js test/console-folder-picker.test.js test/agent-bootstrap.test.js test/console-machine.test.js (passed)",
+              "workId": "PF-0160",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "chooseAgent, the Settings form and the wizard save preferredAgent; the chooser lists and marks the usual agent first but both options stay buttons, the wizard preselects it, and the readiness document reports a saved but unready preferred agent as not ready.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:1dcae2e24b48165f9f1ec5bfc500f0fde84c8165f00556c81e8676fca412015a",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-machine-readiness.test.js",
+              "contentHash": "sha256:a51a998a3d8c711994cbc1b6ec3b3a2fdd719147bc013b747826b5399cf6e524",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/console-machine-readiness.test.js test/console-preferences.test.js test/console-polish.test.js test/console-folder-picker.test.js test/agent-bootstrap.test.js test/console-machine.test.js (passed)",
+              "workId": "PF-0160",
+              "verificationRunId": "V-001"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-16T17:09:51.676Z"
+}

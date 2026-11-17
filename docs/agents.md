@@ -110,9 +110,16 @@ The work lives in the work item, not in the chat, so another agent can pick it u
 ## What is stored
 - **Kept locally:**
   - session link records (including how each session stopped) and your permission decisions, in `.yallaflow/local/agent-sessions/` (git-ignored);
-  - the checkout lock `.yallaflow/local/agent-console.lock` (process identity only), present only while the console runs.
+  - the checkout lock `.yallaflow/local/agent-console.lock` (process identity only), present only while the console runs;
+  - **the console chat's transcript (unreleased, changes an earlier rule)**, in `.yallaflow/local/agent-chat/transcript.jsonl` (git-ignored, readable only by you). Until 1.5.3 YallaFlow kept no chat messages; the console held the last 400 events in memory and a long reply pushed earlier messages out. Now what the chat shows is saved, so it survives a long reply, a page reload and a console restart.
+    - Secret-looking values are redacted before a line is written. This is best effort, not a guarantee: a secret in a form YallaFlow does not recognize, or split across two saved pieces of a streamed reply, can be written as it is. Do not paste secrets into the chat.
+    - About the last 16 MB is kept (the file is rotated once at 8 MB). Older conversation is not kept, and the chat says so at its start. Rotation happens only where a message starts, so a kept message is never cut at its beginning or end.
+    - **Saving is on by default and can be turned off.** In the chat, under **This chat is saved on this machine**, untick **Save new messages on this machine**. It is your preference (`saveChatHistory` in the console's `preferences.json`) and applies to every project on this machine at once. A message is saved whole or not at all: a reply already being saved finishes, and one already arriving when you turn saving on is not saved half.
+    - **Turning saving off deletes nothing.** What was saved before stays, and is still shown, until you delete it.
+    - **Deleting:** **Delete this project's saved chat…** asks for confirmation, then removes this project's two transcript files and empties the chat on every open page. Another project, a lane and the rest of `.yallaflow/local` are not touched. A running session continues. You can also delete the `agent-chat` folder yourself. Nothing is sent anywhere.
+    - With agents off, the chat (and its delete button) is not shown; the saved files stay until agents are on again or you delete the folder.
 - **Never kept by YallaFlow:**
-  - messages and transcripts, which stay with each provider's own history;
+  - the provider's own session history (it stays with Codex or Claude Code);
   - credentials of any kind.
 
 ## Security
@@ -135,4 +142,6 @@ YallaFlow finds and starts agents on Windows without a shell:
 - **Claude Code hooks and launch command** are written with double quotes and forward slashes.
 - **Not covered.** The adapter still receives the Codex shim's path in `CODEX_PATH`; ending a session on Windows stops the adapter process only (no process group).
 
-These rules are tested with simulated Windows paths only. Treat Windows as unverified until it is run there.
+- **New Project wizard tools (unreleased, Phase 1 onboarding).** `composer`, `npx`, `npm`, `php`, `git` and `docker` are found and started by the same rules. Composer's installer shim (`composer.bat` beside `composer.phar`) is started as `php.exe composer.phar`. Children get a short list of Windows system variables (`SystemRoot`, `APPDATA`, `TEMP`, …) and no others.
+
+These rules are tested with simulated Windows paths only. Treat Windows as unverified until it is run there. The steps to run on a real machine are in [`onboarding-manual-validation.md`](onboarding-manual-validation.md).

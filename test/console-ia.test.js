@@ -173,7 +173,7 @@ test('AC-006: the header shows Team or Solo with the branch, amber when Solo off
   // Settings: the Team mode section with the existing confirmed flow.
   const settings = cut('  function viewSettings() {', '  // The add-service form is never redrawn');
   assert.match(settings, /<section class="setsec" id="set-team">[^\n]*gitLine\(g\)/);
-  assert.match(settings, /\['setup-agents', A\('الوكلاء', 'Agents'\)\], \['set-services', A\('تعديل متقدم للتشغيل', 'Advanced run setup'\)\], \['set-team', A\('وضع الفريق', 'Team mode'\)\], \['set-project', A\('المشروع', 'Project'\)\]/);
+  assert.match(settings, /\['setup-agents', A\('الوكلاء', 'Agents'\)\], \['set-services', A\('تعريف الخدمات يدويًا', 'Define services manually'\)\], \['set-team', A\('وضع الفريق', 'Team mode'\)\], \['set-project', A\('المشروع', 'Project'\)\]/);
   assert.match(settings, /agentsSection\(\)/);
 });
 

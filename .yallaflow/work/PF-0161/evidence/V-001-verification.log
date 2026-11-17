@@ -1,0 +1,2230 @@
+TAP version 13
+# Subtest: init refuses a CLAUDE.md link to a file outside the project; the outside file and the project stay untouched
+ok 1 - init refuses a CLAUDE.md link to a file outside the project; the outside file and the project stay untouched
+  ---
+  duration_ms: 306.360012
+  type: 'test'
+  ...
+# Subtest: init refuses a dangling AGENTS.md link (it never creates the link's target)
+ok 2 - init refuses a dangling AGENTS.md link (it never creates the link's target)
+  ---
+  duration_ms: 196.367103
+  type: 'test'
+  ...
+# Subtest: init refuses a link that leaves the project through a linked folder, and a link to a folder
+ok 3 - init refuses a link that leaves the project through a linked folder, and a link to a folder
+  ---
+  duration_ms: 382.89516
+  type: 'test'
+  ...
+# Subtest: init refuses .yallaflow as a link (dangling or to an existing folder) and writes nothing
+ok 4 - init refuses .yallaflow as a link (dangling or to an existing folder) and writes nothing
+  ---
+  duration_ms: 410.349878
+  type: 'test'
+  ...
+# Subtest: still supported: CLAUDE.md linked to AGENTS.md and regular files (permissions kept); a link into another folder is refused
+ok 5 - still supported: CLAUDE.md linked to AGENTS.md and regular files (permissions kept); a link into another folder is refused
+  ---
+  duration_ms: 967.121593
+  type: 'test'
+  ...
+# Subtest: agent setup and agent refresh refuse an unsafe link; status explains it
+ok 6 - agent setup and agent refresh refuse an unsafe link; status explains it
+  ---
+  duration_ms: 429.629738
+  type: 'test'
+  ...
+# Subtest: the init rollback restores only the recorded real file, never through a link that appeared later
+ok 7 - the init rollback restores only the recorded real file, never through a link that appeared later
+  ---
+  duration_ms: 13.274409
+  type: 'test'
+  ...
+# Subtest: the agent contract .yallaflow/AGENT.md is managed the same way: no write through a link or a linked .yallaflow
+ok 8 - the agent contract .yallaflow/AGENT.md is managed the same way: no write through a link or a linked .yallaflow
+  ---
+  duration_ms: 726.457309
+  type: 'test'
+  ...
+# Subtest: a failed write leaves no temporary file behind
+ok 9 - a failed write leaves no temporary file behind
+  ---
+  duration_ms: 248.834002
+  type: 'test'
+  ...
+# Subtest: AC-101: setup creates the provider file, or appends the block leaving existing content byte-for-byte
+ok 10 - AC-101: setup creates the provider file, or appends the block leaving existing content byte-for-byte
+  ---
+  duration_ms: 578.570596
+  type: 'test'
+  ...
+# Subtest: AC-102/AC-104: setup is idempotent and --dry-run writes nothing
+ok 11 - AC-102/AC-104: setup is idempotent and --dry-run writes nothing
+  ---
+  duration_ms: 961.693065
+  type: 'test'
+  ...
+# Subtest: AC-103: a hand-edited block is refused without --preserve-existing, then kept verbatim with it
+ok 12 - AC-103: a hand-edited block is refused without --preserve-existing, then kept verbatim with it
+  ---
+  duration_ms: 1077.454935
+  type: 'test'
+  ...
+# Subtest: AC-105/AC-106: status reads state from markers; refresh updates only unmodified outdated blocks and never downgrades
+ok 13 - AC-105/AC-106: status reads state from markers; refresh updates only unmodified outdated blocks and never downgrades
+  ---
+  duration_ms: 1820.408943
+  type: 'test'
+  ...
+# Subtest: AC-105: a broken block or another provider's block is reported, never rewritten
+ok 14 - AC-105: a broken block or another provider's block is reported, never rewritten
+  ---
+  duration_ms: 207.856282
+  type: 'test'
+  ...
+# Subtest: AC-107: provider blocks point to AGENT.md and never restate its rules
+ok 15 - AC-107: provider blocks point to AGENT.md and never restate its rules
+  ---
+  duration_ms: 1.42865
+  type: 'test'
+  ...
+# Subtest: AC-108: provider knowledge stays in src/agent and the agent command surface
+ok 16 - AC-108: provider knowledge stays in src/agent and the agent command surface
+  ---
+  duration_ms: 109.53961
+  type: 'test'
+  ...
+# Subtest: bootstrap files are classified as repository-root projections; help never writes
+ok 17 - bootstrap files are classified as repository-root projections; help never writes
+  ---
+  duration_ms: 679.789379
+  type: 'test'
+  ...
+# Subtest: versions, forbidden modes, ACP normalization, and API keys stripped from the adapter env
+ok 18 - versions, forbidden modes, ACP normalization, and API keys stripped from the adapter env
+  ---
+  duration_ms: 7.948835
+  type: 'test'
+  ...
+# Subtest: detection: adapter missing, unsupported version, and ready
+ok 19 - detection: adapter missing, unsupported version, and ready
+  ---
+  duration_ms: 86.848373
+  type: 'test'
+  ...
+# Subtest: codex: start, stream, follow-up, permissions (allow, deny, timeout), one session per checkout, no activation
+ok 20 - codex: start, stream, follow-up, permissions (allow, deny, timeout), one session per checkout, no activation
+  ---
+  duration_ms: 5823.630126
+  type: 'test'
+  ...
+# Subtest: codex: cancel, crash, resume after a console restart, explicit activation through Core
+ok 21 - codex: cancel, crash, resume after a console restart, explicit activation through Core
+  ---
+  duration_ms: 9711.663089
+  type: 'test'
+  ...
+# Subtest: codex: ending a session while a permission is pending denies it and never crashes the console
+ok 22 - codex: ending a session while a permission is pending denies it and never crashes the console
+  ---
+  duration_ms: 4974.580151
+  type: 'test'
+  ...
+# Subtest: codex: a non-subscription login is refused and no session starts
+ok 23 - codex: a non-subscription login is refused and no session starts
+  ---
+  duration_ms: 4787.321471
+  type: 'test'
+  ...
+# Subtest: security: opt-in, token, Origin, content type, read-only, unsupported controls
+ok 24 - security: opt-in, token, Origin, content type, read-only, unsupported controls
+  ---
+  duration_ms: 425.223245
+  type: 'test'
+  ...
+# Subtest: security review regressions: start race, modes, symlinks
+ok 25 - security review regressions: start race, modes, symlinks
+  ---
+  duration_ms: 8750.350116
+  type: 'test'
+  ...
+# Subtest: codex: an adapter that cannot be spawned fails the start promptly and frees the checkout
+ok 26 - codex: an adapter that cannot be spawned fails the start promptly and frees the checkout
+  ---
+  duration_ms: 4268.411403
+  type: 'test'
+  ...
+# Subtest: stabilization: Allow for session is session-scoped only; nothing persists or carries to another session
+ok 27 - stabilization: Allow for session is session-scoped only; nothing persists or carries to another session
+  ---
+  duration_ms: 4603.828319
+  type: 'test'
+  ...
+# Subtest: stabilization: ending a Codex session ends what it started, and an incomplete cleanup is never reported as a clean stop
+ok 28 - stabilization: ending a Codex session ends what it started, and an incomplete cleanup is never reported as a clean stop
+  ---
+  duration_ms: 7989.228945
+  type: 'test'
+  ...
+# Subtest: stabilization: one agent console per checkout across separate console processes
+ok 29 - stabilization: one agent console per checkout across separate console processes
+  ---
+  duration_ms: 4727.374525
+  type: 'test'
+  ...
+# Subtest: stabilization: a directory swapped for a link after the check cannot redirect a local write
+ok 30 - stabilization: a directory swapped for a link after the check cannot redirect a local write
+  ---
+  duration_ms: 5.310582
+  type: 'test'
+  ...
+# Subtest: stabilization review: hard links, End while starting, overlapping lock claims, crash cleanup
+ok 31 - stabilization review: hard links, End while starting, overlapping lock claims, crash cleanup
+  ---
+  duration_ms: 2606.447209
+  type: 'test'
+  ...
+# Subtest: CLI: agents detect is read-only; console flag combinations are validated
+ok 32 - CLI: agents detect is read-only; console flag combinations are validated
+  ---
+  duration_ms: 1227.620258
+  type: 'test'
+  ...
+# Subtest: claude (simulated): channel server registers, relays chat, replies, permissions, hooks; bridge token protected
+ok 33 - claude (simulated): channel server registers, relays chat, replies, permissions, hooks; bridge token protected
+  ---
+  duration_ms: 8489.924765
+  type: 'test'
+  ...
+# Subtest: claude (simulated): the channel waits for a console and reports undelivered replies honestly
+ok 34 - claude (simulated): the channel waits for a console and reports undelivered replies honestly
+  ---
+  duration_ms: 494.715752
+  type: 'test'
+  ...
+# Subtest: claude (simulated): bridge file, channel takeover, disconnect, bypass, nested workspaces
+ok 35 - claude (simulated): bridge file, channel takeover, disconnect, bypass, nested workspaces
+  ---
+  duration_ms: 8197.425649
+  type: 'test'
+  ...
+# Subtest: claude (simulated): agents claude-files writes git-ignored launch files
+ok 36 - claude (simulated): agents claude-files writes git-ignored launch files
+  ---
+  duration_ms: 474.256725
+  type: 'test'
+  ...
+# Subtest: review: a stale bridge file pointing at another listener receives no token and no data
+ok 37 - review: a stale bridge file pointing at another listener receives no token and no data
+  ---
+  duration_ms: 1593.382737
+  type: 'test'
+  ...
+# Subtest: review: Claude detection runs only after opt-in; a failed Claude enable leaves no lock or bridge file
+ok 38 - review: Claude detection runs only after opt-in; a failed Claude enable leaves no lock or bridge file
+  ---
+  duration_ms: 696.98361
+  type: 'test'
+  ...
+# Subtest: Claude Team accounts get one plain note that does not block
+ok 39 - Claude Team accounts get one plain note that does not block
+  ---
+  duration_ms: 27.094651
+  type: 'test'
+  ...
+# Subtest: a blocked channel: the check goes out once, is never answered, and the console offers Terminal Mode without claiming a drop
+ok 40 - a blocked channel: the check goes out once, is never answered, and the console offers Terminal Mode without claiming a drop
+  ---
+  duration_ms: 106.403315
+  type: 'test'
+  ...
+# Subtest: a valid channel: only the matching acknowledgment enables direct messaging
+ok 41 - a valid channel: only the matching acknowledgment enables direct messaging
+  ---
+  duration_ms: 94.061527
+  type: 'test'
+  ...
+# Subtest: the check waits for a served permission mode and is sent once
+ok 42 - the check waits for a served permission mode and is sent once
+  ---
+  duration_ms: 1.994593
+  type: 'test'
+  ...
+# Subtest: a late acknowledgment still verifies the same connection
+ok 43 - a late acknowledgment still verifies the same connection
+  ---
+  duration_ms: 97.558699
+  type: 'test'
+  ...
+# Subtest: reconnection: a new connection is checked again, an old acknowledgment is ignored, and nothing is resent
+ok 44 - reconnection: a new connection is checked again, an old acknowledgment is ignored, and nothing is resent
+  ---
+  duration_ms: 7.467609
+  type: 'test'
+  ...
+# Subtest: multiple messages: each chat id has its own state, and only evidence naming it moves it
+ok 45 - multiple messages: each chat id has its own state, and only evidence naming it moves it
+  ---
+  duration_ms: 125.954276
+  type: 'test'
+  ...
+# Subtest: Terminal Mode: a copied message is never sent through the channel, even after the channel verifies later
+ok 46 - Terminal Mode: a copied message is never sent through the channel, even after the channel verifies later
+  ---
+  duration_ms: 187.982464
+  type: 'test'
+  ...
+# Subtest: session isolation: hooks of another session are ignored unless they prove they are this console's session
+ok 47 - session isolation: hooks of another session are ignored unless they prove they are this console's session
+  ---
+  duration_ms: 10.599656
+  type: 'test'
+  ...
+# Subtest: Terminal Mode monitoring works with no channel at all: hooks reach the console, are tied to the session, and name the pasted message
+ok 48 - Terminal Mode monitoring works with no channel at all: hooks reach the console, are tied to the session, and name the pasted message
+  ---
+  duration_ms: 7216.5792
+  type: 'test'
+  ...
+# Subtest: the launch files ask for SessionEnd hooks and let the channel's own two tools run without a prompt
+ok 49 - the launch files ask for SessionEnd hooks and let the channel's own two tools run without a prompt
+  ---
+  duration_ms: 2.028849
+  type: 'test'
+  ...
+# Subtest: claude (simulated): Unlink works when Claude Code is connected without a linked session, and it stays unlinked
+ok 50 - claude (simulated): Unlink works when Claude Code is connected without a linked session, and it stays unlinked
+  ---
+  duration_ms: 4598.572313
+  type: 'test'
+  ...
+# Subtest: claude (simulated): a project with an idle, unlinked Claude Code connection can be removed directly
+ok 51 - claude (simulated): a project with an idle, unlinked Claude Code connection can be removed directly
+  ---
+  duration_ms: 482.727711
+  type: 'test'
+  ...
+# Subtest: stopFrom: a usage limit is recognised with its retry time; other stops keep their reason
+ok 52 - stopFrom: a usage limit is recognised with its retry time; other stops keep their reason
+  ---
+  duration_ms: 4.898015
+  type: 'test'
+  ...
+# Subtest: codex: a usage-limit turn is a stop with its retry time, kept after End and across a console restart
+ok 53 - codex: a usage-limit turn is a stop with its retry time, kept after End and across a console restart
+  ---
+  duration_ms: 5256.09955
+  type: 'test'
+  ...
+# Subtest: codex: a crash and a plain End are recorded as such
+ok 54 - codex: a crash and a plain End are recorded as such
+  ---
+  duration_ms: 4719.470626
+  type: 'test'
+  ...
+# Subtest: UI: a live Codex usage limit offers Claude Code and a terminal message, not Codex again
+ok 55 - UI: a live Codex usage limit offers Claude Code and a terminal message, not Codex again
+  ---
+  duration_ms: 8.277738
+  type: 'test'
+  ...
+# Subtest: UI: a session started after the stop (the switch itself) clears the card
+ok 56 - UI: a session started after the stop (the switch itself) clears the card
+  ---
+  duration_ms: 2.722708
+  type: 'test'
+  ...
+# Subtest: UI: a message sent after the stop clears the card; another item never shows it
+ok 57 - UI: a message sent after the stop clears the card; another item never shows it
+  ---
+  duration_ms: 10.198175
+  type: 'test'
+  ...
+# Subtest: UI: with no session, the last recorded stop of this item is offered, including the same agent; Arabic too
+ok 58 - UI: with no session, the last recorded stop of this item is offered, including the same agent; Arabic too
+  ---
+  duration_ms: 9.0741
+  type: 'test'
+  ...
+# Subtest: UI: only ready providers are offered
+ok 59 - UI: only ready providers are offered
+  ---
+  duration_ms: 3.172461
+  type: 'test'
+  ...
+# Subtest: UI: switching ends Codex first, connects Claude, and prepares (never sends) the continue message
+ok 60 - UI: switching ends Codex first, connects Claude, and prepares (never sends) the continue message
+  ---
+  duration_ms: 7.791525
+  type: 'test'
+  ...
+# Subtest: UI: a failed End stops the switch; nothing else starts
+ok 61 - UI: a failed End stops the switch; nothing else starts
+  ---
+  duration_ms: 4.985662
+  type: 'test'
+  ...
+# Subtest: UI: the item lists which agent worked on it and how each session stopped
+ok 62 - UI: the item lists which agent worked on it and how each session stopped
+  ---
+  duration_ms: 4.4392
+  type: 'test'
+  ...
+# Subtest: a new workspace gets a versioned, current agent contract and no warnings
+ok 63 - a new workspace gets a versioned, current agent contract and no warnings
+  ---
+  duration_ms: 987.031554
+  type: 'test'
+  ...
+# Subtest: an unmodified v0.3.5 AGENT.md is detected read-only and replaced only by refresh
+ok 64 - an unmodified v0.3.5 AGENT.md is detected read-only and replaced only by refresh
+  ---
+  duration_ms: 1197.59921
+  type: 'test'
+  ...
+# Subtest: an unmodified v0.1–v0.3.4 AGENT.md is detected read-only and replaced only by refresh
+ok 65 - an unmodified v0.1–v0.3.4 AGENT.md is detected read-only and replaced only by refresh
+  ---
+  duration_ms: 1282.827385
+  type: 'test'
+  ...
+# Subtest: a customized pre-v0.3.6 AGENT.md is never silently replaced; --preserve-existing keeps it verbatim
+ok 66 - a customized pre-v0.3.6 AGENT.md is never silently replaced; --preserve-existing keeps it verbatim
+  ---
+  duration_ms: 807.630962
+  type: 'test'
+  ...
+# Subtest: an outdated managed block is updated in place; content outside the block is untouched
+ok 67 - an outdated managed block is updated in place; content outside the block is untouched
+  ---
+  duration_ms: 638.358567
+  type: 'test'
+  ...
+# Subtest: hand edits inside the managed block are detected and preserved, never overwritten
+ok 68 - hand edits inside the managed block are detected and preserved, never overwritten
+  ---
+  duration_ms: 579.594074
+  type: 'test'
+  ...
+# Subtest: a contract from a newer YallaFlow is not downgraded
+ok 69 - a contract from a newer YallaFlow is not downgraded
+  ---
+  duration_ms: 392.747172
+  type: 'test'
+  ...
+# Subtest: a missing AGENT.md is recreated by refresh
+ok 70 - a missing AGENT.md is recreated by refresh
+  ---
+  duration_ms: 480.83983
+  type: 'test'
+  ...
+# Subtest: agent contract (v2+) teaches scope-required direct commands
+ok 71 - agent contract (v2+) teaches scope-required direct commands
+  ---
+  duration_ms: 3.178909
+  type: 'test'
+  ...
+# Subtest: a v1 managed contract is reported outdated, read-only, by agent status, status, and doctor
+ok 72 - a v1 managed contract is reported outdated, read-only, by agent status, status, and doctor
+  ---
+  duration_ms: 1407.387129
+  type: 'test'
+  ...
+# Subtest: refresh upgrades a v1 block to the installed contract in place, preserves custom instructions, and is idempotent
+ok 73 - refresh upgrades a v1 block to the installed contract in place, preserves custom instructions, and is idempotent
+  ---
+  duration_ms: 777.999817
+  type: 'test'
+  ...
+# Subtest: a hand-edited v1 block is still never overwritten without --preserve-existing
+ok 74 - a hand-edited v1 block is still never overwritten without --preserve-existing
+  ---
+  duration_ms: 657.785897
+  type: 'test'
+  ...
+# Subtest: the installed CLI refuses to downgrade a newer contract
+ok 75 - the installed CLI refuses to downgrade a newer contract
+  ---
+  duration_ms: 546.20458
+  type: 'test'
+  ...
+# Subtest: agent contract (v3+) teaches reconciliation, immutable history, and state ownership
+ok 76 - agent contract (v3+) teaches reconciliation, immutable history, and state ownership
+  ---
+  duration_ms: 1.519067
+  type: 'test'
+  ...
+# Subtest: a real v0.3.6 (v2) managed block upgrades to the installed contract in place and keeps project text
+ok 77 - a real v0.3.6 (v2) managed block upgrades to the installed contract in place and keeps project text
+  ---
+  duration_ms: 704.315334
+  type: 'test'
+  ...
+# Subtest: agent contract v4+ teaches requirement identity, convergence, and change impact
+ok 78 - agent contract v4+ teaches requirement identity, convergence, and change impact
+  ---
+  duration_ms: 0.803205
+  type: 'test'
+  ...
+# Subtest: a real v0.3.7 (v3) managed block upgrades to the current contract in place and keeps project text
+ok 79 - a real v0.3.7 (v3) managed block upgrades to the current contract in place and keeps project text
+  ---
+  duration_ms: 738.035622
+  type: 'test'
+  ...
+# Subtest: v0.3.9: agent contract v5 teaches Brownfield onboarding, the app-code vs read-only distinction, documents, NEEDS CARE, and Git-free freshness
+ok 80 - v0.3.9: agent contract v5 teaches Brownfield onboarding, the app-code vs read-only distinction, documents, NEEDS CARE, and Git-free freshness
+  ---
+  duration_ms: 1.466206
+  type: 'test'
+  ...
+# Subtest: v0.3.9: a real v0.3.8 (v4) managed block is reported outdated, never rewritten on read, and upgrades to v5 only on explicit refresh
+ok 81 - v0.3.9: a real v0.3.8 (v4) managed block is reported outdated, never rewritten on read, and upgrades to v5 only on explicit refresh
+  ---
+  duration_ms: 2413.70505
+  type: 'test'
+  ...
+# Subtest: the first terminal app on PATH is used, in the project folder, without a shell
+ok 82 - the first terminal app on PATH is used, in the project folder, without a shell
+  ---
+  duration_ms: 13.214195
+  type: 'test'
+  ...
+# Subtest: no terminal, a failed start or a missing folder is reported so the copy fallback shows
+ok 83 - no terminal, a failed start or a missing folder is reported so the copy fallback shows
+  ---
+  duration_ms: 8.050851
+  type: 'test'
+  ...
+# Subtest: macOS uses Terminal through osascript with the folder and command quoted
+ok 84 - macOS uses Terminal through osascript with the folder and command quoted
+  ---
+  duration_ms: 1.041586
+  type: 'test'
+  ...
+# Subtest: the server builds the command itself and needs Claude Code on for the project
+ok 85 - the server builds the command itself and needs Claude Code on for the project
+  ---
+  duration_ms: 0.432187
+  type: 'test'
+  ...
+# Subtest: the chat opens on the chosen agent, shows no account warning and connects through a terminal
+ok 86 - the chat opens on the chosen agent, shows no account warning and connects through a terminal
+  ---
+  duration_ms: 3.864979
+  type: 'test'
+  ...
+# Subtest: simulated Windows: PATH is read whatever its case, and PATHEXT decides the extensions tried
+ok 87 - simulated Windows: PATH is read whatever its case, and PATHEXT decides the extensions tried
+  ---
+  duration_ms: 5.923981
+  type: 'test'
+  ...
+# Subtest: simulated Windows: a native .exe and an npm .cmd shim are found; folders with spaces and Arabic names work
+ok 88 - simulated Windows: a native .exe and an npm .cmd shim are found; folders with spaces and Arabic names work
+  ---
+  duration_ms: 11.090407
+  type: 'test'
+  ...
+# Subtest: POSIX lookup is unchanged: an execute bit is required and the bare name is used
+ok 89 - POSIX lookup is unchanged: an execute bit is required and the bare name is used
+  ---
+  duration_ms: 22.342821
+  type: 'test'
+  ...
+# Subtest: simulated Windows: an npm shim is started as its target with node, never through a shell
+ok 90 - simulated Windows: an npm shim is started as its target with node, never through a shell
+  ---
+  duration_ms: 8.343124
+  type: 'test'
+  ...
+# Subtest: simulated Windows: a broken or unknown command script is refused with a plain reason, not run by a shell
+ok 91 - simulated Windows: a broken or unknown command script is refused with a plain reason, not run by a shell
+  ---
+  duration_ms: 7.779515
+  type: 'test'
+  ...
+# Subtest: a program that cannot be started is an answer with its cause, never a crash
+ok 92 - a program that cannot be started is an answer with its cause, never a crash
+  ---
+  duration_ms: 25.743845
+  type: 'test'
+  ...
+# Subtest: providers are independent: a missing or broken Claude Code never makes Codex unavailable, and the reverse
+ok 93 - providers are independent: a missing or broken Claude Code never makes Codex unavailable, and the reverse
+  ---
+  duration_ms: 368.490159
+  type: 'test'
+  ...
+# Subtest: simulated Windows: the terminal is a new PowerShell window in the project folder; the folder is never in the command text
+ok 94 - simulated Windows: the terminal is a new PowerShell window in the project folder; the folder is never in the command text
+  ---
+  duration_ms: 3.446625
+  type: 'test'
+  ...
+# Subtest: simulated Windows: hook and launch commands use double quotes and forward slashes
+ok 95 - simulated Windows: hook and launch commands use double quotes and forward slashes
+  ---
+  duration_ms: 6.992942
+  type: 'test'
+  ...
+# Subtest: no shell anywhere in agent discovery and launch; an unreachable console is said in plain words
+ok 96 - no shell anywhere in agent discovery and launch; an unreachable console is said in plain words
+  ---
+  duration_ms: 14.67691
+  type: 'test'
+  ...
+# Subtest: a merge-collided work item is listed as invalid and never hides the project
+ok 97 - a merge-collided work item is listed as invalid and never hides the project
+  ---
+  duration_ms: 2770.860205
+  type: 'test'
+  ...
+# Subtest: the exact Vult message: a ledger pinned to another registry version
+ok 98 - the exact Vult message: a ledger pinned to another registry version
+  ---
+  duration_ms: 1116.604187
+  type: 'test'
+  ...
+# Subtest: an unreadable meta.yaml is reported, not fatal
+ok 99 - an unreadable meta.yaml is reported, not fatal
+  ---
+  duration_ms: 1313.589576
+  type: 'test'
+  ...
+# Subtest: zero work items: no completion is claimed
+ok 100 - zero work items: no completion is claimed
+  ---
+  duration_ms: 1083.367764
+  type: 'test'
+  ...
+# Subtest: console: an invalid item is a data warning in a 200 snapshot, not a failed project
+ok 101 - console: an invalid item is a data warning in a 200 snapshot, not a failed project
+  ---
+  duration_ms: 2658.413129
+  type: 'test'
+  ...
+# Subtest: console UI: the theme button is matched by its own attribute, never by <html data-theme>
+ok 102 - console UI: the theme button is matched by its own attribute, never by <html data-theme>
+  ---
+  duration_ms: 40.903648
+  type: 'test'
+  ...
+# Subtest: work-item actions run the canonical commands: same records as the CLI, Core refusals passed through
+ok 103 - work-item actions run the canonical commands: same records as the CLI, Core refusals passed through
+  ---
+  duration_ms: 4956.130417
+  type: 'test'
+  ...
+# Subtest: request edits use full text before work starts and refuse stale or invalid saves
+ok 104 - request edits use full text before work starts and refuse stale or invalid saves
+  ---
+  duration_ms: 2965.948458
+  type: 'test'
+  ...
+# Subtest: action input is validated and values never become options
+ok 105 - action input is validated and values never become options
+  ---
+  duration_ms: 935.427415
+  type: 'test'
+  ...
+# Subtest: security: token, Origin, content type and read-only consoles guard every action and decision
+ok 106 - security: token, Origin, content type and read-only consoles guard every action and decision
+  ---
+  duration_ms: 845.052868
+  type: 'test'
+  ...
+# Subtest: gate decisions: material shown first, exact confirmation, stale and duplicate protection, console provenance
+ok 107 - gate decisions: material shown first, exact confirmation, stale and duplicate protection, console provenance
+  ---
+  duration_ms: 6281.202746
+  type: 'test'
+  ...
+# Subtest: CLI decisions are recorded exactly as before (no provenance), and a bad provenance channel records nothing
+ok 108 - CLI decisions are recorded exactly as before (no provenance), and a bad provenance channel records nothing
+  ---
+  duration_ms: 4320.013384
+  type: 'test'
+  ...
+# Subtest: the Agent Workspace never reaches gate decisions, and agents never inherit the provenance channel
+ok 109 - the Agent Workspace never reaches gate decisions, and agents never inherit the provenance channel
+  ---
+  duration_ms: 5.66796
+  type: 'test'
+  ...
+# Subtest: review findings: re-deciding after "request changes", request ids per gate, malformed bodies, provenance limits, strict doctor
+ok 110 - review findings: re-deciding after "request changes", request ids per gate, malformed bodies, provenance limits, strict doctor
+  ---
+  duration_ms: 4680.13448
+  type: 'test'
+  ...
+# Subtest: revision attachments preserve bytes, deduplicate retries and respect request-edit and HTTP guards
+ok 111 - revision attachments preserve bytes, deduplicate retries and respect request-edit and HTTP guards
+  ---
+  duration_ms: 3251.756333
+  type: 'test'
+  ...
+# Subtest: revision upload rechecks eligibility in the CLI if work starts after its queued check
+ok 112 - revision upload rechecks eligibility in the CLI if work starts after its queued check
+  ---
+  duration_ms: 970.600497
+  type: 'test'
+  ...
+# Subtest: gate decisions: a required gate that was never requested can be decided while the item waits on it
+ok 113 - gate decisions: a required gate that was never requested can be decided while the item waits on it
+  ---
+  duration_ms: 2823.258206
+  type: 'test'
+  ...
+# Subtest: a refused send keeps its error after the agent state reloads
+ok 114 - a refused send keeps its error after the agent state reloads
+  ---
+  duration_ms: 7.903881
+  type: 'test'
+  ...
+# Subtest: a successful send reports success and leaves no error
+ok 115 - a successful send reports success and leaves no error
+  ---
+  duration_ms: 3.354246
+  type: 'test'
+  ...
+# Subtest: a connected Claude Code that is still being checked offers Copy for terminal, not Send
+ok 116 - a connected Claude Code that is still being checked offers Copy for terminal, not Send
+  ---
+  duration_ms: 12.56842
+  type: 'test'
+  ...
+# Subtest: an unverified connection is Terminal mode: one state, no error, no jargon
+ok 117 - an unverified connection is Terminal mode: one state, no error, no jargon
+  ---
+  duration_ms: 7.898816
+  type: 'test'
+  ...
+# Subtest: once the connection check is acknowledged the panel offers Send
+ok 118 - once the connection check is acknowledged the panel offers Send
+  ---
+  duration_ms: 3.032915
+  type: 'test'
+  ...
+# Subtest: the Arabic panel says the same states
+ok 119 - the Arabic panel says the same states
+  ---
+  duration_ms: 9.975214
+  type: 'test'
+  ...
+# Subtest: each message shows its own state, by chat id, in both languages
+ok 120 - each message shows its own state, by chat id, in both languages
+  ---
+  duration_ms: 12.333839
+  type: 'test'
+  ...
+# Subtest: Copy for terminal copies inside the click and records the message without sending it
+ok 121 - Copy for terminal copies inside the click and records the message without sending it
+  ---
+  duration_ms: 0.68869
+  type: 'test'
+  ...
+# Subtest: a failed send puts the typed message back
+ok 122 - a failed send puts the typed message back
+  ---
+  duration_ms: 1.052669
+  type: 'test'
+  ...
+# Subtest: agent replies use formatted content while user messages stay literal
+ok 123 - agent replies use formatted content while user messages stay literal
+  ---
+  duration_ms: 5.009553
+  type: 'test'
+  ...
+# Subtest: approve from the console: Core records it, the facts become project memory, and the note says where it came from
+ok 124 - approve from the console: Core records it, the facts become project memory, and the note says where it came from
+  ---
+  duration_ms: 3228.029439
+  type: 'test'
+  ...
+# Subtest: request changes from the console, then a revised draft needs a fresh review
+ok 125 - request changes from the console, then a revised draft needs a fresh review
+  ---
+  duration_ms: 3673.740126
+  type: 'test'
+  ...
+# Subtest: refused with nothing recorded: no confirmation, no note, a CLI decision in between, a double submit, read-only
+ok 126 - refused with nothing recorded: no confirmation, no note, a CLI decision in between, a double submit, read-only
+  ---
+  duration_ms: 4719.125278
+  type: 'test'
+  ...
+# Subtest: a draft with gaps is approved only with the second acknowledgment; it is never blocked
+ok 127 - a draft with gaps is approved only with the second acknowledgment; it is never blocked
+  ---
+  duration_ms: 2303.066431
+  type: 'test'
+  ...
+# Subtest: structured console provenance stays off the baseline gate, and is refused before anything is promoted
+ok 128 - structured console provenance stays off the baseline gate, and is refused before anything is promoted
+  ---
+  duration_ms: 2190.393139
+  type: 'test'
+  ...
+# Subtest: the review form: both actions wait for the note and the tick; gaps add a named second tick
+ok 129 - the review form: both actions wait for the note and the tick; gaps add a named second tick
+  ---
+  duration_ms: 33.358333
+  type: 'test'
+  ...
+# Subtest: the page sends the digest it showed, and never decides in a read-only console
+ok 130 - the page sends the digest it showed, and never decides in a read-only console
+  ---
+  duration_ms: 0.693449
+  type: 'test'
+  ...
+# Subtest: a baseline in discovery is in progress at Understand, not a new request at the gate
+ok 131 - a baseline in discovery is in progress at Understand, not a new request at the gate
+  ---
+  duration_ms: 118.394094
+  type: 'test'
+  ...
+# Subtest: a drafted baseline waits for the developer; approval finishes it
+ok 132 - a drafted baseline waits for the developer; approval finishes it
+  ---
+  duration_ms: 1091.800229
+  type: 'test'
+  ...
+# Subtest: the console offers an explicit approval for a drafted baseline and never "advance"
+ok 133 - the console offers an explicit approval for a drafted baseline and never "advance"
+  ---
+  duration_ms: 25.031084
+  type: 'test'
+  ...
+# Subtest: the folder chooser labels YallaFlow projects, existing code (with its stack) and empty folders from names only
+ok 134 - the folder chooser labels YallaFlow projects, existing code (with its stack) and empty folders from names only
+  ---
+  duration_ms: 126.707811
+  type: 'test'
+  ...
+# Subtest: preview: an existing Laravel codebase shows its stack and the exact file plan, without running Git
+ok 135 - preview: an existing Laravel codebase shows its stack and the exact file plan, without running Git
+  ---
+  duration_ms: 91.282828
+  type: 'test'
+  ...
+# Subtest: connect: Core init after the confirmed preview; existing content kept; registered; understanding is the next step
+ok 136 - connect: Core init after the confirmed preview; existing content kept; registered; understanding is the next step
+  ---
+  duration_ms: 1258.733795
+  type: 'test'
+  ...
+# Subtest: connect refuses unsafe folders and writes nothing: hand-edited bootstrap, nested project, outside home, hidden, home itself
+ok 137 - connect refuses unsafe folders and writes nothing: hand-edited bootstrap, nested project, outside home, hidden, home itself
+  ---
+  duration_ms: 170.019958
+  type: 'test'
+  ...
+# Subtest: an empty folder becomes a Greenfield project that is ready for work
+ok 138 - an empty folder becomes a Greenfield project that is ready for work
+  ---
+  duration_ms: 751.61121
+  type: 'test'
+  ...
+# Subtest: new folder for a project location: one safe name, inside home, never reused
+ok 139 - new folder for a project location: one safe name, inside home, never reused
+  ---
+  duration_ms: 70.635266
+  type: 'test'
+  ...
+# Subtest: a read-only console neither previews, connects nor creates folders
+ok 140 - a read-only console neither previews, connects nor creates folders
+  ---
+  duration_ms: 86.639287
+  type: 'test'
+  ...
+# Subtest: connect never writes through a CLAUDE.md or AGENTS.md link that leaves the folder (even a dangling one)
+ok 141 - connect never writes through a CLAUDE.md or AGENTS.md link that leaves the folder (even a dangling one)
+  ---
+  duration_ms: 104.983762
+  type: 'test'
+  ...
+# YallaFlow foundation CLI
+# Give AI your project, not just your prompt.
+# Usage:
+#   yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]
+#   yallaflow start [request]
+#   yallaflow start --keep-active -- <request>
+#   yallaflow activate <work-id>
+#   yallaflow request --help
+#   yallaflow intake <file> [<file> ...] [--title TITLE]
+#   yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT] [--before-start]
+#   yallaflow intake ticket <payload-file|ticket-ref> [--provider github|jira|azure-devops] [--work <work-id>] [--reason TEXT] [--fetch [--attachments]] [--attachment <file>]... [--title TITLE] [--max-comments N]
+#   yallaflow source --help
+#   yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]
+#   yallaflow baseline --help
+#   yallaflow guide [work-id]
+#   yallaflow ready [work-id]
+#   yallaflow skill <skill-id> [--work <work-id>]
+#   yallaflow checkpoint --help
+#   yallaflow question --help
+#   yallaflow knowledge --help
+#   yallaflow requirement --help
+#   yallaflow convergence --help
+#   yallaflow impact --help
+#   yallaflow context --help
+#   yallaflow upgrade status|plan
+#   yallaflow brief
+#   yallaflow inspect
+#   yallaflow limitation --help
+#   yallaflow agent --help
+#   yallaflow decompose --help
+#   yallaflow progress <parent-id>
+#   yallaflow next <parent-id>
+#   yallaflow approve <work-id> --stage GATE [--note TEXT]
+#   yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]
+#   yallaflow handoff [work-id]
+#   yallaflow feature <title> --scope SCOPE
+#   yallaflow bug <title> --scope SCOPE
+#   yallaflow investigate <title> --scope SCOPE
+#   yallaflow change <title> --scope SCOPE
+#   yallaflow refactor <title> --scope SCOPE
+#   yallaflow release <title> --scope SCOPE
+#   yallaflow purpose --help
+#   yallaflow finish [work-id] [--verbose]
+#   yallaflow qc --help
+#   yallaflow demo --help
+#   yallaflow shared --help
+#   yallaflow status
+#   yallaflow snapshot [--json]
+#   yallaflow overview [--json]
+#   yallaflow runtime --help
+#   yallaflow new --help
+#   yallaflow history --help
+#   yallaflow console [--port N] [--no-open] [--project DIR]... [--read-only] [--agents]
+#   yallaflow agents detect
+#   yallaflow work show <work-id> [--json]
+#   yallaflow work hold|resume|close <work-id> ...  (lifecycle: on hold, closed without delivery)
+#   yallaflow resume [work-id]
+#   yallaflow doctor [--clear-lock]
+#   yallaflow advance [work-id]
+#   yallaflow verify [work-id] -- <executable> [args...]
+#   yallaflow verify [work-id] --shell "<command>"
+#   yallaflow verify [work-id] --script <path>
+#   yallaflow verify list [work-id]
+#   yallaflow reopen <work-id> --to implementation|verification|review --reason REASON
+#   yallaflow reopen <work-id> --reason REASON   (closed work)
+#   yallaflow --version
+# Subtest: start without new options behaves exactly as before (focus moves to the new item)
+ok 142 - start without new options behaves exactly as before (focus moves to the new item)
+  ---
+  duration_ms: 1548.935844
+  type: 'test'
+  ...
+# Subtest: parseStartArgs: new options only as leading tokens; anything else is the legacy request
+ok 143 - parseStartArgs: new options only as leading tokens; anything else is the legacy request
+  ---
+  duration_ms: 4.801664
+  type: 'test'
+  ...
+# Subtest: --keep-active never replaces unfinished active work; routing and checkpoints never move focus; activate does
+ok 144 - --keep-active never replaces unfinished active work; routing and checkpoints never move focus; activate does
+  ---
+  duration_ms: 1672.060819
+  type: 'test'
+  ...
+# Subtest: --keep-active never activates, even when no work item is active (owner decision)
+ok 145 - --keep-active never activates, even when no work item is active (owner decision)
+  ---
+  duration_ms: 1010.691617
+  type: 'test'
+  ...
+# Subtest: console create with nothing active leaves nothing active
+ok 146 - console create with nothing active leaves nothing active
+  ---
+  duration_ms: 1438.945483
+  type: 'test'
+  ...
+# Subtest: attachments report what YallaFlow could actually do with each file
+ok 147 - attachments report what YallaFlow could actually do with each file
+  ---
+  duration_ms: 3473.217828
+  type: 'test'
+  ...
+# Subtest: request IDs: a retried or concurrent request creates exactly one item, with an unverified console attestation
+ok 148 - request IDs: a retried or concurrent request creates exactly one item, with an unverified console attestation
+  ---
+  duration_ms: 1058.570082
+  type: 'test'
+  ...
+# Subtest: helpers: titles come from the user's words; file names are reduced safely
+ok 149 - helpers: titles come from the user's words; file names are reduced safely
+  ---
+  duration_ms: 0.667878
+  type: 'test'
+  ...
+# Subtest: POST guards: token, Origin, Host, content type, size, read-only, unknown routes
+ok 150 - POST guards: token, Origin, Host, content type, size, read-only, unknown routes
+  ---
+  duration_ms: 124.61186
+  type: 'test'
+  ...
+# Subtest: create: unclassified and classified items through Core; shell text stored verbatim; focus kept
+ok 151 - create: unclassified and classified items through Core; shell text stored verbatim; focus kept
+  ---
+  duration_ms: 2926.1984
+  type: 'test'
+  ...
+# Subtest: create: concurrent requests get distinct IDs; repeated ones never duplicate
+ok 152 - create: concurrent requests get distinct IDs; repeated ones never duplicate
+  ---
+  duration_ms: 2325.253591
+  type: 'test'
+  ...
+# Subtest: brownfield without approved understanding: Core refuses and nothing is created
+ok 153 - brownfield without approved understanding: Core refuses and nothing is created
+  ---
+  duration_ms: 280.055706
+  type: 'test'
+  ...
+# Subtest: attachments: preserved through intake, deduplicated on retry, refused safely, temp files removed, item kept
+ok 154 - attachments: preserved through intake, deduplicated on retry, refused safely, temp files removed, item kept
+  ---
+  duration_ms: 2454.03171
+  type: 'test'
+  ...
+# Subtest: an oversized upload is refused before it is stored
+ok 155 - an oversized upload is refused before it is stored
+  ---
+  duration_ms: 3691.22706
+  type: 'test'
+  ...
+# Subtest: review: requests starting with "-" keep their classification; "--help" is plain text
+ok 156 - review: requests starting with "-" keep their classification; "--help" is plain text
+  ---
+  duration_ms: 2040.7305
+  type: 'test'
+  ...
+# Subtest: review: two identical uploads at once store one copy; a long non-ASCII name is shortened, not leaked
+ok 157 - review: two identical uploads at once store one copy; a long non-ASCII name is shortened, not leaked
+  ---
+  duration_ms: 868.640299
+  type: 'test'
+  ...
+# Subtest: resume on a deferred item says how to activate it, and changes nothing
+ok 158 - resume on a deferred item says how to activate it, and changes nothing
+  ---
+  duration_ms: 482.188889
+  type: 'test'
+  ...
+# Subtest: Run Now: Start keeps its v1.4.2 calls; the manager records a one-task run; the inbox shows paths and the command; answering resolves the same request
+ok 159 - Run Now: Start keeps its v1.4.2 calls; the manager records a one-task run; the inbox shows paths and the command; answering resolves the same request
+  ---
+  duration_ms: 5461.289139
+  type: 'test'
+  ...
+# Subtest: restart: a task that was live becomes interrupted and nothing starts by itself; an unreadable store is reported and left alone
+ok 160 - restart: a task that was live becomes interrupted and nothing starts by itself; an unreadable store is reported and left alone
+  ---
+  duration_ms: 594.234091
+  type: 'test'
+  ...
+# Subtest: the Agents view is read-only and needs the token; without agents it reports disabled
+ok 161 - the Agents view is read-only and needs the token; without agents it reports disabled
+  ---
+  duration_ms: 382.347695
+  type: 'test'
+  ...
+# Subtest: Queue end to end: two items run one after the other through the real bridge; each ends its session only after YallaFlow shows DONE
+ok 162 - Queue end to end: two items run one after the other through the real bridge; each ends its session only after YallaFlow shows DONE
+  ---
+  duration_ms: 9013.054144
+  type: 'test'
+  ...
+# Subtest: execution routes: token, Origin and JSON are required; a read-only console refuses them
+ok 163 - execution routes: token, Origin and JSON are required; a read-only console refuses them
+  ---
+  duration_ms: 282.99822
+  type: 'test'
+  ...
+# Subtest: Parallel: two requests become two lanes (named after the project and lane) with their own agents running at the same time; a third lane is refused; Clean up refuses unmerged lanes
+ok 164 - Parallel: two requests become two lanes (named after the project and lane) with their own agents running at the same time; a third lane is refused; Clean up refuses unmerged lanes
+  ---
+  duration_ms: 8965.129694
+  type: 'test'
+  ...
+# Subtest: Review & Merge in the console: the first lane merges to MERGED & VERIFIED; the second conflicts and is sent back to its agent (reopened, started with the conflict instruction)
+ok 165 - Review & Merge in the console: the first lane merges to MERGED & VERIFIED; the second conflicts and is sent back to its agent (reopened, started with the conflict instruction)
+  ---
+  duration_ms: 22116.640748
+  type: 'test'
+  ...
+# Subtest: B1: the Agents settings form keeps its ticks across the live redraw until Save
+ok 166 - B1: the Agents settings form keeps its ticks across the live redraw until Save
+  ---
+  duration_ms: 6.343946
+  type: 'test'
+  ...
+# Subtest: B2: the wizard expands ~ and ~/… to the home folder, and explains a relative path
+ok 167 - B2: the wizard expands ~ and ~/… to the home folder, and explains a relative path
+  ---
+  duration_ms: 2.209188
+  type: 'test'
+  ...
+# Subtest: B3: the queue Start button names the chosen agent and follows the radio; the toast confirms it
+ok 168 - B3: the queue Start button names the chosen agent and follows the radio; the toast confirms it
+  ---
+  duration_ms: 1.013822
+  type: 'test'
+  ...
+# Subtest: B4: a usage limit is recognised in its provider wordings; an error stop leaves the task waiting for the developer
+ok 169 - B4: a usage limit is recognised in its provider wordings; an error stop leaves the task waiting for the developer
+  ---
+  duration_ms: 24.793971
+  type: 'test'
+  ...
+# Subtest: B4/I7: a stopped agent waits for the developer; a finished item's linked Claude Code session is not "working"
+ok 170 - B4/I7: a stopped agent waits for the developer; a finished item's linked Claude Code session is not "working"
+  ---
+  duration_ms: 9.294714
+  type: 'test'
+  ...
+# Subtest: B5: a queue whose next task waits for another session says so, with what to do
+ok 171 - B5: a queue whose next task waits for another session says so, with what to do
+  ---
+  duration_ms: 2.920892
+  type: 'test'
+  ...
+# Subtest: G1: a PHP module prerequisite is found only when `php -m` lists it; Laravel checks pdo_sqlite
+ok 172 - G1: a PHP module prerequisite is found only when `php -m` lists it; Laravel checks pdo_sqlite
+  ---
+  duration_ms: 174.540647
+  type: 'test'
+  ...
+# Subtest: G2: the Run page says where the agent request went
+ok 173 - G2: the Run page says where the agent request went
+  ---
+  duration_ms: 0.8636
+  type: 'test'
+  ...
+# Subtest: G3: an open request stays in the chat after its event was trimmed; a trimmed resolved request says its outcome
+ok 174 - G3: an open request stays in the chat after its event was trimmed; a trimmed resolved request says its outcome
+  ---
+  duration_ms: 33.376417
+  type: 'test'
+  ...
+# Subtest: G4: the Answer dialog shows each question with its text
+ok 175 - G4: the Answer dialog shows each question with its text
+  ---
+  duration_ms: 1.766592
+  type: 'test'
+  ...
+# Subtest: G5: work show carries the QC runs (additive) and the console opens only that item's report
+ok 176 - G5: work show carries the QC runs (additive) and the console opens only that item's report
+  ---
+  duration_ms: 1944.289787
+  type: 'test'
+  ...
+# Subtest: G6: the first hold or close explains the minimum version in the console's words
+ok 177 - G6: the first hold or close explains the minimum version in the console's words
+  ---
+  duration_ms: 0.818016
+  type: 'test'
+  ...
+# Subtest: work detail carries the baseline draft once it is drafted, and only for a baseline
+ok 178 - work detail carries the baseline draft once it is drafted, and only for a baseline
+  ---
+  duration_ms: 852.940914
+  type: 'test'
+  ...
+# Subtest: Review the draft shows the facts by area, what is unresolved and what was not inspected
+ok 179 - Review the draft shows the facts by area, what is unresolved and what was not inspected
+  ---
+  duration_ms: 20.486595
+  type: 'test'
+  ...
+# Subtest: the draft panel: nothing without a draft, no decision when read-only, folded once approved
+ok 180 - the draft panel: nothing without a draft, no decision when read-only, folded once approved
+  ---
+  duration_ms: 20.696148
+  type: 'test'
+  ...
+# Subtest: while a required step is open, the optional run step is not offered beside it
+ok 181 - while a required step is open, the optional run step is not offered beside it
+  ---
+  duration_ms: 9.147461
+  type: 'test'
+  ...
+# Subtest: once nothing required is left, the Overview card offers running the app, marked optional once
+ok 182 - once nothing required is left, the Overview card offers running the app, marked optional once
+  ---
+  duration_ms: 4.692951
+  type: 'test'
+  ...
+# Subtest: readiness counts a stack running outside YallaFlow as running
+ok 183 - readiness counts a stack running outside YallaFlow as running
+  ---
+  duration_ms: 56.640836
+  type: 'test'
+  ...
+# Subtest: a trusted service already running outside YallaFlow reads as running, with Start off and why
+ok 184 - a trusted service already running outside YallaFlow reads as running, with Start off and why
+  ---
+  duration_ms: 18.010989
+  type: 'test'
+  ...
+# Subtest: a stopped trusted service keeps Start; a foreign port is still warned about
+ok 185 - a stopped trusted service keeps Start; a foreign port is still warned about
+  ---
+  duration_ms: 8.599729
+  type: 'test'
+  ...
+# Subtest: the project control follows the state: Start when stopped, Stop when running, both when partly up
+ok 186 - the project control follows the state: Start when stopped, Stop when running, both when partly up
+  ---
+  duration_ms: 13.939463
+  type: 'test'
+  ...
+# Subtest: a service row offers one Start or Stop that follows its state; Restart only while it runs
+ok 187 - a service row offers one Start or Stop that follows its state; Restart only while it runs
+  ---
+  duration_ms: 10.182092
+  type: 'test'
+  ...
+# Subtest: a service waiting in the approval card has no second Review and trust on its row
+ok 188 - a service waiting in the approval card has no second Review and trust on its row
+  ---
+  duration_ms: 8.430632
+  type: 'test'
+  ...
+# Subtest: approving a stack that already runs outside YallaFlow is one action that starts nothing
+ok 189 - approving a stack that already runs outside YallaFlow is one action that starts nothing
+  ---
+  duration_ms: 9.602999
+  type: 'test'
+  ...
+# Subtest: a stopped service keeps Approve and start, and starting reports through Start project
+ok 190 - a stopped service keeps Approve and start, and starting reports through Start project
+  ---
+  duration_ms: 3.104799
+  type: 'test'
+  ...
+# Subtest: the understanding ask carries the first request, and it is forgotten once understanding is under way
+ok 191 - the understanding ask carries the first request, and it is forgotten once understanding is under way
+  ---
+  duration_ms: 17.141954
+  type: 'test'
+  ...
+# Subtest: the understanding line shows its step, facts so far, last activity and whether an agent is working
+ok 192 - the understanding line shows its step, facts so far, last activity and whether an agent is working
+  ---
+  duration_ms: 41.30438
+  type: 'test'
+  ...
+# Subtest: the review shows the brief first, with citations, an inferred tag, honest coverage, and the fact list folded beneath
+ok 193 - the review shows the brief first, with citations, an inferred tag, honest coverage, and the fact list folded beneath
+  ---
+  duration_ms: 48.247855
+  type: 'test'
+  ...
+# Subtest: a draft without a brief looks exactly as before
+ok 194 - a draft without a brief looks exactly as before
+  ---
+  duration_ms: 5.613066
+  type: 'test'
+  ...
+# Subtest: the page opens a cited fact and starts a change request from a line
+ok 195 - the page opens a cited fact and starts a change request from a line
+  ---
+  duration_ms: 1.838259
+  type: 'test'
+  ...
+# Subtest: on the Overview the brief cites project-memory facts and marks lines whose facts need care
+ok 196 - on the Overview the brief cites project-memory facts and marks lines whose facts need care
+  ---
+  duration_ms: 11.686298
+  type: 'test'
+  ...
+# Subtest: Start here: the own request first, then suggestions with their reason and facts; a click only fills Create work
+ok 197 - Start here: the own request first, then suggestions with their reason and facts; a click only fills Create work
+  ---
+  duration_ms: 14.960237
+  type: 'test'
+  ...
+# Subtest: suggestions that match existing work are hidden; the Workspace panel steps aside once other work exists
+ok 198 - suggestions that match existing work are hidden; the Workspace panel steps aside once other work exists
+  ---
+  duration_ms: 8.397087
+  type: 'test'
+  ...
+# Subtest: nothing reliable to suggest: a plain empty state and the own-task action; hidden in read-only and before approval
+ok 199 - nothing reliable to suggest: a plain empty state and the own-task action; hidden in read-only and before approval
+  ---
+  duration_ms: 33.523546
+  type: 'test'
+  ...
+# Subtest: the draft review lists the proposed first tasks, read-only
+ok 200 - the draft review lists the proposed first tasks, read-only
+  ---
+  duration_ms: 10.743542
+  type: 'test'
+  ...
+# Subtest: an approval is seen without a reload: the cached overview is read again until understanding is established
+ok 201 - an approval is seen without a reload: the cached overview is read again until understanding is established
+  ---
+  duration_ms: 0.6327
+  type: 'test'
+  ...
+# Subtest: a row is one select button plus an open arrow; nothing in the list navigates on a single click
+ok 202 - a row is one select button plus an open arrow; nothing in the list navigates on a single click
+  ---
+  duration_ms: 15.958128
+  type: 'test'
+  ...
+# Subtest: at home with nothing selected the footer says what to do; selecting makes the button act on that folder
+ok 203 - at home with nothing selected the footer says what to do; selecting makes the button act on that folder
+  ---
+  duration_ms: 6.330655
+  type: 'test'
+  ...
+# Subtest: with nothing selected inside a folder, the button acts on the open folder
+ok 204 - with nothing selected inside a folder, the button acts on the open folder
+  ---
+  duration_ms: 6.568003
+  type: 'test'
+  ...
+# Subtest: choosing and previewing use the selected folder
+ok 205 - choosing and previewing use the selected folder
+  ---
+  duration_ms: 14.904331
+  type: 'test'
+  ...
+# Subtest: keys: arrows move the selection, Enter or the forward arrow opens, the back arrow goes up
+ok 206 - keys: arrows move the selection, Enter or the forward arrow opens, the back arrow goes up
+  ---
+  duration_ms: 22.503174
+  type: 'test'
+  ...
+# Subtest: the path bar is the breadcrumb, with the typed path one click away
+ok 207 - the path bar is the breadcrumb, with the typed path one click away
+  ---
+  duration_ms: 7.533366
+  type: 'test'
+  ...
+# Subtest: the preview offers git init only for a folder with no Git repository, unticked
+ok 208 - the preview offers git init only for a folder with no Git repository, unticked
+  ---
+  duration_ms: 4.785016
+  type: 'test'
+  ...
+# Subtest: connect runs git init only when ticked, after the connect, with the confirmed action
+ok 209 - connect runs git init only when ticked, after the connect, with the confirmed action
+  ---
+  duration_ms: 11.726225
+  type: 'test'
+  ...
+# Subtest: a refused git init is reported and never undoes the connect
+ok 210 - a refused git init is reported and never undoes the connect
+  ---
+  duration_ms: 5.614713
+  type: 'test'
+  ...
+# Subtest: previewConnect reports a Git repository above the folder without running Git
+ok 211 - previewConnect reports a Git repository above the folder without running Git
+  ---
+  duration_ms: 134.012623
+  type: 'test'
+  ...
+# Subtest: the locations row lists Home and the local drives, and marks the current one
+ok 212 - the locations row lists Home and the local drives, and marks the current one
+  ---
+  duration_ms: 17.525242
+  type: 'test'
+  ...
+# Subtest: breadcrumbs, the footer path and the typed path use the server's separator, never "/"
+ok 213 - breadcrumbs, the footer path and the typed path use the server's separator, never "/"
+  ---
+  duration_ms: 17.169396
+  type: 'test'
+  ...
+# Subtest: a folder that cannot be opened is said with its reason; the picker stays where it was
+ok 214 - a folder that cannot be opened is said with its reason; the picker stays where it was
+  ---
+  duration_ms: 57.835219
+  type: 'test'
+  ...
+# Subtest: the preview of a project outside home says so
+ok 215 - the preview of a project outside home says so
+  ---
+  duration_ms: 2.429057
+  type: 'test'
+  ...
+# Subtest: the verdict for existing code says nothing is run and takes an optional first request
+ok 216 - the verdict for existing code says nothing is run and takes an optional first request
+  ---
+  duration_ms: 3.658301
+  type: 'test'
+  ...
+# Subtest: an empty folder gets no first-request field, and an empty field stores nothing
+ok 217 - an empty folder gets no first-request field, and an empty field stores nothing
+  ---
+  duration_ms: 16.421006
+  type: 'test'
+  ...
+# Subtest: Windows rules (path.win32): drives, case, spaces and non-ASCII names
+ok 218 - Windows rules (path.win32): drives, case, spaces and non-ASCII names
+  ---
+  duration_ms: 6.515558
+  type: 'test'
+  ...
+# Subtest: Windows rules: network and device paths are recognized before any filesystem call
+ok 219 - Windows rules: network and device paths are recognized before any filesystem call
+  ---
+  duration_ms: 0.917513
+  type: 'test'
+  ...
+# Subtest: Windows rules: system folders at a drive root and hidden folders are refused; the list is by name only
+ok 220 - Windows rules: system folders at a drive root and hidden folders are refused; the list is by name only
+  ---
+  duration_ms: 1.998534
+  type: 'test'
+  ...
+# Subtest: Linux: a volume is local only when its mount type says so
+ok 221 - Linux: a volume is local only when its mount type says so
+  ---
+  duration_ms: 1.633116
+  type: 'test'
+  ...
+# Subtest: macOS: only mounts flagged local are offered
+ok 222 - macOS: only mounts flagged local are offered
+  ---
+  duration_ms: 1.030549
+  type: 'test'
+  ...
+# Subtest: a folder on a local volume is browsed like one in home, with roots and breadcrumbs from the server
+ok 223 - a folder on a local volume is browsed like one in home, with roots and breadcrumbs from the server
+  ---
+  duration_ms: 90.632116
+  type: 'test'
+  ...
+# Subtest: validation is applied to the canonical path: links are judged by where they lead
+ok 224 - validation is applied to the canonical path: links are judged by where they lead
+  ---
+  duration_ms: 46.552522
+  type: 'test'
+  ...
+# Subtest: each failure has its own cause: outside, missing, not a folder, hidden, bad path
+ok 225 - each failure has its own cause: outside, missing, not a folder, hidden, bad path
+  ---
+  duration_ms: 20.109125
+  type: 'test'
+  ...
+# Subtest: with no local volume found, only home is a root (fail closed)
+ok 226 - with no local volume found, only home is a root (fail closed)
+  ---
+  duration_ms: 37.360698
+  type: 'test'
+  ...
+# Subtest: a project on a volume: preview and new folder follow the same rules; the volume itself is not a project
+ok 227 - a project on a volume: preview and new folder follow the same rules; the volume itself is not a project
+  ---
+  duration_ms: 45.009381
+  type: 'test'
+  ...
+# Subtest: security: the folder routes keep the Host, Origin, token and read-only checks
+ok 228 - security: the folder routes keep the Host, Origin, token and read-only checks
+  ---
+  duration_ms: 152.12593
+  type: 'test'
+  ...
+# Subtest: browsing opens no file and never previews: listing reads directory names only
+ok 229 - browsing opens no file and never previews: listing reads directory names only
+  ---
+  duration_ms: 11.50583
+  type: 'test'
+  ...
+# Subtest: review: nothing outside the allowed roots is touched or probed (no existence oracle, no automount trigger)
+ok 230 - review: nothing outside the allowed roots is touched or probed (no existence oracle, no automount trigger)
+  ---
+  duration_ms: 7.458218
+  type: 'test'
+  ...
+# Subtest: review: Linux locality fails closed for volumes; stacked and escaped mounts are read correctly
+ok 231 - review: Linux locality fails closed for volumes; stacked and escaped mounts are read correctly
+  ---
+  duration_ms: 0.957031
+  type: 'test'
+  ...
+# Subtest: review: macOS locality of a resolved folder follows its longest mount point
+ok 232 - review: macOS locality of a resolved folder follows its longest mount point
+  ---
+  duration_ms: 0.779257
+  type: 'test'
+  ...
+# Subtest: review: a network folder inside an allowed root is refused after resolution; unknown is refused under a volume only
+ok 233 - review: a network folder inside an allowed root is refused after resolution; unknown is refused under a volume only
+  ---
+  duration_ms: 8.794483
+  type: 'test'
+  ...
+# Subtest: review: a new folder is never created under a name that would not be browsable
+ok 234 - review: a new folder is never created under a name that would not be browsable
+  ---
+  duration_ms: 7.505767
+  type: 'test'
+  ...
+# Subtest: folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+ok 235 - folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+  ---
+  duration_ms: 221.787253
+  type: 'test'
+  ...
+# Subtest: registration: an existing YallaFlow project inside home is added once, live; others are refused
+ok 236 - registration: an existing YallaFlow project inside home is added once, live; others are refused
+  ---
+  duration_ms: 476.658638
+  type: 'test'
+  ...
+# Subtest: stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+ok 237 - stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+  ---
+  duration_ms: 1467.992909
+  type: 'test'
+  ...
+# Subtest: a plan that installs dependencies needs an explicit acknowledgement (PF-0085)
+ok 238 - a plan that installs dependencies needs an explicit acknowledgement (PF-0085)
+  ---
+  duration_ms: 633.935248
+  type: 'test'
+  ...
+# Subtest: Git init: explicit, once, never inside another repository; refused read-only
+ok 239 - Git init: explicit, once, never inside another repository; refused read-only
+  ---
+  duration_ms: 215.083312
+  type: 'test'
+  ...
+# Subtest: runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+ok 240 - runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+  ---
+  duration_ms: 1020.971669
+  type: 'test'
+  ...
+# Subtest: agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+ok 241 - agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+  ---
+  duration_ms: 82.192184
+  type: 'test'
+  ...
+# Subtest: review: parallel registrations add a project once and lose none from the saved list
+ok 242 - review: parallel registrations add a project once and lose none from the saved list
+  ---
+  duration_ms: 181.032217
+  type: 'test'
+  ...
+# Subtest: review: hidden folders are refused even by path; read-only consoles probe no tools
+ok 243 - review: hidden folders are refused even by path; read-only consoles probe no tools
+  ---
+  duration_ms: 36.592336
+  type: 'test'
+  ...
+# Subtest: review: plans that run package scripts need an acknowledgement; control characters and NUL are refused
+ok 244 - review: plans that run package scripts need an acknowledgement; control characters and NUL are refused
+  ---
+  duration_ms: 723.111456
+  type: 'test'
+  ...
+# Subtest: review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+ok 245 - review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+  ---
+  duration_ms: 398.485792
+  type: 'test'
+  ...
+# Subtest: a registration failure after creation is reported as partial success, never as a failed creation
+ok 246 - a registration failure after creation is reported as partial success, never as a failed creation
+  ---
+  duration_ms: 486.230365
+  type: 'test'
+  ...
+# Subtest: Claude Code: off unless chosen explicitly when enabling agents; never read-only
+ok 247 - Claude Code: off unless chosen explicitly when enabling agents; never read-only
+  ---
+  duration_ms: 73.740459
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): a project leaves the running console and the saved list; its files stay
+ok 248 - removal (PF-0081): a project leaves the running console and the saved list; its files stay
+  ---
+  duration_ms: 78.621574
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): refused while an agent session is live in the project
+ok 249 - removal (PF-0081): refused while an agent session is live in the project
+  ---
+  duration_ms: 2.148314
+  type: 'test'
+  ...
+# Subtest: AC-002/AC-007: header tabs are exactly Workspace · Project · More; no Agents or Setup & run tab
+ok 250 - AC-002/AC-007: header tabs are exactly Workspace · Project · More; no Agents or Setup & run tab
+  ---
+  duration_ms: 7.809786
+  type: 'test'
+  ...
+# Subtest: AC-002/AC-003: old routes and in-page anchors land on their new home
+ok 251 - AC-002/AC-003: old routes and in-page anchors land on their new home
+  ---
+  duration_ms: 24.805294
+  type: 'test'
+  ...
+# Subtest: AC-002: the bell still counts agent requests and leads to the Projects inbox
+ok 252 - AC-002: the bell still counts agent requests and leads to the Projects inbox
+  ---
+  duration_ms: 2.055625
+  type: 'test'
+  ...
+# Subtest: AC-001: Projects shows the Needs-you inbox above the cards and each card lists only its own lanes
+ok 253 - AC-001: Projects shows the Needs-you inbox above the cards and each card lists only its own lanes
+  ---
+  duration_ms: 9.311379
+  type: 'test'
+  ...
+# Subtest: AC-003: one Project page with an accessible tab bar and badges
+ok 254 - AC-003: one Project page with an accessible tab bar and badges
+  ---
+  duration_ms: 5.971727
+  type: 'test'
+  ...
+# Subtest: AC-004: Overview is summary, needs care, areas and stack in two columns, one on phones
+ok 255 - AC-004: Overview is summary, needs care, areas and stack in two columns, one on phones
+  ---
+  duration_ms: 1.096482
+  type: 'test'
+  ...
+# Subtest: AC-005: a failed service is one line with View log, Ask the agent to fix and Start again
+ok 256 - AC-005: a failed service is one line with View log, Ask the agent to fix and Start again
+  ---
+  duration_ms: 14.291061
+  type: 'test'
+  ...
+# Subtest: AC-006: the header shows Team or Solo with the branch, amber when Solo off the integration branch
+ok 257 - AC-006: the header shows Team or Solo with the branch, amber when Solo off the integration branch
+  ---
+  duration_ms: 18.778797
+  type: 'test'
+  ...
+# Subtest: AC-006: the New Project success step offers team mode as optional, with the confirmed flow
+ok 258 - AC-006: the New Project success step offers team mode as optional, with the confirmed flow
+  ---
+  duration_ms: 11.499759
+  type: 'test'
+  ...
+# Subtest: AC-007: every new label has Arabic and English; light and dark use the shared tokens
+ok 259 - AC-007: every new label has Arabic and English; light and dark use the shared tokens
+  ---
+  duration_ms: 3.180076
+  type: 'test'
+  ...
+# Subtest: Codex: installed, signed in and connection are three separate states with one next step
+ok 260 - Codex: installed, signed in and connection are three separate states with one next step
+  ---
+  duration_ms: 6.37138
+  type: 'test'
+  ...
+# Subtest: Claude Code: experimental everywhere, never "verified" ahead of a session, and shown on every system
+ok 261 - Claude Code: experimental everywhere, never "verified" ahead of a session, and shown on every system
+  ---
+  duration_ms: 1.863112
+  type: 'test'
+  ...
+# Subtest: a saved preferred agent is a wish: offered only when available, with the readiness computed now
+ok 262 - a saved preferred agent is a wish: offered only when available, with the readiness computed now
+  ---
+  duration_ms: 0.993765
+  type: 'test'
+  ...
+# Subtest: console: /api/machine carries the readiness; nothing is written; never in a read-only console
+ok 263 - console: /api/machine carries the readiness; nothing is written; never in a read-only console
+  ---
+  duration_ms: 237.049027
+  type: 'test'
+  ...
+# Subtest: the page: Claude Code on simulated Windows is shown, marked Experimental and not verified, with three separate states
+ok 264 - the page: Claude Code on simulated Windows is shown, marked Experimental and not verified, with three separate states
+  ---
+  duration_ms: 11.015829
+  type: 'test'
+  ...
+# Subtest: the page: the usual agent is listed first and marked, and still needs the click that enables it
+ok 265 - the page: the usual agent is listed first and marked, and still needs the click that enables it
+  ---
+  duration_ms: 10.347424
+  type: 'test'
+  ...
+# Subtest: setup environment keeps npm settings but never a credential
+ok 266 - setup environment keeps npm settings but never a credential
+  ---
+  duration_ms: 5.548341
+  type: 'test'
+  ...
+# Subtest: Codex login status: only a ChatGPT subscription sign-in counts
+ok 267 - Codex login status: only a ChatGPT subscription sign-in counts
+  ---
+  duration_ms: 1.393904
+  type: 'test'
+  ...
+# Subtest: nothing installed: the exact install command, approved before it runs, without sudo or secrets
+ok 268 - nothing installed: the exact install command, approved before it runs, without sudo or secrets
+  ---
+  duration_ms: 513.47394
+  type: 'test'
+  ...
+# Subtest: an npm global folder this user cannot write is refused: no sudo, the command to run by hand instead
+ok 269 - an npm global folder this user cannot write is refused: no sudo, the command to run by hand instead
+  ---
+  duration_ms: 233.312988
+  type: 'test'
+  ...
+# Subtest: sign-in: Codex's own device flow after confirmation; the link and code are shown, nothing else
+ok 270 - sign-in: Codex's own device flow after confirmation; the link and code are shown, nothing else
+  ---
+  duration_ms: 1267.571146
+  type: 'test'
+  ...
+# Subtest: an API-key sign-in is reported as not usable
+ok 271 - an API-key sign-in is reported as not usable
+  ---
+  duration_ms: 128.966234
+  type: 'test'
+  ...
+# Subtest: connection test: handshake only, in an empty temporary folder, no session, process ended
+ok 272 - connection test: handshake only, in an empty temporary folder, no session, process ended
+  ---
+  duration_ms: 290.230429
+  type: 'test'
+  ...
+# Subtest: HTTP: status and actions need the token and Origin; a read-only console runs none of them
+ok 273 - HTTP: status and actions need the token and Origin; a read-only console runs none of them
+  ---
+  duration_ms: 456.420245
+  type: 'test'
+  ...
+# Subtest: one setup step at a time from the moment it is accepted; cancel ends the whole process group
+ok 274 - one setup step at a time from the moment it is accepted; cancel ends the whole process group
+  ---
+  duration_ms: 625.159615
+  type: 'test'
+  ...
+# Subtest: setup keeps proxy and certificate settings; a status probe that cannot run is unknown, not signed out
+ok 275 - setup keeps proxy and certificate settings; a status probe that cannot run is unknown, not signed out
+  ---
+  duration_ms: 1.109125
+  type: 'test'
+  ...
+# Subtest: tested Codex versions: exact pins, inside the supported adapter range, checked before an install is offered
+ok 276 - tested Codex versions: exact pins, inside the supported adapter range, checked before an install is offered
+  ---
+  duration_ms: 0.730125
+  type: 'test'
+  ...
+# Subtest: registry: the mode is a field of one entry; absent means managed; older entries are untouched
+ok 277 - registry: the mode is a field of one entry; absent means managed; older entries are untouched
+  ---
+  duration_ms: 118.284532
+  type: 'test'
+  ...
+# Subtest: server boundary: a monitored project refuses every write, agent and execution action, and nothing in it changes
+ok 278 - server boundary: a monitored project refuses every write, agent and execution action, and nothing in it changes
+  ---
+  duration_ms: 1341.850874
+  type: 'test'
+  ...
+# Subtest: opening an existing YallaFlow project for monitoring: saved as monitored, nothing written, no agent needed
+ok 279 - opening an existing YallaFlow project for monitoring: saved as monitored, nothing written, no agent needed
+  ---
+  duration_ms: 175.954806
+  type: 'test'
+  ...
+# Subtest: the page: the mode is per project; a monitored project reads as read-only, the others and the project list do not
+ok 280 - the page: the mode is per project; a monitored project reads as read-only, the others and the project list do not
+  ---
+  duration_ms: 7.993239
+  type: 'test'
+  ...
+# Subtest: the page: the banner names the mode and its limits, in both languages; the switch asks first
+ok 281 - the page: the banner names the mode and its limits, in both languages; the switch asks first
+  ---
+  duration_ms: 7.108439
+  type: 'test'
+  ...
+# Subtest: the page: an existing YallaFlow project offers Monitor only beside Open; a plain repository is told why it cannot be monitored
+ok 282 - the page: an existing YallaFlow project offers Monitor only beside Open; a plain repository is told why it cannot be monitored
+  ---
+  duration_ms: 2.968092
+  type: 'test'
+  ...
+# Subtest: console add/list/remove keep a user-level project list and never touch the project
+ok 283 - console add/list/remove keep a user-level project list and never touch the project
+  ---
+  duration_ms: 2003.097704
+  type: 'test'
+  ...
+# Subtest: snapshot items carry recorded completion time and verification counts
+ok 284 - snapshot items carry recorded completion time and verification counts
+  ---
+  duration_ms: 1108.006923
+  type: 'test'
+  ...
+# Subtest: worktrees: listed from Git files, changed files and overlaps reported, Git never written
+ok 285 - worktrees: listed from Git files, changed files and overlaps reported, Git never written
+  ---
+  duration_ms: 1016.290401
+  type: 'test'
+  ...
+# Subtest: a planted worktree gitdir is ignored: nothing is read or run outside real worktrees
+ok 286 - a planted worktree gitdir is ignored: nothing is read or run outside real worktrees
+  ---
+  duration_ms: 364.896978
+  type: 'test'
+  ...
+# Subtest: verify never records a run on work that became DONE while it ran
+ok 287 - verify never records a run on work that became DONE while it ran
+  ---
+  duration_ms: 603.665723
+  type: 'test'
+  ...
+# Subtest: Open folder opens only the registered project root, behind the token and Origin
+ok 288 - Open folder opens only the registered project root, behind the token and Origin
+  ---
+  duration_ms: 117.302476
+  type: 'test'
+  ...
+# Subtest: a read-only console refuses Open folder
+ok 289 - a read-only console refuses Open folder
+  ---
+  duration_ms: 70.309012
+  type: 'test'
+  ...
+# Subtest: the file manager is started without a shell, per platform, and a missing folder is reported
+ok 290 - the file manager is started without a shell, per platform, and a missing folder is reported
+  ---
+  duration_ms: 28.247683
+  type: 'test'
+  ...
+# Subtest: project cards carry Open, Open folder, Copy path and Remove; read-only hides the writes
+ok 291 - project cards carry Open, Open folder, Copy path and Remove; read-only hides the writes
+  ---
+  duration_ms: 3.691539
+  type: 'test'
+  ...
+# Subtest: the Workspace greeting is one slim row whose counts filter the work
+ok 292 - the Workspace greeting is one slim row whose counts filter the work
+  ---
+  duration_ms: 1.142904
+  type: 'test'
+  ...
+# Subtest: the entrance motion runs only when the page changes and respects reduced motion
+ok 293 - the entrance motion runs only when the page changes and respects reduced motion
+  ---
+  duration_ms: 4.473536
+  type: 'test'
+  ...
+# Subtest: PF-0130: the "since you were last here" notice shows each item as its ID and latest outcome, title in the tooltip
+ok 294 - PF-0130: the "since you were last here" notice shows each item as its ID and latest outcome, title in the tooltip
+  ---
+  duration_ms: 0.998275
+  type: 'test'
+  ...
+# Subtest: PF-0131: the live move toast names the item by its linked ID, the title only in the tooltip
+ok 295 - PF-0131: the live move toast names the item by its linked ID, the title only in the tooltip
+  ---
+  duration_ms: 1.940433
+  type: 'test'
+  ...
+# Subtest: PF-0133: the agent is chosen in place — readiness card and chat panel — and links from the chat close it
+ok 296 - PF-0133: the agent is chosen in place — readiness card and chat panel — and links from the chat close it
+  ---
+  duration_ms: 3.575014
+  type: 'test'
+  ...
+# Subtest: PF-0137: the all-done box is slim, with the filter chips and a small New work button
+ok 297 - PF-0137: the all-done box is slim, with the filter chips and a small New work button
+  ---
+  duration_ms: 18.059139
+  type: 'test'
+  ...
+# Subtest: the file lives beside console.json on Linux, macOS and Windows (simulated environment values)
+ok 298 - the file lives beside console.json on Linux, macOS and Windows (simulated environment values)
+  ---
+  duration_ms: 3.017945
+  type: 'test'
+  ...
+# Subtest: missing, invalid, oversized or linked files mean defaults; reading never throws
+ok 299 - missing, invalid, oversized or linked files mean defaults; reading never throws
+  ---
+  duration_ms: 25.307965
+  type: 'test'
+  ...
+# Subtest: only known, typed fields can be saved: no free-form value, so no credential
+ok 300 - only known, typed fields can be saved: no free-form value, so no credential
+  ---
+  duration_ms: 2.194472
+  type: 'test'
+  ...
+# Subtest: saving merges, is private (0600), keeps keys a newer version wrote, and leaves console.json alone
+ok 301 - saving merges, is private (0600), keeps keys a newer version wrote, and leaves console.json alone
+  ---
+  duration_ms: 100.123231
+  type: 'test'
+  ...
+# Subtest: console API: read anywhere, write only as JSON with the token and Origin, never read-only
+ok 302 - console API: read anywhere, write only as JSON with the token and Origin, never read-only
+  ---
+  duration_ms: 200.381594
+  type: 'test'
+  ...
+# Subtest: the page: saved preferences win over the browser copy; a browser choice is carried over once; read-only saves nothing
+ok 303 - the page: saved preferences win over the browser copy; a browser choice is carried over once; read-only saves nothing
+  ---
+  duration_ms: 25.355552
+  type: 'test'
+  ...
+# Subtest: agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+ok 304 - agent text formats headings, lists, code, links, tables and Arabic without executable HTML
+  ---
+  duration_ms: 8.093561
+  type: 'test'
+  ...
+# Subtest: paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+ok 305 - paste preserves ordinary text, queues real screenshot bytes, removes previews and releases URLs
+  ---
+  duration_ms: 4.82371
+  type: 'test'
+  ...
+# Subtest: file selection and paste combine; unsupported, empty and oversized files are explained
+ok 306 - file selection and paste combine; unsupported, empty and oversized files are explained
+  ---
+  duration_ms: 2.39793
+  type: 'test'
+  ...
+# Subtest: revision partial failure keeps pending files and retries without duplicating text or successful uploads
+ok 307 - revision partial failure keeps pending files and retries without duplicating text or successful uploads
+  ---
+  duration_ms: 3.938569
+  type: 'test'
+  ...
+# Subtest: create uploads pasted files through the existing bound request endpoint
+ok 308 - create uploads pasted files through the existing bound request endpoint
+  ---
+  duration_ms: 4.589464
+  type: 'test'
+  ...
+# Subtest: overview previews keep full facts available under View more, including after redraw
+ok 309 - overview previews keep full facts available under View more, including after redraw
+  ---
+  duration_ms: 6.237282
+  type: 'test'
+  ...
+# Subtest: every project page gets the project chat; a work item page gets its own; new-project pages get none
+ok 310 - every project page gets the project chat; a work item page gets its own; new-project pages get none
+  ---
+  duration_ms: 41.199532
+  type: 'test'
+  ...
+# Subtest: the project chat is labelled, starts no work item and suggests project questions
+ok 311 - the project chat is labelled, starts no work item and suggests project questions
+  ---
+  duration_ms: 9.549703
+  type: 'test'
+  ...
+# Subtest: a running item session shows on project pages as a link to that item
+ok 312 - a running item session shows on project pages as a link to that item
+  ---
+  duration_ms: 5.29674
+  type: 'test'
+  ...
+# Subtest: a project session shows on an item page labelled as the project chat
+ok 313 - a project session shows on an item page labelled as the project chat
+  ---
+  duration_ms: 4.736203
+  type: 'test'
+  ...
+# Subtest: with agents off the project chat explains how to turn them on without naming an item
+ok 314 - with agents off the project chat explains how to turn them on without naming an item
+  ---
+  duration_ms: 2.813075
+  type: 'test'
+  ...
+# Subtest: the item chat is unchanged
+ok 315 - the item chat is unchanged
+  ---
+  duration_ms: 2.806849
+  type: 'test'
+  ...
+# Subtest: Claude Code off for the project is turned on in place; an agent not ready links to Settings → Agents
+ok 316 - Claude Code off for the project is turned on in place; an agent not ready links to Settings → Agents
+  ---
+  duration_ms: 3.722513
+  type: 'test'
+  ...
+# Subtest: blocker texts read in Arabic; suggestions say they only fill the box; your turn after a reply
+ok 317 - blocker texts read in Arabic; suggestions say they only fill the box; your turn after a reply
+  ---
+  duration_ms: 14.445805
+  type: 'test'
+  ...
+# Subtest: the chat says when the agent is working, waiting for an approval, or waiting for a reply
+ok 318 - the chat says when the agent is working, waiting for an approval, or waiting for a reply
+  ---
+  duration_ms: 12.075247
+  type: 'test'
+  ...
+# Subtest: suggestions follow the stage: move on after an approval, plan and design wording
+ok 319 - suggestions follow the stage: move on after an approval, plan and design wording
+  ---
+  duration_ms: 15.893814
+  type: 'test'
+  ...
+# Subtest: switch agent: end an idle Codex session elsewhere; hand over from Claude Code to Codex; wait while working
+ok 320 - switch agent: end an idle Codex session elsewhere; hand over from Claude Code to Codex; wait while working
+  ---
+  duration_ms: 14.442498
+  type: 'test'
+  ...
+# Subtest: chat: whole-job first message, one action (review, answer, continue), steps grouped
+ok 321 - chat: whole-job first message, one action (review, answer, continue), steps grouped
+  ---
+  duration_ms: 15.103455
+  type: 'test'
+  ...
+# Subtest: chat: no whole-job draft while the item waits for an answer or a review
+ok 322 - chat: no whole-job draft while the item waits for an answer or a review
+  ---
+  duration_ms: 14.690153
+  type: 'test'
+  ...
+# Subtest: attention: a pending permission or a finished turn on an item shows on project pages and opens that chat
+ok 323 - attention: a pending permission or a finished turn on an item shows on project pages and opens that chat
+  ---
+  duration_ms: 11.916393
+  type: 'test'
+  ...
+# Subtest: a finished item holding the session: one Start button here, and no "waits for you" call-out
+ok 324 - a finished item holding the session: one Start button here, and no "waits for you" call-out
+  ---
+  duration_ms: 5.12314
+  type: 'test'
+  ...
+# Subtest: Greenfield is never gated: ready for work, and the first work item is created
+ok 325 - Greenfield is never gated: ready for work, and the first work item is created
+  ---
+  duration_ms: 1213.435614
+  type: 'test'
+  ...
+# Subtest: Brownfield without approved understanding: readiness says so and work creation is refused before anything is written
+ok 326 - Brownfield without approved understanding: readiness says so and work creation is refused before anything is written
+  ---
+  duration_ms: 682.175068
+  type: 'test'
+  ...
+# Subtest: Brownfield while the understanding is in progress or awaiting review points at the understanding work item
+ok 327 - Brownfield while the understanding is in progress or awaiting review points at the understanding work item
+  ---
+  duration_ms: 72.010228
+  type: 'test'
+  ...
+# Subtest: Brownfield with an approved baseline is ready with no migration
+ok 328 - Brownfield with an approved baseline is ready with no migration
+  ---
+  duration_ms: 403.846903
+  type: 'test'
+  ...
+# Subtest: agent readiness blocks only agent sessions and queues; runtime is optional
+ok 329 - agent readiness blocks only agent sessions and queues; runtime is optional
+  ---
+  duration_ms: 43.475361
+  type: 'test'
+  ...
+# Subtest: a read-only console reports readiness without probing agents
+ok 330 - a read-only console reports readiness without probing agents
+  ---
+  duration_ms: 445.999942
+  type: 'test'
+  ...
+# Subtest: queue runs: refused before understanding except for the understanding item itself, and without a ready agent
+ok 331 - queue runs: refused before understanding except for the understanding item itself, and without a ready agent
+  ---
+  duration_ms: 5429.730496
+  type: 'test'
+  ...
+# Subtest: PF-0133: choosing the project agent is the first required step; it follows the chosen provider
+ok 332 - PF-0133: choosing the project agent is the first required step; it follows the chosen provider
+  ---
+  duration_ms: 17.427101
+  type: 'test'
+  ...
+# Subtest: PF-0133: a console with no saved agent choice asks for one; saving one answers it
+ok 333 - PF-0133: a console with no saved agent choice asks for one; saving one answers it
+  ---
+  duration_ms: 329.323699
+  type: 'test'
+  ...
+# Subtest: the understanding step carries the baseline progress: step, facts so far, gaps and last activity
+ok 334 - the understanding step carries the baseline progress: step, facts so far, gaps and last activity
+  ---
+  duration_ms: 546.967422
+  type: 'test'
+  ...
+# Subtest: a redraw never rebuilds an unchanged page and waits while a pointer is pressed
+ok 335 - a redraw never rebuilds an unchanged page and waits while a pointer is pressed
+  ---
+  duration_ms: 8.289813
+  type: 'test'
+  ...
+# Subtest: copy reports success only after the browser confirms it, with two fallbacks
+ok 336 - copy reports success only after the browser confirms it, with two fallbacks
+  ---
+  duration_ms: 1.744951
+  type: 'test'
+  ...
+# Subtest: Tailwind is a pinned development tool; users get the built stylesheet with no build step
+ok 337 - Tailwind is a pinned development tool; users get the built stylesheet with no build step
+  ---
+  duration_ms: 5.013049
+  type: 'test'
+  ...
+# Subtest: tw.css is up to date with tailwind.input.css and app.js
+ok 338 - tw.css is up to date with tailwind.input.css and app.js # SKIP Tailwind CLI not installed here (npm ci installs it; CI runs this check)
+  ---
+  duration_ms: 0.423666
+  type: 'test'
+  ...
+# Subtest: typing or changing a field marks the page changed, so a redraw that resets it is never skipped
+ok 339 - typing or changing a field marks the page changed, so a redraw that resets it is never skipped
+  ---
+  duration_ms: 0.496024
+  type: 'test'
+  ...
+# Subtest: nothing saved, no proposal: one primary action asks the agent; a quick scan is the fallback
+ok 340 - nothing saved, no proposal: one primary action asks the agent; a quick scan is the fallback
+  ---
+  duration_ms: 8.296498
+  type: 'test'
+  ...
+# Subtest: a proposal shows each service with its command, preselected, and one button to use them
+ok 341 - a proposal shows each service with its command, preselected, and one button to use them
+  ---
+  duration_ms: 6.085183
+  type: 'test'
+  ...
+# Subtest: saved services are approved together from their reviewed commands; shared and blocked ones are left out
+ok 342 - saved services are approved together from their reviewed commands; shared and blocked ones are left out
+  ---
+  duration_ms: 6.768727
+  type: 'test'
+  ...
+# Subtest: approval without starting, and a refused approval, start nothing
+ok 343 - approval without starting, and a refused approval, start nothing
+  ---
+  duration_ms: 6.629834
+  type: 'test'
+  ...
+# Subtest: nothing to approve shows no card; a read-only console never offers approval
+ok 344 - nothing to approve shows no card; a read-only console never offers approval
+  ---
+  duration_ms: 4.973633
+  type: 'test'
+  ...
+# Subtest: the Run tab hosts the flow; Overview names the next run step; Settings keeps advanced editing
+ok 345 - the Run tab hosts the flow; Overview names the next run step; Settings keeps advanced editing
+  ---
+  duration_ms: 2.126962
+  type: 'test'
+  ...
+# Subtest: security: loopback host, token, origin, read-only methods and ID-only paths
+ok 346 - security: loopback host, token, origin, read-only methods and ID-only paths
+  ---
+  duration_ms: 1071.214006
+  type: 'test'
+  ...
+# Subtest: serves the snapshot, work detail and preserved sources by ID
+ok 347 - serves the snapshot, work detail and preserved sources by ID
+  ---
+  duration_ms: 1598.579691
+  type: 'test'
+  ...
+# Subtest: live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+ok 348 - live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+  ---
+  duration_ms: 1811.275786
+  type: 'test'
+  ...
+# Subtest: the console never writes: browsing every route leaves the workspace byte-identical
+ok 349 - the console never writes: browsing every route leaves the workspace byte-identical
+  ---
+  duration_ms: 1321.703911
+  type: 'test'
+  ...
+# Subtest: extracted text cannot be read outside its source directory; HEAD never opens the event stream
+ok 350 - extracted text cannot be read outside its source directory; HEAD never opens the event stream
+  ---
+  duration_ms: 1028.212309
+  type: 'test'
+  ...
+# Subtest: overview: feature branch without Shared Mode — branch, detected integration branch, Turn on; CLI JSON unchanged
+ok 351 - overview: feature branch without Shared Mode — branch, detected integration branch, Turn on; CLI JSON unchanged
+  ---
+  duration_ms: 2267.373902
+  type: 'test'
+  ...
+# Subtest: overview: a lane project reports its own branch, is never offered Turn on, and cannot enable or preview
+ok 352 - overview: a lane project reports its own branch, is never offered Turn on, and cannot enable or preview
+  ---
+  duration_ms: 1107.150411
+  type: 'test'
+  ...
+# Subtest: ui: Overview line and New Work hint compare only against a known integration branch
+ok 353 - ui: Overview line and New Work hint compare only against a known integration branch
+  ---
+  duration_ms: 89.162819
+  type: 'test'
+  ...
+# Subtest: ui: one Shared enable panel, and work IDs stay whole beside their titles
+ok 354 - ui: one Shared enable panel, and work IDs stay whole beside their titles
+  ---
+  duration_ms: 10.998086
+  type: 'test'
+  ...
+# Subtest: doctor: duplicate fact IDs are diagnosed read-only; a healthy workspace prints no diagnosis
+ok 355 - doctor: duplicate fact IDs are diagnosed read-only; a healthy workspace prints no diagnosis
+  ---
+  duration_ms: 431.654227
+  type: 'test'
+  ...
+# Subtest: the switcher shows the current project with its readiness and lists every project
+ok 356 - the switcher shows the current project with its readiness and lists every project
+  ---
+  duration_ms: 1.545488
+  type: 'test'
+  ...
+# Subtest: project actions live in the same menu; read-only hides Add and New
+ok 357 - project actions live in the same menu; read-only hides Add and New
+  ---
+  duration_ms: 0.425319
+  type: 'test'
+  ...
+# Subtest: header menus: Esc closes and refocuses, arrows move, outside click and opening another close it
+ok 358 - header menus: Esc closes and refocuses, arrows move, outside click and opening another close it
+  ---
+  duration_ms: 1.470008
+  type: 'test'
+  ...
+# Subtest: switcher styles cover readiness, focus, dark mode and phone width
+ok 359 - switcher styles cover readiness, focus, dark mode and phone width
+  ---
+  duration_ms: 0.869106
+  type: 'test'
+  ...
+1..359
+# tests 359
+# suites 0
+# pass 358
+# fail 0
+# cancelled 0
+# skipped 1
+# todo 0
+# duration_ms 62699.141947

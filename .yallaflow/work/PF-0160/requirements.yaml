@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "Agent readiness on this machine is derived, never stored: for each agent it separates installed, signed in (subscription) and connection, and says what is experimental or not verified on this operating system, without claiming unsupported capabilities.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T17:02:28.822Z",
+      "updatedAt": "2026-11-16T17:02:28.822Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "The saved preferred agent is preselected for a new project but is enabled only after the developer confirms it, and its actual readiness is checked again.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T17:02:28.822Z",
+      "updatedAt": "2026-11-16T17:02:28.822Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "GET /api/machine carries a derived readiness document with per-agent installed / authenticated / connection states, platform support and the next step; nothing about it is written to disk.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T17:02:28.822Z",
+      "updatedAt": "2026-11-16T17:02:28.822Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "Claude Code is not hidden on Windows: it is marked Experimental and Not verified there, its three states are shown separately, and its connection is described as checked only when a session starts.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T17:02:28.822Z",
+      "updatedAt": "2026-11-16T17:02:28.822Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-002",
+      "statement": "Choosing an agent for a project saves it as the preferred agent; a new project and the wizard preselect it, a project's agent is never enabled without the developer's click, and a preferred agent that is not ready is shown as not ready.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T17:02:28.822Z",
+      "updatedAt": "2026-11-16T17:02:28.822Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-16T17:02:28.822Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-16T17:02:28.822Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-16T17:02:28.822Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-16T17:02:28.822Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-16T17:02:28.822Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-16T17:02:28.822Z"
+}

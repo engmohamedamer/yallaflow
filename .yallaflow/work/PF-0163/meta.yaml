@@ -1,0 +1,45 @@
+{
+  "id": "PF-0163",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "New Project wizard: keep the developer's choices across a page reload or console restart, and resume an interrupted creation from its saved plan without repeating finished steps",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-16T17:25:01.640Z",
+  "updatedAt": "2026-11-16T17:26:50.459Z",
+  "title": "New Project wizard: keep the developer's choices across a page reload or console restart, and resume an interrupted creation from its saved plan without repeating finished steps",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-16T17:25:01.694Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-16T17:26:50.459Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

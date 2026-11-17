@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Console chat transcript: src/agents/transcript.js numbers every agent event (n, growing across console restarts), merges consecutive streamed chunks into one entry, keeps the newest 400 merged entries in memory and journals everything to .yallaflow/local/agent-chat/transcript.jsonl (git-ignored, 0600, secret-looking values redacted, rotated once at 8 MB). AgentBridge.status returns the newest 200 with transcript.hasOlder; GET /api/p/<id>/agent/transcript?before=n pages older events from memory or disk. The page merges a reload by n (never replaces), shows every loaded entry and folds only tool steps. This replaces the earlier rule that YallaFlow keeps no chat messages.",
+      "evidence": [
+        "src/agents/transcript.js",
+        "test/agent-transcript.test.js",
+        "docs/agents.md"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-16T19:38:12.874Z",
+      "factId": "CTX-0176",
+      "promotedAt": "2026-11-16T19:38:13.042Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-002",
+      "kind": "business-rule",
+      "source": "implementation-runtime",
+      "summary": "The console agent chat is saved per checkout in .yallaflow/local/agent-chat by default; the developer can turn saving off for every project on the machine (preferences.json saveChatHistory: false), which stops new entries and keeps what was saved, and can delete one project's saved chat after a confirmation; a message is saved whole or not at all and rotation happens only where an entry starts.",
+      "evidence": [
+        "src/agents/transcript.js",
+        "src/console/preferences.js",
+        "verification:V-002"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-17T09:22:41.358Z",
+      "factId": "CTX-0178",
+      "promotedAt": "2026-11-17T09:22:41.661Z",
+      "target": "context/business-rules.md"
+    }
+  ],
+  "updatedAt": "2026-11-17T09:22:41.661Z",
+  "reviewedAt": "2026-11-17T09:22:41.661Z"
+}

@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "impacts": [
+    {
+      "id": "IM-001",
+      "status": "assessed",
+      "raisedAt": "2026-11-17T09:11:48.301Z",
+      "stageAtRaise": "IMPLEMENTATION",
+      "triggers": [
+        {
+          "type": "requirements",
+          "changes": [
+            {
+              "id": "REQ-006",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "REQ-007",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-007",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-008",
+              "action": "added",
+              "to": "active"
+            },
+            {
+              "id": "AC-009",
+              "action": "added",
+              "to": "active"
+            }
+          ],
+          "at": "2026-11-17T09:11:48.301Z"
+        }
+      ],
+      "assessment": {
+        "assessedAt": "2026-11-17T09:12:01.330Z",
+        "stages": {
+          "context-discovery": {
+            "verdict": "unaffected",
+            "reason": "The new criteria act on code paths already discovered in PF-0166 (src/runtime/prerequisites.js, supervisor.js start path, ports.js, profile.js overrides, the Run card); no new area needed discovery."
+          },
+          "requirement-clarification": {
+            "verdict": "affected",
+            "reason": "The owner added REQ-006/REQ-007 (three readiness states, Try Anyway that bypasses only the dependency check, port-change safety) in the 2026-11-17 review; the clarified intent changed."
+          },
+          "implementation": {
+            "verdict": "affected",
+            "reason": "Start no longer refuses unconditionally on NEEDS_SETUP; new UNKNOWN state, skip flag, reset command and port-rewrite refusals were implemented for the new criteria."
+          },
+          "delivery-convergence": {
+            "verdict": "affected",
+            "reason": "Three new criteria (AC-007..AC-009) must be assessed and the six earlier findings are stale after the reopen."
+          }
+        },
+        "applied": {
+          "revised": [
+            "requirement-clarification",
+            "implementation"
+          ],
+          "convergenceInvalidated": true
+        }
+      }
+    }
+  ],
+  "updatedAt": "2026-11-17T09:12:01.330Z"
+}

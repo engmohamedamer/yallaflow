@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "business-rule",
+      "source": "implementation-runtime",
+      "summary": "Console first-run journey: with no projects the Projects page shows a welcome panel that routes by intent (Create, Manage, Monitor; saved as onboarding.intent in preferences). Create and Manage are agent-first: in the New Project wizard the agent-planned (empty) project is the default path and needs a chosen, ready agent, with the machine agent setup card shown in place; the pinned generator templates and creating without a ready agent are labeled Advanced options (a template needs no agent). Monitor needs no agent. These are page rules only: the server does not require an agent to create a project.",
+      "evidence": [
+        "resources/console/app.js",
+        "test/console-first-journey.test.js"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-16T17:24:37.747Z",
+      "factId": "CTX-0173",
+      "promotedAt": "2026-11-16T17:24:37.932Z",
+      "target": "context/business-rules.md"
+    }
+  ],
+  "updatedAt": "2026-11-16T17:24:37.932Z",
+  "reviewedAt": "2026-11-16T17:24:37.932Z"
+}

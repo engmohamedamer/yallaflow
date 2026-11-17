@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-16T17:11:07.817Z",
+      "completedAt": "2026-11-16T17:11:07.817Z",
+      "summary": "Read-only exists only console-wide (--read-only, server.js). The registry (console.json) keeps per-project entries whose extra fields survive older versions (parent/lane). A normal open writes .yallaflow/local (scanSetup, agent settings, bridge files). Registration requires .yallaflow (workspaceRoot).",
+      "evidence": [
+        "src/console/server.js",
+        "src/console/registry.js",
+        "src/console/greenfield.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-16T17:11:08.318Z",
+      "completedAt": "2026-11-16T17:11:08.318Z",
+      "summary": "Owner decision 3 (2026-11-16): Phase 1 Monitor Only is limited to existing YallaFlow projects, read-only enforced at the server boundary (not only in the UI), with the monitoring limits for ordinary repositories explained; Monitor and Manage are project-level modes with an explicit transition.",
+      "evidence": [
+        "user:Owner approval of Phase 1 decisions, item 3"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-16T17:16:26.889Z",
+      "completedAt": "2026-11-16T17:16:26.889Z",
+      "summary": "registry.js: per-entry mode (projectModes, setProjectMode). server.js: one POST guard refuses everything addressed to a monitored project except the confirmed mode switch (405 MONITOR_ONLY); monitored projects get no agent settings read, no agent probe, no bridge/execution entry, no setup scan, no merge recovery; POST /api/projects accepts mode monitor for an existing YallaFlow project; POST /api/p/<id>/mode switches (refused while a session is live). Page: per-project read-only, mode chip, banner with limits, confirmed switch, Monitor only button in the folder dialog and a note for folders without records.",
+      "evidence": [
+        "src/console/registry.js",
+        "src/console/server.js",
+        "resources/console/app.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-16T17:17:30.425Z",
+      "completedAt": "2026-11-16T17:17:30.425Z",
+      "summary": "All console and agent tests pass (V-001), including test/console-monitor-mode.test.js (file fingerprint of the monitored project unchanged after open, reads and refused writes).",
+      "evidence": [
+        "verification:V-001"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-16T17:17:31.067Z",
+      "completedAt": "2026-11-16T17:17:31.067Z",
+      "summary": "All three criteria satisfied (CV-001).",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-16T17:17:31.067Z"
+}

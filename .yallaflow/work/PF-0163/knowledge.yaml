@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "The New Project wizard keeps a draft in the browser (localStorage yfc.wizardDraft): bounded typed choices, the step, and the plan id only while a creation runs; never file contents or the plan hash. A creation whose plan has no outcome and is not running is treated as interrupted; continuing posts the same confirmed plan, and createFromPlan skips finished steps, so resuming needs no server-side resume logic.",
+      "evidence": [
+        "resources/console/app.js",
+        "test/console-wizard-resume.test.js"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-16T17:26:49.781Z",
+      "factId": "CTX-0174",
+      "promotedAt": "2026-11-16T17:26:49.964Z",
+      "target": "context/conventions.md"
+    }
+  ],
+  "updatedAt": "2026-11-16T17:26:49.964Z",
+  "reviewedAt": "2026-11-16T17:26:49.964Z"
+}

@@ -1,0 +1,166 @@
+TAP version 13
+# Subtest: folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+ok 1 - folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+  ---
+  duration_ms: 134.009585
+  type: 'test'
+  ...
+# Subtest: registration: an existing YallaFlow project inside home is added once, live; others are refused
+ok 2 - registration: an existing YallaFlow project inside home is added once, live; others are refused
+  ---
+  duration_ms: 295.455175
+  type: 'test'
+  ...
+# Subtest: stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+ok 3 - stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+  ---
+  duration_ms: 914.649462
+  type: 'test'
+  ...
+# Subtest: a plan that installs dependencies needs an explicit acknowledgement (PF-0085)
+ok 4 - a plan that installs dependencies needs an explicit acknowledgement (PF-0085)
+  ---
+  duration_ms: 334.8847
+  type: 'test'
+  ...
+# Subtest: Git init: explicit, once, never inside another repository; refused read-only
+ok 5 - Git init: explicit, once, never inside another repository; refused read-only
+  ---
+  duration_ms: 101.107154
+  type: 'test'
+  ...
+# Subtest: runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+ok 6 - runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+  ---
+  duration_ms: 600.950342
+  type: 'test'
+  ...
+# Subtest: agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+ok 7 - agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+  ---
+  duration_ms: 43.27948
+  type: 'test'
+  ...
+# Subtest: review: parallel registrations add a project once and lose none from the saved list
+ok 8 - review: parallel registrations add a project once and lose none from the saved list
+  ---
+  duration_ms: 74.061727
+  type: 'test'
+  ...
+# Subtest: review: hidden folders are refused even by path; read-only consoles probe no tools
+ok 9 - review: hidden folders are refused even by path; read-only consoles probe no tools
+  ---
+  duration_ms: 9.912023
+  type: 'test'
+  ...
+# Subtest: review: plans that run package scripts need an acknowledgement; control characters and NUL are refused
+ok 10 - review: plans that run package scripts need an acknowledgement; control characters and NUL are refused
+  ---
+  duration_ms: 466.216252
+  type: 'test'
+  ...
+# Subtest: review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+ok 11 - review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+  ---
+  duration_ms: 318.472108
+  type: 'test'
+  ...
+# Subtest: a registration failure after creation is reported as partial success, never as a failed creation
+ok 12 - a registration failure after creation is reported as partial success, never as a failed creation
+  ---
+  duration_ms: 452.366372
+  type: 'test'
+  ...
+# Subtest: Claude Code: off unless chosen explicitly when enabling agents; never read-only
+ok 13 - Claude Code: off unless chosen explicitly when enabling agents; never read-only
+  ---
+  duration_ms: 48.691978
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): a project leaves the running console and the saved list; its files stay
+ok 14 - removal (PF-0081): a project leaves the running console and the saved list; its files stay
+  ---
+  duration_ms: 50.910803
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): refused while an agent session is live in the project
+ok 15 - removal (PF-0081): refused while an agent session is live in the project
+  ---
+  duration_ms: 1.843315
+  type: 'test'
+  ...
+# Subtest: the file lives beside console.json on Linux, macOS and Windows (simulated environment values)
+ok 16 - the file lives beside console.json on Linux, macOS and Windows (simulated environment values)
+  ---
+  duration_ms: 2.973174
+  type: 'test'
+  ...
+# Subtest: missing, invalid, oversized or linked files mean defaults; reading never throws
+ok 17 - missing, invalid, oversized or linked files mean defaults; reading never throws
+  ---
+  duration_ms: 25.745908
+  type: 'test'
+  ...
+# Subtest: only known, typed fields can be saved: no free-form value, so no credential
+ok 18 - only known, typed fields can be saved: no free-form value, so no credential
+  ---
+  duration_ms: 2.189195
+  type: 'test'
+  ...
+# Subtest: saving merges, is private (0600), keeps keys a newer version wrote, and leaves console.json alone
+ok 19 - saving merges, is private (0600), keeps keys a newer version wrote, and leaves console.json alone
+  ---
+  duration_ms: 66.562236
+  type: 'test'
+  ...
+# Subtest: console API: read anywhere, write only as JSON with the token and Origin, never read-only
+ok 20 - console API: read anywhere, write only as JSON with the token and Origin, never read-only
+  ---
+  duration_ms: 162.526537
+  type: 'test'
+  ...
+# Subtest: the page: saved preferences win over the browser copy; a browser choice is carried over once; read-only saves nothing
+ok 21 - the page: saved preferences win over the browser copy; a browser choice is carried over once; read-only saves nothing
+  ---
+  duration_ms: 20.663922
+  type: 'test'
+  ...
+# Subtest: security: loopback host, token, origin, read-only methods and ID-only paths
+ok 22 - security: loopback host, token, origin, read-only methods and ID-only paths
+  ---
+  duration_ms: 770.78583
+  type: 'test'
+  ...
+# Subtest: serves the snapshot, work detail and preserved sources by ID
+ok 23 - serves the snapshot, work detail and preserved sources by ID
+  ---
+  duration_ms: 1105.473681
+  type: 'test'
+  ...
+# Subtest: live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+ok 24 - live: a CLI write reaches an open event stream within 2 seconds and refreshes the data
+  ---
+  duration_ms: 1334.091619
+  type: 'test'
+  ...
+# Subtest: the console never writes: browsing every route leaves the workspace byte-identical
+ok 25 - the console never writes: browsing every route leaves the workspace byte-identical
+  ---
+  duration_ms: 994.544033
+  type: 'test'
+  ...
+# Subtest: extracted text cannot be read outside its source directory; HEAD never opens the event stream
+ok 26 - extracted text cannot be read outside its source directory; HEAD never opens the event stream
+  ---
+  duration_ms: 755.676421
+  type: 'test'
+  ...
+1..26
+# tests 26
+# suites 0
+# pass 26
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8107.844882

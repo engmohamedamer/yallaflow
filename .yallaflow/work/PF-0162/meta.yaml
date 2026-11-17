@@ -1,0 +1,45 @@
+{
+  "id": "PF-0162",
+  "type": "feature",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "First-run journey by intent: Create, Manage or Monitor on the welcome panel; Create and Manage are agent-first with guided agent setup on this machine, fixed-template generation and no-agent creation stay as labeled Advanced options; a returning user with a ready usual agent sees no setup prompts",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-16T17:18:24.592Z",
+  "updatedAt": "2026-11-16T17:24:38.408Z",
+  "title": "First-run journey by intent: Create, Manage or Monitor on the welcome panel; Create and Manage are agent-first with guided agent setup on this machine, fixed-template generation and no-agent creation stay as labeled Advanced options; a returning user with a ready usual agent sees no setup prompts",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope bounded`.",
+  "routedAt": "2026-11-16T17:18:24.643Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "implement",
+    "verify",
+    "converge"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation",
+      "verification",
+      "delivery-convergence"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-16T17:24:38.408Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

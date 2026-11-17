@@ -97,19 +97,27 @@ export async function which(name, env = process.env, { platform = process.platfo
 // the program it points to is started directly: its script with node, or its own .exe. The
 // target must be a real file inside the shim's own folder. Any other command script is
 // refused with a plain reason (error.code SHIM_UNSUPPORTED) instead of being run by a shell.
-export async function launchSpec(file, args = [], { platform = process.platform, isFile = regularFile, readText = (target) => readFile(target, 'utf8'), node = process.execPath } = {}) {
+export async function launchSpec(file, args = [], { platform = process.platform, isFile = regularFile, readText = (target) => readFile(target, 'utf8'), node = process.execPath, php = null } = {}) {
   const p = pathFor(platform);
   if (platform !== 'win32' || !['.cmd', '.bat'].includes(p.extname(String(file)).toLowerCase())) return { file, args: [...args] };
   const refuse = () => Object.assign(new Error(`${p.basename(file)} is a Windows command script that YallaFlow cannot start safely (it never uses a shell). Reinstall the program with npm, or install its native version.`), { code: 'SHIM_UNSUPPORTED' });
   let text;
   try { text = String(await readText(file)).slice(0, 65_536); } catch { throw refuse(); }
   const base = p.dirname(file);
-  const targets = [...text.matchAll(/%~?dp0%?[\\/]([^"\r\n%*]+?\.(?:exe|[cm]?js))(?=["\s]|$)/gim)].map((found) => found[1]).filter((relative) => p.basename(relative).toLowerCase() !== 'node.exe');
+  // PF-0157: a shim may also point to a PHP archive beside it (Composer's Windows installer
+  // writes `php "%~dp0composer.phar" %*`). It is started with php itself, and only when the
+  // caller says where php is (`php`: async () => path | null).
+  const targets = [...text.matchAll(/%~?dp0%?[\\/]?([^"\r\n%*]+?\.(?:exe|[cm]?js|phar))(?=["\s]|$)/gim)].map((found) => found[1]).filter((relative) => p.basename(relative).toLowerCase() !== 'node.exe');
   const relative = targets.at(-1);
   if (!relative) throw refuse();
   const target = p.resolve(base, relative);
   const inside = target.toLowerCase().startsWith(`${base.toLowerCase().replace(/[\\/]+$/, '')}${p.sep}`);
   if (!inside || !(await isFile(target))) throw refuse();
+  if (p.extname(target).toLowerCase() === '.phar') {
+    const interpreter = typeof php === 'function' ? await php() : null;
+    if (!interpreter || p.extname(String(interpreter)).toLowerCase() !== '.exe') throw Object.assign(new Error(`${p.basename(file)} needs PHP (php.exe) on PATH to start.`), { code: 'SHIM_UNSUPPORTED' });
+    return { file: interpreter, args: [target, ...args] };
+  }
   if (p.extname(target).toLowerCase() === '.exe') return { file: target, args: [...args] };
   const beside = p.join(base, 'node.exe');
   return { file: (await isFile(beside)) ? beside : node, args: [target, ...args] };

@@ -1,0 +1,274 @@
+TAP version 13
+# Subtest: simulated Windows: PATH is read whatever its case, and PATHEXT decides the extensions tried
+ok 1 - simulated Windows: PATH is read whatever its case, and PATHEXT decides the extensions tried
+  ---
+  duration_ms: 7.246559
+  type: 'test'
+  ...
+# Subtest: simulated Windows: a native .exe and an npm .cmd shim are found; folders with spaces and Arabic names work
+ok 2 - simulated Windows: a native .exe and an npm .cmd shim are found; folders with spaces and Arabic names work
+  ---
+  duration_ms: 15.956446
+  type: 'test'
+  ...
+# Subtest: POSIX lookup is unchanged: an execute bit is required and the bare name is used
+ok 3 - POSIX lookup is unchanged: an execute bit is required and the bare name is used
+  ---
+  duration_ms: 52.021398
+  type: 'test'
+  ...
+# Subtest: simulated Windows: an npm shim is started as its target with node, never through a shell
+ok 4 - simulated Windows: an npm shim is started as its target with node, never through a shell
+  ---
+  duration_ms: 7.441837
+  type: 'test'
+  ...
+# Subtest: simulated Windows: a broken or unknown command script is refused with a plain reason, not run by a shell
+ok 5 - simulated Windows: a broken or unknown command script is refused with a plain reason, not run by a shell
+  ---
+  duration_ms: 14.366982
+  type: 'test'
+  ...
+# Subtest: a program that cannot be started is an answer with its cause, never a crash
+ok 6 - a program that cannot be started is an answer with its cause, never a crash
+  ---
+  duration_ms: 52.909049
+  type: 'test'
+  ...
+# Subtest: providers are independent: a missing or broken Claude Code never makes Codex unavailable, and the reverse
+ok 7 - providers are independent: a missing or broken Claude Code never makes Codex unavailable, and the reverse
+  ---
+  duration_ms: 612.200178
+  type: 'test'
+  ...
+# Subtest: simulated Windows: the terminal is a new PowerShell window in the project folder; the folder is never in the command text
+ok 8 - simulated Windows: the terminal is a new PowerShell window in the project folder; the folder is never in the command text
+  ---
+  duration_ms: 4.054904
+  type: 'test'
+  ...
+# Subtest: simulated Windows: hook and launch commands use double quotes and forward slashes
+ok 9 - simulated Windows: hook and launch commands use double quotes and forward slashes
+  ---
+  duration_ms: 12.246549
+  type: 'test'
+  ...
+# Subtest: no shell anywhere in agent discovery and launch; an unreachable console is said in plain words
+ok 10 - no shell anywhere in agent discovery and launch; an unreachable console is said in plain words
+  ---
+  duration_ms: 21.820612
+  type: 'test'
+  ...
+# Subtest: the child environment is an allow-list; Windows adds the system variables its programs need
+ok 11 - the child environment is an allow-list; Windows adds the system variables its programs need
+  ---
+  duration_ms: 6.058726
+  type: 'test'
+  ...
+# Subtest: simulated Windows: npx is started as npm's own script with node, never through a shell
+ok 12 - simulated Windows: npx is started as npm's own script with node, never through a shell
+  ---
+  duration_ms: 6.045177
+  type: 'test'
+  ...
+# Subtest: simulated Windows: Composer's installer shim is started as php.exe with composer.phar
+ok 13 - simulated Windows: Composer's installer shim is started as php.exe with composer.phar
+  ---
+  duration_ms: 4.821733
+  type: 'test'
+  ...
+# Subtest: simulated Windows: a missing tool is "not found"; a native .exe starts as itself; an unknown script is refused
+ok 14 - simulated Windows: a missing tool is "not found"; a native .exe starts as itself; an unknown script is refused
+  ---
+  duration_ms: 4.553279
+  type: 'test'
+  ...
+# Subtest: Linux (real files) and simulated macOS: a tool is the executable file on an absolute PATH folder
+ok 15 - Linux (real files) and simulated macOS: a tool is the executable file on an absolute PATH folder
+  ---
+  duration_ms: 46.189212
+  type: 'test'
+  ...
+# Subtest: a plan's prerequisite check finds tools through the shared lookup (real processes on this machine)
+ok 16 - a plan's prerequisite check finds tools through the shared lookup (real processes on this machine)
+  ---
+  duration_ms: 43.938742
+  type: 'test'
+  ...
+# Subtest: folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+ok 17 - folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+  ---
+  duration_ms: 213.074527
+  type: 'test'
+  ...
+# Subtest: registration: an existing YallaFlow project inside home is added once, live; others are refused
+ok 18 - registration: an existing YallaFlow project inside home is added once, live; others are refused
+  ---
+  duration_ms: 589.558813
+  type: 'test'
+  ...
+# Subtest: stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+ok 19 - stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+  ---
+  duration_ms: 1563.861267
+  type: 'test'
+  ...
+# Subtest: a plan that installs dependencies needs an explicit acknowledgement (PF-0085)
+ok 20 - a plan that installs dependencies needs an explicit acknowledgement (PF-0085)
+  ---
+  duration_ms: 619.752095
+  type: 'test'
+  ...
+# Subtest: Git init: explicit, once, never inside another repository; refused read-only
+ok 21 - Git init: explicit, once, never inside another repository; refused read-only
+  ---
+  duration_ms: 232.207082
+  type: 'test'
+  ...
+# Subtest: runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+ok 22 - runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+  ---
+  duration_ms: 1121.515177
+  type: 'test'
+  ...
+# Subtest: agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+ok 23 - agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+  ---
+  duration_ms: 87.863486
+  type: 'test'
+  ...
+# Subtest: review: parallel registrations add a project once and lose none from the saved list
+ok 24 - review: parallel registrations add a project once and lose none from the saved list
+  ---
+  duration_ms: 232.940503
+  type: 'test'
+  ...
+# Subtest: review: hidden folders are refused even by path; read-only consoles probe no tools
+ok 25 - review: hidden folders are refused even by path; read-only consoles probe no tools
+  ---
+  duration_ms: 39.170655
+  type: 'test'
+  ...
+# Subtest: review: plans that run package scripts need an acknowledgement; control characters and NUL are refused
+ok 26 - review: plans that run package scripts need an acknowledgement; control characters and NUL are refused
+  ---
+  duration_ms: 1024.362178
+  type: 'test'
+  ...
+# Subtest: review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+ok 27 - review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+  ---
+  duration_ms: 506.370207
+  type: 'test'
+  ...
+# Subtest: a registration failure after creation is reported as partial success, never as a failed creation
+ok 28 - a registration failure after creation is reported as partial success, never as a failed creation
+  ---
+  duration_ms: 722.102616
+  type: 'test'
+  ...
+# Subtest: Claude Code: off unless chosen explicitly when enabling agents; never read-only
+ok 29 - Claude Code: off unless chosen explicitly when enabling agents; never read-only
+  ---
+  duration_ms: 176.123909
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): a project leaves the running console and the saved list; its files stay
+ok 30 - removal (PF-0081): a project leaves the running console and the saved list; its files stay
+  ---
+  duration_ms: 136.246287
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): refused while an agent session is live in the project
+ok 31 - removal (PF-0081): refused while an agent session is live in the project
+  ---
+  duration_ms: 2.534637
+  type: 'test'
+  ...
+# Subtest: plan: validated name, absent destination, no nesting, catalog-only stacks; nothing is created
+ok 32 - plan: validated name, absent destination, no nesting, catalog-only stacks; nothing is created
+  ---
+  duration_ms: 463.854261
+  type: 'test'
+  ...
+# Subtest: create: hash confirmation, staging, promotion, Core init with provenance → Greenfield, first work item
+ok 33 - create: hash confirmation, staging, promotion, Core init with provenance → Greenfield, first work item
+  ---
+  duration_ms: 1407.472875
+  type: 'test'
+  ...
+# Subtest: existing projects keep the gate: no provenance, no Greenfield; a copied origin on a brownfield workspace is ignored
+ok 34 - existing projects keep the gate: no provenance, no Greenfield; a copied origin on a brownfield workspace is ignored
+  ---
+  duration_ms: 87.92762
+  type: 'test'
+  ...
+# Subtest: failures: generator error, missing marker, destination appearing; staging and diagnostics kept, nothing overwritten
+ok 35 - failures: generator error, missing marker, destination appearing; staging and diagnostics kept, nothing overwritten
+  ---
+  duration_ms: 289.210677
+  type: 'test'
+  ...
+# Subtest: a plan edited outside YallaFlow cannot run a different command
+ok 36 - a plan edited outside YallaFlow cannot run a different command
+  ---
+  duration_ms: 17.500884
+  type: 'test'
+  ...
+# Subtest: CLI: catalog, recommend, plan, create (empty stack), discard
+ok 37 - CLI: catalog, recommend, plan, create (empty stack), discard
+  ---
+  duration_ms: 1923.763328
+  type: 'test'
+  ...
+# Subtest: console: wizard routes are guarded, need the hash confirmation, and are refused read-only
+ok 38 - console: wizard routes are guarded, need the hash confirmation, and are refused read-only
+  ---
+  duration_ms: 1679.810723
+  type: 'test'
+  ...
+# Subtest: review: staging is npm's project root, so a parent .npmrc or node_modules cannot shadow the generator
+ok 39 - review: staging is npm's project root, so a parent .npmrc or node_modules cannot shadow the generator
+  ---
+  duration_ms: 552.926498
+  type: 'test'
+  ...
+# Subtest: review: a retry never labels or installs into a folder that replaced the created one; failure text is redacted
+ok 40 - review: a retry never labels or installs into a folder that replaced the created one; failure text is redacted
+  ---
+  duration_ms: 256.549657
+  type: 'test'
+  ...
+# Subtest: review: a parent npm workspace that would capture staging stops the generator before it runs
+ok 41 - review: a parent npm workspace that would capture staging stops the generator before it runs
+  ---
+  duration_ms: 396.94383
+  type: 'test'
+  ...
+# Subtest: plan carries intent, environment, git and attachments; creation initializes Git and words the first work from the goal
+ok 42 - plan carries intent, environment, git and attachments; creation initializes Git and words the first work from the goal
+  ---
+  duration_ms: 255.154231
+  type: 'test'
+  ...
+# Subtest: custom stack (PF-0087): only with the empty project; recorded in the plan, origin and first work item; nothing runs
+ok 43 - custom stack (PF-0087): only with the empty project; recorded in the plan, origin and first work item; nothing runs
+  ---
+  duration_ms: 1165.037271
+  type: 'test'
+  ...
+# Subtest: isolation (PF-0094): plans and registrations stay in this run's own config folder
+ok 44 - isolation (PF-0094): plans and registrations stay in this run's own config folder
+  ---
+  duration_ms: 0.611669
+  type: 'test'
+  ...
+1..44
+# tests 44
+# suites 0
+# pass 44
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9224.959382

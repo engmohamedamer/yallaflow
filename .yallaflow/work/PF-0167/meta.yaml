@@ -1,0 +1,61 @@
+{
+  "id": "PF-0167",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Document the intermittent Claude Code channel test failure under full-suite load as a known issue",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-17T09:55:03.090Z",
+  "updatedAt": "2026-11-17T10:03:34.778Z",
+  "title": "Document the intermittent Claude Code channel test failure under full-suite load as a known issue",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-17T09:55:03.146Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-17T09:55:46.426Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    },
+    {
+      "completedAt": "2026-11-17T10:03:34.778Z",
+      "verificationRunIds": [
+        "V-002"
+      ]
+    }
+  ],
+  "lastInvalidationAt": "2026-11-17T10:03:32.738Z",
+  "lifecycleHistory": [
+    {
+      "action": "reopen",
+      "fromStage": "DONE",
+      "toStage": "IMPLEMENTATION",
+      "reason": "The final full run (2026-11-17) failed a second known-intermittent test instead (console-execution Queue end to end: 'condition not met in time' under load, passes 3/3 alone); the known-issues note must cover both and give the latest result.",
+      "changedAt": "2026-11-17T10:03:32.738Z"
+    }
+  ]
+}

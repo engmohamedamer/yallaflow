@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "environment",
+      "summary": "No real Windows or macOS machine: the failure and the fix are exercised only with injected platform data",
+      "reason": "This session runs on Linux only",
+      "recordedAt": "2026-11-16T16:51:39.530Z"
+    }
+  ],
+  "updatedAt": "2026-11-16T16:51:39.530Z"
+}

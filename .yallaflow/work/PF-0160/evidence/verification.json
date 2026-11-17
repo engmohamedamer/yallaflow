@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/console-machine-readiness.test.js test/console-preferences.test.js test/console-polish.test.js test/console-folder-picker.test.js test/agent-bootstrap.test.js test/console-machine.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/console-machine-readiness.test.js",
+        "test/console-preferences.test.js",
+        "test/console-polish.test.js",
+        "test/console-folder-picker.test.js",
+        "test/agent-bootstrap.test.js",
+        "test/console-machine.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/console-machine-readiness.test.js test/console-preferences.test.js test/console-polish.test.js test/console-folder-picker.test.js test/agent-bootstrap.test.js test/console-machine.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-16T17:09:47.758Z",
+      "finishedAt": "2026-11-16T17:09:51.352Z",
+      "verifiedAt": "2026-11-16T17:09:51.352Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

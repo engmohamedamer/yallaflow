@@ -1,0 +1,1068 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-17T07:19:45.244Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "Assessed after V-001 and the browser run.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "checkPrerequisites reports DEPENDENCIES_MISSING and LOCAL_TOOL_MISSING with the install command chosen by lockfile; status carries it and startOne refuses with RUNTIME_PREREQUISITES before spawning; diagnoseLog classifies a missing project file as project-file and no install is suggested for it.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/prerequisites.js",
+              "contentHash": "sha256:aa1c8a384a6854cacd5911ff6b232aa5f08b5b24c37ed130359fad87d1a66301",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/diagnose.js",
+              "contentHash": "sha256:fd8c34e8cb6e9e25bc16edbb4163283a2141dea9dd3c33fd134c028ed1a58450",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:86b680a7cd7fd45260066679d8085c62b1b50a930dc1ced013cbaf069d365fb9",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-fixes.test.js",
+              "contentHash": "sha256:7405e492cb83538ed7c0b43761581137fbad939a7503077176bbde839ed64a65",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check:syntax && node --import ./test-support/isolate-user-config.js --test test/runtime-fixes.test.js test/console-run-fixes.test.js test/runtime.test.js test/runtime-plan.test.js test/console-run-flow.test.js test/console-ia.test.js test/shared-project.test.js && git diff --check (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "installPrerequisites requires a trusted service and the hash of the shown command; the page shows the command and enables Install only after the tick; in the test and the browser run package.json and the lockfile were byte-identical after npm ci.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "symbol": "installPrerequisites",
+              "contentHash": "sha256:86b680a7cd7fd45260066679d8085c62b1b50a930dc1ced013cbaf069d365fb9",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:a3f2a2fcb636a03da75e8f2e2d3e7fe3d0e2b297febeaff02edec916c009c941",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-fixes.test.js",
+              "contentHash": "sha256:7405e492cb83538ed7c0b43761581137fbad939a7503077176bbde839ed64a65",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check:syntax && node --import ./test-support/isolate-user-config.js --test test/runtime-fixes.test.js test/console-run-fixes.test.js test/runtime.test.js test/runtime-plan.test.js test/console-run-flow.test.js test/console-ia.test.js test/shared-project.test.js && git diff --check (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "PORT_IN_USE carries ownerService, owner, declaredBy and suggestion; planPortChange changes command, ports, ready.port and links together and throws RUNTIME_PORT_COMMAND for commands it cannot change with certainty; the other service kept running.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/ports.js",
+              "contentHash": "sha256:f9b79c233971333b5e62950f666f8ff38484becb1866ead46fd1693e559577f6",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:86b680a7cd7fd45260066679d8085c62b1b50a930dc1ced013cbaf069d365fb9",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-fixes.test.js",
+              "contentHash": "sha256:7405e492cb83538ed7c0b43761581137fbad939a7503077176bbde839ed64a65",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-run-fixes.test.js",
+              "contentHash": "sha256:f6768d372195a71665bb286bb1d98ca7668d2766b1ec37b8b3aa3a2056948108",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check:syntax && node --import ./test-support/isolate-user-config.js --test test/runtime-fixes.test.js test/console-run-fixes.test.js test/runtime.test.js test/runtime-plan.test.js test/console-run-flow.test.js test/console-ia.test.js test/shared-project.test.js && git diff --check (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "The failure block and RUNTIME_START_FAILED lead with the cause line found in the redacted log; View log stays; the text prepared for the agent starts from the cause and uses redacted lines.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:a3f2a2fcb636a03da75e8f2e2d3e7fe3d0e2b297febeaff02edec916c009c941",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:86b680a7cd7fd45260066679d8085c62b1b50a930dc1ced013cbaf069d365fb9",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-run-fixes.test.js",
+              "contentHash": "sha256:f6768d372195a71665bb286bb1d98ca7668d2766b1ec37b8b3aa3a2056948108",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-fixes.test.js",
+              "contentHash": "sha256:7405e492cb83538ed7c0b43761581137fbad939a7503077176bbde839ed64a65",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check:syntax && node --import ./test-support/isolate-user-config.js --test test/runtime-fixes.test.js test/console-run-fixes.test.js test/runtime.test.js test/runtime-plan.test.js test/console-run-flow.test.js test/console-ia.test.js test/shared-project.test.js && git diff --check (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "Edit and port forms show the scope choice with the file names and that the shared file travels only after commit and push; runtime edit has no default scope; results name the file written and any local override that still wins.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:a3f2a2fcb636a03da75e8f2e2d3e7fe3d0e2b297febeaff02edec916c009c941",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/runtime.js",
+              "contentHash": "sha256:1f28c9883d22f8acb28ca60b5c43c6e7072d2f068ce35b08fc54beb72870963c",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-run-fixes.test.js",
+              "contentHash": "sha256:f6768d372195a71665bb286bb1d98ca7668d2766b1ec37b8b3aa3a2056948108",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check:syntax && node --import ./test-support/isolate-user-config.js --test test/runtime-fixes.test.js test/console-run-fixes.test.js test/runtime.test.js test/runtime-plan.test.js test/console-run-flow.test.js test/console-ia.test.js test/shared-project.test.js && git diff --check (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "updateService merges a patch into the existing entry; a one-field edit left links, dependsOn, open, env and ready unchanged in the shared file; Settings renders only addServicePanel and stackSection under Define services manually; planSection is rendered once, in Run.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/profile.js",
+              "symbol": "updateService",
+              "contentHash": "sha256:0db9cab0c5b82f957882c67d9e29cb9bb0f3db510a4ef159ee624732d8c4b467",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:a3f2a2fcb636a03da75e8f2e2d3e7fe3d0e2b297febeaff02edec916c009c941",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-fixes.test.js",
+              "contentHash": "sha256:7405e492cb83538ed7c0b43761581137fbad939a7503077176bbde839ed64a65",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-run-fixes.test.js",
+              "contentHash": "sha256:f6768d372195a71665bb286bb1d98ca7668d2766b1ec37b8b3aa3a2056948108",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check:syntax && node --import ./test-support/isolate-user-config.js --test test/runtime-fixes.test.js test/console-run-fixes.test.js test/runtime.test.js test/runtime-plan.test.js test/console-run-flow.test.js test/console-ia.test.js test/shared-project.test.js && git diff --check (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-001"
+            }
+          ]
+        }
+      ],
+      "unrequested": [
+        {
+          "id": "UR-001",
+          "disposition": "accepted",
+          "summary": "Long start-error text (log lines with long paths) now wraps inside the service card on small screens.",
+          "reason": "Found during the browser check of the failure display at 390px; it caused horizontal page scroll.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.css",
+              "contentHash": "sha256:68764531c754d2e530c60acdaaa9e51210a4426b086f2fae93a3bf7530385a7f",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CV-002",
+      "recordedAt": "2026-11-17T09:23:49.200Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 2,
+        "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+        "verificationRunIds": [
+          "V-002"
+        ]
+      },
+      "summary": "Re-assessed after the owner review (requirements revision 2), V-002 and the browser run.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "checkPrerequisites reports DEPENDENCIES_MISSING and LOCAL_TOOL_MISSING with the install command chosen by lockfile; status carries it and startOne refuses with RUNTIME_PREREQUISITES before spawning; diagnoseLog classifies a missing project file as project-file and no install is suggested for it. After the owner review this refusal holds unless the developer explicitly chooses Try Anyway (AC-008).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/prerequisites.js",
+              "contentHash": "sha256:aac5cbca0ceeb16a040e4d435adae892bb085ecfafff26b291476ed7f5fd851f",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/diagnose.js",
+              "contentHash": "sha256:fd8c34e8cb6e9e25bc16edbb4163283a2141dea9dd3c33fd134c028ed1a58450",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:a974522ba1a525bee05cbce188bc615755de78c7694afd6f83f7b10a882c925b",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-fixes.test.js",
+              "contentHash": "sha256:548f06e205349c7ead2caa332dbe4c800e8edf6759982853360d8f3152fdc1ae",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "installPrerequisites requires a trusted service and the hash of the shown command; the page shows the command and enables Install only after the tick; in the test and the browser run package.json and the lockfile were byte-identical after npm ci.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "symbol": "installPrerequisites",
+              "contentHash": "sha256:a974522ba1a525bee05cbce188bc615755de78c7694afd6f83f7b10a882c925b",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:4da75c2de63267ff1fa43e2532f47f9719c82e10cd5130dba4a7e50240990a06",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-fixes.test.js",
+              "contentHash": "sha256:548f06e205349c7ead2caa332dbe4c800e8edf6759982853360d8f3152fdc1ae",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "PORT_IN_USE carries ownerService, owner, declaredBy and suggestion; planPortChange changes command, ports, ready.port and links together and throws RUNTIME_PORT_COMMAND for commands it cannot change with certainty; the other service kept running.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/ports.js",
+              "contentHash": "sha256:6f7f83f36371b563bd859a08d75a5612479b895396d5fc44d90634d24be269ba",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:a974522ba1a525bee05cbce188bc615755de78c7694afd6f83f7b10a882c925b",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-fixes.test.js",
+              "contentHash": "sha256:548f06e205349c7ead2caa332dbe4c800e8edf6759982853360d8f3152fdc1ae",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-run-fixes.test.js",
+              "contentHash": "sha256:5562f8f9774f71189d89b2d28a1a8700e5db044302f7ec1a2662f18bd24f88a7",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "The failure block and RUNTIME_START_FAILED lead with the cause line found in the redacted log; View log stays; the text prepared for the agent starts from the cause and uses redacted lines.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:4da75c2de63267ff1fa43e2532f47f9719c82e10cd5130dba4a7e50240990a06",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:a974522ba1a525bee05cbce188bc615755de78c7694afd6f83f7b10a882c925b",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-run-fixes.test.js",
+              "contentHash": "sha256:5562f8f9774f71189d89b2d28a1a8700e5db044302f7ec1a2662f18bd24f88a7",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-fixes.test.js",
+              "contentHash": "sha256:548f06e205349c7ead2caa332dbe4c800e8edf6759982853360d8f3152fdc1ae",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "Edit and port forms show the scope choice with the file names and that the shared file travels only after commit and push; runtime edit has no default scope; results name the file written and any local override that still wins.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:4da75c2de63267ff1fa43e2532f47f9719c82e10cd5130dba4a7e50240990a06",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/runtime.js",
+              "contentHash": "sha256:2c31c4dda6a999264d8d195046ae6196a08cc9e1b4d307c27d91469f79bd5b9f",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-run-fixes.test.js",
+              "contentHash": "sha256:5562f8f9774f71189d89b2d28a1a8700e5db044302f7ec1a2662f18bd24f88a7",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "updateService merges a patch into the existing entry; a one-field edit left links, dependsOn, open, env and ready unchanged in the shared file; Settings renders only addServicePanel and stackSection under Define services manually; planSection is rendered once, in Run.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/profile.js",
+              "symbol": "updateService",
+              "contentHash": "sha256:1ea8a700cfab419879f8908d1514aa0588a7ff47115643af5f1e38e30a42e9e9",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:4da75c2de63267ff1fa43e2532f47f9719c82e10cd5130dba4a7e50240990a06",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-fixes.test.js",
+              "contentHash": "sha256:548f06e205349c7ead2caa332dbe4c800e8edf6759982853360d8f3152fdc1ae",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-run-fixes.test.js",
+              "contentHash": "sha256:5562f8f9774f71189d89b2d28a1a8700e5db044302f7ec1a2662f18bd24f88a7",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "checkPrerequisites returns state READY/NEEDS_SETUP/UNKNOWN with a reason; startOne refuses only NEEDS_SETUP; UNKNOWN starts (tested with NODE_PATH); runtime-readiness tests cover Yarn PnP, NODE_PATH, hoisted npm workspace, pnpm workspace, sibling package, nested lockfile, other commands, Compose, missing/outside folders and missing or unreadable package.json; the card shows the UNKNOWN reason.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/prerequisites.js",
+              "contentHash": "sha256:aac5cbca0ceeb16a040e4d435adae892bb085ecfafff26b291476ed7f5fd851f",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:a974522ba1a525bee05cbce188bc615755de78c7694afd6f83f7b10a882c925b",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-readiness.test.js",
+              "contentHash": "sha256:d3a8762f6946db85288fc04eead54458f2c2a279d96b95bfafbb9875081e7fee",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-008",
+          "status": "satisfied",
+          "reason": "skipSetupCheck is applied only to the named service; tests show untrusted -> RUNTIME_UNTRUSTED, dependency -> RUNTIME_PREREQUISITES, taken port -> PORT_IN_USE with the holder still listening, a linked outside folder refused, the skip written to the log; the console accepts only skipSetupCheck:true on start/restart; a monitored project refuses it with MONITOR_ONLY.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:a974522ba1a525bee05cbce188bc615755de78c7694afd6f83f7b10a882c925b",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/runtime.js",
+              "contentHash": "sha256:4f77d8c2dda5254f78350dbd4c44d52e1e258c1a86d20597858e487e42a683b7",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-readiness.test.js",
+              "contentHash": "sha256:d3a8762f6946db85288fc04eead54458f2c2a279d96b95bfafbb9875081e7fee",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-monitor-mode.test.js",
+              "contentHash": "sha256:b8bb1a6267905aa62ca4f4105b3b2b72d1768891feddb698a87f18207fa0f461",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-002"
+            },
+            {
+              "type": "runtime",
+              "description": "browser run, Try Anyway on landing-start logged 'dependency check skipped'"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-009",
+          "status": "satisfied",
+          "reason": "Local port change keeps the shared file byte-identical and dependsOn/links/name; resetLocalOverride restores it and refuses personal services; planPortChange refuses partial, pnpm/yarn/bun, chained or port-setting scripts and reports other services' command/links/readiness mentions without changing them; no code path stops another service.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/ports.js",
+              "contentHash": "sha256:6f7f83f36371b563bd859a08d75a5612479b895396d5fc44d90634d24be269ba",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/profile.js",
+              "contentHash": "sha256:1ea8a700cfab419879f8908d1514aa0588a7ff47115643af5f1e38e30a42e9e9",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-readiness.test.js",
+              "contentHash": "sha256:d3a8762f6946db85288fc04eead54458f2c2a279d96b95bfafbb9875081e7fee",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-002"
+            },
+            {
+              "type": "runtime",
+              "description": "browser run, shared runtime.yaml sha256 unchanged after Return to the shared definition"
+            }
+          ]
+        }
+      ],
+      "unrequested": [
+        {
+          "id": "UR-002",
+          "disposition": "accepted",
+          "summary": "Long start-error text (log lines with long paths) now wraps inside the service card on small screens.",
+          "reason": "Found during the browser check of the failure display at 390px; it caused horizontal page scroll.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.css",
+              "contentHash": "sha256:418115887d180f57062eec2aa2ff58f6b0482dadcefd2d5f220b87525516906c",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            }
+          ]
+        },
+        {
+          "id": "UR-003",
+          "disposition": "accepted",
+          "summary": "The Try Anyway disclosure keeps its open state across the Run tab's periodic refresh.",
+          "reason": "Found in the browser run: without it the Advanced disclosure closed every few seconds and its button could not be clicked reliably.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:4da75c2de63267ff1fa43e2532f47f9719c82e10cd5130dba4a7e50240990a06",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CV-003",
+      "recordedAt": "2026-11-17T09:54:45.442Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 2,
+        "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+        "verificationRunIds": [
+          "V-004"
+        ]
+      },
+      "summary": "Re-assessed after the owner approval (undo wording) and V-004.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "checkPrerequisites reports DEPENDENCIES_MISSING and LOCAL_TOOL_MISSING with the install command chosen by lockfile; status carries it and startOne refuses with RUNTIME_PREREQUISITES before spawning; diagnoseLog classifies a missing project file as project-file and no install is suggested for it. After the owner review this refusal holds unless the developer explicitly chooses Try Anyway (AC-008).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/prerequisites.js",
+              "contentHash": "sha256:aac5cbca0ceeb16a040e4d435adae892bb085ecfafff26b291476ed7f5fd851f",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/diagnose.js",
+              "contentHash": "sha256:fd8c34e8cb6e9e25bc16edbb4163283a2141dea9dd3c33fd134c028ed1a58450",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:a974522ba1a525bee05cbce188bc615755de78c7694afd6f83f7b10a882c925b",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-fixes.test.js",
+              "contentHash": "sha256:548f06e205349c7ead2caa332dbe4c800e8edf6759982853360d8f3152fdc1ae",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "installPrerequisites requires a trusted service and the hash of the shown command; the page shows the command and enables Install only after the tick; in the test and the browser run package.json and the lockfile were byte-identical after npm ci.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "symbol": "installPrerequisites",
+              "contentHash": "sha256:a974522ba1a525bee05cbce188bc615755de78c7694afd6f83f7b10a882c925b",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:da325f4c28b0893002393052265e176fb9dfe7550e9dd07e186632def98553cf",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-fixes.test.js",
+              "contentHash": "sha256:548f06e205349c7ead2caa332dbe4c800e8edf6759982853360d8f3152fdc1ae",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "PORT_IN_USE carries ownerService, owner, declaredBy and suggestion; planPortChange changes command, ports, ready.port and links together and throws RUNTIME_PORT_COMMAND for commands it cannot change with certainty; the other service kept running.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/ports.js",
+              "contentHash": "sha256:6f7f83f36371b563bd859a08d75a5612479b895396d5fc44d90634d24be269ba",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:a974522ba1a525bee05cbce188bc615755de78c7694afd6f83f7b10a882c925b",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-fixes.test.js",
+              "contentHash": "sha256:548f06e205349c7ead2caa332dbe4c800e8edf6759982853360d8f3152fdc1ae",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-run-fixes.test.js",
+              "contentHash": "sha256:da0c0039daf4aa009b327150eac5db2bd78398cb5763632152dd4c6559a5cb32",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "The failure block and RUNTIME_START_FAILED lead with the cause line found in the redacted log; View log stays; the text prepared for the agent starts from the cause and uses redacted lines.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:da325f4c28b0893002393052265e176fb9dfe7550e9dd07e186632def98553cf",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:a974522ba1a525bee05cbce188bc615755de78c7694afd6f83f7b10a882c925b",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-run-fixes.test.js",
+              "contentHash": "sha256:da0c0039daf4aa009b327150eac5db2bd78398cb5763632152dd4c6559a5cb32",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-fixes.test.js",
+              "contentHash": "sha256:548f06e205349c7ead2caa332dbe4c800e8edf6759982853360d8f3152fdc1ae",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "Edit and port forms show the scope choice with the file names and that the shared file travels only after commit and push; runtime edit has no default scope; results name the file written and any local override that still wins.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:da325f4c28b0893002393052265e176fb9dfe7550e9dd07e186632def98553cf",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/runtime.js",
+              "contentHash": "sha256:2c31c4dda6a999264d8d195046ae6196a08cc9e1b4d307c27d91469f79bd5b9f",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-run-fixes.test.js",
+              "contentHash": "sha256:da0c0039daf4aa009b327150eac5db2bd78398cb5763632152dd4c6559a5cb32",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "updateService merges a patch into the existing entry; a one-field edit left links, dependsOn, open, env and ready unchanged in the shared file; Settings renders only addServicePanel and stackSection under Define services manually; planSection is rendered once, in Run.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/profile.js",
+              "symbol": "updateService",
+              "contentHash": "sha256:1ea8a700cfab419879f8908d1514aa0588a7ff47115643af5f1e38e30a42e9e9",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:da325f4c28b0893002393052265e176fb9dfe7550e9dd07e186632def98553cf",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-fixes.test.js",
+              "contentHash": "sha256:548f06e205349c7ead2caa332dbe4c800e8edf6759982853360d8f3152fdc1ae",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-run-fixes.test.js",
+              "contentHash": "sha256:da0c0039daf4aa009b327150eac5db2bd78398cb5763632152dd4c6559a5cb32",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "checkPrerequisites returns state READY/NEEDS_SETUP/UNKNOWN with a reason; startOne refuses only NEEDS_SETUP; UNKNOWN starts (tested with NODE_PATH); runtime-readiness tests cover Yarn PnP, NODE_PATH, hoisted npm workspace, pnpm workspace, sibling package, nested lockfile, other commands, Compose, missing/outside folders and missing or unreadable package.json; the card shows the UNKNOWN reason.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/prerequisites.js",
+              "contentHash": "sha256:aac5cbca0ceeb16a040e4d435adae892bb085ecfafff26b291476ed7f5fd851f",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:a974522ba1a525bee05cbce188bc615755de78c7694afd6f83f7b10a882c925b",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-readiness.test.js",
+              "contentHash": "sha256:d3a8762f6946db85288fc04eead54458f2c2a279d96b95bfafbb9875081e7fee",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-004"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-008",
+          "status": "satisfied",
+          "reason": "skipSetupCheck is applied only to the named service; tests show untrusted -> RUNTIME_UNTRUSTED, dependency -> RUNTIME_PREREQUISITES, taken port -> PORT_IN_USE with the holder still listening, a linked outside folder refused, the skip written to the log; the console accepts only skipSetupCheck:true on start/restart; a monitored project refuses it with MONITOR_ONLY.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:a974522ba1a525bee05cbce188bc615755de78c7694afd6f83f7b10a882c925b",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/runtime.js",
+              "contentHash": "sha256:4f77d8c2dda5254f78350dbd4c44d52e1e258c1a86d20597858e487e42a683b7",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-readiness.test.js",
+              "contentHash": "sha256:d3a8762f6946db85288fc04eead54458f2c2a279d96b95bfafbb9875081e7fee",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-monitor-mode.test.js",
+              "contentHash": "sha256:b8bb1a6267905aa62ca4f4105b3b2b72d1768891feddb698a87f18207fa0f461",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "browser run, Try Anyway on landing-start logged 'dependency check skipped'"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-009",
+          "status": "satisfied",
+          "reason": "Local port change keeps the shared file byte-identical and dependsOn/links/name; resetLocalOverride restores it and refuses personal services; planPortChange refuses partial, pnpm/yarn/bun, chained or port-setting scripts and reports other services' command/links/readiness mentions without changing them; no code path stops another service. The undo states on the card and in the confirmation that all local changes to the service are removed, as the owner required.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/ports.js",
+              "contentHash": "sha256:6f7f83f36371b563bd859a08d75a5612479b895396d5fc44d90634d24be269ba",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/profile.js",
+              "contentHash": "sha256:1ea8a700cfab419879f8908d1514aa0588a7ff47115643af5f1e38e30a42e9e9",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-readiness.test.js",
+              "contentHash": "sha256:d3a8762f6946db85288fc04eead54458f2c2a279d96b95bfafbb9875081e7fee",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js (passed)",
+              "workId": "PF-0166",
+              "verificationRunId": "V-004"
+            },
+            {
+              "type": "runtime",
+              "description": "browser run, shared runtime.yaml sha256 unchanged after Return to the shared definition"
+            }
+          ]
+        }
+      ],
+      "unrequested": [
+        {
+          "id": "UR-004",
+          "disposition": "accepted",
+          "summary": "Long start-error text (log lines with long paths) now wraps inside the service card on small screens.",
+          "reason": "Found during the browser check of the failure display at 390px; it caused horizontal page scroll.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.css",
+              "contentHash": "sha256:418115887d180f57062eec2aa2ff58f6b0482dadcefd2d5f220b87525516906c",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            }
+          ]
+        },
+        {
+          "id": "UR-005",
+          "disposition": "accepted",
+          "summary": "The Try Anyway disclosure keeps its open state across the Run tab's periodic refresh.",
+          "reason": "Found in the browser run: without it the Advanced disclosure closed every few seconds and its button could not be clicked reliably.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:da325f4c28b0893002393052265e176fb9dfe7550e9dd07e186632def98553cf",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "updatedAt": "2026-11-17T09:54:45.442Z"
+}

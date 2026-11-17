@@ -4,6 +4,14 @@ All notable changes to YallaFlow are documented here. The format loosely follows
 
 **1.0.0 is the first public release**, published to npm as `yallaflow`. From 1.0.0 the package follows Semantic Versioning with the compatibility promise in [`docs/releasing.md`](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise). Every earlier version below is an **internal prerelease**: git-tagged, never published to npm, and kept here as history.
 
+## [Unreleased]
+
+### Known issues
+- **Intermittent test failures under the load of the full suite** (PF-0167). Two tests can fail when the whole suite runs, and pass when run on their own. The code they cover was not changed in this cycle. Until they are fixed, the full suite is not reported as fully passing.
+  - `test/agent-claude-experimental.test.js`, "claude (simulated): channel server registers, relays chat, replies, permissions, hooks; bridge token protected": the check that a request answered in Claude Code is closed as `elsewhere` gets `deny` instead. Passed 3 of 3 runs alone.
+  - `test/console-execution.test.js`, "Queue end to end: two items run one after the other through the real bridge…": `condition not met in time`. Passed 3 of 3 runs alone.
+  - Last two full runs (2026-11-17): 1417 tests, 1415 pass, 1 skipped, 1 failed each time (the Claude Code test in one run, the Queue test in the other).
+
 ## [1.5.3] - 2026-11-15 — A clearer start
 
 The console of 1.5.2, with a clearer start on an existing project and steadier agent sessions. Existing workspaces load unchanged; the new baseline fields are optional.

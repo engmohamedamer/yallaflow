@@ -953,4 +953,77 @@ print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_commo
   - src/overview/collect.js (repository @ 92356b3)
   - resources/console/app.js (repository @ 92356b3)
 
+<!-- yallaflow-fact:CTX-0168 -->
+### CTX-0168 — Developer tools the console and the New Project wizard run (composer, npx, npm, php, git, docker) are found and started through src/utils/command.js: resolveCommand looks the name up on the child's own PATH with detect.js which(), and starts a Windows .cmd/.bat shim's own program directly via launchSpec (npm shims with node; Composer's installer shim as php.exe with composer.phar); safeEnvironment is the allow-listed child environment, adding Windows system variables on win32. No shell is used. Windows and macOS behavior is simulated in tests only.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0157
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-16T16:54:44.278Z
+- **Verified:** 2026-11-16T16:54:44.278Z (commit f33eaec)
+- **Evidence:**
+  - src/utils/command.js (repository @ f33eaec)
+  - test/command-platform.test.js (repository @ f33eaec)
+
+<!-- yallaflow-fact:CTX-0170 -->
+### CTX-0170 — User-level console preferences live in preferences.json beside console.json (src/console/preferences.js; GET/POST /api/preferences): preferred agent, language, theme, last-used folder and onboarding intent/completed. It is a separate file because saveRegistry rewrites console.json and drops unknown top-level keys. Only enumerated or path-typed fields are accepted (no free-form value, so no credential); agent install/sign-in state is never stored; keys from a newer version are preserved; a missing or invalid file means defaults; the browser's localStorage is only a first-paint copy.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0159
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-16T17:01:48.241Z
+- **Verified:** 2026-11-16T17:01:48.241Z (commit f33eaec)
+- **Evidence:**
+  - src/console/preferences.js (repository @ f33eaec)
+  - test/console-preferences.test.js (repository @ f33eaec)
+
+<!-- yallaflow-fact:CTX-0171 -->
+### CTX-0171 — Machine readiness is derived, never stored: src/agents/machine-readiness.js computeMachineReadiness(MachineSetup.status(), preferences) is returned as readiness on GET /api/machine. Per agent it keeps installed, authenticated (subscription only) and connection apart (Codex: handshake test this console run; Claude Code: session-only, never verified ahead), plus support (supported on linux/darwin, not-verified elsewhere) and stability (Claude Code experimental). The saved preferred agent is only preselected and marked; a project's agent is enabled only by the developer's own click.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0160
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-16T17:09:52.309Z
+- **Verified:** 2026-11-16T17:09:52.309Z (commit f33eaec)
+- **Evidence:**
+  - src/agents/machine-readiness.js (repository @ f33eaec)
+  - test/console-machine-readiness.test.js (repository @ f33eaec)
+
+<!-- yallaflow-fact:CTX-0176 -->
+### CTX-0176 — Console chat transcript: src/agents/transcript.js numbers every agent event (n, growing across console restarts), merges consecutive streamed chunks into one entry, keeps the newest 400 merged entries in memory and journals everything to .yallaflow/local/agent-chat/transcript.jsonl (git-ignored, 0600, secret-looking values redacted, rotated once at 8 MB). AgentBridge.status returns the newest 200 with transcript.hasOlder; GET /api/p/<id>/agent/transcript?before=n pages older events from memory or disk. The page merges a reload by n (never replaces), shows every loaded entry and folds only tool steps. This replaces the earlier rule that YallaFlow keeps no chat messages.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0165
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-16T19:38:13.042Z
+- **Verified:** 2026-11-16T19:38:13.042Z (commit f33eaec)
+- **Evidence:**
+  - src/agents/transcript.js (repository @ f33eaec)
+  - test/agent-transcript.test.js (repository @ f33eaec)
+  - docs/agents.md (repository @ f33eaec)
+
+<!-- yallaflow-fact:CTX-0177 -->
+### CTX-0177 — Runtime fixes: before a service starts, src/runtime/prerequisites.js checks from files only whether a Node package manager service has its dependencies (or the script's declared local tool) installed and names the install command by lockfile; runtimeStatus carries prerequisites and, for a failed service, failure (src/runtime/diagnose.js: the log line that states the cause). startOne refuses RUNTIME_PREREQUISITES before spawning; PORT_IN_USE carries ownerService, owner and a free suggestion. runtime install runs the named command only for a trusted service with the hash of that command. runtime port (src/runtime/ports.js) changes command, ports, ready.port and links together or refuses (RUNTIME_PORT_COMMAND). profile.updateService edits fields of an existing service keeping the rest, in the local override (--local) or the shared file (--shared); runtime edit has no default scope. In the console these live on the service card in the Run tab; Settings only defines a service manually.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0166
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-17T07:19:46.243Z
+- **Verified:** 2026-11-17T07:19:46.243Z (commit f33eaec)
+- **Evidence:**
+  - src/runtime/prerequisites.js (repository @ f33eaec)
+  - src/runtime/ports.js (repository @ f33eaec)
+  - src/runtime/profile.js (repository @ f33eaec)
+  - test/runtime-fixes.test.js (repository @ f33eaec)
+
 <!-- yallaflow-context:end -->

@@ -36,12 +36,15 @@ async function saveRegistry(registry, file) {
 
 // PF-0112: a lane (a YallaFlow-created worktree) is saved with its home checkout (`parent`)
 // and its lane name; consoles before 1.5.0 ignore both fields.
-export async function addProject(dir, file = registryPath(), { parent = null, lane = null } = {}) {
+// PF-0161: an entry may carry `mode: 'monitor'` (open for monitoring only). No mode means
+// the project is managed, as every entry was before 1.6; older consoles ignore the field.
+export const PROJECT_MODES = Object.freeze(['manage', 'monitor']);
+export async function addProject(dir, file = registryPath(), { parent = null, lane = null, mode = null } = {}) {
   const root = await findProjectRoot(path.resolve(dir));
   if (!root) throw new Error(`No .yallaflow workspace found at ${dir}. Run \`yallaflow init\` there first.`);
   const registry = await loadRegistry(file);
   if (registry.projects.some((entry) => entry.root === root)) return { root, added: false };
-  registry.projects.push({ root, addedAt: new Date().toISOString(), ...(parent ? { parent, lane } : {}) });
+  registry.projects.push({ root, addedAt: new Date().toISOString(), ...(parent ? { parent, lane } : {}), ...(mode === 'monitor' ? { mode } : {}) });
   await saveRegistry(registry, file);
   return { root, added: true };
 }
@@ -54,4 +57,28 @@ export async function removeProject(dir, file = registryPath()) {
   if (kept.length === registry.projects.length) return { root: target, removed: false };
   await saveRegistry({ ...registry, projects: kept }, file);
   return { root: target, removed: true };
+}
+
+// The saved mode of each project: root -> 'monitor' | 'manage'. An unreadable list means
+// "managed" for every project (the list's own error is reported where the list is loaded).
+export async function projectModes(file = registryPath()) {
+  try {
+    return new Map((await loadRegistry(file)).projects.map((entry) => [entry.root, entry.mode === 'monitor' ? 'monitor' : 'manage']));
+  } catch {
+    return new Map();
+  }
+}
+
+// Saves a project's mode (adding the project to the list when it is not there yet). The
+// project's own files are never touched: the mode lives only in this user-level list.
+export async function setProjectMode(dir, mode, file = registryPath()) {
+  if (!PROJECT_MODES.includes(mode)) throw new Error(`The mode must be one of: ${PROJECT_MODES.join(', ')}.`);
+  const root = await findProjectRoot(path.resolve(dir));
+  if (!root) throw new Error(`No .yallaflow workspace found at ${dir}.`);
+  const registry = await loadRegistry(file);
+  let entry = registry.projects.find((candidate) => candidate.root === root);
+  if (!entry) { entry = { root, addedAt: new Date().toISOString() }; registry.projects.push(entry); }
+  if (mode === 'monitor') entry.mode = 'monitor'; else delete entry.mode;
+  await saveRegistry(registry, file);
+  return { root, mode };
 }

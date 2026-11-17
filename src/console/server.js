@@ -23,8 +23,8 @@ import { exists } from '../utils/fs.js';
 import { loadSource, loadSourceText, sourceOriginalPath } from '../core/sources.js';
 import { isSourceId, isWorkId } from '../core/ids.js';
 import { HttpError, MAX_JSON_BYTES, attachFile, createWork, validateCreateBody } from './create.js';
-import { isServiceId, runRuntimeAction, runRuntimePlanAction, runRuntimeProjectAction } from './runtime.js';
-import { wizardCatalog, wizardCreate, wizardPlan, wizardProgress } from './newproject.js';
+import { changeRuntimePort, editRuntimeService, installRuntimePrerequisites, resetRuntimeOverride, isServiceId, runRuntimeAction, runRuntimePlanAction, runRuntimeProjectAction } from './runtime.js';
+import { wizardCatalog, wizardCreate, wizardPlan, wizardProgress, wizardTools } from './newproject.js';
 import { AgentBridge } from '../agents/bridge.js';
 import { ExecutionManager } from '../execution/manager.js';
 import { cleanupCheck, cleanupLane, createLane, laneIdentity, lanePreconditions, readLanes } from '../execution/lanes.js';
@@ -36,7 +36,7 @@ import { detectProviders } from '../agents/detect.js';
 import { FolderError, createFolder, listFolders } from './folders.js';
 import { connectFolder, previewConnect } from './connect.js';
 import { MachineSetup } from '../agents/setup.js';
-import { addProject as saveToRegistry, removeProject as forgetInRegistry } from './registry.js';
+import { addProject as saveToRegistry, removeProject as forgetInRegistry, projectModes, setProjectMode } from './registry.js';
 import { openInFileManager, openReportFile } from './reveal.js';
 import { qualityDirPath } from '../quality/artifacts.js';
 import { openTerminal, shellQuote } from '../agents/terminal.js';
@@ -45,6 +45,8 @@ import { CLAUDE_NOT_INCLUDED, claudeIncluded, loadClaude } from '../agents/exper
 import { readAgentSettings, readApprovalWait, writeAgentSettings, writeApprovalWait } from '../agents/settings.js';
 import { markSetup, readSetup, scanSetup, setupPending } from './setup.js';
 import { computeReadiness, notReady } from './readiness.js';
+import { loadPreferences, savePreferences } from './preferences.js';
+import { computeMachineReadiness } from '../agents/machine-readiness.js';
 import { defaultIntegrationBranch } from '../shared/git.js';
 import { readYaml } from '../core/yaml.js';
 
@@ -65,9 +67,9 @@ const UI_FILES = Object.freeze({
 // 1.4.0: work-item actions and review-gate decisions (PF-0043) join Create Work.
 // 1.4.0 Greenfield journey (PF-0057): register a project, enable agents for this run, Git init,
 // add a runtime service, attach a planned file to a new project's first work item.
-const WRITE_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|revision-sources|actions\/[a-z]+|gates\/[a-z]+\/decision|quality-report))?|runtime\/[a-z][a-z0-9-]{0,31}\/(?:trust|start|stop|restart)|runtime\/services|runtime\/(?:start|stop)-all|runtime\/analyze|runtime\/plan\/save|agents\/(?:settings|launch-files|approval-wait|open-terminal)|setup\/(?:scan|step)|git\/init|open-folder)$|^\/api\/new\/(?:plan|create|plans\/NP-\d{14}-[0-9a-f]{6}\/files)$|^\/api\/(?:projects|projects\/remove|projects\/connect|agents\/enable|fs\/mkdir|machine\/codex\/(?:install|login|verify)|machine\/job\/cancel)$/;
+const WRITE_ROUTE = /^(?:\/api\/preferences|\/api\/p\/[0-9a-f]{10}\/mode|\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|revision-sources|actions\/[a-z]+|gates\/[a-z]+\/decision|quality-report))?|runtime\/[a-z][a-z0-9-]{0,31}\/(?:trust|start|stop|restart|edit|port|install|reset)|runtime\/services|runtime\/(?:start|stop)-all|runtime\/analyze|runtime\/plan\/save|agents\/(?:settings|launch-files|approval-wait|open-terminal)|setup\/(?:scan|step)|git\/init|open-folder)$|^\/api\/new\/(?:plan|create|plans\/NP-\d{14}-[0-9a-f]{6}\/files)$|^\/api\/(?:projects|projects\/remove|projects\/connect|agents\/enable|fs\/mkdir|machine\/codex\/(?:install|login|verify)|machine\/job\/cancel))$/;
 // Agent Interaction (v1.3.0, only with --agents): the Agent Workspace's actions.
-const AGENT_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/agent\/(start|message|permission|cancel|end|resume|connect|disconnect|activate)$/;
+const AGENT_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/agent\/(start|message|permission|cancel|end|resume|connect|disconnect|activate|clear-history)$/;
 // PF-0112: execution actions (queues): create a run and the developer's run/task controls.
 const EXEC_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/execution\/(run|pause|next|resume|retry|skip|switch|reorder|cancel|parallel|lane-cleanup|shared-enable|merge-approve|merge-continue|merge-abandon|merge-sendback)$/;
 // The Claude channel server and hook forwarder (bridge token, never a browser).
@@ -126,6 +128,8 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
   // choice when enabling agents in the console; never by default, never read-only.
   let claudeOn = agentsOn && Boolean(experimentalClaude);
   let bridge = null;
+  // PF-0165: the developer's choice to save the agent chat on disk (preferences.json; null: on).
+  let saveChat = (await loadPreferences()).saveChatHistory !== false;
   // PF-0112: the Execution Manager above the bridge (runs, the Agents view); exists with the bridge.
   let execution = null;
   let merges = null; // PF-0112 M3 Review & Merge service (created with the console)
@@ -143,10 +147,19 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
   };
   const projects = await Promise.all(roots.map((root) => projectEntry(root)));
   const byId = new Map(projects.map((entry) => [entry.id, entry]));
+  // PF-0161: Monitor Only is a mode of one project, saved in the user's console project list
+  // (never in the project). A monitored project is treated the way a --read-only console
+  // treats every project: no write, no agent or execution action, no agent probe, and nothing
+  // written inside it when it is opened or read. A lane follows its home project.
+  const savedModes = readOnly ? new Map() : await projectModes();
+  for (const entry of projects) entry.mode = entry.kind !== 'lane' && savedModes.get(entry.root) === 'monitor' ? 'monitor' : 'manage';
+  const monitored = (entry) => Boolean(entry) && (entry.mode === 'monitor' || (entry.kind === 'lane' && byId.get(entry.parent)?.mode === 'monitor'));
+  const MONITOR_ONLY = 'This project is open for monitoring only: YallaFlow shows its records and changes nothing. Switch it to Manage to work on it.';
+  const monitorRefusal = () => Object.assign(new Error(MONITOR_ONLY), { status: 405, code: 'MONITOR_ONLY' });
   // PF-0069: each project's saved agent choice (.yallaflow/local/agents.json) applies when
   // the console opens. A read-only console ignores it.
   const savedChoices = new Map();
-  if (!readOnly) for (const entry of projects) savedChoices.set(entry.id, await readAgentSettings(entry.root));
+  if (!readOnly) for (const entry of projects) if (!monitored(entry)) savedChoices.set(entry.id, await readAgentSettings(entry.root));
   if (!readOnly && [...savedChoices.values()].some((choice) => choice.chosen && choice.agents)) agentsOn = true;
   const claudeChosen = () => (claudeIncluded() ? [...savedChoices.entries()].filter(([, choice]) => choice.chosen && choice.claude).map(([id]) => id) : []);
   const clients = new Set();
@@ -164,24 +177,14 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
   // Registrations run one at a time (security review, PF-0057): parallel requests for the
   // same folder must not add it twice, and the saved list is rewritten by one writer.
   let registering = Promise.resolve();
-  function registerRoot(root) {
-    const next = registering.then(() => registerNow(root));
+  function registerRoot(root, options = {}) {
+    const next = registering.then(() => registerNow(root, options));
     registering = next.catch(() => {});
     return next;
   }
-  async function registerNow(root) {
-    const real = await workspaceRoot(root);
-    const known = [];
-    for (const entry of projects) known.push([entry, await realpath(entry.root).catch(() => entry.root)]);
-    const already = known.find(([, existing]) => existing === real)?.[0];
-    const marker = await laneIdentity(real);
-    const saved = await saveToRegistry(real, undefined, marker?.createdBy === 'yallaflow' ? { parent: marker.home, lane: marker.slug } : {});
-    if (already) return { id: already.id, name: already.name, root: already.root, added: false, saved: saved.added };
-    if (byId.has(projectId(real))) { const same = byId.get(projectId(real)); return { id: same.id, name: same.name, root: same.root, added: false, saved: saved.added }; }
-    const entry = await projectEntry(real);
-    projects.push(entry);
-    byId.set(entry.id, entry);
-    watchers.push(watch(entry));
+  // What a managed project gets when it joins the running console: its saved agent choice,
+  // the agent bridge and the execution lanes. A monitored project gets none of it.
+  async function attach(entry) {
     if (!readOnly) {
       const choice = await readAgentSettings(entry.root);
       savedChoices.set(entry.id, choice);
@@ -191,16 +194,61 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     if (bridge && !readOnly) bridge.setApprovalWait(entry.id, (await readApprovalWait(entry.root)).minutes);
     await execution?.addProject(entry);
     if (bridge && savedChoices.get(entry.id)?.claude && claudeIncluded()) await bridge.enableClaude(entry.id);
+  }
+  async function registerNow(root, { mode = null } = {}) {
+    const real = await workspaceRoot(root);
+    const known = [];
+    for (const entry of projects) known.push([entry, await realpath(entry.root).catch(() => entry.root)]);
+    const already = known.find(([, existing]) => existing === real)?.[0];
+    const marker = await laneIdentity(real);
+    const isLane = marker?.createdBy === 'yallaflow';
+    // A project already open or already saved keeps its mode: opening it again never switches it.
+    const wanted = !isLane && mode === 'monitor' ? 'monitor' : null;
+    const saved = await saveToRegistry(real, undefined, { ...(isLane ? { parent: marker.home, lane: marker.slug } : {}), mode: wanted });
+    if (already) return { id: already.id, name: already.name, root: already.root, mode: already.mode, added: false, saved: saved.added };
+    if (byId.has(projectId(real))) { const same = byId.get(projectId(real)); return { id: same.id, name: same.name, root: same.root, mode: same.mode, added: false, saved: saved.added }; }
+    const entry = await projectEntry(real);
+    entry.mode = isLane ? 'manage' : saved.added ? (wanted ?? 'manage') : ((await projectModes()).get(real) ?? 'manage');
+    projects.push(entry);
+    byId.set(entry.id, entry);
+    watchers.push(watch(entry));
+    if (!monitored(entry)) await attach(entry);
     const message = `data: ${JSON.stringify({ type: 'projects', project: entry.id, at: new Date().toISOString() })}\n\n`;
     for (const client of clients) client.write(message);
-    return { id: entry.id, name: entry.name, root: entry.root, added: true, saved: saved.added };
+    return { id: entry.id, name: entry.name, root: entry.root, mode: entry.mode, added: true, saved: saved.added };
+  }
+  // PF-0161: the explicit switch between Monitor and Manage. Runs in the registration queue
+  // (one writer of the saved list). To Monitor: refused while an agent session is live; the
+  // console then lets go of the project's agent connection. To Manage: the project joins the
+  // agent bridge like a newly added project. The project's own files are not changed by the switch.
+  function switchMode(entry, mode) {
+    const next = registering.then(async () => {
+      if (entry.kind === 'lane') throw Object.assign(new Error('A lane follows its home project. Switch the home project instead.'), { status: 409, code: 'NOT_HOME' });
+      if (entry.mode === mode) return { id: entry.id, mode, changed: false };
+      if (mode === 'monitor') {
+        await bridge?.removeProject(entry.id); // refuses (409) while a session is live or starting
+        execution?.removeProject(entry.id);
+        savedChoices.delete(entry.id);
+        await setProjectMode(entry.root, 'monitor');
+        entry.mode = 'monitor';
+      } else {
+        await setProjectMode(entry.root, 'manage');
+        entry.mode = 'manage';
+        await attach(entry);
+      }
+      runner.invalidate(entry.root);
+      broadcastProjects(entry.id);
+      return { id: entry.id, mode, changed: true };
+    });
+    registering = next.catch(() => {});
+    return next;
   }
   // A project the wizard just made: add it, then scan its stack once (PF-0084), so Setup
   // starts from the generated files instead of asking for a scan the developer just chose.
   // A failed scan only leaves the step open.
   async function registerCreated(planId) {
     const registration = await registerRoot((await createdProjectRoot(planId)).root);
-    if (!readOnly) await scanSetup(registration.root, runner).catch(() => {});
+    if (!readOnly && registration.mode !== 'monitor') await scanSetup(registration.root, runner).catch(() => {});
     return registration;
   }
   // PF-0081: takes a project off this console and off the saved list. The project's own
@@ -244,7 +292,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
   }
   async function agentSettingsView(project, scan) {
     // A read-only console runs no agent probes (security review, PF-0069).
-    if (readOnly) return { readOnly: true, claudeAvailable: claudeIncluded(), saved: { chosen: false }, applied: { agents: false, claude: false }, codex: null, claude: null, checklist: null };
+    if (readOnly || monitored(project)) return { readOnly: true, ...(monitored(project) ? { monitor: true } : {}), claudeAvailable: claudeIncluded(), saved: { chosen: false }, applied: { agents: false, claude: false }, codex: null, claude: null, checklist: null };
     const choice = savedChoices.get(project.id) ?? (readOnly ? { chosen: false } : await readAgentSettings(project.root));
     const claudeOnHere = Boolean(bridge?.claudeOnFor(project.id));
     const detected = await detectProviders({ env: agentEnv, claude: (scan || claudeOnHere || choice.claude) && claudeIncluded(), maxAgeMs: scan ? 0 : 30_000 });
@@ -271,7 +319,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     let snapshotError = null;
     try { await runner.get(project.root, 'snapshot', ['snapshot', '--json']); } catch (error) { snapshotError = error.message; }
     let agent = { checked: false };
-    if (!readOnly) {
+    if (!readOnly && !monitored(project)) {
       // PF-0133: the agent step follows the developer's choice for this project (Codex, or the
       // experimental Claude Code); with no saved choice the step asks for one.
       const choice = savedChoices.get(project.id) ?? await readAgentSettings(project.root);
@@ -313,6 +361,13 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     if (origin && !allowedHosts.map((entry) => `http://${entry}`).includes(origin)) return send(response, 403, { error: { code: 'FORBIDDEN_ORIGIN', message: 'Foreign origin.' } });
     const url = new URL(request.url, `http://${request.headers.host}`);
     if (BRIDGE_ROUTE.test(url.pathname)) return handleBridge(request, response, url);
+    // PF-0161: the Monitor Only boundary. Every POST addressed to a monitored project is
+    // refused here, before any route (work, gates, runtime, Git, setup, agent, execution) sees
+    // it. The one exception is the explicit switch of the mode itself.
+    if (request.method === 'POST') {
+      const addressed = /^\/api\/p\/([0-9a-f]{10})\/(.*)$/.exec(url.pathname);
+      if (addressed && monitored(byId.get(addressed[1])) && addressed[2] !== 'mode') return send(response, 405, { error: { code: 'MONITOR_ONLY', message: MONITOR_ONLY } }, { Allow: 'GET, HEAD' });
+    }
     if (request.method === 'POST' && agentsOn && AGENT_ROUTE.test(url.pathname)) {
       if (!authorized(request)) return send(response, 401, { error: { code: 'UNAUTHORIZED', message: 'Missing or wrong console token. Open the link printed by `yallaflow console`.' } });
       if (!origin) return send(response, 403, { error: { code: 'FORBIDDEN_ORIGIN', message: 'An agent action needs the console page as its Origin.' } });
@@ -337,8 +392,10 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
 
     const parts = url.pathname.split('/').filter(Boolean); // ['api', ...]
     if (parts.length === 2 && parts[1] === 'projects') {
-      return send(response, 200, { projects: projects.map(({ id, name, root, kind, parent, laneId }) => ({ id, name, root, kind: kind ?? 'main', ...(kind === 'lane' ? { parent, laneId } : {}) })), unavailable: missing, readOnly, agents: { enabled: agentsOn, claude: claudeOn, canEnable: !readOnly && !agentsOn, claudeAvailable: claudeIncluded() } });
+      return send(response, 200, { projects: projects.map((entry) => { const { id, name, root, kind, parent, laneId } = entry; return { id, name, root, kind: kind ?? 'main', mode: monitored(entry) ? 'monitor' : 'manage', ...(kind === 'lane' ? { parent, laneId } : {}) }; }), unavailable: missing, readOnly, agents: { enabled: agentsOn, claude: claudeOn, canEnable: !readOnly && !agentsOn, claudeAvailable: claudeIncluded() } });
     }
+    // PF-0159: reading the preferences writes nothing, so a read-only console may read them too.
+    if (parts.length === 2 && parts[1] === 'preferences') return send(response, 200, { ...(await loadPreferences()), readOnly });
     // 1.4.0 (PF-0057) reads: folders under the allowed roots (PF-0146), tool availability, agent readiness.
     if (parts.length === 3 && parts[1] === 'fs' && parts[2] === 'dirs') {
       if (readOnly) return send(response, 405, { error: { code: 'READ_ONLY', message: 'This console was started with --read-only; it does not choose folders.' } });
@@ -352,7 +409,9 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     // PF-0123: agent setup status (runs the providers' own --version and login-status probes).
     if (parts.length === 2 && parts[1] === 'machine') {
       if (readOnly) return send(response, 405, { error: { code: 'READ_ONLY', message: 'This console was started with --read-only; it runs no agent probes.' } });
-      return send(response, 200, await machine.status());
+      // PF-0160: the derived readiness of this machine's agents rides along (never stored).
+      const status = await machine.status();
+      return send(response, 200, { ...status, readiness: computeMachineReadiness(status, { preferences: await loadPreferences() }) });
     }
     if (parts.length === 3 && parts[1] === 'machine' && parts[2] === 'job') return send(response, 200, { job: machine.jobView() });
     // PF-0123: what connecting a folder would do (read-only; the chooser's home-bounded rules).
@@ -377,6 +436,8 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       return openEvents(request, response);
     }
     // 1.4.0 New Project Wizard reads (not tied to an existing project).
+    // PF-0158: Recheck one stack's tools (--version probes only): never in a read-only console.
+    if (parts.length === 3 && parts[1] === 'new' && parts[2] === 'prerequisites') return readOnly ? send(response, 405, { error: { code: 'READ_ONLY', message: 'This console was started with --read-only.' } }) : send(response, 200, await wizardTools(url.searchParams.get('stack'), { git: url.searchParams.get('git') === '1' }));
     if (parts.length === 3 && parts[1] === 'new' && parts[2] === 'catalog') return send(response, 200, await wizardCatalog(projects[0]?.root ?? process.cwd(), runner));
     if (parts.length === 4 && parts[1] === 'new' && parts[2] === 'plans' && /^NP-\d{14}-[0-9a-f]{6}$/.test(parts[3])) return send(response, 200, await wizardProgress(parts[3]));
     if (parts[1] !== 'p' || !byId.has(parts[2])) return send(response, 404, { error: { code: 'NOT_FOUND', message: 'Unknown project.' } });
@@ -394,7 +455,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     // PF-0069: the saved project setup (last stack scan, steps) and whether to offer it.
     if (rest.length === 1 && rest[0] === 'setup') {
       const record = await readSetup(project.root);
-      return send(response, 200, { record, pending: !readOnly && setupPending(record), readOnly });
+      return send(response, 200, { record, pending: !readOnly && !monitored(project) && setupPending(record), readOnly: readOnly || monitored(project) });
     }
     if (rest.length === 1 && rest[0] === 'readiness') return send(response, 200, await readinessFor(project));
     if (rest.length === 1 && rest[0] === 'runtime') {
@@ -423,14 +484,22 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     if (rest.length === 4 && rest[0] === 'work' && isWorkId(rest[1]) && rest[2] === 'gates') {
       return send(response, 200, await gateReview(project.root, rest[1], rest[3], runner));
     }
+    // PF-0165: older chat events, a page at a time (read-only).
+    if (rest.length === 2 && rest[0] === 'agent' && rest[1] === 'transcript') {
+      if (!agentsOn || monitored(project)) return send(response, 200, { events: [], hasOlder: false });
+      return send(response, 200, await bridge.transcript(project.id, { before: Number(url.searchParams.get('before')), limit: Number.parseInt(url.searchParams.get('limit') ?? '100', 10) }));
+    }
     if (rest.length === 1 && rest[0] === 'agent') {
-      if (!agentsOn) return send(response, 200, { enabled: false });
+      if (!agentsOn || monitored(project)) return send(response, 200, { enabled: false, ...(monitored(project) ? { monitor: true } : {}) });
       return send(response, 200, await bridge.status(project.id));
     }
     // PF-0112 M2: this home project's lanes with their Clean up checks, and the Shared preview. Read-only.
     if (project.kind === 'lane' && ['lanes', 'merges', 'shared'].includes(rest[0])) return send(response, 409, { error: { code: 'NOT_HOME', message: 'Use the home project for this, not a lane.' } });
+    // PF-0161: a monitored project prepares no lane review (that reads through Git with the
+    // lane's own state and belongs to working on the project).
+    if (monitored(project) && rest[0] === 'lanes' && rest.length > 1) return send(response, 405, { error: { code: 'MONITOR_ONLY', message: MONITOR_ONLY } });
     if (rest.length === 1 && rest[0] === 'lanes') {
-      if (!agentsOn) return send(response, 200, { lanes: [], preconditions: null });
+      if (!agentsOn || monitored(project)) return send(response, 200, { lanes: [], preconditions: null });
       return send(response, 200, await laneList(project));
     }
     if (rest.length === 3 && rest[0] === 'lanes' && /^l-[0-9a-f]{8}$/.test(rest[1]) && rest[2] === 'review') {
@@ -460,18 +529,29 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
   // POST /api/p/<project>/work/<id>/sources    — attach one file to the item it created
   async function handleWrite(request, response, url) {
     const parts = url.pathname.split('/').filter(Boolean);
+    // PF-0159: the developer's own preferences on this machine (a user-level file, never a
+    // project's): only known, typed fields are accepted.
+    if (parts.length === 2 && parts[1] === 'preferences') {
+      const type = String(request.headers['content-type'] ?? '').split(';')[0].trim().toLowerCase();
+      if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+      const saved = await savePreferences(await readJsonBody(request));
+      saveChat = saved.saveChatHistory !== false; // applies from the next chat entry, in every project
+      return send(response, 200, saved);
+    }
     // 1.4.0 (PF-0057): register a project — a plan's finished project, or an existing
     // YallaFlow project inside the home folder chosen in the folder chooser.
     if (parts.length === 2 && parts[1] === 'projects') {
       const type = String(request.headers['content-type'] ?? '').split(';')[0].trim().toLowerCase();
       if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
       const body = await readJsonBody(request);
-      const keys = body && typeof body === 'object' && !Array.isArray(body) ? Object.keys(body) : [];
-      if (keys.length !== 1 || !['planId', 'root'].includes(keys[0]) || typeof body[keys[0]] !== 'string' || !body[keys[0]]) return send(response, 400, { error: { code: 'BAD_REQUEST', message: 'Send { planId } or { root }.' } });
+      // PF-0161: { root, mode: 'monitor' } opens an existing YallaFlow project for monitoring only.
+      const mode = body && typeof body === 'object' && !Array.isArray(body) && 'mode' in body ? body.mode : undefined;
+      const keys = body && typeof body === 'object' && !Array.isArray(body) ? Object.keys(body).filter((key) => key !== 'mode') : [];
+      if (keys.length !== 1 || !['planId', 'root'].includes(keys[0]) || typeof body[keys[0]] !== 'string' || !body[keys[0]] || (mode !== undefined && (!['manage', 'monitor'].includes(mode) || keys[0] !== 'root'))) return send(response, 400, { error: { code: 'BAD_REQUEST', message: 'Send { planId } or { root } (optionally with mode: "monitor").' } });
       if (body.planId) return send(response, 200, await registerRoot((await createdProjectRoot(body.planId)).root));
       try {
         const listed = await listFolders(body.root); // a real local folder under an allowed root
-        return send(response, 200, await registerRoot(listed.path));
+        return send(response, 200, await registerRoot(listed.path, { mode: mode ?? null }));
       } catch (error) {
         if (error instanceof FolderError) return send(response, error.status, { error: { code: error.code, message: error.message } });
         throw error;
@@ -575,6 +655,15 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       return send(response, 200, await openReport(path.join(qualityDirPath(project.root, rest[1]), 'report.html'), project.root));
     }
     // PF-0128: open this project's folder in the file manager (the registered root only).
+    // PF-0161: switch this project between Monitor and Manage. An explicit, confirmed action;
+    // the mode is saved in the user's console list, never in the project.
+    if (rest.length === 1 && rest[0] === 'mode') {
+      if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+      const body = await readJsonBody(request);
+      const keys = body && typeof body === 'object' && !Array.isArray(body) ? Object.keys(body).sort().join(',') : '';
+      if (keys !== 'confirm,mode' || body.confirm !== true || !['manage', 'monitor'].includes(body.mode)) return send(response, 400, { error: { code: 'CONFIRMATION_REQUIRED', message: 'Send { mode: "manage" | "monitor", confirm: true }.' } });
+      return send(response, 200, await switchMode(project, body.mode));
+    }
     if (rest.length === 1 && rest[0] === 'open-folder') {
       if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
       await readJsonBody(request);
@@ -655,6 +744,11 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     // 1.4.0 runtime: POST /api/p/<project>/runtime/<service>/(trust|start|stop|restart)
     if (rest.length === 3 && rest[0] === 'runtime' && isServiceId(rest[1])) {
       if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+      // PF-0166: edit a service, move it to another port, install what it is missing.
+      if (rest[2] === 'edit') return send(response, 200, await editRuntimeService(project.root, rest[1], await readJsonBody(request), runner));
+      if (rest[2] === 'port') return send(response, 200, await changeRuntimePort(project.root, rest[1], await readJsonBody(request), runner));
+      if (rest[2] === 'install') return send(response, 200, await installRuntimePrerequisites(project.root, rest[1], await readJsonBody(request), runner));
+      if (rest[2] === 'reset') return send(response, 200, await resetRuntimeOverride(project.root, rest[1], await readJsonBody(request), runner));
       return send(response, 200, await runRuntimeAction(project.root, rest[1], rest[2], await readJsonBody(request), runner));
     }
     if (rest.length === 3 && rest[0] === 'work' && isWorkId(rest[1]) && ['sources', 'revision-sources'].includes(rest[2])) {
@@ -867,6 +961,11 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
         return send(response, 200, bridge.answerPermission(project.id, String(body.requestId ?? ''), String(body.decision ?? '')));
       case 'cancel':
         return send(response, 200, bridge.cancel(project.id));
+      // PF-0165: delete this project's saved conversation. Explicit and confirmed; it touches
+      // only this project's own .yallaflow/local/agent-chat files.
+      case 'clear-history':
+        if (body.confirm !== true || Object.keys(body).some((key) => key !== 'confirm')) return send(response, 400, { error: { code: 'CONFIRMATION_REQUIRED', message: 'Send { confirm: true } to delete this project\'s saved conversation.' } });
+        return send(response, 200, await bridge.clearTranscript(project.id));
       case 'end':
         return send(response, 200, await bridge.end(project.id));
       case 'connect': {
@@ -983,11 +1082,12 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
   });
 
   const makeBridge = ({ claude = claudeOn } = {}) => new AgentBridge({
-    projects,
+    projects: projects.filter((entry) => !monitored(entry)), // PF-0161: a monitored project has no agent connection
     port: listening.port,
     claude,
     claudeFor: claudeChosen(),
     env: agentEnv,
+    saveChat: () => saveChat,
     broadcast: (projectId, event) => {
       const message = `data: ${JSON.stringify({ type: 'agent', project: projectId, event })}\n\n`;
       for (const client of clients) client.write(message);
@@ -1004,11 +1104,11 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     const message = `data: ${JSON.stringify({ type: 'execution', project: projectId, at: new Date().toISOString() })}\n\n`;
     for (const client of clients) client.write(message);
   };
-  const makeExecution = (forBridge) => new ExecutionManager({ bridge: forBridge, runner, projects, broadcast: broadcastExecution });
+  const makeExecution = (forBridge) => new ExecutionManager({ bridge: forBridge, runner, projects: projects.filter((entry) => !monitored(entry)), broadcast: broadcastExecution });
   execution = bridge ? makeExecution(bridge) : null;
   // PF-0112 D15: each project's saved approval wait (missing → today's 5 minutes).
   const applyApprovalWait = async (forBridge, entry) => { if (!readOnly && forBridge) forBridge.setApprovalWait(entry.id, (await readApprovalWait(entry.root)).minutes); };
-  for (const entry of projects) await applyApprovalWait(bridge, entry);
+  for (const entry of projects) if (!monitored(entry)) await applyApprovalWait(bridge, entry);
   // PF-0112 M3: Review & Merge for lanes. Context comes from the bridge (sessions) and the
   // manager (which work items the lane's runs drove), and the lane's own YallaFlow snapshot.
   merges = new MergeService({
@@ -1025,7 +1125,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     }
   });
   // Review M2: a read-only console never rewrites merge records.
-  if (!readOnly) for (const entry of projects) if (entry.kind !== 'lane') await merges.recover(entry.root).catch(() => {});
+  if (!readOnly) for (const entry of projects) if (entry.kind !== 'lane' && !monitored(entry)) await merges.recover(entry.root).catch(() => {});
   // Enabling agents for this run: builds the bridge the --agents flag would have built. It
   // starts no session, claims no checkout and activates nothing.
   let enabling = null;
@@ -1037,7 +1137,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       if (claude && !claudeOn) {
         claudeOn = true;
         bridge.claudeEnabled = true;
-        for (const project of projects) await bridge.enableClaude(project.id);
+        for (const project of projects) if (!monitored(project)) await bridge.enableClaude(project.id);
         api.agents = { enabled: true, claude: true };
         return { enabled: true, claude: true, already: false };
       }
@@ -1055,8 +1155,8 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       }
       bridge = next;
       // A project registered while the bridge was being built is added now.
-      for (const project of projects) await next.addProject(project);
-      for (const project of projects) await applyApprovalWait(next, project);
+      for (const project of projects) if (!monitored(project)) await next.addProject(project);
+      for (const project of projects) if (!monitored(project)) await applyApprovalWait(next, project);
       execution = makeExecution(next);
       await execution.open();
       agentsOn = true;

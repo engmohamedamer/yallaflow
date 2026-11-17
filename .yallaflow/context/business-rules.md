@@ -145,4 +145,108 @@
   - test/console-readiness.test.js (repository @ 4d7c388)
   - npm run check (failed) (runtime, PF-0133 V-001)
 
+<!-- yallaflow-fact:CTX-0169 -->
+### CTX-0169 — The New Project wizard never starts a generator while a required tool is missing: createFromPlan checks prerequisites fresh (checkPrerequisites) before creating anything and refuses with NEW_PROJECT_PREREQUISITES; the console's create route checks first too. The override (CLI --allow-missing-tools, console overrideMissingTools) is honored only when the generator's own program is present and never replaces the plan-hash confirmation, script acknowledgement or catalog verification. Per-OS install guidance is display-only data in src/newproject/guidance.js; YallaFlow installs none of these tools.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0158
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-16T16:58:54.472Z
+- **Verified:** 2026-11-16T16:58:54.472Z (commit f33eaec)
+- **Evidence:**
+  - src/newproject/project.js (repository @ f33eaec)
+  - src/newproject/guidance.js (repository @ f33eaec)
+  - test/new-project-prerequisites.test.js (repository @ f33eaec)
+
+<!-- yallaflow-fact:CTX-0172 -->
+### CTX-0172 — Monitor Only is a per-project mode saved in the user's console list (console.json entry mode: 'monitor'; absent = managed), never in the project, and only for folders that already hold .yallaflow. The server is the boundary: one guard ahead of every route refuses any POST addressed to a monitored project (405 MONITOR_ONLY) except the confirmed switch POST /api/p/<id>/mode; a monitored project gets no agent-settings read, agent probe, bridge or execution entry, setup scan or merge recovery, so opening and reading it writes nothing inside it. A lane follows its home project. Switching to Monitor is refused while an agent session is live.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0161
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-16T17:17:31.547Z
+- **Verified:** 2026-11-16T17:17:31.547Z (commit f33eaec)
+- **Evidence:**
+  - src/console/server.js (repository @ f33eaec)
+  - src/console/registry.js (repository @ f33eaec)
+  - test/console-monitor-mode.test.js (repository @ f33eaec)
+
+<!-- yallaflow-fact:CTX-0173 -->
+### CTX-0173 — Console first-run journey: with no projects the Projects page shows a welcome panel that routes by intent (Create, Manage, Monitor; saved as onboarding.intent in preferences). Create and Manage are agent-first: in the New Project wizard the agent-planned (empty) project is the default path and needs a chosen, ready agent, with the machine agent setup card shown in place; the pinned generator templates and creating without a ready agent are labeled Advanced options (a template needs no agent). Monitor needs no agent. These are page rules only: the server does not require an agent to create a project.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0162
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-16T17:24:37.932Z
+- **Verified:** 2026-11-16T17:24:37.932Z (commit f33eaec)
+- **Evidence:**
+  - resources/console/app.js (repository @ f33eaec)
+  - test/console-first-journey.test.js (repository @ f33eaec)
+
+<!-- yallaflow-fact:CTX-0175 -->
+### CTX-0175 — When a New Project plan initializes Git (--git), Git is one of its prerequisites: it is checked with the stack's tools before anything is created, and a missing Git is never overridable (the developer installs Git or plans without it).
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0158
+- **Knowledge ID:** K-002
+- **Promoted at:** 2026-11-16T18:31:16.486Z
+- **Verified:** 2026-11-16T18:31:16.486Z (commit f33eaec)
+- **Evidence:**
+  - src/newproject/project.js (repository @ f33eaec)
+  - test/new-project-prerequisites.test.js (repository @ f33eaec)
+
+<!-- yallaflow-fact:CTX-0178 -->
+### CTX-0178 — The console agent chat is saved per checkout in .yallaflow/local/agent-chat by default; the developer can turn saving off for every project on the machine (preferences.json saveChatHistory: false), which stops new entries and keeps what was saved, and can delete one project's saved chat after a confirmation; a message is saved whole or not at all and rotation happens only where an entry starts.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0165
+- **Knowledge ID:** K-002
+- **Promoted at:** 2026-11-17T09:22:41.661Z
+- **Verified:** 2026-11-17T09:22:41.661Z (commit f33eaec)
+- **Evidence:**
+  - src/agents/transcript.js (repository @ f33eaec)
+  - src/console/preferences.js (repository @ f33eaec)
+  - node --import ./test-support/isolate-user-config.js --test test/agent-chat-history.test.js test/agent-transcript.test.js test/agent-bridge.test.js test/console-preferences.test.js test/console-monitor-mode.test.js test/console-project-chat.test.js test/agent-terminal.test.js (passed) (runtime, PF-0165 V-002)
+
+<!-- yallaflow-fact:CTX-0179 -->
+### CTX-0179 — Runtime dependency readiness is READY, NEEDS_SETUP or UNKNOWN. Only NEEDS_SETUP refuses a start, and the developer can start anyway (runtime start|restart --skip-setup-check, console Advanced action), which skips only that check for the named service; trust, folder protection, port pre-flight and Monitor Only still apply. A local port change is a personal override that runtime reset removes without touching the shared file; uncertain command rewrites are refused and other services that mention the old port are reported, never changed.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0166
+- **Knowledge ID:** K-002
+- **Promoted at:** 2026-11-17T09:23:50.553Z
+- **Verified:** 2026-11-17T09:23:50.553Z (commit f33eaec)
+- **Evidence:**
+  - src/runtime/prerequisites.js (repository @ f33eaec)
+  - src/runtime/supervisor.js (repository @ f33eaec)
+  - src/runtime/ports.js (repository @ f33eaec)
+  - node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js (passed) (runtime, PF-0166 V-002)
+
+<!-- yallaflow-fact:CTX-0180 -->
+### CTX-0180 — Owner decision (2026-11-17): undoing a local runtime change is, for now, a full reset of that service's local override (runtime reset / 'Remove all local changes and return to the shared definition'); the card and the confirmation must say that all local changes to the service are removed, listing them, not only the port. A field-level undo is not provided.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0166
+- **Knowledge ID:** K-003
+- **Promoted at:** 2026-11-17T09:54:57.215Z
+- **Verified:** 2026-11-17T09:54:57.215Z (commit f33eaec)
+- **Evidence:**
+  - resources/console/app.js (repository @ f33eaec)
+  - src/runtime/profile.js (repository @ f33eaec)
+  - node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js (passed) (runtime, PF-0166 V-004)
+
 <!-- yallaflow-context:end -->

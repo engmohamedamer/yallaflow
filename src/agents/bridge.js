@@ -13,6 +13,7 @@ import { loadClaude } from './experimental.js';
 import { CAPABILITIES, agentEvent, isForbiddenMode } from './events.js';
 import { detectProviders } from './detect.js';
 import { acquireCheckoutLock, lockedError, readCheckoutLock } from './checkout-lock.js';
+import { Transcript } from './transcript.js';
 
 const RECORD_ID = /^[0-9a-f]{12}$/;
 // PF-0143 (B4): providers word it differently (usage_limit_reached, "hit your usage limit").
@@ -63,7 +64,6 @@ export async function projectConfigFingerprint(root) {
   await walk(base);
   return hash.digest('hex');
 }
-const MAX_EVENTS = 400;
 export const DEFAULT_PERMISSION_TIMEOUT_MS = 5 * 60_000;
 
 function localDir(root) {
@@ -97,8 +97,9 @@ export class AgentBridge {
   // `claude` turns the experimental Claude connection on for every project (the
   // --experimental-claude flag); `claudeFor` names the projects whose saved choice turns it on
   // (PF-0069). enableClaude/disableClaude change one project while the console runs.
-  constructor({ projects, broadcast, claude = false, claudeFor = [], env = process.env, runActivate, permissionTimeoutMs, port }) {
+  constructor({ projects, broadcast, claude = false, claudeFor = [], env = process.env, runActivate, permissionTimeoutMs, port, saveChat = () => true }) {
     this.env = env;
+    this.saveChat = saveChat; // PF-0165: the developer's choice to keep the chat on disk (read when an entry starts)
     this.claudeEnabled = claude;
     this.claudeFor = new Set(claudeFor);
     this.broadcast = broadcast;
@@ -111,11 +112,19 @@ export class AgentBridge {
   }
 
   entry(project) {
+    // PF-0165: the chat transcript of this checkout: merged in memory, saved under
+    // .yallaflow/local/agent-chat (created only when an agent event is written).
+    const transcript = new Transcript({
+      dirFor: async () => { await ensureLocalIgnored(project.root); return safeLocalDir(project.root, '.yallaflow', 'local', 'agent-chat'); },
+      readDir: async () => ((await lstat(path.join(project.root, '.yallaflow', 'local', 'agent-chat')).catch(() => null))?.isDirectory() ? safeLocalDir(project.root, '.yallaflow', 'local', 'agent-chat') : null),
+      saving: () => this.saveChat() !== false
+    });
     return {
       ...project,
       session: null, // { provider, record, impl }
       pending: new Map(),
-      events: [],
+      transcript,
+      events: transcript.events, // the same list: merged, newest last
       claude: null,
       claudeOn: false,
       bridgeToken: null,
@@ -147,6 +156,7 @@ export class AgentBridge {
     if (project.claudeOn) await this.disableClaude(projectId);
     if (project.session || project.claude?.streamBusy()) throw conflict('An agent session is running in this project. End it first, then remove the project.');
     this.denyPending(project, null, 'project removed from the console');
+    await project.transcript.flush();
     if (project.owner) {
       await project.owner.release().catch(() => {});
       project.owner = null;
@@ -292,6 +302,7 @@ export class AgentBridge {
       else if (project.session?.provider === 'codex' && project.session.impl) cleanup = await this.finishCodex(project, 'console stopped');
       if (cleanup && !cleanup.complete) incomplete.push({ project: project.name ?? project.root, cleanup });
       project.claude?.detach();
+      await project.transcript.flush(); // PF-0165: the last chunks reach the saved transcript
       if (project.owner) {
         if (project.claudeOn) await safeRemove(localDir(project.root), 'agent-bridge.json').catch(() => {});
         await project.owner.release();
@@ -325,8 +336,9 @@ export class AgentBridge {
 
 
   emit(project, event) {
-    project.events.push(event);
-    if (project.events.length > MAX_EVENTS) project.events.splice(0, project.events.length - MAX_EVENTS);
+    // PF-0165: numbered, merged (a streamed reply is one entry) and saved; the page still
+    // receives every chunk as it arrives.
+    project.transcript.add(event);
     this.broadcast(project.id, event);
     // PF-0112: the Execution Manager observes the same events; a listener never affects the session.
     for (const listener of this.listeners ?? []) {
@@ -407,6 +419,7 @@ export class AgentBridge {
     let workingSince = null;
     for (let index = project.events.length - 1; index >= 0; index--) {
       const event = project.events[index];
+      if (event.restored) break; // history from an earlier console run says nothing about now
       if (!lastStep && ['tool.started', 'tool.updated', 'permission.requested'].includes(event.type) && event.title) lastStep = { title: event.title, at: event.at };
       if (!workingSince && ['turn.started', 'message.sent'].includes(event.type)) workingSince = event.at;
       if (event.type === 'turn.ended' && !workingSince) break;
@@ -526,6 +539,7 @@ export class AgentBridge {
     const providers = [{ id: 'codex', label: 'Codex', ready: detected.codex.ready, problems: detected.codex.problems, versions: { codex: detected.codex.codex?.version ?? null, adapter: detected.codex.adapter?.version ?? null }, capabilities: CAPABILITIES.codex }];
     if (project.claudeOn) providers.push({ id: 'claude', label: 'Claude Code', experimental: true, ready: detected.claude.ready, problems: detected.claude.problems, warnings: detected.claude.warnings ?? [], versions: { claude: detected.claude.claude?.version ?? null }, auth: detected.claude.auth ? { method: detected.claude.auth.method, plan: detected.claude.auth.plan } : null, capabilities: CAPABILITIES.claude });
     const records = await this.listRecords(project);
+    const latest = await project.transcript.latest(200);
     // Read-only: another live console's lock is reported; nothing is claimed here.
     const holder = project.owner ? null : await readCheckoutLock(project.root).catch(() => null);
     const foreign = holder && !holder.stale && holder.nonce !== project.owner?.nonce;
@@ -540,8 +554,29 @@ export class AgentBridge {
       resumable: records.filter((record) => record.provider === 'codex' && record.resumable && record.status !== 'running').slice(0, 5).map((record) => ({ id: record.id, workId: record.workId, startedAt: record.startedAt, endedAt: record.endedAt })),
       // Which agent worked on which item and how each session stopped (PF-0066).
       history: records.slice(0, 30).map((record) => ({ id: record.id, provider: record.provider, workId: record.workId ?? null, startedAt: record.startedAt, endedAt: record.endedAt ?? null, status: record.status, lastStop: record.lastStop ?? null })),
-      events: project.events.slice(-200)
+      // PF-0165: the newest events, and whether older ones can be loaded (transcript()).
+      events: latest.events,
+      transcript: { hasOlder: latest.hasOlder, saved: latest.saved, ...(latest.saveError ? { saveError: latest.saveError } : {}), ...(latest.readError ? { readError: latest.readError } : {}) }
     };
+  }
+
+  // PF-0165: deletes this one project's saved conversation (.yallaflow/local/agent-chat of its
+  // own checkout) and its chat in memory. A lane or another project keeps its own. Open pages
+  // are told so they empty their view too.
+  async clearTranscript(projectId) {
+    const project = this.projects.get(projectId);
+    if (!project) throw Object.assign(new Error('Unknown project.'), { status: 404, code: 'NOT_FOUND' });
+    const result = await project.transcript.clear();
+    this.broadcast(project.id, { type: 'chat.cleared', at: new Date().toISOString() });
+    return result;
+  }
+
+  // PF-0165: older chat events (before event number `before`), oldest first. Read-only.
+  async transcript(projectId, { before, limit = 100 } = {}) {
+    const project = this.projects.get(projectId);
+    if (!project) throw Object.assign(new Error('Unknown project.'), { status: 404, code: 'NOT_FOUND' });
+    if (!Number.isSafeInteger(before) || before <= 0) throw Object.assign(new Error('before must be an event number.'), { status: 400, code: 'BAD_REQUEST' });
+    return project.transcript.older(before, Math.max(1, Math.min(200, Number.isInteger(limit) ? limit : 100)));
   }
 
   sessionSummary(project) {

@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Runtime fixes: before a service starts, src/runtime/prerequisites.js checks from files only whether a Node package manager service has its dependencies (or the script's declared local tool) installed and names the install command by lockfile; runtimeStatus carries prerequisites and, for a failed service, failure (src/runtime/diagnose.js: the log line that states the cause). startOne refuses RUNTIME_PREREQUISITES before spawning; PORT_IN_USE carries ownerService, owner and a free suggestion. runtime install runs the named command only for a trusted service with the hash of that command. runtime port (src/runtime/ports.js) changes command, ports, ready.port and links together or refuses (RUNTIME_PORT_COMMAND). profile.updateService edits fields of an existing service keeping the rest, in the local override (--local) or the shared file (--shared); runtime edit has no default scope. In the console these live on the service card in the Run tab; Settings only defines a service manually.",
+      "evidence": [
+        "src/runtime/prerequisites.js",
+        "src/runtime/ports.js",
+        "src/runtime/profile.js",
+        "test/runtime-fixes.test.js"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-17T07:19:46.099Z",
+      "factId": "CTX-0177",
+      "promotedAt": "2026-11-17T07:19:46.243Z",
+      "target": "context/architecture.md"
+    },
+    {
+      "id": "K-002",
+      "kind": "business-rule",
+      "source": "implementation-runtime",
+      "summary": "Runtime dependency readiness is READY, NEEDS_SETUP or UNKNOWN. Only NEEDS_SETUP refuses a start, and the developer can start anyway (runtime start|restart --skip-setup-check, console Advanced action), which skips only that check for the named service; trust, folder protection, port pre-flight and Monitor Only still apply. A local port change is a personal override that runtime reset removes without touching the shared file; uncertain command rewrites are refused and other services that mention the old port are reported, never changed.",
+      "evidence": [
+        "src/runtime/prerequisites.js",
+        "src/runtime/supervisor.js",
+        "src/runtime/ports.js",
+        "verification:V-002"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-17T09:23:50.242Z",
+      "factId": "CTX-0179",
+      "promotedAt": "2026-11-17T09:23:50.553Z",
+      "target": "context/business-rules.md"
+    },
+    {
+      "id": "K-003",
+      "kind": "business-rule",
+      "source": "implementation-runtime",
+      "summary": "Owner decision (2026-11-17): undoing a local runtime change is, for now, a full reset of that service's local override (runtime reset / 'Remove all local changes and return to the shared definition'); the card and the confirmation must say that all local changes to the service are removed, listing them, not only the port. A field-level undo is not provided.",
+      "evidence": [
+        "resources/console/app.js",
+        "src/runtime/profile.js",
+        "verification:V-004"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-17T09:54:56.901Z",
+      "factId": "CTX-0180",
+      "promotedAt": "2026-11-17T09:54:57.215Z",
+      "target": "context/business-rules.md"
+    }
+  ],
+  "updatedAt": "2026-11-17T09:54:57.215Z",
+  "reviewedAt": "2026-11-17T09:54:57.215Z"
+}

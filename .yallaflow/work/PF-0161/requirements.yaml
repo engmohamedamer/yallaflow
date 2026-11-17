@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "An existing YallaFlow project can be opened for monitoring only, as a mode of that project (not of the whole console), without any agent setup and without changing the project.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T17:11:07.982Z",
+      "updatedAt": "2026-11-16T17:11:07.982Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "Monitor and Manage are switched only by an explicit, confirmed transition, and the limits of monitoring are explained, including for repositories without YallaFlow records.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T17:11:07.982Z",
+      "updatedAt": "2026-11-16T17:11:07.982Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "The mode is saved per project in the user's console project list; a project without a saved mode is managed as before; other projects in the same console keep their own mode.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T17:11:07.982Z",
+      "updatedAt": "2026-11-16T17:11:07.982Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "For a monitored project the server refuses every write, agent and execution action, runs no agent probe, and writes nothing inside the project when it is opened or read.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T17:11:07.982Z",
+      "updatedAt": "2026-11-16T17:11:07.982Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-002",
+      "statement": "Switching to Manage or back to Monitor needs an explicit confirmation; switching to Monitor is refused while an agent session is live; the page shows the mode, what monitoring cannot do, and that a folder without YallaFlow records cannot be monitored until it is set up.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T17:11:07.982Z",
+      "updatedAt": "2026-11-16T17:11:07.982Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-16T17:11:07.982Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-16T17:11:07.982Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-16T17:11:07.982Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-16T17:11:07.982Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-16T17:11:07.982Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-16T17:11:07.982Z"
+}

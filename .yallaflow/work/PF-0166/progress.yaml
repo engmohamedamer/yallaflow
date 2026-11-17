@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-16T19:38:57.115Z",
+      "completedAt": "2026-11-16T19:38:57.115Z",
+      "summary": "Start path: supervisor.startOne (trust, Compose pre-flight, port pre-flight with portOwner, spawn, settle). No prerequisite check, no port suggestion, no edit path (addService refuses an existing shared id; a local override needs the whole command), no code that understands port arguments. A failure shows the last non-empty log line (160 chars). Merge rule: shallow whole-field override of OVERRIDABLE fields; dependsOn and kind are never overridable. Run tab and Settings 'Advanced run setup' both render the plan/analysis tools. Lockfile detection exists in suggest.js (pnpm, yarn, npm) and inventory/stack.js.",
+      "evidence": [
+        "src/runtime/supervisor.js",
+        "src/runtime/profile.js",
+        "src/runtime/observe.js",
+        "src/runtime/suggest.js",
+        "resources/console/app.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-17T09:22:49.336Z",
+      "completedAt": "2026-11-17T09:22:49.336Z",
+      "summary": "Owner review 2026-11-17 added REQ-006 (READY / NEEDS_SETUP / UNKNOWN; Try Anyway bypasses only the dependency check; UNKNOWN never blocks) and REQ-007 (port-change safety: shared definitions kept, dependents reported, local change reversible, uncertain rewrites refused, nothing stopped), with AC-007..AC-009. Recorded as requirements revision 2; impact IM-001 assessed."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-17T09:54:11.651Z",
+      "completedAt": "2026-11-17T09:54:40.861Z",
+      "summary": "Owner-approved full local-override reset: the edit form now says that returning to the shared definition removes all local changes to the service (listed), not only the port; the button reads 'Remove all local changes and return to the shared definition' and the confirmation lists what is removed. docs/runtime.md updated.",
+      "evidence": [
+        "resources/console/app.js",
+        "test/console-run-fixes.test.js",
+        "docs/runtime.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-17T09:54:45.033Z",
+      "completedAt": "2026-11-17T09:54:45.033Z",
+      "summary": "Focused tests pass (V-004, 47/47) after the undo wording change.",
+      "evidence": [
+        "verification:V-004"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-17T09:54:46.396Z",
+      "completedAt": "2026-11-17T09:54:46.396Z",
+      "summary": "All nine criteria satisfied after the undo wording change."
+    }
+  },
+  "rulings": [
+    {
+      "decision": "Start is refused (RUNTIME_PREREQUISITES) when dependencies or the script's declared local tool are certainly missing; installing from the console/CLI runs the package manager for a trusted service after the developer confirms the exact command.",
+      "reason": "The owner asked for a readiness check before start and for an install that runs only on an explicit action. An install runs package scripts, so it needs the same trust as starting the service plus a confirmation bound to the command's hash.",
+      "costIfWrong": "A project that provides dependencies in a way the check does not know (other than Yarn PnP or hoisted node_modules) could be refused at start with no override; the check would need an opt-out.",
+      "createdAt": "2026-11-17T07:13:42.888Z"
+    },
+    {
+      "decision": "Try Anyway skips the dependency check only for the service the developer named; services it depends on are still checked and can each be tried anyway.",
+      "reason": "The owner limited the bypass to the dependency readiness check of the action taken; extending it silently to dependencies would widen it.",
+      "costIfWrong": "Starting a service whose dependency also needs setup takes one extra Try Anyway click.",
+      "createdAt": "2026-11-17T09:12:23.301Z"
+    },
+    {
+      "decision": "UNKNOWN is shown on the Run card only when the check applied but could not tell (no package.json, Yarn PnP, NODE_PATH, folder missing or outside); a command the check does not apply to (Compose, a script, php) stays quiet, though the API still reports UNKNOWN with its reason.",
+      "reason": "A note on every non-Node service would be noise without information; the owner asked to explain inconclusive detection, not to flag every service.",
+      "costIfWrong": "A developer could miss that a non-Node service was never checked; the API and docs say so.",
+      "createdAt": "2026-11-17T09:12:23.950Z"
+    },
+    {
+      "decision": "Appending '-- --port N' to a known dev-server script is now done only for 'npm run'; pnpm, Yarn and Bun, scripts that set a port or chain commands, and commands that would keep another mention of the old port are refused with the reason.",
+      "reason": "Port review: these rewrites were uncertain (pnpm and Yarn versions pass '--' differently; a chained script would give the port to the wrong command); the owner asked to refuse uncertain rewrites.",
+      "costIfWrong": "Developers on pnpm/Yarn/Bun edit the command themselves instead of a one-click port move.",
+      "createdAt": "2026-11-17T09:12:24.580Z"
+    },
+    {
+      "decision": "Undo of a local change (runtime reset / Return to the shared definition) drops the whole local override of that shared service, after a confirmation listing every overridden field; it never removes a personal service.",
+      "reason": "A field-level undo would need a history of overrides that does not exist; the whole-override reset is exact, listed before it runs, and the shared file is untouched.",
+      "costIfWrong": "Another local tweak of the same service (for example an env name) is dropped with the port change; it is listed in the confirmation.",
+      "createdAt": "2026-11-17T09:12:25.218Z"
+    }
+  ],
+  "history": [
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Owner review (2026-11-17): dependency detection must not be an unconditional blocker. Use READY / NEEDS_SETUP / UNKNOWN; NEEDS_SETUP offers an Advanced Try Anyway that bypasses only the dependency readiness check (never Monitor Only, trust, command validation or path protection); UNKNOWN never blocks. Regression tests for custom setups, monorepos and unknown environments. Review port-change safety (shared definitions, dependents and proxy URLs, reversibility of local changes, refusing uncertain rewrites, never stopping another service) and fix confirmed issues only.",
+      "changedAt": "2026-11-17T08:50:48.383Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Owner review (2026-11-17): dependency detection must not be an unconditional blocker. Use READY / NEEDS_SETUP / UNKNOWN; NEEDS_SETUP offers an Advanced Try Anyway that bypasses only the dependency readiness check (never Monitor Only, trust, command validation or path protection); UNKNOWN never blocks. Regression tests for custom setups, monorepos and unknown environments. Review port-change safety (shared definitions, dependents and proxy URLs, reversibility of local changes, refusing uncertain rewrites, never stopping another service) and fix confirmed issues only.",
+      "changedAt": "2026-11-17T08:50:48.383Z"
+    },
+    {
+      "skill": "delivery-convergence",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Owner review (2026-11-17): dependency detection must not be an unconditional blocker. Use READY / NEEDS_SETUP / UNKNOWN; NEEDS_SETUP offers an Advanced Try Anyway that bypasses only the dependency readiness check (never Monitor Only, trust, command validation or path protection); UNKNOWN never blocks. Regression tests for custom setups, monorepos and unknown environments. Review port-change safety (shared definitions, dependents and proxy URLs, reversibility of local changes, refusing uncertain rewrites, never stopping another service) and fix confirmed issues only.",
+      "changedAt": "2026-11-17T08:50:48.383Z"
+    },
+    {
+      "skill": "requirement-clarification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-001: The owner added REQ-006/REQ-007 (three readiness states, Try Anyway that bypasses only the dependency check, port-change safety) in the 2026-11-17 review; the clarified intent changed.",
+      "changedAt": "2026-11-17T09:12:01.330Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "in_progress",
+      "to": "pending",
+      "reason": "Impact IM-001: Start no longer refuses unconditionally on NEEDS_SETUP; new UNKNOWN state, skip flag, reset command and port-rewrite refusals were implemented for the new criteria.",
+      "changedAt": "2026-11-17T09:12:01.330Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Owner approval (2026-11-17): the full local-override reset is accepted for now, provided the UI clearly explains that all local changes to that service are removed.",
+      "changedAt": "2026-11-17T09:54:11.651Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Owner approval (2026-11-17): the full local-override reset is accepted for now, provided the UI clearly explains that all local changes to that service are removed.",
+      "changedAt": "2026-11-17T09:54:11.651Z"
+    },
+    {
+      "skill": "delivery-convergence",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Owner approval (2026-11-17): the full local-override reset is accepted for now, provided the UI clearly explains that all local changes to that service are removed.",
+      "changedAt": "2026-11-17T09:54:11.651Z"
+    }
+  ],
+  "updatedAt": "2026-11-17T09:54:46.396Z"
+}

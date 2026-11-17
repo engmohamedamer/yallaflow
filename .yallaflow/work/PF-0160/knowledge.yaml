@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Machine readiness is derived, never stored: src/agents/machine-readiness.js computeMachineReadiness(MachineSetup.status(), preferences) is returned as readiness on GET /api/machine. Per agent it keeps installed, authenticated (subscription only) and connection apart (Codex: handshake test this console run; Claude Code: session-only, never verified ahead), plus support (supported on linux/darwin, not-verified elsewhere) and stability (Claude Code experimental). The saved preferred agent is only preselected and marked; a project's agent is enabled only by the developer's own click.",
+      "evidence": [
+        "src/agents/machine-readiness.js",
+        "test/console-machine-readiness.test.js"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-16T17:09:52.157Z",
+      "factId": "CTX-0171",
+      "promotedAt": "2026-11-16T17:09:52.309Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-16T17:09:52.309Z",
+  "reviewedAt": "2026-11-16T17:09:52.309Z"
+}

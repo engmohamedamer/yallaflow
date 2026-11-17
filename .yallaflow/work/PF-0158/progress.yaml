@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-16T16:55:42.017Z",
+      "completedAt": "2026-11-16T16:55:42.017Z",
+      "summary": "createFromPlan (src/newproject/project.js) runs the generator without checking prerequisites; the plan stores a frozen probe; the review step only warns (resources/console/app.js viewNew step 4). wizardCreate (src/console/newproject.js) starts yallaflow new create.",
+      "evidence": [
+        "src/newproject/project.js",
+        "src/console/newproject.js",
+        "resources/console/app.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-16T16:55:42.345Z",
+      "completedAt": "2026-11-16T16:55:42.345Z",
+      "summary": "Owner decision 7 (2026-11-16): block normal generator execution when required tools are missing; OS-specific guidance, Recheck, Advanced override where safe; the override must not bypass mandatory security checks (plan hash confirmation, script acknowledgement, catalog verification stay).",
+      "evidence": [
+        "user:Owner approval of Phase 1 decisions, item 7"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-16T16:55:42.676Z",
+      "completedAt": "2026-11-16T16:55:42.676Z",
+      "summary": "1) Core: fresh prerequisite probe in createFromPlan before staging; refuse NEW_PROJECT_PREREQUISITES unless allowMissingTools, and never when the generator's own program is missing. CLI flag --allow-missing-tools. 2) src/newproject/guidance.js: per-OS install guidance (links and well-known commands, display only). 3) Console: plan response carries tool readiness (missing, guidance, overridable); create accepts overrideMissingTools. 4) UI: review step blocks Create, shows guidance, Recheck, empty-project fallback, Advanced override. 5) Tests."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-16T18:26:58.657Z",
+      "completedAt": "2026-11-16T18:29:26.544Z",
+      "summary": "As before, plus: when the plan initializes Git, Git is checked with the other tools before anything is created (plan prerequisites, createFromPlan, console create and Recheck); a missing Git is never overridable; the page offers Continue without Git. Guidance addresses are stored without a scheme.",
+      "evidence": [
+        "src/newproject/project.js",
+        "src/console/newproject.js",
+        "resources/console/app.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-16T18:29:33.521Z",
+      "completedAt": "2026-11-16T18:29:33.521Z",
+      "summary": "Focused tests pass (V-003), including Git missing with Git ticked.",
+      "evidence": [
+        "verification:V-003"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Browser walk on a machine without Git: with 'Initialize a local Git repository' ticked the plan still includes git init, which fails only after the project is created. Git must be checked with the other tools before creation.",
+      "changedAt": "2026-11-16T18:26:58.657Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Browser walk on a machine without Git: with 'Initialize a local Git repository' ticked the plan still includes git init, which fails only after the project is created. Git must be checked with the other tools before creation.",
+      "changedAt": "2026-11-16T18:26:58.657Z"
+    }
+  ],
+  "updatedAt": "2026-11-16T18:29:33.521Z"
+}

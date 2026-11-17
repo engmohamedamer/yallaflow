@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-17T09:55:23.340Z",
+      "completedAt": "2026-11-17T09:55:23.340Z",
+      "summary": "The failing test is test/agent-claude-experimental.test.js ('claude (simulated): channel server registers, relays chat, replies, permissions, hooks; bridge token protected'); line 137 expects the permission to be resolved as 'elsewhere' and got 'deny'. It failed once in the full run (1417 tests; that test took about 17 s under load) and passed 3/3 when run alone. This round did not change the Claude channel code. The note belongs in CHANGELOG.md under a new Unreleased section.",
+      "evidence": [
+        "test/agent-claude-experimental.test.js",
+        "CHANGELOG.md"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-17T09:55:28.515Z",
+      "completedAt": "2026-11-17T09:55:28.515Z",
+      "summary": "Owner (2026-11-17): keep the intermittent Claude Code test failure documented as a known issue and do not report the full suite as fully passing. Deliver: a short Known issues entry in CHANGELOG.md (Unreleased) naming the test, the symptom, that it passes alone, and that the suite is not reported as fully passing until it is fixed. No code change."
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-17T09:55:33.610Z",
+      "completedAt": "2026-11-17T09:55:33.610Z",
+      "summary": "Add an '## [Unreleased]' section above 1.5.3 in CHANGELOG.md with one 'Known issues' entry; verify with the changelog-related tests and git diff --check."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-17T10:03:32.738Z",
+      "completedAt": "2026-11-17T10:03:33.048Z",
+      "summary": "The known-issues entry now covers both intermittent tests (Claude Code channel and Queue end to end), each with its symptom and 3/3 passes alone, and the last two full-suite results (1415 pass, 1 skipped, 1 failed each).",
+      "evidence": [
+        "CHANGELOG.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-17T10:03:34.448Z",
+      "completedAt": "2026-11-17T10:03:34.448Z",
+      "summary": "test/cli.test.js passes (V-002); documentation only.",
+      "evidence": [
+        "verification:V-002"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "The final full run (2026-11-17) failed a second known-intermittent test instead (console-execution Queue end to end: 'condition not met in time' under load, passes 3/3 alone); the known-issues note must cover both and give the latest result.",
+      "changedAt": "2026-11-17T10:03:32.738Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: The final full run (2026-11-17) failed a second known-intermittent test instead (console-execution Queue end to end: 'condition not met in time' under load, passes 3/3 alone); the known-issues note must cover both and give the latest result.",
+      "changedAt": "2026-11-17T10:03:32.738Z"
+    }
+  ],
+  "updatedAt": "2026-11-17T10:03:34.448Z"
+}

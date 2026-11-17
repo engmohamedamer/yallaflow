@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-16T17:01:47.427Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "Assessed after V-001 passed.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "GET/POST /api/preferences read and save preferences.json beside console.json; a second console on another port reads the same values; the page applies and saves language, theme and last folder.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/preferences.js",
+              "contentHash": "sha256:eea5ced007437c493cadb2371df6fdce0b36ce411f1260adb871549cd783dd56",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/console/server.js",
+              "contentHash": "sha256:efe51fa5bafe3265fe12907f611d5acfcca164ce47438f5685afac1462fc2ed2",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:051cb8ec685c1fac78af0fa1bc21283ce3377627801aee76cce327f863328e22",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/console-preferences.test.js test/console-server.test.js test/console-greenfield.test.js (passed)",
+              "workId": "PF-0159",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "validatePreferencesPatch accepts only enumerated or path-typed fields and refuses unknown keys; the file is written 0600 by atomic replace and a link is never read or written through; a read-only console answers POST with 405.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/console/preferences.js",
+              "symbol": "validatePreferencesPatch",
+              "contentHash": "sha256:eea5ced007437c493cadb2371df6fdce0b36ce411f1260adb871549cd783dd56",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-preferences.test.js",
+              "contentHash": "sha256:d33236f9ccb9637f310a821c288778749790f96dc7ffb21d7bc003f2cdaaaee5",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/console-preferences.test.js test/console-server.test.js test/console-greenfield.test.js (passed)",
+              "workId": "PF-0159",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "A missing, invalid or linked file yields defaults without throwing; console.json is byte-identical after saves; loadPrefs carries an existing browser language/theme into the file once.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/console-preferences.test.js",
+              "contentHash": "sha256:d33236f9ccb9637f310a821c288778749790f96dc7ffb21d7bc003f2cdaaaee5",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/console-preferences.test.js test/console-server.test.js test/console-greenfield.test.js (passed)",
+              "workId": "PF-0159",
+              "verificationRunId": "V-001"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-16T17:01:47.427Z"
+}

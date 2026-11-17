@@ -20,6 +20,8 @@ import { registryPath } from '../console/registry.js';
 import { redactSecrets } from '../security/redact.js';
 import { safeLocalDir, safeWriteFile } from '../agents/local-files.js';
 import { CATALOG, CATALOG_VERSION, catalogEntry } from './catalog.js';
+import { resolveCommand, safeEnvironment } from '../utils/command.js';
+import { toolGuidance } from './guidance.js';
 
 export const PLAN_SCHEMA = 'yallaflow.new-project-plan/1';
 export const PROJECT_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/;
@@ -72,22 +74,46 @@ export function planHash(body) {
   return createHash('sha256').update(JSON.stringify(canonical(body))).digest('hex');
 }
 
-function probePrerequisite(prereq) {
-  const result = spawnSync(prereq.argv[0], prereq.argv.slice(1), { encoding: 'utf8', timeout: PREREQ_TIMEOUT_MS, shell: false, env: scrubbedEnv() });
+// PF-0157: every tool is found and started the same way on Linux, macOS and Windows
+// (src/utils/command.js): looked up on the child's own PATH, a Windows shim's program
+// started directly, never through a shell.
+async function probePrerequisite(prereq) {
+  const env = scrubbedEnv();
+  const command = await resolveCommand(prereq.argv, env);
+  if (!command.ok) return { name: prereq.name, found: false, note: prereq.note ?? null, ...(command.reason === 'not-startable' ? { problem: command.message.slice(0, 300) } : {}) };
+  const result = spawnSync(command.file, command.args, { encoding: 'utf8', timeout: PREREQ_TIMEOUT_MS, shell: false, env, windowsHide: true });
   if (result.error || result.status !== 0) return { name: prereq.name, found: false, note: prereq.note ?? null };
   // A PHP module is found when `php -m` lists it (PF-0143).
   if (prereq.module) {
-    const found = `${result.stdout}`.split('\n').some((line) => line.trim().toLowerCase() === prereq.module);
+    const found = `${result.stdout}`.split(/\r?\n/).some((line) => line.trim().toLowerCase() === prereq.module);
     return { name: prereq.name, found, ...(found ? { version: 'enabled' } : {}), module: true, note: prereq.note ?? null };
   }
-  const version = `${result.stdout}`.split('\n').map((line) => line.trim()).find((line) => /\d/.test(line)) ?? '';
+  const version = `${result.stdout}`.split(/\r?\n/).map((line) => line.trim()).find((line) => /\d/.test(line)) ?? '';
   return { name: prereq.name, found: true, version: version.slice(0, 120), note: prereq.note ?? null };
 }
 
 function scrubbedEnv(source = process.env) {
-  const env = {};
-  for (const name of SAFE_ENV) if (typeof source[name] === 'string') env[name] = source[name];
-  return env;
+  return safeEnvironment(SAFE_ENV, source);
+}
+
+// PF-0158: what a stack still needs on this machine, checked now (never from a saved plan).
+// `overridable`: the generator's own program is present, so only a secondary tool (a PHP
+// module, …) is missing and an experienced developer may run the generator anyway. When the
+// generator itself is missing there is nothing to run, so there is nothing to override.
+// Git is needed only when the plan initializes a repository (the developer's own choice).
+const GIT_PREREQUISITE = Object.freeze({ name: 'git', argv: ['git', '--version'] });
+const requirementsOf = (entry, git) => [...entry.prerequisites, ...(git ? [GIT_PREREQUISITE] : [])];
+// `git`: the plan runs `git init`. A missing Git is never overridable: the step would fail
+// after the project exists; the developer installs Git or leaves Git off.
+export async function checkPrerequisites(stackId, { catalog = CATALOG, platform = process.platform, probe = probePrerequisite, git = false } = {}) {
+  const entry = catalogEntry(stackId, catalog);
+  if (!entry) throw new NewProjectError('NEW_PROJECT_STACK', `Unknown stack ${JSON.stringify(stackId)}. See \`yallaflow new catalog\`.`);
+  const required = requirementsOf(entry, git);
+  const tools = await Promise.all(required.map(probe));
+  const missing = tools.filter((tool) => !tool.found).map((tool) => ({ ...tool, guidance: toolGuidance(tool.name, platform) }));
+  const program = entry.argv ? entry.argv('x')[0] : null;
+  const programPresent = !required.some((prereq, index) => !tools[index].found && !prereq.module && (prereq === GIT_PREREQUISITE || prereq.argv[0] === program));
+  return { stack: entry.id, platform, checkedAt: new Date().toISOString(), tools, missing, ready: missing.length === 0, overridable: missing.length > 0 && programPresent };
 }
 
 // Validates the request and writes an immutable plan. Nothing is created or executed
@@ -149,7 +175,7 @@ export async function createPlan(input, { catalog = CATALOG, env = process.env, 
     install: Boolean(install && entry.install),
     allowNested: Boolean(allowNested && nested),
     nestedIn: nested ? nested.at : null,
-    prerequisites: entry.prerequisites.map(probePrerequisite),
+    prerequisites: await Promise.all(requirementsOf(entry, git).map(probePrerequisite)),
     expectedStructure: entry.structure,
     network: steps.some((step) => step.network),
     executesExternalCommands: steps.some((step) => Array.isArray(step.argv)),
@@ -228,8 +254,15 @@ function runLogged(argv, cwd, logFile, timeoutMs) {
     open(logFile, constants.O_WRONLY | constants.O_APPEND | constants.O_CREAT | (constants.O_NOFOLLOW ?? 0), 0o600).then(async (log) => {
       await log.write(`\n$ ${argv.join(' ')}\n`);
       let child;
+      const env = scrubbedEnv();
+      const command = await resolveCommand(argv, env);
+      if (!command.ok) {
+        await log.write(`${command.message}\n`);
+        await log.close();
+        return resolve({ code: null, error: command.message });
+      }
       try {
-        child = spawn(argv[0], argv.slice(1), { cwd, env: { ...scrubbedEnv(), CI: '1' }, shell: false, detached: process.platform !== 'win32', stdio: ['ignore', log.fd, log.fd] });
+        child = spawn(command.file, command.args, { cwd, env: { ...env, CI: '1' }, shell: false, detached: process.platform !== 'win32', windowsHide: true, stdio: ['ignore', log.fd, log.fd] });
       } catch (error) {
         await log.close();
         return resolve({ code: null, error: error.message });
@@ -253,7 +286,7 @@ async function logTail(file, lines = 40) {
 // Executes a reviewed plan. `confirm` must be a prefix (>= 8 hex chars) of the plan hash.
 // hooks.initProject / hooks.firstWork are Core entry points (injected so the CLI module
 // graph stays acyclic).
-export async function createFromPlan(id, confirm, { catalog = CATALOG, env = process.env, hooks, onStep = () => {} } = {}) {
+export async function createFromPlan(id, confirm, { catalog = CATALOG, env = process.env, hooks, onStep = () => {}, allowMissingTools = false, probe } = {}) {
   const plan = await loadPlan(id, env);
   if (typeof confirm !== 'string' || confirm.length < 8 || !plan.hash.startsWith(confirm.toLowerCase())) throw new NewProjectError('NEW_PROJECT_CONFIRM', `Confirm the reviewed plan with the first 8 or more characters of its hash (${plan.hash.slice(0, 8)}…).`);
   const entry = verifyAgainstCatalog(plan, catalog);
@@ -261,6 +294,16 @@ export async function createFromPlan(id, confirm, { catalog = CATALOG, env = pro
   const done = (step) => progress.steps[step]?.status === 'done';
   const mark = async (step, status, extra = {}) => { progress.steps[step] = { status, at: new Date().toISOString(), ...extra }; await savePlan(plan, env); onStep(step, status); };
 
+  // PF-0158: a generator is not started while a tool it needs is missing. Checked now, before
+  // anything is created; the confirmation, the catalog check and every later check still apply
+  // whatever `allowMissingTools` says.
+  if ((entry.argv && !done('generate')) || (body.git && !done('promote'))) {
+    const readiness = await checkPrerequisites(entry.id, { catalog, git: Boolean(body.git) && !done('git-init'), ...(probe ? { probe } : {}) });
+    if (!readiness.ready && !(allowMissingTools && readiness.overridable)) {
+      const names = readiness.missing.map((tool) => tool.name).join(', ');
+      throw new NewProjectError('NEW_PROJECT_PREREQUISITES', `${entry.label} needs ${names} on this machine, and ${readiness.missing.length === 1 ? 'it was' : 'they were'} not found. Nothing was created. Install ${readiness.missing.length === 1 ? 'it' : 'them'}, open a new terminal so PATH is current, and try again${readiness.overridable ? ' (or pass --allow-missing-tools to run the generator anyway)' : ''}${readiness.missing.some((tool) => tool.name === 'git') ? ' (or make a plan without --git)' : ''}.`, { missing: readiness.missing, overridable: readiness.overridable });
+    }
+  }
   if (!done('promote')) {
     if (await exists(body.destination)) throw new NewProjectError('NEW_PROJECT_EXISTS', `${body.destination} exists now. Nothing was created or changed; the wizard never overwrites an existing folder.`);
     const realParent = await realpath(body.parent).catch(() => null);
@@ -277,7 +320,8 @@ export async function createFromPlan(id, confirm, { catalog = CATALOG, env = pro
     // A parent package.json whose "workspaces" match staging could still make the parent npm's
     // root. Verify npm's own answer before any npm-based generator runs (re-review, PF-0048).
     if (entry.argv && ['npx', 'npm'].includes(entry.argv(body.name)[0])) {
-      const prefix = spawnSync('npm', ['prefix'], { cwd: staging, encoding: 'utf8', env: scrubbedEnv(), timeout: PREREQ_TIMEOUT_MS, shell: false });
+      const npm = await resolveCommand(['npm', 'prefix'], scrubbedEnv());
+      const prefix = npm.ok ? spawnSync(npm.file, npm.args, { cwd: staging, encoding: 'utf8', env: scrubbedEnv(), timeout: PREREQ_TIMEOUT_MS, shell: false, windowsHide: true }) : { status: null, stdout: '' };
       const resolved = prefix.status === 0 ? await realpath(prefix.stdout.trim()).catch(() => null) : null;
       if (resolved !== await realpath(staging)) {
         await mark('generate', 'failed', { error: 'npm project root is not the staging folder' });

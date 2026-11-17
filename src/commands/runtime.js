@@ -3,10 +3,10 @@ import { parseArgs } from 'node:util';
 import { createInterface } from 'node:readline';
 import { findProjectRoot } from '../core/workspace.js';
 import { PACKAGE_VERSION } from '../version.js';
-import { addService, definitionHash, loadRuntimeProfiles, removeService } from '../runtime/profile.js';
+import { addService, definitionHash, loadRuntimeProfiles, removeService, resolveServiceCwd, updateService } from '../runtime/profile.js';
 import { suggestServices } from '../runtime/suggest.js';
 import { trustService, trustState } from '../runtime/trust.js';
-import { RuntimeError, restartService, runtimeStatus, serviceLogs, startAllServices, startService, stopAllServices, stopService } from '../runtime/supervisor.js';
+import { RuntimeError, installPrerequisites, restartService, runtimeStatus, serviceLogs, startAllServices, startService, stopAllServices, stopService } from '../runtime/supervisor.js';
 import { readFile } from 'node:fs/promises';
 
 export const RUNTIME_SCHEMA = 'yallaflow.runtime/1';
@@ -15,6 +15,15 @@ import { RUNTIME_USAGE } from './runtime-usage.js';
 
 function usage() {
   return Object.assign(new Error(`Usage: ${RUNTIME_USAGE}`), { code: 'USAGE' });
+}
+
+// PF-0166: where a change was saved, in words that do not suggest anything was uploaded.
+function savedLines(result) {
+  const lines = [result.savedTo === 'local'
+    ? `Saved for this machine only (${result.file}, ignored by Git). Teammates are not affected.`
+    : `Saved in the shared file ${result.file}. Teammates get it only after you commit and push it; nothing was uploaded.`];
+  if (result.masked?.length) lines.push(`On this machine your personal override still wins for: ${result.masked.join(', ')} (.yallaflow/local/runtime.yaml).`);
+  return lines;
 }
 
 function out(json, value, lines) {
@@ -28,7 +37,7 @@ export async function runtimeCommand(rest) {
     return await run(rest, json);
   } catch (error) {
     if (!json) throw error;
-    process.stdout.write(`${JSON.stringify({ error: { code: error.code ?? 'ERROR', message: error.message, ...(error.review ? { review: error.review } : {}), ...(error.shared ? { shared: error.shared } : {}), ...(error.problems ? { problems: error.problems } : {}), ...(error.blocking ? { blocking: error.blocking } : {}) } })}\n`);
+    process.stdout.write(`${JSON.stringify({ error: { code: error.code ?? 'ERROR', message: error.message, ...(error.review ? { review: error.review } : {}), ...(error.shared ? { shared: error.shared } : {}), ...(error.code === 'PORT_IN_USE' ? { port: error.port ?? null, owner: error.owner ?? null, ownerService: error.ownerService ?? null, declaredBy: error.declaredBy ?? null, suggestion: error.suggestion ?? null } : {}), ...(error.failure ? { failure: error.failure } : {}), ...(error.problems ? { problems: error.problems, ...(error.state ? { state: error.state } : {}) } : {}), ...(error.blocking ? { blocking: error.blocking } : {}) } })}\n`);
     process.exitCode = 1;
     return null;
   }
@@ -69,6 +78,68 @@ async function run(rest, json) {
     const { reviewService } = await import('../runtime/review.js');
     const review = await reviewService(root, plain[0]);
     return out(json, { schema: RUNTIME_SCHEMA, review }, reviewLines(review));
+  }
+  // PF-0166: change fields of an existing service; every other field is kept. Nothing runs.
+  if (action === 'edit') {
+    const at = plain.indexOf('--');
+    const command = at === -1 ? null : plain.slice(at + 1);
+    const { values, positionals } = parseArgs({ args: at === -1 ? plain : plain.slice(0, at), options: { local: { type: 'boolean' }, shared: { type: 'boolean' }, name: { type: 'string' }, cwd: { type: 'string' }, open: { type: 'string' }, port: { type: 'string', multiple: true }, env: { type: 'string', multiple: true }, 'no-env': { type: 'boolean' }, 'no-ports': { type: 'boolean' }, 'ready-port': { type: 'string' }, 'ready-log': { type: 'string' }, 'no-ready': { type: 'boolean' } }, allowPositionals: true, strict: true });
+    if (positionals.length !== 1) throw usage();
+    // Where it is saved is the developer's decision, never a default.
+    if (Boolean(values.local) === Boolean(values.shared)) throw Object.assign(new Error('Say where to save the change: --local (this machine only) or --shared (the repository file; teammates get it after you commit and push).'), { code: 'USAGE' });
+    if ([values['ready-port'], values['ready-log'], values['no-ready']].filter((entry) => entry !== undefined).length > 1) throw Object.assign(new Error('Use one of --ready-port, --ready-log, --no-ready.'), { code: 'USAGE' });
+    const patch = {};
+    if (values.name !== undefined) patch.name = values.name;
+    if (values.cwd !== undefined) patch.cwd = values.cwd;
+    if (values.open !== undefined) patch.open = values.open;
+    if (values.port !== undefined || values['no-ports']) patch.ports = (values.port ?? []).map(Number);
+    if (values.env !== undefined || values['no-env']) patch.env = values.env ?? [];
+    if (values['ready-port'] !== undefined) patch.ready = { port: Number(values['ready-port']) };
+    else if (values['ready-log'] !== undefined) patch.ready = { log: values['ready-log'] };
+    else if (values['no-ready']) patch.ready = null;
+    if (command) patch.command = command;
+    const result = await updateService(root, positionals[0], patch, { local: Boolean(values.local) });
+    return out(json, { ok: true, ...result }, [...savedLines(result), 'Nothing was run. A changed command, port or folder needs a new review: yallaflow runtime trust ' + result.id]);
+  }
+  // PF-0166: move a service to another port: the port, the readiness check, the links and the
+  // command's port argument change together, or nothing changes.
+  if (action === 'port') {
+    const { values, positionals } = parseArgs({ args: plain, options: { from: { type: 'string' }, to: { type: 'string' }, shared: { type: 'boolean' }, local: { type: 'boolean' } }, allowPositionals: true, strict: true });
+    if (positionals.length !== 1 || values.from === undefined || values.to === undefined || (values.shared && values.local)) throw usage();
+    const { planPortChange } = await import('../runtime/ports.js');
+    const all = (await loadRuntimeProfiles(root)).services;
+    const service = all.find((entry) => entry.id === positionals[0]);
+    if (!service) throw new RuntimeError('RUNTIME_UNKNOWN_SERVICE', `No service ${positionals[0]} in the runtime profile.`);
+    const plan = await planPortChange(service, Number(values.from), Number(values.to), { cwd: await resolveServiceCwd(root, service), others: all });
+    const result = await updateService(root, service.id, plan.patch, { local: !values.shared });
+    const refs = plan.references.map((entry) => `${entry.id} (${entry.where.join(', ')})`);
+    return out(json, { ok: true, ...result, from: plan.from, to: plan.to, changedTogether: plan.changed, references: plan.references }, [`${service.id}: port ${plan.from} → ${plan.to}. Changed together: ${plan.changed.join(', ')}.`, ...savedLines(result), ...(refs.length ? [`Still mention port ${plan.from}, not changed: ${refs.join('; ')}. Check whether they should use ${plan.to}. Project files such as a proxy config or .env were not read.`] : []), `Nothing was run and no other service was touched. Review it again before starting: yallaflow runtime trust ${service.id}`, ...(result.savedTo === 'local' ? [`To undo this machine's change: yallaflow runtime reset ${service.id}`] : [])]);
+  }
+  // Owner review (2026-11-17): undo this machine's change to a shared service (the local
+  // override), so the shared definition applies again. A service defined only on this machine
+  // has no shared definition to return to and is refused (that is runtime remove --local).
+  if (action === 'reset') {
+    if (plain.length !== 1) throw usage();
+    const { resetLocalOverride } = await import('../runtime/profile.js');
+    const result = await resetLocalOverride(root, plain[0]);
+    return out(json, { ok: true, ...result }, [`${result.id}: this machine's change (${result.reset.join(', ')}) was removed; the shared definition applies again. The shared file was not changed. Review it again before starting: yallaflow runtime trust ${result.id}`]);
+  }
+  // PF-0166: install a service's missing dependencies. Without --confirm it only shows the
+  // command. Running it is a human decision (a terminal, or the console's confirmed action).
+  if (action === 'install') {
+    const { values, positionals } = parseArgs({ args: plain, options: { confirm: { type: 'string' } }, allowPositionals: true, strict: true });
+    if (positionals.length !== 1) throw usage();
+    const status = (await runtimeStatus(root)).services.find((entry) => entry.id === positionals[0]);
+    if (!status) throw new RuntimeError('RUNTIME_UNKNOWN_SERVICE', `No service ${positionals[0]} in the runtime profile.`);
+    const fix = status.prerequisites?.problems?.[0]?.fix ?? null;
+    if (!values.confirm) {
+      return out(json, { ok: true, id: status.id, problems: status.prerequisites?.problems ?? [], ran: false }, fix
+        ? [status.prerequisites.problems[0].message, `Command: ${fix.display}`, fix.changesLockfile ? 'There is no lockfile, so this install creates one.' : `It follows ${fix.lockfile}; package.json and the lockfile are not changed.`, 'Installed dependencies stay on this machine; they are not part of the repository.', `Nothing was run. To run it: yallaflow runtime install ${status.id} --confirm ${fix.hash}`]
+        : [`Nothing is missing for ${status.id}.`]);
+    }
+    if (!process.stdin.isTTY && process.env.YALLAFLOW_RUNTIME_VIA !== 'console') throw new RuntimeError('RUNTIME_INSTALL_INTERACTIVE', 'Installing dependencies runs package scripts on this machine: it is a human decision. Run it in a terminal, or confirm it in the console.');
+    const result = await installPrerequisites(root, status.id, { confirm: values.confirm, startedBy: process.env.YALLAFLOW_RUNTIME_VIA === 'console' ? 'console' : 'cli' });
+    return out(json, { ok: true, ...result }, [`Installed with: ${result.command}`, result.ready ? `${result.id} has what it needs now. Start it with: yallaflow runtime start ${result.id}` : `Something is still missing: ${result.problems[0]?.message ?? ''}`]);
   }
   if (action === 'remove') {
     const { values, positionals } = parseArgs({ args: plain, options: { local: { type: 'boolean' } }, allowPositionals: true, strict: true });
@@ -116,11 +187,14 @@ async function run(rest, json) {
   }
   if (action === 'start' || action === 'restart') {
     const confirmShared = action === 'restart' && plain.includes('--confirm-shared');
-    const ids = plain.filter((token) => token !== '--confirm-shared');
-    if (ids.length !== 1 || (action === 'start' && confirmShared)) throw usage();
+    // Owner review (2026-11-17): start although the dependency check says NEEDS_SETUP. It
+    // skips that one check; trust, folders, ports and every other check still apply.
+    const skipSetupCheck = plain.includes('--skip-setup-check');
+    const ids = plain.filter((token) => token !== '--confirm-shared' && token !== '--skip-setup-check');
+    if (ids.length !== 1 || ids[0].startsWith('-') || (action === 'start' && confirmShared)) throw usage();
     const startedBy = process.env.YALLAFLOW_RUNTIME_VIA === 'console' ? 'console' : 'cli';
-    const result = action === 'start' ? await startService(root, ids[0], { startedBy }) : await restartService(root, ids[0], { startedBy, confirmShared });
-    return out(json, { ok: true, ...result }, [result.state === 'running-outside' ? `${result.id} already runs outside YallaFlow (${(result.outside ?? []).join(', ')}); it was not started and YallaFlow will never stop it.` : result.already ? `${result.id} is already ${result.state} (pid ${result.pid}).` : `${result.id} ${action === 'restart' ? 'restarted' : 'started'}: ${result.state} (pid ${result.pid}). Logs: yallaflow runtime logs ${result.id}`]);
+    const result = action === 'start' ? await startService(root, ids[0], { startedBy, skipSetupCheck }) : await restartService(root, ids[0], { startedBy, confirmShared, skipSetupCheck });
+    return out(json, { ok: true, ...result }, [result.state === 'running-outside' ? `${result.id} already runs outside YallaFlow (${(result.outside ?? []).join(', ')}); it was not started and YallaFlow will never stop it.` : result.already ? `${result.id} is already ${result.state} (pid ${result.pid}).` : `${result.id} ${action === 'restart' ? 'restarted' : 'started'}: ${result.state} (pid ${result.pid}). Logs: yallaflow runtime logs ${result.id}`, ...(result.setupCheckSkipped ? [`The dependency check was skipped as you asked (${result.setupCheckSkipped.join(', ')}); if it fails, its log says why.`] : [])]);
   }
   if (action === 'stop') {
     if (plain.length === 1 && plain[0] === '--all') {

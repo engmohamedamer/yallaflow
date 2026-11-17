@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "A separate user-level preferences.json keeps the preferred agent, language, theme, last-used folder and onboarding preferences, so a returning user does not set them again; existing project settings stay as they are.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T16:59:30.968Z",
+      "updatedAt": "2026-11-16T16:59:30.968Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "Preferences are read and saved through the console (API and page) in preferences.json beside console.json, and survive a console restart and a different port.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T16:59:30.968Z",
+      "updatedAt": "2026-11-16T16:59:30.968Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "Only the known, typed fields are stored: no credential or free-form value can be saved, the file is private to the user, and a read-only console never writes it.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T16:59:30.968Z",
+      "updatedAt": "2026-11-16T16:59:30.968Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-001",
+      "statement": "Backward compatible: a missing or unreadable file means defaults, console.json and project settings are untouched, and a language or theme already chosen in the browser is carried over.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T16:59:30.968Z",
+      "updatedAt": "2026-11-16T16:59:30.968Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-16T16:59:30.968Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-16T16:59:30.968Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-16T16:59:30.968Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-16T16:59:30.968Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-16T16:59:30.968Z"
+}

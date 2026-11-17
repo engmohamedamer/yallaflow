@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-16T17:25:02.080Z",
+      "completedAt": "2026-11-16T17:25:02.080Z",
+      "summary": "The wizard state (wiz) lives only in page memory; the plan and its step progress are saved on disk (plansDir) and createFromPlan skips finished steps; the server's job table is in memory, so after a restart a plan has progress but no outcome, and the page offers Retry only when an outcome carries an error.",
+      "evidence": [
+        "resources/console/app.js",
+        "src/console/newproject.js",
+        "src/newproject/project.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-16T17:25:02.408Z",
+      "completedAt": "2026-11-16T17:25:02.408Z",
+      "summary": "Owner decision 9 (2026-11-16): preserve wizard choices and resume staged creation safely without repeating completed operations.",
+      "evidence": [
+        "user:Owner approval of Phase 1 decisions, item 9"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-16T17:25:02.731Z",
+      "completedAt": "2026-11-16T17:25:02.731Z",
+      "summary": "Page: a draft (choices, step, plan id, acknowledgement; never file contents) in this browser's storage, restored when the wizard opens; a creation with no outcome and nothing running reads as interrupted, with Continue (the same confirmed plan; the server skips finished steps), Add to the console when the project already exists, and Start over. The Projects page points to an unfinished creation. No server change: the plan-hash confirmation and every create-time check apply to a resumed creation as to a first one."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-16T17:26:42.940Z",
+      "completedAt": "2026-11-16T17:26:42.940Z",
+      "summary": "Page only: a bounded draft of the wizard's typed choices, step and running plan id in this browser's storage (no files, no plan hash); restored when the wizard opens; a creation with no outcome and nothing running is shown as interrupted with Continue (same confirmed plan), Add to the console when the project exists, and Start over; the Projects page links to an unfinished creation. No server change.",
+      "evidence": [
+        "resources/console/app.js",
+        "test/console-wizard-resume.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-16T17:26:49.604Z",
+      "completedAt": "2026-11-16T17:26:49.604Z",
+      "summary": "Focused tests pass (V-001), including a real interrupted creation continued from its plan with the generator run exactly once.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-16T17:26:49.604Z"
+}

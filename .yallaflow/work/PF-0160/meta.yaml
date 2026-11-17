@@ -1,0 +1,45 @@
+{
+  "id": "PF-0160",
+  "type": "feature",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Machine readiness and agent setup: one derived readiness document for this machine (per agent: installed, signed in, connection, platform support), a saved preferred agent that is preselected but confirmed per project, and Claude Code shown as Experimental / not verified on Windows",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-16T17:02:16.833Z",
+  "updatedAt": "2026-11-16T17:09:52.717Z",
+  "title": "Machine readiness and agent setup: one derived readiness document for this machine (per agent: installed, signed in, connection, platform support), a saved preferred agent that is preselected but confirmed per project, and Claude Code shown as Experimental / not verified on Windows",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope bounded`.",
+  "routedAt": "2026-11-16T17:02:16.889Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "implement",
+    "verify",
+    "converge"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation",
+      "verification",
+      "delivery-convergence"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-16T17:09:52.717Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

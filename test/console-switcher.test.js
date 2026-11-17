@@ -17,7 +17,9 @@ test('the switcher shows the current project with its readiness and lists every 
 });
 
 test('project actions live in the same menu; read-only hides Add and New', () => {
-  assert.match(topbar, /readOnly \? '' : `<button type="button" role="menuitem" class="projmenu-item" data-folder-open="existing">/);
+  // PF-0161: the whole console being read-only hides them; a monitored project does not (adding
+  // projects is a console matter), so the menu asks consoleReadOnly.
+  assert.match(topbar, /consoleReadOnly \? '' : `<button type="button" role="menuitem" class="projmenu-item" data-folder-open="existing">/);
   assert.match(topbar, /href="#\/new"><span class="projmenu-check" aria-hidden="true">✦<\/span>\$\{A\('مشروع جديد', 'New project'\)\}/);
   // PF-0132: with agents on, the same item reads "All projects & agents" (Agents moved into Projects).
   assert.match(topbar, /href="#\/projects"><span class="projmenu-check" aria-hidden="true">▤<\/span>\$\{agentsOn \? A\('كل المشاريع والوكلاء', 'All projects & agents'\) : A\('كل المشاريع', 'All projects'\)\}/);

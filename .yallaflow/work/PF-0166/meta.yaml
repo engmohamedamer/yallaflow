@@ -1,0 +1,75 @@
+{
+  "id": "PF-0166",
+  "type": "feature",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Run tab: check what a service needs before it starts (missing dependencies or local tool, with the install command for the project's package manager, run only on an explicit action), name the port's owner and offer a free port applied consistently, show the line of the log that explains a failure, say whether a change is saved for this machine or shared in the repository, and edit a service from its card without losing its other fields; one place for run setup",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-16T19:38:29.509Z",
+  "updatedAt": "2026-11-17T09:54:57.674Z",
+  "title": "Run tab: check what a service needs before it starts (missing dependencies or local tool, with the install command for the project's package manager, run only on an explicit action), name the port's owner and offer a free port applied consistently, show the line of the log that explains a failure, say whether a change is saved for this machine or shared in the repository, and edit a service from its card without losing its other fields; one place for run setup",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope bounded`.",
+  "routedAt": "2026-11-16T19:38:29.569Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "implement",
+    "verify",
+    "converge"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation",
+      "verification",
+      "delivery-convergence"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-17T07:19:46.655Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    },
+    {
+      "completedAt": "2026-11-17T09:23:57.455Z",
+      "verificationRunIds": [
+        "V-002",
+        "V-003"
+      ]
+    },
+    {
+      "completedAt": "2026-11-17T09:54:57.674Z",
+      "verificationRunIds": [
+        "V-004"
+      ]
+    }
+  ],
+  "lastInvalidationAt": "2026-11-17T09:54:11.651Z",
+  "lifecycleHistory": [
+    {
+      "action": "reopen",
+      "fromStage": "DONE",
+      "toStage": "IMPLEMENTATION",
+      "reason": "Owner review (2026-11-17): dependency detection must not be an unconditional blocker. Use READY / NEEDS_SETUP / UNKNOWN; NEEDS_SETUP offers an Advanced Try Anyway that bypasses only the dependency readiness check (never Monitor Only, trust, command validation or path protection); UNKNOWN never blocks. Regression tests for custom setups, monorepos and unknown environments. Review port-change safety (shared definitions, dependents and proxy URLs, reversibility of local changes, refusing uncertain rewrites, never stopping another service) and fix confirmed issues only.",
+      "changedAt": "2026-11-17T08:50:48.383Z"
+    },
+    {
+      "action": "reopen",
+      "fromStage": "DONE",
+      "toStage": "IMPLEMENTATION",
+      "reason": "Owner approval (2026-11-17): the full local-override reset is accepted for now, provided the UI clearly explains that all local changes to that service are removed.",
+      "changedAt": "2026-11-17T09:54:11.651Z"
+    }
+  ]
+}

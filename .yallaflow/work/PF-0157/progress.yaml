@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-16T16:51:29.900Z",
+      "completedAt": "2026-11-16T16:51:29.900Z",
+      "summary": "Read src/newproject/project.js (probePrerequisite, runLogged, scrubbedEnv, npm prefix check), src/console/greenfield.js (probeTools, runQuiet, gitInit) and src/agents/detect.js (which, launchSpec, envValue). The wizard starts composer/npx/npm by bare name with shell:false and a POSIX-only environment allow-list; the agent side already has a Windows-aware lookup and shim launcher.",
+      "evidence": [
+        "src/newproject/project.js",
+        "src/console/greenfield.js",
+        "src/agents/detect.js"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-16T16:51:39.342Z",
+      "completedAt": "2026-11-16T16:51:39.342Z",
+      "summary": "Root cause (from code; reproduction on real Windows unavailable here): (1) probePrerequisite, runLogged, the npm prefix check and probeTools call spawn/execFile with the bare names composer, npx, npm and shell:false. On Windows these are .bat/.cmd shims; Node resolves a bare name only to .exe/.com and refuses to start .cmd/.bat without a shell, so the tools read as missing and cannot be started even when installed. (2) scrubbedEnv/SAFE_ENV pass only POSIX names (PATH, HOME, TMPDIR...), dropping SystemRoot, APPDATA, LOCALAPPDATA, USERPROFILE, TEMP, PATHEXT that npm, Composer and networking need on Windows. src/agents/detect.js which()/launchSpec() already solve lookup and shim launch without a shell (PF-0148) but the wizard does not use them. The real trial's first failure (Composer genuinely absent) is consistent with the same code path.",
+      "evidence": [
+        "src/newproject/project.js:75-93",
+        "src/newproject/project.js:226-242",
+        "src/console/greenfield.js:25-66",
+        "src/agents/detect.js"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-16T16:54:11.834Z",
+      "completedAt": "2026-11-16T16:54:11.834Z",
+      "summary": "New src/utils/command.js (safeEnvironment, resolveCommand) reuses detect.js which/launchSpec; launchSpec also resolves Composer's Windows shim (php + composer.phar inside the shim's folder). project.js probePrerequisite/runLogged/npm-prefix and greenfield.js runQuiet (tool chips, git init) use it. Windows children get an allow-listed set of system variables. No shell anywhere. Tests: test/command-platform.test.js (Windows/macOS simulated, Linux real).",
+      "evidence": [
+        "src/utils/command.js",
+        "test/command-platform.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-16T16:54:25.760Z",
+      "completedAt": "2026-11-16T16:54:25.760Z",
+      "summary": "44 focused tests pass (V-001). Windows and macOS cases are simulated with injected platform data; not verified on real machines.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-16T16:54:25.760Z"
+}

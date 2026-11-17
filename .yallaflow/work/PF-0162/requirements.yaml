@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "The first screen routes by what the user wants to do: create a new project, manage an existing one, or monitor one; Monitor needs no agent setup.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T17:18:25.194Z",
+      "updatedAt": "2026-11-16T17:18:25.194Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "Create and Manage are agent-first: an agent is required on the normal path and its setup on this machine is guided in place, while deterministic generation and creating without an agent remain as explicitly labeled Advanced options.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T17:18:25.194Z",
+      "updatedAt": "2026-11-16T17:18:25.194Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "A returning user whose usual agent is ready is not asked to set anything up again.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T17:18:25.194Z",
+      "updatedAt": "2026-11-16T17:18:25.194Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "With no projects, the welcome panel offers Create, Manage and Monitor in plain words (Arabic and English); the chosen intent is saved; Monitor opens the folder chooser with Monitor only as the main action and shows no agent setup.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T17:18:25.194Z",
+      "updatedAt": "2026-11-16T17:18:25.194Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-002",
+      "statement": "In the wizard the default path is an agent-planned project; fixed templates are under a labeled Advanced section; continuing needs a chosen, ready agent unless the labeled Advanced option to continue without one is ticked; when the agent is not ready, the machine setup steps are shown in place.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T17:18:25.194Z",
+      "updatedAt": "2026-11-16T17:18:25.194Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-003",
+      "statement": "When the saved usual agent is ready on this machine, the wizard preselects it and shows no setup card or warning, and existing projects and their settings open as before.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T17:18:25.194Z",
+      "updatedAt": "2026-11-16T17:18:25.194Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-16T17:18:25.194Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-16T17:18:25.194Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-16T17:18:25.194Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-16T17:18:25.194Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-16T17:18:25.194Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-16T17:18:25.194Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-16T17:18:25.194Z"
+}

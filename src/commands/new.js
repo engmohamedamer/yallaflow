@@ -60,7 +60,7 @@ export async function newCommand(rest) {
     return await run(rest.filter((token) => token !== '--json'), json);
   } catch (error) {
     if (!json) throw error;
-    process.stdout.write(`${JSON.stringify({ error: { code: error.code ?? 'ERROR', message: error.message, ...(error.staging ? { staging: error.staging } : {}) } })}\n`);
+    process.stdout.write(`${JSON.stringify({ error: { code: error.code ?? 'ERROR', message: error.message, ...(error.staging ? { staging: error.staging } : {}), ...(error.missing ? { missing: error.missing, overridable: Boolean(error.overridable) } : {}) } })}\n`);
     process.exitCode = 1;
     return null;
   }
@@ -96,14 +96,14 @@ async function run(rest, json) {
     return out(json, { plans: plans.map((plan) => ({ id: plan.id, name: plan.body.name, stack: plan.body.stack, destination: plan.body.destination, progress: plan.progress })) }, plans.length ? plans.map((plan) => `${plan.id}  ${plan.body.stack.padEnd(11)} ${plan.body.destination}`) : ['No plans.']);
   }
   if (action === 'create') {
-    const { values, positionals } = parseArgs({ args, options: { confirm: { type: 'string' } }, allowPositionals: true, strict: true });
+    const { values, positionals } = parseArgs({ args, options: { confirm: { type: 'string' }, 'allow-missing-tools': { type: 'boolean' } }, allowPositionals: true, strict: true });
     if (positionals.length !== 1 || !values.confirm) throw usage();
     // Creating a project after reviewing its plan is a human decision: from a terminal, or
     // from the console's confirmed page. A script or an agent's tool call is refused (this
     // prevents automation from confirming its own plan; it is not a boundary against a
     // process that controls the whole user account).
     if (!process.stdin.isTTY && process.env.YALLAFLOW_NEW_VIA !== 'console') throw Object.assign(new Error('Creating a project is a human decision: run `yallaflow new create` in a terminal after reviewing the plan, or confirm it on the console\'s New project page. It cannot be scripted.'), { code: 'NEW_PROJECT_INTERACTIVE' });
-    const result = await createFromPlan(positionals[0], values.confirm, { hooks: CORE_HOOKS, onStep: (step, status) => { if (!json) console.log(`${step}: ${status}`); } });
+    const result = await createFromPlan(positionals[0], values.confirm, { hooks: CORE_HOOKS, allowMissingTools: Boolean(values['allow-missing-tools']), onStep: (step, status) => { if (!json) console.log(`${step}: ${status}`); } });
     return out(json, { ok: true, ...result }, [
       `Created ${result.destination} with YallaFlow initialized (${result.stack === 'empty' ? 'new empty project' : 'new project; the generated code has not been reviewed'}).`,
       `First work item: ${result.workId} (not routed, not active).`,

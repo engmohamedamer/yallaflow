@@ -1,0 +1,308 @@
+{
+  "schemaVersion": 1,
+  "revision": 2,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "Before a service starts, YallaFlow detects missing run requirements for the supported cases (missing installed dependencies, a missing local tool such as the Angular CLI), explains the cause, and names the exact install command for the project's package manager and lockfile; nothing is installed without the developer's explicit action.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T19:38:57.299Z",
+      "updatedAt": "2026-11-16T19:38:57.299Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "A port conflict names the owner where it can and offers a free port; accepting it updates the command, the port, the readiness check and the open links together, without stopping the other service and without guessing at commands it does not understand.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T19:38:57.299Z",
+      "updatedAt": "2026-11-16T19:38:57.299Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "A failed start shows the line of the log that explains it, keeps the full log one click away, and redacts secrets before showing the log or handing it to the agent.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T19:38:57.299Z",
+      "updatedAt": "2026-11-16T19:38:57.299Z"
+    },
+    {
+      "id": "REQ-004",
+      "statement": "Every change says where it is saved: this machine only, or shared in the repository (and only after commit and push); installed dependencies and running processes are always local.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T19:38:57.299Z",
+      "updatedAt": "2026-11-16T19:38:57.299Z"
+    },
+    {
+      "id": "REQ-005",
+      "statement": "The Run tab is the main place to set up, diagnose and fix services; a service is edited from its card with rarely used fields under Advanced, one changed field keeps the rest of the definition (links, dependencies), and the same tools are not offered in two places.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T19:38:57.299Z",
+      "updatedAt": "2026-11-16T19:38:57.299Z"
+    },
+    {
+      "id": "REQ-006",
+      "statement": "Dependency readiness is never an unconditional execution blocker: each service is READY, NEEDS_SETUP (exact missing dependencies and the recommended setup command) or UNKNOWN (detection inconclusive, explained, never blocking); NEEDS_SETUP offers an Advanced Try Anyway that bypasses only the dependency readiness check, never Monitor Only, trust/approval, command validation, path protection or any other security boundary.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T09:11:48.301Z",
+      "updatedAt": "2026-11-17T09:11:48.301Z"
+    },
+    {
+      "id": "REQ-007",
+      "statement": "Port conflict resolution preserves shared service definitions, accounts for dependent services and proxy URLs, keeps local port changes reversible, refuses uncertain command rewrites and never stops another service to free a port.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T09:11:48.301Z",
+      "updatedAt": "2026-11-17T09:11:48.301Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "For an npm/pnpm/yarn/bun service whose dependencies are not installed or whose script's local tool is missing, status and start report it before anything runs, with the install command chosen from the lockfile; a MODULE_NOT_FOUND for a project file is reported as a wrong path, not as missing dependencies.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T19:38:57.299Z",
+      "updatedAt": "2026-11-16T19:38:57.299Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "The install command is shown first and runs only after the developer confirms that exact command for a trusted service; package.json and the lockfile are not changed by a frozen install.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T19:38:57.299Z",
+      "updatedAt": "2026-11-16T19:38:57.299Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-002",
+      "statement": "PORT_IN_USE carries the owner (another service of this project by name, a container, or a process) and a free suggested port; accepting changes ports, ready.port, links on that port and a recognized port argument together, and refuses with an explanation when the command's port cannot be changed with certainty.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T19:38:57.299Z",
+      "updatedAt": "2026-11-16T19:38:57.299Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-003",
+      "statement": "A failure shows the explaining line (for example the Cannot find module line with the missing file) rather than the last stack-trace lines; the log shown and the text prepared for the agent are redacted.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T19:38:57.299Z",
+      "updatedAt": "2026-11-16T19:38:57.299Z"
+    },
+    {
+      "id": "AC-005",
+      "requirement": "REQ-004",
+      "statement": "Edit and port changes state the save location before saving (this machine only, or the shared repository file that travels after commit and push) and the result names the file written; nothing suggests that saving uploads anything.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T19:38:57.299Z",
+      "updatedAt": "2026-11-16T19:38:57.299Z"
+    },
+    {
+      "id": "AC-006",
+      "requirement": "REQ-005",
+      "statement": "A service can be edited from its card; changing one field keeps every other field of the definition; Settings keeps only manual service definition under a name that says so, and the analysis and suggestions live in the Run tab only.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-16T19:38:57.299Z",
+      "updatedAt": "2026-11-16T19:38:57.299Z"
+    },
+    {
+      "id": "AC-007",
+      "requirement": "REQ-006",
+      "statement": "Status and the Run tab report READY, NEEDS_SETUP or UNKNOWN with a reason; UNKNOWN never blocks a start; regression tests cover custom setups (Yarn PnP, NODE_PATH), monorepos (hoisted, pnpm workspace, sibling package, nested lockfile) and unknown environments (other commands, Compose, missing or outside folders, no or unreadable package.json).",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T09:11:48.301Z",
+      "updatedAt": "2026-11-17T09:11:48.301Z"
+    },
+    {
+      "id": "AC-008",
+      "requirement": "REQ-006",
+      "statement": "Try Anyway (console Advanced action and runtime start|restart --skip-setup-check) skips only the dependency check of the named service; trust, a dependency's own check, folder protection, the port pre-flight and the Monitor Only boundary still refuse, and the skip is written to the service log.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T09:11:48.301Z",
+      "updatedAt": "2026-11-17T09:11:48.301Z"
+    },
+    {
+      "id": "AC-009",
+      "requirement": "REQ-007",
+      "statement": "A local port change leaves the shared file byte-identical and other fields intact and can be undone (runtime reset / Return to the shared definition) without removing a personal service; a rewrite is refused when the old port would remain elsewhere in the command, the script sets its own port or chains commands, or the manager is not npm; other services that mention the old port are reported and not changed; nothing is stopped.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T09:11:48.301Z",
+      "updatedAt": "2026-11-17T09:11:48.301Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-16T19:38:57.299Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-16T19:38:57.299Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-16T19:38:57.299Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-004",
+      "at": "2026-11-16T19:38:57.299Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-005",
+      "at": "2026-11-16T19:38:57.299Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-16T19:38:57.299Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-16T19:38:57.299Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-16T19:38:57.299Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-11-16T19:38:57.299Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-005",
+      "at": "2026-11-16T19:38:57.299Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-006",
+      "at": "2026-11-16T19:38:57.299Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-006",
+      "at": "2026-11-17T09:11:48.301Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "REQ-007",
+      "at": "2026-11-17T09:11:48.301Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-007",
+      "at": "2026-11-17T09:11:48.301Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-008",
+      "at": "2026-11-17T09:11:48.301Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-009",
+      "at": "2026-11-17T09:11:48.301Z",
+      "revision": 2
+    }
+  ],
+  "updatedAt": "2026-11-17T09:11:48.301Z"
+}

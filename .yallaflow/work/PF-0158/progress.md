@@ -1,0 +1,17 @@
+# Work Ledger — PF-0158
+
+Created: 2026-11-16T16:55:32.782Z
+
+- 2026-11-16T16:55:32.782Z Routing: pending
+- 2026-11-16T16:55:32.845Z Routing: routed as change + bounded (high)
+- 2026-11-16T16:55:42.180Z Stage: INTAKE → CURRENT_BEHAVIOR
+- 2026-11-16T16:55:42.508Z Stage: CURRENT_BEHAVIOR → REQUESTED_DELTA
+- 2026-11-16T16:55:42.837Z Stage: REQUESTED_DELTA → IMPACT_ANALYSIS
+- 2026-11-16T16:55:43.258Z Stage: IMPACT_ANALYSIS → ACCEPTANCE_CRITERIA
+- 2026-11-16T16:55:43.705Z Stage: ACCEPTANCE_CRITERIA → PLAN
+- 2026-11-16T16:55:47.593Z Stage: PLAN → IMPLEMENTATION
+- 2026-11-16T16:58:41.300Z Stage: IMPLEMENTATION → VERIFICATION
+- 2026-11-16T16:58:54.888Z Stage: VERIFICATION → DONE
+- 2026-11-16T18:26:58.657Z Reopened: DONE → IMPLEMENTATION (Browser walk on a machine without Git: with 'Initialize a local Git repository' ticked the plan still includes git init, which fails only after the project is created. Git must be checked with the other tools before creation.)
+- 2026-11-16T18:29:26.852Z Stage: IMPLEMENTATION → VERIFICATION
+- 2026-11-16T18:31:16.995Z Stage: VERIFICATION → DONE

@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-16T17:24:37.183Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "Assessed after V-001 passed.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "welcomePanel renders Create, Manage and Monitor in Arabic and English; chooseIntent saves onboarding.intent and routes Create to the wizard and Manage/Monitor to the folder chooser, where Monitor only is the main action for the monitor intent; the Monitor card states that no agent is needed.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:a47578d5197e6583361d051bb88b07cc31814ba5d01222ebfcc1ff73559acf69",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-first-journey.test.js",
+              "contentHash": "sha256:80256a760b353dce682cd39e389fd64d024f167a6d80e796051040743eaf3bc2",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/console-first-journey.test.js test/console-monitor-mode.test.js test/console-machine-readiness.test.js test/console-greenfield.test.js test/console-polish.test.js test/console-ia.test.js test/console-folder-picker.test.js test/console-switcher.test.js test/console-first-run.test.js (passed)",
+              "workId": "PF-0162",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "The stack step lists the agent-planned project first and all five fixed templates inside the Advanced section labeled no agent needed; wizardNext refuses to plan an agent-planned project with no agent or an unready one unless noAgent (Advanced) is ticked, and the machine setup card is rendered under the agent choice.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:a47578d5197e6583361d051bb88b07cc31814ba5d01222ebfcc1ff73559acf69",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-first-journey.test.js",
+              "contentHash": "sha256:80256a760b353dce682cd39e389fd64d024f167a6d80e796051040743eaf3bc2",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/console-first-journey.test.js test/console-monitor-mode.test.js test/console-machine-readiness.test.js test/console-greenfield.test.js test/console-polish.test.js test/console-ia.test.js test/console-folder-picker.test.js test/console-switcher.test.js test/console-first-run.test.js (passed)",
+              "workId": "PF-0162",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "With a ready preferred agent the wizard preselects it, marks it as the usual agent, renders no setup card or warning and plans at once; existing console tests for opening projects and settings still pass.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/console-first-journey.test.js",
+              "contentHash": "sha256:80256a760b353dce682cd39e389fd64d024f167a6d80e796051040743eaf3bc2",
+              "gitCommit": "f33eaece650d453d0b8388d0de92ac8e781df209",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/console-first-journey.test.js test/console-monitor-mode.test.js test/console-machine-readiness.test.js test/console-greenfield.test.js test/console-polish.test.js test/console-ia.test.js test/console-folder-picker.test.js test/console-switcher.test.js test/console-first-run.test.js (passed)",
+              "workId": "PF-0162",
+              "verificationRunId": "V-001"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-16T17:24:37.183Z"
+}

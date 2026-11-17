@@ -1,0 +1,352 @@
+TAP version 13
+# Subtest: AC-101: setup creates the provider file, or appends the block leaving existing content byte-for-byte
+ok 1 - AC-101: setup creates the provider file, or appends the block leaving existing content byte-for-byte
+  ---
+  duration_ms: 386.113928
+  type: 'test'
+  ...
+# Subtest: AC-102/AC-104: setup is idempotent and --dry-run writes nothing
+ok 2 - AC-102/AC-104: setup is idempotent and --dry-run writes nothing
+  ---
+  duration_ms: 447.805693
+  type: 'test'
+  ...
+# Subtest: AC-103: a hand-edited block is refused without --preserve-existing, then kept verbatim with it
+ok 3 - AC-103: a hand-edited block is refused without --preserve-existing, then kept verbatim with it
+  ---
+  duration_ms: 564.745498
+  type: 'test'
+  ...
+# Subtest: AC-105/AC-106: status reads state from markers; refresh updates only unmodified outdated blocks and never downgrades
+ok 4 - AC-105/AC-106: status reads state from markers; refresh updates only unmodified outdated blocks and never downgrades
+  ---
+  duration_ms: 1168.821072
+  type: 'test'
+  ...
+# Subtest: AC-105: a broken block or another provider's block is reported, never rewritten
+ok 5 - AC-105: a broken block or another provider's block is reported, never rewritten
+  ---
+  duration_ms: 120.316908
+  type: 'test'
+  ...
+# Subtest: AC-107: provider blocks point to AGENT.md and never restate its rules
+ok 6 - AC-107: provider blocks point to AGENT.md and never restate its rules
+  ---
+  duration_ms: 1.465823
+  type: 'test'
+  ...
+# Subtest: AC-108: provider knowledge stays in src/agent and the agent command surface
+ok 7 - AC-108: provider knowledge stays in src/agent and the agent command surface
+  ---
+  duration_ms: 64.149156
+  type: 'test'
+  ...
+# Subtest: bootstrap files are classified as repository-root projections; help never writes
+ok 8 - bootstrap files are classified as repository-root projections; help never writes
+  ---
+  duration_ms: 488.179784
+  type: 'test'
+  ...
+# Subtest: a row is one select button plus an open arrow; nothing in the list navigates on a single click
+ok 9 - a row is one select button plus an open arrow; nothing in the list navigates on a single click
+  ---
+  duration_ms: 12.386284
+  type: 'test'
+  ...
+# Subtest: at home with nothing selected the footer says what to do; selecting makes the button act on that folder
+ok 10 - at home with nothing selected the footer says what to do; selecting makes the button act on that folder
+  ---
+  duration_ms: 5.719118
+  type: 'test'
+  ...
+# Subtest: with nothing selected inside a folder, the button acts on the open folder
+ok 11 - with nothing selected inside a folder, the button acts on the open folder
+  ---
+  duration_ms: 4.900163
+  type: 'test'
+  ...
+# Subtest: choosing and previewing use the selected folder
+ok 12 - choosing and previewing use the selected folder
+  ---
+  duration_ms: 12.686545
+  type: 'test'
+  ...
+# Subtest: keys: arrows move the selection, Enter or the forward arrow opens, the back arrow goes up
+ok 13 - keys: arrows move the selection, Enter or the forward arrow opens, the back arrow goes up
+  ---
+  duration_ms: 19.186766
+  type: 'test'
+  ...
+# Subtest: the path bar is the breadcrumb, with the typed path one click away
+ok 14 - the path bar is the breadcrumb, with the typed path one click away
+  ---
+  duration_ms: 6.270425
+  type: 'test'
+  ...
+# Subtest: the preview offers git init only for a folder with no Git repository, unticked
+ok 15 - the preview offers git init only for a folder with no Git repository, unticked
+  ---
+  duration_ms: 3.793807
+  type: 'test'
+  ...
+# Subtest: connect runs git init only when ticked, after the connect, with the confirmed action
+ok 16 - connect runs git init only when ticked, after the connect, with the confirmed action
+  ---
+  duration_ms: 7.081505
+  type: 'test'
+  ...
+# Subtest: a refused git init is reported and never undoes the connect
+ok 17 - a refused git init is reported and never undoes the connect
+  ---
+  duration_ms: 7.908434
+  type: 'test'
+  ...
+# Subtest: previewConnect reports a Git repository above the folder without running Git
+ok 18 - previewConnect reports a Git repository above the folder without running Git
+  ---
+  duration_ms: 91.68475
+  type: 'test'
+  ...
+# Subtest: the locations row lists Home and the local drives, and marks the current one
+ok 19 - the locations row lists Home and the local drives, and marks the current one
+  ---
+  duration_ms: 10.956098
+  type: 'test'
+  ...
+# Subtest: breadcrumbs, the footer path and the typed path use the server's separator, never "/"
+ok 20 - breadcrumbs, the footer path and the typed path use the server's separator, never "/"
+  ---
+  duration_ms: 7.155604
+  type: 'test'
+  ...
+# Subtest: a folder that cannot be opened is said with its reason; the picker stays where it was
+ok 21 - a folder that cannot be opened is said with its reason; the picker stays where it was
+  ---
+  duration_ms: 12.906758
+  type: 'test'
+  ...
+# Subtest: the preview of a project outside home says so
+ok 22 - the preview of a project outside home says so
+  ---
+  duration_ms: 1.476841
+  type: 'test'
+  ...
+# Subtest: the verdict for existing code says nothing is run and takes an optional first request
+ok 23 - the verdict for existing code says nothing is run and takes an optional first request
+  ---
+  duration_ms: 2.262976
+  type: 'test'
+  ...
+# Subtest: an empty folder gets no first-request field, and an empty field stores nothing
+ok 24 - an empty folder gets no first-request field, and an empty field stores nothing
+  ---
+  duration_ms: 4.176683
+  type: 'test'
+  ...
+# Subtest: Codex: installed, signed in and connection are three separate states with one next step
+ok 25 - Codex: installed, signed in and connection are three separate states with one next step
+  ---
+  duration_ms: 6.26466
+  type: 'test'
+  ...
+# Subtest: Claude Code: experimental everywhere, never "verified" ahead of a session, and shown on every system
+ok 26 - Claude Code: experimental everywhere, never "verified" ahead of a session, and shown on every system
+  ---
+  duration_ms: 1.767903
+  type: 'test'
+  ...
+# Subtest: a saved preferred agent is a wish: offered only when available, with the readiness computed now
+ok 27 - a saved preferred agent is a wish: offered only when available, with the readiness computed now
+  ---
+  duration_ms: 0.91423
+  type: 'test'
+  ...
+# Subtest: console: /api/machine carries the readiness; nothing is written; never in a read-only console
+ok 28 - console: /api/machine carries the readiness; nothing is written; never in a read-only console
+  ---
+  duration_ms: 184.095762
+  type: 'test'
+  ...
+# Subtest: the page: Claude Code on simulated Windows is shown, marked Experimental and not verified, with three separate states
+ok 29 - the page: Claude Code on simulated Windows is shown, marked Experimental and not verified, with three separate states
+  ---
+  duration_ms: 12.122558
+  type: 'test'
+  ...
+# Subtest: the page: the usual agent is listed first and marked, and still needs the click that enables it
+ok 30 - the page: the usual agent is listed first and marked, and still needs the click that enables it
+  ---
+  duration_ms: 11.017533
+  type: 'test'
+  ...
+# Subtest: setup environment keeps npm settings but never a credential
+ok 31 - setup environment keeps npm settings but never a credential
+  ---
+  duration_ms: 4.754402
+  type: 'test'
+  ...
+# Subtest: Codex login status: only a ChatGPT subscription sign-in counts
+ok 32 - Codex login status: only a ChatGPT subscription sign-in counts
+  ---
+  duration_ms: 1.101275
+  type: 'test'
+  ...
+# Subtest: nothing installed: the exact install command, approved before it runs, without sudo or secrets
+ok 33 - nothing installed: the exact install command, approved before it runs, without sudo or secrets
+  ---
+  duration_ms: 404.64189
+  type: 'test'
+  ...
+# Subtest: an npm global folder this user cannot write is refused: no sudo, the command to run by hand instead
+ok 34 - an npm global folder this user cannot write is refused: no sudo, the command to run by hand instead
+  ---
+  duration_ms: 129.26219
+  type: 'test'
+  ...
+# Subtest: sign-in: Codex's own device flow after confirmation; the link and code are shown, nothing else
+ok 35 - sign-in: Codex's own device flow after confirmation; the link and code are shown, nothing else
+  ---
+  duration_ms: 1077.857512
+  type: 'test'
+  ...
+# Subtest: an API-key sign-in is reported as not usable
+ok 36 - an API-key sign-in is reported as not usable
+  ---
+  duration_ms: 63.726543
+  type: 'test'
+  ...
+# Subtest: connection test: handshake only, in an empty temporary folder, no session, process ended
+ok 37 - connection test: handshake only, in an empty temporary folder, no session, process ended
+  ---
+  duration_ms: 192.035709
+  type: 'test'
+  ...
+# Subtest: HTTP: status and actions need the token and Origin; a read-only console runs none of them
+ok 38 - HTTP: status and actions need the token and Origin; a read-only console runs none of them
+  ---
+  duration_ms: 278.427726
+  type: 'test'
+  ...
+# Subtest: one setup step at a time from the moment it is accepted; cancel ends the whole process group
+ok 39 - one setup step at a time from the moment it is accepted; cancel ends the whole process group
+  ---
+  duration_ms: 527.230831
+  type: 'test'
+  ...
+# Subtest: setup keeps proxy and certificate settings; a status probe that cannot run is unknown, not signed out
+ok 40 - setup keeps proxy and certificate settings; a status probe that cannot run is unknown, not signed out
+  ---
+  duration_ms: 1.178399
+  type: 'test'
+  ...
+# Subtest: tested Codex versions: exact pins, inside the supported adapter range, checked before an install is offered
+ok 41 - tested Codex versions: exact pins, inside the supported adapter range, checked before an install is offered
+  ---
+  duration_ms: 0.741187
+  type: 'test'
+  ...
+# Subtest: Open folder opens only the registered project root, behind the token and Origin
+ok 42 - Open folder opens only the registered project root, behind the token and Origin
+  ---
+  duration_ms: 128.704409
+  type: 'test'
+  ...
+# Subtest: a read-only console refuses Open folder
+ok 43 - a read-only console refuses Open folder
+  ---
+  duration_ms: 79.337214
+  type: 'test'
+  ...
+# Subtest: the file manager is started without a shell, per platform, and a missing folder is reported
+ok 44 - the file manager is started without a shell, per platform, and a missing folder is reported
+  ---
+  duration_ms: 22.952538
+  type: 'test'
+  ...
+# Subtest: project cards carry Open, Open folder, Copy path and Remove; read-only hides the writes
+ok 45 - project cards carry Open, Open folder, Copy path and Remove; read-only hides the writes
+  ---
+  duration_ms: 4.659674
+  type: 'test'
+  ...
+# Subtest: the Workspace greeting is one slim row whose counts filter the work
+ok 46 - the Workspace greeting is one slim row whose counts filter the work
+  ---
+  duration_ms: 1.027386
+  type: 'test'
+  ...
+# Subtest: the entrance motion runs only when the page changes and respects reduced motion
+ok 47 - the entrance motion runs only when the page changes and respects reduced motion
+  ---
+  duration_ms: 3.757914
+  type: 'test'
+  ...
+# Subtest: PF-0130: the "since you were last here" notice shows each item as its ID and latest outcome, title in the tooltip
+ok 48 - PF-0130: the "since you were last here" notice shows each item as its ID and latest outcome, title in the tooltip
+  ---
+  duration_ms: 0.845575
+  type: 'test'
+  ...
+# Subtest: PF-0131: the live move toast names the item by its linked ID, the title only in the tooltip
+ok 49 - PF-0131: the live move toast names the item by its linked ID, the title only in the tooltip
+  ---
+  duration_ms: 1.59728
+  type: 'test'
+  ...
+# Subtest: PF-0133: the agent is chosen in place — readiness card and chat panel — and links from the chat close it
+ok 50 - PF-0133: the agent is chosen in place — readiness card and chat panel — and links from the chat close it
+  ---
+  duration_ms: 3.176506
+  type: 'test'
+  ...
+# Subtest: PF-0137: the all-done box is slim, with the filter chips and a small New work button
+ok 51 - PF-0137: the all-done box is slim, with the filter chips and a small New work button
+  ---
+  duration_ms: 14.39331
+  type: 'test'
+  ...
+# Subtest: the file lives beside console.json on Linux, macOS and Windows (simulated environment values)
+ok 52 - the file lives beside console.json on Linux, macOS and Windows (simulated environment values)
+  ---
+  duration_ms: 4.261929
+  type: 'test'
+  ...
+# Subtest: missing, invalid, oversized or linked files mean defaults; reading never throws
+ok 53 - missing, invalid, oversized or linked files mean defaults; reading never throws
+  ---
+  duration_ms: 32.928
+  type: 'test'
+  ...
+# Subtest: only known, typed fields can be saved: no free-form value, so no credential
+ok 54 - only known, typed fields can be saved: no free-form value, so no credential
+  ---
+  duration_ms: 3.374481
+  type: 'test'
+  ...
+# Subtest: saving merges, is private (0600), keeps keys a newer version wrote, and leaves console.json alone
+ok 55 - saving merges, is private (0600), keeps keys a newer version wrote, and leaves console.json alone
+  ---
+  duration_ms: 107.474104
+  type: 'test'
+  ...
+# Subtest: console API: read anywhere, write only as JSON with the token and Origin, never read-only
+ok 56 - console API: read anywhere, write only as JSON with the token and Origin, never read-only
+  ---
+  duration_ms: 215.942875
+  type: 'test'
+  ...
+# Subtest: the page: saved preferences win over the browser copy; a browser choice is carried over once; read-only saves nothing
+ok 57 - the page: saved preferences win over the browser copy; a browser choice is carried over once; read-only saves nothing
+  ---
+  duration_ms: 19.957766
+  type: 'test'
+  ...
+1..57
+# tests 57
+# suites 0
+# pass 57
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3506.052935

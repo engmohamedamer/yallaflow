@@ -127,7 +127,7 @@ test('the Run tab hosts the flow; Overview names the next run step; Settings kee
   assert.match(app, /<div class="pmain">\$\{runApprove\(r\)\}\$\{runSection\(r, rows/);
   assert.match(app, /href="#\/run" data-run-next="\$\{esc\(st\.status\)\}"/);
   assert.doesNotMatch(app, /'Define the services'/);
-  assert.match(app, /\['set-services', A\('تعديل متقدم للتشغيل', 'Advanced run setup'\)\], \['set-team'/);
+  assert.match(app, /\['set-services', A\('تعريف الخدمات يدويًا', 'Define services manually'\)\], \['set-team'/);
   assert.match(app, /if \(e\.target\.closest\('\[data-plan-use\]'\)\) \{ useProposal\(\); return; \}/);
   assert.match(app, /approveAll\(apv\.dataset\.runApprove === 'start'\)/);
 });

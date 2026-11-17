@@ -16,6 +16,9 @@
   const firstRequest = () => { const text = store.get(firstRequestKey(pid), null); return typeof text === 'string' && text.trim() ? text.trim().slice(0, 300) : null; };
   let lang = store.get('lang', 'ar');
   let theme = store.get('theme', null);
+  // PF-0159: the developer's preferences on this machine (the server's preferences.json). The
+  // browser's own storage is only a fast first paint; the saved preferences decide once read.
+  let prefs = null;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   // POSIX single-quoted argument for a command shown to copy (spaces, quotes, Unicode).
   const shq = (v) => (/^[A-Za-z0-9_./:@%+=,-]+$/.test(String(v)) ? String(v) : `'${String(v).replace(/'/g, `'\\''`)}'`);
@@ -137,6 +140,15 @@
   let projects = [];
   let unavailable = [];
   let readOnly = true; // until the server says creation is allowed
+  // PF-0161: `readOnly` is what the current view may do: the whole console started read-only,
+  // or the open project is monitored only. The server enforces both; the page only follows.
+  let consoleReadOnly = true;
+  let modeAsk = null; // the switch being confirmed: 'manage' | 'monitor'
+  let modeBusy = false;
+  let modeError = null;
+  const projectMode = (id = pid) => (projects.find((p) => p.id === id)?.mode === 'monitor' ? 'monitor' : 'manage');
+  const monitorProject = () => !consoleReadOnly && projectMode() === 'monitor';
+  const viewReadOnly = (view) => consoleReadOnly || (monitorProject() && !['projects', 'new'].includes(view));
   let pid = store.get('project', null);
   let snap = null;
   let detail = null; // work show of the open item
@@ -170,13 +182,15 @@
         const listed = await api('/api/projects');
         projects = listed.projects;
         unavailable = listed.unavailable ?? [];
-        readOnly = listed.readOnly !== false;
+        consoleReadOnly = listed.readOnly !== false;
+        readOnly = viewReadOnly(route().v);
         agentsOn = Boolean(listed.agents?.enabled);
         agentsCanEnable = Boolean(listed.agents?.canEnable);
         agentsClaudeAvailable = Boolean(listed.agents?.claudeAvailable);
         if (!projects.some((p) => p.id === pid)) pid = projects[0]?.id ?? null;
       }
-      // No project yet (1.4.0): an empty console starts on project creation.
+      // No project yet: the console opens on the Projects page, whose welcome panel asks what
+      // the developer wants to do (PF-0162).
       if (!projects.length) {
         error = null;
         snap = { project: { name: '' }, items: [], invalid: [], counts: { new: 0, active: 0, you: 0, fail: 0, paused: 0, done: 0, held: 0, closed: 0 } };
@@ -247,7 +261,7 @@
       <div class="projmenu-panel" role="menu"><div class="projmenu-h tiny muted">${A('المشاريع', 'Projects')}</div>
         ${projects.map((p) => `<a role="menuitem" href="#/map" data-open-project="${esc(p.id)}" class="projmenu-item" ${p.id === pid ? 'aria-current="true"' : ''}><span class="projmenu-check" aria-hidden="true">${p.id === pid ? '✓' : ''}</span><span class="grow"><b>${esc(p.name)}</b><span class="tiny muted ltr projmenu-path">${esc(folderTail(p.root))}</span></span></a>`).join('')}
         <div class="projmenu-sep" role="separator"></div>
-        ${readOnly ? '' : `<button type="button" role="menuitem" class="projmenu-item" data-folder-open="existing"><span class="projmenu-check" aria-hidden="true">＋</span>${A('ضيف مشروع موجود', 'Add an existing project')}</button><a role="menuitem" class="projmenu-item" href="#/new"><span class="projmenu-check" aria-hidden="true">✦</span>${A('مشروع جديد', 'New project')}</a>`}
+        ${consoleReadOnly ? '' : `<button type="button" role="menuitem" class="projmenu-item" data-folder-open="existing"><span class="projmenu-check" aria-hidden="true">＋</span>${A('ضيف مشروع موجود', 'Add an existing project')}</button><a role="menuitem" class="projmenu-item" href="#/new"><span class="projmenu-check" aria-hidden="true">✦</span>${A('مشروع جديد', 'New project')}</a>`}
         <a role="menuitem" class="projmenu-item" href="#/projects"><span class="projmenu-check" aria-hidden="true">▤</span>${agentsOn ? A('كل المشاريع والوكلاء', 'All projects & agents') : A('كل المشاريع', 'All projects')}</a></div></details>`;
     const count = snap ? needs().length : 0;
     // PF-0123: Flow and Work are one Workspace (its page switches the view); Insights and
@@ -363,14 +377,52 @@
   // PF-0133: the agent step names the agent chosen for this project.
   const CLAUDE_READY_TEXT = { done: ['Claude Code جاهز', 'Claude Code is ready'], missing: ['Claude Code مش جاهز على الجهاز ده', 'Claude Code is not ready on this machine'] };
   const readyPair = (st) => (st.id === 'agent' && st.provider === 'claude' && CLAUDE_READY_TEXT[st.status]) || READY_TEXT[st.id]?.[st.status];
+  // PF-0161: Monitor and Manage. The banner names the mode and its limits; the switch is one
+  // explicit, confirmed action that the server carries out (the mode is saved for this project
+  // on this machine, never in the project).
+  const roText = () => (monitorProject() ? A('هذا المشروع للمتابعة فقط.', 'This project is monitor only.') : A('الكونسول ده للقراءة بس.', 'This console is read-only.'));
+  function modeConfirm(to) {
+    const text = to === 'manage'
+      ? A('الإدارة تسمح بإنشاء المهام والقرارات والتشغيل، وتحتاج وكيلاً تختاره لهذا المشروع. YallaFlow يحفظ إعداداتك الشخصية في ‎.yallaflow/local داخل المشروع (لا تدخل Git). لن تبدأ أي جلسة من تلقاء نفسها.', 'Manage allows creating work, decisions and running, and needs an agent you choose for this project. YallaFlow keeps your personal settings in .yallaflow/local inside the project (ignored by Git). No session starts on its own.')
+      : A('في المتابعة فقط لا يغيّر YallaFlow شيئاً في المشروع: لا مهام جديدة ولا قرارات ولا وكيل ولا تشغيل. يجب إنهاء أي جلسة وكيل مفتوحة أولاً. ملفات المشروع وسجلاته تبقى كما هي.', 'In Monitor only YallaFlow changes nothing in the project: no new work, decisions, agent or running. Any open agent session must be ended first. The project\'s files and records stay as they are.');
+    return `<div class="modeask" data-mode-ask="${to}"><p class="small">${text}</p>${modeError ? `<p class="small" role="alert" style="color:var(--clay)" dir="auto">${esc(modeError)}</p>` : ''}<div class="row"><button type="button" class="btn sm go" data-mode-confirm="${to}" ${modeBusy ? 'disabled' : ''}>${to === 'manage' ? A('نعم، أدِر هذا المشروع', 'Yes, manage this project') : A('نعم، متابعة فقط', 'Yes, monitor only')}</button><button type="button" class="btn sm ghost" data-mode-switch="" ${modeBusy ? 'disabled' : ''}>${A('إلغاء', 'Cancel')}</button></div></div>`;
+  }
+  function monitorBanner() {
+    if (!monitorProject()) return '';
+    return `<section class="wsbanner note monitorbar" data-monitor-banner role="status"><div class="row" style="flex-wrap:wrap"><b>👁 ${A('متابعة فقط', 'Monitor only')}</b><span class="small grow">${A('ترى سجلات هذا المشروع وتقدّمه مباشرة، ولا يتغيّر فيه شيء من هنا.', 'You see this project\'s records and progress live, and nothing in it changes from here.')}</span>${modeAsk === 'manage' ? '' : `<button type="button" class="btn sm" data-mode-switch="manage">${A('حوّله إلى إدارة…', 'Switch to Manage…')}</button>`}</div>
+      <details class="small"><summary>${A('ما الذي لا تفعله المتابعة؟', 'What monitoring does not do')}</summary><ul class="small"><li>${A('لا تنشئ مهاماً ولا تسجّل قرارات ولا ترفع ملفات.', 'It creates no work, records no decisions and uploads no files.')}</li><li>${A('لا تشغّل وكيلاً ولا تفحص الوكلاء، ولا تشغّل خدمات المشروع أو أوامره.', 'It runs no agent and no agent checks, and starts none of the project\'s services or commands.')}</li><li>${A('تقرأ سجلات YallaFlow وحالة Git فقط؛ ما يفعله وكيلك في نافذة الأوامر يظهر هنا عندما يسجّله YallaFlow.', 'It reads YallaFlow records and Git status only; what your agent does in a terminal appears here once YallaFlow records it.')}</li></ul></details>
+      ${modeAsk === 'manage' ? modeConfirm('manage') : ''}</section>`;
+  }
+  async function switchMode(to) {
+    if (!['manage', 'monitor'].includes(to) || modeBusy) return;
+    modeBusy = true; modeError = null; render();
+    try {
+      await post(`/api/p/${pid}/mode`, JSON.stringify({ mode: to, confirm: true }), { 'Content-Type': 'application/json' });
+      modeAsk = null;
+      await reloadProjects();
+      toast(esc(to === 'manage' ? A('المشروع الآن في وضع الإدارة ✓', 'This project is now managed ✓') : A('المشروع الآن للمتابعة فقط ✓', 'This project is now monitor only ✓')));
+      modeBusy = false;
+      // Managing starts where the project's next step is shown (its agent first).
+      await switchProject(pid, to === 'manage' ? 'overview' : 'map');
+      return;
+    } catch (err) { modeError = err.message; }
+    modeBusy = false; render();
+  }
+  // PF-0160: the saved preferred agent, only while it can be offered in this console.
+  const preferredAgentId = () => (prefs?.preferredAgent === 'codex' ? 'codex' : prefs?.preferredAgent === 'claude' && agentsClaudeAvailable ? 'claude' : null);
   // PF-0133: choose the project's agent in place (readiness card, chat panel) — no page change.
   function agentChooser() {
     if (readOnly) return '';
     const card = (id, name, sub, extra = '') => `<button type="button" class="agentpick-opt" data-agent-choose="${id}"><b>${name}</b><span class="tiny muted">${sub}</span>${extra}</button>`;
-    const claude = agentsClaudeAvailable
-      ? card('claude', `Claude Code <span class="chip wait tiny">${A('تجريبي', 'experimental')}</span>`, A('اشتراك Claude بتاعك', 'Your Claude subscription'), '')
+    // PF-0160: the usual agent (saved preference) comes first and is marked. It is never
+    // enabled for a project without this click.
+    const usual = preferredAgentId();
+    const mark = (id) => (usual === id ? ` <span class="chip active tiny" data-usual-agent="${id}">${A('وكيلك المعتاد', 'your usual agent')}</span>` : '');
+    const codexCard = card('codex', 'Codex', A('اشتراك ChatGPT بتاعك · الموصى بيه', 'Your ChatGPT subscription · recommended'), mark('codex'));
+    const claudeCard = agentsClaudeAvailable
+      ? card('claude', `Claude Code <span class="chip wait tiny">${A('تجريبي', 'experimental')}</span>`, A('اشتراك Claude بتاعك', 'Your Claude subscription'), mark('claude'))
       : '';
-    return `<div class="agentpick" role="group" aria-label="${A('اختار وكيل المشروع', 'Choose the project\'s agent')}">${card('codex', 'Codex', A('اشتراك ChatGPT بتاعك · الموصى بيه', 'Your ChatGPT subscription · recommended'))}${claude}</div>
+    return `<div class="agentpick" role="group" aria-label="${A('اختار وكيل المشروع', 'Choose the project\'s agent')}">${usual === 'claude' ? claudeCard + codexCard : codexCard + claudeCard}</div>${usual ? `<p class="tiny muted">${A('اختيارك المعتاد محدّد أولاً. لن يُفعَّل لهذا المشروع إلا عندما تضغط عليه.', 'Your usual choice is listed first. It is enabled for this project only when you click it.')}</p>` : ''}
       <p class="tiny muted agentpick-note">${A('الاختيار بيتحفظ للمشروع ده على جهازك بس، وتقدر تغيّره من الإعدادات ← الوكلاء. الوكيل بيستخدم اشتراكك، من غير مفاتيح API.', 'The choice is saved for this project on this machine only; change it under Settings → Agents. The agent uses your subscription, never API keys.')}</p>`;
   }
   async function chooseAgent(provider, el) {
@@ -379,6 +431,7 @@
       await post(`/api/p/${pid}/agents/settings`, JSON.stringify({ agents: true, claude: provider === 'claude' }), { 'Content-Type': 'application/json' });
       await post(`/api/p/${pid}/setup/step`, JSON.stringify({ step: 'agents' }), { 'Content-Type': 'application/json' }).catch(() => {});
       agentsOn = true;
+      savePrefs({ preferredAgent: provider }); // PF-0160: remembered as the usual agent
       if (provider === 'claude') agentProvider = 'claude';
       await reloadProjects().catch(() => {});
       await Promise.all([loadReadiness(), agentsOn ? loadAgent().catch(() => {}) : loadAgentInfo()]);
@@ -1025,15 +1078,61 @@
     const bell = document.querySelector('[data-bell]');
     if (bell) { const n = snap ? needs().length : 0; bell.innerHTML = `🔔${n ? `<b>${n}</b>` : ''}`; }
   }
+  // PF-0165: the chat keeps what it already shows. A reload of the agent state brings the
+  // server's newest events; older ones the page already loaded stay, and events that arrived
+  // while the request was on its way are kept after them. `n` (the event number) decides, so
+  // nothing is shown twice and nothing disappears.
   async function loadAgent() {
     if (!agentsOn || !chatCtx()) return;
-    try { agent = { pid, ...(await api(`/api/p/${pid}/agent`)) }; agentError = null; } catch (e) { agentError = e.message; }
+    const forPid = pid;
+    try {
+      const next = await api(`/api/p/${forPid}/agent`);
+      if (forPid !== pid) return;
+      const prev = agent?.pid === forPid ? agent.events ?? [] : [];
+      const events = adoptAgentEvents(prev, next.events ?? []);
+      // Older events are still loadable when the server says so, or when the page holds them.
+      const heldOlder = events.length && next.events?.length && events[0].n < next.events[0].n; // the page already reaches further back
+      const hasOlder = heldOlder ? Boolean(agent?.transcript?.hasOlder) : Boolean(next.transcript?.hasOlder);
+      agent = { pid: forPid, ...next, events, transcript: { ...(next.transcript ?? {}), hasOlder } };
+      agentError = null;
+    } catch (e) { agentError = e.message; }
+  }
+  // Older messages, a page at a time. The reader stays on the line they were reading.
+  async function loadOlderChat() {
+    if (!agent || chatOlder.busy || !agent.events.length) return;
+    chatOlder = { busy: true, error: null }; renderAgent();
+    const forPid = pid;
+    try {
+      const page = await api(`/api/p/${forPid}/agent/transcript?before=${agent.events[0].n}&limit=100`);
+      if (forPid !== pid || !agent) return;
+      const body = document.querySelector('#chatwin .chatbody');
+      const before = body ? body.scrollHeight - body.scrollTop : null;
+      agent.events = [...page.events.filter((ev) => evLast(ev) < agent.events[0].n), ...agent.events];
+      agent.transcript = { ...(agent.transcript ?? {}), hasOlder: Boolean(page.hasOlder) };
+      chatOlder = { busy: false, error: null };
+      chatHold = true; renderAgent(); chatHold = false;
+      const after = document.querySelector('#chatwin .chatbody');
+      if (after && before !== null) after.scrollTop = after.scrollHeight - before;
+    } catch (e) { chatOlder = { busy: false, error: e.message }; renderAgent(); }
+  }
+  const evLast = (ev) => ev.endN ?? ev.n ?? 0;
+  const CHAT_KEEP = 5000; // events held by the page; older ones are loaded again on demand
+  function adoptAgentEvents(prev, next) {
+    const first = next[0]?.n ?? Infinity;
+    const last = next.length ? evLast(next.at(-1)) : 0;
+    const older = prev.filter((ev) => ev.n && evLast(ev) < first);
+    const newer = prev.filter((ev) => ev.n && ev.n > last);
+    return [...older, ...next, ...newer];
   }
   function onAgentEvent(projectId, event) {
     if (projectId === pid && route().v === 'settings' && ['session.connected', 'session.disconnected', 'session.started', 'session.ended', 'mode.changed', 'channel.state'].includes(event.type)) refreshAgentSetup();
     if (!agent || agent.pid !== projectId) return;
+    // PF-0165: this project's saved chat was deleted (here or in another open page).
+    if (event.type === 'chat.cleared') { agent.events = []; agent.transcript = { ...(agent.transcript ?? {}), hasOlder: false }; chatOlder = { busy: false, error: null }; renderAgent(); return; }
+    // PF-0165: an event the page already holds (it came with a state reload) is not added again.
+    if (event.n && agent.events.length && event.n <= evLast(agent.events.at(-1))) return;
     agent.events.push(event);
-    if (agent.events.length > 400) agent.events.splice(0, agent.events.length - 400);
+    if (agent.events.length > CHAT_KEEP) { agent.events.splice(0, agent.events.length - CHAT_KEEP); agent.transcript = { ...(agent.transcript ?? {}), hasOlder: true }; }
     if (event.type === 'permission.requested') agent.pending.push(event);
     if (event.type === 'permission.resolved') agent.pending = agent.pending.filter((p) => p.requestId !== event.requestId);
     if (event.type === 'session.disconnected' && switchWanted) {
@@ -1054,6 +1153,17 @@
   // The chat window body is what scrolls (PF-0070). It follows the newest message unless the
   // reader has scrolled up to read older ones; opening the chat or sending always goes to the end.
   let chatForceEnd = false;
+  let chatHold = false; // older messages were added above: the view must not move
+  let chatUnseen = false; // something new arrived while the reader was reading older messages
+  function syncChatJump() {
+    const btn = document.querySelector('#chatwin [data-chat-jump]');
+    if (!btn) return;
+    const away = !chatAtEnd();
+    if (!away) chatUnseen = false;
+    btn.hidden = !away;
+    btn.textContent = chatUnseen ? A('رسائل جديدة ↓', 'New messages ↓') : A('انتقل لآخر المحادثة ↓', 'Jump to latest ↓');
+    btn.classList.toggle('fresh', chatUnseen);
+  }
   function chatAtEnd() {
     const body = document.querySelector('#chatwin .chatbody');
     return !body || body.scrollHeight - body.scrollTop - body.clientHeight < 80;
@@ -1068,8 +1178,10 @@
     const it = chatCtx();
     if (!host || !it) return;
     const focused = document.activeElement?.matches?.('[data-agent-input]');
-    const stick = chatForceEnd || chatAtEnd();
+    const stick = !chatHold && (chatForceEnd || chatAtEnd());
     chatForceEnd = false;
+    // PF-0165: the reader is above the end: stay there, and say that something new arrived.
+    if (!stick && !chatHold) chatUnseen = true;
     const streamHost = streamOnly && host.querySelector('.astream');
     if (streamHost) {
       // Keep Stop/End and the composer in the DOM while message chunks arrive.
@@ -1087,6 +1199,7 @@
     const head = document.querySelector('#chatwin .chatstate');
     if (head && !streamOnly) head.textContent = agentState(it).label;
     if (stick) toChatEnd();
+    syncChatJump();
     if (focused && !streamHost) { const box = document.querySelector('[data-agent-input]'); if (box) { box.focus(); box.setSelectionRange(box.value.length, box.value.length); } }
   }
   // PF-0096: while the agent is silent, the working line's minutes still move.
@@ -1109,6 +1222,8 @@
       else if (ev.type === 'tool.started') out.push({ kind: 'tool', id: ev.toolCallId, title: ev.title, status: ev.status });
       else if (ev.type === 'tool.updated') { const t = [...out].reverse().find((x) => x.kind === 'tool' && x.id === ev.toolCallId); if (t) t.status = ev.status ?? t.status; }
       else if (ev.type === 'permission.requested') out.push({ ...ev, toolKind: ev.kind, kind: 'perm' });
+      // PF-0165: what the bridge has to tell the developer (for example an answer that was not delivered).
+      else if (ev.type === 'notice' && ev.text) out.push({ kind: 'note', warn: true, text: ev.text });
       else if (ev.type === 'permission.resolved') {
         const p = out.find((x) => x.kind === 'perm' && x.requestId === ev.requestId);
         if (p) { p.decision = ev.decision; p.by = ev.by; }
@@ -1142,9 +1257,10 @@
       }
     }
     // PF-0134: a run of plain "session started/ended" lines shows only its last one.
-    const shown = out.filter((x, i) => !(x.session && out[i + 1]?.session)).slice(-80);
+    // PF-0165: every loaded entry is shown; older ones are loaded with «Load earlier messages».
+    const shown = out.filter((x, i) => !(x.session && out[i + 1]?.session));
     // PF-0143 (G3): an open request stays answerable even when a busy stream pushed its event out
-    // of the kept history (the server sends the last 200 events; the chat shows the last 80 entries).
+    // of the kept history (the page holds the newest events; older ones load on demand).
     if (events === agent?.events) for (const p of agent.pending ?? []) if (!shown.some((x) => x.kind === 'perm' && x.requestId === p.requestId)) shown.push({ ...p, toolKind: p.kind, kind: 'perm' });
     return shown;
   }
@@ -1163,12 +1279,13 @@
     return ev.decision === 'deny' ? A(`طلب الإذن ${what} اترفض.`, `The permission request ${what} was denied.`) : A(`طلب الإذن ${what} اتسمح.`, `The permission request ${what} was allowed.`);
   }
   function permCard(p) {
-    const open = !p.decision;
+    // PF-0165: a request restored from the saved history is history: it cannot be answered now.
+    const open = !p.decision && !p.restored;
     const label = { allow: A('اتسمح', 'Allowed'), allow_session: A('اتسمح للجلسة', 'Allowed for this session'), deny: A('اترفض', 'Denied'), elsewhere: A('اتجاوب عليه في Claude Code', 'Answered in Claude Code') }[p.decision] ?? '';
     const by = p.by === 'timeout' ? A('(محدش ردّ، فاترفض تلقائي)', '(no answer, denied automatically)') : p.by && p.by !== 'user' && p.decision !== 'elsewhere' ? `(${esc(p.by)})` : '';
     const sentNote = p.provider === 'claude' && p.decision ? `<span class="tiny muted">${A('Claude Code بيطبّق أول رد يوصله (الكونسول أو الترمينال).', 'Claude Code applies the first answer it receives (console or terminal).')}</span>` : '';
     return `<div class="aperm ${open ? 'open' : ''}"><div class="row"><span class="ptag">${A('إذن للأداة', 'Tool permission')}</span><b class="grow">${esc(p.title)}</b></div>${permScope(p)}${p.detail ? `<pre class="pdetail" dir="ltr">${esc(p.detail)}</pre>` : ''}
-      ${open ? `<div class="row">${p.decisions.map((d) => `<button class="btn sm ${d === 'deny' ? 'ghost' : 'go'}" data-agent-perm="${esc(p.requestId)}" data-decision="${d}">${{ allow: A('اسمح مرة', 'Allow once'), allow_session: A('اسمح للجلسة', 'Allow for session'), deny: A('ارفض', 'Deny') }[d]}</button>`).join('')}<span class="tiny muted">${A('لو محدش ردّ هيترفض تلقائي.', 'Unanswered requests are denied automatically.')}</span></div>` : `<div class="tiny ${p.overridden ? 'warn' : 'muted'}">${label} ${by}</div>${sentNote}`}</div>`;
+      ${!open && !p.decision ? `<p class="tiny muted">${A('طلب من جلسة سابقة؛ لم يعد مفتوحاً.', 'A request from an earlier session; it is no longer open.')}</p>` : ''}${open ? `<div class="row">${p.decisions.map((d) => `<button class="btn sm ${d === 'deny' ? 'ghost' : 'go'}" data-agent-perm="${esc(p.requestId)}" data-decision="${d}">${{ allow: A('اسمح مرة', 'Allow once'), allow_session: A('اسمح للجلسة', 'Allow for session'), deny: A('ارفض', 'Deny') }[d]}</button>`).join('')}<span class="tiny muted">${A('لو محدش ردّ هيترفض تلقائي.', 'Unanswered requests are denied automatically.')}</span></div>` : `<div class="tiny ${p.overridden ? 'warn' : 'muted'}">${label} ${by}</div>${sentNote}`}</div>`;
   }
   // The agent chat as a floating window (owner choice, PF-0059): a corner button shows the
   // session state and opens the chat over the page. Open/closed is remembered per browser.
@@ -1292,11 +1409,13 @@
     }
     return out;
   }
+  const chatStepsOpen = new Set(); // PF-0165: step groups the reader opened stay open while the chat updates
   function stepsLine(steps, line) {
     const running = steps.some((x) => x.status !== 'completed' && x.status !== 'failed');
     const failed = steps.filter((x) => x.status === 'failed').length;
     const names = [...new Set(steps.map((x) => String(x.title ?? '').split(/[:\s]/)[0]).filter(Boolean))].slice(0, 3).join('، ');
-    return `<details class="atools"><summary><span>${running ? '●' : failed ? '✕' : '✓'}</span> ${A(`${steps.length} خطوات`, `${steps.length} steps`)}${failed ? ` · ${A(`${failed} فشلت`, `${failed} failed`)}` : ''} <span class="tiny muted ltr">${esc(names)}</span></summary>${steps.map(line).join('')}</details>`;
+    const key = String(steps[0]?.id ?? '');
+    return `<details class="atools" data-steps="${esc(key)}" ${chatStepsOpen.has(key) ? 'open' : ''}><summary><span>${running ? '●' : failed ? '✕' : '✓'}</span> ${A(`${steps.length} خطوات`, `${steps.length} steps`)}${failed ? ` · ${A(`${failed} فشلت`, `${failed} failed`)}` : ''} <span class="tiny muted ltr">${esc(names)}</span></summary>${steps.map(line).join('')}</details>`;
   }
   // PF-0105: the message that starts or continues an item asks for the whole job, stopping only
   // for a decision the developer alone can make.
@@ -1470,10 +1589,38 @@
 
   // PF-0133: the readiness agent step (status 'choose' until this project's agent is chosen).
   const agentStep = () => (readiness?.pid === pid ? readiness.data?.steps?.find((st) => st.id === 'agent') : null);
+  // PF-0165: the conversation itself: the control that loads older messages, then every loaded
+  // entry. User messages and replies are always shown whole; only tool steps fold.
+  let chatOlder = { busy: false, error: null }; // loading older messages
+  function chatOlderBar() {
+    const t = agent?.transcript ?? {};
+    if (chatOlder.error) return `<div class="chatolder" data-chat-older="error" role="alert"><span class="small">${A('تعذّر تحميل الرسائل الأقدم؛ هي محفوظة ولم تُحذف.', 'Older messages could not be loaded; they are saved, not deleted.')}</span> <button type="button" class="btn sm" data-chat-older-load>${A('حاول مرة أخرى', 'Try again')}</button></div>`;
+    if (chatOlder.busy) return `<div class="chatolder" data-chat-older="busy" role="status"><span class="small muted">${A('جارٍ تحميل الرسائل الأقدم…', 'Loading earlier messages…')}</span></div>`;
+    if (t.hasOlder) return `<div class="chatolder" data-chat-older="more"><button type="button" class="btn sm ghost" data-chat-older-load>↑ ${A('حمّل الرسائل الأقدم', 'Load earlier messages')}</button><span class="tiny muted">${A('توجد رسائل أقدم محفوظة لم تُحمَّل بعد.', 'There are older saved messages that are not loaded yet.')}</span></div>`;
+    if (!agent?.events?.length) return '';
+    return `<p class="tiny muted chatolder" data-chat-older="start">${t.saved === false ? A('هذه بداية ما يحتفظ به الكونسول في هذه الجلسة.', 'This is the start of what the console holds for this run.') : A('هذه بداية المحادثة المحفوظة على هذا الجهاز. يُحتفظ بآخر ما يقارب 16 ميجابايت من المحادثة؛ الأقدم من ذلك لا يُحفظ.', 'This is the start of the conversation saved on this machine. About the last 16 MB of conversation is kept; anything older is not saved.')}</p>`;
+  }
+  function chatEntriesHtml() {
+    const toolLine = (e) => `<div class="atool ${e.status === 'failed' ? 'fail' : e.status === 'completed' ? 'done' : ''}"><span>${e.status === 'completed' ? '✓' : e.status === 'failed' ? '✕' : '●'}</span> ${esc(e.title)}</div>`;
+    return groupSteps(agentEntries(agent.events)).map((e) => e.kind === 'user' ? `<div class="amsg me"><p>${esc(e.text)}</p>${messageState(e)}</div>` : e.kind === 'agent' ? `<div class="amsg richtext">${richText(e.text)}</div>` : e.kind === 'steps' ? stepsLine(e.steps, toolLine) : e.kind === 'tool' ? toolLine(e) : e.kind === 'perm' ? permCard(e) : `<div class="anote ${e.warn ? 'warn' : ''}">${esc(e.text)}</div>`).join('');
+  }
+  const chatJump = () => `<button type="button" class="chatjump" data-chat-jump hidden></button>`;
+  // Where the conversation is kept, the choice to keep saving it (all projects on this
+  // machine), and deleting what this project saved. Turning saving off deletes nothing.
+  function chatSaveNote() {
+    const t = agent?.transcript ?? {};
+    const failed = t.saveError ? `<p class="tiny warn" role="alert" data-chat-save-error>${A('تعذّر حفظ المحادثة على القرص؛ ستبقى ظاهرة حتى إغلاق الكونسول فقط.', 'The conversation could not be saved to disk; it stays visible only until the console is closed.')} <span dir="auto">(${esc(t.saveError)})</span></p>` : '';
+    const unread = t.readError ? `<p class="tiny warn" role="alert" data-chat-read-error>${A('جزء من المحادثة المحفوظة لم يُقرأ:', 'Part of the saved conversation was not read:')} <span dir="ltr">${esc(t.readError)}</span></p>` : '';
+    const on = t.saved !== false;
+    const keep = `<details class="chatkeep" data-steps="chat-keep" data-chat-keep ${chatStepsOpen.has('chat-keep') ? 'open' : ''}><summary class="tiny muted">${on ? A('المحادثة تُحفظ على هذا الجهاز', 'This chat is saved on this machine') : A('حفظ المحادثة متوقف', 'Saving the chat is off')}</summary><div class="tiny"><p class="muted">${A('تُحفظ داخل هذا المشروع في <span dir="ltr">.yallaflow/local/agent-chat</span>: خارج Git، ولا يقرؤها غيرك على هذا الجهاز. القيم التي تشبه كلمات السر والمفاتيح تُخفى قبل الحفظ، لكن هذا لا يضمن إخفاء كل سر.', 'It is kept inside this project in <span dir="ltr">.yallaflow/local/agent-chat</span>: outside Git and readable only by you on this machine. Values that look like passwords or keys are hidden before saving, but that does not guarantee every secret is caught.')}</p><label class="optin"><input type="checkbox" data-chat-save-toggle ${on ? 'checked' : ''}> ${A('احفظ الرسائل الجديدة على هذا الجهاز (لكل المشاريع)', 'Save new messages on this machine (all projects)')}</label>${on ? '' : `<p class="muted" data-chat-save-off>${A('الرسائل الجديدة تبقى حتى إغلاق الكونسول فقط. ما حُفظ من قبل باقٍ كما هو؛ امسحه بالزر أدناه إن أردت.', 'New messages stay only until the console is closed. What was saved before is kept as it is; delete it with the button below if you want.')}</p>`}<button type="button" class="btn sm ghost danger" data-chat-clear>${A('امسح المحادثة المحفوظة لهذا المشروع…', 'Delete this project\'s saved chat…')}</button></div></details>`;
+    return `${failed}${unread}${keep}`;
+  }
   function agentPanel(it) {
     // PF-0133: no agent chosen for this project yet — choose it here, first.
     if (!readOnly && agentStep()?.status === 'choose') return `<section class="panel agent" id="agent"><div class="ahead"><h2>${A('اختار وكيل المشروع', 'Choose the project\'s agent')}</h2></div><p class="small muted">${A('أول خطوة: اختار الوكيل اللي هيشتغل على المشروع ده.', 'First step: choose the agent that works on this project.')}</p>${agentChooser()}</section>`;
     if (!agentsOn) return agentOffPanel(it);
+    // PF-0165: a failed first load is said, with a way to try again (it used to read "Loading" forever).
+    if ((!agent || agent.pid !== pid) && agentError) return `<section class="panel agent" id="agent"><div class="errbar data small" role="alert"><b>${A('تعذّر تحميل المحادثة', 'The chat could not be loaded')}</b><p class="small" dir="auto">${esc(agentError)}</p><button type="button" class="btn sm" data-agent-retry>${A('حاول مرة أخرى', 'Try again')}</button></div><p class="tiny muted">${A('الرسائل المحفوظة لم تُحذف؛ التحميل فقط هو الذي فشل.', 'Saved messages were not deleted; only loading them failed.')}</p></section>`;
     if (!agent || agent.pid !== pid) return `<section class="panel agent" id="agent"><p class="muted">${A('بيحمّل مساحة الوكيل…', 'Loading the agent workspace…')}</p></section>`;
     const s = agent.session;
     const provider = (id) => agent.providers.find((p) => p.id === id);
@@ -1498,7 +1645,10 @@
       else if (p?.ready && p.id === 'claude') action = `<div class="row"><span class="small grow">${A('Claude Code بيشتغل في الترمينال بتاعك باشتراكك. YallaFlow بيتوصّل بيه بس، مش بيشغّله.', 'Claude Code runs in your terminal with your subscription. YallaFlow connects to it; it never runs it.')}</span><button class="btn go" data-agent-connect ${agentBusy ? 'disabled' : ''}>${A('وصّل Claude Code', 'Connect Claude Code')}</button></div>`;
       // PF-0072: a prepared message (for example the runtime plan request) waits for a session.
       const waiting = agentDraft.trim() ? `<div class="anote" role="status" data-draft-waiting><b class="small">${A('فيه رسالة جاهزة مستنية', 'A prepared message is waiting')}</b><p class="tiny">${A('ابدأ جلسة أو وصّل Claude Code، وهتلاقيها في خانة الكتابة تراجعها وتبعتها بنفسك. مفيش حاجة اتبعتت.', 'Start a session or connect Claude Code and it will be in the message box for you to review and send. Nothing was sent.')}</p><details><summary class="tiny">${A('اعرض الرسالة', 'Show the message')}</summary><pre class="cli small" dir="ltr" style="white-space:pre-wrap">${esc(agentDraft)}</pre></details></div>` : '';
-      return `<section class="panel agent" id="agent">${head}${err}${stopCard(it)}${waiting}<div class="apicks">${picks}</div>${otherLink}${problems}${action}${otherLink ? '' : setupHint()}<p class="tiny muted">${A('الوكيل بيستخدم اشتراكك الموجود بس، من غير مفاتيح API. أذونات الأدوات مش موافقات YallaFlow.', 'Agents use only your existing subscription, never API keys. Tool permissions are not YallaFlow approvals.')}</p></section>`;
+      // PF-0165: the conversation stays readable after its session ended (it used to vanish here).
+      const past = chatEntriesHtml();
+      const earlier = past ? `<div class="apast" data-chat-past><p class="tiny muted">${A('المحادثة السابقة في هذا المشروع (للقراءة؛ ابدأ جلسة لتكمل):', 'The earlier conversation in this project (to read; start a session to continue):')}</p><div class="astream" aria-label="${A('المحادثة السابقة', 'Earlier conversation')}">${chatOlderBar()}${past}</div>${chatSaveNote()}</div>` : '';
+      return `<section class="panel agent" id="agent">${head}${err}${earlier}${stopCard(it)}${waiting}${chatJump()}<div class="apicks">${picks}</div>${otherLink}${problems}${action}${otherLink ? '' : setupHint()}<p class="tiny muted">${A('الوكيل بيستخدم اشتراكك الموجود بس، من غير مفاتيح API. أذونات الأدوات مش موافقات YallaFlow.', 'Agents use only your existing subscription, never API keys. Tool permissions are not YallaFlow approvals.')}</p></section>`;
     }
     const cap = provider(s.provider)?.capabilities ?? {};
     const modeChip = s.mode ? `<span class="chip ${autoApproves(s.mode) ? 'wait' : 'todo'}" title="${esc(L(MODE_LABEL[s.mode] ?? { ar: esc(s.mode), en: esc(s.mode) }))}">${esc(s.mode)}</span>` : '';
@@ -1523,8 +1673,7 @@
     const launch = s.provider === 'claude' && !s.connected && agentLaunch && agentTerminal?.opened
       ? `<div class="alaunch"><p class="small">${A('Claude Code اتفتح في ترمينال في فولدر المشروع. وافق على تحذير القناة التجريبية هناك، والشات هنا هيتوصّل لوحده.', 'Claude Code opened in a terminal in the project folder. Accept its development-channel prompt there; this chat connects by itself.')}</p><details class="tiny"><summary class="muted">${A('ما اتفتحش؟ شغّل الأمر بنفسك', 'Did not open? Run the command yourself')}</summary>${copyBlock(agentLaunch)}</details></div>`
       : s.provider === 'claude' && !s.connected && agentLaunch ? `<div class="alaunch">${agentTerminal?.error ? `<p class="tiny muted">${esc(agentTerminal.error)}</p>` : ''}<p class="small">${A('شغّل Claude Code بنفسك في فولدر المشروع بالأمر ده. Claude Code هيعرض تحذير القناة التجريبية والقرار ليك.', 'Start Claude Code yourself in the project folder with this command. Claude Code shows its own development-channel warning; the decision is yours.')}</p><pre class="cli" dir="ltr">${esc(agentLaunch)}</pre><button class="btn sm ghost" data-copy="${esc(agentLaunch)}">${A('انسخ', 'Copy')}</button></div>` : '';
-    const toolLine = (e) => `<div class="atool ${e.status === 'failed' ? 'fail' : e.status === 'completed' ? 'done' : ''}"><span>${e.status === 'completed' ? '✓' : e.status === 'failed' ? '✕' : '●'}</span> ${esc(e.title)}</div>`;
-    const entries = groupSteps(agentEntries(agent.events)).map((e) => e.kind === 'user' ? `<div class="amsg me"><p>${esc(e.text)}</p>${messageState(e)}</div>` : e.kind === 'agent' ? `<div class="amsg richtext">${richText(e.text)}</div>` : e.kind === 'steps' ? stepsLine(e.steps, toolLine) : e.kind === 'tool' ? toolLine(e) : e.kind === 'perm' ? permCard(e) : `<div class="anote ${e.warn ? 'warn' : ''}">${esc(e.text)}</div>`).join('');
+    const entries = chatEntriesHtml();
     const canSend = cap.send && (s.provider === 'codex' ? s.status === 'idle' : s.connected);
     // PF-0105: before the first message on an item, the box holds the whole-job instruction.
     // PF-0154: an item waiting for the developer's answer or review is not started again:
@@ -1538,8 +1687,8 @@
     return `<section class="panel agent" id="agent">${head}${err}
       <div class="abar"><b>${PROVIDER[s.provider]}</b>${s.provider === 'claude' ? ` <i class="exp">${A('تجريبي', 'experimental')}</i>` : ''}<span class="chip active"><i></i>${esc(state)}</span>${s.auth ? `<span class="chip todo">${esc(s.auth)}</span>` : ''}${modeChip}<span class="grow"></span>${controls}</div>
       ${!it.project && !s.workId ? `<p class="tiny muted">${A('دي جلسة شات المشروع، مش مربوطة بالشغلانة دي.', 'This is the project chat session; it is not tied to this work item.')}</p>` : ''}${s.provider === 'claude' && !it.project ? switchHere(it, s) : ''}${warn}${stopCard(it)}${launch}
-      <div class="astream" aria-live="polite">${entries || `<p class="tiny muted">${it.project ? A('اسأل الوكيل عن المشروع، مثلاً: «إيه اللي مستنيني؟».', 'Ask the agent about the project, for example: "What is waiting for me?".') : A(`اكتب للوكيل، مثلاً: «كمّل ${it.id}».`, `Message the agent, for example: "Continue ${it.id}".`)}</p>`}</div>
-      ${sessionHistory(it)}${suggestionChips(it, (agent.pending ?? []).length ? 'approval' : s.status === 'working' ? 'working' : canSend && agentEntries(agent.events).at(-1)?.kind === 'agent' ? 'reply' : null)}<form class="acompose" data-agent-form ${terminal ? 'data-terminal' : ''}><textarea data-agent-input rows="2" maxlength="20000" placeholder="${A(`اكتب لـ ${PROVIDER[s.provider]}…`, `Message ${PROVIDER[s.provider]}…`)}" ${canSend ? '' : 'disabled'}>${esc(agentDraft)}</textarea><button class="btn go" type="submit" ${canSend && !agentBusy ? '' : 'disabled'}>${terminal ? A('انسخ للترمينال', 'Copy for terminal') : A('ابعت', 'Send')}</button></form>
+      <div class="astream" aria-live="polite">${chatOlderBar()}${entries || `<p class="tiny muted">${it.project ? A('اسأل الوكيل عن المشروع، مثلاً: «إيه اللي مستنيني؟».', 'Ask the agent about the project, for example: "What is waiting for me?".') : A(`اكتب للوكيل، مثلاً: «كمّل ${it.id}».`, `Message the agent, for example: "Continue ${it.id}".`)}</p>`}</div>
+      ${chatSaveNote()}${chatJump()}${sessionHistory(it)}${suggestionChips(it, (agent.pending ?? []).length ? 'approval' : s.status === 'working' ? 'working' : canSend && agentEntries(agent.events).at(-1)?.kind === 'agent' ? 'reply' : null)}<form class="acompose" data-agent-form ${terminal ? 'data-terminal' : ''}><textarea data-agent-input rows="2" maxlength="20000" placeholder="${A(`اكتب لـ ${PROVIDER[s.provider]}…`, `Message ${PROVIDER[s.provider]}…`)}" ${canSend ? '' : 'disabled'}>${esc(agentDraft)}</textarea><button class="btn go" type="submit" ${canSend && !agentBusy ? '' : 'disabled'}>${terminal ? A('انسخ للترمينال', 'Copy for terminal') : A('ابعت', 'Send')}</button></form>
       ${how ? `<p class="tiny muted" data-agent-how>${how}</p>` : ''}</section>`;
   }
   // Returns false when the action failed. Its error survives the state reload that follows
@@ -2311,15 +2460,211 @@
   };
   // One compact row per saved service: state, ports and actions up front; the exact
   // definition, the trust review, confirmations and logs open beneath it.
+  // ---------- PF-0166: fix what a service needs, where it fails ----------
+  const rtFix = {}; // service id -> { port, owner, ownerService, declaredBy, suggestion, error, cannot }
+  const svcEdit = {}; // service id -> { error } while its edit form is open
+  const rtInstallAck = new Set(); // services whose install command the developer ticked as reviewed
+  // Where a change is saved, said before saving. Saving never uploads anything.
+  function scopeChoice(sv, name) {
+    if (sv.source === 'local') return `<p class="small scopenote" data-scope-only="local">💻 ${A('هذه الخدمة معرّفة على جهازك فقط، فالتغيير يُحفظ على جهازك فقط', 'This service is defined on this machine only, so the change is saved on this machine only')} <span class="ltr tiny muted">.yallaflow/local/runtime.yaml</span><input type="hidden" name="${name}" value="local"></p>`;
+    return `<fieldset class="scopepick" data-scope-pick><legend class="small">${A('أين يُحفظ هذا التغيير؟', 'Where is this change saved?')}</legend>
+      <label class="small"><input type="radio" name="${name}" value="local" checked> <b>${A('على جهازي فقط', 'This machine only')}</b> <span class="muted">${A('— لا يتأثر الفريق. يُحفظ في ملف محلي خارج Git:', '— teammates are not affected. Saved in a local file ignored by Git:')}</span> <span class="ltr tiny muted">.yallaflow/local/runtime.yaml</span></label>
+      <label class="small"><input type="radio" name="${name}" value="shared"> <b>${A('مشترك للفريق', 'Shared with the team')}</b> <span class="muted">${A('— يُحفظ في ملف داخل المستودع، ويصل للفريق فقط بعد أن تعمل commit و push بنفسك. الحفظ لا يرفع شيئاً:', '— saved in a file in the repository; teammates get it only after you commit and push it yourself. Saving uploads nothing:')}</span> <span class="ltr tiny muted">.yallaflow/runtime.yaml</span></label></fieldset>`;
+  }
+  const savedWhere = (result) => (result?.savedTo === 'shared'
+    ? A(`حُفظ في الملف المشترك ${result.file}. يصل للفريق بعد commit و push؛ لم يُرفع شيء.`, `Saved in the shared file ${result.file}. Teammates get it after you commit and push; nothing was uploaded.`)
+    : A(`حُفظ على جهازك فقط (${result?.file ?? '.yallaflow/local/runtime.yaml'}).`, `Saved for this machine only (${result?.file ?? '.yallaflow/local/runtime.yaml'}).`)) + (result?.masked?.length ? ` ${A('تعديلك المحلي ما زال يغلب على هذا الجهاز في:', 'Your local override still wins on this machine for:')} ${result.masked.join(', ')}.` : '');
+  // What the service is missing before it can start, with the exact command that installs it.
+  function needsBlock(sv) {
+    const pr = sv.prerequisites?.problems?.[0];
+    if (!pr || ['running', 'starting'].includes(sv.state) || runsOutside(sv)) return '';
+    const fx = pr.fix;
+    const where = pr.dir === '.' ? A('فولدر المشروع', 'the project folder') : pr.dir;
+    const why = pr.code === 'LOCAL_TOOL_MISSING'
+      ? A(`أمر التشغيل يبدأ ${pr.tool} (من الحزمة ${pr.package})، وهو غير مثبّت في ${where}.`, `The start script runs ${pr.tool} (from the package ${pr.package}), and it is not installed in ${where}.`)
+      : A(`اعتماديات ${where} غير مثبّتة (لا يوجد مجلد node_modules)، فلن تعمل الخدمة قبل تثبيتها.`, `The dependencies of ${where} are not installed (there is no node_modules folder), so the service cannot start until they are.`);
+    const lock = fx.changesLockfile
+      ? A('لا يوجد ملف قفل، فالتثبيت سينشئ واحداً (تغيير في المستودع تقرّر أنت رفعه).', 'There is no lockfile, so the install creates one (a repository change you decide whether to commit).')
+      : A(`يتبع ${fx.lockfile} كما هو: لن يتغيّر package.json ولا ملف القفل.`, `It follows ${fx.lockfile} as it is: package.json and the lockfile are not changed.`);
+    const busy = runtimeBusy[sv.id] === 'install';
+    const anyway = tryAnywayBlock(sv);
+    const run = readOnly ? '' : !sv.trust.trusted
+      ? `<p class="tiny muted">${A('التثبيت من هنا متاح بعد مراجعة الخدمة وتوثيقها (لأنه يشغّل سكريبتات الحزم). أو شغّل الأمر بنفسك في الترمينال ثم اضغط «شغّل».', 'Installing from here is available once the service is reviewed and trusted (an install runs the packages\' own scripts). Or run the command yourself in a terminal, then press Start.')}</p>`
+      : `<label class="small optin"><input type="checkbox" data-rt-install-ack="${esc(sv.id)}" ${rtInstallAck.has(sv.id) ? 'checked' : ''} ${busy ? 'disabled' : ''}> ${A('راجعت هذا الأمر وأريد تشغيله على جهازي', 'I reviewed this command and want to run it on this machine')}</label><div class="row"><button type="button" class="btn sm go" data-rt-install="${esc(sv.id)}" data-hash="${esc(fx.hash)}" ${busy || !rtInstallAck.has(sv.id) ? 'disabled' : ''}>${busy ? A('جارٍ التثبيت… قد يستغرق دقائق', 'Installing… this can take a few minutes') : A('ثبّت الآن', 'Install now')}</button><span class="tiny muted">${A('لا شيء يُثبَّت قبل أن تضغط. المخرجات تُكتب في سجل الخدمة.', 'Nothing is installed until you press this. The output goes to the service log.')}</span></div>`;
+    return `<div class="svcneed" role="status" data-svc-need="${esc(pr.code)}"><p class="small"><b>⚠ ${A('ينقصها شيء قبل التشغيل', 'Something is missing before it can start')}</b> ${esc(why)}</p>
+      <p class="small">${A('أمر الإصلاح', 'The fix')} <span class="tiny muted">(${esc(fx.manager)}${fx.lockfile ? ` · ${esc(fx.lockfile)}` : ''})</span>:</p>
+      <div class="row"><code class="cli grow" dir="ltr">${esc(fx.display)}</code><button type="button" class="btn sm ghost" data-copy="${esc(fx.display)}" data-copy-what="text">${A('نسخ', 'Copy')}</button></div>
+      <ul class="tiny muted svcneed-notes"><li>${esc(lock)}</li><li>💻 ${A('الملفات المثبّتة تبقى على جهازك فقط (ليست جزءاً من المستودع)؛ كل زميل يثبّتها على جهازه.', 'Installed files stay on this machine only (they are not part of the repository); each teammate installs them on their own machine.')}</li></ul>${run}${anyway}</div>`;
+  }
+  // Owner review (2026-11-17): the check can be wrong for a custom setup. "Try anyway" starts
+  // the service without this one check; trust, folders and ports are still checked by Core.
+  function tryAnywayBlock(sv) {
+    if (readOnly || !sv.trust?.trusted) return '';
+    const busy = Boolean(runtimeBusy[sv.id]);
+    return `<details class="small svcanyway" data-svc-anyway="${esc(sv.id)}" data-sx="anyway:${esc(sv.id)}" ${sxOpen(`anyway:${sv.id}`)}><summary>${A('متقدم: شغّلها رغم ذلك', 'Advanced: start it anyway')}</summary><p class="tiny muted">${A('إن كانت الاعتماديات موفَّرة بطريقة لا يعرفها هذا الفحص (مجلد آخر، حاوية، إعداد خاص)، يمكنك التشغيل دون هذا الفحص وحده. التوثيق والمجلدات والمنافذ ما زالت تُفحص. إن فشلت، يعرض السجل السبب.', 'If the dependencies are provided in a way this check does not know (another folder, a container, a custom setup), you can start without this one check. Trust, folders and ports are still checked. If it fails, the log shows why.')}</p><button type="button" class="btn sm ghost" data-rt="start-anyway" data-id="${esc(sv.id)}" ${busy ? 'disabled' : ''}>${runtimeBusy[sv.id] === 'start' ? A('بيبدأ…', 'Starting…') : A('جرّب التشغيل دون فحص الاعتماديات', 'Try starting without the dependency check')}</button></details>`;
+  }
+  // UNKNOWN: the check could not tell. Said in words, never a block; nothing for a command
+  // the check does not apply to (Compose, a script), so most cards stay quiet.
+  const UNKNOWN_WHY = {
+    'no-package-json': { ar: 'أمر التشغيل يستخدم مدير حزم، لكن لا يوجد package.json مقروء في مجلد الخدمة.', en: 'The command uses a package manager, but there is no readable package.json in the service folder.' },
+    'yarn-pnp': { ar: 'المشروع يستخدم Yarn Plug\'n\'Play (بلا node_modules)، فلا يمكن فحص الحزم المثبّتة.', en: 'The project uses Yarn Plug\'n\'Play (no node_modules), so installed packages cannot be checked.' },
+    'custom-module-path': { ar: 'الخدمة تمرّر NODE_PATH، أي أن الحزم قد تكون في مكان لا يفحصه YallaFlow.', en: 'The service passes NODE_PATH, so its packages may be somewhere YallaFlow does not look.' },
+    'outside-project': { ar: 'مجلد الحزمة خارج المشروع، وYallaFlow لا يفحص خارجه.', en: 'The package folder is outside the project, and YallaFlow does not look outside it.' },
+    'folder-missing': { ar: 'مجلد الخدمة غير موجود أو لا يمكن قراءته.', en: 'The service folder does not exist or cannot be read.' }
+  };
+  function unknownNote(sv) {
+    const pr = sv.prerequisites;
+    if (pr?.state !== 'UNKNOWN' || !UNKNOWN_WHY[pr.reason] || ['running', 'starting'].includes(sv.state) || runsOutside(sv)) return '';
+    return `<p class="tiny muted" data-svc-unknown="${esc(pr.reason)}">ℹ ${A('لم يتمكن YallaFlow من التأكد من الاعتماديات:', 'YallaFlow could not tell whether the dependencies are installed:')} ${L(UNKNOWN_WHY[pr.reason])} ${A('التشغيل غير ممنوع؛ إن فشل، يعرض السجل السبب.', 'Starting is not blocked; if it fails, the log shows why.')}</p>`;
+  }
+  // A port that is taken: who holds it, a free one, and one action that moves everything together.
+  function portBlock(sv) {
+    const fx = rtFix[sv.id];
+    if (!fx) return '';
+    const who = fx.ownerService ? A(`الخدمة «${fx.ownerService.name}» في هذا المشروع`, `the service "${fx.ownerService.name}" of this project`)
+      : fx.owner ? fx.owner : A('برنامج لم يشغّله YallaFlow', 'a process YallaFlow did not start');
+    const also = !fx.ownerService && fx.declaredBy ? ` ${A(`(المنفذ معرّف أيضاً للخدمة «${fx.declaredBy.name}» في هذا المشروع.)`, `(The port is also defined for the service "${fx.declaredBy.name}" of this project.)`)}` : '';
+    const busy = runtimeBusy[sv.id] === 'port';
+    return `<form class="svcport" data-svc-portform="${esc(sv.id)}" data-keep="port-${esc(sv.id)}"><p class="small"><b>⚠ ${A(`المنفذ ${fx.port} مستخدم`, `Port ${fx.port} is in use`)}</b> ${A('من', 'by')} <span dir="auto">${esc(who)}</span>.${esc(also)} ${A('لم يتوقف أي شيء، ولن يوقف YallaFlow الخدمة الأخرى.', 'Nothing was stopped, and YallaFlow will not stop the other one.')}</p>
+      <label class="small">${A('شغّل هذه الخدمة على منفذ آخر', 'Run this service on another port')} <input class="ltr" type="number" name="to" min="1" max="65535" required value="${fx.suggestion ?? ''}" style="width:8em"> ${fx.suggestion ? `<span class="tiny muted">${A(`(${fx.suggestion} متاح الآن)`, `(${fx.suggestion} is free now)`)}</span>` : ''}</label>
+      <p class="tiny muted">${A('يتغيّر معاً: أمر التشغيل، المنفذ، فحص الجاهزية، وروابط الفتح. إن لم يستطع YallaFlow تغيير الأمر بيقين فلن يغيّر شيئاً وسيخبرك.', 'Changed together: the start command, the port, the readiness check and the open links. If YallaFlow cannot change the command with certainty it changes nothing and tells you.')}</p>
+      ${scopeChoice(sv, 'scope')}
+      ${fx.error ? `<p class="small" role="alert" style="color:var(--clay)" dir="auto">${esc(fx.error)}</p>${fx.cannot ? `<button type="button" class="btn sm" data-svc-edit="${esc(sv.id)}">${A('عدّل الأمر بنفسك', 'Edit the command yourself')}</button>` : ''}` : ''}
+      <div class="row"><button class="btn sm go" type="submit" ${busy ? 'disabled' : ''}>${busy ? A('جارٍ الحفظ…', 'Saving…') : A('استخدم هذا المنفذ', 'Use this port')}</button><button type="button" class="btn sm ghost" data-rt-port-cancel="${esc(sv.id)}">${A('إلغاء', 'Cancel')}</button></div></form>`;
+  }
+  // Edit a service from its card. Only the fields that changed are sent, so everything else
+  // (its links, what it depends on) stays exactly as it is.
+  function editForm(sv) {
+    const state = svcEdit[sv.id];
+    if (!state) return '';
+    const cmd = sv.command.map(shq).join(' ');
+    const ready = sv.ready?.port ? 'port' : sv.ready?.log ? 'log' : 'none';
+    const busy = runtimeBusy[sv.id] === 'edit';
+    // Owner review (2026-11-17): a local change to a shared service can be undone here.
+    // Owner decision: the undo removes every local change of this service, and says so first.
+    const undo = sv.source === 'shared' && sv.overridden?.length ? `<div class="tiny" data-svc-local-change><p>${A('لك تعديلات محلية على هذا الجهاز في:', 'You have local changes on this machine to:')} <span class="ltr">${esc(sv.overridden.join(', '))}</span></p><p class="muted" data-svc-reset-scope>${A('الرجوع للتعريف المشترك يحذف <b>كل</b> تعديلاتك المحلية على هذه الخدمة (المذكورة أعلاه)، وليس المنفذ فقط. الملف المشترك لا يتغيّر.', 'Returning to the shared definition removes <b>all</b> of your local changes to this service (listed above), not only the port. The shared file is not changed.')}</p><button type="button" class="btn sm ghost" data-rt-reset="${esc(sv.id)}" data-fields="${esc(sv.overridden.join(', '))}" ${busy ? 'disabled' : ''}>${A('احذف كل التعديلات المحلية وارجع للتعريف المشترك', 'Remove all local changes and return to the shared definition')}</button></div>` : '';
+    return `<form class="svcedit" data-svc-editform="${esc(sv.id)}" data-keep="edit-${esc(sv.id)}"><h3 class="small"><b>${A('تعديل الخدمة', 'Edit the service')}</b></h3>${undo}
+      <label class="small">${A('الاسم', 'Name')}<input name="name" maxlength="80" required value="${esc(sv.name)}"></label>
+      <label class="small">${A('أمر التشغيل', 'Start command')} <span class="tiny muted">${A('(كل كلمة وسيط منفصل؛ استخدم علامات التنصيص للمسافات؛ بدون shell)', '(each word is one argument; quote spaces; no shell)')}</span><input class="ltr mono" name="command" required value="${esc(cmd)}"></label>
+      <label class="small">${A('المنافذ', 'Ports')} <span class="tiny muted">${A('(أرقام تفصلها فواصل)', '(numbers, comma-separated)')}</span><input class="ltr" name="ports" value="${esc(sv.ports.map((x) => x.port).join(', '))}" inputmode="numeric"></label>
+      <details class="small svcedit-adv" ${state.adv ? 'open' : ''}><summary>${A('خيارات متقدمة', 'Advanced options')}</summary>
+        <label class="small">${A('الفولدر', 'Folder')}<input class="ltr mono" name="cwd" value="${esc(sv.cwd)}"></label>
+        <label class="small">${A('تعتبر جاهزة عندما', 'Ready when')} <select name="readyKind"><option value="port" ${ready === 'port' ? 'selected' : ''}>${A('منفذ يرد', 'a port answers')}</option><option value="log" ${ready === 'log' ? 'selected' : ''}>${A('نص يظهر في السجل', 'the log shows a text')}</option><option value="none" ${ready === 'none' ? 'selected' : ''}>${A('بدون فحص', 'no check')}</option></select></label>
+        <label class="small">${A('منفذ الجاهزية', 'Readiness port')}<input class="ltr" type="number" name="readyPort" min="1" max="65535" value="${sv.ready?.port ?? ''}"></label>
+        <label class="small">${A('نص الجاهزية في السجل', 'Readiness text in the log')}<input class="ltr" name="readyLog" maxlength="200" value="${esc(sv.ready?.log ?? '')}"></label>
+        <label class="small">${A('صفحة الفتح', 'Page to open')}<input class="ltr" name="open" value="${esc(sv.open ?? '/')}"></label>
+        <label class="small">${A('متغيرات البيئة (أسماء فقط، بلا قيم)', 'Environment variables (names only, never values)')}<input class="ltr mono" name="env" value="${esc(sv.env.join(', '))}"></label></details>
+      <p class="tiny muted" data-edit-kept>${A('ما لا تغيّره يبقى كما هو، ومن ذلك الروابط', 'What you do not change stays as it is, including the links')}${sv.links?.length ? ` (${sv.links.length})` : ''}${A(' والاعتماد على خدمات أخرى', ' and the services it depends on')}${sv.dependsOn?.length ? ` (${esc(sv.dependsOn.join(', '))})` : ''}. ${A('تغيير الأمر أو المنفذ أو الفولدر يحتاج مراجعة وتوثيقاً من جديد قبل التشغيل.', 'A changed command, port or folder needs a new review and trust before it starts.')}</p>
+      ${scopeChoice(sv, 'scope')}
+      ${state.error ? `<p class="small" role="alert" style="color:var(--clay)" dir="auto">${esc(state.error)}</p>` : ''}
+      <div class="row"><button class="btn sm go" type="submit" ${busy ? 'disabled' : ''}>${busy ? A('جارٍ الحفظ…', 'Saving…') : A('احفظ التعديل', 'Save the change')}</button><button type="button" class="btn sm ghost" data-svc-edit-cancel="${esc(sv.id)}">${A('إلغاء', 'Cancel')}</button></div></form>`;
+  }
+  // Reads the edit form and keeps only what differs from the service as it is now.
+  function editPatch(sv, form) {
+    const get = (name) => String(form.querySelector(`[name="${name}"]`)?.value ?? '').trim();
+    const list = (text) => text.split(/[\s,،]+/).filter(Boolean);
+    const body = {};
+    if (get('name') !== sv.name) body.name = get('name');
+    const argv = argvOf(get('command'));
+    if (JSON.stringify(argv) !== JSON.stringify(sv.command)) body.argv = argv;
+    const ports = list(get('ports')).map(Number);
+    if (JSON.stringify(ports) !== JSON.stringify(sv.ports.map((x) => x.port))) body.ports = ports;
+    if (get('cwd') !== sv.cwd) body.cwd = get('cwd');
+    if (get('open') !== (sv.open ?? '/')) body.open = get('open');
+    const env = list(get('env'));
+    if (JSON.stringify(env) !== JSON.stringify(sv.env)) body.env = env;
+    const kind = get('readyKind');
+    const was = sv.ready?.port ? `port:${sv.ready.port}` : sv.ready?.log ? `log:${sv.ready.log}` : 'none';
+    const now = kind === 'port' ? `port:${get('readyPort')}` : kind === 'log' ? `log:${get('readyLog')}` : 'none';
+    if (now !== was) { if (kind === 'port') body.readyPort = Number(get('readyPort')); else if (kind === 'log') body.readyLog = get('readyLog'); else body.noReady = true; }
+    return body;
+  }
+  async function submitEdit(form) {
+    const id = form.dataset.svcEditform;
+    const sv = runtime?.data?.services.find((x) => x.id === id);
+    if (!sv || readOnly) return;
+    const body = editPatch(sv, form);
+    svcEdit[id] = { adv: Boolean(form.querySelector('.svcedit-adv')?.open), error: null };
+    if (!Object.keys(body).length) { svcEdit[id].error = A('لم تغيّر شيئاً.', 'You did not change anything.'); return render(); }
+    if (body.argv && !body.argv.length) { svcEdit[id].error = A('اكتب أمر التشغيل.', 'Type the start command.'); return render(); }
+    body.scope = form.querySelector('[name="scope"]:checked')?.value ?? form.querySelector('[name="scope"]')?.value ?? 'local';
+    runtimeBusy[id] = 'edit'; render();
+    try {
+      const done = await post(`/api/p/${pid}/runtime/${encodeURIComponent(id)}/edit`, JSON.stringify(body), { 'Content-Type': 'application/json' });
+      delete svcEdit[id]; delete runtimeReview[id];
+      toast(esc(`${A('تم تعديل الخدمة.', 'The service was changed.')} ${savedWhere(done)}`));
+    } catch (e) { svcEdit[id].error = e.message; }
+    runtimeBusy[id] = null;
+    await loadRuntime(); render();
+  }
+  async function submitPort(form) {
+    const id = form.dataset.svcPortform;
+    const fx = rtFix[id];
+    if (!fx || readOnly) return;
+    const to = Number(form.querySelector('[name="to"]')?.value);
+    const scope = form.querySelector('[name="scope"]:checked')?.value ?? form.querySelector('[name="scope"]')?.value ?? 'local';
+    fx.error = null; fx.cannot = false; fx.suggestion = to || fx.suggestion;
+    runtimeBusy[id] = 'port'; render();
+    try {
+      const done = await post(`/api/p/${pid}/runtime/${encodeURIComponent(id)}/port`, JSON.stringify({ from: fx.port, to, scope }), { 'Content-Type': 'application/json' });
+      delete rtFix[id]; delete runtimeReview[id]; runtimeErr[id] = null;
+      // Other services that still mention the old port were not changed: said, so the developer decides.
+      const refs = (done?.references ?? []).map((r) => `${r.id} (${r.where.join(', ')})`).join('، ');
+      toast(esc(`${A(`المنفذ أصبح ${to}.`, `The port is now ${to}.`)} ${savedWhere(done)} ${refs ? A(`خدمات أخرى ما زالت تذكر المنفذ ${fx.port} ولم تُغيَّر: ${refs}. راجعها، وكذلك إعدادات البروكسي أو .env إن وُجدت.`, `Other services still mention port ${fx.port} and were not changed: ${refs}. Check them, and any proxy config or .env too.`) : ''} ${done?.savedTo === 'local' ? A('للتراجع: «تعديل» ← «ارجع للتعريف المشترك».', 'To undo: Edit → Return to the shared definition.') : ''} ${A('راجع الخدمة ووثّقها ثم شغّلها.', 'Review and trust the service, then start it.')}`));
+    } catch (e) { fx.error = e.message; fx.cannot = e.code === 'RUNTIME_PORT_COMMAND'; }
+    runtimeBusy[id] = null;
+    await loadRuntime(); render();
+  }
+  async function installNeeds(id, hash) {
+    if (readOnly || runtimeBusy[id] || !rtInstallAck.has(id)) return;
+    runtimeBusy[id] = 'install'; runtimeErr[id] = null; render();
+    try {
+      const done = await post(`/api/p/${pid}/runtime/${encodeURIComponent(id)}/install`, JSON.stringify({ confirmed: true, commandHash: hash }), { 'Content-Type': 'application/json' });
+      rtInstallAck.delete(id);
+      toast(esc(done.ready ? A('تم التثبيت على جهازك. الخدمة جاهزة للتشغيل.', 'Installed on this machine. The service is ready to start.') : A('تم التثبيت، لكن ما زال ينقصها شيء.', 'Installed, but something is still missing.')));
+    } catch (e) { runtimeErr[id] = e.message; }
+    runtimeBusy[id] = null;
+    await loadRuntime();
+    if (runtimeLogs[id]) await loadServiceLogs(id);
+    render();
+  }
   // PF-0123: what failed and how to recover, shown on the failed service itself.
   function failureBlock(sv) {
     const tail = (failedTail[sv.id] ?? []).slice(-6);
-    const ask = A(`الخدمة «${sv.name}» (${sv.id}) وقعت في التشغيل. دي آخر سطور السجل:\n${tail.join('\n')}\nشوف السبب واقترح التصليح.`, `The service "${sv.name}" (${sv.id}) failed. These are its last log lines:\n${tail.join('\n')}\nFind the cause and propose a fix.`);
+    // The log lines come from Core already redacted; the cause line leads so the agent starts from it.
+    const cause = sv.failure?.line ? A(`السبب الظاهر في السجل: ${sv.failure.line}\n`, `The cause stated in the log: ${sv.failure.line}\n`) : '';
+    const ask = A(`الخدمة «${sv.name}» (${sv.id}) وقعت في التشغيل. ${cause}دي آخر سطور السجل:\n${tail.join('\n')}\nشوف السبب واقترح التصليح.`, `The service "${sv.name}" (${sv.id}) failed. ${cause}These are its last log lines:\n${tail.join('\n')}\nFind the cause and propose a fix.`);
     // PF-0132: one short line instead of a large log; the log itself opens on demand.
     const clean = (x) => String(x ?? '').replace(/\u001b\[[0-9;?]*[A-Za-z]/g, '').replace(/[\u0000-\u001f\u007f]/g, '').trim();
-    const line = clean([...tail].reverse().find((x) => clean(x)) ?? '');
-    return `<div class="svcfail" role="status"><p class="small grow"><b>✕ ${A('وقعت.', 'It stopped.')}</b> ${line ? `<span class="ltr svcfail-line" title="${esc(line)}">${esc(line.length > 160 ? `${line.slice(0, 160)}…` : line)}</span>` : `<span class="muted">${A('مفيش سجل لسه.', 'No log yet.')}</span>`}</p>
+    // PF-0166: the line that explains the failure (found by Core in the redacted log), not the
+    // last line of a stack trace; without one, the last line as before.
+    const line = clean(sv.failure?.line ?? [...tail].reverse().find((x) => clean(x)) ?? '');
+    const why = failureWhy(sv);
+    return `<div class="svcfail" role="status"><p class="small grow"><b>✕ ${A('وقعت.', 'It stopped.')}</b> ${why ? `<span data-fail-why>${esc(why)}</span> ` : ''}${line ? `<span class="ltr svcfail-line" title="${esc(line)}"${sv.failure ? ` data-fail-cause="${esc(sv.failure.kind)}"` : ''}>${esc(line.length > 300 ? `${line.slice(0, 300)}…` : line)}</span>` : `<span class="muted">${A('مفيش سجل لسه.', 'No log yet.')}</span>`}</p>
       <div class="row svcfail-acts"><button class="btn sm ghost" data-rt-logs="${esc(sv.id)}">${runtimeLogs[sv.id] ? A('حدّث السجل', 'Refresh log') : A('اعرض السجل', 'View log')}</button>${readOnly ? '' : `${agentsOn ? `<button class="btn sm go" data-ready-chat="${esc(ask)}">${A('اطلب من الوكيل يصلّحها', 'Ask the agent to fix it')}</button>` : `<button class="btn sm ghost" data-copy="${esc(ask)}" data-copy-what="text">${A('انسخ للوكيل', 'Copy for your agent')}</button>`}<button class="btn sm" data-rt="restart" data-id="${esc(sv.id)}" ${runtimeBusy[sv.id] ? 'disabled' : ''}>${A('شغّلها تاني', 'Start again')}</button>`}</div></div>`;
+  }
+  // The cause of a failure in the reader's words, from the line of the log that states it.
+  function failureWhy(sv) {
+    const f = sv.failure;
+    if (!f) return '';
+    const needs = Boolean(sv.prerequisites?.problems?.length);
+    if (f.kind === 'missing-module') return f.module === 'project-file'
+      ? A('الأمر يشير إلى ملف غير موجود في المشروع. راجع المسار في أمر التشغيل أو فولدر الخدمة (هذا ليس نقص اعتماديات).', 'The command points to a file that does not exist in the project. Check the path in the start command or the service folder (this is not a missing dependency).')
+      : needs ? A('حزمة مطلوبة غير مثبّتة. الإصلاح بالأعلى.', 'A required package is not installed. The fix is above.') : A('حزمة مطلوبة غير موجودة. تأكد من تثبيت الاعتماديات في الفولدر الصحيح.', 'A required package was not found. Check that the dependencies are installed in the right folder.');
+    if (f.kind === 'port-in-use') return A(`المنفذ ${f.detail ?? ''} مستخدم من برنامج آخر.`, `Port ${f.detail ?? ''} is used by another program.`);
+    if (f.kind === 'command-not-found') return A(`البرنامج ${f.detail ?? ''} غير موجود على هذا الجهاز أو غير مثبّت في المشروع.`, `The program ${f.detail ?? ''} is not on this machine or not installed in the project.`);
+    if (f.kind === 'missing-script') return A(`السكريبت ${f.detail ?? ''} غير معرّف في package.json.`, `The script ${f.detail ?? ''} is not defined in package.json.`);
+    if (f.kind === 'missing-file') return A('ملف أو فولدر مطلوب غير موجود.', 'A required file or folder does not exist.');
+    if (f.kind === 'permission') return A('لا توجد صلاحية للوصول إلى ملف أو منفذ.', 'Permission was denied for a file or a port.');
+    if (f.kind === 'out-of-memory') return A('انتهت الذاكرة المتاحة للعملية.', 'The process ran out of memory.');
+    if (f.kind === 'syntax') return A('خطأ صياغة في الكود أو الإعداد.', 'A syntax error in the code or configuration.');
+    return '';
+  }
+  // PF-0166: where this service's definition lives, on the card.
+  function savedChip(sv) {
+    if (sv.source === 'local') return `<span class="chip todo" data-saved="local" title="${esc(A('معرّفة على هذا الجهاز فقط (.yallaflow/local/runtime.yaml، خارج Git).', 'Defined on this machine only (.yallaflow/local/runtime.yaml, ignored by Git).'))}">💻 ${A('على جهازي فقط', 'this machine only')}</span>`;
+    if (sv.overridden?.length) return `<span class="chip wait" data-saved="shared-local" title="${esc(A(`التعريف مشترك في المستودع، ولك تعديل محلي على: ${sv.overridden.join(', ')}. التعديل المحلي لا يصل للفريق.`, `The definition is shared in the repository, with your local change to: ${sv.overridden.join(', ')}. The local change does not reach teammates.`))}">👥 ${A('مشترك + تعديل محلي', 'shared + local change')}</span>`;
+    return `<span class="chip todo" data-saved="shared" title="${esc(A('معرّفة في ملف داخل المستودع (.yallaflow/runtime.yaml)؛ يتشاركها الفريق عبر Git.', 'Defined in a file in the repository (.yallaflow/runtime.yaml); the team shares it through Git.'))}">👥 ${A('مشترك في المستودع', 'shared in the repository')}</span>`;
   }
   function serviceCard(sv) {
     const busy = runtimeBusy[sv.id];
@@ -2353,12 +2698,12 @@
     const links = openLinks(sv);
     return `<article class="svcrow svc ${trusted ? '' : 'untrusted'}" data-service="${esc(sv.id)}" data-definition-hash="${esc(sv.definitionHash)}">
       <div class="svchead"><span class="sdot ${st.tone}" aria-hidden="true"></span>
-        <div class="svcname"><b>${esc(sv.name)}</b> <span class="tiny muted ltr">${esc(sv.id)}</span><div class="svcmeta"><span class="chip ${st.tone}" data-svc-state="${esc(outside ? 'outside' : sv.state)}"><i></i>${L(st.t)}</span>${trustLine}${sv.stale ? `<span class="chip wait">${A('شغّال بتعريف أقدم', 'running an older definition')}</span>` : ''}${sv.sharedMarker ? `<span class="chip fail" title="${esc(A('بتخدم مشاريع تانية كمان؛ «وقّف المشروع» مابيوقفهاش.', 'Also serves other projects; Stop project never stops it.'))}"><i></i>${A('مشترك', 'Shared')}</span>` : ''}${ports}</div></div>
-        <div class="svcacts">${actions}${sv.state === 'failed' ? '' : `<button class="btn sm ghost" data-rt-logs="${esc(sv.id)}">${logs ? A('حدّث السجل', 'Refresh logs') : A('السجل', 'Logs')}</button>`}</div></div>
-      ${changed}${sv.state === 'failed' ? failureBlock(sv) : ''}
+        <div class="svcname"><b>${esc(sv.name)}</b> <span class="tiny muted ltr">${esc(sv.id)}</span><div class="svcmeta"><span class="chip ${st.tone}" data-svc-state="${esc(outside ? 'outside' : sv.state)}"><i></i>${L(st.t)}</span>${trustLine}${sv.stale ? `<span class="chip wait">${A('شغّال بتعريف أقدم', 'running an older definition')}</span>` : ''}${sv.sharedMarker ? `<span class="chip fail" title="${esc(A('بتخدم مشاريع تانية كمان؛ «وقّف المشروع» مابيوقفهاش.', 'Also serves other projects; Stop project never stops it.'))}"><i></i>${A('مشترك', 'Shared')}</span>` : ''}${ports}${savedChip(sv)}</div></div>
+        <div class="svcacts">${actions}${sv.state === 'failed' ? '' : `<button class="btn sm ghost" data-rt-logs="${esc(sv.id)}">${logs ? A('حدّث السجل', 'Refresh logs') : A('السجل', 'Logs')}</button>`}${readOnly || running ? '' : `<button class="btn sm ghost" data-svc-edit="${esc(sv.id)}" ${busy ? 'disabled' : ''}>${A('تعديل', 'Edit')}</button>`}</div></div>
+      ${changed}${needsBlock(sv)}${unknownNote(sv)}${portBlock(sv)}${editForm(sv)}${sv.state === 'failed' ? failureBlock(sv) : ''}
       ${sv.runningOutside?.length ? `<p class="small" data-outside>${A('شغّالة بالفعل من برا YallaFlow:', 'Already running outside YallaFlow:')} <span class="ltr">${esc(sv.runningOutside.join(', '))}</span>. ${A('افتح التطبيق من الروابط. YallaFlow مش هيشغّلها تاني ولا هيوقفها؛ لو عايزه يديرها، وقّفها من برا الأول وبعدين دوس «شغّل».', 'Open the app from its links. YallaFlow will not start it again or stop it; to let YallaFlow manage it, stop it outside first, then press Start.')}</p>` : ''}
       ${sv.reason ? `<p class="small">${esc(sv.reason)}</p>` : ''}
-      ${sv.unmanagedPorts.length && !outside ? `<p class="small" style="color:var(--clay)">${A('المنفذ ده مستخدم من برنامج YallaFlow ماشغّلوش، ومش هيتلمس:', 'This port is held by a process YallaFlow did not start; it will not be touched:')} <span class="ltr">${sv.unmanagedPorts.join(', ')}</span></p>` : ''}
+      ${sv.unmanagedPorts.length && !outside ? `<p class="small" style="color:var(--clay)">${A('المنفذ ده مستخدم من برنامج YallaFlow ماشغّلوش، ومش هيتلمس:', 'This port is held by a process YallaFlow did not start; it will not be touched:')} <span class="ltr">${sv.unmanagedPorts.join(', ')}</span>${readOnly || rtFix[sv.id] ? '' : ` <button type="button" class="btn sm ghost" data-rt-port-open="${esc(sv.id)}" data-port="${sv.unmanagedPorts[0]}">${A('استخدم منفذاً آخر…', 'Use another port…')}</button>`}</p>` : ''}
       ${!trusted ? reviewPanel(sv) : ''}${sharedConfirm(sv)}
       ${runtimeErr[sv.id] ? `<p class="small" role="alert" style="color:var(--clay);white-space:pre-wrap">${esc(runtimeErr[sv.id])}</p>` : ''}
       ${logs ? `<pre class="svclog ltr" tabindex="0" aria-label="${A('سجل الخدمة', 'Service log')}">${logs.length ? logs.map(esc).join('\n') : esc(A('لسه مفيش مخرجات.', 'No output yet.'))}</pre><div class="row"><p class="tiny muted grow">${A('الأسرار المعروفة بتتخفي من السجل، لكن ده أفضل مجهود ومش مضمون مع أي برنامج.', 'Recognizable secrets are hidden from the log, but this is best effort and cannot be guaranteed for every program.')}</p><button class="btn sm ghost" data-rt-logs-hide="${esc(sv.id)}">${A('اقفل السجل', 'Hide log')}</button></div>` : ''}
@@ -2628,6 +2973,7 @@
     const claude = agents && Boolean(form.querySelector('[name="claude"]')?.checked);
     return setupDo('agents', async () => {
       await setupPost('agents/settings', { agents, claude });
+      if (agents) savePrefs({ preferredAgent: claude ? 'claude' : 'codex' });
       if (setupPending(setupInfo?.record)) await setupPost('setup/step', { step: 'agents' });
       agentsOn = agentsOn || agents;
       toast(esc(A('اختيار الوكلاء اتحفظ للمشروع ده.', 'The agent choice is saved for this project.')));
@@ -2820,17 +3166,32 @@
     const state = c.ready && v?.ok ? ['done', A('جاهز ومتجرّب', 'Ready · tested')] : c.ready ? ['active', A('جاهز', 'Ready')] : ['wait', A('محتاج إعداد', 'Needs setup')];
     return `<div class="tw:mb-4" data-agent-setup>
       <h3 class="tw:text-base tw:font-semibold">${A('على الجهاز ده', 'On this machine')}</h3>
-      ${m.supportedPlatform ? '' : `<p class="small tw:text-amber">${A('الإعداد ده مدعوم على Linux وmacOS.', 'This setup is supported on Linux and macOS.')}</p>`}
+      ${m.supportedPlatform ? '' : `<p class="small tw:text-amber" data-platform-note>${A(`إعداد الوكلاء مدعوم على Linux وmacOS. على ${osName(m.platform)} لم يتم التحقق منه بعد: قد تعمل الخطوات، لكن YallaFlow لا يؤكد ذلك على هذا النظام.`, `Agent setup is supported on Linux and macOS. On ${osName(m.platform)} it is not verified yet: the steps may work, but YallaFlow does not confirm them on this system.`)}</p>`}
       <div class="tw:mt-2 tw:grid tw:gap-3 tw:md:grid-cols-2">
         <section class="tw:rounded-card tw:border tw:border-line tw:bg-card tw:px-4 tw:py-3" aria-label="Codex"><div class="row"><b class="grow">Codex</b><span class="chip ${state[0]}"><i></i>${state[1]}</span></div>
           <ul class="tw:mt-2 tw:list-none tw:p-0">${row(Boolean(c.cli), A('البرنامج', 'Codex CLI'), c.cli ? `<span class="ltr">codex ${esc(c.cli.version ?? '')}</span>` : A('مش متسطّب', 'not installed'))}${row(Boolean(c.adapter) && !c.problems.some((x) => /not supported/.test(x)), A('الوصلة', 'Adapter'), c.adapter ? `<span class="ltr">codex-acp ${esc(c.adapter.version ?? '')}</span>` : A('مش متسطّبة', 'not installed'))}${row(!c.cli ? null : login.method === 'chatgpt', A('تسجيل الدخول', 'Sign-in'), loginText)}${row(v ? v.ok : null, A('الاتصال', 'Connection'), verifyText)}</ul>
           ${c.tested ? `<p class="tiny muted tw:mt-2">${A('متجرّب مع', 'Tested with')} <span class="ltr">codex ${esc(c.tested.cli)} · codex-acp ${esc(c.tested.adapter)}</span>${c.installed && !c.matchesTested ? ` — ${A('النسخ المتسطّبة مختلفة؛ ممكن تشتغل، بس دي اللي اتجرّبت.', 'the installed versions differ; they may work, but these are the tested ones.')}` : ''}</p>` : ''}
           ${next}${machineUi.verifyError ? `<p class="small tw:mt-2 tw:text-clay" role="alert" dir="auto">${esc(machineUi.verifyError)}</p>` : ''}</section>
-        <section class="tw:rounded-card tw:border tw:border-line tw:bg-card tw:px-4 tw:py-3" aria-label="Claude Code"><div class="row"><b class="grow">Claude Code</b><span class="chip wait">${A('تجريبي', 'Experimental')}</span></div>
-          <ul class="tw:mt-2 tw:list-none tw:p-0">${row(claude.installed ? true : null, A('البرنامج', 'Claude Code CLI'), claude.installed ? `<span class="ltr">claude ${esc(claude.version ?? '')}</span>` : A('مش متسطّب', 'not installed'))}${claude.auth ? row(claude.auth.loggedIn && claude.auth.method === 'claude.ai', A('تسجيل الدخول', 'Sign-in'), claude.auth.loggedIn ? `<span class="ltr">${esc(claude.auth.method ?? '')}${claude.auth.plan ? ` (${esc(claude.auth.plan)})` : ''}</span>` : A('مش داخل', 'not signed in')) : ''}</ul>
-          ${claude.connectionIncluded && claude.warnings?.length ? claudeWarnings({ warnings: claude.warnings }) : ''}<p class="tiny muted tw:mt-2">${claude.connectionIncluded ? A('التوصيل التجريبي موجود في النسخة دي (نسخة تطوير) — إعداده تحت.', 'The experimental connection is in this build (a development build) — set it up below.') : A('توصيل الكونسول بـ Claude Code تجريبي ومش جزء من النسخة دي. تقدر تستخدم Claude Code في الترمينال، وهو بيتبع YallaFlow من CLAUDE.md.', 'The console connection to Claude Code is experimental and not part of this release. You can use Claude Code in your terminal; it follows YallaFlow through CLAUDE.md.')}</p></section>
+        ${claudeMachineCard(m, row)}
       </div>
       <p class="tiny muted tw:mt-2">${A('اشتراكك بس، من غير مفاتيح API. أي تسطيب أو تسجيل دخول بيستنى موافقتك، ومن غير sudo.', 'Your subscription only, never API keys. Every install or sign-in waits for your approval and never uses sudo.')}</p></div>`;
+  }
+  // PF-0160: Claude Code on this machine, its three states kept apart: the program, the
+  // sign-in, and the console's connection (which only a session the developer starts can show).
+  // It is experimental everywhere, and said to be not verified where YallaFlow has not run it.
+  const osName = (platform) => ({ win32: 'Windows', darwin: 'macOS', linux: 'Linux' }[platform] ?? platform);
+  function claudeMachineCard(m, row) {
+    const claude = m.claude;
+    const r = m.readiness?.agents?.claude ?? { support: m.supportedPlatform ? 'supported' : 'not-verified', installed: Boolean(claude.installed), authenticated: claude.auth ? Boolean(claude.auth.loggedIn && claude.auth.method === 'claude.ai') : null, connection: claude.connectionIncluded ? 'session-only' : 'unavailable', next: null };
+    const unverified = r.support === 'not-verified';
+    const chip = `<span class="chip wait" data-claude-chip>${unverified ? A(`تجريبي · لم يتم التحقق منه على ${osName(m.platform)}`, `Experimental · not verified on ${osName(m.platform)}`) : A('تجريبي', 'Experimental')}</span>`;
+    const signIn = !r.installed ? '—' : r.authenticated === true ? `<span class="ltr">${esc(claude.auth?.method ?? '')}${claude.auth?.plan ? ` (${esc(claude.auth.plan)})` : ''}</span>` : r.authProblem === 'not-subscription' ? A('ليس باشتراك Claude — جلسات مفاتيح API غير مدعومة', 'not a Claude subscription — API-key sessions are not supported') : r.authenticated === false ? A('غير مسجّل الدخول', 'not signed in') : A('لم يُفحص', 'not checked');
+    const connection = r.connection === 'unavailable' ? A('غير متاح في هذه النسخة', 'not available in this release') : A('يُفحص عند بدء جلسة فقط — لا يمكن اختباره مسبقاً', 'checked only when you start a session — it cannot be tested ahead');
+    const next = r.next === 'install-manually' ? `<p class="small tw:mt-2">${A('ثبّت Claude Code بنفسك من صفحته الرسمية، ثم افتح نافذة أوامر جديدة:', 'Install Claude Code yourself from its official page, then open a new terminal:')} <a class="ltr" href="https://claude.com/claude-code" target="_blank" rel="noopener noreferrer">claude.com/claude-code</a></p>`
+      : r.next === 'sign-in-manually' ? `<p class="small tw:mt-2">${A('سجّل الدخول باشتراكك في Claude: شغّل', 'Sign in with your Claude subscription: run')} <code class="ltr">claude</code> ${A('في نافذة الأوامر واتبع التعليمات.', 'in a terminal and follow its prompts.')}</p>` : '';
+    return `<section class="tw:rounded-card tw:border tw:border-line tw:bg-card tw:px-4 tw:py-3" aria-label="Claude Code" data-claude-card><div class="row"><b class="grow">Claude Code</b>${chip}</div>
+          <ul class="tw:mt-2 tw:list-none tw:p-0">${row(r.installed ? true : null, A('البرنامج', 'Claude Code CLI'), r.installed ? `<span class="ltr">claude ${esc(claude.version ?? '')}</span>` : A('غير مثبّت', 'not installed'))}${row(!r.installed ? null : r.authenticated, A('تسجيل الدخول', 'Sign-in'), signIn)}${row(null, A('الاتصال بالكونسول', 'Console connection'), connection)}</ul>
+          ${claude.connectionIncluded && claude.warnings?.length ? claudeWarnings({ warnings: claude.warnings }) : ''}${next}<p class="tiny muted tw:mt-2">${claude.connectionIncluded ? A('الربط التجريبي متاح في هذه النسخة — إعداده بالأسفل. لا يدعم الإيقاف من الكونسول، والردود تصل كاملة لا متدفقة.', 'The experimental connection is available in this build — set it up below. It has no Stop from the console, and replies arrive whole, not streamed.') : A('ربط الكونسول بـ Claude Code تجريبي وليس جزءاً من هذه النسخة. يمكنك استخدام Claude Code في نافذة الأوامر، وهو يتبع YallaFlow من CLAUDE.md.', 'The console connection to Claude Code is experimental and not part of this release. You can use Claude Code in your terminal; it follows YallaFlow through CLAUDE.md.')}</p></section>`;
   }
   // First open: one quiet, dismissible line when Codex is not ready on this machine.
   function agentStrip() {
@@ -2859,7 +3220,7 @@
       ${tick(modeOk, c.mode ? A(`وضع الأذونات: ${esc(c.mode)}${c.modeState === 'auto-approves' ? ' (بيوافق لوحده على أغلب الأفعال)' : ''}`, `Permission mode: ${esc(c.mode)}${c.modeState === 'auto-approves' ? ' (approves most actions itself)' : ''}`) : A('وضع الأذونات معروف', 'Permission mode known'), c.modeState === 'refused' ? A('وضع بيتخطّى كل الأذونات، غيّره في Claude Code.', 'A mode that skips every permission; change it in Claude Code.') : A('بيتعرف من أول رسالة.', 'Known from the first message.'))}
       </ul>${c.channelConnected ? `<p class="tiny muted" data-channel-mode>${c.channel === 'verified' ? A('الرسائل: تُرسل من الكونسول مباشرة.', 'Messages: sent from the console.') : c.channel === 'checking' ? A('الرسائل: جارٍ التحقق من إمكانية الإرسال من الكونسول…', 'Messages: checking whether the console can send…') : A('الرسائل: وضع الترمينال. تنسخ رسالتك من الكونسول وتلصقها في Claude Code، والكونسول يعرض العمل.', 'Messages: Terminal mode. You copy your message from the console and paste it in Claude Code; the console shows the work.')}</p>` : ''}${readOnly ? '' : `<div class="row" style="margin-top:8px"><button class="btn sm ${c.launchFiles ? 'ghost' : 'go'}" data-agents-launch ${setupBusy ? 'disabled' : ''}>${c.launchFiles ? A('اكتب ملفات التشغيل تاني', 'Rewrite launch files') : A('اكتب ملفات التشغيل', 'Write launch files')}</button></div>`}
       ${launch && !c.channelConnected ? `<p class="small" style="margin-top:8px">${A('شغّل الأمر ده في ترمينال جوه فولدر المشروع، ومتكتبش حاجة بعده:', 'Run this in a terminal inside the project folder, and type nothing after it:')}</p>` : ''}${launch ? `<pre class="cli" dir="ltr">${esc(launch)}</pre><button class="btn sm ghost" data-copy="${esc(launch)}">${A('انسخ', 'Copy')}</button>` : ''}` : '');
-    const form = readOnly ? `<p class="small muted">${A('الكونسول ده للقراءة بس.', 'This console is read-only.')}</p>` : `<form class="wizform" data-agents-settings data-keep="agents-${esc(pid)}" style="margin-top:8px">
+    const form = readOnly ? `<p class="small muted">${roText()}</p>` : `<form class="wizform" data-agents-settings data-keep="agents-${esc(pid)}" style="margin-top:8px">
       <label class="small"><input type="checkbox" name="agents" ${d.saved?.agents || (!d.saved?.chosen && d.applied?.agents) ? 'checked' : ''}> <b>${A('الوكلاء للمشروع ده (Codex)', 'Agents for this project (Codex)')}</b></label>
       ${d.claudeAvailable ? `<label class="small"><input type="checkbox" name="claude" ${d.saved?.claude || d.applied?.claude ? 'checked' : ''}> <b>${A('كمان Claude Code (تجريبي)', 'Also Claude Code (experimental)')}</b> <span class="tiny muted">${A('بتشغّله بنفسك في الترمينال؛ مفيش Stop من الكونسول؛ موافقة Anthropic المكتوبة لسه مستنيينها.', 'You start it yourself in a terminal; no Stop from the console; Anthropic\'s written answer is still pending.')}</span></label>` : ''}
       <div class="row"><button class="btn go sm" type="submit" ${setupBusy ? 'disabled' : ''}>${setupBusy === 'agents' ? A('بيحفظ…', 'Saving…') : A('احفظ للمشروع ده', 'Save for this project')}</button><span class="tiny muted">${A('بيتحفظ في .yallaflow/local (مش بيتعمله commit) وبيتطبّق كل ما الكونسول يفتح. قفل الوكلاء بيتطبّق من التشغيل الجاي للكونسول؛ قفل Claude Code بيتطبّق على طول.', 'Saved in .yallaflow/local (not committed) and applied whenever the console opens. Turning agents off applies from the next console start; turning Claude Code off applies at once.')}</span></div>
@@ -3041,7 +3402,7 @@
     const dev = devPanel(A('أوامر التشغيل', 'Runtime commands'), RUNTIME_CMDS);
     if (!r.services.length) {
       if (!readOnly) return projectPage('run', profileError(r) + runFind(r) + dev);
-      return projectPage('run', profileError(r) + `<section class="panel runempty" id="setup-run"><h2>${A('لسه مفيش خدمات', 'No services yet')}</h2><p class="small muted">${A('تشغيل التطبيق من هنا اختياري. اعرف خدماته واحفظها ووثّقها من «الإعدادات» ← «تعريف الخدمات»، وبعدها شغّل ووقّف من هنا. مفيش حاجة بتشتغل لوحدها، وYallaFlow بيوقف بس اللي هو شغّله.', 'Running the app from here is optional. Find its services, save and trust them under Settings → Service definitions, then start and stop it here. Nothing runs on its own, and YallaFlow stops only what it started.')}</p></section>` + dev);
+      return projectPage('run', profileError(r) + `<section class="panel runempty" id="setup-run"><h2>${A('لسه مفيش خدمات', 'No services yet')}</h2><p class="small muted">${A('تشغيل التطبيق من هنا اختياري. خدماته تُكتشف وتُحفظ وتُوثَّق من هذا التبويب، وبعدها تُشغَّل وتُوقَف من هنا. مفيش حاجة بتشتغل لوحدها، وYallaFlow بيوقف بس اللي هو شغّله.', 'Running the app from here is optional. Its services are found, saved and trusted in this tab, then started and stopped here. Nothing runs on its own, and YallaFlow stops only what it started.')}</p></section>` + dev);
     }
     const rows = `<div class="svcrows">${r.services.map(serviceCard).join('')}</div>`;
     const opens = r.services.filter((sv) => sv.state === 'running' || sv.runningOutside?.length).map((sv) => ({ sv, html: openLinks(sv) })).filter((x) => x.html);
@@ -3051,12 +3412,15 @@
     const p = runtimePlan?.pid === pid ? runtimePlan.data : null;
     const how = `<details class="panel sidecard how" data-sx="how" ${sxOpen('how')}><summary><b>${A('اتجهّز إزاي', 'How this was set up')}</b></summary>
       ${p?.agent ? `<p class="tiny muted">${A(`اقتراح الوكيل: ${when(p.agent.proposedAt)}`, `Agent proposal: ${when(p.agent.proposedAt)}`)}</p>${p.agent.summary ? `<p class="small plansum" dir="auto">${esc(p.agent.summary)}</p>` : ''}` : ''}${p?.scan ? `<p class="tiny muted">${A(`آخر فحص سريع: ${when(p.scan.analyzedAt)}`, `Last quick scan: ${when(p.scan.analyzedAt)}`)}</p>` : ''}${!p?.agent && !p?.scan ? `<p class="tiny muted">${A('مفيش تحليل محفوظ؛ الخدمات اتضافت بنفسك أو من الاقتراحات.', 'No saved analysis; the services were added by hand or from suggestions.')}</p>` : ''}
-      <a class="tiny" href="#/settings/services">${A('عدّل تعريف الخدمات أو حلّل من جديد', 'Change the definitions or analyze again')} ${fwd()}</a></details>`;
-    return projectPage('run', profileError(r) + `<div class="pcols"><div class="pmain">${runApprove(r)}${runSection(r, rows, { opens: false, approving: !readOnly && bulkable(r).length > 0 })}${setupGuide() ? `<p class="tiny muted" style="margin-top:10px"><a href="#/settings">${A('إعداد المشروع لأول مرة لسه مخلصش', 'First-time project setup is not finished')} ${fwd()}</a></p>` : ''}</div><aside class="pside" aria-label="${A('روابط وتفاصيل', 'Links and details')}">${quick}${sharedCard}${how}</aside></div>` + dev);
+      <p class="tiny muted">${A('لتعديل خدمة اضغط «تعديل» على بطاقتها. لاكتشاف خدمات أخرى افتح «اكتشاف خدمات أخرى» أسفل القائمة.', 'To change a service press Edit on its card. To find more services open "Find more services" below the list.')}</p>
+      <a class="tiny" href="#/settings/services">${A('تعريف خدمة يدويًا', 'Define a service manually')} ${fwd()}</a></details>`;
+    // PF-0166: the analysis, the agent's proposal and the suggestions, here and nowhere else.
+    const more = readOnly ? '' : `<details class="panel runmore" data-sx="run-more" ${sxOpen('run-more')}><summary><b>${A('اكتشاف خدمات أخرى', 'Find more services')}</b> <span class="tiny muted">${A('— تحليل المشروع من جديد، اقتراح الوكيل، والاقتراحات', '— analyze the project again, the agent\'s proposal, and suggestions')}</span></summary>${planSection(r)}${suggestionsPanel(r)}</details>`;
+    return projectPage('run', profileError(r) + `<div class="pcols"><div class="pmain">${runApprove(r)}${runSection(r, rows, { opens: false, approving: !readOnly && bulkable(r).length > 0 })}${more}${setupGuide() ? `<p class="tiny muted" style="margin-top:10px"><a href="#/settings">${A('إعداد المشروع لأول مرة لسه مخلصش', 'First-time project setup is not finished')} ${fwd()}</a></p>` : ''}</div><aside class="pside" aria-label="${A('روابط وتفاصيل', 'Links and details')}">${quick}${sharedCard}${how}</aside></div>` + dev);
   }
   // Settings: a section menu; Agents, Team mode, Service definitions and the project folder.
   function viewSettings() {
-    const nav = [['setup-agents', A('الوكلاء', 'Agents')], ['set-services', A('تعديل متقدم للتشغيل', 'Advanced run setup')], ['set-team', A('وضع الفريق', 'Team mode')], ['set-project', A('المشروع', 'Project')]];
+    const nav = [['setup-agents', A('الوكلاء', 'Agents')], ['set-services', A('تعريف الخدمات يدويًا', 'Define services manually')], ['set-team', A('وضع الفريق', 'Team mode')], ['set-project', A('المشروع', 'Project')]];
     const menu = `<nav class="setnav" aria-label="${A('أقسام الإعدادات', 'Settings sections')}">${nav.map(([id, label]) => `<button type="button" class="setnav-item" data-scroll-to="${id}">${label}</button>`).join('')}</nav>`;
     const g = projectGit();
     const team = `<section class="setsec" id="set-team">${!projectOverview || projectOverview.pid !== pid ? `<p class="muted">${A('بيقرا وضع الفريق…', 'Reading team mode…')}</p>` : projectOverview.error ? `<p class="small warn">${esc(projectOverview.error)}</p>` : gitLine(g)}</section>`;
@@ -3064,13 +3428,15 @@
     if (!runtime || runtime.pid !== pid) services = runtimeLoading();
     else if (runtime.error) services = runtimeError();
     else if (!runtime.data.supported) services = stackSection() + runtimeUnsupported();
-    else services = profileError(runtime.data) + planSection(runtime.data) + suggestionsPanel(runtime.data) + addServicePanel() + stackSection();
-    const servicesSec = `<section class="setsec" id="set-services"><div class="setsec-h"><h2>${A('تعديل متقدم للتشغيل', 'Advanced run setup')}</h2><p class="tiny muted">${A('المسار العادي من تبويب «التشغيل»: اقتراح، ثم موافقتك، ثم التشغيل. هنا تعديل تعريف الخدمات يدويًا، والتعديل لا يشغّل شيئًا.', 'The usual path is the Run tab: a proposal, your approval, then start. Here you edit the service definitions by hand; editing runs nothing.')} <a href="#/run">${A('افتح «التشغيل»', 'Open Run')} ${fwd()}</a></p></div>${services}</section>`;
+    // PF-0166: finding services (the analysis, the agent's proposal, suggestions) and editing
+    // them live in the Run tab only; here is the one thing Run does not offer: a service typed by hand.
+    else services = profileError(runtime.data) + addServicePanel() + stackSection();
+    const servicesSec = `<section class="setsec" id="set-services"><div class="setsec-h"><h2>${A('تعريف الخدمات يدويًا', 'Define services manually')}</h2><p class="tiny muted">${A('الإعداد والتشخيص والإصلاح وتعديل أي خدمة موجودة كلها في تبويب «التشغيل». هنا فقط تكتب تعريف خدمة جديدة بنفسك عندما لا يقترحها YallaFlow؛ التعريف لا يشغّل شيئًا.', 'Setup, diagnosis, fixes and editing an existing service are all in the Run tab. Here you only type a new service definition yourself, when YallaFlow does not propose it; defining runs nothing.')} <a href="#/run">${A('افتح «التشغيل»', 'Open Run')} ${fwd()}</a></p></div>${services}</section>`;
     const current = projects.find((x) => x.id === pid);
     const o = projectOverview?.pid === pid ? projectOverview.data : null;
     const projSec = `<section class="setsec" id="set-project"><div class="panel setupsec"><h2 style="font-size:18px">${A('المشروع', 'Project')}</h2>
-      <dl class="svcdef"><dt>${A('الفولدر', 'Folder')}</dt><dd class="ltr mono">${esc(current?.root ?? '')}</dd>${o ? `<dt>${A('النوع', 'Kind')}</dt><dd>${o.project.kind === 'greenfield' ? A('مشروع جديد (greenfield)', 'New project (greenfield)') : A('مشروع قايم (brownfield)', 'Existing project (brownfield)')}</dd>${o.yallaflowVersion ? `<dt>YallaFlow</dt><dd class="ltr">${esc(o.yallaflowVersion)}</dd>` : ''}` : ''}</dl>
-      <div class="row">${readOnly ? '' : `<button type="button" class="btn sm" data-open-folder="${esc(pid)}">${A('افتح الفولدر', 'Open folder')}</button>`}<button type="button" class="btn sm ghost" data-copy="${esc(current?.root ?? '')}" data-copy-what="path">${A('انسخ المسار', 'Copy path')}</button><span class="grow"></span>${readOnly || !current ? '' : `<button type="button" class="btn sm ghost danger" data-remove-project="${esc(pid)}">${A('شيل من الكونسول', 'Remove from the console')}</button>`}</div>
+      <dl class="svcdef"><dt>${A('الفولدر', 'Folder')}</dt><dd class="ltr mono">${esc(current?.root ?? '')}</dd>${o ? `<dt>${A('النوع', 'Kind')}</dt><dd>${o.project.kind === 'greenfield' ? A('مشروع جديد (greenfield)', 'New project (greenfield)') : A('مشروع قايم (brownfield)', 'Existing project (brownfield)')}</dd>${o.yallaflowVersion ? `<dt>YallaFlow</dt><dd class="ltr">${esc(o.yallaflowVersion)}</dd>` : ''}` : ''}${consoleReadOnly || current?.kind === 'lane' ? '' : `<dt>${A('الوضع', 'Mode')}</dt><dd data-project-mode="${projectMode()}">${projectMode() === 'monitor' ? A('متابعة فقط', 'Monitor only') : A('إدارة', 'Managed')}${projectMode() === 'manage' && modeAsk !== 'monitor' ? ` <button type="button" class="btn sm ghost" data-mode-switch="monitor">${A('حوّله إلى متابعة فقط…', 'Switch to Monitor only…')}</button>` : ''}</dd>`}</dl>${modeAsk === 'monitor' && projectMode() === 'manage' ? modeConfirm('monitor') : ''}
+      <div class="row">${readOnly ? '' : `<button type="button" class="btn sm" data-open-folder="${esc(pid)}">${A('افتح الفولدر', 'Open folder')}</button>`}<button type="button" class="btn sm ghost" data-copy="${esc(current?.root ?? '')}" data-copy-what="path">${A('انسخ المسار', 'Copy path')}</button><span class="grow"></span>${consoleReadOnly || !current ? '' : `<button type="button" class="btn sm ghost danger" data-remove-project="${esc(pid)}">${A('شيل من الكونسول', 'Remove from the console')}</button>`}</div>
       <p class="tiny muted">${A('الشيل من الكونسول مابيمسحش ولا ملف.', 'Removing it from the console deletes no files.')}</p></div></section>`;
     return projectPage('settings', `<div class="setlayout">${menu}<div class="setbody">${setupGuide()}${agentsSection()}${servicesSec}${team}${projSec}${devPanel(A('أوامر التشغيل', 'Runtime commands'), RUNTIME_CMDS)}</div></div>`);
   }
@@ -3111,6 +3477,7 @@
       const panel = document.querySelector(`[data-review="${CSS.escape(id)}"]`);
       body = { confirmed: Boolean(panel?.querySelector('[data-trust-input]')?.checked), definitionHash: panel?.dataset.reviewHash ?? '' };
     }
+    if (action === 'start-anyway') { body = { skipSetupCheck: true }; action = 'start'; }
     if (action === 'shared-stop' || action === 'shared-restart') {
       body = { confirmedShared: Boolean(document.querySelector(`[data-shared-input="${CSS.escape(id)}"]`)?.checked) };
       action = action === 'shared-stop' ? 'stop' : 'restart';
@@ -3124,6 +3491,9 @@
       delete sharedAsk[id];
     } catch (e) {
       if (e.code === 'RUNTIME_SHARED' && e.data?.shared) sharedAsk[id] = { action, reasons: e.data.shared.reasons ?? [], scope: e.data.shared.scope ?? [] };
+      // PF-0166: a taken port opens its fix on the card; a missing requirement is already shown there.
+      else if (e.code === 'PORT_IN_USE' && e.data?.port) rtFix[id] = { port: e.data.port, owner: e.data.owner ?? null, ownerService: e.data.ownerService ?? null, declaredBy: e.data.declaredBy ?? null, suggestion: e.data.suggestion ?? null };
+      else if (e.code === 'RUNTIME_PREREQUISITES') runtimeErr[id] = null;
       else runtimeErr[id] = e.message;
       if (action === 'trust') await loadReview(id);
     }
@@ -3151,16 +3521,57 @@
   // server registers the new project in the console; the page then switches to it.
   let wiz = { step: 1, catalog: null, tools: null, form: null, files: [], plan: null, error: null, busy: false, progress: null, acknowledged: false, attach: null, registration: null, ready: null };
   let wizTimer = null;
+  // PF-0163: the wizard's choices survive a page reload or a console restart. The draft is kept
+  // in this browser only: the typed choices, the step, and the id of the plan being created
+  // (never file contents, never a confirmation). A creation is resumed from its saved plan
+  // through the same confirmed request as a first try, so the server skips finished steps.
+  const WIZ_DRAFT = 'wizardDraft';
+  const WIZ_TEXT = { name: 64, description: 4000, requirements: 16000, parent: 4096, stack: 32, environment: 10, customStack: 120, agent: 10 };
+  const WIZ_FLAGS = ['git', 'install', 'allowNested', 'noAgent'];
+  function cleanWizDraft(raw) {
+    if (!raw || typeof raw !== 'object' || !raw.form || typeof raw.form !== 'object') return null;
+    const form = {};
+    for (const [key, max] of Object.entries(WIZ_TEXT)) if (typeof raw.form[key] === 'string' && raw.form[key].length <= max) form[key] = raw.form[key];
+    for (const key of WIZ_FLAGS) if (typeof raw.form[key] === 'boolean') form[key] = raw.form[key];
+    if (!Object.keys(form).length) return null;
+    const planId = typeof raw.planId === 'string' && /^NP-\d{14}-[0-9a-f]{6}$/.test(raw.planId) ? raw.planId : null;
+    return { form, step: raw.step === 'progress' && planId ? 'progress' : [1, 2, 3, 4].includes(raw.step) ? raw.step : 1, planId, acknowledged: raw.acknowledged === true, hadFiles: raw.hadFiles === true };
+  }
+  const wizDraft = () => cleanWizDraft(store.get(WIZ_DRAFT, null));
+  function saveWizDraft() {
+    if (!wiz.form) return;
+    const { files: _files, ...form } = wiz.form;
+    store.set(WIZ_DRAFT, { form, step: wiz.step, planId: wiz.step === 'progress' ? wiz.plan?.id ?? null : null, acknowledged: wiz.acknowledged === true, hadFiles: wiz.files.length > 0, savedAt: new Date().toISOString() });
+  }
+  const dropWizDraft = () => store.set(WIZ_DRAFT, null);
+  async function restoreWizard() {
+    const draft = wizDraft();
+    if (!draft || wiz.form) return;
+    wiz.form = { ...wizForm(), ...draft.form };
+    wiz.acknowledged = draft.acknowledged;
+    wiz.restored = { hadFiles: draft.hadFiles };
+    // A reviewed plan is not kept: the review step builds a fresh one, with a fresh tool check.
+    wiz.step = draft.step === 'progress' ? 3 : Math.min(draft.step, 3);
+    if (draft.step !== 'progress') return;
+    try {
+      const progress = await api(`/api/new/plans/${draft.planId}`);
+      wiz.plan = progress.plan; wiz.progress = progress; wiz.step = 'progress';
+      if (progress.running) { if (!wizTimer) wizTimer = setInterval(pollWizard, 1200); }
+      else if (progress.outcome?.ok && !wiz.ready) await afterCreate(progress.outcome, { upload: false }); // the files are not in this page any more
+    } catch { saveWizDraft(); /* the plan is gone: the choices are kept, the review step makes a new plan */ }
+  }
   async function loadWizard() {
     if (!wiz.catalog) { try { wiz.catalog = await api('/api/new/catalog'); } catch (e) { wiz.error = e.message; } }
+    if (!consoleReadOnly) await restoreWizard();
   }
   async function loadTools() {
     if (wiz.tools) return;
     try { wiz.tools = await api('/api/new/tools'); } catch { wiz.tools = { tools: [] }; }
     if (route().v === 'new') render();
   }
-  const parentGuess = () => { const root = projects.find((p) => p.id === pid)?.root ?? projects[0]?.root ?? ''; return root.replace(/[\\/][^\\/]+[\\/]?$/, '') || root; };
-  const CAT = { fullstack: { ar: 'Full-stack: واجهة وخادم في مشروع واحد', en: 'Full-stack: frontend and server in one project' }, frontend: { ar: 'واجهة بس (Frontend)', en: 'Frontend only' }, backend: { ar: 'خادم بس (Backend / API)', en: 'Backend only (API)' }, blank: { ar: 'فاضي', en: 'Blank' } };
+  // PF-0159: the folder used last time (saved preferences) comes first for a returning user.
+  const parentGuess = () => { if (prefs?.lastFolder) return prefs.lastFolder; const root = projects.find((p) => p.id === pid)?.root ?? projects[0]?.root ?? ''; return root.replace(/[\\/][^\\/]+[\\/]?$/, '') || root; };
+  const CAT = { fullstack: { ar: 'Full-stack: واجهة وخادم في مشروع واحد', en: 'Full-stack: frontend and server in one project' }, frontend: { ar: 'واجهة بس (Frontend)', en: 'Frontend only' }, backend: { ar: 'خادم بس (Backend / API)', en: 'Backend only (API)' }, blank: { ar: 'مع وكيلك', en: 'With your agent' } };
   // PF-0087: the catalog's descriptions in Arabic (the catalog itself stays English for the CLI).
   const STACK_AR = {
     laravel: { fit: 'Full-stack بـ PHP: الراوتنج وقاعدة البيانات (Eloquent) واختيارات تسجيل الدخول والـ queues وصفحات Blade، كله في فريمورك واحد.', tradeoffs: 'محتاج PHP 8.3 أو أحدث وComposer على جهازك (أو Docker بعدين). بيسطّب مكتباته وهو بيتعمل، فالإنشاء بياخد وقت أطول ومحتاج إنترنت.' },
@@ -3176,7 +3587,7 @@
     local: { t: { ar: 'أدوات على جهازك', en: 'Local tools' }, d: { ar: 'هتشغّل المشروع بالأدوات المتسطّبة عندك. بعد الإنشاء، «الإعدادات» بتقترح أوامر من ملفات المشروع وانت بتراجعها.', en: 'Run the project with tools installed on this machine. After creation, Settings suggests commands from the project files for you to review.' }, tools: ['node', 'npm', 'php', 'composer'] },
     later: { t: { ar: 'أقرر بعدين', en: 'Decide later' }, d: { ar: 'مفيش حاجة بتتسجّل للبيئة دلوقتي. تقدر تضبطها في أي وقت.', en: 'Nothing about the environment is recorded now. You can configure it at any time.' }, tools: [] }
   };
-  const wizForm = () => (wiz.form ??= { name: '', description: '', requirements: '', parent: parentGuess(), stack: 'empty', environment: 'later', git: true, install: false, allowNested: false, agent: 'none' });
+  const wizForm = () => (wiz.form ??= { name: '', description: '', requirements: '', parent: parentGuess(), stack: 'empty', environment: 'later', git: true, install: false, allowNested: false, agent: preferredAgentId() ?? 'codex', noAgent: false });
   // PF-0086: the agent for the new project. Personal to this machine, so it is not part of the
   // plan; it is saved for the project right after creation. No session starts on its own.
   const AGENT_CHOICE = {
@@ -3185,8 +3596,18 @@
     claude: { t: { ar: 'Claude Code (تجريبي)', en: 'Claude Code (experimental)' }, d: { ar: 'باشتراكك في Claude. بتشغّله في الترمينال بالأمر اللي هيظهر، وبعدها الشات بيشتغل من الكونسول.', en: 'On your Claude subscription. You start it in a terminal with the command shown; then the chat works from the console.' } }
   };
   const agentChoices = () => ['none', 'codex', ...(agentsClaudeAvailable ? ['claude'] : [])];
+  // PF-0162: a project planned with the agent needs one (a chosen, ready agent), unless the
+  // developer ticks the labeled Advanced option. A fixed template needs no agent.
+  const agentRequired = (f = wizForm()) => !stackOf(f.stack)?.generator;
+  // Ready on this machine right now (the derived machine readiness); null while unknown.
+  const machineAgentReady = (k) => { const view = machineInfo?.data?.readiness?.agents?.[k]; return view ? Boolean(view.ready) : null; };
   function agentReady(k) {
-    if (k === 'none' || !agentInfo) return '';
+    if (k === 'none') return '';
+    const known = machineAgentReady(k);
+    if (known === true) return `<span class="chip done"><i></i>${A('جاهز على الجهاز ده', 'ready on this machine')}</span>`;
+    // Only the chosen agent asks for attention; another agent's state is a quiet note.
+    if (known === false) return wizForm().agent === k ? `<span class="chip wait">${A('غير جاهز — أكمل إعداده بالأسفل', 'not ready — finish its setup below')}</span>` : `<span class="tiny muted">${A('يحتاج إعداداً على هذا الجهاز', 'needs setup on this machine')}</span>`;
+    if (!agentInfo) return '';
     const p = k === 'codex' ? agentInfo.codex : agentInfo.claudeCode;
     if (!p) return '';
     return p.ready ? `<span class="chip done"><i></i>${A('جاهز على الجهاز ده', 'ready on this machine')}</span>` : `<span class="chip wait" data-tip="${esc((p.problems ?? []).join(' · '))}">${A('مش جاهز — هتلاقي الحل في الإعداد', 'not ready — Setup shows how to fix it')}</span>`;
@@ -3201,11 +3622,49 @@
     return `<ol class="stepper">${names.map((n, i) => `<li class="${i + 1 < at ? 'done' : i + 1 === at ? 'now' : ''}" ${i + 1 === at ? 'aria-current="step"' : ''}><span class="sn">${i + 1 < at ? '✓' : i + 1}</span>${n}</li>`).join('')}</ol>`;
   }
   const navRow = (next, { back = true, nextLabel = A('التالي', 'Next') } = {}) => `<div class="row wiznav">${back ? `<button class="btn ghost" type="button" data-wiz-prev>${A('رجوع', 'Back')}</button>` : ''}<span class="grow"></span>${next ? `<button class="btn go" type="submit" ${wiz.busy ? 'disabled' : ''}>${nextLabel}</button>` : ''}</div>`;
+  // PF-0158: a generator is not started while a tool it needs is missing. The server enforces
+  // this; the page explains it, says how to get each tool on this system, and offers Recheck,
+  // an empty project instead, and (only when the generator itself is present) an Advanced override.
+  const OS_NAME = { win32: 'Windows', darwin: 'macOS', linux: 'Linux' };
+  const HINT_AR = {
+    'php-zip': 'نزّل ملف PHP المضغوط (Thread Safe, x64)، فك الضغط، وأضف المجلد إلى PATH.',
+    'composer-setup': 'شغّل Composer-Setup.exe (يحتاج PHP مثبّتاً أولاً)، ثم افتح نافذة أوامر جديدة.',
+    'php-ini-sqlite': 'في ملف php.ini فعّل السطرين extension=pdo_sqlite و extension=sqlite3.',
+    'brew-php-sqlite': 'نسخة PHP من Homebrew تتضمنه؛ أعد تثبيت PHP من Homebrew إن كان ناقصاً.'
+  };
+  const toolsBlocked = (plan) => Boolean(plan?.tools && !plan.tools.ready && !(wiz.overrideTools && plan.tools.overridable));
+  function toolGuide(tool) {
+    const g = tool.guidance;
+    const how = !g ? '' : `${g.command ? `<span class="row" style="gap:6px;flex-wrap:wrap"><code class="ltr mono">${esc(g.command)}</code><button type="button" class="btn ghost sm" data-copy="${esc(g.command)}" data-copy-what="text">${A('نسخ', 'Copy')}</button>${g.commandNote ? `<span class="tiny muted ltr">(${esc(g.commandNote)})</span>` : ''}</span>` : ''}${(g.steps ?? []).map((step) => `<span class="small">${esc(lang === 'ar' && HINT_AR[g.hint] ? HINT_AR[g.hint] : step)}</span>`).join('')}${g.url ? `<a class="small ltr" href="https://${esc(g.url)}" target="_blank" rel="noopener noreferrer">${esc(g.url)}</a>` : ''}`;
+    return `<li data-missing-tool="${esc(tool.name)}"><b class="ltr">${esc(tool.name)}</b> <span class="chip wait">${A('غير موجود', 'not found')}</span>${tool.problem ? `<span class="small" dir="auto">${esc(tool.problem)}</span>` : tool.note ? `<span class="tiny muted ltr">${esc(tool.note)}</span>` : ''}${how ? `<span class="toolhow">${how}</span>` : ''}</li>`;
+  }
+  function toolsBlock(plan) {
+    const t = plan.tools;
+    if (!t || t.ready) return '';
+    const os = OS_NAME[t.platform] ?? t.platform;
+    const gitMissing = t.missing.some((tool) => tool.name === 'git');
+    return `<section class="errbar data toolsblock" role="alert" data-wiz-tools style="margin-top:12px"><b>${A('هذه الخطة تحتاج أدوات غير موجودة على هذا الجهاز', 'This plan needs tools that are not on this machine')}</b>
+      <p class="small">${A(`لن يبدأ الإنشاء قبل توفّرها، ولم يُنشأ أي شيء. ثبّتها بنفسك (YallaFlow لا يثبّت شيئاً)، ثم اضغط «افحص مرة أخرى». الإرشادات لنظام ${os}:`, `Creation does not start until they are available, and nothing was created. Install them yourself (YallaFlow installs nothing), then press Recheck. Guidance for ${os}:`)}</p>
+      <ul class="small toolslist">${t.missing.map(toolGuide).join('')}</ul>
+      <p class="tiny muted">${A('بعد التثبيت أعد تشغيل الكونسول من نافذة أوامر جديدة حتى يرى PATH المحدّث.', 'After installing, restart the console from a new terminal so it sees the updated PATH.')}</p>
+      <div class="row" style="flex-wrap:wrap"><button type="button" class="btn sm" data-wiz-recheck ${wiz.busy ? 'disabled' : ''}>${wiz.busy ? A('جارٍ الفحص…', 'Checking…') : A('افحص مرة أخرى', 'Recheck')}</button>${gitMissing ? `<button type="button" class="btn ghost sm" data-wiz-nogit ${wiz.busy ? 'disabled' : ''}>${A('تابع بدون Git', 'Continue without Git')}</button>` : ''}${plan.body.generator ? `<button type="button" class="btn ghost sm" data-wiz-empty ${wiz.busy ? 'disabled' : ''}>${A('أنشئ مشروعاً فارغاً بدلاً من ذلك', 'Create an empty project instead')}</button>` : ''}</div>
+      ${gitMissing ? `<p class="tiny muted">${A('بدون Git يُنشأ المشروع دون مستودع؛ يمكنك تهيئة Git لاحقاً من صفحة المشروع.', 'Without Git the project is created with no repository; you can initialize Git later from the project page.')}</p>` : ''}${plan.body.generator ? `<p class="tiny muted">${A('المشروع الفارغ لا يحتاج أدوات التقنية: وكيلك يجهّزها في أول مهمة بعد موافقتك.', 'An empty project needs none of the stack\'s tools: your agent sets the stack up in the first work item, after you approve how.')}</p>` : ''}
+      <details class="small" ${wiz.overrideTools ? 'open' : ''}><summary>${A('متقدم', 'Advanced')}</summary>${t.overridable
+        ? `<label class="small optin"><input type="checkbox" name="overrideMissingTools" ${wiz.overrideTools ? 'checked' : ''}> ${A('شغّل المولّد على أي حال. قد يفشل الإنشاء أو يكتمل ناقصاً، وكل الفحوص والتأكيدات الأخرى تبقى كما هي.', 'Run the generator anyway. Creation may fail or finish incomplete; every other check and confirmation still applies.')}</label>`
+        : `<p class="small muted">${A('لا يمكن التجاوز هنا: برنامج لازم لتنفيذ الخطة نفسه غير موجود (المولّد أو Git)، فلا يوجد ما يُشغَّل.', 'No override here: a program the plan itself runs (the generator, or Git) is missing, so there is nothing to run.')}</p>`}</details></section>`;
+  }
+  // PF-0162: the chosen agent is not ready on this machine: its setup, in place (the same card
+  // as Settings → Agents). Nothing is shown for a ready agent, so a returning user sees no setup.
+  function wizAgentSetup(f) {
+    if (f.agent === 'none' || machineAgentReady(f.agent) !== false) return '';
+    return `<div class="wizagentsetup" data-wiz-agent-setup="${esc(f.agent)}"><p class="small"><b>${A(`${f.agent === 'claude' ? 'Claude Code' : 'Codex'} غير جاهز على هذا الجهاز بعد.`, `${f.agent === 'claude' ? 'Claude Code' : 'Codex'} is not ready on this machine yet.`)}</b> ${A('أكمل الخطوات التالية ثم تابع. YallaFlow لا يثبّت شيئاً ولا يسجّل الدخول دون موافقتك.', 'Finish the steps below, then continue. YallaFlow installs nothing and signs in to nothing without your approval.')}</p>${agentSetupCard()}</div>`;
+  }
   function viewNew() {
     const head = `<section class="pagehead"><h1 style="font-size:26px">${A('مشروع جديد', 'New project')}</h1><p class="muted">${A('اوصف اللي هتبنيه، اختار التقنية والبيئة، راجع، وبعدين أنشئ. YallaFlow بيعمل فولدر جديد بس، عمره ما بيكتب فوق حاجة موجودة.', 'Describe what you are building, choose the stack and environment, review, then create. YallaFlow only creates a new folder; it never overwrites anything.')}</p></section>`;
     if (readOnly) return head + `<section class="panel"><p>${A('الكونسول ده للقراءة بس.', 'This console is read-only.')}</p></section>`;
     if (!wiz.catalog) return head + (wiz.error ? `<section class="errbar" role="alert"><p>${esc(wiz.error)}</p></section>` : `<p class="muted">${A('بيحمّل…', 'Loading…')}</p>`);
-    const err = wiz.error ? `<section class="errbar" role="alert" style="margin-bottom:12px"><p class="small" style="white-space:pre-wrap">${esc(wiz.error)}</p></section>` : '';
+    const restoredNote = wiz.restored && typeof wiz.step === 'number' ? `<p class="small muted wizrestored" data-wiz-restored>↺ ${A('استعدنا اختياراتك السابقة.', 'Your previous choices were restored.')}${wiz.restored.hadFiles ? ` ${A('المرفقات لا تُحفظ في المتصفح: اخترها مرة أخرى.', 'Attachments are not kept in the browser: pick them again.')}` : ''} <button type="button" class="linkbtn" data-wiz-reset>${A('ابدأ من جديد', 'Start over')}</button></p>` : '';
+    const err = restoredNote + (wiz.error ? `<section class="errbar" role="alert" style="margin-bottom:12px"><p class="small" style="white-space:pre-wrap">${esc(wiz.error)}</p></section>` : '');
     const f = wizForm();
     if (wiz.step === 1) {
       const files = wiz.files.map((x, i) => `<li><span class="ltr">${esc(x.name)}</span> <span class="tiny muted">${size(x.size)}</span> <button type="button" class="btn ghost sm" data-wiz-unfile="${i}" aria-label="${A('شيل', 'Remove')} ${esc(x.name)}">✕</button></li>`).join('');
@@ -3221,16 +3680,22 @@
         ${navRow(true, { back: false })}</form>`;
     }
     if (wiz.step === 2) {
-      const groups = ['fullstack', 'frontend', 'backend', 'blank'].map((cat) => {
+      // PF-0162: the normal path is a project planned with the agent (it starts empty). The
+      // fixed templates still exist, as a labeled Advanced choice that needs no agent.
+      const group = (cat) => {
         const list = wiz.catalog.catalog.filter((c) => (c.category ?? 'blank') === cat);
         if (!list.length) return '';
         const picked = (id) => (f.customStack ? id === 'custom' : f.stack === id);
         const custom = cat === 'blank' ? `<label class="stackcard ${picked('custom') ? 'on' : ''}"><input type="radio" name="wiz-stack" value="custom" ${picked('custom') ? 'checked' : ''}><b>${A('حاجة تانية', 'Something else')}</b><span class="tiny muted">${A('اكتب الـ stack اللي عايزه', 'name the stack you want')}</span><span class="small">${A('مثلاً Flutter أو Django أو FastAPI. المشروع بيتعمل فاضي، ووكيلك بيجهّز الـ stack في أول شغلانة بعد ما توافق على طريقته.', 'For example Flutter, Django or FastAPI. The project starts empty, and your agent sets the stack up in the first work item after you approve how.')}</span><input class="ltr" name="customStack" maxlength="120" placeholder="Flutter" value="${esc(f.customStack ?? '')}" aria-label="${A('الـ stack اللي عايزه', 'The stack you want')}"><span class="tiny muted">⚖ ${A('مفيش أوامر بتشتغل وقت الإنشاء.', 'No command runs at creation.')}</span></label>` : '';
-        return `<fieldset class="stackgroup"><legend>${L(CAT[cat])}</legend><div class="stackgrid">${list.map((c) => `<label class="stackcard ${picked(c.id) ? 'on' : ''}"><input type="radio" name="wiz-stack" value="${esc(c.id)}" ${picked(c.id) ? 'checked' : ''}><b>${esc(c.label)}</b><span class="tiny muted">${esc(c.stack.join(' · ') || A('من غير كود', 'no code'))}</span>${c.fit ? `<span class="small">${esc(stackText(c, 'fit'))}</span>` : ''}${c.tradeoffs ? `<span class="tiny muted">⚖ ${esc(stackText(c, 'tradeoffs'))}</span>` : ''}<span class="row tiny">${c.network ? `<span class="chip wait">${A('محتاج إنترنت', 'needs network')}</span>` : ''}</span></label>`).join('')}${custom}</div></fieldset>`;
-      }).join('');
+        return `<fieldset class="stackgroup"><legend>${L(CAT[cat])}</legend><div class="stackgrid">${list.map((c) => `<label class="stackcard ${picked(c.id) ? 'on' : ''}"><input type="radio" name="wiz-stack" value="${esc(c.id)}" ${picked(c.id) ? 'checked' : ''}><b>${c.id === 'empty' ? A('خطّطه مع وكيلك', 'Plan it with your agent') : esc(c.label)}</b>${c.id === 'empty' ? `<span class="chip active tiny">${A('الموصى به', 'recommended')}</span>` : ''}<span class="tiny muted">${esc(c.stack.join(' · ') || A('من غير كود', 'no code'))}</span>${c.fit ? `<span class="small">${esc(stackText(c, 'fit'))}</span>` : ''}${c.tradeoffs ? `<span class="tiny muted">⚖ ${esc(stackText(c, 'tradeoffs'))}</span>` : ''}<span class="row tiny">${c.network ? `<span class="chip wait">${A('محتاج إنترنت', 'needs network')}</span>` : ''}</span></label>`).join('')}${custom}</div></fieldset>`;
+      };
+      const templated = Boolean(stackOf(f.stack)?.generator) && !f.customStack;
       return head + stepper() + err + `<form class="panel wizform" data-wiz-step="2" data-keep="wiz-2">
-        <p class="small">${A('اختار التقنية بنفسك. تقدر تغيّرها لحد ما تأكد الإنشاء.', 'Choose the stack yourself. You can change it until you confirm creation.')}</p>${groups}
-        <p class="tiny muted" style="margin-top:8px">ⓘ ${A('مش متأكد؟ اختار «مشروع فاضي»، واختار وكيل في خطوة البيئة، واسأله بعد الإنشاء.', 'Not sure? Choose the empty project, pick an agent in the Environment step, and ask it after creation.')}</p>
+        <p class="small">${A('الطريق المعتاد: يبدأ المشروع فارغاً، ووكيلك يقترح التقنية ويجهّزها في أول مهمة بعد موافقتك. يمكنك تغيير الاختيار حتى تأكيد الإنشاء.', 'The usual way: the project starts empty, and your agent proposes the stack and sets it up in the first work item, after you approve. You can change this until you confirm creation.')}</p>
+        <div data-stack-agent>${group('blank')}</div>
+        <details class="advstacks" data-stack-advanced ${templated ? 'open' : ''}><summary class="small"><b>${A('متقدم: توليد كود مبدئي من قالب ثابت', 'Advanced: generate starter code from a fixed template')}</b> <span class="tiny muted">${A('(بدون وكيل)', '(no agent needed)')}</span></summary>
+          <p class="tiny muted">${A('مولّدات رسمية بإصدارات محددة تعمل على جهازك مباشرة، وتحتاج أدواتها مثبّتة (مثل PHP وComposer أو Node.js). مناسب إن كنت تعرف التقنية التي تريدها.', 'Official generators at pinned versions run directly on this machine and need their tools installed (such as PHP and Composer, or Node.js). For when you already know the stack you want.')}</p>
+          ${['fullstack', 'frontend', 'backend'].map(group).join('')}</details>
         ${navRow(true)}</form>`;
     }
     if (wiz.step === 3) {
@@ -3248,7 +3713,7 @@
         <fieldset><legend>Git</legend><label class="small"><input type="checkbox" name="git" ${f.git ? 'checked' : ''}> ${A('اعمل Git repository محلي', 'Initialize a local Git repository')} ${toolChips(['git'])}</label>
           <p class="tiny muted">${A('بيعمل git init بس: من غير remote ولا commit ولا push. ربطه بـGitHub أو غيره خطوة منفصلة بتعملها انت.', 'Runs git init only: no remote, no commit, no push. Connecting it to GitHub or another remote is a separate step you take yourself.')}</p></fieldset>
         ${st?.install ? `<fieldset><legend>${A('المكتبات', 'Dependencies')}</legend><label class="small"><input type="checkbox" name="install" ${f.install ? 'checked' : ''}> ${A('سطّب المكتبات بعد الإنشاء', 'Install dependencies after creation')} <span class="ltr tiny mono">${esc(st.install.join(' '))}</span></label><p class="tiny muted">${A('بيحتاج إنترنت وبيشغّل سكريبتات الحزم، فهتأكد عليه قبل الإنشاء.', 'Needs the network and runs package scripts, so you will confirm it before creation.')}</p></fieldset>` : ''}
-        <fieldset><legend>${A('الوكيل', 'Agent')}</legend><div class="stackgrid">${agentChoices().map((k) => `<label class="stackcard ${f.agent === k ? 'on' : ''}"><input type="radio" name="wiz-agent" value="${k}" ${f.agent === k ? 'checked' : ''}><b>${L(AGENT_CHOICE[k].t)}</b><span class="small">${L(AGENT_CHOICE[k].d)}</span><span class="row tiny">${agentReady(k)}</span></label>`).join('')}</div><p class="tiny muted">${A('الاختيار بيتحفظ للمشروع ده على الجهاز ده بس. الوكيل بيتربط، ومفيش جلسة بتبدأ لوحدها.', 'The choice is saved for this project on this machine only. The agent is connected; no session starts on its own.')}</p></fieldset>
+        <fieldset><legend>${A('الوكيل', 'Agent')}</legend><div class="stackgrid">${agentChoices().filter((k) => k !== 'none' || !agentRequired(f)).map((k) => `<label class="stackcard ${f.agent === k ? 'on' : ''}"><input type="radio" name="wiz-agent" value="${k}" ${f.agent === k ? 'checked' : ''}><b>${L(AGENT_CHOICE[k].t)}</b><span class="small">${L(AGENT_CHOICE[k].d)}</span><span class="row tiny">${agentReady(k)}${k !== 'none' && preferredAgentId() === k ? `<span class="chip active" data-usual-agent="${k}">${A('وكيلك المعتاد', 'your usual agent')}</span>` : ''}</span></label>`).join('')}</div><p class="tiny muted">${A('الاختيار بيتحفظ للمشروع ده على الجهاز ده بس. الوكيل بيتربط، ومفيش جلسة بتبدأ لوحدها.', 'The choice is saved for this project on this machine only. The agent is connected; no session starts on its own.')}</p>${agentRequired(f) ? `<details class="small" data-agent-advanced ${f.noAgent ? 'open' : ''}><summary>${A('متقدم', 'Advanced')}</summary><label class="small optin"><input type="checkbox" name="noAgent" ${f.noAgent ? 'checked' : ''}> ${A('أكمل بدون وكيل جاهز. يُنشأ المشروع، وتختار الوكيل أو تجهّزه لاحقاً من «الإعدادات»؛ لن يجهّز أحد التقنية حتى ذلك الحين.', 'Continue without a ready agent. The project is created, and you choose or set up the agent later under Settings; nothing sets the stack up until then.')}</label></details>` : ''}${wizAgentSetup(f)}</fieldset>
         <details class="small"><summary>${A('متقدم', 'Advanced')}</summary><label><input type="checkbox" name="allowNested" ${f.allowNested ? 'checked' : ''}> ${A('اسمح بمشروع جوه مستودع موجود', 'Allow a project inside an existing repository')}</label></details>
         ${navRow(true, { nextLabel: wiz.busy ? A('بيجهّز الخطة…', 'Preparing the plan…') : A('راجع', 'Review') })}</form>`;
     }
@@ -3279,12 +3744,12 @@
       ${b.intent?.requirements ? `<dt>${A('المتطلبات', 'Requirements')}</dt><dd><div class="brief clamp3"><p>${esc(b.intent.requirements)}</p></div></dd>` : ''}
       ${b.attachments?.length ? `<dt>${A('المرفقات', 'Attachments')}</dt><dd>${b.attachments.map((a) => `<span class="ltr tag">${esc(a.name)}</span>`).join(' ')}</dd>` : ''}</dl>
       <div class="twocol" style="margin-top:12px"><div><h3 style="font-size:15px">${A('هيتعمل', 'Will be created')}</h3><ul class="small">${will.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div><div><h3 style="font-size:15px">${A('مش هيحصل', 'Will not happen')}</h3><ul class="small">${wont.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div></div>
-      ${prereq && b.prerequisites.some((p) => !p.found) ? `<p class="small" style="margin-top:8px;color:var(--clay)">${A('في أدوات ناقصة، الإنشاء هيفشل غالباً:', 'Some tools are missing; creation will likely fail:')}</p><ul class="small">${prereq}</ul>` : ''}
+      ${wiz.step === 4 ? toolsBlock(plan) : ''}
       <details style="margin-top:12px"><summary class="small">${A('تفاصيل تقنية', 'Technical details')}</summary><ol class="wizsteps">${steps}</ol>${prereq ? `<ul class="small">${prereq}</ul>` : ''}<p class="tiny muted ltr">plan ${esc(plan.id)} · sha256 ${esc(plan.hash)}</p></details></section>`;
     if (wiz.step === 4) {
       return head + stepper() + err + summary + `<form class="panel" data-wiz-create data-keep="wiz-4" style="margin-top:12px">
         ${typedName(b) ? `<label class="small optin"><input type="checkbox" name="acknowledgeScripts" required ${wiz.acknowledged ? 'checked' : ''}> <b>${A('فاهم إن الخطة دي هتنزّل مكتبات وتشغّل سكريبتات على جهازي', 'I understand this plan downloads dependencies and runs scripts on this machine')}</b></label><p class="tiny muted">${esc(scriptTools(b))}</p>` : `<p class="small">${A('لما تدوس «أنشئ المشروع»، YallaFlow بينفّذ الخطة اللي فوق دي بالظبط. لو اتغيّرت، الإنشاء بيترفض.', 'When you press Create the project, YallaFlow carries out exactly the plan above. If it changed, creation is refused.')}</p>`}
-        <div class="row wiznav"><button class="btn ghost" type="button" data-wiz-prev>${A('رجوع', 'Back')}</button><span class="grow"></span><button class="btn go" type="submit" data-wiz-create-btn ${wiz.busy || (typedName(b) && !wiz.acknowledged) ? 'disabled' : ''}>${A('أنشئ المشروع', 'Create the project')}</button></div></form>`;
+        <div class="row wiznav"><button class="btn ghost" type="button" data-wiz-prev>${A('رجوع', 'Back')}</button><span class="grow"></span><button class="btn go" type="submit" data-wiz-create-btn ${wiz.busy || (typedName(b) && !wiz.acknowledged) || toolsBlocked(plan) ? 'disabled' : ''}>${A('أنشئ المشروع', 'Create the project')}</button></div></form>`;
     }
     // Progress and outcome.
     const pr = wiz.progress;
@@ -3319,6 +3784,15 @@
       result = `<section class="panel wizready" data-wiz-done style="margin-top:12px"><h2 style="font-size:20px">${A('المشروع جاهز ✓', 'The project is ready ✓')}</h2><ul class="small">${made.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>${attachLine}
         ${reg?.ok ? (wiz.ready ? `<p class="small">${A('الخطوة الجاية: افتح المشروع، وهتلاقي «ابدأ من هنا» فوق.', 'Next: open the project; «Start here» is at the top.')}</p><div class="row"><button class="btn go" data-wiz-open="${esc(reg.id)}">${A('افتح المشروع وابدأ', 'Open the project and start')}</button></div>${wizTeamStep(reg.id)}` : `<p class="small muted">${A('بيكمّل آخر خطوات…', 'Finishing the last steps…')}</p>`)
           : `<div class="errbar data" role="alert"><b>${A('المشروع اتعمل، بس مااتضافش للكونسول', 'The project exists, but it was not added to the console')}</b><p class="small">${esc(reg?.message ?? '')}</p><button class="btn sm" data-wiz-register>${A('ضيفه للكونسول', 'Add it to the console')}</button><p class="tiny muted">${A('ده بيسجّله بس، عمره ما بيعمل مشروع تاني.', 'This only registers it; it never creates a second project.')}</p></div>`}</section>`;
+    } else if (pr && !pr.running && !outcome) {
+      // PF-0163: this console did not finish the creation (the page or the console was closed).
+      // What is done stays done: continuing sends the same confirmed plan, and the server skips
+      // every finished step. A project that already exists is only added to the console.
+      const created = ['promote', 'init', 'first-work'].every((id) => stepState(id) === 'done');
+      result = created
+        ? `<section class="errbar data" role="status" data-wiz-interrupted="created" style="margin-top:12px"><b>${A('المشروع أُنشئ بالفعل', 'The project was already created')}</b><p class="small">${A('اكتملت خطوات الإنشاء قبل إغلاق الصفحة. بقي إضافته إلى الكونسول فقط.', 'The creation steps finished before the page was closed. Only adding it to the console is left.')}</p>${wiz.registration && !wiz.registration.ok ? `<p class="small" role="alert" style="color:var(--clay)" dir="auto">${esc(wiz.registration.message ?? '')}</p>` : ''}<div class="row">${wiz.registration?.ok ? `<button class="btn sm go" data-wiz-open="${esc(wiz.registration.id)}">${A('افتح المشروع وابدأ', 'Open the project and start')}</button>` : `<button class="btn sm go" data-wiz-register>${A('أضفه إلى الكونسول', 'Add it to the console')}</button>`}<button class="btn sm ghost" data-wiz-reset>${A('ابدأ مشروعاً آخر', 'Start another project')}</button></div></section>`
+        : `<section class="errbar data" role="status" data-wiz-interrupted="unfinished" style="margin-top:12px"><b>${A('الإنشاء لم يكتمل', 'The creation did not finish')}</b><p class="small">${A('أُغلقت الصفحة أو أُعيد تشغيل الكونسول قبل أن ينتهي. لم يُكتب فوق أي شيء، والخطوات المنتهية لن تتكرر.', 'The page was closed or the console restarted before it ended. Nothing was overwritten, and finished steps are not repeated.')}</p><div class="row"><button class="btn sm go" data-wiz-retry ${wiz.busy ? 'disabled' : ''}>${A('أكمل الإنشاء', 'Continue the creation')}</button><button class="btn sm ghost" data-wiz-reset>${A('ابدأ من جديد', 'Start over')}</button></div>
+        <details class="small"><summary>${A('تفاصيل تقنية', 'Technical details')}</summary><p class="tiny muted">${A('«ابدأ من جديد» يترك ما أُنشئ كما هو. لإزالة مجلد التجهيز المؤقت:', 'Start over leaves what was created as it is. To remove the temporary staging folder:')}</p><code class="ltr">yallaflow new discard ${esc(plan.id)}</code></details></section>`;
     } else if (outcome?.error) {
       result = `<section class="errbar" role="alert" data-wiz-failed style="margin-top:12px"><b>${A('الإنشاء وقف — مفيش حاجة اتكتب فوقها', 'Creation stopped — nothing was overwritten')}</b><p class="small" style="white-space:pre-wrap">${esc(outcome.error.message)}</p><div class="row"><button class="btn sm" data-wiz-retry>${A('حاول تاني', 'Retry')}</button><span class="tiny muted">${A('المحاولة بتكمّل من آخر خطوة خلصت، ومابتعملش مشروع تاني.', 'Retrying continues from the last finished step and never creates a second project.')}</span></div>
         <details class="small"><summary>${A('تفاصيل تقنية', 'Technical details')}</summary><code class="ltr">yallaflow new discard ${esc(plan.id)}</code></details></section>`;
@@ -3357,9 +3831,11 @@
       f.git = data.get('git') === 'on';
       f.install = data.get('install') === 'on';
       f.allowNested = data.get('allowNested') === 'on';
+      f.noAgent = data.get('noAgent') === 'on';
       f.agent = String(data.get('wiz-agent') ?? f.agent);
       if (!agentChoices().includes(f.agent)) f.agent = 'none';
     }
+    saveWizDraft();
   }
   async function wizardNext(form) {
     readStep(form);
@@ -3373,17 +3849,29 @@
       }
       if (!f.parent.trim()) { wiz.error = A('اختار الفولدر اللي هيتعمل جواه المشروع.', 'Choose the folder the project will be created in.'); return render(); }
       if (!f.parent.startsWith('/') && !/^[A-Za-z]:[\\/]/.test(f.parent)) { wiz.error = A('اكتب مسار كامل يبدأ بـ / أو ~/ (مثلاً ~/code)، أو اختار الفولدر بزرار «اختار فولدر».', 'Type a full path that starts with / or ~/ (for example ~/code), or use Choose folder.'); return render(); }
-      wiz.step = 2; return render();
+      wiz.step = 2; saveWizDraft(); return render();
     }
     if (wiz.step === 2) {
       if (f.customStack && !f.customStack.trim()) { f.customStack = ' '; wiz.error = A('اكتب الـ stack اللي عايزه، أو اختار واحد من اللي فوق.', 'Name the stack you want, or choose one above.'); return render(); }
-      wiz.step = 3; return render();
+      wiz.step = 3; saveWizDraft(); return render();
     }
     if (wiz.step === 3) {
-      wiz.busy = true; wiz.plan = null; render();
+      // PF-0162: an agent-planned project needs its agent chosen and ready before creation.
+      if (agentRequired(f) && !f.noAgent) {
+        if (f.agent === 'none') { wiz.error = A('اختر وكيل المشروع. لإنشائه بدون وكيل افتح «متقدم».', 'Choose the agent for this project. To create it without one, open Advanced.'); return render(); }
+        if (machineAgentReady(f.agent) === false) { wiz.error = A(`${f.agent === 'claude' ? 'Claude Code' : 'Codex'} غير جاهز على هذا الجهاز بعد. أكمل إعداده بالأسفل، أو افتح «متقدم» للمتابعة بدونه.`, `${f.agent === 'claude' ? 'Claude Code' : 'Codex'} is not ready on this machine yet. Finish its setup below, or open Advanced to continue without it.`); return render(); }
+      }
+      return wizardPlanNow();
+    }
+  }
+  // Builds the plan from the current choices (also Recheck: the plan carries a fresh tool check).
+  async function wizardPlanNow() {
+    const f = wizForm();
+    {
+      wiz.busy = true; wiz.plan = null; wiz.overrideTools = false; render();
       try {
         wiz.plan = await post('/api/new/plan', JSON.stringify({ name: f.name, parent: f.parent, stack: f.stack, install: f.install, allowNested: f.allowNested, description: f.description.trim() || null, requirements: f.requirements.trim() || null, environment: f.environment, git: f.git, ...(f.customStack?.trim() ? { customStack: f.customStack.trim() } : {}), files: wiz.files.map(({ name, size: s, sha256 }) => ({ name, size: s, sha256 })) }), { 'Content-Type': 'application/json' });
-        wiz.step = 4;
+        wiz.step = 4; saveWizDraft();
       } catch (e) {
         wiz.error = e.message;
         if (e.code === 'NEW_PROJECT_NESTED' || e.code === 'NEW_PROJECT_EXISTS' || e.code === 'NEW_PROJECT_PARENT') wiz.step = e.code === 'NEW_PROJECT_NESTED' ? 3 : 1;
@@ -3423,11 +3911,15 @@
     if (form) wiz.acknowledged = Boolean(form.querySelector('[name="acknowledgeScripts"]')?.checked);
     wiz.busy = true; wiz.error = null; render();
     try {
-      await post('/api/new/create', JSON.stringify({ planId: wiz.plan.id, confirm: wiz.plan.hash, ...(typedName(wiz.plan.body) ? { acknowledgeScripts: wiz.acknowledged === true } : {}) }), { 'Content-Type': 'application/json' });
+      await post('/api/new/create', JSON.stringify({ planId: wiz.plan.id, confirm: wiz.plan.hash, ...(typedName(wiz.plan.body) ? { acknowledgeScripts: wiz.acknowledged === true } : {}), ...(wiz.overrideTools && wiz.plan.tools && !wiz.plan.tools.ready ? { overrideMissingTools: true } : {}) }), { 'Content-Type': 'application/json' });
       wiz.step = 'progress'; wiz.progress = null; wiz.attach = null; wiz.registration = null;
+      saveWizDraft(); // PF-0163: a reload finds this creation again
       if (!wizTimer) wizTimer = setInterval(pollWizard, 1200);
       await pollWizard();
-    } catch (e) { wiz.error = e.message; }
+    } catch (e) {
+      // PF-0158: the server found tools missing now: show its fresh check on the review step.
+      if (e.code === 'NEW_PROJECT_PREREQUISITES' && e.data?.tools) { wiz.plan.tools = e.data.tools; wiz.step = 4; wiz.overrideTools = false; } else wiz.error = e.message;
+    }
     wiz.busy = false; render();
   }
   async function uploadPlanned() {
@@ -3451,8 +3943,8 @@
     agentsCanEnable = Boolean(listed.agents?.canEnable);
     agentsClaudeAvailable = Boolean(listed.agents?.claudeAvailable);
   }
-  async function afterCreate(outcome) {
-    await uploadPlanned();
+  async function afterCreate(outcome, { upload = true } = {}) {
+    if (upload) await uploadPlanned();
     try { await reloadProjects(); } catch { /* shown on the next load */ }
     const reg = outcome.registration;
     // PF-0086: save and apply the agent chosen in the wizard; the Setup agents step is then done.
@@ -3463,6 +3955,7 @@
         await post(`/api/p/${reg.id}/agents/settings`, JSON.stringify({ agents: true, claude: agent === 'claude' }), { 'Content-Type': 'application/json' });
         await post(`/api/p/${reg.id}/setup/step`, JSON.stringify({ step: 'agents' }), { 'Content-Type': 'application/json' });
         agentsOn = true; agentSaved = true;
+        savePrefs({ preferredAgent: agent });
         await loadAgentInfo();
       } catch (e) { toast(esc(A(`المشروع اتعمل، بس اختيار الوكيل مااتحفظش: ${e.message}. اختاره من «الإعدادات».`, `The project was created, but the agent choice was not saved: ${e.message}. Choose it under Project → Settings.`))); }
     }
@@ -3472,7 +3965,7 @@
     if (reg?.ok) { try { git = (await api(`/api/p/${reg.id}/overview`)).git ?? null; } catch { git = null; } }
     if (reg?.ok) wiz.ready = { id: reg.id, workId: outcome.workId ?? null, agentSaved, git };
   }
-  function resetWizard() { wiz = { ...wiz, step: 1, form: null, files: [], plan: null, error: null, busy: false, progress: null, acknowledged: false, attach: null, registration: null, ready: null }; }
+  function resetWizard() { wiz = { ...wiz, step: 1, form: null, files: [], plan: null, error: null, busy: false, progress: null, acknowledged: false, attach: null, registration: null, ready: null, restored: null, overrideTools: false }; dropWizDraft(); if (wizTimer) { clearInterval(wizTimer); wizTimer = null; } }
   async function wizardRegister() {
     try {
       const reg = await post('/api/projects', JSON.stringify({ planId: wiz.plan.id }), { 'Content-Type': 'application/json' });
@@ -3520,14 +4013,14 @@
     return known[e?.code] ?? e?.message ?? String(e);
   }
   const recentFolders = () => { const list = store.get(RECENT_KEY, []); return Array.isArray(list) ? list.filter((x) => typeof x === 'string').slice(0, 6) : []; };
-  const rememberFolder = (dir) => { if (dir) store.set(RECENT_KEY, [dir, ...recentFolders().filter((x) => x !== dir)].slice(0, 6)); };
+  const rememberFolder = (dir) => { if (!dir) return; store.set(RECENT_KEY, [dir, ...recentFolders().filter((x) => x !== dir)].slice(0, 6)); savePrefs({ lastFolder: dir }); };
   async function openFolder(mode, at) {
     const fresh = !folder || folder.mode !== mode;
     folder = { mode, data: fresh ? null : folder.data, error: null, busy: true, preview: null, previewError: null, previewBusy: false, ack: false, creating: false, sel: null, editPath: false, gitInit: false };
     let d = document.getElementById('folderdlg');
     if (!d) {
       d = document.createElement('dialog'); d.id = 'folderdlg'; d.className = 'panel folderdlg';
-      d.addEventListener('close', () => { folder = null; });
+      d.addEventListener('close', () => { folder = null; folderIntent = null; });
       d.addEventListener('input', onFolderInput);
       d.addEventListener('keydown', onFolderKey);
       // PF-0139: like a file dialog — one click selects a folder, a double click opens it.
@@ -3601,9 +4094,16 @@
       return `<div class="fpick-foot" data-folder-foot><div class="grow tw:min-w-0"><div class="tiny muted">${A('المشروع الجديد هيتعمل في فولدر جديد جوه:', 'The new project gets a new folder inside:')}</div><div class="ltr fpick-path" title="${esc(t?.path ?? '')}">${esc(tildePath(t?.path))}${name ? `${esc(folderSep())}<b>${esc(name)}</b>` : ''}</div>${here?.yallaflow ? `<div class="tiny tw:text-amber">${A('ده مشروع YallaFlow — غالباً عايز تختار فولدر برّاه.', 'This is a YallaFlow project — you probably want a folder outside it.')}</div>` : ''}</div>${action}</div>`;
     }
     if (!t || atHome) return `<div class="fpick-foot" data-folder-foot><span class="fpick-ico tw:text-muted">${FOLDER_SVG}</span><div class="grow tw:min-w-0 small">${A('اضغط على فولدر المشروع علشان تختاره.', 'Click the project folder to select it.')}</div><button type="button" class="btn go" disabled>${A('اختار فولدر المشروع', 'Choose the project folder')}</button></div>`;
-    if (here?.yallaflow) action = `<button type="button" class="btn go" data-folder-choose>${A('افتح المشروع', 'Open this project')}</button>`;
-    else action = `<button type="button" class="btn go" data-folder-preview>${here?.empty ? A('ابدأ مشروع جديد هنا', 'Start a new project here') : A('جهّز YallaFlow هنا', 'Set up YallaFlow here')}</button>`;
-    return `<div class="fpick-foot" data-folder-foot><span class="fpick-ico ${k.tone}">${k.icon}</span><div class="grow tw:min-w-0"><div class="tiny muted">${what}${k.label ? ` · ${esc(k.label)}` : ''}</div><div class="ltr fpick-path" title="${esc(t.path)}">${esc(tildePath(t.path))}</div></div>${action}</div>`;
+    // PF-0161: an existing YallaFlow project can be opened to manage, or for monitoring only.
+    // A folder without YallaFlow records has nothing to monitor yet, and the page says so.
+    let note = '';
+    const watching = typeof folderIntent !== 'undefined' && folderIntent === 'monitor'; // PF-0162: opened from «Monitor a project»
+    if (here?.yallaflow) action = `<button type="button" class="btn ${watching ? 'go' : 'ghost'}" data-folder-monitor title="${A('عرض سجلات المشروع فقط: بدون وكيل وبدون أي تغيير', 'Shows the project\'s records only: no agent, no changes')}">👁 ${A('متابعة فقط', 'Monitor only')}</button><button type="button" class="btn ${watching ? 'ghost' : 'go'}" data-folder-choose>${A('افتح المشروع', 'Open this project')}</button>`;
+    else {
+      action = `<button type="button" class="btn go" data-folder-preview>${here?.empty ? A('ابدأ مشروع جديد هنا', 'Start a new project here') : A('جهّز YallaFlow هنا', 'Set up YallaFlow here')}</button>`;
+      if (!here?.empty) note = `<p class="tiny muted fpick-note" data-monitor-note>${A('المتابعة فقط تعرض سجلات YallaFlow، وهذا الفولدر ليس فيه سجلات بعد، فلا يوجد ما يُتابَع. تجهيزه يضيف ملفات تراجعها أولاً، ويجعله مشروعاً تديره مع وكيل.', 'Monitor only shows YallaFlow records, and this folder has none yet, so there is nothing to monitor. Setting it up adds files you review first, and makes it a project you manage with an agent.')}</p>`;
+    }
+    return `<div class="fpick-foot" data-folder-foot><span class="fpick-ico ${k.tone}">${k.icon}</span><div class="grow tw:min-w-0"><div class="tiny muted">${what}${k.label ? ` · ${esc(k.label)}` : ''}</div><div class="ltr fpick-path" title="${esc(t.path)}">${esc(tildePath(t.path))}</div>${note}</div>${action}</div>`;
   }
   function previewPanel() {
     const p = folder.preview;
@@ -3725,7 +4225,7 @@
       document.querySelector('#folderdlg [data-folder-choose]')?.focus();
     } catch (e) { folder.error = why(e); renderFolder(); document.querySelector('#folderdlg [data-folder-newform] input')?.focus(); }
   }
-  async function chooseFolder() {
+  async function chooseFolder(mode = null) {
     const x = folderTarget();
     if (!x) return;
     if (folder.mode === 'parent') {
@@ -3738,14 +4238,15 @@
     }
     folder.busy = true; renderFolder();
     try {
-      const reg = await post('/api/projects', JSON.stringify({ root: x.path }), { 'Content-Type': 'application/json' });
+      const reg = await post('/api/projects', JSON.stringify({ root: x.path, ...(mode === 'monitor' ? { mode } : {}) }), { 'Content-Type': 'application/json' });
       rememberFolder(parentPath(x.path));
       document.getElementById('folderdlg')?.close();
       folder = null;
       await reloadProjects();
       // PF-0069: a project without a finished setup opens on its first-time setup.
+      // PF-0161: a monitored project has no setup: it opens on its work.
       let firstTime = false;
-      try { firstTime = Boolean((await api(`/api/p/${reg.id}/setup`)).pending); } catch { firstTime = false; }
+      if (reg.mode !== 'monitor') { try { firstTime = Boolean((await api(`/api/p/${reg.id}/setup`)).pending); } catch { firstTime = false; } }
       await switchProject(reg.id, firstTime ? 'settings' : 'overview');
     } catch (e) { folder.busy = false; folder.error = e.message; renderFolder(); }
   }
@@ -3784,7 +4285,7 @@
   // The work item page while agents are off: say so plainly, and how to turn them on.
   function agentOffPanel(it) {
     const explain = `<p class="tiny muted">${A('«فعّل الشغلانة» بيخليها الشغلانة النشطة في YallaFlow. «ابدأ جلسة» بيفتح Codex عليها. ولا واحدة فيهم بتحصل لوحدها.', 'Activating makes this the active work item in YallaFlow. Starting a session opens Codex on it. Neither happens on its own.')}</p>`;
-    if (readOnly) return `<section class="panel agent" id="agent"><h2>${A('الوكيل', 'Agent')}</h2><p class="small">${A('الكونسول ده للقراءة بس، فمساحة الوكيل مقفولة.', 'This console is read-only, so the Agent Workspace is off.')}</p></section>`;
+    if (readOnly) return `<section class="panel agent" id="agent"><h2>${A('الوكيل', 'Agent')}</h2><p class="small">${monitorProject() ? A('هذا المشروع للمتابعة فقط، فلا يعمل معه وكيل من الكونسول. حوّله إلى إدارة لتستخدم وكيلاً.', 'This project is monitor only, so no agent works on it from the console. Switch it to Manage to use an agent.') : A('الكونسول ده للقراءة بس، فمساحة الوكيل مقفولة.', 'This console is read-only, so the Agent Workspace is off.')}</p></section>`;
     const codex = agentInfo?.codex;
     const status = codex && !codex.ready ? `<p class="small">${A('Codex مش جاهز على الجهاز ده:', 'Codex is not ready on this machine:')}</p><ul class="aprob">${codex.problems.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>` : '';
     return `<section class="panel agent" id="agent"><div class="ahead"><h2>${A('الوكيل', 'Agent')}</h2><span class="grow"></span><span class="chip todo">${A('مقفول', 'off')}</span></div>
@@ -3871,6 +4372,46 @@
     if (!parts.length) parts.push(`<span class="chip done"><i></i>${A('مفيش حاجة محتاجة مراجعة', 'nothing needs care')}</span>`);
     return `<div class="memh row tiny">${label} <span>${A(`${m.current} معلومة`, `${m.current} facts`)}</span>${parts.join('')}</div>`;
   }
+  // PF-0162: the first screen asks what the developer wants to do. Create and Manage work with
+  // an AI agent, so the state of the agents on this machine is shown with them, and its setup
+  // opens in place. Monitor needs no agent. The intent is saved with the preferences.
+  let welcomeSetup = false;
+  let folderIntent = null; // 'manage' | 'monitor': what the folder chooser was opened for
+  function welcomeAgentLine() {
+    if (!machineInfo) return `<p class="small muted" data-welcome-agent="checking">${A('جارٍ فحص الوكلاء على هذا الجهاز…', 'Checking the agents on this machine…')}</p>`;
+    const r = machineInfo.data?.readiness;
+    if (!r) return '';
+    const names = { codex: 'Codex', claude: 'Claude Code' };
+    if (r.level === 'ready') {
+      const usual = r.preferredAgent?.ready ? r.preferredAgent.id : r.readyAgents[0];
+      return `<p class="small" data-welcome-agent="ready"><span class="chip done"><i></i>${A('الوكيل جاهز', 'Agent ready')}</span> ${A(`${names[usual]} جاهز على هذا الجهاز، فالإنشاء والإدارة يعملان مباشرة.`, `${names[usual]} is ready on this machine, so Create and Manage work right away.`)}</p>`;
+    }
+    return `<div data-welcome-agent="needs-setup"><p class="small"><span class="chip wait">${A('الوكيل يحتاج إعداداً', 'Agent needs setup')}</span> ${A('الإنشاء والإدارة يعملان مع وكيل ذكاء اصطناعي باشتراكك أنت (بدون مفاتيح API). جهّزه مرة واحدة على هذا الجهاز؛ المتابعة فقط لا تحتاجه.', 'Create and Manage work with an AI agent on your own subscription (never API keys). Set it up once on this machine; Monitor only does not need it.')} ${welcomeSetup ? '' : `<button type="button" class="btn sm" data-welcome-setup>${A('جهّز الوكيل', 'Set up the agent')}</button>`}</p>${welcomeSetup ? agentSetupCard() : ''}</div>`;
+  }
+  // PF-0163: an unfinished new project (this browser's draft) is one click away.
+  function unfinishedCreation() {
+    if (readOnly) return '';
+    const draft = wizDraft();
+    if (!draft?.form?.name) return '';
+    return `<section class="wsbanner note" data-unfinished-new><div class="row" style="flex-wrap:wrap"><span class="grow small">${draft.step === 'progress' ? A(`إنشاء المشروع «${esc(draft.form.name)}» لم يُستكمل في هذه الصفحة.`, `Creating the project “${esc(draft.form.name)}” was not finished in this page.`) : A(`لديك مشروع جديد لم يكتمل إعداده: «${esc(draft.form.name)}».`, `You have a new project you did not finish setting up: “${esc(draft.form.name)}”.`)}</span><a class="btn sm" href="#/new">${A('أكمل من حيث توقفت', 'Continue where you left off')}</a></div></section>`;
+  }
+  function welcomePanel() {
+    if (readOnly) return `<section class="panel"><h2 style="font-size:20px">${A('أهلاً في YallaFlow', 'Welcome to YallaFlow')}</h2><p class="small">${A('لسه مفيش مشاريع في الكونسول. ابدأ مشروع جديد، أو ضيف مشروع YallaFlow موجود.', 'There are no projects in the console yet. Start a new project, or add an existing YallaFlow project.')}</p></section>`;
+    const card = (intent, icon, title, text, button, needs) => `<article class="intentcard" data-intent="${intent}"><span class="intent-ico" aria-hidden="true">${icon}</span><h3>${title}</h3><p class="small grow">${text}</p><p class="tiny muted">${needs}</p><button type="button" class="btn ${intent === 'create' ? 'go' : ''}" data-intent-go="${intent}">${button}</button></article>`;
+    const withAgent = A('يعمل مع وكيل ذكاء اصطناعي', 'Works with an AI agent');
+    return `<section class="panel welcome" data-welcome><h2 style="font-size:20px">${A('أهلاً في YallaFlow', 'Welcome to YallaFlow')}</h2><p class="small">${A('ماذا تريد أن تفعل؟ يمكنك تغيير ذلك لاحقاً لأي مشروع.', 'What do you want to do? You can change this later for any project.')}</p>
+      <div class="intentgrid">
+        ${card('create', '✦', A('أنشئ مشروعاً جديداً', 'Create a new project'), A('صف فكرتك والنتيجة التي تريدها. وكيلك يساعدك في اختيار التقنية ووضع الخطة، وYallaFlow يتابع التنفيذ والأدلة.', 'Describe your idea and the outcome you want. Your agent helps choose the stack and plan the work; YallaFlow keeps track of the work and its evidence.'), A('ابدأ مشروعاً جديداً', 'Start a new project'), withAgent)}
+        ${card('manage', '⚙', A('أدِر مشروعاً موجوداً', 'Manage an existing project'), A('YallaFlow يفهم المشروع أولاً مع وكيلك، ويعرض عليك ما سيضيفه قبل أي تغيير. ملفاتك وتاريخ Git يبقيان كما هما.', 'YallaFlow first understands the project with your agent, and shows you what it would add before changing anything. Your files and Git history stay as they are.'), A('اختر فولدر المشروع', 'Choose the project folder'), withAgent)}
+        ${card('monitor', '👁', A('تابِع مشروعاً فقط', 'Monitor a project'), A('شاهد مهام مشروع YallaFlow موجود وتقدّمه مباشرة. لا شيء يتغيّر في المشروع من هنا.', 'Watch the work and progress of an existing YallaFlow project, live. Nothing in the project changes from here.'), A('اختر مشروعاً للمتابعة', 'Choose a project to monitor'), A('بدون وكيل · للمشاريع التي فيها سجلات YallaFlow', 'No agent needed · for projects that already have YallaFlow records'))}
+      </div>${welcomeAgentLine()}</section>`;
+  }
+  function chooseIntent(intent) {
+    savePrefs({ onboarding: { intent, completed: true } });
+    if (intent === 'create') { location.hash = '#/new'; return; }
+    folderIntent = intent;
+    openFolder('existing');
+  }
   function viewProjects() {
     if (!overview) return `<p class="muted" style="margin-top:30px">${A('بيحمّل المشاريع…', 'Loading projects…')}</p>`;
     const cards = overview.map(({ project, snap: s, error: e, health }) => {
@@ -3883,7 +4424,7 @@
       const tail = String(project.root ?? '').split(/[\\/]/).filter(Boolean).slice(-2).join('/');
       return `<article class="pcard panel ${project.id === pid ? 'here' : ''}">
         <header class="pcard-head"><div class="grow pcard-id"><a class="pcard-title" href="#/map" data-open-project="${project.id}"><h2>${esc(project.name)}</h2></a><span class="ltr tiny muted pcard-path" title="${esc(project.root ?? '')}">…/${esc(tail)}</span></div>${badge}</header>
-        <div class="row tiny pcard-chips">${s.counts.you ? `<span class="chip you"><i></i>${s.counts.you} ${L(STATE.you)}</span>` : ''}${s.counts.fail ? `<span class="chip fail"><i></i>${s.counts.fail} ${L(STATE.fail)}</span>` : ''}<span class="chip todo">${s.counts.active + s.counts.paused + s.counts.new} ${A('مفتوح', 'open')}</span><span class="chip done"><i></i>${s.counts.done} ${L(STATE.done)}</span>${s.invalid?.length ? `<span class="chip wait">⚠ ${s.invalid.length} ${A('سجلات مش سليمة', 'invalid records')}</span>` : ''}</div>
+        <div class="row tiny pcard-chips">${projectMode(project.id) === 'monitor' ? `<span class="chip wait" data-mode-chip="monitor">👁 ${A('متابعة فقط', 'Monitor only')}</span>` : ''}${s.counts.you ? `<span class="chip you"><i></i>${s.counts.you} ${L(STATE.you)}</span>` : ''}${s.counts.fail ? `<span class="chip fail"><i></i>${s.counts.fail} ${L(STATE.fail)}</span>` : ''}<span class="chip todo">${s.counts.active + s.counts.paused + s.counts.new} ${A('مفتوح', 'open')}</span><span class="chip done"><i></i>${s.counts.done} ${L(STATE.done)}</span>${s.invalid?.length ? `<span class="chip wait">⚠ ${s.invalid.length} ${A('سجلات مش سليمة', 'invalid records')}</span>` : ''}</div>
         ${!s.items.length ? `<p class="small muted">${A('لسه مفيش شغل مسجّل.', 'No work recorded yet.')}</p>` : !openN ? `<p class="small muted">${A('كل الشغل المسجّل خلص.', 'All recorded work is done.')}</p>` : ''}
         ${memoryHealth(health)}
         <div class="pflow">${dist.map((n, i) => `<span style="--hue:${ST[i].hue}" data-tip="${esc(L(ST[i].name))}: ${n}"><i style="height:${6 + n * 10}px"></i><b>${n}</b></span>`).join('')}</div>
@@ -3892,8 +4433,9 @@
         <footer class="pcard-foot"><button type="button" class="btn sm go" data-open-project="${project.id}">${A('افتح', 'Open')}</button>${readOnly ? '' : `<button type="button" class="btn sm" data-open-folder="${project.id}" title="${esc(A('افتح فولدر المشروع في مدير الملفات', 'Open the project folder in your file manager'))}">${A('افتح الفولدر', 'Open folder')}</button>`}<button type="button" class="btn sm ghost" data-copy="${esc(project.root ?? '')}" data-copy-what="path">${A('انسخ المسار', 'Copy path')}</button><span class="grow"></span>${readOnly ? '' : `<button type="button" class="btn sm ghost danger" data-remove-project="${project.id}" aria-label="${esc(A(`شيل ${project.name} من الكونسول`, `Remove ${project.name} from the console`))}">${A('شيل', 'Remove')}</button>`}</footer></article>`;
     }).join('');
     return `<section class="pagehead"><div class="row"><h1 style="font-size:26px">${A('المشاريع', 'Projects')}</h1>${readOnly ? '' : `<button class="btn sm" data-folder-open="existing" style="margin-inline-start:auto">${A('ضيف مشروع موجود', 'Add an existing project')}</button><a class="btn sm go" href="#/new">＋ ${A('مشروع جديد', 'New project')}</a>`}</div><p class="muted">${agentsOn ? A('كل مشاريعك ووكلاءها في مكان واحد. كل مشروع ليه مجلد .yallaflow خاص بيه، والكونسول بيقرا كل واحد لوحده.', 'All your projects and their agents in one place. Each project has its own .yallaflow; the console reads each one separately.') : A('كل مشروع ليه مجلد .yallaflow خاص بيه، والكونسول بيقرا كل واحد لوحده.', 'Each project has its own .yallaflow; the console reads each one separately.')}</p></section>
+      ${unfinishedCreation()}
       ${overview.length ? inboxSection() : ''}
-      ${overview.length ? `<section class="projects">${cards}</section>` : `<section class="panel"><h2 style="font-size:20px">${A('أهلاً في YallaFlow', 'Welcome to YallaFlow')}</h2><p class="small">${A('لسه مفيش مشاريع في الكونسول. ابدأ مشروع جديد، أو ضيف مشروع YallaFlow موجود.', 'There are no projects in the console yet. Start a new project, or add an existing YallaFlow project.')}</p>${readOnly ? '' : `<div class="row" style="margin-top:8px"><a class="btn go" href="#/new">＋ ${A('مشروع جديد', 'New project')}</a><button class="btn" data-folder-open="existing">${A('ضيف مشروع موجود', 'Add an existing project')}</button></div>`}</section>`}
+      ${overview.length ? `<section class="projects">${cards}</section>` : welcomePanel()}
       ${unavailable.length ? `<p class="small" style="margin-top:14px">${A('مش متاحة (الفولدر اتنقل أو اتمسح):', 'Unavailable (folder moved or deleted):')} ${unavailable.map((u) => `<span class="ltr tag">${esc(u)}${readOnly ? '' : ` <button type="button" class="tagx" data-remove-project-root="${esc(u)}" aria-label="${esc(A(`شيل ${u} من الكونسول`, `Remove ${u} from the console`))}">✕</button>`}</span>`).join(' ')}</p>` : ''}
       ${devPanel(A('إدارة قائمة المشاريع', 'Manage the project list'), ['yallaflow console add <folder>', 'yallaflow console remove <folder>', 'yallaflow console list'])}`;
   }
@@ -4349,6 +4891,7 @@
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
     if (theme) document.documentElement.dataset.theme = theme; else delete document.documentElement.dataset.theme;
     const r = route();
+    readOnly = viewReadOnly(r.v); // PF-0161: a monitored project reads as read-only, project by project
     if (r.v === 'map' || r.v === 'lines') store.set('wsView', r.v);
     const hadQ = document.activeElement?.matches?.('[data-q]');
     const hadAgent = document.activeElement?.matches?.('[data-agent-input]');
@@ -4364,7 +4907,7 @@
     const entering = !reduced && r.v !== lastView;
     // PF-0155: the first paint with data is an entrance too; the loading placeholder is not a view.
     lastView = snap ? r.v : null;
-    const html = topbar(r) + `<main>${banner()}${snap && ['map', 'lines'].includes(r.v) ? agentStrip() + queueStrip() + limitNotices() + branchBanner() + (readiness?.pid === pid ? readinessCard() : understandingStrip()) + firstTasksPanel() : ''}${body}</main>` + (chatCtx(r) ? agentDock(chatCtx(r)) : '');
+    const html = topbar(r) + `<main>${banner()}${snap && !['projects', 'new'].includes(r.v) ? monitorBanner() : ''}${snap && ['map', 'lines'].includes(r.v) ? agentStrip() + queueStrip() + limitNotices() + branchBanner() + (readiness?.pid === pid ? readinessCard() : understandingStrip()) + firstTasksPanel() : ''}${body}</main>` + (chatCtx(r) ? agentDock(chatCtx(r)) : '');
     const appEl = document.getElementById('app');
     // Nothing changed: keep the live DOM (focus, selection, open menus, hover, a click in progress).
     noteMutations(domWatch.takeRecords());
@@ -4610,7 +5153,7 @@
       try { sessionStorage.setItem('yfc.token', token); } catch { /* unavailable */ }
       history.replaceState(null, '', location.pathname + '#/map');
       projects = []; snap = null; detail = null; error = null;
-      render(); await load(); await buildDigest(); render(); listen();
+      render(); await loadPrefs(); await load(); await buildDigest(); render(); listen();
       return;
     }
     normalizeRoute();
@@ -4637,6 +5180,10 @@
   document.addEventListener('click', (e) => {
     if (e.target.closest('[data-wiz-prev]')) { const form = e.target.closest('form'); if (form?.dataset.wizStep) readStep(form); if (wiz.step === 4) wiz.plan = null; wiz.step = Math.max(1, (typeof wiz.step === 'number' ? wiz.step : 4) - 1); wiz.error = null; render(); return; }
     if (e.target.closest('[data-wiz-retry]')) { wizardCreate(null); return; }
+    if (e.target.closest('[data-wiz-reset]')) { resetWizard(); render(); return; }
+    if (e.target.closest('[data-wiz-recheck]')) { wiz.step = 3; wiz.error = null; wizardPlanNow(); return; }
+    if (e.target.closest('[data-wiz-nogit]')) { wizForm().git = false; wiz.step = 3; wiz.error = null; wizardPlanNow(); return; }
+    if (e.target.closest('[data-wiz-empty]')) { const f = wizForm(); f.customStack = stackOf(f.stack)?.label ?? f.stack; f.stack = 'empty'; f.install = false; wiz.step = 3; wiz.error = null; wizardPlanNow(); return; }
     if (e.target.closest('[data-wiz-register]')) { wizardRegister(); return; }
     if (e.target.closest('[data-wiz-reattach]')) { uploadPlanned().then(render); return; }
     const unfile = e.target.closest('[data-wiz-unfile]');
@@ -4649,7 +5196,15 @@
     if (fep && folder) { folder.editPath = fep.dataset.folderEditpath === 'on'; renderFolder(); const input = document.getElementById('fpick-path'); if (input) { input.focus(); input.select(); } return; }
     const fg = e.target.closest('[data-folder-go]');
     if (fg && folder) { openFolder(folder.mode, fg.dataset.folderGo); return; }
+    const intentGo = e.target.closest('[data-intent-go]');
+    if (intentGo) { chooseIntent(intentGo.dataset.intentGo); return; }
+    if (e.target.closest('[data-welcome-setup]')) { welcomeSetup = true; render(); return; }
     if (e.target.closest('[data-folder-choose]')) { chooseFolder(); return; }
+    if (e.target.closest('[data-folder-monitor]')) { chooseFolder('monitor'); return; }
+    const modeSwitch = e.target.closest('[data-mode-switch]');
+    if (modeSwitch) { modeAsk = modeSwitch.dataset.modeSwitch || null; modeError = null; render(); return; }
+    const modeGo = e.target.closest('[data-mode-confirm]');
+    if (modeGo) { switchMode(modeGo.dataset.modeConfirm); return; }
     if (e.target.closest('[data-folder-preview]')) { previewFolder(); return; }
     if (e.target.closest('[data-folder-connect]')) { connectFolder(); return; }
     if (e.target.closest('[data-folder-back]') && folder) { folder.preview = null; folder.previewError = null; renderFolder(); return; }
@@ -4665,6 +5220,19 @@
     const rmr = e.target.closest('[data-remove-project-root]');
     if (rmr) { askRemoveProject({ root: rmr.dataset.removeProjectRoot, name: rmr.dataset.removeProjectRoot }); return; }
     if (e.target.closest('[data-remove-project-cancel]')) { removing = null; document.getElementById('rmprojdlg')?.close(); return; }
+    if (e.target.closest('[data-chat-older-load]')) { loadOlderChat(); return; }
+    if (e.target.closest('[data-chat-jump]')) { chatUnseen = false; toChatEnd(); syncChatJump(); return; }
+    if (e.target.closest('[data-chat-save-toggle]')) {
+      const on = e.target.closest('[data-chat-save-toggle]').checked;
+      savePrefs({ saveChatHistory: on }).then((saved) => { if (!saved) agentError = A('تعذّر حفظ الإعداد.', 'The setting could not be saved.'); return loadAgent(); }).then(() => renderAgent());
+      return;
+    }
+    if (e.target.closest('[data-chat-clear]')) {
+      if (!confirm(A('تمسح المحادثة المحفوظة لهذا المشروع نهائيًا؟ تُحذف من هذا الجهاز ومن الصفحة، ولا يمكن استرجاعها. المشاريع الأخرى لا تتأثر، والجلسة الحالية (إن وُجدت) تستمر.', 'Permanently delete this project\'s saved chat? It is removed from this machine and from the page and cannot be recovered. Other projects are not affected, and a running session continues.'))) return;
+      agentAction('clear-history', { confirm: true }, () => { if (agent) { agent.events = []; agent.transcript = { ...(agent.transcript ?? {}), hasOlder: false }; } });
+      return;
+    }
+    if (e.target.closest('[data-agent-retry]')) { agentError = null; renderAgent(); loadAgent().then(() => renderAgent()); return; }
     if (e.target.closest('[data-chat-toggle]')) { toggleChat(); return; }
     // PF-0123: readiness → the project chat opens with the prepared request; the developer sends it.
     const readyChat = e.target.closest('[data-ready-chat]');
@@ -4738,6 +5306,27 @@
     if (sd) { store.set('agentStripDismissed', sd.dataset.agentStripDismiss); render(); return; }
     const sg = e.target.closest('[data-rt-suggest]');
     if (sg) { addService({ fromSuggestion: sg.dataset.rtSuggest }); return; }
+    const svcEditBtn = e.target.closest('[data-svc-edit]');
+    if (svcEditBtn) { svcEdit[svcEditBtn.dataset.svcEdit] = { adv: false, error: null }; delete rtFix[svcEditBtn.dataset.svcEdit]; render(); return; }
+    const svcEditCancel = e.target.closest('[data-svc-edit-cancel]');
+    if (svcEditCancel) { delete svcEdit[svcEditCancel.dataset.svcEditCancel]; render(); return; }
+    const portOpen = e.target.closest('[data-rt-port-open]');
+    if (portOpen) { rtFix[portOpen.dataset.rtPortOpen] = { port: Number(portOpen.dataset.port), owner: null, ownerService: null, declaredBy: null, suggestion: null }; render(); return; }
+    const portCancel = e.target.closest('[data-rt-port-cancel]');
+    if (portCancel) { delete rtFix[portCancel.dataset.rtPortCancel]; render(); return; }
+    const resetBtn = e.target.closest('[data-rt-reset]');
+    if (resetBtn) {
+      const id = resetBtn.dataset.rtReset;
+      if (readOnly || !confirm(A(`تحذف كل تعديلاتك المحلية على ${id}؟\nسيُحذف: ${resetBtn.dataset.fields}\nليس المنفذ فقط: كل ما سبق يعود للتعريف المشترك على هذا الجهاز. الملف المشترك لا يتغيّر، وستحتاج لمراجعة الخدمة وتوثيقها من جديد.`, `Remove all of your local changes to ${id}?\nRemoved: ${resetBtn.dataset.fields}\nNot only the port: everything listed returns to the shared definition on this machine. The shared file is not changed, and you will need to review and trust the service again.`))) return;
+      runtimeBusy[id] = 'edit'; render();
+      post(`/api/p/${pid}/runtime/${encodeURIComponent(id)}/reset`, JSON.stringify({ confirm: true }), { 'Content-Type': 'application/json' })
+        .then(() => { delete svcEdit[id]; delete runtimeReview[id]; runtimeErr[id] = null; toast(esc(A('عاد التعريف المشترك على هذا الجهاز.', 'The shared definition applies on this machine again.'))); })
+        .catch((err) => { runtimeErr[id] = err.message; })
+        .finally(async () => { runtimeBusy[id] = null; await loadRuntime(); render(); });
+      return;
+    }
+    const installBtn = e.target.closest('[data-rt-install]');
+    if (installBtn) { installNeeds(installBtn.dataset.rtInstall, installBtn.dataset.hash); return; }
     const rt = e.target.closest('[data-rt]');
     if (rt) { runtimeAction(rt.dataset.rt, rt.dataset.id); return; }
     const rth = e.target.closest('[data-rt-logs-hide]');
@@ -4902,8 +5491,8 @@
     }
     const x = e.target.closest('[data-lang],[data-theme-toggle],[data-bell],[data-digest],[data-open-project],[data-dev],[data-f],[data-more-st],[data-dtab],[data-file],[data-art],[data-more],[data-copy]');
     if (!x) { if (bellOpen && !e.target.closest('.notes')) { bellOpen = false; render(); } return; }
-    if (x.hasAttribute('data-lang')) { lang = lang === 'ar' ? 'en' : 'ar'; store.set('lang', lang); render(); }
-    else if (x.hasAttribute('data-theme-toggle')) { const dark = theme ? theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; theme = dark ? 'light' : 'dark'; store.set('theme', theme); render(); }
+    if (x.hasAttribute('data-lang')) { lang = lang === 'ar' ? 'en' : 'ar'; store.set('lang', lang); savePrefs({ language: lang }); render(); }
+    else if (x.hasAttribute('data-theme-toggle')) { const dark = theme ? theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; theme = dark ? 'light' : 'dark'; store.set('theme', theme); savePrefs({ theme }); render(); }
     else if (x.hasAttribute('data-bell')) { bellOpen = !bellOpen; render(); }
     else if (x.hasAttribute('data-digest')) { store.set(seenKey(), new Date().toISOString()); digest = null; render(); }
     else if (x.dataset.openProject) { e.preventDefault(); x.closest('[data-popmenu]')?.removeAttribute('open'); switchProject(x.dataset.openProject, x.dataset.openView ?? 'map'); }
@@ -4916,6 +5505,9 @@
     else if (x.hasAttribute('data-more')) { const b = x.previousElementSibling; b.classList.toggle('clamp'); x.textContent = b.classList.contains('clamp') ? A('اقرأ الطلب كله ↓', 'Read the whole request ↓') : A('أقل ↑', 'Less ↑'); }
     else if (x.dataset.copy) copy(x.dataset.copy, x.dataset.copyWhat);
   });
+  // PF-0165: the «jump to latest» control follows the reader's own scrolling.
+  document.addEventListener('scroll', (e) => { if (e.target?.classList?.contains('chatbody')) syncChatJump(); }, true);
+  document.addEventListener('toggle', (e) => { const steps = e.target.dataset?.steps; if (steps && e.target.isConnected) { if (e.target.open) chatStepsOpen.add(steps); else chatStepsOpen.delete(steps); } }, true);
   document.addEventListener('toggle', (e) => { const key = e.target.dataset?.overview; if (key && e.target.isConnected) { if (e.target.open) overviewExpanded.add(key); else overviewExpanded.delete(key); } const sx = e.target.dataset?.sx; if (sx && e.target.isConnected) setupOpen.set(sx, e.target.open); }, true);
   document.addEventListener('input', (e) => { if (e.target.closest('[data-gate-form]')) gateReady(e.target.closest('[data-gate-form]')); else if (e.target.closest('[data-baseline-form]')) baselineInput(e.target.closest('[data-baseline-form]')); });
   document.addEventListener('change', (e) => { if (e.target.closest?.('[data-baseline-form]')) baselineInput(e.target.closest('[data-baseline-form]')); });
@@ -5043,6 +5635,8 @@
     if (e.target.matches('[data-act-form]')) { e.preventDefault(); submitAction(e.target); return; }
     if (e.target.matches('[data-gate-form]')) { e.preventDefault(); submitGate(e.target); return; }
     if (e.target.matches('[data-rt-form]')) { e.preventDefault(); submitService(e.target); return; }
+    if (e.target.matches('[data-svc-editform]')) { e.preventDefault(); submitEdit(e.target); return; }
+    if (e.target.matches('[data-svc-portform]')) { e.preventDefault(); submitPort(e.target); return; }
     if (e.target.matches('[data-agents-settings]')) { e.preventDefault(); saveAgents(e.target); return; }
     if (e.target.matches('[data-agents-form]')) { e.preventDefault(); confirmAgents(e.target); return; }
     if (e.target.matches('[data-remove-project-form]')) { e.preventDefault(); confirmRemoveProject(); return; }
@@ -5050,7 +5644,10 @@
     else if (e.target.matches('[data-agent-form]')) { e.preventDefault(); const text = agentDraft.trim(); if (!text) return; agentDraft = ''; chatForceEnd = true; const viaTerminal = e.target.hasAttribute('data-terminal'); const chatId = viaTerminal ? newChatId() : null; if (viaTerminal) copy(terminalText(text, chatId), 'terminal'); agentAction('message', viaTerminal ? { text, terminal: true, chatId } : { text }).then((sent) => { if (!sent && !agentDraft) { agentDraft = text; renderAgent(); } }); }
   });
   document.addEventListener('change', async (e) => {
-    if (e.target.matches('[name="acknowledgeScripts"]')) { wiz.acknowledged = e.target.checked; const go = document.querySelector('[data-wiz-create-btn]'); if (go) go.disabled = wiz.busy || !wiz.acknowledged; return; }
+    if (e.target.matches('[data-rt-install-ack]')) { const id = e.target.dataset.rtInstallAck; if (e.target.checked) rtInstallAck.add(id); else rtInstallAck.delete(id); const b = document.querySelector(`[data-rt-install="${CSS.escape(id)}"]`); if (b) b.disabled = !e.target.checked; return; }
+    if (e.target.matches('[name="wiz-agent"], [name="noAgent"]')) { const form = e.target.closest('form[data-wiz-step="3"]'); if (form) { readStep(form); wiz.error = null; render(); } return; }
+    if (e.target.matches('[name="acknowledgeScripts"]')) { wiz.acknowledged = e.target.checked; const go = document.querySelector('[data-wiz-create-btn]'); if (go) go.disabled = wiz.busy || !wiz.acknowledged || toolsBlocked(wiz.plan); return; }
+    if (e.target.matches('[name="overrideMissingTools"]')) { wiz.overrideTools = e.target.checked; const go = document.querySelector('[data-wiz-create-btn]'); if (go) go.disabled = wiz.busy || (typedName(wiz.plan.body) && !wiz.acknowledged) || toolsBlocked(wiz.plan); return; }
     if (e.target.matches('[data-agent-mode]')) { agentMode = e.target.value; return; }
     if (e.target.matches('input[name="agentProvider"]')) { agentProvider = e.target.value; renderAgent(); return; }
     if (e.target.matches('dialog.create input[name="type"]')) {
@@ -5083,10 +5680,28 @@
     landOnSection();
   }
 
+  // PF-0159: read the saved preferences. A language or theme saved there wins over this
+  // browser's copy; one chosen in this browser before preferences existed is carried over once.
+  async function loadPrefs() {
+    try { prefs = await api('/api/preferences'); } catch { prefs = null; return; }
+    const carry = {};
+    if (prefs.language && prefs.language !== lang) { lang = prefs.language; store.set('lang', lang); }
+    else if (!prefs.language && store.get('lang', null)) carry.language = lang;
+    if (prefs.theme && prefs.theme !== theme) { theme = prefs.theme; store.set('theme', theme); }
+    else if (!prefs.theme && theme) carry.theme = theme;
+    if (Object.keys(carry).length) savePrefs(carry);
+  }
+  // Saves a change in the background; a failure never blocks the page (the browser copy stays).
+  function savePrefs(patch) {
+    if (!prefs || prefs.readOnly) return Promise.resolve(null);
+    return post('/api/preferences', JSON.stringify(patch), { 'Content-Type': 'application/json' }).then((saved) => { prefs = { ...saved, readOnly: false }; return saved; }).catch(() => null);
+  }
+
   (async () => {
     if (!token) { error = Object.assign(new Error('no token'), { status: 401 }); render(); return; }
     normalizeRoute();
     render();
+    await loadPrefs();
     await load();
     await buildDigest();
     await loadForView();

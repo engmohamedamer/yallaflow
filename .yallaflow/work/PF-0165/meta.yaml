@@ -1,0 +1,60 @@
+{
+  "id": "PF-0165",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Console chat: a large part of the conversation disappears (each streamed chunk uses one slot of a 400-event memory cap, the page receives the last 200 and shows 80 entries, nothing is saved, and the conversation is hidden when no session is active)",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-16T19:17:48.729Z",
+  "updatedAt": "2026-11-17T09:22:42.154Z",
+  "title": "Console chat: a large part of the conversation disappears (each streamed chunk uses one slot of a 400-event memory cap, the page receives the last 200 and shows 80 entries, nothing is saved, and the conversation is hidden when no session is active)",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-11-16T19:17:48.787Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-16T19:38:13.508Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    },
+    {
+      "completedAt": "2026-11-17T09:22:42.154Z",
+      "verificationRunIds": [
+        "V-002",
+        "V-003"
+      ]
+    }
+  ],
+  "lastInvalidationAt": "2026-11-17T08:50:42.940Z",
+  "lifecycleHistory": [
+    {
+      "action": "reopen",
+      "fromStage": "DONE",
+      "toStage": "IMPLEMENTATION",
+      "reason": "Owner review (2026-11-17): add Clear Chat History with confirmation, a setting to stop saving future chat to disk (existing history kept unless deleted separately), tests for deletion/disabled saving/no cross-project deletion, and verify streaming stays responsive and retention never cuts a message in the middle.",
+      "changedAt": "2026-11-17T08:50:42.940Z"
+    }
+  ]
+}

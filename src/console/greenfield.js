@@ -20,14 +20,21 @@ import { loadRuntimeProfiles } from '../runtime/profile.js';
 import { loadPlan } from '../newproject/project.js';
 import { ENVIRONMENTS, GIT_INIT_ARGV } from '../newproject/project.js';
 import { SAFE_GIT } from '../utils/git-safety.js';
+import { resolveCommand, safeEnvironment } from '../utils/command.js';
 
 const TOOL_TIMEOUT_MS = 5000;
 const SAFE_ENV = ['PATH', 'HOME', 'LANG', 'LC_ALL', 'USER', 'LOGNAME', 'TMPDIR', 'TZ'];
-const scrubbed = () => Object.fromEntries(SAFE_ENV.filter((name) => typeof process.env[name] === 'string').map((name) => [name, process.env[name]]));
+const scrubbed = () => safeEnvironment(SAFE_ENV);
 
-function runQuiet(file, args, { cwd = os.homedir() } = {}) {
+// PF-0157: found and started like every other tool (src/utils/command.js): no shell, and a
+// Windows shim's own program is started directly. A tool that is missing or cannot be started
+// is an answer ({ ok: false }), never an exception.
+async function runQuiet(file, args, { cwd = os.homedir() } = {}) {
+  const env = scrubbed();
+  const command = await resolveCommand([file, ...args], env);
+  if (!command.ok) return { ok: false, code: 'ENOENT', stdout: '', stderr: command.message, missing: command.reason === 'not-found', problem: command.reason === 'not-startable' ? command.message : null };
   return new Promise((resolve) => {
-    execFile(file, args, { cwd, env: scrubbed(), timeout: TOOL_TIMEOUT_MS, maxBuffer: 256 * 1024, shell: false }, (error, stdout, stderr) => {
+    execFile(command.file, command.args, { cwd, env, timeout: TOOL_TIMEOUT_MS, maxBuffer: 256 * 1024, shell: false, windowsHide: true }, (error, stdout, stderr) => {
       resolve({ ok: !error, code: error?.code ?? 0, stdout: String(stdout ?? ''), stderr: String(stderr ?? '') });
     });
   });
@@ -53,11 +60,11 @@ export async function probeTools({ maxAgeMs = 30_000 } = {}) {
   const tools = await Promise.all(TOOLS.map(async (tool) => {
     const result = await runQuiet(tool.argv[0], tool.argv.slice(1));
     if (tool.module) {
-      const found = result.ok && result.stdout.split('\n').some((line) => line.trim().toLowerCase() === tool.module);
+      const found = result.ok && result.stdout.split(/\r?\n/).some((line) => line.trim().toLowerCase() === tool.module);
       return { id: tool.id, found, version: found ? 'enabled' : '' };
     }
-    const version = result.ok ? `${result.stdout}`.split('\n').map((line) => line.trim()).find((line) => /\d/.test(line)) ?? '' : '';
-    return { id: tool.id, found: result.ok, version: version.slice(0, 120) };
+    const version = result.ok ? `${result.stdout}`.split(/\r?\n/).map((line) => line.trim()).find((line) => /\d/.test(line)) ?? '' : '';
+    return { id: tool.id, found: result.ok, version: version.slice(0, 120), ...(result.problem ? { problem: String(result.problem).slice(0, 300) } : {}) };
   }));
   const value = { tools, checkedAt: new Date().toISOString(), environments: ENVIRONMENTS };
   toolCache = { at: Date.now(), value };

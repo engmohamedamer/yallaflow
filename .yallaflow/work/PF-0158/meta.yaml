@@ -1,0 +1,62 @@
+{
+  "id": "PF-0158",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "New Project wizard: block generator execution when required tools are missing (server-enforced), with OS-specific install guidance, Recheck, an empty-project fallback and an Advanced override where the generator itself is present",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-16T16:55:32.782Z",
+  "updatedAt": "2026-11-16T18:31:16.995Z",
+  "title": "New Project wizard: block generator execution when required tools are missing (server-enforced), with OS-specific install guidance, Recheck, an empty-project fallback and an Advanced override where the generator itself is present",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-16T16:55:32.845Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-16T16:58:54.888Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    },
+    {
+      "completedAt": "2026-11-16T18:31:16.995Z",
+      "verificationRunIds": [
+        "V-002",
+        "V-003"
+      ]
+    }
+  ],
+  "lastInvalidationAt": "2026-11-16T18:26:58.657Z",
+  "lifecycleHistory": [
+    {
+      "action": "reopen",
+      "fromStage": "DONE",
+      "toStage": "IMPLEMENTATION",
+      "reason": "Browser walk on a machine without Git: with 'Initialize a local Git repository' ticked the plan still includes git init, which fails only after the project is created. Git must be checked with the other tools before creation.",
+      "changedAt": "2026-11-16T18:26:58.657Z"
+    }
+  ]
+}

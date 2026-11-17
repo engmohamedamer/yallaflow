@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-16T17:27:34.748Z",
+      "completedAt": "2026-11-16T17:27:34.748Z",
+      "summary": "docs/console.md (Your projects, New project), docs/new-project.md (Plan, review, create), docs/agents.md (Windows) describe the pre-Phase-1 behavior; src/agents/experimental.js says the Claude Code files are absent from published releases while npm pack --dry-run lists them.",
+      "evidence": [
+        "docs/console.md",
+        "docs/new-project.md",
+        "docs/agents.md",
+        "src/agents/experimental.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-16T17:27:35.141Z",
+      "completedAt": "2026-11-16T17:27:35.141Z",
+      "summary": "Owner release gates (2026-11-16): provide a manual validation checklist for real Windows and macOS; never claim Windows or macOS support from simulation. Docs follow the delivered behavior of PF-0157..PF-0163; no version number is assigned (the release is a separate approval).",
+      "evidence": [
+        "user:Owner approval of Phase 1, release gates and deliverables"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-16T17:27:35.515Z",
+      "completedAt": "2026-11-16T17:27:35.515Z",
+      "summary": "Add a Phase 1 section to docs/console.md, the missing-tools and resume rules to docs/new-project.md, wizard tools to the Windows section of docs/agents.md, a new docs/onboarding-manual-validation.md, and make the experimental.js comment match what the package ships (comment only)."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-16T18:29:36.941Z",
+      "completedAt": "2026-11-16T18:29:36.941Z",
+      "summary": "docs/console.md (first hour, Monitor only, preferences, agents on this machine), docs/new-project.md (missing tools, agent-first, resume), docs/agents.md (wizard tools on Windows), new docs/onboarding-manual-validation.md, and the experimental.js comment now matches what the package ships.",
+      "evidence": [
+        "docs/console.md",
+        "docs/new-project.md",
+        "docs/agents.md",
+        "docs/onboarding-manual-validation.md",
+        "src/agents/experimental.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-16T18:31:08.534Z",
+      "completedAt": "2026-11-16T18:31:08.534Z",
+      "summary": "Syntax check, the experimental-Claude and source-scan tests and git diff --check pass (V-001).",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-16T18:31:08.534Z"
+}

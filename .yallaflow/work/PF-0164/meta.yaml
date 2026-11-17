@@ -1,0 +1,45 @@
+{
+  "id": "PF-0164",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Documentation for Phase 1 onboarding: first-run journey, Monitor Only, preferences, missing-tool blocking and resume, cross-platform notes, and a manual validation checklist for real Windows and macOS machines; correct the comment about where the experimental Claude Code files ship",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-16T17:27:07.016Z",
+  "updatedAt": "2026-11-16T18:31:08.890Z",
+  "title": "Documentation for Phase 1 onboarding: first-run journey, Monitor Only, preferences, missing-tool blocking and resume, cross-platform notes, and a manual validation checklist for real Windows and macOS machines; correct the comment about where the experimental Claude Code files ship",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-16T17:27:07.083Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-16T18:31:08.890Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

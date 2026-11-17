@@ -37,6 +37,39 @@ yallaflow console list
 - **What it holds.** Folder paths only. Each project's state stays in its own `.yallaflow/`.
 - **Missing folders.** A saved project whose folder is gone is listed as unavailable, never dropped silently.
 
+## Your first hour: Create, Manage or Monitor (unreleased, Phase 1 onboarding)
+
+With no project yet, the Projects page asks what you want to do:
+
+- **Create a new project.** You describe the idea; your agent helps choose the stack and plan the work. Needs an AI agent.
+- **Manage an existing project.** YallaFlow first understands the project with your agent and shows what it would add before changing anything. Needs an AI agent.
+- **Monitor a project.** Watch an existing YallaFlow project's work. No agent, and nothing in the project changes.
+
+The same panel shows whether an agent is ready on this machine, and opens its setup in place. Nobody is asked whether they are a beginner or an expert: the usual path has few choices, and the rest is under **Advanced**.
+
+### Monitor only
+
+- **A mode of one project.** It is saved for that project in your console list (`console.json`, a `mode` field), never in the project. Other projects in the same console keep their own mode. A project without a saved mode is managed, as before.
+- **Only for projects that already have YallaFlow records.** The console shows `.yallaflow` records. A repository without them has nothing to monitor yet; setting it up adds files you review first, and that is Manage.
+- **Enforced by the server.** For a monitored project every write, agent action and queue action is refused (`405 MONITOR_ONLY`), whatever the page shows. Opening and reading it writes nothing inside it: no setup scan, no agent settings, no agent check.
+- **What it reads.** YallaFlow's own records and Git status. It starts no project service, command or script.
+- **Switching.** **Switch to Manage…** on the banner, or **Settings → Project → Switch to Monitor only…**, each with a confirmation. Switching to Monitor is refused while an agent session is open. `--read-only` still makes the whole console read-only.
+
+### Your preferences
+
+Your language, theme, last-used folder, usual agent and first-run choice are kept in `preferences.json` beside `console.json` (readable only by you), so they follow you across restarts and ports.
+
+- **Only known settings are stored.** No password, token or key can be saved there. Whether an agent is installed or signed in is never stored; it is checked again each time.
+- **Your usual agent is a suggestion.** It is listed first and marked for a new project, and is turned on for a project only when you click it.
+- **Nothing to migrate.** A missing or unreadable file means defaults. A language or theme you already chose in the browser is carried over once.
+
+### Agents on this machine
+
+**Settings → Agents** and the first-run panel show, for each agent, three separate things: the program, the sign-in (your subscription, never an API key), and the console's connection.
+
+- **Codex:** the connection has a **Test the connection** button.
+- **Claude Code (experimental):** the connection can only be checked when you start a session; it is never shown as tested ahead of time. On Windows it is shown as **Experimental · not verified on Windows**.
+
 ## New project (1.4.0)
 
 **All projects → New project** creates a new project in four steps: idea (name, description, requirements, attachments, location from a home-folder chooser), stack, environment (Docker, local tools or later; Git on by default) and review & create. **Create the project** is bound to the exact plan you reviewed; a plan that installs dependencies also asks for the project name. Progress, the log (collapsed) and failure recovery are shown on the page. When it finishes, the project is added to the console and its Overview opens. **All projects → Add an existing project** opens the folder picker:
@@ -87,6 +120,8 @@ Claude Code is detected and shown as experimental. In the chat, **Connect** open
 **Copy** says *copied* only when the browser confirms it. If the browser refuses, the console tries a second method, then shows the text selected so you can press ⌘C or Ctrl+C.
 
 ## Run: get your app running (1.4.1, one guided flow since 1.5.2)
+
+**Run is the one place to set up, diagnose and fix services (unreleased).** A service card shows what is missing before it can start with the exact install command, a taken port with its owner and a free port, the line of the log that explains a failure, and **Edit** (rarely used fields are under *Advanced options*). Every change says where it is saved: **this machine only**, or **shared with the team** (the repository file, which travels only after you commit and push). **Find more services** under the list holds the analysis, the agent's proposal and the suggestions. **Settings → Define services manually** is only for typing a service YallaFlow does not propose. Details: [`runtime.md`](runtime.md#fixing-a-service-that-does-not-start-unreleased).
 
 **Project → Run** has two layouts. [Screens →](tour.md#part-3--get-the-app-running-then-just-press-start)
 
@@ -332,6 +367,15 @@ The corner chat button is on every project page (Overview, Flow, Work, Setup, Wo
 **Switching agents (one agent per project folder).** Only one agent session works in a checkout at a time. From the work item that needs the agent:
 - an idle Codex session on another item shows **End the PF-x session and work here**: it ends that session (it stays under earlier sessions, to resume later) and shows the agent picker here; while Codex is working, the page says to wait;
 - with Claude Code connected, **Use Codex for this item** explains that Claude Code must close first: type `/exit` in its terminal. As soon as it disconnects, the chat switches to Codex with a prepared first message. The console never just unlinks Claude Code for this, because Claude Code would keep running and could still edit files.
+
+### The conversation is kept (unreleased)
+
+- **Nothing disappears during a long reply.** A streamed reply is one entry, however many pieces it arrives in.
+- **Saved on this machine.** The chat comes back after a page reload or a console restart, and stays readable after its session ends. See [`agents.md`](agents.md#what-is-stored) for where it is saved and its limit.
+- **Older messages load on demand.** **Load earlier messages** appears when saved messages are not loaded yet. If loading fails, the chat says so and offers **Try again**; a failed load never means deleted messages.
+- **Your reading position is yours.** While you read older messages the chat does not jump to the end; **New messages ↓** takes you there.
+- **Only tool steps fold.** Your messages and the agent's replies are always shown whole. A group of steps opens to its details and stays open.
+- **You decide what is kept.** Below the chat, **This chat is saved on this machine** says where it is kept and lets you turn saving off (for every project on this machine) or delete this project's saved chat after a confirmation. Turning saving off deletes nothing. See [`agents.md`](agents.md#what-is-stored).
 
 ## Running work: Queue, Parallel, Review & Merge (1.5.0)
 

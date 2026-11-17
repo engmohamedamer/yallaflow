@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "business-rule",
+      "source": "implementation-runtime",
+      "summary": "The New Project wizard never starts a generator while a required tool is missing: createFromPlan checks prerequisites fresh (checkPrerequisites) before creating anything and refuses with NEW_PROJECT_PREREQUISITES; the console's create route checks first too. The override (CLI --allow-missing-tools, console overrideMissingTools) is honored only when the generator's own program is present and never replaces the plan-hash confirmation, script acknowledgement or catalog verification. Per-OS install guidance is display-only data in src/newproject/guidance.js; YallaFlow installs none of these tools.",
+      "evidence": [
+        "src/newproject/project.js",
+        "src/newproject/guidance.js",
+        "test/new-project-prerequisites.test.js"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-16T16:58:54.314Z",
+      "factId": "CTX-0169",
+      "promotedAt": "2026-11-16T16:58:54.472Z",
+      "target": "context/business-rules.md"
+    },
+    {
+      "id": "K-002",
+      "kind": "business-rule",
+      "source": "implementation-runtime",
+      "summary": "When a New Project plan initializes Git (--git), Git is one of its prerequisites: it is checked with the stack's tools before anything is created, and a missing Git is never overridable (the developer installs Git or plans without it).",
+      "evidence": [
+        "src/newproject/project.js",
+        "test/new-project-prerequisites.test.js"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-16T18:31:16.134Z",
+      "factId": "CTX-0175",
+      "promotedAt": "2026-11-16T18:31:16.486Z",
+      "target": "context/business-rules.md"
+    }
+  ],
+  "updatedAt": "2026-11-16T18:31:16.486Z",
+  "reviewedAt": "2026-11-16T18:31:16.486Z"
+}
