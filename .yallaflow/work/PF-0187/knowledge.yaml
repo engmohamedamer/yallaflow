@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "CI on Windows must check out byte-exact (git config --global core.autocrlf false before actions/checkout): the built-in skill instructions are hash-pinned, and CRLF conversion makes doctor/health fail. The npm package itself is packed from LF files.",
+      "evidence": [
+        ".github/workflows/ci.yml",
+        "verification:V-002"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-18T16:36:03.449Z",
+      "factId": "CTX-0193",
+      "promotedAt": "2026-11-18T16:36:03.632Z",
+      "target": "context/conventions.md"
+    }
+  ],
+  "updatedAt": "2026-11-18T16:36:03.632Z",
+  "reviewedAt": "2026-11-18T16:36:03.632Z"
+}

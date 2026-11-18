@@ -26,6 +26,21 @@
       "finishedAt": "2026-11-18T16:30:00.083Z",
       "verifiedAt": "2026-11-18T16:30:00.083Z",
       "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "GH_TOKEN=$(~/.local/bin/gh auth token --user engmohamedamer) ~/.local/bin/gh run view 44347969788 -R engmohamedamer/yallaflow --exit-status --json jobs -q \".jobs[] | .name + \\\": \\\" + .conclusion\"",
+      "executionMode": "shell",
+      "executable": "GH_TOKEN=$(~/.local/bin/gh auth token --user engmohamedamer) ~/.local/bin/gh run view 44347969788 -R engmohamedamer/yallaflow --exit-status --json jobs -q \".jobs[] | .name + \\\": \\\" + .conclusion\"",
+      "args": [],
+      "displayCommand": "GH_TOKEN=$(~/.local/bin/gh auth token --user engmohamedamer) ~/.local/bin/gh run view 44347969788 -R engmohamedamer/yallaflow --exit-status --json jobs -q \".jobs[] | .name + \\\": \\\" + .conclusion\"",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-18T16:36:00.644Z",
+      "finishedAt": "2026-11-18T16:36:02.729Z",
+      "verifiedAt": "2026-11-18T16:36:02.729Z",
+      "log": "V-002-verification.log"
     }
   ]
 }

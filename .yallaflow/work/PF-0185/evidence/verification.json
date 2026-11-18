@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/cfd076f8-600d-486e-a6e8-7816b2dd6384/scratchpad/smoke155.sh",
+      "executionMode": "argv",
+      "executable": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/cfd076f8-600d-486e-a6e8-7816b2dd6384/scratchpad/smoke155.sh",
+      "args": [],
+      "displayCommand": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/cfd076f8-600d-486e-a6e8-7816b2dd6384/scratchpad/smoke155.sh",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-18T16:36:25.536Z",
+      "finishedAt": "2026-11-18T16:45:13.911Z",
+      "verifiedAt": "2026-11-18T16:45:13.911Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/cfd076f8-600d-486e-a6e8-7816b2dd6384/scratchpad/smoke155.sh",
+      "executionMode": "argv",
+      "executable": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/cfd076f8-600d-486e-a6e8-7816b2dd6384/scratchpad/smoke155.sh",
+      "args": [],
+      "displayCommand": "/tmp/claude-1000/-home-engamer-Amasi-YallaFlow/cfd076f8-600d-486e-a6e8-7816b2dd6384/scratchpad/smoke155.sh",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-18T16:46:09.338Z",
+      "finishedAt": "2026-11-18T16:46:52.415Z",
+      "verifiedAt": "2026-11-18T16:46:52.415Z",
+      "log": "V-002-verification.log"
+    }
+  ]
+}

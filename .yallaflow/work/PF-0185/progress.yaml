@@ -21,16 +21,37 @@
       "summary": "Plan: (1) version 1.6.0-rc.1 -> 1.5.5 in package.json, package-lock.json, src/version.js, two version tests; docs that say 1.6.0 -> 1.5.5. SemVer note: 1.5.5 carries new backward-compatible features (would normally be a minor); the owner chose 1.5.5 deliberately; no breaking change (additive runtime capabilities field, additive optional config block, new commands only). (2) CHANGELOG [1.5.5] stable section, README What's new, .github/release-notes/v1.5.5.md. (3) Independent review of PF-0182..0184 on an isolated copy. (4) Full suite, tw.css scratch check, npm audit, npm pack + isolated smoke. (5) Push branch; CI on Windows/macOS/Ubuntu must pass before tagging. (6) Commit, fast-forward main, annotated tag v1.5.5, push main+tag, GitHub Release (non-prerelease) as engmohamedamer; release.yml publishes npm latest with provenance; verify registry, provenance, install. Stop before publication if any gate fails."
     },
     "implementation": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-18T16:36:24.917Z",
+      "completedAt": "2026-11-18T16:36:25.109Z",
+      "summary": "Version 1.6.0-rc.1 reconciled to 1.5.5 (package.json, package-lock.json, src/version.js, two version tests, docs). CHANGELOG [1.5.5] (rc content + PF-0182..PF-0187, versioning note, verification by system, known issues), README What's new, release notes generated from the changelog. Independent review (isolated copy) → fixes PF-0186. First real Windows/macOS CI run → fixes PF-0187; second run green. Release commit 0c4b4f3 + 4588e66 on feature/phase1-onboarding, pushed for CI only.",
+      "evidence": [
+        "CHANGELOG.md",
+        "package.json",
+        "README.md"
+      ]
     },
     "verification": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-18T16:47:03.997Z",
+      "completedAt": "2026-11-18T16:47:04.193Z",
+      "summary": "Gates: full suite local 1487/1485 pass/2 skipped/0 fail (PF-0186 V-001); CI 44347969788 on 4588e66 all green (full Node 20/24; platform suite on windows-latest 46 pass/6 skipped, macos-latest 51/1, ubuntu-latest 51/1); tw.css byte-identical to a scratch build; npm audit unchanged since 1.5.4 (runtime 2 moderate file-type via officeparser, dev-only picomatch high); npm pack 324 files, no secret patterns; isolated-prefix smoke V-002 (version, greenfield/brownfield init and gate, health, refresh, doctor, branches, runtime capabilities); 1.5.4 reads a 1.5.5 workspace with a branches block (doctor healthy); yallaflow@1.5.5 not on npm.",
+      "evidence": [
+        "verification:V-002"
+      ]
     },
     "code-review": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-18T16:47:04.541Z",
+      "completedAt": "2026-11-18T16:47:04.707Z",
+      "summary": "Independent reviewer on an isolated copy (real repo read-only; HEAD, refs and index entries verified unchanged afterwards) reviewed PF-0182..PF-0184: 1 blocking (crafted manifest restore outside the project), 3 should-fix (linked --add-missing, Branch Health running repo filters, lazy fetch in partial clones), 3 minor; all fixed in PF-0186 with regression tests. The Windows work (PF-0172..PF-0179) was reviewed earlier, fixes in PF-0181. Real CI then found PF-0187 issues, fixed.",
+      "evidence": [
+        "src/agent/refresh.js",
+        "src/core/branches.js"
+      ]
     }
   },
   "rulings": [],
   "history": [],
-  "updatedAt": "2026-11-18T16:06:22.604Z"
+  "updatedAt": "2026-11-18T16:47:04.707Z"
 }

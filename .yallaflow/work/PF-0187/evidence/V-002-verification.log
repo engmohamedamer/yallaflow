@@ -1,0 +1,5 @@
+platform (ubuntu-latest): success
+full (20): success
+platform (windows-latest): success
+platform (macos-latest): success
+full (24): success

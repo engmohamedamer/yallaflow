@@ -37,10 +37,16 @@
       ]
     },
     "verification": {
-      "status": "pending"
+      "status": "completed",
+      "startedAt": "2026-11-18T16:36:02.922Z",
+      "completedAt": "2026-11-18T16:36:03.099Z",
+      "summary": "V-001 local suites pass; V-002 CI run 44347969788 on 4588e66: full Node 20/24 and platform ubuntu/windows/macos all success (platform suite 52 tests: windows 46 pass 6 skipped with reasons, macos 51/1, ubuntu 51/1, 0 failed).",
+      "evidence": [
+        "verification:V-002"
+      ]
     }
   },
   "rulings": [],
   "history": [],
-  "updatedAt": "2026-11-18T16:29:54.120Z"
+  "updatedAt": "2026-11-18T16:36:03.099Z"
 }

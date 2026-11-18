@@ -411,4 +411,18 @@
   - src/core/branches.js (repository @ 1e63e03)
   - node --import ./test-support/isolate-user-config.js --test (passed) (runtime, PF-0186 V-001)
 
+<!-- yallaflow-fact:CTX-0193 -->
+### CTX-0193 — CI on Windows must check out byte-exact (git config --global core.autocrlf false before actions/checkout): the built-in skill instructions are hash-pinned, and CRLF conversion makes doctor/health fail. The npm package itself is packed from LF files.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0187
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-18T16:36:03.632Z
+- **Verified:** 2026-11-18T16:36:03.632Z (commit 4588e66)
+- **Evidence:**
+  - .github/workflows/ci.yml (repository @ 4588e66)
+  - GH_TOKEN=$(~/.local/bin/gh auth token --user engmohamedamer) ~/.local/bin/gh run view 44347969788 -R engmohamedamer/yallaflow --exit-status --json jobs -q ".jobs[] | .name + \": \" + .conclusion" (passed) (runtime, PF-0187 V-002)
+
 <!-- yallaflow-context:end -->

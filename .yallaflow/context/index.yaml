@@ -16239,7 +16239,48 @@
       ],
       "createdAt": "2026-11-18T16:23:37.077Z",
       "updatedAt": "2026-11-18T16:23:37.077Z"
+    },
+    {
+      "id": "CTX-0193",
+      "area": "convention",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "CI on Windows must check out byte-exact (git config --global core.autocrlf false before actions/checkout): the built-in skill instructions are hash-pinned, and CRLF conversion makes doctor/health fail. The npm package itself is packed from LF files.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0187",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": ".github/workflows/ci.yml",
+          "contentHash": "sha256:92b114d3b90c5f5e0bca709f57b8b383959fb201e0151dc6cb69575206a4a40d",
+          "gitCommit": "4588e665509accb800f8e9cab344ce6cbcce89c3",
+          "workingTree": "head"
+        },
+        {
+          "type": "runtime",
+          "description": "GH_TOKEN=$(~/.local/bin/gh auth token --user engmohamedamer) ~/.local/bin/gh run view 44347969788 -R engmohamedamer/yallaflow --exit-status --json jobs -q \".jobs[] | .name + \\\": \\\" + .conclusion\" (passed)",
+          "workId": "PF-0187",
+          "verificationRunId": "V-002"
+        }
+      ],
+      "verifiedAt": "2026-11-18T16:36:03.632Z",
+      "verifiedAtCommit": "4588e665509accb800f8e9cab344ce6cbcce89c3",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-18T16:36:03.632Z",
+          "workId": "PF-0187",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-18T16:36:03.632Z",
+      "updatedAt": "2026-11-18T16:36:03.632Z"
     }
   ],
-  "updatedAt": "2026-11-18T16:23:37.077Z"
+  "updatedAt": "2026-11-18T16:36:03.632Z"
 }
