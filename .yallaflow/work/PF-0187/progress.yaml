@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-18T16:29:19.622Z",
+      "completedAt": "2026-11-18T16:29:19.792Z",
+      "summary": "CI run 44346821611 on 0c4b4f3: full (Node 20/24) and platform ubuntu pass; platform windows 8 failures, macos 1. Logs read with gh run view --log-failed.",
+      "evidence": [
+        "test/health-refresh.test.js",
+        ".github/workflows/ci.yml"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-18T16:29:19.962Z",
+      "completedAt": "2026-11-18T16:29:20.134Z",
+      "summary": "(1) 5 health/refresh failures: doctor 'built-in skill registry: context-discovery v1 no longer matches' — the windows runner's Git has core.autocrlf=true, so hash-pinned resources/skills/*.md are checked out with CRLF; the npm tarball is unaffected (packed from LF). Fix: CI disables autocrlf before checkout. (2) command-platform 'Linux (real files) and simulated macOS' and 'prerequisite check (real processes)' write POSIX shell scripts as tools; on Windows they are not programs, and the fresh registry Path (PF-0173) correctly finds the runner's real PHP 8.5.12. Test-only: skip on win32 (Windows lookup has its own simulated tests). (3) startService checks trust before assertComposeHere, so a Compose service on Windows answers RUNTIME_UNTRUSTED (asks to trust something that can never run there) instead of RUNTIME_COMPOSE_WINDOWS. Fix: refuse Compose on Windows before the trust check. (4) macOS: ENOENT on .git/objects/maintenance.lock during the test's own snapshot: Git's automatic background maintenance after the test's commits. Fix: tests disable maintenance.auto/gc.auto and tolerate vanished files.",
+      "evidence": [
+        "src/runtime/supervisor.js",
+        "test/command-platform.test.js",
+        "test/branch-health.test.js"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-18T16:29:53.948Z",
+      "completedAt": "2026-11-18T16:29:54.120Z",
+      "summary": "ci.yml and release.yml: git config --global core.autocrlf false before every checkout. supervisor.js startService refuses Compose on Windows (assertComposeHere) for the service and its dependencies before the trust check. command-platform.test.js: the two POSIX shell-script tests skip on win32 with a reason. branch-health.test.js: GIT_CONFIG_* disables maintenance.auto and gc.auto for test repositories.",
+      "evidence": [
+        "src/runtime/supervisor.js",
+        ".github/workflows/ci.yml",
+        "test/command-platform.test.js"
+      ]
+    },
+    "verification": {
+      "status": "pending"
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-18T16:29:54.120Z"
+}

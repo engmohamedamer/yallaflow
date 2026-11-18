@@ -75,7 +75,7 @@ test('simulated Windows: a missing tool is "not found"; a native .exe starts as 
   assert.equal((await resolveCommand(['composer'], { Path: `C:\\odd;${PHP_DIR}` }, outside)).reason, 'not-startable');
 });
 
-test('Linux (real files) and simulated macOS: a tool is the executable file on an absolute PATH folder', async () => {
+test('Linux (real files) and simulated macOS: a tool is the executable file on an absolute PATH folder', { skip: process.platform === 'win32' && 'POSIX execute bits and shell scripts; Windows lookup is covered by the simulated Windows tests' }, async () => {
   const dir = await mkdtemp(path.join(os.tmpdir(), 'yf-command-'));
   const tool = path.join(dir, 'composer');
   await writeFile(tool, '#!/bin/sh\necho "Composer version 2.8.0"\n');
@@ -89,7 +89,7 @@ test('Linux (real files) and simulated macOS: a tool is the executable file on a
   assert.equal((await resolveCommand(['composer'], { PATH: '.' })).ok, false);
 });
 
-test('a plan\'s prerequisite check finds tools through the shared lookup (real processes on this machine)', async (t) => {
+test('a plan\'s prerequisite check finds tools through the shared lookup (real processes on this machine)', { skip: process.platform === 'win32' && 'the fake tool is a shell script; on Windows the refreshed registry Path also finds the machine\'s real tools' }, async (t) => {
   const bin = await mkdtemp(path.join(os.tmpdir(), 'yf-prereq-'));
   const parent = await mkdtemp(path.join(os.tmpdir(), 'yf-parent-'));
   const config = await mkdtemp(path.join(os.tmpdir(), 'yf-config-'));

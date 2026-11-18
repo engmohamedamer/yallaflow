@@ -1,0 +1,250 @@
+TAP version 13
+# Subtest: dev → qc → prod: readiness, production-only hotfix, back-merge conflict; nothing in the repository changes
+ok 1 - dev → qc → prod: readiness, production-only hotfix, back-merge conflict; nothing in the repository changes
+  ---
+  duration_ms: 603.165042
+  type: 'test'
+  ...
+# Subtest: a promotion that would conflict, and one where the upper branch has changes the lower lacks
+ok 2 - a promotion that would conflict, and one where the upper branch has changes the lower lacks
+  ---
+  duration_ms: 825.03139
+  type: 'test'
+  ...
+# Subtest: configured flow, remote-tracking branches, divergence from upstream and stale fetch information
+ok 3 - configured flow, remote-tracking branches, divergence from upstream and stale fetch information
+  ---
+  duration_ms: 663.045404
+  type: 'test'
+  ...
+# Subtest: the merge preview writes no object into the repository; no flow and no repository are explained
+ok 4 - the merge preview writes no object into the repository; no flow and no repository are explained
+  ---
+  duration_ms: 274.681108
+  type: 'test'
+  ...
+# Subtest: branch settings: validation, the configure command, and the CLI report
+ok 5 - branch settings: validation, the configure command, and the CLI report
+  ---
+  duration_ms: 1779.57448
+  type: 'test'
+  ...
+# Subtest: a repository filter is never run; a branch behind its upstream gives "Check first"; remote-only hotfix branches are seen
+ok 6 - a repository filter is never run; a branch behind its upstream gives "Check first"; remote-only hotfix branches are seen
+  ---
+  duration_ms: 788.12274
+  type: 'test'
+  ...
+# Subtest: a partial clone: Branch Health never asks the remote for missing objects
+ok 7 - a partial clone: Branch Health never asks the remote for missing objects
+  ---
+  duration_ms: 215.865028
+  type: 'test'
+  ...
+# Subtest: the child environment is an allow-list; Windows adds the system variables its programs need
+ok 8 - the child environment is an allow-list; Windows adds the system variables its programs need
+  ---
+  duration_ms: 7.618673
+  type: 'test'
+  ...
+# Subtest: simulated Windows: npx is started as npm's own script with node, never through a shell
+ok 9 - simulated Windows: npx is started as npm's own script with node, never through a shell
+  ---
+  duration_ms: 4.989473
+  type: 'test'
+  ...
+# Subtest: simulated Windows: Composer's installer shim is started as php.exe with composer.phar
+ok 10 - simulated Windows: Composer's installer shim is started as php.exe with composer.phar
+  ---
+  duration_ms: 4.515994
+  type: 'test'
+  ...
+# Subtest: simulated Windows: a missing tool is "not found"; a native .exe starts as itself; an unknown script is refused
+ok 11 - simulated Windows: a missing tool is "not found"; a native .exe starts as itself; an unknown script is refused
+  ---
+  duration_ms: 3.451886
+  type: 'test'
+  ...
+# Subtest: Linux (real files) and simulated macOS: a tool is the executable file on an absolute PATH folder
+ok 12 - Linux (real files) and simulated macOS: a tool is the executable file on an absolute PATH folder
+  ---
+  duration_ms: 20.076091
+  type: 'test'
+  ...
+# Subtest: a plan's prerequisite check finds tools through the shared lookup (real processes on this machine)
+ok 13 - a plan's prerequisite check finds tools through the shared lookup (real processes on this machine)
+  ---
+  duration_ms: 45.27791
+  type: 'test'
+  ...
+# Subtest: Windows: a trusted service can be started and stopped; a running one says that Stop is forceful
+ok 14 - Windows: a trusted service can be started and stopped; a running one says that Stop is forceful
+  ---
+  duration_ms: 20.703258
+  type: 'test'
+  ...
+# Subtest: Windows: a Docker Compose service shows why it is not started here and offers no Start or Stop
+ok 15 - Windows: a Docker Compose service shows why it is not started here and offers no Start or Stop
+  ---
+  duration_ms: 7.031794
+  type: 'test'
+  ...
+# Subtest: the platform note: what is not verified, the forceful stop and Compose on Windows; nothing on Linux; no lifecycle on an unknown system
+ok 16 - the platform note: what is not verified, the forceful stop and Compose on Windows; nothing on Linux; no lifecycle on an unknown system
+  ---
+  duration_ms: 10.085839
+  type: 'test'
+  ...
+# Subtest: the Run page is never replaced by an "unsupported" page; an empty project shows its own empty state first
+ok 17 - the Run page is never replaced by an "unsupported" page; an empty project shows its own empty state first
+  ---
+  duration_ms: 4.118876
+  type: 'test'
+  ...
+# Subtest: a new project is healthy; health, refresh check and preview write nothing
+ok 18 - a new project is healthy; health, refresh check and preview write nothing
+  ---
+  duration_ms: 965.784421
+  type: 'test'
+  ...
+# Subtest: an older contract and bootstrap: update available, preview, apply only the managed blocks, idempotent, restore
+ok 19 - an older contract and bootstrap: update available, preview, apply only the managed blocks, idempotent, restore
+  ---
+  duration_ms: 379.826497
+  type: 'test'
+  ...
+# Subtest: a hand-edited managed block is a conflict: nothing is written until the developer resolves it
+ok 20 - a hand-edited managed block is a conflict: nothing is written until the developer resolves it
+  ---
+  duration_ms: 750.718782
+  type: 'test'
+  ...
+# Subtest: missing AGENT.md and missing bootstraps are repairable; --add-missing adds the blocks
+ok 21 - missing AGENT.md and missing bootstraps are repairable; --add-missing adds the blocks
+  ---
+  duration_ms: 364.202999
+  type: 'test'
+  ...
+# Subtest: links: a managed file or workspace link leaving the project is unsafe and never written through
+ok 22 - links: a managed file or workspace link leaving the project is unsafe and never written through
+  ---
+  duration_ms: 614.310589
+  type: 'test'
+  ...
+# Subtest: a block from a newer YallaFlow is refused; a project requiring a newer YallaFlow is unsafe to update
+ok 23 - a block from a newer YallaFlow is refused; a project requiring a newer YallaFlow is unsafe to update
+  ---
+  duration_ms: 516.876111
+  type: 'test'
+  ...
+# Subtest: an interrupted refresh is reported and can be restored; restore refuses a file changed afterwards
+ok 24 - an interrupted refresh is reported and can be restored; restore refuses a file changed afterwards
+  ---
+  duration_ms: 236.440643
+  type: 'test'
+  ...
+# Subtest: older workspace fixture: health is read-only, refresh changes only AGENT.md and keeps all history
+ok 25 - older workspace fixture: health is read-only, refresh changes only AGENT.md and keeps all history
+  ---
+  duration_ms: 199.111473
+  type: 'test'
+  ...
+# Subtest: restore never acts on a crafted or foreign manifest: only the three managed files, this checkout only
+ok 26 - restore never acts on a crafted or foreign manifest: only the three managed files, this checkout only
+  ---
+  duration_ms: 220.840443
+  type: 'test'
+  ...
+# Subtest: --add-missing with CLAUDE.md linked to AGENTS.md writes the shared file once and verifies
+ok 27 - --add-missing with CLAUDE.md linked to AGENTS.md writes the shared file once and verifies
+  ---
+  duration_ms: 165.658377
+  type: 'test'
+  ...
+# Subtest: a file edited while the refresh runs is not overwritten
+ok 28 - a file edited while the refresh runs is not overwritten
+  ---
+  duration_ms: 152.614542
+  type: 'test'
+  ...
+# Subtest: real processes on linux: start, find again, stop the whole tree, restart
+ok 29 - real processes on linux: start, find again, stop the whole tree, restart
+  ---
+  duration_ms: 3937.960768
+  type: 'test'
+  ...
+# Subtest: real processes on linux: a record whose identity no longer matches is never signalled; a taken port starts nothing
+ok 30 - real processes on linux: a record whose identity no longer matches is never signalled; a taken port starts nothing
+  ---
+  duration_ms: 1268.103761
+  type: 'test'
+  ...
+# Subtest: Windows: a Docker Compose service is refused before anything runs; other services stay usable
+ok 31 - Windows: a Docker Compose service is refused before anything runs; other services stay usable # SKIP Windows only
+  ---
+  duration_ms: 0.371315
+  type: 'test'
+  ...
+# Subtest: process table: pid, parent, creation time and name from the fixed query; unusable lines are skipped
+ok 32 - process table: pid, parent, creation time and name from the fixed query; unusable lines are skipped
+  ---
+  duration_ms: 6.200556
+  type: 'test'
+  ...
+# Subtest: descendants: the whole tree by parent link, never a process created before its parent, never from a leader that changed
+ok 33 - descendants: the whole tree by parent link, never a process created before its parent, never from a leader that changed
+  ---
+  duration_ms: 2.045767
+  type: 'test'
+  ...
+# Subtest: stop: the verified leader and each process it started are ended one by one; nothing else
+ok 34 - stop: the verified leader and each process it started are ended one by one; nothing else
+  ---
+  duration_ms: 2.315558
+  type: 'test'
+  ...
+# Subtest: review finding 1: a leader pid now held by another program — nothing at all is signalled, not even its children
+ok 35 - review finding 1: a leader pid now held by another program — nothing at all is signalled, not even its children
+  ---
+  duration_ms: 0.684679
+  type: 'test'
+  ...
+# Subtest: a child started during the stop is included; a reused pid of a member is not expanded
+ok 36 - a child started during the stop is included; a reused pid of a member is not expanded
+  ---
+  duration_ms: 3.197028
+  type: 'test'
+  ...
+# Subtest: an unreadable process table signals nothing and is reported as such
+ok 37 - an unreadable process table signals nothing and is reported as such
+  ---
+  duration_ms: 0.892364
+  type: 'test'
+  ...
+# Subtest: netstat: listening TCP sockets with their pid, whatever the language of the state column
+ok 38 - netstat: listening TCP sockets with their pid, whatever the language of the state column
+  ---
+  duration_ms: 0.984307
+  type: 'test'
+  ...
+# Subtest: a Windows service gets the system variables programs need, and still no credential
+ok 39 - a Windows service gets the system variables programs need, and still no credential
+  ---
+  duration_ms: 0.970805
+  type: 'test'
+  ...
+# Subtest: capabilities: Windows runs services but not Compose, and stops forcefully; only Linux is verified on a real machine
+ok 40 - capabilities: Windows runs services but not Compose, and stops forcefully; only Linux is verified on a real machine
+  ---
+  duration_ms: 1.471285
+  type: 'test'
+  ...
+1..40
+# tests 40
+# suites 0
+# pass 39
+# fail 0
+# cancelled 0
+# skipped 1
+# todo 0
+# duration_ms 5455.714839

@@ -27,6 +27,11 @@ jobs:
     outputs:
       publish: ${{ steps.registry.outputs.publish }}
     steps:
+      # PF-0187: check out byte-exact. The Windows runner's Git converts line endings by default,
+      # which breaks the hash-pinned skill instructions (the npm package is packed from LF files).
+      - name: Exact line endings
+        run: git config --global core.autocrlf false
+
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.release.tag_name }}
@@ -84,6 +89,11 @@ jobs:
       matrix:
         node: [20, 22, 24] # engines: >=20.16.0
     steps:
+      # PF-0187: check out byte-exact. The Windows runner's Git converts line endings by default,
+      # which breaks the hash-pinned skill instructions (the npm package is packed from LF files).
+      - name: Exact line endings
+        run: git config --global core.autocrlf false
+
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.release.tag_name }}
@@ -121,6 +131,11 @@ jobs:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
     steps:
+      # PF-0187: check out byte-exact. The Windows runner's Git converts line endings by default,
+      # which breaks the hash-pinned skill instructions (the npm package is packed from LF files).
+      - name: Exact line endings
+        run: git config --global core.autocrlf false
+
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.release.tag_name }}
@@ -141,6 +156,11 @@ jobs:
       contents: read
       id-token: write # OIDC for npm Trusted Publishing and provenance
     steps:
+      # PF-0187: check out byte-exact. The Windows runner's Git converts line endings by default,
+      # which breaks the hash-pinned skill instructions (the npm package is packed from LF files).
+      - name: Exact line endings
+        run: git config --global core.autocrlf false
+
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.release.tag_name }}

@@ -23,6 +23,11 @@ jobs:
       matrix:
         node: [20, 24] # engines: >=20.16.0
     steps:
+      # PF-0187: check out byte-exact. The Windows runner's Git converts line endings by default,
+      # which breaks the hash-pinned skill instructions (the npm package is packed from LF files).
+      - name: Exact line endings
+        run: git config --global core.autocrlf false
+
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0 # tags: mixed-version tests run real frozen releases from Git
@@ -50,6 +55,11 @@ jobs:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
     steps:
+      # PF-0187: check out byte-exact. The Windows runner's Git converts line endings by default,
+      # which breaks the hash-pinned skill instructions (the npm package is packed from LF files).
+      - name: Exact line endings
+        run: git config --global core.autocrlf false
+
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false

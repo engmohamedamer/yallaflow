@@ -10,7 +10,8 @@ import { fileURLToPath } from 'node:url';
 import { analyzeBranches, describeBranches, previewMerge, validateBranchesConfig } from '../src/core/branches.js';
 
 const CLI = fileURLToPath(new URL('../src/cli.js', import.meta.url));
-const GIT_ENV = { ...process.env, GIT_AUTHOR_NAME: 't', GIT_AUTHOR_EMAIL: 't@example.com', GIT_COMMITTER_NAME: 't', GIT_COMMITTER_EMAIL: 't@example.com' };
+// No automatic background maintenance (macOS CI: it changed .git while a test read it, PF-0187).
+const GIT_ENV = { ...process.env, GIT_AUTHOR_NAME: 't', GIT_AUTHOR_EMAIL: 't@example.com', GIT_COMMITTER_NAME: 't', GIT_COMMITTER_EMAIL: 't@example.com', GIT_CONFIG_COUNT: '2', GIT_CONFIG_KEY_0: 'maintenance.auto', GIT_CONFIG_VALUE_0: 'false', GIT_CONFIG_KEY_1: 'gc.auto', GIT_CONFIG_VALUE_1: '0' };
 function git(cwd, ...args) {
   const out = spawnSync('git', args, { cwd, encoding: 'utf8', env: GIT_ENV });
   assert.equal(out.status, 0, `git ${args.join(' ')}: ${out.stderr}`);

@@ -1,0 +1,35 @@
+{
+  "id": "PF-0187",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "First real Windows/macOS CI run (44346821611) of the platform suite: Windows checkout converts line endings (skill hash check fails), two POSIX-only tests run on Windows, a Compose service on Windows is asked to be trusted before being refused as unsupported, macOS Git background maintenance races a test snapshot",
+  "status": "VERIFICATION",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-18T16:29:19.318Z",
+  "updatedAt": "2026-11-18T16:29:54.382Z",
+  "title": "First real Windows/macOS CI run (44346821611) of the platform suite: Windows checkout converts line endings (skill hash check fails), two POSIX-only tests run on Windows, a Compose service on Windows is asked to be trusted before being refused as unsupported, macOS Git background maintenance races a test snapshot",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-11-18T16:29:19.386Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  }
+}

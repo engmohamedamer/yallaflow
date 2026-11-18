@@ -345,7 +345,9 @@ export async function startService(root, id, { startedBy = 'cli', skipSetupCheck
   assertSupported();
   const profiles = await loadRuntimeProfiles(root);
   const order = startOrder(profiles, id);
-  // Trust is checked for the service AND all its dependencies before anything starts.
+  // Trust is checked for the service AND all its dependencies before anything starts. A Compose
+  // service on Windows is refused first: trusting it could not make it run there (PF-0187).
+  for (const service of order) assertComposeHere(service);
   for (const service of order) {
     const trust = await trustState(root, service);
     if (!trust.trusted) {
