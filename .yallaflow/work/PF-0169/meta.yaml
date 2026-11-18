@@ -1,0 +1,84 @@
+{
+  "id": "PF-0169",
+  "type": "feature",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Projects page UX: actionable project cards, next actions, search and filters",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-17T12:03:28.057Z",
+  "updatedAt": "2026-11-17T13:24:12.519Z",
+  "title": "Projects page UX: actionable project cards, next actions, search and filters",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope bounded`.",
+  "routedAt": "2026-11-17T12:03:28.127Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "implement",
+    "verify",
+    "converge"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation",
+      "verification",
+      "delivery-convergence"
+    ]
+  },
+  "sources": [
+    {
+      "id": "SRC-0119",
+      "type": "file",
+      "name": "projects-page-ux-brief.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-17T12:03:41.012Z",
+      "workStatusAtLink": "INTAKE",
+      "relationship": "work-input"
+    },
+    {
+      "id": "SRC-0120",
+      "type": "file",
+      "name": "projects-page-polish-review.md",
+      "detectedFormat": "md",
+      "contentAvailability": "native-text",
+      "linkedAt": "2026-11-17T13:00:09.019Z",
+      "workStatusAtLink": "IMPLEMENTATION",
+      "relationship": "work-input"
+    }
+  ],
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-17T12:27:46.557Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    },
+    {
+      "completedAt": "2026-11-17T13:24:12.519Z",
+      "verificationRunIds": [
+        "V-002",
+        "V-003"
+      ]
+    }
+  ],
+  "lastInvalidationAt": "2026-11-17T13:00:18.169Z",
+  "lifecycleHistory": [
+    {
+      "action": "reopen",
+      "fromStage": "DONE",
+      "toStage": "IMPLEMENTATION",
+      "reason": "Owner review: final UX polish before acceptance — compact content-height cards, one empty-work message, audit of open counts and the highlighted item, open vs historical agent tasks, non-overlapping filter labels, running/paused/historical sessions, Continue navigation, menu/keyboard/remove checks, RTL and responsive review.",
+      "changedAt": "2026-11-17T13:00:00.621Z"
+    }
+  ]
+}

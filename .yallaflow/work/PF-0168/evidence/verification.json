@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --test test/console-ia.test.js test/console-first-journey.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--test",
+        "test/console-ia.test.js",
+        "test/console-first-journey.test.js"
+      ],
+      "displayCommand": "node --test test/console-ia.test.js test/console-first-journey.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-17T11:55:35.025Z",
+      "finishedAt": "2026-11-17T11:55:35.376Z",
+      "verifiedAt": "2026-11-17T11:55:35.376Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-17T13:24:38.714Z",
+      "completedAt": "2026-11-17T13:24:38.714Z",
+      "summary": "switchProject() and the boot sequence render only after load() + buildDigest() + loadForView(); loadForView awaits readiness (~2s, CLI + provider detection), agent state, execution, project overview (~1.5s) and runtime one after another, so 'Loading…' stays for their sum (worse under CPU load: owner saw it at load avg ~9). Snapshot itself is cached (~1ms). The hashchange path already renders before loadForView, so views tolerate missing data. The loading state is plain muted text.",
+      "evidence": [
+        "resources/console/app.js",
+        "runtime:curl timings on the repo console: snapshot 0.001s, overview 1.49s, readiness 1.97s, runtime 1.39s"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-17T13:24:39.106Z",
+      "completedAt": "2026-11-17T13:24:39.106Z",
+      "summary": "Opening a project (and the first page load) draws the page as soon as the snapshot is loaded; the rest fills in as it arrives. While nothing can be drawn, a visible loader (spinner + text, still for reduced motion) replaces the plain text, on the Workspace and the Projects page.",
+      "evidence": [
+        "user:owner asked why loading takes long and to add a loader if needed (2026-11-17)"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-17T13:24:39.486Z",
+      "completedAt": "2026-11-17T13:24:39.486Z",
+      "summary": "Add render() after buildDigest() in switchProject and boot; a pageLoader() helper used by the main !snap state, viewProjects and viewTeam loading; spinner CSS with prefers-reduced-motion; focused test.",
+      "evidence": [
+        "resources/console/app.js"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-17T13:29:57.988Z",
+      "completedAt": "2026-11-17T13:29:57.988Z",
+      "summary": "app.js: render() right after load()+buildDigest() in switchProject and the boot sequence, before loadForView; pageLoader() (spinner + text, role=status) for the main no-snapshot state, the Projects page and Worktrees. app.css: .pageload spinner, still under reduced motion. Test added to test/console-projects-page.test.js.",
+      "evidence": [
+        "resources/console/app.js",
+        "resources/console/app.css",
+        "test/console-projects-page.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-17T13:37:04.736Z",
+      "completedAt": "2026-11-17T13:37:04.736Z",
+      "summary": "npm run check passed (V-001: 1431 passed, 0 failed, 1 skipped). Browser on the repo console: opening portal from Projects drew the Workspace in 106-139ms over 3 rounds while readiness finished at ~1.5s and the project overview at ~2.8-3.1s (before, the page waited for all of them); the loader renders with a delayed snapshot. A queue test failed once in a parallel console-only run and passed 3/3 alone (known load flakiness).",
+      "evidence": [
+        "verification:V-001",
+        "runtime:Playwright timing on 127.0.0.1:4790, 2026-11-17 15:29"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-17T13:37:04.736Z"
+}

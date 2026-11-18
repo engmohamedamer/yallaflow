@@ -81,12 +81,12 @@ test('AC-001: Projects shows the Needs-you inbox above the cards and each card l
   assert.doesNotMatch(card, /PF-0099/, 'another project\'s lane is not');
   assert.match(card, /data-x-open="p1" data-x-work="PF-0007"/);
   assert.match(card, /data-open-view="team"/, 'queues and merges stay on Worktrees');
-  assert.match(on.card({ id: 'p3' }), /No agent running\./);
+  assert.equal(on.card({ id: 'p3' }), '', 'PF-0169: no agents panel when no lane is live');
   const off = projects({ agentsOn: false, execView });
   assert.equal(off.inbox(), '');
   assert.equal(off.card({ id: 'p1' }), '');
   assert.match(app, /\$\{overview\.length \? inboxSection\(\) : ''\}/, 'the inbox comes before the cards');
-  assert.match(app, /\$\{cardAgents\(project\)\}/);
+  assert.match(app, /\$\{cardAgents\(project, f\.closed\)\}/);
   assert.match(app, /if \(agentsOn && \(\['projects', 'team'\]\.includes\(v\) \|\| !execView\)\) await loadExecution\(\);/);
   assert.doesNotMatch(app, /function viewAgents\(/);
 });

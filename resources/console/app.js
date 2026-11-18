@@ -4299,15 +4299,11 @@
     overview = await Promise.all(projects.map(async (project) => {
       // PF-0082: each card's memory health comes from the project's own overview (read-only).
       // A failure there leaves the card as it was.
-      const health = api(`/api/p/${project.id}/overview`).then((o) => ({ memory: o.memory ?? null, understanding: o.understanding?.state ?? null, kind: o.project?.kind ?? null, origin: o.project?.origin ?? null })).catch(() => null);
+      const health = api(`/api/p/${project.id}/overview`).then((o) => ({ memory: o.memory ?? null, understanding: o.understanding?.state ?? null, baselineId: o.understanding?.baselineId ?? null, kind: o.project?.kind ?? null, origin: o.project?.origin ?? null })).catch(() => null);
       try { return { project, snap: await api(`/api/p/${project.id}/snapshot`), health: await health }; } catch (e) { return { project, error: e.message, health: await health }; }
     }));
   }
   // PF-0081: take a project off the console (and the saved list). Its files stay as they are.
-  function projRemoveBtn(project) {
-    if (readOnly) return '';
-    return `<button type="button" class="btn ghost sm projrm" data-remove-project="${project.id}" aria-label="${esc(A(`شيل ${project.name} من الكونسول`, `Remove ${project.name} from the console`))}" title="${esc(A('شيل من الكونسول', 'Remove from the console'))}">✕</button>`;
-  }
   let removing = null; // { id?, root?, name }
   function askRemoveProject(target) {
     removing = target;
@@ -4346,31 +4342,30 @@
     await load();
     if (pid) await buildDigest();
   }
-  // PF-0082: what the project's memory holds and what in it needs care, from its own records.
-  function memoryHealth(h) {
+  // PF-0082 / PF-0169: the card's readiness and memory line, from the project's own records —
+  // kept apart from its execution state. Counts that need care link to the project's Overview.
+  function cardHealth(project, h) {
     if (!h) return '';
-    const label = `<b>${A('ذاكرة المشروع:', 'Project memory:')}</b>`;
-    const m = h.memory;
-    if (!m?.available) return `<div class="memh tiny muted">${label} ${A('مش قادر يقراها.', 'could not be read.')}</div>`;
-    if (!m.current && h.origin?.createdBy === 'yallaflow new') {
-      // PF-0084: what was chosen in the wizard, until the first work item records it in memory.
-      const env = { docker: 'Docker', local: A('أدوات على الجهاز', 'local tools') }[h.origin.environment];
-      const chosen = [(h.origin.stack ?? []).join(' · ') || A('مشروع فاضي', 'empty project'), env ? `${env}${h.origin.environment === 'docker' ? ` (${A('مخطّط', 'planned')})` : ''}` : null].filter(Boolean).join(' · ');
-      return `<div class="memh tiny">${label} <span class="muted">${A('لسه فاضية.', 'empty so far.')}</span></div><div class="tiny"><b>${A('اتختار وقت الإنشاء:', 'Chosen at creation:')}</b> <span class="ltr">${esc(chosen)}</span> <span class="muted">${A('— بيدخل الذاكرة مع أول شغلانة.', '— it enters memory with the first work item.')}</span></div>`;
-    }
-    if (!m.current) {
-      const why = h.kind === 'greenfield'
-        ? A('لسه فاضية. بتتكوّن من قراراتك والشغل.', 'empty so far. It grows from your decisions and the work.')
-        : L((UNDERSTANDING_TEXT[h.understanding] ?? UNDERSTANDING_TEXT.PROJECT_UNDERSTANDING_REQUIRED).title);
-      return `<div class="memh tiny">${label} <span class="muted">${esc(why)}</span></div>`;
-    }
-    const stale = (m.mayBeStale ?? 0) + (m.staleEvidence ?? 0);
     const parts = [];
-    if (stale) parts.push(`<span class="chip wait" data-tip="${esc(A('الملفات اللي بتثبتها اتغيّرت أو اتشالت. الوكيل بيراجعها لما الشغل يلمسها.', 'The files that back them changed or are gone. The agent rechecks them when work touches them.'))}">${A(`${stale} محتاجة مراجعة`, `${stale} to revalidate`)}</span>`);
-    if (m.disputed) parts.push(`<span class="chip fail">${A(`${m.disputed} عليها خلاف`, `${m.disputed} disputed`)}</span>`);
-    if (m.unresolved) parts.push(`<span class="chip todo">${A(`${m.unresolved} مش محسومة`, `${m.unresolved} unresolved`)}</span>`);
-    if (!parts.length) parts.push(`<span class="chip done"><i></i>${A('مفيش حاجة محتاجة مراجعة', 'nothing needs care')}</span>`);
-    return `<div class="memh row tiny">${label} <span>${A(`${m.current} معلومة`, `${m.current} facts`)}</span>${parts.join('')}</div>`;
+    const gate = h.understanding && !['PROJECT_UNDERSTANDING_ESTABLISHED', 'GREENFIELD_UNDERSTANDING_FROM_INTENT'].includes(h.understanding) ? (UNDERSTANDING_TEXT[h.understanding] ?? UNDERSTANDING_TEXT.PROJECT_UNDERSTANDING_UNAVAILABLE) : null;
+    if (gate) parts.push(`<span class="chip ${gate.tone}" data-understanding-chip="${esc(h.understanding)}"><i></i>${L(gate.title)}</span>`);
+    const m = h.memory;
+    if (!m?.available) parts.push(`<span class="muted">${A('الذاكرة مش مقروءة.', 'Memory could not be read.')}</span>`);
+    else if (!m.current) {
+      // PF-0084: what was chosen in the wizard, until the first work item records it in memory.
+      const env = { docker: 'Docker', local: A('أدوات على الجهاز', 'local tools') }[h.origin?.environment];
+      const chosen = h.origin?.createdBy === 'yallaflow new' ? [(h.origin.stack ?? []).join(' · ') || A('مشروع فاضي', 'empty project'), env].filter(Boolean).join(' · ') : '';
+      if (!gate) parts.push(`<span class="muted">${A('فاضية لسه — بتتملى مع الشغل.', 'empty so far — it fills as work is recorded.')}</span>${chosen ? `<span class="muted pcard-chosen">${A('اتختار وقت الإنشاء:', 'Chosen at creation:')} <bdi>${esc(chosen)}</bdi></span>` : ''}`);
+    } else {
+      parts.push(`<span>${A(`${m.current} معلومة`, `${m.current} facts`)}</span>`);
+      const stale = (m.mayBeStale ?? 0) + (m.staleEvidence ?? 0);
+      const care = [stale ? A(`${stale} محتاجة مراجعة`, `${stale} to recheck`) : '', m.disputed ? A(`${m.disputed} عليها خلاف`, `${m.disputed} disputed`) : '', m.unresolved ? A(`${m.unresolved} مش محسومة`, `${m.unresolved} unresolved`) : ''].filter(Boolean);
+      const why = A('«محتاجة مراجعة»: الملفات اللي بتثبتها اتغيّرت، والوكيل بيراجعها لما الشغل يلمسها. «مش محسومة»: معلومة لسه من غير دليل كفاية.', '“To recheck”: the files behind them changed; the agent rechecks them when work touches them. “Unresolved”: knowledge without enough evidence yet.');
+      parts.push(care.length
+        ? `<button type="button" class="linkbtn pcard-care" data-open-project="${esc(project.id)}" data-open-view="overview" title="${esc(why)}">${care.join(' · ')} ${fwd()}</button>`
+        : `<span class="muted">✓ ${A('مفيش حاجة محتاجة مراجعة', 'nothing needs care')}</span>`);
+    }
+    return `<div class="pcard-health tiny"><b>${A('ذاكرة المشروع', 'Project memory')}</b>${parts.join('')}</div>`;
   }
   // PF-0162: the first screen asks what the developer wants to do. Create and Manage work with
   // an AI agent, so the state of the agents on this machine is shown with them, and its setup
@@ -4412,30 +4407,18 @@
     folderIntent = intent;
     openFolder('existing');
   }
+  // PF-0170: one visible loader for a page that cannot draw yet (still for reduced motion).
+  const pageLoader = (text = A('بيحمّل…', 'Loading…')) => `<div class="pageload" role="status" aria-live="polite"><span class="pageload-spin" aria-hidden="true"></span><span>${text}</span></div>`;
   function viewProjects() {
-    if (!overview) return `<p class="muted" style="margin-top:30px">${A('بيحمّل المشاريع…', 'Loading projects…')}</p>`;
-    const cards = overview.map(({ project, snap: s, error: e, health }) => {
-      if (e) return `<div class="projwrap"><article class="proj panel"><div class="grow"><h2 style="font-size:20px">${esc(project.name)}</h2><p class="small" style="color:var(--clay)">${A('YallaFlow مش قادر يقرا سجلات المشروع ده:', 'YallaFlow cannot read this project\'s records:')} ${esc(e)}</p>${memoryHealth(health)}</div></article>${projRemoveBtn(project)}</div>`;
-      const openN = s.items.filter((it) => it.state !== 'done').length;
-      const badge = !s.items.length ? `<span class="hico sm" aria-hidden="true">＋</span>` : openN ? ring(s.openCompletion ?? 0, 92, 9) : `<span class="hico sm done" aria-hidden="true">✓</span>`;
-      const dist = ST.map((_, i) => s.items.filter((it) => curIndex(it) === i).length);
-      const last = s.items.map((it) => it.lastActivityAt).filter(Boolean).sort().at(-1);
-      // PF-0128: a card with its own actions — open the project, open its folder, copy its path.
-      const tail = String(project.root ?? '').split(/[\\/]/).filter(Boolean).slice(-2).join('/');
-      return `<article class="pcard panel ${project.id === pid ? 'here' : ''}">
-        <header class="pcard-head"><div class="grow pcard-id"><a class="pcard-title" href="#/map" data-open-project="${project.id}"><h2>${esc(project.name)}</h2></a><span class="ltr tiny muted pcard-path" title="${esc(project.root ?? '')}">…/${esc(tail)}</span></div>${badge}</header>
-        <div class="row tiny pcard-chips">${projectMode(project.id) === 'monitor' ? `<span class="chip wait" data-mode-chip="monitor">👁 ${A('متابعة فقط', 'Monitor only')}</span>` : ''}${s.counts.you ? `<span class="chip you"><i></i>${s.counts.you} ${L(STATE.you)}</span>` : ''}${s.counts.fail ? `<span class="chip fail"><i></i>${s.counts.fail} ${L(STATE.fail)}</span>` : ''}<span class="chip todo">${s.counts.active + s.counts.paused + s.counts.new} ${A('مفتوح', 'open')}</span><span class="chip done"><i></i>${s.counts.done} ${L(STATE.done)}</span>${s.invalid?.length ? `<span class="chip wait">⚠ ${s.invalid.length} ${A('سجلات مش سليمة', 'invalid records')}</span>` : ''}</div>
-        ${!s.items.length ? `<p class="small muted">${A('لسه مفيش شغل مسجّل.', 'No work recorded yet.')}</p>` : !openN ? `<p class="small muted">${A('كل الشغل المسجّل خلص.', 'All recorded work is done.')}</p>` : ''}
-        ${memoryHealth(health)}
-        <div class="pflow">${dist.map((n, i) => `<span style="--hue:${ST[i].hue}" data-tip="${esc(L(ST[i].name))}: ${n}"><i style="height:${6 + n * 10}px"></i><b>${n}</b></span>`).join('')}</div>
-        <div class="tiny muted">${last ? A(`آخر نشاط مسجّل ${ago(last)}`, `last recorded activity ${ago(last)}`) : ''}</div>
-        ${cardAgents(project)}
-        <footer class="pcard-foot"><button type="button" class="btn sm go" data-open-project="${project.id}">${A('افتح', 'Open')}</button>${readOnly ? '' : `<button type="button" class="btn sm" data-open-folder="${project.id}" title="${esc(A('افتح فولدر المشروع في مدير الملفات', 'Open the project folder in your file manager'))}">${A('افتح الفولدر', 'Open folder')}</button>`}<button type="button" class="btn sm ghost" data-copy="${esc(project.root ?? '')}" data-copy-what="path">${A('انسخ المسار', 'Copy path')}</button><span class="grow"></span>${readOnly ? '' : `<button type="button" class="btn sm ghost danger" data-remove-project="${project.id}" aria-label="${esc(A(`شيل ${project.name} من الكونسول`, `Remove ${project.name} from the console`))}">${A('شيل', 'Remove')}</button>`}</footer></article>`;
-    }).join('');
-    return `<section class="pagehead"><div class="row"><h1 style="font-size:26px">${A('المشاريع', 'Projects')}</h1>${readOnly ? '' : `<button class="btn sm" data-folder-open="existing" style="margin-inline-start:auto">${A('ضيف مشروع موجود', 'Add an existing project')}</button><a class="btn sm go" href="#/new">＋ ${A('مشروع جديد', 'New project')}</a>`}</div><p class="muted">${agentsOn ? A('كل مشاريعك ووكلاءها في مكان واحد. كل مشروع ليه مجلد .yallaflow خاص بيه، والكونسول بيقرا كل واحد لوحده.', 'All your projects and their agents in one place. Each project has its own .yallaflow; the console reads each one separately.') : A('كل مشروع ليه مجلد .yallaflow خاص بيه، والكونسول بيقرا كل واحد لوحده.', 'Each project has its own .yallaflow; the console reads each one separately.')}</p></section>
+    if (!overview) return pageLoader(A('بيحمّل المشاريع…', 'Loading projects…'));
+    const entries = overview.map((entry) => ({ ...entry, f: projectFacts(entry, lanesOf(entry.project.id)) }));
+    const shown = orderProjects(entries).filter((entry) => projectMatches(entry, pflt));
+    const none = entries.length && !shown.length ? `<p class="small muted pempty">${A('مفيش مشروع مطابق.', 'No project matches.')} <button type="button" class="linkbtn" data-pf-reset>${A('امسح البحث والفلتر', 'Clear search and filter')}</button></p>` : '';
+    return `<section class="pagehead"><div class="row"><h1 style="font-size:26px">${A('المشاريع', 'Projects')}</h1>${readOnly ? '' : `<button class="btn sm" data-folder-open="existing" style="margin-inline-start:auto">${A('ضيف مشروع موجود', 'Add an existing project')}</button><a class="btn sm go" href="#/new">＋ ${A('مشروع جديد', 'New project')}</a>`}</div><p class="muted pagehead-sub">${agentsOn ? A('حالة كل مشروع، شغله المفتوح، ووكلاؤه — والخطوة الجاية.', 'Each project’s state, open work and agents — and what to do next.') : A('حالة كل مشروع وشغله المفتوح — والخطوة الجاية.', 'Each project’s state and open work — and what to do next.')}</p></section>
       ${unfinishedCreation()}
       ${overview.length ? inboxSection() : ''}
-      ${overview.length ? `<section class="projects">${cards}</section>` : welcomePanel()}
+      ${entries.length > 1 ? projectsToolbar(entries) : ''}
+      ${overview.length ? `<section class="projects">${shown.map(projectCard).join('')}</section>${none}` : welcomePanel()}
       ${unavailable.length ? `<p class="small" style="margin-top:14px">${A('مش متاحة (الفولدر اتنقل أو اتمسح):', 'Unavailable (folder moved or deleted):')} ${unavailable.map((u) => `<span class="ltr tag">${esc(u)}${readOnly ? '' : ` <button type="button" class="tagx" data-remove-project-root="${esc(u)}" aria-label="${esc(A(`شيل ${u} من الكونسول`, `Remove ${u} from the console`))}">✕</button>`}</span>`).join(' ')}</p>` : ''}
       ${devPanel(A('إدارة قائمة المشاريع', 'Manage the project list'), ['yallaflow console add <folder>', 'yallaflow console remove <folder>', 'yallaflow console list'])}`;
   }
@@ -4542,31 +4525,204 @@
   function inboxSection() {
     if (!agentsOn) return '';
     const inbox = execView?.inbox ?? [];
-    const list = !execView ? `<p class="tiny muted">${execError ? esc(execError) : A('بيحمّل…', 'Loading…')}</p>` : inbox.length ? `<div class="inbox-list">${inbox.map(xPermCard).join('')}</div>` : `<p class="tiny muted">${A('مفيش طلبات مستنية دلوقتي.', 'Nothing is waiting for you right now.')}</p>`;
-    return `<section class="inbox ${inbox.length ? 'has' : ''}" id="inbox" aria-labelledby="inbox-h"><div class="row inbox-h"><h2 id="inbox-h">${A('محتاجك', 'Needs you')}</h2>${inbox.length ? `<span class="pbadge you">${inbox.length}</span>` : ''}<span class="tiny muted grow">${A('طلبات الوكلاء من كل المشاريع. لو محدش ردّ، الطلب بيترفض تلقائي — عمره ما بيتوافق عليه لوحده.', 'Agent requests from every project. Unanswered requests are denied automatically — never approved on their own.')}</span></div>${list}</section>${limitNotices()}`;
+    // PF-0169: nothing waiting is one slim line; requests are the full, prominent list.
+    if (!inbox.length) return `<p class="inbox-ok tiny" id="inbox" role="status">${!execView ? `<span class="muted">${execError ? esc(execError) : A('بيحمّل طلبات الوكلاء…', 'Loading agent requests…')}</span>` : `<span class="chip done"><i></i>${A('مفيش حاجة مستنياك', 'Nothing needs you')}</span><span class="muted">${A('طلبات الوكلاء من كل المشاريع بتظهر هنا.', 'Agent requests from every project appear here.')}</span>`}</p>${limitNotices()}`;
+    return `<section class="inbox has" id="inbox" aria-labelledby="inbox-h"><div class="row inbox-h"><h2 id="inbox-h">${A('محتاجك', 'Needs you')}</h2><span class="pbadge you">${inbox.length}</span><span class="tiny muted grow">${A('طلبات الوكلاء من كل المشاريع. لو محدش ردّ، الطلب بيترفض تلقائي — عمره ما بيتوافق عليه لوحده.', 'Agent requests from every project. Unanswered requests are denied automatically — never approved on their own.')}</span></div><div class="inbox-list">${inbox.map(xPermCard).join('')}</div></section>${limitNotices()}`;
   }
   const lanesOf = (projectId) => (execView?.lanes ?? []).filter((lane) => lane.project === projectId || (lane.kind === 'lane' && lane.parent === projectId));
-  const activeRun = (lane) => lane.runs.some((run) => !['finished', 'cancelled'].includes(run.state));
-  function laneRow(lane) {
+  // PF-0169: what one agent lane is doing now, for a project card — or null when all it holds is
+  // history. A run task whose work item is DONE or closed, or that has finished, is history; a
+  // paused or interrupted task (a console restart interrupts live ones) can be resumed.
+  const FINAL_TASK = ['done', 'failed', 'skipped', 'cancelled'];
+  function laneStatus(lane, closed = new Set()) {
+    const s = lane.session;
+    const tasks = lane.runs.filter((run) => !['finished', 'cancelled'].includes(run.state)).flatMap((run) => (run.lanes ?? []).flatMap((entry) => entry.tasks ?? [])).filter((task) => !FINAL_TASK.includes(task.state) && !closed.has(task.workId));
+    const resumable = tasks.find((task) => ['paused', 'interrupted', 'starting', 'working', 'needs-you'].includes(task.state));
+    const queued = tasks.find((task) => task.state === 'queued');
+    const work = s?.workId ?? resumable?.workId ?? queued?.workId ?? null;
+    if (lane.pending?.length) return { key: 'approval', tone: 'you', label: A('محتاج موافقتك', 'needs your approval'), work };
+    if (s?.status === 'working') return { key: 'working', tone: 'active', label: A('شغّال', 'working'), work };
+    if (s?.status === 'starting') return { key: 'starting', tone: 'active', label: A('بيبدأ', 'starting'), work };
+    if (s) return { key: 'session', tone: 'wait', label: s.status === 'connected' ? A('الجلسة مفتوحة', 'session open') : A('الجلسة مستنياك', 'session waiting for you'), work };
+    if (resumable) return { key: 'paused', tone: 'idle', label: A('متوقف — ينفع يكمّل', 'paused — can resume'), work };
+    if (queued) return { key: 'queued', tone: 'todo', label: A('في الطابور', 'queued'), work };
+    if (lane.kind === 'lane') return { key: 'lane', tone: 'todo', label: A('مفيش وكيل شغّال', 'no agent running'), work: null };
+    return null;
+  }
+  function laneRow(lane, st) {
     const s = lane.session;
     const prov = s ? (s.provider === 'claude' ? ['c', 'Claude Code'] : ['x', 'Codex']) : null;
-    const tone = lane.pending.length ? 'you' : ['working', 'starting'].includes(s?.status) ? 'active' : s ? 'wait' : 'todo';
-    const status = !s ? (activeRun(lane) ? A('في الطابور', 'queued') : A('مفيش وكيل شغّال', 'no agent running')) : lane.pending.length ? A('محتاج موافقتك', 'needs your approval') : s.status === 'working' ? A('شغّال', 'working') : s.status === 'starting' ? A('بيبدأ', 'starting') : s.status === 'connected' ? A('متوصّل', 'connected') : A('مستنيك', 'waiting for you');
-    const work = s?.workId ?? lane.runs.flatMap((run) => run.lanes?.[0]?.tasks ?? []).find((task) => ['starting', 'working', 'needs-you', 'queued', 'paused', 'interrupted'].includes(task.state))?.workId ?? null;
-    const workedMin = lane.workingSince ? Math.floor((Date.now() - Date.parse(lane.workingSince)) / 60000) : null;
-    const detail = [lane.lastStep?.title ? esc(lane.lastStep.title) : '', workedMin !== null ? A(`بقاله ${mins(workedMin)}`, `for ${mins(workedMin)}`) : ''].filter(Boolean).join(' · ');
-    return `<li class="plane"><span class="plane-prov ${prov ? prov[0] : ''}" ${prov ? `title="${prov[1]}"` : ''} aria-hidden="true">${prov ? prov[0].toUpperCase() : '–'}</span><div class="grow plane-body"><div class="plane-top">${work ? `<a href="#" class="ltr" data-x-open="${esc(lane.project)}" data-x-work="${esc(work)}">${esc(work)}</a>` : ''}${lane.kind === 'lane' ? `<span class="tag ltr" title="${esc(A('مسار (worktree)', 'Lane (worktree)'))}">${esc(lane.name)}</span>` : ''}</div>${detail ? `<div class="tiny muted plane-step">${detail}</div>` : ''}</div><span class="chip ${tone}"><i></i>${prov ? `<span class="sr-only">${prov[1]}: </span>` : ''}${status}</span></li>`;
+    const workedMin = st.key === 'working' && lane.workingSince ? Math.floor((Date.now() - Date.parse(lane.workingSince)) / 60000) : null;
+    const detail = [s && lane.lastStep?.title ? esc(lane.lastStep.title) : '', workedMin !== null ? A(`بقاله ${mins(workedMin)}`, `for ${mins(workedMin)}`) : ''].filter(Boolean).join(' · ');
+    return `<li class="plane" data-lane-state="${st.key}"><span class="plane-prov ${prov ? prov[0] : ''}" ${prov ? `title="${prov[1]}"` : ''} aria-hidden="true">${prov ? prov[0].toUpperCase() : '–'}</span><div class="grow plane-body"><div class="plane-top">${st.work ? `<a href="#" class="ltr" data-x-open="${esc(lane.project)}" data-x-work="${esc(st.work)}">${esc(st.work)}</a>` : ''}${lane.kind === 'lane' ? `<span class="tag ltr" title="${esc(A('مسار (worktree)', 'Lane (worktree)'))}">${esc(lane.name)}</span>` : ''}</div>${detail ? `<div class="tiny muted plane-step">${detail}</div>` : ''}</div><span class="chip ${st.tone}"><i></i>${prov ? `<span class="sr-only">${prov[1]}: </span>` : ''}${st.label}</span></li>`;
   }
-  function cardAgents(project) {
-    if (!agentsOn) return '';
-    const lanes = lanesOf(project.id);
-    const live = lanes.filter((lane) => lane.session || lane.pending.length || lane.kind === 'lane' || activeRun(lane));
-    const working = live.filter((lane) => lane.session?.status === 'working').length;
-    const head = `<div class="row pagents-h"><b class="tiny">${A('الوكلاء', 'Agents')}</b><span class="grow"></span>${working ? `<span class="tiny muted">${A(`${working} شغّال`, `${working} working`)}</span>` : ''}</div>`;
-    if (!execView) return `<div class="pagents">${head}<p class="tiny muted">${A('بيحمّل…', 'Loading…')}</p></div>`;
-    if (!live.length) return `<div class="pagents">${head}<p class="tiny muted">${A('مفيش وكيل شغّال.', 'No agent running.')}</p></div>`;
-    const more = lanes.some((lane) => lane.runs.length || lane.kind === 'lane' || lane.session) ? `<button type="button" class="linkbtn tiny" data-open-project="${esc(project.id)}" data-open-view="team">${A('الطوابير والدمج والتحكم في الجلسة', 'Queues, merges and session controls')} ${fwd()}</button>` : '';
-    return `<div class="pagents">${head}<ul class="planes">${live.map(laneRow).join('')}</ul>${more}</div>`;
+  // The work items a card treats as history for its agent rows: DONE or closed in its snapshot.
+  const closedWork = (snap) => new Set((snap?.items ?? []).filter((it) => ['done', 'closed'].includes(it.state)).map((it) => it.id));
+  function cardAgents(project, closed = new Set()) {
+    if (!agentsOn || !execView) return '';
+    const rows = lanesOf(project.id).map((lane) => [lane, laneStatus(lane, closed)]).filter(([, st]) => st);
+    // PF-0169: no panel when nothing is live — history stays on Worktrees.
+    if (!rows.length) return '';
+    return `<div class="pagents"><ul class="planes" aria-label="${esc(A('الوكلاء', 'Agents'))}">${rows.map(([lane, st]) => laneRow(lane, st)).join('')}</ul><button type="button" class="linkbtn tiny" data-open-project="${esc(project.id)}" data-open-view="team">${A('الطوابير والدمج والتحكم في الجلسة', 'Queues, merges and session controls')} ${fwd()}</button></div>`;
+  }
+
+  // ---------- PF-0169: the Projects page — what each card says, from recorded data only ----------
+  let pflt = { q: '', st: 'all', sort: 'recent' };
+  let projOrder = null; // { sort, ids }: the card order, frozen for this visit so live updates never reshuffle it
+  const OPEN_STATES = ['new', 'active', 'paused', 'you', 'fail'];
+  const SETUP_UNDERSTANDING = ['PROJECT_UNDERSTANDING_REQUIRED', 'PROJECT_UNDERSTANDING_IN_PROGRESS', 'PROJECT_UNDERSTANDING_AWAITING_REVIEW'];
+  // An item's latest recorded moment: its last activity, else its last update, else its creation.
+  const lastMoment = (it) => it.lastActivityAt ?? it.updatedAt ?? it.createdAt ?? '';
+  const byRecent = (a, b) => String(lastMoment(b)).localeCompare(String(lastMoment(a)));
+  function projectFacts(entry, lanes = []) {
+    const closed = closedWork(entry.snap);
+    const live = lanes.map((lane) => laneStatus(lane, closed)).filter(Boolean);
+    const agents = {
+      live: live.length,
+      pending: lanes.reduce((n, lane) => n + (lane.pending?.length ?? 0), 0),
+      working: live.filter((st) => ['working', 'starting'].includes(st.key)).length
+    };
+    const understanding = entry.health?.understanding ?? null;
+    const baselineId = entry.health?.baselineId ?? null;
+    const s = entry.snap;
+    if (entry.error || !s) return { error: entry.error ?? 'unavailable', items: 0, open: 0, done: 0, held: 0, you: 0, fail: 0, invalid: 0, lastAt: null, current: null, closed, understanding, baselineId, ...agents };
+    const items = s.items ?? [];
+    const open = items.filter((it) => OPEN_STATES.includes(it.state));
+    const active = s.project?.activeWork ?? null;
+    // The item the card leads with: one waiting for you, then a failing one, then the
+    // project's active work, then the most recent open item.
+    const current = open.find((it) => it.state === 'you') ?? open.find((it) => it.state === 'fail') ?? open.find((it) => it.id === active) ?? [...open].sort(byRecent)[0] ?? null;
+    return {
+      error: null,
+      items: items.length,
+      open: open.length,
+      done: items.filter((it) => it.state === 'done').length,
+      held: items.filter((it) => it.state === 'held').length,
+      you: open.filter((it) => it.state === 'you').length,
+      fail: open.filter((it) => it.state === 'fail').length,
+      invalid: s.invalid?.length ?? 0,
+      lastAt: items.map(lastMoment).filter(Boolean).sort().at(-1) ?? null,
+      current,
+      closed,
+      understanding,
+      baselineId,
+      ...agents
+    };
+  }
+  // One execution state per card; "working" only with a working agent session.
+  function projectState(f) {
+    if (f.error) return { key: 'error', tone: 'fail', label: A('السجلات مش مقروءة', 'Records unreadable') };
+    if (f.pending || f.you) return { key: 'you', tone: 'you', label: A('محتاجك', 'Needs you') };
+    if (f.fail) return { key: 'fail', tone: 'fail', label: A('فيه فحص فشل', 'A check failed') };
+    if (f.working) return { key: 'running', tone: 'active', label: A('وكيل شغّال', 'Agent working') };
+    if (f.open) return { key: 'open', tone: 'openw', label: A('فيه شغل مفتوح', 'Open work') };
+    if (f.done) return { key: 'done', tone: 'done', label: A('كل المهام خلصت', 'All tasks completed') };
+    return { key: 'empty', tone: 'todo', label: A('لسه مفيش شغل', 'No work yet') };
+  }
+  const needsSetup = (f, readinessData = null) => SETUP_UNDERSTANDING.includes(f.understanding) || Boolean(readinessData?.steps?.some((st) => st.id === 'agent' && st.status === 'choose'));
+  // The one next action a card offers, from recorded state and an existing console destination.
+  // ctx: { monitor, readOnly, readiness } — readiness is known only for the current project.
+  function nextAction(projectId, f, { monitor = false, readOnly: ro = false, readiness: rd = null } = {}) {
+    if (f.error) return null;
+    const write = !monitor && !ro;
+    const item = (it, label, attn = false) => ({ kind: 'item', work: it.id, label, attn });
+    const view = (v, label, attn = false) => ({ kind: 'view', view: v, label, attn });
+    if (f.pending && write) return { kind: 'inbox', label: A('راجع طلب الوكيل', 'Review the agent request'), attn: true };
+    const you = f.current?.state === 'you' ? f.current : null;
+    if (you) return write ? item(you, you.waitingFor?.kind === 'question' ? A('جاوب السؤال', 'Answer the question') : A('راجع القرار', 'Review the decision'), true) : item(you, A(`افتح ${you.id}`, `Open ${you.id}`));
+    if (write && f.understanding === 'PROJECT_UNDERSTANDING_AWAITING_REVIEW') return f.baselineId ? { kind: 'item', work: f.baselineId, label: A('راجع فهم المشروع', 'Review project understanding'), attn: true } : view('map', A('راجع فهم المشروع', 'Review project understanding'), true);
+    if (write && f.understanding === 'PROJECT_UNDERSTANDING_REQUIRED') return view('map', A('ابدأ فهم المشروع', 'Start project understanding'));
+    if (write && f.understanding === 'PROJECT_UNDERSTANDING_IN_PROGRESS') return f.baselineId ? { kind: 'item', work: f.baselineId, label: A('كمّل فهم المشروع', 'Continue project understanding') } : view('map', A('كمّل فهم المشروع', 'Continue project understanding'));
+    if (write && rd?.steps?.some((st) => st.id === 'agent' && st.status === 'choose')) return view('settings/agents', A('كمّل الإعداد', 'Continue setup'));
+    if (f.current?.state === 'fail') return item(f.current, A('افتح الشغل اللي فشل', 'Open the failing work'), true);
+    if (f.working) return view('team', A('شوف الشغل الشغّال', 'View running work'));
+    if (f.current) return item(f.current, A(`كمّل ${f.current.id}`, `Continue ${f.current.id}`));
+    return null;
+  }
+  // The filters never overlap: each project falls in exactly one, by this precedence, so the
+  // counts add up to All. "Open work" says nothing about agents running.
+  const FILTERS = [
+    ['all', { ar: 'الكل', en: 'All' }],
+    ['attention', { ar: 'محتاجك', en: 'Needs you' }],
+    ['setup', { ar: 'محتاج إعداد', en: 'Needs setup' }],
+    ['open', { ar: 'فيه شغل مفتوح', en: 'Open work' }],
+    ['idle', { ar: 'مفيش شغل مفتوح', en: 'No open work' }]
+  ];
+  function projectGroup(entry) {
+    const st = projectState(entry.f).key;
+    if (['you', 'fail', 'error'].includes(st)) return 'attention';
+    if (needsSetup(entry.f, entry.project.id === pid && readiness?.pid === pid ? readiness.data : null)) return 'setup';
+    if (['running', 'open'].includes(st)) return 'open';
+    return 'idle';
+  }
+  const projectFilterKey = (entry, key) => key === 'all' || projectGroup(entry) === key;
+  function projectMatches(entry, by) {
+    const q = String(by.q ?? '').trim().toLowerCase();
+    if (q && !`${entry.project.name ?? ''}\n${entry.project.root ?? ''}`.toLowerCase().includes(q)) return false;
+    return projectFilterKey(entry, by.st ?? 'all');
+  }
+  const GROUP_RANK = { attention: 0, setup: 1, open: 2, idle: 3 };
+  function sortProjects(entries, sort) {
+    const recent = (a, b) => String(b.f.lastAt ?? '').localeCompare(String(a.f.lastAt ?? '')) || String(a.project.name).localeCompare(String(b.project.name));
+    return [...entries].sort(sort === 'attention' ? (a, b) => GROUP_RANK[projectGroup(a)] - GROUP_RANK[projectGroup(b)] || recent(a, b) : recent);
+  }
+  // Frozen per visit: a project that becomes active later keeps its place until the page is
+  // opened again or the order is changed; a newly added project goes last.
+  function orderProjects(entries) {
+    if (!projOrder || projOrder.sort !== pflt.sort) projOrder = { sort: pflt.sort, ids: [] };
+    // Projects not placed yet (the first draw, or one added since) go after the placed ones, in sort order.
+    const fresh = sortProjects(entries.filter((e) => !projOrder.ids.includes(e.project.id)), pflt.sort);
+    projOrder.ids.push(...fresh.map((e) => e.project.id));
+    const at = (e) => projOrder.ids.indexOf(e.project.id);
+    return [...entries].sort((a, b) => at(a) - at(b));
+  }
+  function projectsToolbar(entries) {
+    const count = (key) => entries.filter((e) => projectFilterKey(e, key)).length;
+    const chips = FILTERS.map(([key, label]) => [key, label, count(key)]).filter(([key, , n]) => key === 'all' || n || pflt.st === key)
+      .map(([key, label, n]) => `<button type="button" class="fchip ${pflt.st === key ? 'on' : ''}" data-pf="${key}" aria-pressed="${pflt.st === key}">${L(label)} <span class="pfn">${n}</span></button>`).join('');
+    return `<section class="ptools" aria-label="${esc(A('دوّر في المشاريع', 'Find a project'))}">
+      <input type="search" data-pq value="${esc(pflt.q)}" placeholder="${esc(A('دوّر بالاسم أو المسار…', 'Search by name or path…'))}" aria-label="${esc(A('دوّر في المشاريع', 'Search projects'))}">
+      <div class="pfchips" role="group" aria-label="${esc(A('فلتر بالحالة', 'Filter by status'))}">${chips}</div>
+      <label class="psort tiny muted">${A('الترتيب', 'Order')} <select data-psort><option value="recent" ${pflt.sort === 'recent' ? 'selected' : ''}>${A('آخر نشاط', 'Latest activity')}</option><option value="attention" ${pflt.sort === 'attention' ? 'selected' : ''}>${A('اللي محتاجك الأول', 'Needs attention first')}</option></select></label>
+    </section>`;
+  }
+  function projectMenu(project) {
+    const items = [
+      readOnly ? '' : `<button type="button" role="menuitem" class="projmenu-item" data-open-folder="${esc(project.id)}"><span class="projmenu-check" aria-hidden="true">▢</span>${A('افتح الفولدر', 'Open folder')}</button>`,
+      `<button type="button" role="menuitem" class="projmenu-item" data-copy="${esc(project.root ?? '')}" data-copy-what="path"><span class="projmenu-check" aria-hidden="true">⧉</span>${A('انسخ المسار', 'Copy path')}</button>`,
+      readOnly ? '' : `<div class="projmenu-sep" role="separator"></div><button type="button" role="menuitem" class="projmenu-item danger" data-remove-project="${esc(project.id)}"><span class="projmenu-check" aria-hidden="true">✕</span>${A('شيل من الكونسول…', 'Remove from the console…')}</button>`
+    ].join('');
+    return `<details class="pcard-menu" data-popmenu><summary class="pcard-more" aria-haspopup="menu" aria-label="${esc(A(`إجراءات تانية لـ ${project.name}`, `More actions for ${project.name}`))}" title="${esc(A('إجراءات تانية', 'More actions'))}"><span aria-hidden="true">⋯</span></summary><div class="projmenu-panel pcard-menu-panel" role="menu">${items}</div></details>`;
+  }
+  function nextButton(projectId, act) {
+    if (!act) return '';
+    const cls = `btn sm pcard-next ${act.attn ? 'attn' : ''}`;
+    if (act.kind === 'inbox') return `<button type="button" class="${cls}" data-pinbox>${act.label}</button>`;
+    if (act.kind === 'item') return `<button type="button" class="${cls}" data-x-open="${esc(projectId)}" data-x-work="${esc(act.work)}">${act.label}</button>`;
+    return `<button type="button" class="${cls}" data-open-project="${esc(projectId)}" data-open-view="${esc(act.view)}">${act.label}</button>`;
+  }
+  function projectCard({ project, health, f }) {
+    const here = project.id === pid;
+    const monitor = projectMode(project.id) === 'monitor';
+    const state = projectState(f);
+    const act = nextAction(project.id, f, { monitor, readOnly, readiness: here && readiness?.pid === pid ? readiness.data : null });
+    const tail = String(project.root ?? '').split(/[\\/]/).filter(Boolean).slice(-2).join('/');
+    // Counts say only what is there; with nothing open, the state chip is the one empty-work message.
+    const counts = f.error ? '' : [f.open ? A(`${f.open} مفتوح`, `${f.open} open`) : '', f.done ? A(`${f.done} خلص`, `${f.done} done`) : '', f.held ? A(`${f.held} متوقف`, `${f.held} on hold`) : ''].filter(Boolean).join(' · ');
+    const it = f.current;
+    const work = f.error
+      ? `<p class="small pcard-err">${A('YallaFlow مش قادر يقرا سجلات المشروع ده:', 'YallaFlow cannot read this project\'s records:')} ${esc(f.error)}</p>`
+      : it
+        ? `<a href="#" class="pcard-work" data-x-open="${esc(project.id)}" data-x-work="${esc(it.id)}"><span class="pcard-wid ltr">${esc(it.id)}</span><span class="pcard-wtitle" dir="auto">${esc(it.title)}</span><span class="tiny muted pcard-wst">${['you', 'fail'].includes(it.state) ? `${L(STATE[it.state])} · ` : ''}${esc(stName(curIndex(it)))}</span></a>`
+        : '';
+    return `<article class="pcard panel ${here ? 'here' : ''}" data-card-open="${esc(project.id)}" data-pstate="${state.key}">
+        <header class="pcard-head"><div class="grow pcard-id"><div class="pcard-tline"><a class="pcard-title" href="#/map" data-open-project="${esc(project.id)}"><h2 dir="auto">${esc(project.name)}</h2></a>${here ? `<span class="tag pcard-here">${A('المشروع الحالي', 'Current')}</span>` : ''}</div><span class="ltr tiny muted pcard-path" title="${esc(project.root ?? '')}">…/${esc(tail)}</span></div>${projectMenu(project)}</header>
+        <div class="row pcard-status"><span class="chip ${state.tone}" data-state-chip><i></i>${state.label}</span>${monitor ? `<span class="chip wait" data-mode-chip="monitor">👁 ${A('متابعة فقط', 'Monitor only')}</span>` : ''}${f.invalid ? `<span class="chip wait">⚠ ${f.invalid} ${A('سجلات مش سليمة', 'invalid records')}</span>` : ''}<span class="tiny muted pcard-counts">${counts}</span></div>
+        ${work}
+        ${cardAgents(project, f.closed)}
+        ${cardHealth(project, health)}
+        <footer class="pcard-foot"><button type="button" class="btn sm go" data-open-project="${esc(project.id)}">${A('افتح المشروع', 'Open project')}</button>${nextButton(project.id, act)}<span class="grow"></span><span class="tiny muted pcard-last">${f.lastAt ? A(`آخر نشاط ${ago(f.lastAt)}`, `Active ${ago(f.lastAt)}`) : ''}</span></footer>
+      </article>`;
   }
   // Worktrees: this project's agent lanes in full (queues, Review & Merge, Clean up, session controls).
   function agentLanesSection() {
@@ -4577,7 +4733,7 @@
   }
 
   function viewTeam() {
-    if (!team) return `<p class="muted" style="margin-top:30px">${A('بيحمّل…', 'Loading…')}</p>`;
+    if (!team) return pageLoader();
     if (team.error) return `<section class="errbar">${esc(team.error)}</section>`;
     if (!team.git) return `<section class="pagehead"><h1 style="font-size:26px">${A('نسخ الشغل', 'Worktrees')}</h1><p class="muted">${A('المشروع ده مش جوه Git repository لسه.', 'This project is not in a Git repository yet.')}</p></section><section class="panel"><p class="small">${A('نسخ الشغل (git worktrees) بتخليك تشغّل أكتر من وكيل على شغلانات مختلفة في نفس الوقت من غير ما يتداخلوا. محتاجة Git الأول.', 'Worktrees (git worktrees) let you run several agents on different work items at the same time without collisions. They need Git first.')}</p>${readOnly ? '' : `<button class="btn sm go" data-git-init style="margin-top:8px">${A('اعمل Git repository', 'Initialize Git')}</button><p class="tiny muted">${A('git init بس: من غير remote ولا commit ولا push.', 'git init only: no remote, commit or push.')}</p>`}</section>${agentLanesSection()}`;
     const lane = (w) => {
@@ -4893,7 +5049,8 @@
     const r = route();
     readOnly = viewReadOnly(r.v); // PF-0161: a monitored project reads as read-only, project by project
     if (r.v === 'map' || r.v === 'lines') store.set('wsView', r.v);
-    const hadQ = document.activeElement?.matches?.('[data-q]');
+    const hadQ = document.activeElement?.matches?.('[data-q]') ? '[data-q]' : document.activeElement?.matches?.('[data-pq]') ? '[data-pq]' : null;
+    if (r.v !== 'projects') projOrder = null; // PF-0169: the card order is frozen per visit
     const hadAgent = document.activeElement?.matches?.('[data-agent-input]');
     const chatBody = document.querySelector('#chatwin .chatbody');
     const chatEnd = chatForceEnd || chatAtEnd(); const chatTop = chatBody?.scrollTop ?? 0;
@@ -4901,7 +5058,7 @@
     document.title = (snap?.counts?.you ? `(${snap.counts.you}) ` : '') + 'YallaFlow' + (snap?.project?.name ? ` · ${snap.project.name}` : '');
     if (!projects.length && snap && !['new', 'projects'].includes(r.v)) { location.hash = '#/projects'; return; }
     const views = { new: viewNew, overview: viewOverview, run: viewRun, settings: viewSettings, setup: viewRun, item: () => viewItem(r.id), lines: viewLines, agents: viewProjects, team: viewTeam, insights: viewInsights, projects: viewProjects, map: viewMap };
-    const body = !snap ? `<p class="muted" style="margin-top:40px;text-align:center">${error ? '' : A('بيحمّل…', 'Loading…')}</p>` : (views[r.v] ?? viewMap)();
+    const body = !snap ? (error ? '' : pageLoader()) : (views[r.v] ?? viewMap)();
     // Forms marked data-keep survive a redraw: typed values and focus are carried over (PF-0057).
     const kept = [...document.querySelectorAll('form[data-keep]')].map((form) => ({ key: form.dataset.keep, values: [...form.elements].filter((el) => el.name && el.type !== 'file' && (el.type === 'checkbox' || el.type === 'radio' ? el.checked !== el.defaultChecked : el.value !== el.defaultValue)).map((el) => [el.name, el.type === 'checkbox' || el.type === 'radio' ? (el.type === 'radio' ? (el.checked ? el.value : null) : el.checked) : el.value, el.type]), focus: form.contains(document.activeElement) ? document.activeElement.name : null, caret: document.activeElement?.selectionStart ?? null }));
     const entering = !reduced && r.v !== lastView;
@@ -4935,7 +5092,7 @@
       if (k.focus) { const el = form.elements.namedItem(k.focus); if (el?.focus) { el.focus(); if (k.caret !== null && el.setSelectionRange) try { el.setSelectionRange(k.caret, k.caret); } catch { /* not a text field */ } } }
     }
     requestAnimationFrame(placeConnectors);
-    if (hadQ) { const q = document.querySelector('[data-q]'); if (q) { q.focus(); q.setSelectionRange(q.value.length, q.value.length); } }
+    if (hadQ) { const q = document.querySelector(hadQ); if (q) { q.focus(); q.setSelectionRange(q.value.length, q.value.length); } }
     if (hadAgent) { const box = document.querySelector('[data-agent-input]'); if (box) { box.focus(); box.setSelectionRange(box.value.length, box.value.length); } }
     if (chatEnd) toChatEnd(); else { const body = document.querySelector('#chatwin .chatbody'); if (body) body.scrollTop = chatTop; }
   }
@@ -5505,6 +5662,21 @@
     else if (x.hasAttribute('data-more')) { const b = x.previousElementSibling; b.classList.toggle('clamp'); x.textContent = b.classList.contains('clamp') ? A('اقرأ الطلب كله ↓', 'Read the whole request ↓') : A('أقل ↑', 'Less ↑'); }
     else if (x.dataset.copy) copy(x.dataset.copy, x.dataset.copyWhat);
   });
+  // PF-0169: the Projects page — filters, order, the Needs-you jump, and the card itself.
+  document.addEventListener('click', (e) => {
+    const item = e.target.closest?.('[data-popmenu] [role=menuitem]');
+    if (item) item.closest('[data-popmenu]').open = false;
+    const pf = e.target.closest?.('[data-pf]');
+    if (pf) { pflt.st = pflt.st === pf.dataset.pf && pf.dataset.pf !== 'all' ? 'all' : pf.dataset.pf; render(); return; }
+    if (e.target.closest?.('[data-pf-reset]')) { pflt.q = ''; pflt.st = 'all'; render(); return; }
+    if (e.target.closest?.('[data-pinbox]')) { document.getElementById('inbox')?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' }); return; }
+    // A click on the card's own surface opens the project; its links, buttons and menu act on their own.
+    const card = e.target.closest?.('[data-card-open]');
+    if (!card || e.target.closest('a,button,summary,details,input,select,label,[role=menu]')) return;
+    if (String(window.getSelection?.() ?? '').trim()) return; // selecting text is not a click
+    switchProject(card.dataset.cardOpen);
+  });
+  document.addEventListener('change', (e) => { if (e.target.matches?.('[data-psort]')) { pflt.sort = e.target.value; projOrder = null; render(); } });
   // PF-0165: the «jump to latest» control follows the reader's own scrolling.
   document.addEventListener('scroll', (e) => { if (e.target?.classList?.contains('chatbody')) syncChatJump(); }, true);
   document.addEventListener('toggle', (e) => { const steps = e.target.dataset?.steps; if (steps && e.target.isConnected) { if (e.target.open) chatStepsOpen.add(steps); else chatStepsOpen.delete(steps); } }, true);
@@ -5596,7 +5768,7 @@
   document.addEventListener('dragend', () => { document.querySelectorAll('.station').forEach((st) => st.classList.remove('drop-ok', 'drop-no')); });
   document.addEventListener('dragover', (e) => { const st = e.target.closest?.('.station.drop-ok'); if (st) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; } });
   document.addEventListener('drop', (e) => { const st = e.target.closest?.('.station[data-st]'); if (st && dragged) { e.preventDefault(); dropOn(Number(st.dataset.st)); } });
-  document.addEventListener('input', (e) => { if (e.target.matches('[data-q]')) { flt.q = e.target.value; render(); } else if (e.target.matches('[data-agent-input]')) agentDraft = e.target.value; });
+  document.addEventListener('input', (e) => { if (e.target.matches('[data-q]')) { flt.q = e.target.value; render(); } else if (e.target.matches('[data-pq]')) { pflt.q = e.target.value; render(); } else if (e.target.matches('[data-agent-input]')) agentDraft = e.target.value; });
   document.addEventListener('click', (e) => {
     if (!e.target.closest?.('[data-chat-wide]')) return;
     e.preventDefault();
@@ -5675,6 +5847,7 @@
     render();
     await load();
     await buildDigest();
+    render(); // PF-0170: the page shows as soon as the snapshot is here; the rest fills in
     await loadForView();
     render();
     landOnSection();
@@ -5704,6 +5877,7 @@
     await loadPrefs();
     await load();
     await buildDigest();
+    render(); // PF-0170: draw before the slower reads (readiness, overview, agents)
     await loadForView();
     render();
     landOnSection();

@@ -328,7 +328,8 @@ html[dir="rtl"] .drawer { --dirx: -1; } .drawer.open { transform: none; }
 
  
 
-.projects { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 16px; }
+.projects { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; } /* PF-0169: each card takes its own content height */
+@media (max-width: 1100px) { .projects { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .proj { display: flex; gap: 18px; align-items: center; transition: transform .2s var(--spring); } .proj:hover { transform: translateY(-2px); }
 .proj.here { box-shadow: 0 0 0 2px var(--nile), var(--shadow); }
 .projwrap { position: relative; } .projwrap > .proj { height: 100%; }
@@ -1080,8 +1081,58 @@ dialog.copydlg .copyarea { width: 100%; margin-top: 12px; border: 1px solid var(
 .pcard-title:focus-visible { outline: 2px solid var(--nile); outline-offset: 3px; border-radius: 6px; }
 .pcard-path { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px; }
 .pcard-chips { flex-wrap: wrap; }
-.pcard .pflow { margin-top: auto; }
-.pcard-foot { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; padding-top: 10px; margin-top: 2px; border-top: 1px solid var(--line); }
+.pcard-foot { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; padding-top: 10px; margin-top: auto; border-top: 1px solid var(--line); }
+/* PF-0169: a compact card that says the state, the open work and the next step; the whole card opens the project. */
+.pcard { gap: 12px; padding: 18px 20px; cursor: pointer; position: relative; min-width: 0; }
+.pcard:has([data-popmenu][open]) { z-index: 20; transform: none; }
+.pcard-tline { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.pcard-tline .pcard-title { min-width: 0; }
+.pcard-here { flex: none; background: var(--nile-soft); color: var(--nile-2); font-weight: 600; }
+:root[data-theme="dark"] .pcard-here { color: var(--nile); }
+.pcard-status { flex-wrap: wrap; gap: 6px 8px; align-items: center; }
+.pcard-counts { margin-inline-start: auto; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.chip.openw { background: var(--nile-soft); color: var(--nile-2); }
+:root[data-theme="dark"] .chip.openw { color: var(--nile); }
+.pcard-work { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 8px; row-gap: 2px; align-items: baseline; padding: 10px 12px; border-radius: 14px; background: var(--bg); border: 1px solid var(--line); color: inherit; text-decoration: none; }
+a.pcard-work:hover { border-color: var(--nile); }
+a.pcard-work:focus-visible { outline: 2px solid var(--nile); outline-offset: 2px; }
+.pcard-err { margin: 0; color: var(--clay); }
+.pcard-wid { font-family: var(--mono); font-size: 12.5px; font-weight: 700; color: var(--dusk); }
+.pcard-wtitle { font-size: 14.5px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pcard-wst { grid-column: 2; }
+.pcard-health { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.pcard-health b { font-weight: 600; }
+.pcard-care { font-size: inherit; text-align: start; }
+.pcard-last { white-space: nowrap; }
+.pcard-next.attn { background: var(--dusk-soft); border-color: color-mix(in srgb, var(--dusk) 45%, transparent); color: var(--dusk); font-weight: 600; }
+.pcard .pagents { padding: 8px 10px; }
+.pcard-menu { position: relative; flex: none; align-self: flex-start; }
+.pcard-more { list-style: none; display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; border: 1px solid transparent; color: var(--muted); font-size: 20px; line-height: 1; cursor: pointer; }
+.pcard-more::-webkit-details-marker { display: none; }
+.pcard-more:hover, .pcard-menu[open] .pcard-more { background: var(--bg-2); border-color: var(--line); color: var(--ink); }
+.pcard-more:focus-visible { outline: 2px solid var(--nile); outline-offset: 2px; }
+.pcard-menu-panel { inset-inline-start: auto; inset-inline-end: 0; width: 260px; top: calc(100% + 4px); }
+.projmenu-item.danger { color: var(--clay); }
+/* PF-0169: search, status filters and order for the project list. */
+.ptools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin: 4px 0 14px; }
+.ptools input[type=search] { flex: 0 1 280px; min-width: 200px; border: 1px solid var(--line); border-radius: 999px; padding: 8px 16px; background: var(--card); color: var(--ink); font: inherit; font-size: 14px; }
+.pfchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.pfchips .fchip { cursor: pointer; color: var(--ink); }
+.pfchips .fchip.on { color: var(--bg); }
+.pcard-chosen { flex-basis: 100%; }
+[dir=rtl] .pcard-path { text-align: right; }
+.pfn { font-variant-numeric: tabular-nums; opacity: .7; margin-inline-start: 2px; }
+.psort { margin-inline-start: auto; display: inline-flex; align-items: center; gap: 6px; }
+.psort select { border: 1px solid var(--line); border-radius: 10px; padding: 5px 8px; background: var(--card); color: var(--ink); font: inherit; font-size: 13.5px; }
+.pempty { margin-top: 12px; }
+.inbox-ok { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 12px; }
+.pagehead-sub { max-width: 70ch; }
+@media (max-width: 760px) {
+  .ptools input[type=search] { flex: 1 1 100%; }
+  .psort { margin-inline-start: 0; }
+  .pcard { padding: 16px; }
+  .pcard-menu-panel { position: absolute; inset-inline: auto 0; width: min(260px, calc(100vw - 64px)); }
+}
 
 /* PF-0128: a short entrance when the page changes (never on live updates; off for reduced motion). */
 main.enter > * { animation: enter .35s var(--spring) both; }
@@ -1396,3 +1447,9 @@ button.briefref:hover { color: var(--ink); border-color: var(--ink-2); }
 /* A start error carries log lines with long paths: it wraps inside the card on a small screen. */
 .svcrow > * { min-width: 0; }
 .svcrow > p[role="alert"] { overflow-wrap: anywhere; }
+
+/* PF-0170: a visible loader while a page cannot draw yet. */
+.pageload { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 48px auto; color: var(--muted); font-size: 15px; }
+.pageload-spin { width: 22px; height: 22px; border-radius: 50%; border: 3px solid color-mix(in srgb, var(--nile) 22%, transparent); border-top-color: var(--nile); animation: pageload-spin .8s linear infinite; }
+@keyframes pageload-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .pageload-spin { animation: none; border-top-color: color-mix(in srgb, var(--nile) 22%, transparent); border-right-color: var(--nile); } }

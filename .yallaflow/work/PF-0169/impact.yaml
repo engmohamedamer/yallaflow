@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "impacts": [
+    {
+      "id": "IM-001",
+      "status": "assessed",
+      "raisedAt": "2026-11-17T13:00:09.019Z",
+      "stageAtRaise": "IMPLEMENTATION",
+      "triggers": [
+        {
+          "type": "source",
+          "source": "SRC-0120",
+          "at": "2026-11-17T13:00:09.019Z"
+        }
+      ],
+      "assessment": {
+        "assessedAt": "2026-11-17T13:00:18.169Z",
+        "stages": {
+          "context-discovery": {
+            "verdict": "affected",
+            "reason": "The review asks to audit the work statistics, the highlighted item and the agent lane/session data, which needs fresh discovery of the snapshot and execution-view semantics."
+          },
+          "requirement-clarification": {
+            "verdict": "affected",
+            "reason": "The review adds acceptance criteria: content-height cards, one empty-work message, open vs historical agent tasks, non-overlapping filter labels, running/paused/historical sessions, Continue navigation."
+          },
+          "implementation": {
+            "verdict": "affected",
+            "reason": "The card, filters and agent rows change."
+          },
+          "delivery-convergence": {
+            "verdict": "affected",
+            "reason": "New and revised criteria must be re-assessed after verification."
+          }
+        },
+        "applied": {
+          "revised": [
+            "context-discovery",
+            "requirement-clarification",
+            "implementation"
+          ],
+          "convergenceInvalidated": true
+        }
+      }
+    }
+  ],
+  "updatedAt": "2026-11-17T13:00:18.169Z"
+}

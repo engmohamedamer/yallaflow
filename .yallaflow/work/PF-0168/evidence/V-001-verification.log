@@ -1,0 +1,112 @@
+TAP version 13
+# Subtest: first run: the welcome panel offers Create, Manage and Monitor in plain words, in Arabic and English
+ok 1 - first run: the welcome panel offers Create, Manage and Monitor in plain words, in Arabic and English
+  ---
+  duration_ms: 13.928031
+  type: 'test'
+  ...
+# Subtest: first run: the agent state is shown with Create and Manage; its setup opens in place; a ready agent shows no setup
+ok 2 - first run: the agent state is shown with Create and Manage; its setup opens in place; a ready agent shows no setup
+  ---
+  duration_ms: 9.777564
+  type: 'test'
+  ...
+# Subtest: first run: the intent is saved and routes: Create to the wizard, Manage and Monitor to the folder chooser
+ok 3 - first run: the intent is saved and routes: Create to the wizard, Manage and Monitor to the folder chooser
+  ---
+  duration_ms: 8.28317
+  type: 'test'
+  ...
+# Subtest: wizard stack step: planning with the agent is the usual path; fixed templates are a labeled Advanced section
+ok 4 - wizard stack step: planning with the agent is the usual path; fixed templates are a labeled Advanced section
+  ---
+  duration_ms: 19.2343
+  type: 'test'
+  ...
+# Subtest: wizard agent step: an agent-planned project needs a chosen, ready agent; the way around it is a labeled Advanced tick
+ok 5 - wizard agent step: an agent-planned project needs a chosen, ready agent; the way around it is a labeled Advanced tick
+  ---
+  duration_ms: 30.877236
+  type: 'test'
+  ...
+# Subtest: wizard agent step: a fixed template needs no agent; a returning user with a ready usual agent sees no setup
+ok 6 - wizard agent step: a fixed template needs no agent; a returning user with a ready usual agent sees no setup
+  ---
+  duration_ms: 22.424378
+  type: 'test'
+  ...
+# Subtest: layout: the intent cards wrap on narrow screens and use the theme tokens (light and dark)
+ok 7 - layout: the intent cards wrap on narrow screens and use the theme tokens (light and dark)
+  ---
+  duration_ms: 1.208494
+  type: 'test'
+  ...
+# Subtest: AC-002/AC-007: header tabs are exactly Workspace · Project · More; no Agents or Setup & run tab
+ok 8 - AC-002/AC-007: header tabs are exactly Workspace · Project · More; no Agents or Setup & run tab
+  ---
+  duration_ms: 5.301547
+  type: 'test'
+  ...
+# Subtest: AC-002/AC-003: old routes and in-page anchors land on their new home
+ok 9 - AC-002/AC-003: old routes and in-page anchors land on their new home
+  ---
+  duration_ms: 20.687483
+  type: 'test'
+  ...
+# Subtest: AC-002: the bell still counts agent requests and leads to the Projects inbox
+ok 10 - AC-002: the bell still counts agent requests and leads to the Projects inbox
+  ---
+  duration_ms: 1.868165
+  type: 'test'
+  ...
+# Subtest: AC-001: Projects shows the Needs-you inbox above the cards and each card lists only its own lanes
+ok 11 - AC-001: Projects shows the Needs-you inbox above the cards and each card lists only its own lanes
+  ---
+  duration_ms: 7.98326
+  type: 'test'
+  ...
+# Subtest: AC-003: one Project page with an accessible tab bar and badges
+ok 12 - AC-003: one Project page with an accessible tab bar and badges
+  ---
+  duration_ms: 4.447514
+  type: 'test'
+  ...
+# Subtest: AC-004: Overview is summary, needs care, areas and stack in two columns, one on phones
+ok 13 - AC-004: Overview is summary, needs care, areas and stack in two columns, one on phones
+  ---
+  duration_ms: 1.16946
+  type: 'test'
+  ...
+# Subtest: AC-005: a failed service is one line with View log, Ask the agent to fix and Start again
+ok 14 - AC-005: a failed service is one line with View log, Ask the agent to fix and Start again
+  ---
+  duration_ms: 13.237844
+  type: 'test'
+  ...
+# Subtest: AC-006: the header shows Team or Solo with the branch, amber when Solo off the integration branch
+ok 15 - AC-006: the header shows Team or Solo with the branch, amber when Solo off the integration branch
+  ---
+  duration_ms: 16.81385
+  type: 'test'
+  ...
+# Subtest: AC-006: the New Project success step offers team mode as optional, with the confirmed flow
+ok 16 - AC-006: the New Project success step offers team mode as optional, with the confirmed flow
+  ---
+  duration_ms: 11.966548
+  type: 'test'
+  ...
+# Subtest: AC-007: every new label has Arabic and English; light and dark use the shared tokens
+ok 17 - AC-007: every new label has Arabic and English; light and dark use the shared tokens
+  ---
+  duration_ms: 2.736574
+  type: 'test'
+  ...
+1..17
+# tests 17
+# suites 0
+# pass 17
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 270.797572

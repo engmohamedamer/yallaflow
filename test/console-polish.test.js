@@ -85,12 +85,15 @@ test('the file manager is started without a shell, per platform, and a missing f
   await assert.rejects(openInFileManager(root, { spawnFn: failing }), { code: 'FILE_MANAGER_UNAVAILABLE' });
 });
 
-test('project cards carry Open, Open folder, Copy path and Remove; read-only hides the writes', () => {
-  const view = app.slice(app.indexOf('function viewProjects'), app.indexOf('function viewProjects') + 6000);
-  assert.match(view, /class="pcard panel/);
-  assert.match(view, /data-open-project="\$\{project\.id\}">\$\{A\('افتح', 'Open'\)\}/);
-  assert.match(view, /readOnly \? '' : `<button type="button" class="btn sm" data-open-folder=/);
-  assert.match(view, /data-copy="\$\{esc\(project\.root \?\? ''\)\}" data-copy-what="path"/);
+test('project cards carry Open project, and a menu with Open folder, Copy path and Remove; read-only hides the writes', () => {
+  // PF-0169: Open project stays on the card; the secondary actions moved into the card's menu.
+  const card = app.slice(app.indexOf('  function projectCard('), app.indexOf('  function projectCard(') + 6000);
+  const menu = app.slice(app.indexOf('  function projectMenu('), app.indexOf('  function nextButton('));
+  assert.match(card, /class="pcard panel/);
+  assert.match(card, /data-open-project="\$\{esc\(project\.id\)\}">\$\{A\('افتح المشروع', 'Open project'\)\}/);
+  assert.match(menu, /readOnly \? '' : `<button type="button" role="menuitem" class="projmenu-item" data-open-folder=/);
+  assert.match(menu, /data-copy="\$\{esc\(project\.root \?\? ''\)\}" data-copy-what="path"/);
+  assert.match(menu, /readOnly \? '' : `<div class="projmenu-sep" role="separator"><\/div><button type="button" role="menuitem" class="projmenu-item danger" data-remove-project=/);
   assert.match(app, /what === 'path' \? A\('اتنسخ المسار ✓', 'Path copied ✓'\)/);
   for (const selector of ['.pcard {', '.pcard-foot {', '.pcard-path {']) assert.ok(css.includes(selector), selector);
 });

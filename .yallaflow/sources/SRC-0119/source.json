@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0119",
+  "sourceType": "file",
+  "sourceName": "projects-page-ux-brief.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-11-17T12:03:40.951Z",
+  "original": {
+    "path": "sources/SRC-0119/projects-page-ux-brief.md",
+    "sha256": "e11227ee142e3f12f91d9798ce7cbbaeb89b6fde111e14eb01d4e67a169cbb2d",
+    "sizeBytes": 3307
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0169"
+  ],
+  "rawText": "# YallaFlow — Projects Page UX Improvement (brief from the owner, 2026-11-17)\n\nGoal: transform the Projects page from a statistics-heavy dashboard into a clean, modern, actionable project overview. In 5 seconds a user should understand: (1) current state of each project, (2) what work is open or running, (3) whether anything needs the user's attention, (4) the next useful action. Focused UX improvement, not a Console redesign.\n\n1. Review existing implementation (viewProjects, stats/progress, health, work items, agent activity, approvals, navigation/actions, styles, RTL/LTR). Identify misleading values. Do not invent states, progress values or next actions.\n2. Cards: name+path; selected-project indication; readiness/health separate from execution state; open and completed counts; current work item when available; last activity; relevant next action; attention indicators only when meaningful. Remove the five unlabeled mini charts (keep workflow detail inside the project). Remove/replace the unclear circular percentage; any remaining percentage must have explicit, accurate scope. Consistent headers/spacing. Cards clickable to open the project; inner controls independently usable.\n3. Context-aware next action derived from real state (examples: needs understanding -> Start Project Understanding; setup -> Continue Setup; pending approval -> Review Decision; running agent -> View Running Work; open task -> Continue/Open Task; done/idle -> Open Project or Add Work). Not a fixed order. Never mark blocked/running/ready without evidence. No duplicate actions.\n4. Agents & Needs You: no large empty agent panel; concise activity when an agent is running; prominent pending approvals/blockers; empty Needs You collapses to a small indicator; review decision/approval navigation; memory-review counts understandable and navigable where a supported destination exists. Don't hide meaningful warnings.\n5. Actions: Open Project primary; three-dot menu with Open Folder, Copy Path, Remove Project. Removal keeps existing safeguards and confirmation. Accessibility and keyboard preserved.\n6. Discovery: search by name or path; simple status filters; stable default ordering by latest meaningful activity; optional prioritize-attention. No unexpected reordering during normal interaction.\n7. Visual: existing design language; less vertical space; consistent card dimensions; Arabic RTL and English LTR; paths/IDs/code tokens directional-correct; desktop/tablet/mobile; polished, uncluttered.\n8. Safety: preserve project data, work records, agent execution, approvals/security, project switching, running services, CLI contracts. No new dependencies unless necessary. Don't modify unrelated Console pages.\n9. Verification: focused tests for status/progress semantics, next-action selection, empty/active agent states, pending approvals, card navigation and action menus, search/filter, RTL/LTR, mobile layout, removal safeguards. Run checks; real browser visual verification; screenshots Arabic+English, desktop+mobile.\n10. Delivery: implement in existing source; report summary, before/after screenshots, unavailable data/actions, tests and results, local install instructions. Do not commit, push, tag, publish or release. Do not alter the globally installed YallaFlow unless explicitly requested.\n"
+}

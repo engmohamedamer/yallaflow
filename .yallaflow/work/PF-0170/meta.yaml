@@ -1,0 +1,45 @@
+{
+  "id": "PF-0170",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Opening a project shows its Workspace as soon as the snapshot is ready, with a visible loader while it waits",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-17T13:24:21.384Z",
+  "updatedAt": "2026-11-17T13:37:05.111Z",
+  "title": "Opening a project shows its Workspace as soon as the snapshot is ready, with a visible loader while it waits",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-17T13:24:21.452Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-17T13:37:05.111Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

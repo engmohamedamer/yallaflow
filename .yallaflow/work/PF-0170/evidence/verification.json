@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-17T13:30:01.291Z",
+      "finishedAt": "2026-11-17T13:36:57.418Z",
+      "verifiedAt": "2026-11-17T13:36:57.418Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

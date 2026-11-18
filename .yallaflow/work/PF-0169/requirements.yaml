@@ -1,0 +1,463 @@
+{
+  "schemaVersion": 1,
+  "revision": 2,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "Each project card on the Projects page shows, compactly and consistently, the project's execution state, its readiness/memory health (separately), open and completed counts, the current work item when one exists, last activity, and the current-project indication — derived only from recorded data, with no unlabeled mini charts and no unexplained percentage.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0119",
+          "locator": "§2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T12:07:25.635Z",
+      "updatedAt": "2026-11-17T12:07:25.635Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "Each card offers one context-aware next action derived from real state and existing console destinations, never claiming blocked/running/ready without evidence and never duplicating Open Project.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0119",
+          "locator": "§3"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T12:07:25.635Z",
+      "updatedAt": "2026-11-17T12:07:25.635Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "Agent activity appears on a card only when an agent lane is live; pending approvals and blockers are prominent; an empty Needs You collapses to a small indicator; memory-review counts are explained and link to the project's Overview.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0119",
+          "locator": "§4"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T12:07:25.635Z",
+      "updatedAt": "2026-11-17T12:07:25.635Z"
+    },
+    {
+      "id": "REQ-004",
+      "statement": "Open Project is the primary action and the whole card opens the project while inner controls stay independent; Open Folder, Copy Path and Remove move into an accessible three-dot menu, Remove keeping its confirmation dialog and read-only hiding.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0119",
+          "locator": "§5"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T12:07:25.635Z",
+      "updatedAt": "2026-11-17T12:07:25.635Z"
+    },
+    {
+      "id": "REQ-005",
+      "statement": "The page offers search by name or path, simple status filters, a stable default order by latest recorded activity and an optional needs-attention-first order, without reordering cards during live updates.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0119",
+          "locator": "§6"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T12:07:25.635Z",
+      "updatedAt": "2026-11-17T12:07:25.635Z"
+    },
+    {
+      "id": "REQ-006",
+      "statement": "The page works in Arabic RTL and English LTR (paths and IDs left-to-right) at desktop, tablet and mobile widths, without changing unrelated console pages, CLI contracts or dependencies.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0119",
+          "locator": "§7-8"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T12:07:25.635Z",
+      "updatedAt": "2026-11-17T12:07:25.635Z"
+    },
+    {
+      "id": "REQ-007",
+      "statement": "Final polish from the owner's review: compact content-height cards with one clear empty-work message, an accurate highlighted open item, agent rows that separate live, paused/resumable and historical tasks, non-overlapping filter labels that never imply a running agent, and verified navigation, menu, keyboard, removal, RTL and responsive behavior.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0120"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T13:01:46.856Z",
+      "updatedAt": "2026-11-17T13:01:46.856Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "The five-bar station chart and the open-work percentage ring are gone from project cards; open = new+active+paused+you+fail, on-hold shown separately, done = done.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0119",
+          "locator": "§2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T12:07:25.635Z",
+      "updatedAt": "2026-11-17T12:07:25.635Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "The card shows one execution-state chip (needs you, failing, agent working, open work, all done, no work yet, unreadable) and, separately, understanding/memory health; the current project carries a visible 'current' label.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0119",
+          "locator": "§2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T12:07:25.635Z",
+      "updatedAt": "2026-11-17T12:07:25.635Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-001",
+      "statement": "The current work item (waiting-for-you, failing, the project's active work, else the most recently active open item) is shown with its ID (LTR), title and station.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0119",
+          "locator": "§2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T12:07:25.635Z",
+      "updatedAt": "2026-11-17T12:07:25.635Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-002",
+      "statement": "The next action is chosen from: agent approval request -> Review request; item waiting for review/question -> Review decision/Answer question; understanding awaiting review -> Review project understanding; understanding required/in progress -> Start/Continue project understanding; current project agent not chosen -> Continue setup; failing item -> Open failing work; working agent -> View running work; open item -> Continue <ID>; otherwise none beyond Open project. Monitor-only projects get only viewing actions.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0119",
+          "locator": "§3"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T12:07:25.635Z",
+      "updatedAt": "2026-11-17T12:07:25.635Z"
+    },
+    {
+      "id": "AC-005",
+      "requirement": "REQ-003",
+      "statement": "No agents panel renders when no lane is live; a live lane renders one compact row with its status; Needs You renders the full list only when requests exist, otherwise a small indicator that keeps the #inbox anchor.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0119",
+          "locator": "§4"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T12:07:25.635Z",
+      "updatedAt": "2026-11-17T12:07:25.635Z"
+    },
+    {
+      "id": "AC-006",
+      "requirement": "REQ-003",
+      "statement": "The memory line says what the counts mean and links to that project's Overview.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0119",
+          "locator": "§4"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T12:07:25.635Z",
+      "updatedAt": "2026-11-17T12:07:25.635Z"
+    },
+    {
+      "id": "AC-007",
+      "requirement": "REQ-004",
+      "statement": "Clicking empty card space opens the project; buttons, links and the menu inside do not trigger it; the card has a keyboard-reachable Open project button; the menu (details/summary, role=menu, Esc/arrow keys) holds Open folder, Copy path and Remove, with Remove going through the existing confirmation dialog and hidden in read-only.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0119",
+          "locator": "§5"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T12:07:25.635Z",
+      "updatedAt": "2026-11-17T12:07:25.635Z"
+    },
+    {
+      "id": "AC-008",
+      "requirement": "REQ-005",
+      "statement": "Search filters by name or path case-insensitively and keeps focus while typing; status filters with counts; default order is by latest recorded activity, frozen per visit so live updates do not reorder; an 'attention first' option is available.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0119",
+          "locator": "§6"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T12:07:25.635Z",
+      "updatedAt": "2026-11-17T13:01:46.856Z"
+    },
+    {
+      "id": "AC-009",
+      "requirement": "REQ-006",
+      "statement": "Grid is 3/2/1 columns at desktop/tablet/mobile; browser screenshots in Arabic and English at desktop and mobile show correct direction and no overflow; existing console tests pass.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0119",
+          "locator": "§7-9"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T12:07:25.635Z",
+      "updatedAt": "2026-11-17T12:07:25.635Z"
+    },
+    {
+      "id": "AC-010",
+      "requirement": "REQ-007",
+      "statement": "Cards take their content height instead of stretching to the tallest card in the row, and a card without open work shows a single empty-work message (its state: 'All tasks completed' or 'No work yet') with no separate empty box.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0120",
+          "locator": "1-2"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T13:01:46.856Z",
+      "updatedAt": "2026-11-17T13:01:46.856Z"
+    },
+    {
+      "id": "AC-011",
+      "requirement": "REQ-007",
+      "statement": "The open/done counts match the project's snapshot, and the highlighted item is an open item chosen as waiting-for-you, then failing, then the project's active work, then the most recent by last activity, update or creation time — audited against the real registered projects.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0120",
+          "locator": "3"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T13:01:46.856Z",
+      "updatedAt": "2026-11-17T13:01:46.856Z"
+    },
+    {
+      "id": "AC-012",
+      "requirement": "REQ-007",
+      "statement": "A card's agent rows never show a task whose work item is DONE or closed, or a finished task; the rows that remain say which of: needs your approval, working, starting, session open, queued, or paused (can resume).",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0120",
+          "locator": "4,6"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T13:01:46.856Z",
+      "updatedAt": "2026-11-17T13:01:46.856Z"
+    },
+    {
+      "id": "AC-013",
+      "requirement": "REQ-007",
+      "statement": "Status filters do not overlap — each project counts once by precedence needs you > needs setup > open work > no open work, so the counts add up to All — and neither filters nor the state chip use wording that implies a running agent unless a session is working.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0120",
+          "locator": "5"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T13:01:46.856Z",
+      "updatedAt": "2026-11-17T13:01:46.856Z"
+    },
+    {
+      "id": "AC-014",
+      "requirement": "REQ-007",
+      "statement": "Continue/Open on a card's item opens that project with that item's page (#/item/<ID>), verified in the browser from a different current project; menu keyboard use and the remove confirmation are re-verified; Arabic and English screenshots at desktop and mobile show correct alignment and layout.",
+      "provenance": [
+        {
+          "type": "source",
+          "source": "SRC-0120",
+          "locator": "7-9"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-17T13:01:46.856Z",
+      "updatedAt": "2026-11-17T13:01:46.856Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-17T12:07:25.635Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-17T12:07:25.635Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-17T12:07:25.635Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-004",
+      "at": "2026-11-17T12:07:25.635Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-005",
+      "at": "2026-11-17T12:07:25.635Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-006",
+      "at": "2026-11-17T12:07:25.635Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-17T12:07:25.635Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-17T12:07:25.635Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-17T12:07:25.635Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-11-17T12:07:25.635Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-005",
+      "at": "2026-11-17T12:07:25.635Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-006",
+      "at": "2026-11-17T12:07:25.635Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-007",
+      "at": "2026-11-17T12:07:25.635Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-008",
+      "at": "2026-11-17T12:07:25.635Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-009",
+      "at": "2026-11-17T12:07:25.635Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-007",
+      "at": "2026-11-17T13:01:46.856Z",
+      "revision": 2
+    },
+    {
+      "action": "revised",
+      "id": "AC-008",
+      "at": "2026-11-17T13:01:46.856Z",
+      "revision": 2,
+      "previous": {
+        "id": "AC-008",
+        "requirement": "REQ-005",
+        "statement": "Search filters by name or path case-insensitively and keeps focus while typing; filters All/Needs you/In progress/Idle/Setup show counts; default order is by latest recorded activity, frozen per visit so live updates do not reorder; an 'attention first' option is available.",
+        "provenance": [
+          {
+            "type": "source",
+            "source": "SRC-0119",
+            "locator": "§6"
+          }
+        ],
+        "status": "active"
+      }
+    },
+    {
+      "action": "added",
+      "id": "AC-010",
+      "at": "2026-11-17T13:01:46.856Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-011",
+      "at": "2026-11-17T13:01:46.856Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-012",
+      "at": "2026-11-17T13:01:46.856Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-013",
+      "at": "2026-11-17T13:01:46.856Z",
+      "revision": 2
+    },
+    {
+      "action": "added",
+      "id": "AC-014",
+      "at": "2026-11-17T13:01:46.856Z",
+      "revision": 2
+    }
+  ],
+  "updatedAt": "2026-11-17T13:01:46.856Z"
+}

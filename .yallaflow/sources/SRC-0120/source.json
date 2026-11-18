@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "id": "SRC-0120",
+  "sourceType": "file",
+  "sourceName": "projects-page-polish-review.md",
+  "detectedFormat": "md",
+  "contentType": "text/markdown",
+  "contentAvailability": "native-text",
+  "capturedAt": "2026-11-17T13:00:08.947Z",
+  "original": {
+    "path": "sources/SRC-0120/projects-page-polish-review.md",
+    "sha256": "dc46d0d917ee21f99c0122f4255ba13e93e63f8cfa57686233652536b8b8c3df",
+    "sizeBytes": 1297
+  },
+  "metadata": {
+    "extension": ".md",
+    "detectedFormat": "md"
+  },
+  "linkedWork": [
+    "PF-0169"
+  ],
+  "rawText": "# Projects page — final UX polish review (owner, 2026-11-17)\n\nDirection approved; final focused polish before acceptance:\n1. Eliminate excessive empty card space; compact, content-driven card heights instead of stretching to the tallest card in the row; keep layout balanced.\n2. Remove duplicate empty-work messages; one clear message such as \"All tasks completed\" when appropriate.\n3. Audit project work statistics; the highlighted task must genuinely be the correct current open work item.\n4. Distinguish an open work item from an agent-associated historical task.\n5. Clarify filter labels; determine whether counts overlap; avoid wording implying an agent is running when only open tasks exist.\n6. Distinguish running, paused/resumable and historical agent sessions accurately.\n7. Verify the Continue Task action navigates to the correct task context.\n8. Verify dropdown behavior, keyboard accessibility and remove-project confirmation.\n9. Review Arabic RTL alignment, English labels and responsive card layout.\nConstraints: keep the visual design and Tailwind styling; no new dashboard features; preserve data, security and functionality; focused regression tests; verify real browser interactions; before/after screenshots desktop+mobile; no commit, push, tag, publish or global reinstall.\n"
+}

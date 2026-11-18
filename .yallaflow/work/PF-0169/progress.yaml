@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-17T13:01:46.666Z",
+      "completedAt": "2026-11-17T13:01:46.666Z",
+      "summary": "Audit: YallaFlow open = PF-0169 (active) + PF-0112 (paused since 11-10); portal open = PF-0008 (paused) + PF-0009 (new, no lastActivityAt — ranking must fall back to updated/created); phonelist PF-0001 new; counts match snapshots. The YallaFlow card's 'PF-0140 queued' row is a stale run r-13ceeb64 in .yallaflow/local/execution/runs.json whose task became interrupted after restart while PF-0140 is DONE: laneRow shows any non-final run without a session as 'queued'. Task states: queued/starting/working/needs-you/paused/interrupted/done/failed/skipped/cancelled; only paused/interrupted are resumable. Cards stretch because the grid stretches rows; empty work shows chip + dashed box + counts; filters overlap (setup vs idle) and 'In progress' reads as running.",
+      "evidence": [
+        "src/execution/model.js",
+        "src/execution/manager.js",
+        "resources/console/app.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-17T13:01:47.060Z",
+      "completedAt": "2026-11-17T13:01:47.060Z",
+      "summary": "SRC-0120 recorded as REQ-007 / AC-010..AC-014; AC-008 reworded (filter names no longer fixed there; AC-013 defines them).",
+      "evidence": [
+        "source:SRC-0120"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-17T13:23:50.691Z",
+      "completedAt": "2026-11-17T13:23:50.691Z",
+      "summary": "Polish: grid align-items:start (content-height cards); no empty-work box, the state chip is the one message ('All tasks completed' / 'No work yet'), counts show only non-zero parts; laneStatus() replaces liveLane/activeRun — tasks of DONE/closed work or finished tasks are history and hidden, remaining rows say needs approval / working / starting / session open / paused — can resume / queued; exclusive filter groups (needs you > needs setup > open work > no open work) with labels 'Open work'/'No open work'; chip label 'Open work'; ranking falls back to updated/created time. Tests: AC-010..AC-014 added; console-ia pinned string updated.",
+      "evidence": [
+        "resources/console/app.js",
+        "resources/console/app.css",
+        "test/console-projects-page.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-17T13:23:51.182Z",
+      "completedAt": "2026-11-17T13:23:51.182Z",
+      "summary": "npm run check passed (V-003: 1430 passed, 0 failed, 1 skipped; V-002 failed on a pinned string in console-ia, fixed). Browser on repo console :4790: Continue on portal (current YallaFlow) -> #/item/PF-0008 with portal selected and the item page showing PF-0008; phonelist work link -> #/item/PF-0001; Tab title->menu, Enter, ArrowDown x2 -> Copy path, Esc closes and refocuses; Copy path by keyboard closes the menu with a toast; Open folder posts (intercepted); Remove dialog names the project, focuses Cancel, Esc closes, nothing posted; filter counts add to All; YallaFlow card shows no PF-0140 row.",
+      "evidence": [
+        "verification:V-003",
+        "runtime:Playwright run against the repo console on 127.0.0.1:4790, 2026-11-17 15:00-15:20"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-17T13:24:12.021Z",
+      "completedAt": "2026-11-17T13:24:12.021Z",
+      "summary": "Re-assessed AC-001..AC-014 after V-003: all satisfied; 2 unrequested changes accepted.",
+      "evidence": [
+        "verification:V-003"
+      ]
+    }
+  },
+  "rulings": [
+    {
+      "decision": "'Continue setup' (agent not chosen) is offered only on the current project's card; other cards do not fetch readiness",
+      "reason": "Readiness is loaded only for the current project and computing it per card runs provider detection and runtime status for every project on each overview load",
+      "costIfWrong": "A non-current project whose agent is not chosen shows no setup action until it is opened; its Workspace still shows the readiness card",
+      "createdAt": "2026-11-17T12:27:04.523Z"
+    }
+  ],
+  "history": [
+    {
+      "skill": "implementation",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Owner review: final UX polish before acceptance — compact content-height cards, one empty-work message, audit of open counts and the highlighted item, open vs historical agent tasks, non-overlapping filter labels, running/paused/historical sessions, Continue navigation, menu/keyboard/remove checks, RTL and responsive review.",
+      "changedAt": "2026-11-17T13:00:00.621Z"
+    },
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Owner review: final UX polish before acceptance — compact content-height cards, one empty-work message, audit of open counts and the highlighted item, open vs historical agent tasks, non-overlapping filter labels, running/paused/historical sessions, Continue navigation, menu/keyboard/remove checks, RTL and responsive review.",
+      "changedAt": "2026-11-17T13:00:00.621Z"
+    },
+    {
+      "skill": "delivery-convergence",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Reopened to implementation: Owner review: final UX polish before acceptance — compact content-height cards, one empty-work message, audit of open counts and the highlighted item, open vs historical agent tasks, non-overlapping filter labels, running/paused/historical sessions, Continue navigation, menu/keyboard/remove checks, RTL and responsive review.",
+      "changedAt": "2026-11-17T13:00:00.621Z"
+    },
+    {
+      "skill": "context-discovery",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-001: The review asks to audit the work statistics, the highlighted item and the agent lane/session data, which needs fresh discovery of the snapshot and execution-view semantics.",
+      "changedAt": "2026-11-17T13:00:18.169Z"
+    },
+    {
+      "skill": "requirement-clarification",
+      "from": "completed",
+      "to": "pending",
+      "reason": "Impact IM-001: The review adds acceptance criteria: content-height cards, one empty-work message, open vs historical agent tasks, non-overlapping filter labels, running/paused/historical sessions, Continue navigation.",
+      "changedAt": "2026-11-17T13:00:18.169Z"
+    },
+    {
+      "skill": "implementation",
+      "from": "in_progress",
+      "to": "pending",
+      "reason": "Impact IM-001: The card, filters and agent rows change.",
+      "changedAt": "2026-11-17T13:00:18.169Z"
+    }
+  ],
+  "updatedAt": "2026-11-17T13:24:12.021Z"
+}

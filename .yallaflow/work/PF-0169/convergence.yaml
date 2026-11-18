@@ -1,0 +1,668 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-17T12:27:34.792Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "Assessed after V-001 and the browser run on the repo console.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "projectCard has no ring or pflow; projectFacts counts open as new/active/paused/you/fail, held separately, done = done; tested in console-projects-page AC-001.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:0381d4a2e64ce49f6a999adbeeee7b69d09f7f50d09b70ae9c0447cce293b52a",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-projects-page.test.js",
+              "contentHash": "sha256:6ba924834d5a4dd39496be8d660e21cc94938e0668b97a080f6c732a2b799fc6",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0169",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "projectState yields one chip (you/fail/running/open/done/empty/error); running only with a working/starting session; cardHealth shows understanding and memory separately; the current card carries a 'Current' tag.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:0381d4a2e64ce49f6a999adbeeee7b69d09f7f50d09b70ae9c0447cce293b52a",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-projects-page.test.js",
+              "contentHash": "sha256:6ba924834d5a4dd39496be8d660e21cc94938e0668b97a080f6c732a2b799fc6",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "screenshots after-en-desktop/after-ar-desktop show state chip, memory line and Current tag"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "projectFacts.current picks you > fail > activeWork > most recent open; the card renders ID (ltr), title (dir=auto) and station.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:0381d4a2e64ce49f6a999adbeeee7b69d09f7f50d09b70ae9c0447cce293b52a",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-projects-page.test.js",
+              "contentHash": "sha256:6ba924834d5a4dd39496be8d660e21cc94938e0668b97a080f6c732a2b799fc6",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "untracked"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "nextAction implements the listed order with existing destinations (inbox, item page, map readiness card, settings/agents, team); monitor and read-only get only viewing actions; idle returns none (no duplicate of Open project). Setup is offered only for the current project (ruling recorded).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:0381d4a2e64ce49f6a999adbeeee7b69d09f7f50d09b70ae9c0447cce293b52a",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-projects-page.test.js",
+              "contentHash": "sha256:6ba924834d5a4dd39496be8d660e21cc94938e0668b97a080f6c732a2b799fc6",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0169",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "cardAgents returns '' without a live lane and a compact list with laneRow when live; inboxSection renders a one-line indicator with id=inbox when empty and the full list otherwise.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:0381d4a2e64ce49f6a999adbeeee7b69d09f7f50d09b70ae9c0447cce293b52a",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-projects-page.test.js",
+              "contentHash": "sha256:6ba924834d5a4dd39496be8d660e21cc94938e0668b97a080f6c732a2b799fc6",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-ia.test.js",
+              "contentHash": "sha256:f37b40338bfc97fc899b090c9ccf0c0fa5f93beeb9f07b4fbf66b0a3f599a0e9",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "cardHealth shows 'N facts' and a link 'X to recheck · Y unresolved →' to the project's Overview with an explanatory title.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:0381d4a2e64ce49f6a999adbeeee7b69d09f7f50d09b70ae9c0447cce293b52a",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-projects-page.test.js",
+              "contentHash": "sha256:6ba924834d5a4dd39496be8d660e21cc94938e0668b97a080f6c732a2b799fc6",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "untracked"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "Card-surface click opens the project, ignoring links/buttons/menu/selection; Open project button; details/summary menu with role=menu, Enter/ArrowDown/Esc verified in the browser; Remove opens the existing confirmation dialog (cancel verified, no request sent); read-only hides folder/remove.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:0381d4a2e64ce49f6a999adbeeee7b69d09f7f50d09b70ae9c0447cce293b52a",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-projects-page.test.js",
+              "contentHash": "sha256:6ba924834d5a4dd39496be8d660e21cc94938e0668b97a080f6c732a2b799fc6",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "Playwright run on 127.0.0.1:4790 — menu keys, remove dialog cancel, card click to #/map"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-008",
+          "status": "satisfied",
+          "reason": "Search by name/path keeps focus across redraws; filter chips with counts; recent order frozen per visit (fixed an empty-first-draw freeze found in the browser); attention-first option; verified in the browser and in tests.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:0381d4a2e64ce49f6a999adbeeee7b69d09f7f50d09b70ae9c0447cce293b52a",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-projects-page.test.js",
+              "contentHash": "sha256:6ba924834d5a4dd39496be8d660e21cc94938e0668b97a080f6c732a2b799fc6",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "Playwright run — 'yasch' -> portal,phonelist; no-match + reset; Needs setup -> govultlinks; attention order"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-009",
+          "status": "satisfied",
+          "reason": "Grid 3/2/1 columns; Arabic and English desktop and mobile screenshots show correct direction, LTR paths/IDs, no horizontal overflow; full check passed.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.css",
+              "contentHash": "sha256:3e63d70ed4d20ece7157bddbbb633413cd9f9e8a24565c411590a3902f3477aa",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0169",
+              "verificationRunId": "V-001"
+            },
+            {
+              "type": "runtime",
+              "description": "screenshots before/after ar/en desktop/mobile in the session scratchpad"
+            }
+          ]
+        }
+      ],
+      "unrequested": [
+        {
+          "id": "UR-001",
+          "disposition": "accepted",
+          "summary": "Page subtitle shortened to say what the page shows (state, open work, agents, next step).",
+          "reason": "The old two-line description wrapped with an orphan word, which the owner pointed out in the earlier review; shortening it is part of reducing vertical space (brief §7).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:0381d4a2e64ce49f6a999adbeeee7b69d09f7f50d09b70ae9c0447cce293b52a",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            }
+          ]
+        },
+        {
+          "id": "UR-002",
+          "disposition": "accepted",
+          "summary": "'Chosen at creation' for wizard-created projects moved into the memory line as one muted line.",
+          "reason": "Keeps the information that the old card showed while reducing card height.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:0381d4a2e64ce49f6a999adbeeee7b69d09f7f50d09b70ae9c0447cce293b52a",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CV-002",
+      "recordedAt": "2026-11-17T13:24:10.785Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 2,
+        "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+        "verificationRunIds": [
+          "V-003"
+        ]
+      },
+      "summary": "Re-assessed after the owner's polish review, V-003 and the browser run.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "No ring or station bars; open = new/active/paused/you/fail, held separate, done = done; counts now omit zero parts.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:75839eb9233b6dfbecb83f4ed71901380e23f6fa7559b12f7a6ec3473069f9e4",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-projects-page.test.js",
+              "contentHash": "sha256:8a98e84ed83cb12197a2dbebf4fd69de3764dea72bc2e101f228523dfe0f9ad2",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0169",
+              "verificationRunId": "V-003"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "One state chip per card (labels now 'Open work', 'All tasks completed'); running only with a working/starting session; memory/understanding on their own line; Current tag.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:75839eb9233b6dfbecb83f4ed71901380e23f6fa7559b12f7a6ec3473069f9e4",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-projects-page.test.js",
+              "contentHash": "sha256:8a98e84ed83cb12197a2dbebf4fd69de3764dea72bc2e101f228523dfe0f9ad2",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "untracked"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "Highlighted item: you > fail > active work > most recent (now with update/creation fallback); ID ltr, title dir=auto, station.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:75839eb9233b6dfbecb83f4ed71901380e23f6fa7559b12f7a6ec3473069f9e4",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-projects-page.test.js",
+              "contentHash": "sha256:8a98e84ed83cb12197a2dbebf4fd69de3764dea72bc2e101f228523dfe0f9ad2",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "untracked"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "nextAction unchanged and still tested; Continue verified in the browser.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:75839eb9233b6dfbecb83f4ed71901380e23f6fa7559b12f7a6ec3473069f9e4",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-projects-page.test.js",
+              "contentHash": "sha256:8a98e84ed83cb12197a2dbebf4fd69de3764dea72bc2e101f228523dfe0f9ad2",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "Continue on portal opened #/item/PF-0008"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "No agents panel unless a lane has live status; Needs you one line when empty.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:75839eb9233b6dfbecb83f4ed71901380e23f6fa7559b12f7a6ec3473069f9e4",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-projects-page.test.js",
+              "contentHash": "sha256:8a98e84ed83cb12197a2dbebf4fd69de3764dea72bc2e101f228523dfe0f9ad2",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-ia.test.js",
+              "contentHash": "sha256:886dc655b5f87f5d157b38d6f96ff55a8f8fe4cc8182b87d27e1f2bdbfb7c407",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "Memory line with explained counts linking to the Overview.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:75839eb9233b6dfbecb83f4ed71901380e23f6fa7559b12f7a6ec3473069f9e4",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-projects-page.test.js",
+              "contentHash": "sha256:8a98e84ed83cb12197a2dbebf4fd69de3764dea72bc2e101f228523dfe0f9ad2",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "untracked"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "Card-surface click, Open project, ⋯ menu with keyboard, Remove via confirmation — all re-verified in the browser.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:75839eb9233b6dfbecb83f4ed71901380e23f6fa7559b12f7a6ec3473069f9e4",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-projects-page.test.js",
+              "contentHash": "sha256:8a98e84ed83cb12197a2dbebf4fd69de3764dea72bc2e101f228523dfe0f9ad2",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "Tab/Enter/ArrowDown/Esc, copy by keyboard, remove dialog Esc with nothing posted"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-008",
+          "status": "satisfied",
+          "reason": "Search by name/path with focus kept, filters with counts, frozen recent order, attention-first option.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:75839eb9233b6dfbecb83f4ed71901380e23f6fa7559b12f7a6ec3473069f9e4",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-projects-page.test.js",
+              "contentHash": "sha256:8a98e84ed83cb12197a2dbebf4fd69de3764dea72bc2e101f228523dfe0f9ad2",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "untracked"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-009",
+          "status": "satisfied",
+          "reason": "3/2/1 grid; Arabic/English desktop/mobile screenshots; full check passed.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.css",
+              "contentHash": "sha256:772f948f1d4cc09b71087c23ccc609b76827394173c2ac4d17cbed65d6742cdb",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "npm run check (passed)",
+              "workId": "PF-0169",
+              "verificationRunId": "V-003"
+            },
+            {
+              "type": "runtime",
+              "description": "before/after screenshots ar/en desktop/mobile"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-010",
+          "status": "satisfied",
+          "reason": "Grid align-items:start; no empty box; the state chip is the single empty-work message; counts drop '0 open'.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.css",
+              "contentHash": "sha256:772f948f1d4cc09b71087c23ccc609b76827394173c2ac4d17cbed65d6742cdb",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:75839eb9233b6dfbecb83f4ed71901380e23f6fa7559b12f7a6ec3473069f9e4",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-projects-page.test.js",
+              "contentHash": "sha256:8a98e84ed83cb12197a2dbebf4fd69de3764dea72bc2e101f228523dfe0f9ad2",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "after-en-desktop screenshot"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-011",
+          "status": "satisfied",
+          "reason": "Audited real snapshots: YallaFlow open = PF-0169 + PF-0112, highlighted PF-0169 (active); portal open = PF-0008 + PF-0009, highlighted PF-0008 (latest by time); phonelist PF-0001; counts on cards match; ranking falls back to updated/created.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:75839eb9233b6dfbecb83f4ed71901380e23f6fa7559b12f7a6ec3473069f9e4",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-projects-page.test.js",
+              "contentHash": "sha256:8a98e84ed83cb12197a2dbebf4fd69de3764dea72bc2e101f228523dfe0f9ad2",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "yallaflow snapshot --json for YallaFlow, portal, phonelist, vult"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-012",
+          "status": "satisfied",
+          "reason": "laneStatus hides tasks of DONE/closed work and finished tasks (the stale PF-0140 run no longer shows); rows say needs approval / working / starting / session open / paused — can resume / queued.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:75839eb9233b6dfbecb83f4ed71901380e23f6fa7559b12f7a6ec3473069f9e4",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-projects-page.test.js",
+              "contentHash": "sha256:8a98e84ed83cb12197a2dbebf4fd69de3764dea72bc2e101f228523dfe0f9ad2",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "YallaFlow card shows 0 agent rows"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-013",
+          "status": "satisfied",
+          "reason": "Exclusive groups with precedence; counts add up to All (browser: 1+4+3 = 8, and 2+3+3 = 8 after the current project changed); labels 'Open work'/'No open work'.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:75839eb9233b6dfbecb83f4ed71901380e23f6fa7559b12f7a6ec3473069f9e4",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-projects-page.test.js",
+              "contentHash": "sha256:8a98e84ed83cb12197a2dbebf4fd69de3764dea72bc2e101f228523dfe0f9ad2",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "filter counts sum to All in the browser"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-014",
+          "status": "satisfied",
+          "reason": "Continue and the work link open the other project's item page; menu, keyboard and remove re-verified; Arabic/English desktop/mobile screenshots reviewed.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:75839eb9233b6dfbecb83f4ed71901380e23f6fa7559b12f7a6ec3473069f9e4",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/console-projects-page.test.js",
+              "contentHash": "sha256:8a98e84ed83cb12197a2dbebf4fd69de3764dea72bc2e101f228523dfe0f9ad2",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "#/item/PF-0008 (portal) and #/item/PF-0001 (phonelist) from YallaFlow"
+            }
+          ]
+        }
+      ],
+      "unrequested": [
+        {
+          "id": "UR-003",
+          "disposition": "accepted",
+          "summary": "Page subtitle shortened to say what the page shows (state, open work, agents, next step).",
+          "reason": "The old two-line description wrapped with an orphan word; part of reducing vertical space (brief §7).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:75839eb9233b6dfbecb83f4ed71901380e23f6fa7559b12f7a6ec3473069f9e4",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            }
+          ]
+        },
+        {
+          "id": "UR-004",
+          "disposition": "accepted",
+          "summary": "'Chosen at creation' for wizard-created projects moved into the memory line as one muted line.",
+          "reason": "Keeps the information the old card showed while reducing card height.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "resources/console/app.js",
+              "contentHash": "sha256:75839eb9233b6dfbecb83f4ed71901380e23f6fa7559b12f7a6ec3473069f9e4",
+              "gitCommit": "e8096a271b339a3276147dd75576b56b62d64732",
+              "workingTree": "modified"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "updatedAt": "2026-11-17T13:24:10.785Z"
+}
