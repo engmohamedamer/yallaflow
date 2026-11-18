@@ -16280,7 +16280,48 @@
       ],
       "createdAt": "2026-11-18T16:36:03.632Z",
       "updatedAt": "2026-11-18T16:36:03.632Z"
+    },
+    {
+      "id": "CTX-0194",
+      "area": "convention",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Release 1.5.5 (2026-11-18): tag v1.5.5 on main at 632a068, GitHub Release (stable) by engmohamedamer, release.yml run 44351331927 (attempt 2 after GitHub could not acquire a macOS runner in attempt 1; no test had run), npm latest 1.5.5 with SLSA provenance, shasum 99b4ff0659c93cc02013cefad8071909dd38ac4f equal to the local pack. When a release job is cancelled for runner capacity, rerun the failed jobs; the publish job only runs after every gate passes.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0185",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": ".github/workflows/release.yml",
+          "contentHash": "sha256:25a58eb14521afb34fa897e422b00f28cde026be2fbe4f105b028092324b5fb0",
+          "gitCommit": "632a068fd7725c962b33195c4d8b587e1a3953a5",
+          "workingTree": "head"
+        },
+        {
+          "type": "runtime",
+          "description": "test \"$(npm view yallaflow dist-tags.latest)\" = 1.5.5 && test \"$(npm view yallaflow@1.5.5 dist.shasum)\" = 99b4ff0659c93cc02013cefad8071909dd38ac4f && test \"$(npm view yallaflow@1.5.5 gitHead)\" = 632a068fd7725c962b33195c4d8b587e1a3953a5 && npm view yallaflow@1.5.5 dist.attestations.provenance.predicateType (passed)",
+          "workId": "PF-0185",
+          "verificationRunId": "V-003"
+        }
+      ],
+      "verifiedAt": "2026-11-18T17:11:35.900Z",
+      "verifiedAtCommit": "632a068fd7725c962b33195c4d8b587e1a3953a5",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-18T17:11:35.900Z",
+          "workId": "PF-0185",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-18T17:11:35.900Z",
+      "updatedAt": "2026-11-18T17:11:35.900Z"
     }
   ],
-  "updatedAt": "2026-11-18T16:36:03.632Z"
+  "updatedAt": "2026-11-18T17:11:35.900Z"
 }

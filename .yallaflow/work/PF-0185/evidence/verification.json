@@ -30,6 +30,21 @@
       "finishedAt": "2026-11-18T16:46:52.415Z",
       "verifiedAt": "2026-11-18T16:46:52.415Z",
       "log": "V-002-verification.log"
+    },
+    {
+      "id": "V-003",
+      "command": "test \"$(npm view yallaflow dist-tags.latest)\" = 1.5.5 && test \"$(npm view yallaflow@1.5.5 dist.shasum)\" = 99b4ff0659c93cc02013cefad8071909dd38ac4f && test \"$(npm view yallaflow@1.5.5 gitHead)\" = 632a068fd7725c962b33195c4d8b587e1a3953a5 && npm view yallaflow@1.5.5 dist.attestations.provenance.predicateType",
+      "executionMode": "shell",
+      "executable": "test \"$(npm view yallaflow dist-tags.latest)\" = 1.5.5 && test \"$(npm view yallaflow@1.5.5 dist.shasum)\" = 99b4ff0659c93cc02013cefad8071909dd38ac4f && test \"$(npm view yallaflow@1.5.5 gitHead)\" = 632a068fd7725c962b33195c4d8b587e1a3953a5 && npm view yallaflow@1.5.5 dist.attestations.provenance.predicateType",
+      "args": [],
+      "displayCommand": "test \"$(npm view yallaflow dist-tags.latest)\" = 1.5.5 && test \"$(npm view yallaflow@1.5.5 dist.shasum)\" = 99b4ff0659c93cc02013cefad8071909dd38ac4f && test \"$(npm view yallaflow@1.5.5 gitHead)\" = 632a068fd7725c962b33195c4d8b587e1a3953a5 && npm view yallaflow@1.5.5 dist.attestations.provenance.predicateType",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-18T17:11:31.909Z",
+      "finishedAt": "2026-11-18T17:11:35.517Z",
+      "verifiedAt": "2026-11-18T17:11:35.517Z",
+      "log": "V-003-verification.log"
     }
   ]
 }

@@ -425,4 +425,18 @@
   - .github/workflows/ci.yml (repository @ 4588e66)
   - GH_TOKEN=$(~/.local/bin/gh auth token --user engmohamedamer) ~/.local/bin/gh run view 44347969788 -R engmohamedamer/yallaflow --exit-status --json jobs -q ".jobs[] | .name + \": \" + .conclusion" (passed) (runtime, PF-0187 V-002)
 
+<!-- yallaflow-fact:CTX-0194 -->
+### CTX-0194 — Release 1.5.5 (2026-11-18): tag v1.5.5 on main at 632a068, GitHub Release (stable) by engmohamedamer, release.yml run 44351331927 (attempt 2 after GitHub could not acquire a macOS runner in attempt 1; no test had run), npm latest 1.5.5 with SLSA provenance, shasum 99b4ff0659c93cc02013cefad8071909dd38ac4f equal to the local pack. When a release job is cancelled for runner capacity, rerun the failed jobs; the publish job only runs after every gate passes.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0185
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-18T17:11:35.900Z
+- **Verified:** 2026-11-18T17:11:35.900Z (commit 632a068)
+- **Evidence:**
+  - .github/workflows/release.yml (repository @ 632a068)
+  - test "$(npm view yallaflow dist-tags.latest)" = 1.5.5 && test "$(npm view yallaflow@1.5.5 dist.shasum)" = 99b4ff0659c93cc02013cefad8071909dd38ac4f && test "$(npm view yallaflow@1.5.5 gitHead)" = 632a068fd7725c962b33195c4d8b587e1a3953a5 && npm view yallaflow@1.5.5 dist.attestations.provenance.predicateType (passed) (runtime, PF-0185 V-003)
+
 <!-- yallaflow-context:end -->
