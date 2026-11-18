@@ -1,0 +1,47 @@
+{
+  "id": "PF-0179",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Full-suite fixes after Phase 1/1.1: answer delivery moves to src/agents/answer.js (provider knowledge stays in src/agents, AC-108), and the project-setup Run harness gets the runtimeCaps stand-in",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-18T11:51:40.166Z",
+  "updatedAt": "2026-11-18T12:17:00.203Z",
+  "title": "Full-suite fixes after Phase 1/1.1: answer delivery moves to src/agents/answer.js (provider knowledge stays in src/agents, AC-108), and the project-setup Run harness gets the runtimeCaps stand-in",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-18T11:51:40.231Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-18T12:17:00.203Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002",
+        "V-003"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "id": "PF-0185",
+  "type": "release",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Release 1.5.5 (stable, npm latest): reconcile the prepared 1.6.0-rc.1 (PF-0172..PF-0181) with PF-0182..PF-0184 into version 1.5.5, changelog, README, release notes, docs, package and install smoke tests, cross-platform CI, then commit, merge to main, tag v1.5.5, GitHub Release and npm publish only if every gate passes",
+  "status": "EXECUTION",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-18T16:06:07.484Z",
+  "updatedAt": "2026-11-18T16:06:26.422Z",
+  "title": "Release 1.5.5 (stable, npm latest): reconcile the prepared 1.6.0-rc.1 (PF-0172..PF-0181) with PF-0182..PF-0184 into version 1.5.5, changelog, README, release notes, docs, package and install smoke tests, cross-platform CI, then commit, merge to main, tag v1.5.5, GitHub Release and npm publish only if every gate passes",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow release --scope bounded`.",
+  "routedAt": "2026-11-18T16:06:07.567Z",
+  "workflow": "release",
+  "requiredCapabilities": [
+    "discover",
+    "plan",
+    "implement",
+    "verify",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "code-review"
+    ]
+  }
+}

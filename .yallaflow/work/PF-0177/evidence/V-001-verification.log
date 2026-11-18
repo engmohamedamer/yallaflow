@@ -1,0 +1,418 @@
+TAP version 13
+# Subtest: work detail carries the baseline draft once it is drafted, and only for a baseline
+ok 1 - work detail carries the baseline draft once it is drafted, and only for a baseline
+  ---
+  duration_ms: 392.82709
+  type: 'test'
+  ...
+# Subtest: Review the draft shows the facts by area, what is unresolved and what was not inspected
+ok 2 - Review the draft shows the facts by area, what is unresolved and what was not inspected
+  ---
+  duration_ms: 6.179298
+  type: 'test'
+  ...
+# Subtest: the draft panel: nothing without a draft, no decision when read-only, folded once approved
+ok 3 - the draft panel: nothing without a draft, no decision when read-only, folded once approved
+  ---
+  duration_ms: 6.52598
+  type: 'test'
+  ...
+# Subtest: while a required step is open, the optional run step is not offered beside it
+ok 4 - while a required step is open, the optional run step is not offered beside it
+  ---
+  duration_ms: 3.359248
+  type: 'test'
+  ...
+# Subtest: once nothing required is left, the Overview card offers running the app, marked optional once
+ok 5 - once nothing required is left, the Overview card offers running the app, marked optional once
+  ---
+  duration_ms: 1.713649
+  type: 'test'
+  ...
+# Subtest: readiness counts a stack running outside YallaFlow as running
+ok 6 - readiness counts a stack running outside YallaFlow as running
+  ---
+  duration_ms: 18.66194
+  type: 'test'
+  ...
+# Subtest: a trusted service already running outside YallaFlow reads as running, with Start off and why
+ok 7 - a trusted service already running outside YallaFlow reads as running, with Start off and why
+  ---
+  duration_ms: 6.241152
+  type: 'test'
+  ...
+# Subtest: a stopped trusted service keeps Start; a foreign port is still warned about
+ok 8 - a stopped trusted service keeps Start; a foreign port is still warned about
+  ---
+  duration_ms: 3.955851
+  type: 'test'
+  ...
+# Subtest: the project control follows the state: Start when stopped, Stop when running, both when partly up
+ok 9 - the project control follows the state: Start when stopped, Stop when running, both when partly up
+  ---
+  duration_ms: 10.02004
+  type: 'test'
+  ...
+# Subtest: a service row offers one Start or Stop that follows its state; Restart only while it runs
+ok 10 - a service row offers one Start or Stop that follows its state; Restart only while it runs
+  ---
+  duration_ms: 6.728272
+  type: 'test'
+  ...
+# Subtest: a service waiting in the approval card has no second Review and trust on its row
+ok 11 - a service waiting in the approval card has no second Review and trust on its row
+  ---
+  duration_ms: 6.216764
+  type: 'test'
+  ...
+# Subtest: approving a stack that already runs outside YallaFlow is one action that starts nothing
+ok 12 - approving a stack that already runs outside YallaFlow is one action that starts nothing
+  ---
+  duration_ms: 4.937793
+  type: 'test'
+  ...
+# Subtest: a stopped service keeps Approve and start, and starting reports through Start project
+ok 13 - a stopped service keeps Approve and start, and starting reports through Start project
+  ---
+  duration_ms: 1.989462
+  type: 'test'
+  ...
+# Subtest: the understanding ask carries the first request, and it is forgotten once understanding is under way
+ok 14 - the understanding ask carries the first request, and it is forgotten once understanding is under way
+  ---
+  duration_ms: 6.971606
+  type: 'test'
+  ...
+# Subtest: the understanding line shows its step, facts so far, last activity and whether an agent is working
+ok 15 - the understanding line shows its step, facts so far, last activity and whether an agent is working
+  ---
+  duration_ms: 15.848427
+  type: 'test'
+  ...
+# Subtest: the review shows the brief first, with citations, an inferred tag, honest coverage, and the fact list folded beneath
+ok 16 - the review shows the brief first, with citations, an inferred tag, honest coverage, and the fact list folded beneath
+  ---
+  duration_ms: 9.957324
+  type: 'test'
+  ...
+# Subtest: a draft without a brief looks exactly as before
+ok 17 - a draft without a brief looks exactly as before
+  ---
+  duration_ms: 1.769145
+  type: 'test'
+  ...
+# Subtest: the page opens a cited fact and starts a change request from a line
+ok 18 - the page opens a cited fact and starts a change request from a line
+  ---
+  duration_ms: 1.255862
+  type: 'test'
+  ...
+# Subtest: on the Overview the brief cites project-memory facts and marks lines whose facts need care
+ok 19 - on the Overview the brief cites project-memory facts and marks lines whose facts need care
+  ---
+  duration_ms: 4.820874
+  type: 'test'
+  ...
+# Subtest: Start here: the own request first, then suggestions with their reason and facts; a click only fills Create work
+ok 20 - Start here: the own request first, then suggestions with their reason and facts; a click only fills Create work
+  ---
+  duration_ms: 6.531004
+  type: 'test'
+  ...
+# Subtest: suggestions that match existing work are hidden; the Workspace panel steps aside once other work exists
+ok 21 - suggestions that match existing work are hidden; the Workspace panel steps aside once other work exists
+  ---
+  duration_ms: 7.71857
+  type: 'test'
+  ...
+# Subtest: nothing reliable to suggest: a plain empty state and the own-task action; hidden in read-only and before approval
+ok 22 - nothing reliable to suggest: a plain empty state and the own-task action; hidden in read-only and before approval
+  ---
+  duration_ms: 9.337225
+  type: 'test'
+  ...
+# Subtest: the draft review lists the proposed first tasks, read-only
+ok 23 - the draft review lists the proposed first tasks, read-only
+  ---
+  duration_ms: 3.4865
+  type: 'test'
+  ...
+# Subtest: an approval is seen without a reload: the cached overview is read again until understanding is established
+ok 24 - an approval is seen without a reload: the cached overview is read again until understanding is established
+  ---
+  duration_ms: 0.460438
+  type: 'test'
+  ...
+# Subtest: AC-002/AC-007: header tabs are exactly Workspace · Project · More; no Agents or Setup & run tab
+ok 25 - AC-002/AC-007: header tabs are exactly Workspace · Project · More; no Agents or Setup & run tab
+  ---
+  duration_ms: 7.318322
+  type: 'test'
+  ...
+# Subtest: AC-002/AC-003: old routes and in-page anchors land on their new home
+ok 26 - AC-002/AC-003: old routes and in-page anchors land on their new home
+  ---
+  duration_ms: 25.37792
+  type: 'test'
+  ...
+# Subtest: AC-002: the bell still counts agent requests and leads to the Projects inbox
+ok 27 - AC-002: the bell still counts agent requests and leads to the Projects inbox
+  ---
+  duration_ms: 1.481263
+  type: 'test'
+  ...
+# Subtest: AC-001: Projects shows the Needs-you inbox above the cards and each card lists only its own lanes
+ok 28 - AC-001: Projects shows the Needs-you inbox above the cards and each card lists only its own lanes
+  ---
+  duration_ms: 10.382288
+  type: 'test'
+  ...
+# Subtest: AC-003: one Project page with an accessible tab bar and badges
+ok 29 - AC-003: one Project page with an accessible tab bar and badges
+  ---
+  duration_ms: 5.678578
+  type: 'test'
+  ...
+# Subtest: AC-004: Overview is summary, needs care, areas and stack in two columns, one on phones
+ok 30 - AC-004: Overview is summary, needs care, areas and stack in two columns, one on phones
+  ---
+  duration_ms: 1.057849
+  type: 'test'
+  ...
+# Subtest: AC-005: a failed service is one line with View log, Ask the agent to fix and Start again
+ok 31 - AC-005: a failed service is one line with View log, Ask the agent to fix and Start again
+  ---
+  duration_ms: 14.446031
+  type: 'test'
+  ...
+# Subtest: AC-006: the header shows Team or Solo with the branch, amber when Solo off the integration branch
+ok 32 - AC-006: the header shows Team or Solo with the branch, amber when Solo off the integration branch
+  ---
+  duration_ms: 18.426158
+  type: 'test'
+  ...
+# Subtest: AC-006: the New Project success step offers team mode as optional, with the confirmed flow
+ok 33 - AC-006: the New Project success step offers team mode as optional, with the confirmed flow
+  ---
+  duration_ms: 10.205106
+  type: 'test'
+  ...
+# Subtest: AC-007: every new label has Arabic and English; light and dark use the shared tokens
+ok 34 - AC-007: every new label has Arabic and English; light and dark use the shared tokens
+  ---
+  duration_ms: 2.525993
+  type: 'test'
+  ...
+# Subtest: console routes: edit and port need a save location, take fields (never a command line), and report where they saved
+ok 35 - console routes: edit and port need a save location, take fields (never a command line), and report where they saved
+  ---
+  duration_ms: 1560.499486
+  type: 'test'
+  ...
+# Subtest: the card says what is missing, shows the exact command first, and installs only after a tick on a trusted service
+ok 36 - the card says what is missing, shows the exact command first, and installs only after a tick on a trusted service
+  ---
+  duration_ms: 10.741638
+  type: 'test'
+  ...
+# Subtest: a taken port: the owner by name, a free port, one consistent change, and where it is saved
+ok 37 - a taken port: the owner by name, a free port, one consistent change, and where it is saved
+  ---
+  duration_ms: 8.358566
+  type: 'test'
+  ...
+# Subtest: the edit form sends only what changed, with rarely used fields under Advanced
+ok 38 - the edit form sends only what changed, with rarely used fields under Advanced
+  ---
+  duration_ms: 4.567163
+  type: 'test'
+  ...
+# Subtest: a failure shows the cause line and says what it means; the text for the agent starts from it
+ok 39 - a failure shows the cause line and says what it means; the text for the agent starts from it
+  ---
+  duration_ms: 3.645495
+  type: 'test'
+  ...
+# Subtest: one place for run setup: Run holds the analysis and suggestions; Settings only defines a service by hand
+ok 40 - one place for run setup: Run holds the analysis and suggestions; Settings only defines a service by hand
+  ---
+  duration_ms: 5.301718
+  type: 'test'
+  ...
+# Subtest: owner review: NEEDS_SETUP offers an Advanced "try anyway" (trusted services only); UNKNOWN is a note, never a block; a local change can be undone
+ok 41 - owner review: NEEDS_SETUP offers an Advanced "try anyway" (trusted services only); UNKNOWN is a note, never a block; a local change can be undone
+  ---
+  duration_ms: 11.074877
+  type: 'test'
+  ...
+# Subtest: nothing saved, no proposal: one primary action asks the agent; a quick scan is the fallback
+ok 42 - nothing saved, no proposal: one primary action asks the agent; a quick scan is the fallback
+  ---
+  duration_ms: 10.334759
+  type: 'test'
+  ...
+# Subtest: a proposal shows each service with its command, preselected, and one button to use them
+ok 43 - a proposal shows each service with its command, preselected, and one button to use them
+  ---
+  duration_ms: 6.565673
+  type: 'test'
+  ...
+# Subtest: saved services are approved together from their reviewed commands; shared and blocked ones are left out
+ok 44 - saved services are approved together from their reviewed commands; shared and blocked ones are left out
+  ---
+  duration_ms: 6.598129
+  type: 'test'
+  ...
+# Subtest: approval without starting, and a refused approval, start nothing
+ok 45 - approval without starting, and a refused approval, start nothing
+  ---
+  duration_ms: 6.543666
+  type: 'test'
+  ...
+# Subtest: nothing to approve shows no card; a read-only console never offers approval
+ok 46 - nothing to approve shows no card; a read-only console never offers approval
+  ---
+  duration_ms: 4.980789
+  type: 'test'
+  ...
+# Subtest: the Run tab hosts the flow; Overview names the next run step; Settings keeps advanced editing
+ok 47 - the Run tab hosts the flow; Overview names the next run step; Settings keeps advanced editing
+  ---
+  duration_ms: 2.443893
+  type: 'test'
+  ...
+# Subtest: Windows: a trusted service can be started and stopped; a running one says that Stop is forceful
+ok 48 - Windows: a trusted service can be started and stopped; a running one says that Stop is forceful
+  ---
+  duration_ms: 18.65608
+  type: 'test'
+  ...
+# Subtest: Windows: a Docker Compose service shows why it is not started here and offers no Start or Stop
+ok 49 - Windows: a Docker Compose service shows why it is not started here and offers no Start or Stop
+  ---
+  duration_ms: 6.168743
+  type: 'test'
+  ...
+# Subtest: the platform note: what is not verified, the forceful stop and Compose on Windows; nothing on Linux; no lifecycle on an unknown system
+ok 50 - the platform note: what is not verified, the forceful stop and Compose on Windows; nothing on Linux; no lifecycle on an unknown system
+  ---
+  duration_ms: 9.106049
+  type: 'test'
+  ...
+# Subtest: the Run page is never replaced by an "unsupported" page; an empty project shows its own empty state first
+ok 51 - the Run page is never replaced by an "unsupported" page; an empty project shows its own empty state first
+  ---
+  duration_ms: 3.651737
+  type: 'test'
+  ...
+# Subtest: profiles: argv only, repository-relative cwd, names not values; secrets and unknown fields refused without echo
+ok 52 - profiles: argv only, repository-relative cwd, names not values; secrets and unknown fields refused without echo
+  ---
+  duration_ms: 1264.035733
+  type: 'test'
+  ...
+# Subtest: trust: required before start, personal, and renewed after any material change (shared or override)
+ok 53 - trust: required before start, personal, and renewed after any material change (shared or override)
+  ---
+  duration_ms: 1467.343037
+  type: 'test'
+  ...
+# Subtest: start/stop/logs: readiness, minimal environment, redacted logs, graceful stop; nothing auto-starts
+ok 54 - start/stop/logs: readiness, minimal environment, redacted logs, graceful stop; nothing auto-starts
+  ---
+  duration_ms: 2825.0521
+  type: 'test'
+  ...
+# Subtest: a port held by someone else refuses start and that process is never touched
+ok 55 - a port held by someone else refuses start and that process is never touched
+  ---
+  duration_ms: 994.479623
+  type: 'test'
+  ...
+# Subtest: crash recovery: a service killed outside YallaFlow reads failed; a reused PID is unmanaged and never signalled
+ok 56 - crash recovery: a service killed outside YallaFlow reads failed; a reused PID is unmanaged and never signalled
+  ---
+  duration_ms: 2791.268111
+  type: 'test'
+  ...
+# Subtest: concurrency: five simultaneous starts start one process; restart replaces it; stop --all stops owned services only
+ok 57 - concurrency: five simultaneous starts start one process; restart replaces it; stop --all stops owned services only
+  ---
+  duration_ms: 3626.768465
+  type: 'test'
+  ...
+# Subtest: start failures are reported with the log tail; a cwd escaping through a symlink is refused
+ok 58 - start failures are reported with the log tail; a cwd escaping through a symlink is refused
+  ---
+  duration_ms: 1973.190396
+  type: 'test'
+  ...
+# Subtest: suggestions come from repository evidence and never run
+ok 59 - suggestions come from repository evidence and never run
+  ---
+  duration_ms: 541.281986
+  type: 'test'
+  ...
+# Subtest: console: runtime routes are token/Origin/JSON guarded, trust needs the typed id, read-only refuses
+ok 60 - console: runtime routes are token/Origin/JSON guarded, trust needs the typed id, read-only refuses
+  ---
+  duration_ms: 2468.610417
+  type: 'test'
+  ...
+# Subtest: review: trust and run records planted inside the repository are ignored; trust needs the reviewed definition
+ok 61 - review: trust and run records planted inside the repository are ignored; trust needs the reviewed definition
+  ---
+  duration_ms: 974.093813
+  type: 'test'
+  ...
+# Subtest: review: a run record whose process no longer leads its own group is unmanaged and never signalled
+ok 62 - review: a run record whose process no longer leads its own group is unmanaged and never signalled
+  ---
+  duration_ms: 833.165742
+  type: 'test'
+  ...
+# Subtest: review: log symlinks and hard links are refused; reading logs never writes, truncates or rotates
+ok 63 - review: log symlinks and hard links are refused; reading logs never writes, truncates or rotates
+  ---
+  duration_ms: 1034.447193
+  type: 'test'
+  ...
+# Subtest: review: an untrusted dependency starts nothing; control and bidi characters are refused
+ok 64 - review: an untrusted dependency starts nothing; control and bidi characters are refused
+  ---
+  duration_ms: 1112.575114
+  type: 'test'
+  ...
+# Subtest: review: CLI trust is a human decision — refused when not interactive
+ok 65 - review: CLI trust is a human decision — refused when not interactive
+  ---
+  duration_ms: 679.941499
+  type: 'test'
+  ...
+# Subtest: review: a FIFO planted as the log never hangs reads
+ok 66 - review: a FIFO planted as the log never hangs reads
+  ---
+  duration_ms: 418.789602
+  type: 'test'
+  ...
+# Subtest: trust: script edits reject stale confirmation and start, while application edits retain trust
+ok 67 - trust: script edits reject stale confirmation and start, while application edits retain trust
+  ---
+  duration_ms: 1453.143439
+  type: 'test'
+  ...
+# Subtest: trust: a service changing its inputs during startup is stopped (only its own process) and the start fails (PF-0072 D2/R6)
+ok 68 - trust: a service changing its inputs during startup is stopped (only its own process) and the start fails (PF-0072 D2/R6)
+  ---
+  duration_ms: 1936.442787
+  type: 'test'
+  ...
+1..68
+# tests 68
+# suites 0
+# pass 68
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 26800.321286

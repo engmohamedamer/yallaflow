@@ -1,0 +1,43 @@
+{
+  "id": "PF-0186",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Review fixes for 1.5.5: refresh restore must accept only the three managed files and safe backup names (crafted manifest could write outside the project), --add-missing with CLAUDE.md linked to AGENTS.md, Branch Health status must not run repo filters, no lazy fetch in partial clones, readiness on stale or unavailable information, backup taken from the same read as the write, check wording",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-18T16:14:35.786Z",
+  "updatedAt": "2026-11-18T16:23:37.549Z",
+  "title": "Review fixes for 1.5.5: refresh restore must accept only the three managed files and safe backup names (crafted manifest could write outside the project), --add-missing with CLAUDE.md linked to AGENTS.md, Branch Health status must not run repo filters, no lazy fetch in partial clones, readiness on stale or unavailable information, backup taken from the same read as the write, check wording",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-11-18T16:14:35.872Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-18T16:23:37.549Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

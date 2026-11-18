@@ -193,7 +193,7 @@ test('console: a saved choice turns agents and Claude on for that project only; 
     assert.equal(view.checklist.modeState, 'unknown');
     assert.equal(view.launchCommand, null, 'no command before the launch files are written');
     const launch = await c.postProject('agents/launch-files', {});
-    assert.match(launch.command, /^claude 'Run yallaflow brief/);
+    assert.match(launch.command, /^cd '[^']+' && claude 'Run yallaflow brief/);
     assert.equal((await c.get('agents/settings')).launchCommand, launch.command, 'the settings view carries the command once the files are current');
     const off = await c.postProject('agents/settings', { agents: true, claude: false });
     assert.equal(off.applied.claude, false);
@@ -245,7 +245,7 @@ const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&
 function ui({ setupInfo = null, agentSetup = null, readOnly = false, lang = 'en', runtime = null, calls = [] } = {}) {
   // PF-0102: Setup → Agents also shows the Claude Team/Enterprise warning (claudeWarnings).
   const code = cut('  // ---------- project setup: Stack, Run, Agents', '  // PF-0132: the former Setup & run page') + cut('  // PF-0145: on Claude Team/Enterprise accounts', '  // PF-0103: one agent per checkout');
-  const context = vm.createContext({ pid: 'p', readOnly, lang, runtime, agentsOn: false, A: (ar, en) => (lang === 'ar' ? ar : en), esc, toast() {}, render() {}, roText: () => (lang === 'ar' ? 'الكونسول ده للقراءة بس.' : 'This console is read-only.'), api: async (url) => { calls.push(url); return {}; }, post: async () => ({}), loadRuntime: async () => {}, loadPlan: async () => {} });
+  const context = vm.createContext({ runtimeCaps: () => ({ platform: 'linux', lifecycle: true, compose: true, gracefulStop: true, verified: true }), pid: 'p', readOnly, lang, runtime, agentsOn: false, A: (ar, en) => (lang === 'ar' ? ar : en), esc, toast() {}, render() {}, roText: () => (lang === 'ar' ? 'الكونسول ده للقراءة بس.' : 'This console is read-only.'), api: async (url) => { calls.push(url); return {}; }, post: async () => ({}), loadRuntime: async () => {}, loadPlan: async () => {} });
   vm.runInContext(`${code}\nsetupInfo = ${JSON.stringify(setupInfo)}; agentSetup = ${JSON.stringify(agentSetup)};\nthis.guide = setupGuide; this.stack = stackSection; this.runS = runSection; this.agents = agentsSection; this.links = openLinks;`, context);
   return context;
 }
@@ -288,7 +288,7 @@ test('UI: the run message is re-rendered in the current language after a switch'
   // PF-0102: Setup → Agents also shows the Claude Team/Enterprise warning (claudeWarnings).
   const code = cut('  // ---------- project setup: Stack, Run, Agents', '  // PF-0132: the former Setup & run page') + cut('  // PF-0145: on Claude Team/Enterprise accounts', '  // PF-0103: one agent per checkout');
   const context = vm.createContext({
-    pid: 'p', readOnly: false, lang: 'en', runtime: null, agentsOn: false, esc, toast() {}, render() {}, roText: () => 'This console is read-only.', // PF-0161: the read-only line names its reason
+    runtimeCaps: () => ({ platform: 'linux', lifecycle: true, compose: true, gracefulStop: true, verified: true }), pid: 'p', readOnly: false, lang: 'en', runtime: null, agentsOn: false, esc, toast() {}, render() {}, roText: () => 'This console is read-only.', // PF-0161: the read-only line names its reason
     api: async () => ({}), loadRuntime: async () => {}, loadPlan: async () => {},
     post: async () => ({ started: [{ id: 'web', already: false }], skipped: [], failed: null })
   });

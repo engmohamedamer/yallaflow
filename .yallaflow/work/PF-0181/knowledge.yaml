@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "The Run Manager supports Windows (PF-0176, revised by PF-0181): process identity is pid plus creation time from one constant Win32_Process CIM query (System32 powershell.exe, argv only), read asynchronously and kept briefly; an unreadable list makes identity 'unverifiable' (nothing signalled, no record cleared, a start whose identity cannot be recorded is refused). Stop is forceful and never uses taskkill /T: a tree is expanded only from a process whose pid and creation time match, children count only when created after their parent, each process is ended individually while its creation time matches, survivors are reported. Services launch through the shared resolveCommand (.cmd shims become node + script) with safeEnvironment and the refreshed PATH, not detached and with windowsHide (own hidden console). Docker Compose lifecycle is refused on Windows (RUNTIME_COMPOSE_WINDOWS). runtimeStatus carries capabilities { lifecycle, compose, gracefulStop, verified }.",
+      "evidence": [
+        "src/runtime/process.js",
+        "src/runtime/supervisor.js"
+      ],
+      "confidence": "inferred",
+      "provenance": "repository",
+      "relation": {
+        "type": "supersedes",
+        "factId": "CTX-0185"
+      },
+      "status": "promoted",
+      "createdAt": "2026-11-18T13:03:20.462Z",
+      "factId": "CTX-0187",
+      "promotedAt": "2026-11-18T13:03:20.862Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-18T13:03:20.862Z",
+  "reviewedAt": "2026-11-18T13:03:20.862Z"
+}

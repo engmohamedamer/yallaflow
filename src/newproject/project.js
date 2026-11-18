@@ -22,6 +22,8 @@ import { safeLocalDir, safeWriteFile } from '../agents/local-files.js';
 import { CATALOG, CATALOG_VERSION, catalogEntry } from './catalog.js';
 import { resolveCommand, safeEnvironment } from '../utils/command.js';
 import { toolGuidance } from './guidance.js';
+import { knownWindowsLocations, toolEnvironment } from '../utils/fresh-path.js';
+import { existsSync } from 'node:fs';
 
 export const PLAN_SCHEMA = 'yallaflow.new-project-plan/1';
 export const PROJECT_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/;
@@ -78,9 +80,9 @@ export function planHash(body) {
 // (src/utils/command.js): looked up on the child's own PATH, a Windows shim's program
 // started directly, never through a shell.
 async function probePrerequisite(prereq) {
-  const env = scrubbedEnv();
+  const env = await scrubbedEnv();
   const command = await resolveCommand(prereq.argv, env);
-  if (!command.ok) return { name: prereq.name, found: false, note: prereq.note ?? null, ...(command.reason === 'not-startable' ? { problem: command.message.slice(0, 300) } : {}) };
+  if (!command.ok) return { name: prereq.name, found: false, note: prereq.note ?? null, ...(command.reason === 'not-startable' ? { problem: command.message.slice(0, 300) } : notVisible(prereq.argv[0])) };
   const result = spawnSync(command.file, command.args, { encoding: 'utf8', timeout: PREREQ_TIMEOUT_MS, shell: false, env, windowsHide: true });
   if (result.error || result.status !== 0) return { name: prereq.name, found: false, note: prereq.note ?? null };
   // A PHP module is found when `php -m` lists it (PF-0143).
@@ -92,8 +94,19 @@ async function probePrerequisite(prereq) {
   return { name: prereq.name, found: true, version: version.slice(0, 120), note: prereq.note ?? null };
 }
 
-function scrubbedEnv(source = process.env) {
-  return safeEnvironment(SAFE_ENV, source);
+// PF-0173: the PATH a new terminal would get (on Windows the current registry Path is added),
+// so a tool installed while the console runs is found by Recheck, and the same environment is
+// used to find a tool and to run it.
+async function scrubbedEnv(source = process.env) {
+  return safeEnvironment(SAFE_ENV, await toolEnvironment(source));
+}
+
+// A tool missing from PATH that its Windows installer put in its usual folder: said as such,
+// never started from there.
+function notVisible(name) {
+  if (process.platform !== 'win32') return {};
+  const at = knownWindowsLocations(name).find((file) => existsSync(file));
+  return at ? { problem: `${name} is installed at ${at}, but that folder is not on the PATH YallaFlow can see. Close every terminal, open a new one, start the console from it, then press Recheck.` } : {};
 }
 
 // PF-0158: what a stack still needs on this machine, checked now (never from a saved plan).
@@ -254,7 +267,7 @@ function runLogged(argv, cwd, logFile, timeoutMs) {
     open(logFile, constants.O_WRONLY | constants.O_APPEND | constants.O_CREAT | (constants.O_NOFOLLOW ?? 0), 0o600).then(async (log) => {
       await log.write(`\n$ ${argv.join(' ')}\n`);
       let child;
-      const env = scrubbedEnv();
+      const env = await scrubbedEnv();
       const command = await resolveCommand(argv, env);
       if (!command.ok) {
         await log.write(`${command.message}\n`);
@@ -320,8 +333,9 @@ export async function createFromPlan(id, confirm, { catalog = CATALOG, env = pro
     // A parent package.json whose "workspaces" match staging could still make the parent npm's
     // root. Verify npm's own answer before any npm-based generator runs (re-review, PF-0048).
     if (entry.argv && ['npx', 'npm'].includes(entry.argv(body.name)[0])) {
-      const npm = await resolveCommand(['npm', 'prefix'], scrubbedEnv());
-      const prefix = npm.ok ? spawnSync(npm.file, npm.args, { cwd: staging, encoding: 'utf8', env: scrubbedEnv(), timeout: PREREQ_TIMEOUT_MS, shell: false, windowsHide: true }) : { status: null, stdout: '' };
+      const npmEnv = await scrubbedEnv();
+      const npm = await resolveCommand(['npm', 'prefix'], npmEnv);
+      const prefix = npm.ok ? spawnSync(npm.file, npm.args, { cwd: staging, encoding: 'utf8', env: npmEnv, timeout: PREREQ_TIMEOUT_MS, shell: false, windowsHide: true }) : { status: null, stdout: '' };
       const resolved = prefix.status === 0 ? await realpath(prefix.stdout.trim()).catch(() => null) : null;
       if (resolved !== await realpath(staging)) {
         await mark('generate', 'failed', { error: 'npm project root is not the staging folder' });

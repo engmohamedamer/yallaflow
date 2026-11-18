@@ -10,7 +10,9 @@
 // - Reads come from `snapshot --json` / `work show --json` (runner.js) and preserved
 //   source originals read by ID. Create Work runs the CLI's own start/route/intake add
 //   (create.js), never writing .yallaflow itself.
+import { loadDraft, saveDraft } from './drafts.js';
 import { claimedGitName, decideGate, gateReview, runAction } from './actions.js';
+import { deliverAnswer } from '../agents/answer.js';
 import http from 'node:http';
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { readFile, realpath, stat } from 'node:fs/promises';
@@ -39,7 +41,7 @@ import { MachineSetup } from '../agents/setup.js';
 import { addProject as saveToRegistry, removeProject as forgetInRegistry, projectModes, setProjectMode } from './registry.js';
 import { openInFileManager, openReportFile } from './reveal.js';
 import { qualityDirPath } from '../quality/artifacts.js';
-import { openTerminal, shellQuote } from '../agents/terminal.js';
+import { openTerminal } from '../agents/terminal.js';
 import { addRuntimeService, attachPlannedFile, createdProjectRoot, gitInit, probeTools, workspaceRoot } from './greenfield.js';
 import { CLAUDE_NOT_INCLUDED, claudeIncluded, loadClaude } from '../agents/experimental.js';
 import { readAgentSettings, readApprovalWait, writeAgentSettings, writeApprovalWait } from '../agents/settings.js';
@@ -67,7 +69,7 @@ const UI_FILES = Object.freeze({
 // 1.4.0: work-item actions and review-gate decisions (PF-0043) join Create Work.
 // 1.4.0 Greenfield journey (PF-0057): register a project, enable agents for this run, Git init,
 // add a runtime service, attach a planned file to a new project's first work item.
-const WRITE_ROUTE = /^(?:\/api\/preferences|\/api\/p\/[0-9a-f]{10}\/mode|\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|revision-sources|actions\/[a-z]+|gates\/[a-z]+\/decision|quality-report))?|runtime\/[a-z][a-z0-9-]{0,31}\/(?:trust|start|stop|restart|edit|port|install|reset)|runtime\/services|runtime\/(?:start|stop)-all|runtime\/analyze|runtime\/plan\/save|agents\/(?:settings|launch-files|approval-wait|open-terminal)|setup\/(?:scan|step)|git\/init|open-folder)$|^\/api\/new\/(?:plan|create|plans\/NP-\d{14}-[0-9a-f]{6}\/files)$|^\/api\/(?:projects|projects\/remove|projects\/connect|agents\/enable|fs\/mkdir|machine\/codex\/(?:install|login|verify)|machine\/job\/cancel))$/;
+const WRITE_ROUTE = /^(?:\/api\/preferences|\/api\/p\/[0-9a-f]{10}\/mode|\/api\/p\/[0-9a-f]{10}\/(?:work(?:\/[^/]+\/(?:sources|revision-sources|actions\/[a-z]+|gates\/[a-z]+\/decision|quality-report))?|runtime\/[a-z][a-z0-9-]{0,31}\/(?:trust|start|stop|restart|edit|port|install|reset)|runtime\/services|runtime\/(?:start|stop)-all|runtime\/analyze|runtime\/plan\/save|agents\/(?:settings|launch-files|approval-wait|open-terminal)|setup\/(?:scan|step)|git\/init|open-folder)$|^\/api\/new\/(?:plan|create|draft|plans\/NP-\d{14}-[0-9a-f]{6}\/files)$|^\/api\/(?:projects|projects\/remove|projects\/connect|agents\/enable|fs\/mkdir|machine\/codex\/(?:install|login|verify)|machine\/job\/cancel))$/;
 // Agent Interaction (v1.3.0, only with --agents): the Agent Workspace's actions.
 const AGENT_ROUTE = /^\/api\/p\/[0-9a-f]{10}\/agent\/(start|message|permission|cancel|end|resume|connect|disconnect|activate|clear-history)$/;
 // PF-0112: execution actions (queues): create a run and the developer's run/task controls.
@@ -213,6 +215,8 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     byId.set(entry.id, entry);
     watchers.push(watch(entry));
     if (!monitored(entry)) await attach(entry);
+    // PF-0175: first-run setup is complete once a project really joined (not when an intent was clicked).
+    if (!readOnly) await savePreferences({ onboarding: { completed: true } }).catch(() => {});
     const message = `data: ${JSON.stringify({ type: 'projects', project: entry.id, at: new Date().toISOString() })}\n\n`;
     for (const client of clients) client.write(message);
     return { id: entry.id, name: entry.name, root: entry.root, mode: entry.mode, added: true, saved: saved.added };
@@ -438,6 +442,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     // 1.4.0 New Project Wizard reads (not tied to an existing project).
     // PF-0158: Recheck one stack's tools (--version probes only): never in a read-only console.
     if (parts.length === 3 && parts[1] === 'new' && parts[2] === 'prerequisites') return readOnly ? send(response, 405, { error: { code: 'READ_ONLY', message: 'This console was started with --read-only.' } }) : send(response, 200, await wizardTools(url.searchParams.get('stack'), { git: url.searchParams.get('git') === '1' }));
+    if (parts.length === 3 && parts[1] === 'new' && parts[2] === 'draft') return send(response, 200, readOnly ? { draft: null } : await loadDraft());
     if (parts.length === 3 && parts[1] === 'new' && parts[2] === 'catalog') return send(response, 200, await wizardCatalog(projects[0]?.root ?? process.cwd(), runner));
     if (parts.length === 4 && parts[1] === 'new' && parts[2] === 'plans' && /^NP-\d{14}-[0-9a-f]{6}$/.test(parts[3])) return send(response, 200, await wizardProgress(parts[3]));
     if (parts[1] !== 'p' || !byId.has(parts[2])) return send(response, 404, { error: { code: 'NOT_FOUND', message: 'Unknown project.' } });
@@ -611,6 +616,12 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
       const result = await attachPlannedFile(parts[3], request, runner);
       return send(response, result.duplicate ? 200 : 201, result);
     }
+    // PF-0175: the unfinished New Project form, kept on this machine across ports and restarts.
+    if (parts.length === 3 && parts[1] === 'new' && parts[2] === 'draft') {
+      const type = String(request.headers['content-type'] ?? '').split(';')[0].trim().toLowerCase();
+      if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
+      return send(response, 200, await saveDraft(await readJsonBody(request)));
+    }
     // 1.4.0 New Project Wizard: POST /api/new/plan, /api/new/create (JSON only).
     if (parts[1] === 'new') {
       const type = String(request.headers['content-type'] ?? '').split(';')[0].trim().toLowerCase();
@@ -637,7 +648,11 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
     }
     if (rest.length === 4 && rest[0] === 'work' && isWorkId(rest[1]) && rest[2] === 'actions') {
       if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
-      return send(response, 200, await runAction(project.root, rest[3], rest[1], await readJsonBody(request), runner));
+      const actionBody = await readJsonBody(request);
+      const result = await runAction(project.root, rest[3], rest[1], actionBody, runner);
+      // PF-0174: an answer also reaches the item's own idle agent session (one action for the developer).
+      if (rest[3] === 'answer') result.delivery = await deliverAnswer(agentsOn && !monitored(project) ? bridge : null, project.id, rest[1], actionBody);
+      return send(response, 200, result);
     }
     if (rest.length === 5 && rest[0] === 'work' && isWorkId(rest[1]) && rest[2] === 'gates' && rest[4] === 'decision') {
       if (type !== 'application/json') return send(response, 415, { error: { code: 'CONTENT_TYPE', message: 'Send application/json.' } });
@@ -697,7 +712,7 @@ export async function startConsoleServer({ roots, port = 0, host = '127.0.0.1', 
         const binary = found.claude?.claude?.path;
         // On Windows the plain `claude` is kept: the new PowerShell window finds it on PATH
         // itself, and no machine path is placed inside the command text (PF-0148).
-        const command = binary && process.platform !== 'win32' ? files.command.replace(/^claude /, `${shellQuote(binary)} `) : files.command;
+        const command = binary && process.platform !== 'win32' ? (await loadClaude()).launchCommand(project.root, files.mcpFile, files.settingsFile, { binary }) : files.command;
         return send(response, 200, { ...(await openTerminalFor(project.root, command)), command: files.command });
       }
       if (rest[1] === 'launch-files') {

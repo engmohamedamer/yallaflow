@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Every child process YallaFlow starts gets an allow-listed environment built by safeEnvironment (src/utils/command.js), which on Windows adds the system variables programs need (Path in any case, APPDATA, SystemRoot, TEMP, PATHEXT, ComSpec, ...). A hand-written POSIX-only allow-list breaks Windows children: npm then cannot expand its builtin prefix=${APPDATA}\\npm (seen on a real Windows 11 machine in the 1.5.4 trial).",
+      "evidence": [
+        "src/utils/command.js",
+        "src/agents/setup.js"
+      ],
+      "confidence": "confirmed",
+      "provenance": "repository",
+      "status": "promoted",
+      "createdAt": "2026-11-18T11:12:15.337Z",
+      "factId": "CTX-0181",
+      "promotedAt": "2026-11-18T11:12:19.147Z",
+      "target": "context/conventions.md"
+    }
+  ],
+  "updatedAt": "2026-11-18T11:12:19.147Z",
+  "reviewedAt": "2026-11-18T11:12:19.147Z"
+}

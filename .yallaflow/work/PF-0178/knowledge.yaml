@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "CI: .github/workflows/ci.yml runs the full suite (npm run check) on Ubuntu and the platform suite (npm run test:platform: real-process runtime lifecycle plus the Windows-rule suites) on windows-latest, macos-latest and ubuntu-latest for pushes and PRs; release.yml runs the same platform job before publish. The full suite is POSIX-only; a test that must pass on every OS belongs in test:platform.",
+      "evidence": [
+        ".github/workflows/ci.yml",
+        "package.json"
+      ],
+      "confidence": "confirmed",
+      "provenance": "repository",
+      "status": "promoted",
+      "createdAt": "2026-11-18T11:44:35.220Z",
+      "factId": "CTX-0186",
+      "promotedAt": "2026-11-18T11:44:35.586Z",
+      "target": "context/conventions.md"
+    }
+  ],
+  "updatedAt": "2026-11-18T11:44:35.586Z",
+  "reviewedAt": "2026-11-18T11:44:35.586Z"
+}

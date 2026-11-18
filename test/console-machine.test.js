@@ -201,3 +201,62 @@ test('tested Codex versions: exact pins, inside the supported adapter range, che
   assert.deepEqual(pinnedCompatible(), { ok: true, problems: [] });
   assert.equal(pinnedCompatible('14.21.3').ok, false, 'an unsupported Node.js gets no install offer');
 });
+
+// ---------------------------------------------------------------- PF-0172 (real Windows trial, W1)
+test('Windows: the setup environment keeps the system variables npm needs (Path whatever its case), never a credential', async () => {
+  const win = { Path: 'C:\\Program Files\\nodejs\;C:\\Users\\u\\AppData\\Roaming\\npm', PATHEXT: '.COM;.EXE;.BAT;.CMD', APPDATA: 'C:\\Users\\u\\AppData\\Roaming', LOCALAPPDATA: 'C:\\Users\\u\\AppData\\Local', USERPROFILE: 'C:\\Users\\u', SystemRoot: 'C:\\WINDOWS', TEMP: 'C:\\Users\\u\\AppData\\Local\\Temp', TMP: 'C:\\Users\\u\\AppData\\Local\\Temp', ComSpec: 'C:\\WINDOWS\\system32\\cmd.exe', OPENAI_API_KEY: 'k', GITHUB_TOKEN: 'g', npm_config_registry: 'r', npm_config__authToken: 'a' };
+  const env = setupEnvironment(win, 'win32');
+  assert.equal(env.PATH, win.Path, 'Path is kept (written as PATH)');
+  for (const name of ['APPDATA', 'LOCALAPPDATA', 'USERPROFILE', 'SystemRoot', 'TEMP', 'TMP', 'PATHEXT', 'ComSpec']) assert.equal(env[name], win[name], `${name} is kept`);
+  for (const secret of ['OPENAI_API_KEY', 'GITHUB_TOKEN', 'npm_config__authToken']) assert.equal(env[secret], undefined, `${secret} is not passed`);
+  assert.equal(env.npm_config_registry, 'r');
+  // Before PF-0172 this environment came out empty: npm could not expand ${APPDATA}.
+  assert.ok(Object.keys(env).length >= 10);
+});
+
+test('an npm global folder with an unexpanded variable or a relative path is never installed into', async () => {
+  const { prefixProblem } = await import('../src/agents/setup.js');
+  for (const bad of ['C:\\WINDOWS\\system32\\${APPDATA}\\npm', '${APPDATA}\\npm', '%APPDATA%\\npm', 'npm', '']) assert.ok(prefixProblem(bad, 'win32'), `refused: ${bad}`);
+  assert.equal(prefixProblem('C:\\Users\\u\\AppData\\Roaming\\npm', 'win32'), null);
+  assert.equal(prefixProblem('/home/u/.npm-global', 'linux'), null);
+  assert.ok(prefixProblem('relative/prefix', 'linux'));
+
+  clearDetectionCache();
+  const b = await bin();
+  // An npm whose prefix comes back unexpanded (what the real machine reported).
+  await writeFile(path.join(b.binDir, 'npm'), `#!/usr/bin/env node\nconst fs = require('fs');\nif (process.argv[2] === 'prefix') { console.log(process.cwd() + '/\${APPDATA}/npm'); process.exit(0); }\nfs.appendFileSync(${JSON.stringify(b.record)}, 'ran\\n');\n`);
+  const machine = new MachineSetup({ env: b.env });
+  const status = await machine.status();
+  assert.match(status.codex.install.problem, /unexpanded variable/);
+  assert.equal(status.codex.install.writable, false);
+  await assert.rejects(machine.install({ confirm: true, planHash: status.codex.install.planHash }), { code: 'NPM_PREFIX_UNRESOLVED' });
+  assert.equal(existsSync(b.record), false, 'nothing was installed');
+});
+
+test('the prefix probe runs where the install runs (the home folder), not where the console was started', async () => {
+  clearDetectionCache();
+  const b = await bin();
+  await writeFile(path.join(b.binDir, 'npm'), `#!/usr/bin/env node\nif (process.argv[2] === 'prefix') { console.log(process.cwd()); process.exit(0); }\nconsole.log('cwd=' + process.cwd());\n`);
+  const machine = new MachineSetup({ env: b.env });
+  const status = await machine.status();
+  assert.equal(status.codex.install.prefix, os.homedir());
+});
+
+test('an install that finished but left Codex unfindable says so, with the folder npm used', async () => {
+  clearDetectionCache();
+  const b = await bin();
+  const machine = new MachineSetup({ env: b.env });
+  const before = await machine.status();
+  assert.equal(before.codex.afterInstall, null);
+  await machine.install({ confirm: true, planHash: before.codex.install.planHash });
+  assert.equal((await waitJob(machine)).state, 'done');
+  const after = await machine.status();
+  assert.deepEqual(after.codex.afterInstall, { found: false, prefix: b.prefix });
+});
+
+test('Windows system programs are started by their System32 path; an odd SystemRoot is not trusted', async () => {
+  const { windowsSystemProgram } = await import('../src/utils/command.js');
+  assert.equal(windowsSystemProgram('reg.exe', { SystemRoot: 'C:\\WINDOWS' }), 'C:\\WINDOWS\\System32\\reg.exe');
+  assert.equal(windowsSystemProgram('reg.exe', { SystemRoot: '%EVIL%' }), 'C:\\Windows\\System32\\reg.exe');
+  assert.equal(windowsSystemProgram('reg.exe', { SystemRoot: 'relative' }), 'C:\\Windows\\System32\\reg.exe');
+});

@@ -1,0 +1,45 @@
+{
+  "id": "PF-0177",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "W6a: the Run page on Windows — no whole-page 'Linux and macOS only' block; show services, discovery, plans, trust, logs and settings; 'No services yet' for an empty project; name what this system cannot do (Docker Compose on Windows, forceful stop, not yet verified on a real machine) and never offer an action it cannot perform",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-18T11:38:54.578Z",
+  "updatedAt": "2026-11-18T11:42:19.275Z",
+  "title": "W6a: the Run page on Windows — no whole-page 'Linux and macOS only' block; show services, discovery, plans, trust, logs and settings; 'No services yet' for an empty project; name what this system cannot do (Docker Compose on Windows, forceful stop, not yet verified on a real machine) and never offer an action it cannot perform",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-18T11:38:54.650Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-18T11:42:19.275Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

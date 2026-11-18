@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-18T12:17:37.343Z",
+      "completedAt": "2026-11-18T12:17:37.525Z",
+      "summary": "Freeze checks: v1.5.4 tags the release commit 9edf610; HEAD 1e63e03 is its record commit; package.json and src/version.js are 1.5.4; npm dist-tags { latest: 1.5.4 }, no next. release.yml publishes a prerelease version with --tag next and requires the tag on main and the GitHub prerelease flag. Version-coupled tests: test/cli.test.js and test/pilot-hardening.test.js. Changes since 1.5.4: PF-0172..PF-0179 (new user-facing capability: Windows Run Manager, answer delivery, refreshed PATH) -> minor version, released first as a candidate for real-Windows testing.",
+      "evidence": [
+        ".github/workflows/release.yml",
+        "package.json",
+        "src/version.js"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-18T12:17:38.819Z",
+      "completedAt": "2026-11-18T12:17:39.014Z",
+      "summary": "Bump package.json, package-lock.json root and src/version.js to 1.6.0-rc.1 plus the two version tests; CHANGELOG [1.6.0-rc.1] section; README What's new; no internal contract/schema version bump (runtime-1 schema change is additive). Then: full check, doctor, npm audit, pack --dry-run, real pack with file list and secret scan, isolated-prefix install smoke (version, init greenfield + brownfield, doctor, console start on a free port and API answer), provider/network scan (the suite's guard), git diff --check. Stop before commit/tag/push/publish.",
+      "evidence": [
+        "docs/releasing.md"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-18T12:18:23.925Z",
+      "completedAt": "2026-11-18T12:18:24.102Z",
+      "summary": "Version 1.6.0-rc.1 in package.json, package-lock.json (root), src/version.js and the two version tests; CHANGELOG [1.6.0-rc.1] with Fixed/Added/Changed/Documentation, verification status by system and known issues; README 'What's new in 1.6.0-rc.1 (release candidate)'. No internal contract, registry or schema version bump (runtime-1 change is additive).",
+      "evidence": [
+        "package.json",
+        "src/version.js",
+        "CHANGELOG.md",
+        "README.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-18T12:25:57.362Z",
+      "completedAt": "2026-11-18T13:24:57.611Z",
+      "summary": "Re-verified after the PF-0181 review fixes. V-006 and V-007 failed only on the known load-dependent 'Queue end to end' test (same line 136 as in the untouched pre-change baseline; passes alone 7/7). V-008 full check passed (1468 tests: 1466 pass, 2 skipped, 0 failed). V-009 tarball 1.6.0-rc.1 (shasum 674cb1b11709f49196148deb70fb8e99ac86d59f) installed in an isolated prefix: version, init, doctor, runtime capabilities. V-010 tarball holds only src, resources, docs, README, CHANGELOG, LICENSE, package.json, no secret pattern. V-011 git diff --check. V-012 doctor. V-013 test:platform. npm audit unchanged since 1.5.4 (runtime: 2 moderate via officeparser/file-type; dev-only: 3 high via the Tailwind CLI).",
+      "evidence": [
+        "verification:V-001",
+        "verification:V-003",
+        "verification:V-004",
+        "verification:V-008",
+        "verification:V-009",
+        "verification:V-010"
+      ]
+    },
+    "code-review": {
+      "status": "completed",
+      "startedAt": "2026-11-18T13:24:57.825Z",
+      "completedAt": "2026-11-18T13:24:58.025Z",
+      "summary": "Independent review of the full PF-0172..PF-0179 diff on an isolated copy. Linux/macOS: no regression found. Blocking (fixed in PF-0181): Windows stop could expand and kill the children of a program that had received a dead service's pid. Should-fix (fixed in PF-0181): taskkill /T follows parent links without creation times (removed everywhere); synchronous PowerShell blocked the console (now async, shared read); an unreadable process list cleared service records (now 'unverifiable', record kept, start refused without identity); detached Windows services likely opened visible windows for their console children (now not detached, windowsHide). Minor fixed: drive-relative PATH entries, install bound to the reviewed npm, answer text must carry the recorded answer. Minor accepted and listed as known issues: 'delivered' means the turn started, read-only consoles are not recorded for the port note. Re-verified (V-008..V-013). No open blocking issue.",
+      "evidence": [
+        "convergence:PF-0181"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [
+    {
+      "skill": "verification",
+      "from": "completed",
+      "to": "in_progress",
+      "reason": "Verification V-006 failed after the verification checkpoint was completed.",
+      "changedAt": "2026-11-18T13:10:39.847Z"
+    }
+  ],
+  "updatedAt": "2026-11-18T13:24:58.025Z"
+}

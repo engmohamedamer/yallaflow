@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "environment",
+      "summary": "reg.exe Path refresh exercised only with simulated output",
+      "reason": "No Windows machine in this session; covered by the real-Windows checklist",
+      "recordedAt": "2026-11-18T11:18:21.695Z"
+    }
+  ],
+  "updatedAt": "2026-11-18T11:18:21.695Z"
+}

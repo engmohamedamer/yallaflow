@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-18T11:19:04.137Z",
+      "completedAt": "2026-11-18T11:19:04.318Z",
+      "summary": "Chat 'Answer the question' (app.js chatAction waitingFor.kind question) opens the action dialog; submitAction posts /work/<id>/actions/answer -> runAction (src/console/actions.js:60) -> yallaflow question answer. Execution task state: model.js question -> needs-you:question; only turn-started returns it to working (model.js:95); manager.checkItem maps snapshot waitingFor. Bridge.message (bridge.js:790) is the only path that reaches a Codex session; one session slot per checkout prevents duplicates.",
+      "evidence": [
+        "src/console/actions.js"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-18T11:19:05.050Z",
+      "completedAt": "2026-11-18T11:19:05.228Z",
+      "summary": "Root cause: the answer action has no delivery step. It writes the YallaFlow record only; the idle Codex session never receives it, no turn starts, so the execution task stays needs-you:question while the item no longer shows a question, and the success toast implies delivery. The verification tab text is static (app.js 'No verification recorded yet.') regardless of stage or waiting state. Confirmed by code trace; the UI and manager tests use the same paths.",
+      "evidence": [
+        "resources/console/app.js"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-18T11:22:52.663Z",
+      "completedAt": "2026-11-18T11:22:52.663Z",
+      "summary": "Answer is now one action: server actions route (answer) records the answer through Core, then deliverAnswer() (src/console/actions.js) sends it to the item's own Codex session only when that session is idle with no open approval; returns sent (only after the turn really started), busy, other-item, manual (Claude Code), no-session or failed. No session is started and nothing goes to another item's session; the existing one-slot-per-checkout guard is unchanged. Execution model: new question-answered signal moves needs-you:question to needs-you:reply when the answer was not sent (manager.checkItem), and turn-started still is the only way back to working. Console: answer toast says what happened (in AR/EN), the chat state reads 'Waiting for your input — PF-####' / 'Waiting for your review — PF-####', and the verification tab says why there is no run yet (waiting for your answer/review, current stage, or verification is the current step).",
+      "evidence": [
+        "src/console/actions.js",
+        "src/execution/model.js",
+        "src/execution/manager.js",
+        "resources/console/app.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-18T11:23:59.818Z",
+      "completedAt": "2026-11-18T11:23:59.818Z",
+      "summary": "V-001 passed (82 tests): delivery states with a fake bridge, task transitions, AR/EN toast and verification text, and an end-to-end run through the real console server and bridge with the simulated Codex agent (answer recorded in YallaFlow, message.sent with the answer, turn.started), plus the existing action, execution, queue and bridge suites.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-18T11:23:59.818Z"
+}

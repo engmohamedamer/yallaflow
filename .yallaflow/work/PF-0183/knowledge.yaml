@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "yallaflow health (src/core/health.js) is a read-only five-class project check (healthy, update-available, repairable, manual-review, unsafe) built on assessWorkspace/doctor; yallaflow refresh (src/agent/refresh.js) updates only hash-provable managed text (AGENT.md contract block or known generated template, AGENTS.md/CLAUDE.md bootstrap blocks), is all-or-nothing on conflicts or refused files, backs up to .yallaflow/local/backups with a manifest (before/intended/after hashes), verifies afterwards, and restore refuses files changed since.",
+      "evidence": [
+        "src/agent/refresh.js",
+        "src/core/health.js",
+        "verification:V-001"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-18T15:51:50.982Z",
+      "factId": "CTX-0189",
+      "promotedAt": "2026-11-18T15:51:51.196Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-18T15:51:51.196Z",
+  "reviewedAt": "2026-11-18T15:51:51.196Z"
+}

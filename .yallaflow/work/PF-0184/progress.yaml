@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-18T15:56:38.146Z",
+      "completedAt": "2026-11-18T15:56:38.318Z",
+      "summary": "Reviewed the existing (untracked) diff against the brief. Reused: SAFE_GIT (src/utils/git-safety.js), isBranchName (src/shared/config.js), the merge-tree preview pattern of src/execution/git-ops.js (which writes objects; here a temporary object store is used instead). Before this item no branch-health feature existed at HEAD (git show HEAD:src/cli.js has no branches command).",
+      "evidence": [
+        "src/core/branches.js",
+        "src/utils/git-safety.js",
+        "src/execution/git-ops.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-18T15:56:38.911Z",
+      "completedAt": "2026-11-18T15:56:39.103Z",
+      "summary": "Intent from the owner's 1.5.5 brief section 4 recorded as REQ-001..003 / AC-001..004. CLI only in 1.5.5 (no console page); read-only by construction."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-18T15:57:08.597Z",
+      "completedAt": "2026-11-18T15:57:08.799Z",
+      "summary": "Already-made change (see ruling) reviewed and completed: src/core/branches.js (analyzeBranches, previewMerge with temporary object store, describeBranches), src/commands/branches.js (report and configure), validateBranchesConfig in src/shared/config.js (wired into validateProjectConfig), CLI wiring (read-only and lock-free except configure), back-merge conflict preview added, docs/cli.md rows and docs/updating-projects.md Branch Health section, test:platform now includes health-refresh and branch-health. Correction: the read-only claim was narrowed after a test showed Git refreshes existing object mtimes during merge-tree (content unchanged).",
+      "evidence": [
+        "src/core/branches.js",
+        "test/branch-health.test.js",
+        "docs/updating-projects.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-18T16:05:45.355Z",
+      "completedAt": "2026-11-18T16:05:45.549Z",
+      "summary": "V-002 passed: branch-health (5), health-refresh, cli, help safety, agent-bootstrap, shared-project guards (git-scan, no-network), doctor-integrity; execution-gitops/merge also pass after the git-ops addition. V-001 failed on the git-scan guard (for-each-ref/remote/merge-tree outside git-ops); fixed by reading via rev-parse/config/rev-list and previewing through git-ops.",
+      "evidence": [
+        "verification:V-002"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-18T16:05:46.505Z",
+      "completedAt": "2026-11-18T16:05:46.699Z",
+      "summary": "4/4 criteria satisfied."
+    }
+  },
+  "rulings": [
+    {
+      "decision": "src/core/branches.js, src/commands/branches.js, test/branch-health.test.js and the branches parts of src/shared/config.js and src/cli.js were edited before this work item reached an implementation-authorized stage, without workflow authorization; adopted for review and verification",
+      "reason": "The agent implemented Branch Health directly after finishing PF-0183 without first advancing PF-0184 through discovery and requirement clarification; the change is kept, disclosed to the owner, and walked through the workflow now.",
+      "costIfWrong": "Requirements recorded after the code could be shaped to fit it; mitigated by deriving them from the owner's brief section 4 and assessing convergence against that brief.",
+      "createdAt": "2026-11-18T15:56:37.964Z"
+    }
+  ],
+  "history": [],
+  "updatedAt": "2026-11-18T16:05:46.699Z"
+}

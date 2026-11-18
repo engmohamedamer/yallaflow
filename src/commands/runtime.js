@@ -6,7 +6,7 @@ import { PACKAGE_VERSION } from '../version.js';
 import { addService, definitionHash, loadRuntimeProfiles, removeService, resolveServiceCwd, updateService } from '../runtime/profile.js';
 import { suggestServices } from '../runtime/suggest.js';
 import { trustService, trustState } from '../runtime/trust.js';
-import { RuntimeError, installPrerequisites, restartService, runtimeStatus, serviceLogs, startAllServices, startService, stopAllServices, stopService } from '../runtime/supervisor.js';
+import { RuntimeError, installPrerequisites, restartService, runtimeStatus, serviceLogs, startAllServices, startService, stopAllServices, stopService, runtimeCapabilities } from '../runtime/supervisor.js';
 import { readFile } from 'node:fs/promises';
 
 export const RUNTIME_SCHEMA = 'yallaflow.runtime/1';
@@ -327,7 +327,7 @@ export async function collectRuntime(root, { now = new Date().toISOString() } = 
   } catch (error) {
     if (error.code !== 'RUNTIME_PROFILE_INVALID') throw error;
     profileError = error.message;
-    status = { supported: true, profile: { exists: true }, services: [] };
+    status = { supported: true, capabilities: runtimeCapabilities(), profile: { exists: true }, services: [] };
   }
   let suggestions = [];
   try {
@@ -335,7 +335,7 @@ export async function collectRuntime(root, { now = new Date().toISOString() } = 
   } catch {
     suggestions = [];
   }
-  return { schema: RUNTIME_SCHEMA, generatedAt: now, yallaflowVersion: PACKAGE_VERSION, supported: status.supported, profile: { ...status.profile, error: profileError }, services: status.services, suggestions };
+  return { schema: RUNTIME_SCHEMA, generatedAt: now, yallaflowVersion: PACKAGE_VERSION, supported: status.supported, capabilities: status.capabilities ?? runtimeCapabilities(), profile: { ...status.profile, error: profileError }, services: status.services, suggestions };
 }
 
 function statusLines(status) {

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --import ./test-support/isolate-user-config.js --test",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-18T16:17:40.029Z",
+      "finishedAt": "2026-11-18T16:23:25.378Z",
+      "verifiedAt": "2026-11-18T16:23:25.378Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

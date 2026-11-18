@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "The Run Manager supports Windows (PF-0176): process identity is pid plus creation time from one constant Win32_Process CIM query (System32 powershell.exe, argv only); stop is forceful there (System32 taskkill /T /F on a re-verified leader, tracked descendants killed only while their creation time matches, survivors reported); services launch through the shared resolveCommand (.cmd shims become node + script) with safeEnvironment and the refreshed PATH, detached and hidden; Docker Compose lifecycle is refused on Windows (RUNTIME_COMPOSE_WINDOWS). runtimeStatus carries capabilities { lifecycle, compose, gracefulStop, verified }.",
+      "evidence": [
+        "src/runtime/process.js",
+        "src/runtime/supervisor.js"
+      ],
+      "confidence": "inferred",
+      "provenance": "repository",
+      "status": "promoted",
+      "createdAt": "2026-11-18T11:38:42.561Z",
+      "factId": "CTX-0185",
+      "promotedAt": "2026-11-18T11:38:42.894Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-18T11:38:42.894Z",
+  "reviewedAt": "2026-11-18T11:38:42.894Z"
+}

@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-18T15:39:12.936Z",
+      "completedAt": "2026-11-18T15:39:13.131Z",
+      "summary": "Read src/agents/claude-files.js launchCommand, src/agents/terminal.js (macOS osascript cd && command), src/console/server.js open-terminal and settings view (launchCommand surfaced for copy). The copy command is project-relative.",
+      "evidence": [
+        "src/agents/claude-files.js",
+        "src/agents/terminal.js",
+        "src/console/server.js"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-18T15:39:13.320Z",
+      "completedAt": "2026-11-18T15:39:13.514Z",
+      "summary": "Root cause (code reasoning; no macOS device): launchCommand writes --mcp-config and --settings relative to the project root, and the console shows that command to copy with 'run it in a terminal in the project folder'. A new macOS Terminal opens in the home folder, so a pasted command makes Claude Code resolve .yallaflow/local/agent/claude-settings.json against the home folder. The terminal the console opens itself does cd first, so only the copied command fails. Fix: POSIX command starts with cd '<root>' && and uses absolute quoted paths; Windows uses absolute paths (no cd: the PowerShell window the console opens already starts in the project, and a cd syntax common to PowerShell, CMD and Git Bash does not exist). Reproduction on a real Mac is not available.",
+      "evidence": [
+        "src/agents/claude-files.js"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-18T15:40:46.024Z",
+      "completedAt": "2026-11-18T15:40:46.225Z",
+      "summary": "launchCommand: on macOS/Linux the command starts with cd '<project>' && and names --mcp-config/--settings by absolute single-quoted path; optional binary replaces claude. The console's open-terminal builds the binary command through launchCommand instead of a regex. Windows command unchanged (relative names; PowerShell expands $(...) in double quotes, PF-0148). Tests: new regression test runs the copied command from another folder; updated three assertions; docs/agents-claude-experimental.md.",
+      "evidence": [
+        "src/agents/claude-files.js",
+        "test/agent-windows.test.js",
+        "docs/agents-claude-experimental.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-18T15:42:09.567Z",
+      "completedAt": "2026-11-18T15:42:09.775Z",
+      "summary": "V-001: agent-windows (new PF-0182 regression test runs the copied command from another folder), agent-claude-experimental, project-setup, shared-project guards all pass on Linux. Not run on a real Mac.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-18T15:42:09.775Z"
+}

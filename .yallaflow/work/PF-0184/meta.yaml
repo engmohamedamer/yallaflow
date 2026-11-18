@@ -1,0 +1,46 @@
+{
+  "id": "PF-0184",
+  "type": "feature",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Read-only Git branch health: optional branch flow configuration (feature to dev to qc to prod, hotfix to prod), ahead/behind, merge bases, production-only commits and hotfixes missing downstream, merge-conflict preview without touching the working tree, refs, or remote, staleness, safe next-step recommendations",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-18T15:39:01.719Z",
+  "updatedAt": "2026-11-18T16:05:47.697Z",
+  "title": "Read-only Git branch health: optional branch flow configuration (feature to dev to qc to prod, hotfix to prod), ahead/behind, merge bases, production-only commits and hotfixes missing downstream, merge-conflict preview without touching the working tree, refs, or remote, staleness, safe next-step recommendations",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope bounded`.",
+  "routedAt": "2026-11-18T15:39:01.803Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "implement",
+    "verify",
+    "converge"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation",
+      "verification",
+      "delivery-convergence"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-18T16:05:47.697Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002"
+      ]
+    }
+  ]
+}

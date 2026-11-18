@@ -1,6 +1,7 @@
 import { killAllAgentsNow } from '../agents/acp.js';
 import { CLAUDE_NOT_INCLUDED, claudeIncluded } from '../agents/experimental.js';
 import { spawn } from 'node:child_process';
+import { consoleOnPort, forgetConsole, recordConsole } from '../console/instances.js';
 import path from 'node:path';
 import { findProjectRoot } from '../core/workspace.js';
 import { startConsoleServer } from '../console/server.js';
@@ -40,6 +41,8 @@ export async function consoleCommand({ port, open = true, projects = [], poll = 
   const link = `${server.url}#token=${server.token}`;
   console.log(readOnly ? 'YallaFlow console is running (read-only).' : 'YallaFlow console is running. It changes things only when you confirm an action on the page (--read-only turns every change off).');
   if (server.agents?.enabled) console.log(`Agent Workspace: on (Codex${server.agents.claude ? ', Claude Code experimental' : ''}). Agents use your own subscriptions; YallaFlow never uses API keys.`);
+  for (const note of busyPortNotes(server.busyPorts ?? [], server.url)) console.log(`\nNote: ${note}`);
+  if (!readOnly) await recordConsole(server.port ?? Number(new URL(server.url).port));
   console.log(`\nOpen: ${link}\n`);
   for (const project of server.projects) console.log(`Project: ${project.name} (${project.root})`);
   if (!server.projects.length) console.log('No projects yet: open the link to create one, or add an existing project from the page.');
@@ -67,6 +70,7 @@ export async function consoleCommand({ port, open = true, projects = [], poll = 
   });
   process.once('exit', killAllAgentsNow);
   const incomplete = await server.close();
+  if (!readOnly) await forgetConsole();
   for (const entry of incomplete ?? []) {
     console.log(entry.cleanup.verified === false
       ? `\nWarning: the Codex adapter in ${entry.project} was stopped, but on this system YallaFlow cannot check the processes it started. Check them yourself.`
@@ -77,14 +81,28 @@ export async function consoleCommand({ port, open = true, projects = [], poll = 
 
 async function listen(roots, port, poll, missing, readOnly, extra = {}) {
   if (port !== undefined) return startConsoleServer({ roots, port, poll, missing, readOnly, ...extra });
+  const busy = [];
   for (let candidate = DEFAULT_PORT; candidate < DEFAULT_PORT + 10; candidate++) {
     try {
-      return await startConsoleServer({ roots, port: candidate, poll, missing, readOnly, ...extra });
+      const server = await startConsoleServer({ roots, port: candidate, poll, missing, readOnly, ...extra });
+      return Object.assign(server, { busyPorts: busy });
     } catch (error) {
       if (error.code !== 'EADDRINUSE') throw error;
+      busy.push({ port: candidate, console: Boolean(await consoleOnPort(candidate)) });
     }
   }
-  return startConsoleServer({ roots, port: 0, poll, missing, readOnly, ...extra });
+  return Object.assign(await startConsoleServer({ roots, port: 0, poll, missing, readOnly, ...extra }), { busyPorts: busy });
+}
+
+// What the terminal says when the usual port was taken (never silent: an earlier console keeps
+// the PATH it was started with, so a tool installed since is not found from its page).
+export function busyPortNotes(busy, url) {
+  const earlier = busy.filter((entry) => entry.console).map((entry) => entry.port);
+  const other = busy.filter((entry) => !entry.console).map((entry) => entry.port);
+  const notes = [];
+  if (earlier.length) notes.push(`Another YallaFlow console is still running on port ${earlier.join(', ')}. It keeps the PATH it was started with, so it does not see tools installed since. Use this console's link (${url}), and stop the other one (Ctrl-C in its window, or close that window).`);
+  if (other.length) notes.push(`Port ${other.join(', ')} is used by another program, so this console uses ${url}.`);
+  return notes;
 }
 
 function openBrowser(url) {

@@ -2,7 +2,15 @@
 
 YallaFlow can start, stop, restart and show the logs of your project's local development services, such as `php artisan serve`, `npm run dev` or `docker compose up`, from the CLI and the console's **Setup** tab. It only runs commands you reviewed and trusted, and it only stops processes it started and can still positively identify.
 
-Supported on Linux and macOS. On Windows the commands refuse with a clear message.
+Supported on Linux, macOS and Windows (Windows since 1.5.5). Linux is verified on real machines; macOS and Windows run the platform suite on real CI runners, and their full journey is still to be verified by hand ([checklist](onboarding-manual-validation.md)). The Run page never hides itself on a system: it says what that system cannot do.
+
+**Windows specifics (1.5.5, PF-0176):**
+
+- A service command is found on the service's `PATH` (with the current registry `Path`, so a tool installed while the console runs is found) and started without a shell; an npm `.cmd` shim such as `npm.cmd` is started as `node` with its script. Services start with a hidden console of their own (shared with the programs they start), so no window opens and they keep running when the console stops or its window is closed.
+- A process is YallaFlow's only while its pid **and its creation time** match the run record. They are read from the system's process table with one fixed, read-only query (`powershell.exe -NoProfile -NonInteractive -Command "Get-CimInstance Win32_Process …"`). The list is read in the background, never while the console waits. If it cannot be read, no process has an identity: nothing is stopped and no record is cleared; a service whose identity cannot be recorded at start is not kept running.
+- **Stop is forceful on Windows.** Windows cannot ask a detached console program to stop gracefully. YallaFlow reads the process list again, starts only from the service's own process (same pid **and** creation time), and ends it and every process it started one by one, each only while its own creation time still matches (never `taskkill /T`, which follows parent links without checking them). A child started during the stop is included; anything still running is reported, never claimed stopped. `stopSignal` does not apply there. If the process list cannot be read, nothing is stopped and the record is kept (`RUNTIME_UNVERIFIABLE`).
+- **Docker Compose services are not started, stopped or restarted on Windows** in this release (`RUNTIME_COMPOSE_WINDOWS`). Their cards say so; the other services stay usable.
+- Who holds a port is read from `netstat -ano`.
 
 ## Analyze, review, trust, start (PF-0072)
 

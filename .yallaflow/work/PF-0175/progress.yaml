@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-18T11:24:33.545Z",
+      "completedAt": "2026-11-18T11:24:33.721Z",
+      "summary": "Preferences (language, theme, preferred agent, last folder, chat history, onboarding) are a user-level file through /api/preferences (src/console/preferences.js) and survive restarts and port changes. The wizard draft (app.js WIZ_DRAFT), recent folders (RECENT_KEY) and the selected project use localStorage (store.get/set). chooseIntent (app.js) saves onboarding {intent, completed: true} on click; no code reads onboarding.completed. Project agent choice stays in .yallaflow/local/agents.json (unchanged).",
+      "evidence": [
+        "resources/console/app.js"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-18T11:24:34.552Z",
+      "completedAt": "2026-11-18T11:24:34.752Z",
+      "summary": "Root cause: browser storage is per origin and the origin includes the port; the console moves to 4748+ when 4747 is taken (PF-0173), so the draft and recent folders written on one port are invisible on the next. onboarding.completed records a click, not a finished setup. Confirmed by code trace (no Windows-specific cause).",
+      "evidence": [
+        "src/console/preferences.js"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-18T11:26:47.501Z",
+      "completedAt": "2026-11-18T11:26:47.501Z",
+      "summary": "New src/console/drafts.js keeps the unfinished New Project form in new-project-draft.json beside preferences.json (typed and bounded like the page's cleanWizDraft, never file contents, 0600, atomic), served by GET/POST /api/new/draft (token + Origin, refused read-only). The page saves and drops the draft there as well as in browser storage and restores from it when its own origin has none. Preferences gain recentFolders (absolute paths, at most six); the folder chooser saves them and merges them back on load. onboarding.completed is now set by the server only when a project really joins the console (registerNow); choosing an intent records only the intent. Project agent choice (.yallaflow/local/agents.json) and Monitor Only behavior are unchanged.",
+      "evidence": [
+        "src/console/drafts.js",
+        "src/console/preferences.js",
+        "src/console/server.js",
+        "resources/console/app.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-18T11:26:55.022Z",
+      "completedAt": "2026-11-18T11:26:55.022Z",
+      "summary": "V-001 passed: preferences (recentFolders validation and persistence), draft store (typed fields, 0600, removal), two consoles on different ports sharing one draft over HTTP with a read-only console reading none, wizard restore from the machine copy, onboarding completion only on project registration, plus first-journey and folder-picker suites.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-18T11:26:55.022Z"
+}

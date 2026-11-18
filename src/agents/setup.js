@@ -15,7 +15,7 @@
 // - Claude Code stays experimental: in a published release it is only detected, never connected.
 import { execFile, spawn } from 'node:child_process';
 import { createHash, randomBytes } from 'node:crypto';
-import { access, mkdtemp, rm } from 'node:fs/promises';
+import { access, mkdtemp, open, rm, stat, unlink } from 'node:fs/promises';
 import { constants } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -23,6 +23,9 @@ import { REQUIREMENTS, TESTED_CODEX, clearDetectionCache, detectProviders, launc
 import { CodexSession } from './codex.js';
 import { claudeIncluded } from './experimental.js';
 import { redactSecrets } from '../security/redact.js';
+import { safeEnvironment } from '../utils/command.js';
+import { windowsEndHeldTree } from '../runtime/process.js';
+import { toolEnvironment } from '../utils/fresh-path.js';
 
 // An error the console server answers with this HTTP status and code.
 class SetupError extends Error {
@@ -52,18 +55,30 @@ const LOGIN_TIMEOUT_MS = 15 * 60_000;
 const TAIL_BYTES = 6000;
 
 // The environment a setup child sees: the basics a CLI needs, npm's own non-secret settings,
-// and nothing that looks like a credential.
-export function setupEnvironment(env = process.env) {
-  // Network settings (proxies, extra certificate authorities) are kept: without them installs and
-  // sign-in fail behind a corporate proxy. They are not subscription credentials.
-  const keep = ['PATH', 'HOME', 'USER', 'LOGNAME', 'LANG', 'LC_ALL', 'TMPDIR', 'SHELL', 'XDG_CONFIG_HOME', 'XDG_DATA_HOME', 'NVM_DIR', 'CODEX_HOME',
-    'HTTPS_PROXY', 'HTTP_PROXY', 'NO_PROXY', 'ALL_PROXY', 'https_proxy', 'http_proxy', 'no_proxy', 'all_proxy', 'NODE_EXTRA_CA_CERTS', 'SSL_CERT_FILE', 'SSL_CERT_DIR'];
-  const clean = {};
-  for (const [key, value] of Object.entries(env)) {
-    if (typeof value !== 'string') continue;
-    if (keep.includes(key) || (/^npm_config_/i.test(key) && !SECRET_ENV.test(key))) clean[key] = value;
+// and nothing that looks like a credential. On Windows the system variables programs need
+// (Path whatever its case, APPDATA, SystemRoot, TEMP, …) come from the shared allow-list
+// (src/utils/command.js): without APPDATA npm cannot expand its own prefix=${APPDATA}\npm and
+// installs into a folder named after the unexpanded text (PF-0172, seen on a real Windows machine).
+// Network settings (proxies, extra certificate authorities) are kept: without them installs and
+// sign-in fail behind a corporate proxy. They are not subscription credentials.
+const SETUP_KEEP = Object.freeze(['PATH', 'HOME', 'USER', 'LOGNAME', 'LANG', 'LC_ALL', 'TMPDIR', 'SHELL', 'XDG_CONFIG_HOME', 'XDG_DATA_HOME', 'NVM_DIR', 'CODEX_HOME',
+  'HTTPS_PROXY', 'HTTP_PROXY', 'NO_PROXY', 'ALL_PROXY', 'https_proxy', 'http_proxy', 'no_proxy', 'all_proxy', 'NODE_EXTRA_CA_CERTS', 'SSL_CERT_FILE', 'SSL_CERT_DIR']);
+export function setupEnvironment(env = process.env, platform = process.platform) {
+  const clean = safeEnvironment(SETUP_KEEP, env, platform);
+  for (const [key, value] of Object.entries(env ?? {})) {
+    if (typeof value === 'string' && /^npm_config_/i.test(key) && !SECRET_ENV.test(key)) clean[key] = value;
   }
   return clean;
+}
+
+// Why npm's reported global folder cannot be used, or null. A folder that still carries an
+// unexpanded variable (${APPDATA}, %APPDATA%) or is not absolute is never installed into.
+export function prefixProblem(prefix, platform = process.platform) {
+  const p = platform === 'win32' ? path.win32 : path.posix;
+  if (typeof prefix !== 'string' || !prefix.trim()) return 'npm did not report its global folder.';
+  if (/\$\{[^}]*\}|%[^%\s]+%/.test(prefix)) return `npm reported its global folder as ${prefix}, which still contains an unexpanded variable.`;
+  if (/[\u0000-\u001f\u007f]/.test(prefix) || !p.isAbsolute(prefix)) return `npm reported its global folder as ${prefix}, which is not an absolute folder.`;
+  return null;
 }
 
 async function run(program, programArgs, { env, timeoutMs = 8000, cwd } = {}) {
@@ -95,20 +110,50 @@ export function parseLoginStatus(result) {
   return { loggedIn: false, method: null };
 }
 
+// Windows ignores access-control lists in fs.access(W_OK), so there the only reliable answer is
+// to create (and at once remove) an empty file in the deepest folder that exists.
+async function windowsCanWrite(target) {
+  let dir = target;
+  for (let depth = 0; depth < 32; depth++) {
+    try {
+      if ((await stat(dir)).isDirectory()) break;
+      return false;
+    } catch (error) {
+      if (error.code !== 'ENOENT') return false;
+      const parent = path.dirname(dir);
+      if (parent === dir) return false;
+      dir = parent;
+    }
+  }
+  const probe = path.join(dir, `.yallaflow-write-check-${randomBytes(6).toString('hex')}`);
+  try {
+    const handle = await open(probe, 'wx');
+    await handle.close();
+    await unlink(probe).catch(() => {});
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function npmGlobal(env) {
   const npm = await which('npm', env);
-  if (!npm) return { npm: null, prefix: null, writable: false };
-  const result = await run(npm, ['prefix', '-g'], { env: setupEnvironment(env) });
-  const prefix = result.ok ? result.stdout.trim().split('\n').pop() : null;
-  if (!prefix) return { npm, prefix: null, writable: false };
+  if (!npm) return { npm: null, prefix: null, writable: false, problem: null };
+  // The probe runs where the install will run (the home folder), so the folder it reports is
+  // the folder npm installs into: never relative to wherever the console was started.
+  const result = await run(npm, ['prefix', '-g'], { env: setupEnvironment(env), cwd: os.homedir() });
+  const reported = result.ok ? result.stdout.trim().split(/\r?\n/).pop()?.trim() : null;
+  const problem = prefixProblem(reported);
+  if (problem) return { npm, prefix: reported || null, writable: false, problem };
+  const prefix = reported;
   // npm writes packages under lib/node_modules and links under bin (Linux and macOS layout);
   // a folder that does not exist yet is created inside the prefix, so the prefix must be writable.
   const canWrite = async (target) => { try { await access(target, constants.W_OK); return true; } catch (error) { return error.code === 'ENOENT' ? canWrite(path.dirname(target)) : false; } };
   // Windows keeps node_modules and the command shims in the prefix folder itself.
   const writable = process.platform === 'win32'
-    ? (await canWrite(path.join(prefix, 'node_modules'))) && (await canWrite(prefix))
+    ? await windowsCanWrite(prefix)
     : (await canWrite(path.join(prefix, 'lib', 'node_modules'))) && (await canWrite(path.join(prefix, 'bin')));
-  return { npm, prefix, writable };
+  return { npm, prefix, writable, problem: null };
 }
 
 function installPlan(codex, npmInfo) {
@@ -118,7 +163,9 @@ function installPlan(codex, npmInfo) {
   if (!codex.adapter || codex.problems.some((problem) => /codex-acp .* is not supported/.test(problem))) packages.push(ADAPTER_PACKAGE);
   if (!packages.length || !npmInfo.npm) return null;
   const argv = ['npm', 'install', '-g', ...packages];
-  return { argv, command: argv.join(' '), packages, prefix: npmInfo.prefix, writable: npmInfo.writable, planHash: createHash('sha256').update(JSON.stringify({ argv, prefix: npmInfo.prefix })).digest('hex') };
+  // The approval is bound to the command, the npm that runs it and the folder it installs into:
+  // a change to any of them (a refreshed PATH finding another npm) asks for a new review.
+  return { argv, command: argv.join(' '), packages, npm: npmInfo.npm, prefix: npmInfo.prefix, writable: npmInfo.writable, problem: npmInfo.problem ?? null, planHash: createHash('sha256').update(JSON.stringify({ argv, prefix: npmInfo.prefix, npm: npmInfo.npm })).digest('hex') };
 }
 
 export class MachineSetup {
@@ -134,23 +181,25 @@ export class MachineSetup {
   async status() {
     if (this.readOnly) throw new SetupError(405, 'READ_ONLY', 'This console was started with --read-only; it runs no agent probes.');
     clearDetectionCache();
-    const found = await detectProviders({ env: this.env, claude: claudeIncluded(), maxAgeMs: 0 });
+    // PF-0173: the PATH a new terminal would get, so a tool installed meanwhile is found.
+    const env = await toolEnvironment(this.env);
+    const found = await detectProviders({ env, claude: claudeIncluded(), maxAgeMs: 0 });
     const codex = found.codex;
     let login = { loggedIn: false, method: null, checked: false };
     if (codex.codex?.path) {
-      const parsed = parseLoginStatus(await run(codex.codex.path, ['login', 'status'], { env: { ...setupEnvironment(this.env) } }));
+      const parsed = parseLoginStatus(await run(codex.codex.path, ['login', 'status'], { env: setupEnvironment(env), cwd: os.homedir() }));
       login = { ...parsed, checked: !parsed.unknown };
     }
     this.login = login;
-    const npmInfo = await npmGlobal(this.env);
-    const claudeBin = found.claude?.claude?.path ?? (await which('claude', this.env));
+    const npmInfo = await npmGlobal(env);
+    const claudeBin = found.claude?.claude?.path ?? (await which('claude', env));
     let claudeVersion = found.claude?.claude?.version ?? null;
-    if (claudeBin && !claudeVersion) claudeVersion = (parseVersion((await run(claudeBin, ['--version'], { env: setupEnvironment(this.env) })).stdout) ?? []).join('.') || null;
+    if (claudeBin && !claudeVersion) claudeVersion = (parseVersion((await run(claudeBin, ['--version'], { env: setupEnvironment(env) })).stdout) ?? []).join('.') || null;
     return {
       platform: process.platform,
       supportedPlatform: ['linux', 'darwin'].includes(process.platform),
       node: process.versions.node,
-      npm: { found: Boolean(npmInfo.npm), prefix: npmInfo.prefix, writable: npmInfo.writable },
+      npm: { found: Boolean(npmInfo.npm), prefix: npmInfo.prefix, writable: npmInfo.writable, problem: npmInfo.problem ?? null },
       codex: {
         cli: codex.codex ? { version: codex.codex.version } : null,
         adapter: codex.adapter ? { version: codex.adapter.version } : null,
@@ -159,6 +208,9 @@ export class MachineSetup {
         installed: Boolean(codex.codex && codex.adapter && !codex.problems.length),
         ready: Boolean(codex.ready && login.method === 'chatgpt'),
         install: installPlan(codex, npmInfo),
+        // An install that finished while Codex is still not found: npm put it somewhere this
+        // console does not look (its folder is not on PATH). Said instead of a silent "not installed".
+        afterInstall: this.job?.kind === 'install' && this.job.state === 'done' && !(codex.codex && codex.adapter) ? { found: false, prefix: npmInfo.prefix } : null,
         // What this release was tested with, and whether the installed parts match it.
         tested: { cli: TESTED_CODEX.cli.version, adapter: TESTED_CODEX.adapter.version, testedAt: TESTED_CODEX.testedAt, compatible: pinnedCompatible() },
         matchesTested: Boolean(codex.codex?.version === TESTED_CODEX.cli.version && codex.adapter?.version === TESTED_CODEX.adapter.version),
@@ -193,10 +245,18 @@ export class MachineSetup {
     try { return await fn(); } finally { this.pending = null; }
   }
 
-  // Ends the child and everything it started (its own process group): SIGTERM, then SIGKILL.
+  // Ends the child and everything it started. POSIX: its own process group, SIGTERM then
+  // SIGKILL. Windows (no process groups): the child (still held, so its pid cannot belong to
+  // anything else) and each process it started, checked by creation time.
   terminate(job) {
     const pid = job.child?.pid;
     if (!pid) return;
+    if (process.platform === 'win32') {
+      // PF-0181: each process of the tree checked by its creation time, never `taskkill /T`.
+      const child = job.child;
+      windowsEndHeldTree(child).catch(() => { try { child?.kill(); } catch { /* gone */ } });
+      return;
+    }
     const signal = (sig) => { try { process.kill(-pid, sig); } catch { try { job.child?.kill(sig); } catch { /* gone */ } } };
     signal('SIGTERM');
     const force = setTimeout(() => { if (job.child) signal('SIGKILL'); }, 5000);
@@ -212,7 +272,8 @@ export class MachineSetup {
   startJob(kind, file, args, { timeoutMs, onLine = null, env }) {
     const job = { id: randomBytes(6).toString('hex'), kind, state: 'running', tail: '', url: null, code: null, startedAt: new Date().toISOString(), endedAt: null, exit: null };
     // Its own process group, so a cancel or timeout also ends what npm or codex started.
-    const child = spawn(file, args, { env, shell: false, detached: true, stdio: ['ignore', 'pipe', 'pipe'], cwd: os.homedir() });
+    // Windows: no new console window, and no detached group (it has none; taskkill ends the tree).
+    const child = spawn(file, args, { env, shell: false, detached: process.platform !== 'win32', windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'], cwd: os.homedir() });
     job.child = child;
     const timer = setTimeout(() => { job.message = 'timed out'; job.state = 'cancelling'; this.terminate(job); }, timeoutMs);
     timer.unref();
@@ -245,10 +306,12 @@ export class MachineSetup {
     const plan = current.codex.install;
     if (!plan) throw new SetupError(409, 'NOTHING_TO_INSTALL', 'Codex and its adapter are already installed.');
     if (plan.planHash !== body.planHash) throw Object.assign(new SetupError(409, 'PLAN_CHANGED', 'What needs installing changed. Review the command again.'), { extra: { status: current } });
+    if (plan.problem) throw Object.assign(new SetupError(409, 'NPM_PREFIX_UNRESOLVED', `${plan.problem} YallaFlow does not install there. Run the command yourself in a new terminal, then press Rescan this machine.`), { extra: { status: current } });
     if (!plan.writable) throw Object.assign(new SetupError(409, 'NPM_PREFIX_NOT_WRITABLE', `npm installs global packages into ${plan.prefix}, which this user cannot write. YallaFlow never uses sudo. Run the command yourself with a Node.js installed for your user (for example through nvm), or set an npm prefix in your home folder.`), { extra: { status: current } });
-    const npm = await which('npm', this.env);
-    const start = await this.launchable(npm, plan.argv.slice(1));
-    return this.startJob('install', start.file, start.args, { timeoutMs: INSTALL_TIMEOUT_MS, env: setupEnvironment(this.env) });
+    const env = await toolEnvironment(this.env);
+    // PF-0181: the npm the developer's reviewed plan was bound to, not a fresh lookup.
+    const start = await this.launchable(plan.npm, plan.argv.slice(1));
+    return this.startJob('install', start.file, start.args, { timeoutMs: INSTALL_TIMEOUT_MS, env: setupEnvironment(env) });
     });
   }
 
@@ -256,7 +319,8 @@ export class MachineSetup {
     if (this.readOnly) throw new SetupError(405, 'READ_ONLY', 'This console was started with --read-only.');
     if (body?.confirm !== true) throw new SetupError(400, 'CONFIRMATION_REQUIRED', 'Confirm starting Codex\'s own sign-in.');
     return this.exclusive('login', async () => {
-    const found = await detectProviders({ env: this.env, maxAgeMs: 0 });
+    const env = await toolEnvironment(this.env);
+    const found = await detectProviders({ env, maxAgeMs: 0 });
     const codex = found.codex.codex?.path;
     if (!codex) throw new SetupError(409, 'CODEX_MISSING', 'Install Codex first.');
     // Codex's device sign-in prints an official link and a one-time code; the developer
@@ -264,7 +328,7 @@ export class MachineSetup {
     const start = await this.launchable(codex, ['login', '--device-auth']);
     return this.startJob('login', start.file, start.args, {
       timeoutMs: LOGIN_TIMEOUT_MS,
-      env: setupEnvironment(this.env),
+      env: setupEnvironment(env),
       // Read from the whole output so far, so a link split across chunks is never kept half-way.
       onLine: (job) => {
         job.url = /https:\/\/[^\s"'<>]+(?=\s)/.exec(job.tail)?.[0]?.replace(/[).,]+$/, '') ?? null;
@@ -287,10 +351,11 @@ export class MachineSetup {
     if (this.readOnly) throw new SetupError(405, 'READ_ONLY', 'This console was started with --read-only.');
     return this.exclusive('verify', async () => {
     clearDetectionCache();
-    const found = await detectProviders({ env: this.env, maxAgeMs: 0 });
+    const env = await toolEnvironment(this.env);
+    const found = await detectProviders({ env, maxAgeMs: 0 });
     if (!found.codex.ready) throw new SetupError(409, 'CODEX_NOT_INSTALLED', found.codex.problems.join(' ') || 'Codex is not installed.');
     const scratch = await mkdtemp(path.join(os.tmpdir(), 'yallaflow-codex-check-'));
-    const session = new CodexSession({ root: scratch, detection: found.codex, emit: () => {}, askPermission: async () => 'deny', env: this.env });
+    const session = new CodexSession({ root: scratch, detection: found.codex, emit: () => {}, askPermission: async () => 'deny', env });
     const at = new Date().toISOString();
     try {
       session.spawnAdapter();

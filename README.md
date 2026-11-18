@@ -173,6 +173,20 @@ flowchart TB
 
 The depth adapts to the work. A bounded bug fix goes from root-cause analysis straight to the fix, while architectural work gets a reviewed design, specification, or plan. Nothing is called done without fresh verification evidence, and work that carries acceptance criteria is checked against them before it closes. What was learned becomes reviewed project knowledge. [Workflows in detail →](docs/workflows.md)
 
+## What's new in 1.5.5
+
+**Windows first hour, safe updates, branch health.** [Changelog →](CHANGELOG.md#155---2026-11-18--windows-first-hour-safe-updates-branch-health)
+
+- **Install Codex from the console on Windows**, without an administrator terminal, with real progress and errors.
+- **Recheck finds a tool you just installed** (Git with winget, for example) without restarting the console.
+- **Answer the agent's question once**: the answer is recorded and delivered, and the console says when the agent works again.
+- **Run Manager on Windows**: start, stop, restart and logs for your development services. Stop on Windows ends the service at once and never touches a process YallaFlow cannot prove it started; Docker Compose is not run from YallaFlow on Windows yet.
+- **`yallaflow health`** tells you whether an existing project is healthy, has an update available, can be repaired, needs your review, or is unsafe to update. Read-only.
+- **`yallaflow refresh`**: check for updates, preview changes and refresh YallaFlow's own files, with backups and restore. Your edits are never overwritten without your decision; work history and project memory are never touched. [How →](docs/updating-projects.md)
+- **`yallaflow branches`**: is dev ready for QC, is QC ready for production, is a production hotfix missing downstream, would a promotion conflict. Read-only; it never merges, fetches or pushes.
+- The Claude Code launch command now works from any folder on macOS and Linux.
+- Windows and macOS: the platform suite runs on real Windows and macOS CI runners; the rest is simulated, and nothing has been run on a real Windows or macOS machine yet. See the [Windows checklist](docs/onboarding-manual-validation.md#w-windows-11-first-hour-end-to-end-phase-1-and-11).
+
 ## What's new in 1.5.4
 
 **Your first hour, your way.** [Changelog →](CHANGELOG.md#154---2026-11-18--your-first-hour-your-way)

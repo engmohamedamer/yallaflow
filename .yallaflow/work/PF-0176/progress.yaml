@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-18T11:28:12.108Z",
+      "completedAt": "2026-11-18T11:28:12.299Z",
+      "summary": "Runtime platform gate: src/runtime/process.js SUPPORTED (linux, darwin) -> supervisor assertSupported (start, install, stop, start-all). OS-specific parts: process.js identity (/proc, ps lstart), process groups and signals, descendantsOf (Linux /proc), serviceEnvironment POSIX-only BASE_ENV, supervisor spawn(service.command[0]) without the shared resolver (npm.cmd cannot start), installPrerequisites spawn and process.kill(-pid), observe.js listeners (ss, lsof). Platform-neutral: profile, discover, plan, trust, state, prerequisites, diagnose, probe (loopback), logs, locks.",
+      "evidence": [
+        "src/runtime/process.js",
+        "src/runtime/supervisor.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-18T11:28:22.037Z",
+      "completedAt": "2026-11-18T11:28:22.284Z",
+      "summary": "Intent is the owner's approved Phase 1.1 brief (2026-11-18, in the agent session): REQ-001..006 / AC-001..006 recorded from it. Design decisions taken within it: identity on Windows from one fixed PowerShell Get-CimInstance Win32_Process query (pid, parent, creation time, name; argv, no shell, short cache, refreshed before a stop); stop = verified leader then System32 taskkill /T /F, tracked descendants killed only while their creation time matches; graceful stop not available on Windows and disclosed; port owners from System32 netstat -ano; Compose refused on Windows. No business ambiguity open.",
+      "evidence": [
+        "user:owner-approved-phase-1.1-brief-2026-11-18"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-18T11:36:36.774Z",
+      "completedAt": "2026-11-18T11:36:36.774Z",
+      "summary": "Windows joins SUPPORTED. process.js: one constant Win32_Process CIM query via System32 powershell.exe (argv, no profile, hidden, 1 s cache, fresh before a stop) gives pid/parent/creation time/name; processStartTime/identify use it on win32 (unreadable table = no identity = never signalled); windowsDescendants accepts a child only if created after its parent; windowsStopTree re-reads the table, ends a verified leader with System32 taskkill /T /F, kills tracked descendants one by one only while their creation time matches, and returns survivors; groupAlive/signalGroup never use negative pids on Windows; serviceEnvironment goes through safeEnvironment. supervisor.js: launchFor (Windows: shared resolveCommand, .cmd shim -> node script, relative path from the service folder; POSIX unchanged), childEnvironment with the refreshed PATH, spawn detached + windowsHide, forced stop recorded and disclosed, Compose refused on Windows (RUNTIME_COMPOSE_WINDOWS) for start/stop/install and skipped by start-all/stop-all, runtimeCapabilities() in status and the CLI JSON (schema additive), port holder recognises a service's descendant on Windows; dependency installs use the same launcher and taskkill on timeout. observe.js: Windows listeners from System32 netstat -ano, locale-independent. test-support/git-scan.js allowlists runtime/process.js.",
+      "evidence": [
+        "src/runtime/process.js",
+        "src/runtime/supervisor.js",
+        "src/runtime/observe.js",
+        "src/commands/runtime.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-18T11:38:14.064Z",
+      "completedAt": "2026-11-18T11:38:14.064Z",
+      "summary": "V-001 passed: simulated-Windows unit tests (process table, pid-reuse-safe descendants, verified tree stop, mismatched identity never signalled, survivors reported, unreadable table signals nothing, locale-independent netstat, Windows service env, capabilities) and the real-process lifecycle test on Linux (start, recovery from the record, stop of leader+child+grandchild, restart, mismatched record never signalled, taken port starts nothing), plus all existing runtime, run-page and network-guard suites. Real Windows and macOS execution pending (CI matrix and the manual checklist).",
+      "evidence": [
+        "verification:V-001"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-18T11:38:42.009Z",
+      "completedAt": "2026-11-18T11:38:42.205Z",
+      "summary": "CV-001: all six acceptance criteria satisfied against requirements revision 2; no unrequested behavior.",
+      "evidence": [
+        "convergence:PF-0176/CV-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-18T11:38:42.205Z"
+}

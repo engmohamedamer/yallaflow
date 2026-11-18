@@ -1,0 +1,62 @@
+# PF-0178: tests on every push and pull request, on the three operating systems YallaFlow
+# supports. The full suite runs on Linux (it is largely POSIX-only: shell fakes, file modes).
+# The platform suite runs on real Windows, macOS and Linux runners; it includes a lifecycle test
+# with real processes. Everything else about Windows and macOS is simulated platform data.
+name: CI
+
+on:
+  push:
+    branches: [main, 'feature/**', 'release/**']
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  full:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [20, 24] # engines: >=20.16.0
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # tags: mixed-version tests run real frozen releases from Git
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Git test environment
+        run: |
+          git config --global user.name "YallaFlow CI"
+          git config --global user.email "ci@users.noreply.github.com"
+          git config --global init.defaultBranch main
+
+      - run: npm ci
+      - run: npm run check
+        env:
+          YALLAFLOW_REQUIRE_CSS_CHECK: '1'
+
+  platform:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+
+      - run: npm ci
+      - run: npm run test:platform

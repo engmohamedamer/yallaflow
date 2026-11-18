@@ -1,6 +1,6 @@
 {
   "name": "yallaflow",
-  "version": "1.5.4",
+  "version": "1.5.5",
   "description": "AI-agnostic engineering governance layer for coding agents: durable project memory, adaptive workflows, and evidence-backed delivery.",
   "keywords": [
     "ai",
@@ -40,6 +40,7 @@
     "test": "node --import ./test-support/isolate-user-config.js --test",
     "check:syntax": "find src test test-support -name '*.js' -print0 | xargs -0 -n1 node --check",
     "check": "npm run check:syntax && npm test",
+    "test:platform": "node --import ./test-support/isolate-user-config.js --test test/runtime-lifecycle-os.test.js test/runtime-windows.test.js test/fresh-path.test.js test/command-platform.test.js test/console-run-windows.test.js test/console-machine-readiness.test.js test/health-refresh.test.js test/branch-health.test.js",
     "build:css": "tailwindcss -i resources/console/tailwind.input.css -o resources/console/tw.css --minify"
   },
   "engines": {

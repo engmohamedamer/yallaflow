@@ -64,11 +64,11 @@ test('first run: the agent state is shown with Create and Manage; its setup open
 test('first run: the intent is saved and routes: Create to the wizard, Manage and Monitor to the folder chooser', () => {
   const create = welcome();
   create.fx.chooseIntent('create');
-  assert.equal(JSON.stringify([create.calls.prefs, create.calls.hash, create.calls.opened]), JSON.stringify([[{ onboarding: { intent: 'create', completed: true } }], '#/new', []]));
+  assert.equal(JSON.stringify([create.calls.prefs, create.calls.hash, create.calls.opened]), JSON.stringify([[{ onboarding: { intent: 'create' } }], '#/new', []]));
   for (const intent of ['manage', 'monitor']) {
     const picked = welcome();
     picked.fx.chooseIntent(intent);
-    assert.equal(JSON.stringify([picked.calls.prefs, picked.calls.opened, picked.fx.intent(), picked.calls.hash]), JSON.stringify([[{ onboarding: { intent, completed: true } }], ['existing'], intent, null]));
+    assert.equal(JSON.stringify([picked.calls.prefs, picked.calls.opened, picked.fx.intent(), picked.calls.hash]), JSON.stringify([[{ onboarding: { intent } }], ['existing'], intent, null]));
   }
   // Monitor makes «Monitor only» the main action in the chooser; closing the chooser forgets the intent
   assert.match(app, /const watching = typeof folderIntent !== 'undefined' && folderIntent === 'monitor';/);

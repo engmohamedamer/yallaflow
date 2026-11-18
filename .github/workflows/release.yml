@@ -108,8 +108,33 @@ jobs:
         env:
           YALLAFLOW_REQUIRE_CSS_CHECK: '1'
 
+  # PF-0178: the platform suite on real Windows, macOS and Linux runners. It includes a lifecycle
+  # test with real processes (start, recovery, stop of a process tree, restart). The full suite
+  # runs on Linux above; most of it is POSIX-only, and Windows and macOS are otherwise covered by
+  # simulated platform data.
+  platform:
+    needs: guard
+    if: needs.guard.outputs.publish == 'true'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+
+      - run: npm ci
+      - run: npm run test:platform
+
   publish:
-    needs: [guard, test]
+    needs: [guard, test, platform]
     if: needs.guard.outputs.publish == 'true'
     runs-on: ubuntu-latest
     permissions:

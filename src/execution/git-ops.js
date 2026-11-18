@@ -12,6 +12,7 @@
 // (A4, FR34). YallaFlow never pushes, pulls, fetches, rebases, resets, reverts, stashes,
 // cleans, checks out, deletes branches or edits refs directly.
 import { spawnSync } from 'node:child_process';
+import { mkdtempSync, rmSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { lstat, mkdtemp, readFile, realpath, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
@@ -338,6 +339,31 @@ export function previewMerge(cwd, ours, theirs) {
   if (result.status === 0 && isTree) return { result: 'no-conflict', tree, conflicts: [] };
   if (result.status === 1 && isTree) return { result: 'conflict', tree, conflicts: parts.slice(1) };
   return { result: 'error', tree: null, conflicts: [], message: String(result.stderr ?? '').trim().split('\n')[0] || `exit ${result.status}` };
+}
+
+// PF-0184 (1.5.5) Branch Health: the same in-memory preview, but the trees merge-tree computes
+// go to a temporary object store (the repository's objects are an alternate), removed afterwards:
+// nothing is added to the repository. Git may refresh the timestamp of an existing object it
+// meets again; no content, ref, index entry or file changes.
+export function previewMergeIsolated(cwd, ours, theirs) {
+  assertObject(cwd, ours, 'commit');
+  assertObject(cwd, theirs, 'commit');
+  const common = git(cwd, ['rev-parse', '--git-common-dir']);
+  if (common.status !== 0 || !String(common.stdout).trim()) throw new GitOpsError('GIT_FAILED', 'the Git folder could not be found', 409);
+  const objects = path.join(path.resolve(cwd, String(common.stdout).trim()), 'objects');
+  const temp = mkdtempSync(path.join(os.tmpdir(), 'yf-merge-preview-'));
+  try {
+    const extraEnv = { GIT_OBJECT_DIRECTORY: temp, GIT_ALTERNATE_OBJECT_DIRECTORIES: objects, GIT_NO_LAZY_FETCH: '1' };
+    const result = git(cwd, ['merge-tree', '--write-tree', '--name-only', '--no-messages', '-z', ours, theirs], { extraEnv });
+    const parts = String(result.stdout ?? '').split('\0').filter(Boolean);
+    const tree = parts[0]?.trim() ?? '';
+    const isTree = OID.test(tree) && git(cwd, ['cat-file', '-e', `${tree}^{tree}`], { extraEnv }).status === 0;
+    if (result.status === 0 && isTree) return { result: 'no-conflict', conflicts: [] };
+    if (result.status === 1 && isTree) return { result: 'conflict', conflicts: [...new Set(parts.slice(1))] };
+    return { result: 'error', conflicts: [], message: String(result.stderr ?? '').trim().split('\n')[0] || `exit ${result.status}` };
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
 }
 
 // Read-only: a file's content at a commit (cat-file), or null when it is not there.

@@ -1,0 +1,46 @@
+{
+  "id": "PF-0178",
+  "type": "change",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "CI on Windows, macOS and Ubuntu (real-OS platform suite on every push and before every publish), docs and the real Windows 11 validation checklist for the Phase 1/1.1 Windows stabilization",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-18T11:42:45.979Z",
+  "updatedAt": "2026-11-18T11:44:36.097Z",
+  "title": "CI on Windows, macOS and Ubuntu (real-OS platform suite on every push and before every publish), docs and the real Windows 11 validation checklist for the Phase 1/1.1 Windows stabilization",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow change --scope bounded`.",
+  "routedAt": "2026-11-18T11:42:46.059Z",
+  "workflow": "change",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "plan",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation-planning",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-18T11:44:36.097Z",
+      "verificationRunIds": [
+        "V-001",
+        "V-002"
+      ]
+    }
+  ]
+}

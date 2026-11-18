@@ -70,6 +70,14 @@ const reconcileStatusCommand = lazy('./commands/reconcile.js', 'reconcileStatusC
 const upgradePlanCommand = lazy('./commands/upgrade.js', 'upgradePlanCommand');
 const upgradeStatusCommand = lazy('./commands/upgrade.js', 'upgradeStatusCommand');
 const briefCommand = lazy('./commands/brief.js', 'briefCommand');
+const healthCommand = lazy('./commands/health.js', 'healthCommand');
+const branchesCommand = lazy('./commands/branches.js', 'branchesCommand');
+const branchesConfigureCommand = lazy('./commands/branches.js', 'branchesConfigureCommand');
+const refreshCheckCommand = lazy('./commands/refresh.js', 'refreshCheckCommand');
+const refreshPreviewCommand = lazy('./commands/refresh.js', 'refreshPreviewCommand');
+const refreshApplyCommand = lazy('./commands/refresh.js', 'refreshApplyCommand');
+const refreshRestoreCommand = lazy('./commands/refresh.js', 'refreshRestoreCommand');
+const refreshBackupsCommand = lazy('./commands/refresh.js', 'refreshBackupsCommand');
 const inspectCommand = lazy('./commands/inspect.js', 'inspectCommand');
 import { PACKAGE_VERSION } from './version.js';
 const agentRefreshCommand = lazy('./commands/agent.js', 'agentRefreshCommand');
@@ -117,7 +125,7 @@ const WORK_LIFECYCLE_USAGE = 'yallaflow work show <work-id> [--json]\n  yallaflo
 const VALID_PROJECT_TYPES = new Set(['greenfield', 'brownfield']);
 
 function help() {
-  console.log(`YallaFlow foundation CLI\n\nGive AI your project, not just your prompt.\n\nUsage:\n  yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]\n  yallaflow start [request]\n  yallaflow start --keep-active -- <request>\n  yallaflow activate <work-id>\n  yallaflow request --help\n  yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT] [--before-start]\n  yallaflow intake ticket <payload-file|ticket-ref> [--provider github|jira|azure-devops] [--work <work-id>] [--reason TEXT] [--fetch [--attachments]] [--attachment <file>]... [--title TITLE] [--max-comments N]\n  yallaflow source --help\n  yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]\n  yallaflow baseline --help\n  yallaflow guide [work-id]\n  yallaflow ready [work-id]\n  yallaflow skill <skill-id> [--work <work-id>]\n  yallaflow checkpoint --help\n  yallaflow question --help\n  yallaflow knowledge --help\n  yallaflow requirement --help\n  yallaflow convergence --help\n  yallaflow impact --help\n  yallaflow context --help\n  yallaflow upgrade status|plan\n  yallaflow brief\n  yallaflow inspect\n  yallaflow limitation --help\n  yallaflow agent --help\n  yallaflow decompose --help\n  yallaflow progress <parent-id>\n  yallaflow next <parent-id>\n  yallaflow approve <work-id> --stage GATE [--note TEXT]\n  yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]\n  yallaflow handoff [work-id]\n  yallaflow feature <title> --scope SCOPE\n  yallaflow bug <title> --scope SCOPE\n  yallaflow investigate <title> --scope SCOPE\n  yallaflow change <title> --scope SCOPE\n  yallaflow refactor <title> --scope SCOPE\n  yallaflow release <title> --scope SCOPE\n  yallaflow purpose --help\n  yallaflow finish [work-id] [--verbose]\n  yallaflow qc --help\n  yallaflow demo --help\n  yallaflow shared --help\n  yallaflow status\n  yallaflow snapshot [--json]\n  yallaflow overview [--json]\n  yallaflow runtime --help\n  yallaflow new --help\n  yallaflow history --help\n  yallaflow console [--port N] [--no-open] [--project DIR]... [--read-only] [--agents]\n  yallaflow agents detect\n  yallaflow work show <work-id> [--json]\n  yallaflow work hold|resume|close <work-id> ...  (lifecycle: on hold, closed without delivery)\n  yallaflow resume [work-id]\n  yallaflow doctor [--clear-lock]\n  yallaflow advance [work-id]\n  yallaflow verify [work-id] -- <executable> [args...]\n  yallaflow verify [work-id] --shell "<command>"\n  yallaflow verify [work-id] --script <path>\n  yallaflow verify list [work-id]\n  yallaflow reopen <work-id> --to implementation|verification|review --reason REASON\n  yallaflow reopen <work-id> --reason REASON   (closed work)\n  yallaflow --version\n`);
+  console.log(`YallaFlow foundation CLI\n\nGive AI your project, not just your prompt.\n\nUsage:\n  yallaflow init [--name NAME] [--type greenfield|brownfield] [--mode autonomous|adaptive|gated]\n  yallaflow start [request]\n  yallaflow start --keep-active -- <request>\n  yallaflow activate <work-id>\n  yallaflow request --help\n  yallaflow intake <file> [<file> ...] [--title TITLE]\n  yallaflow intake add <work-id> <file> [<file> ...] [--reason TEXT] [--before-start]\n  yallaflow intake ticket <payload-file|ticket-ref> [--provider github|jira|azure-devops] [--work <work-id>] [--reason TEXT] [--fetch [--attachments]] [--attachment <file>]... [--title TITLE] [--max-comments N]\n  yallaflow source --help\n  yallaflow route <work-id> --type TYPE --scope SCOPE --confidence LEVEL --reason REASON [--title TITLE]\n  yallaflow baseline --help\n  yallaflow guide [work-id]\n  yallaflow ready [work-id]\n  yallaflow skill <skill-id> [--work <work-id>]\n  yallaflow checkpoint --help\n  yallaflow question --help\n  yallaflow knowledge --help\n  yallaflow requirement --help\n  yallaflow convergence --help\n  yallaflow impact --help\n  yallaflow context --help\n  yallaflow upgrade status|plan\n  yallaflow health [--json]\n  yallaflow branches [--json]\n  yallaflow refresh check|preview|apply|restore|backups\n  yallaflow brief\n  yallaflow inspect\n  yallaflow limitation --help\n  yallaflow agent --help\n  yallaflow decompose --help\n  yallaflow progress <parent-id>\n  yallaflow next <parent-id>\n  yallaflow approve <work-id> --stage GATE [--note TEXT]\n  yallaflow feedback <work-id> --stage GATE --changes-requested [--note TEXT]\n  yallaflow handoff [work-id]\n  yallaflow feature <title> --scope SCOPE\n  yallaflow bug <title> --scope SCOPE\n  yallaflow investigate <title> --scope SCOPE\n  yallaflow change <title> --scope SCOPE\n  yallaflow refactor <title> --scope SCOPE\n  yallaflow release <title> --scope SCOPE\n  yallaflow purpose --help\n  yallaflow finish [work-id] [--verbose]\n  yallaflow qc --help\n  yallaflow demo --help\n  yallaflow shared --help\n  yallaflow status\n  yallaflow snapshot [--json]\n  yallaflow overview [--json]\n  yallaflow runtime --help\n  yallaflow new --help\n  yallaflow history --help\n  yallaflow console [--port N] [--no-open] [--project DIR]... [--read-only] [--agents]\n  yallaflow agents detect\n  yallaflow work show <work-id> [--json]\n  yallaflow work hold|resume|close <work-id> ...  (lifecycle: on hold, closed without delivery)\n  yallaflow resume [work-id]\n  yallaflow doctor [--clear-lock]\n  yallaflow advance [work-id]\n  yallaflow verify [work-id] -- <executable> [args...]\n  yallaflow verify [work-id] --shell "<command>"\n  yallaflow verify [work-id] --script <path>\n  yallaflow verify list [work-id]\n  yallaflow reopen <work-id> --to implementation|verification|review --reason REASON\n  yallaflow reopen <work-id> --reason REASON   (closed work)\n  yallaflow --version\n`);
 }
 
 function decomposeHelp() {
@@ -133,6 +141,9 @@ const CONTEXT_USAGE = `yallaflow context status\n  yallaflow context list [--are
 const SHARED_USAGE = 'yallaflow shared enable [--integration-branch BRANCH] [--dry-run]\n  yallaflow shared status [--verbose]\n  yallaflow shared check\n  yallaflow shared integrate [--dry-run] [--verbose]';
 const PURPOSE_USAGE = 'yallaflow purpose set [work-id] --objective TEXT [--mode bootstrap|intent|freshness] [--preserve TEXT]... [--focus TEXT]...\n  yallaflow purpose show [work-id]';
 const UPGRADE_USAGE = 'yallaflow upgrade status\n  yallaflow upgrade plan';
+const HEALTH_USAGE = 'yallaflow health [--json]';
+const BRANCHES_USAGE = 'yallaflow branches [--json]\n  yallaflow branches configure --flow dev,qc,prod [--hotfix PATTERN] [--remote NAME]\n  yallaflow branches configure --clear';
+const REFRESH_USAGE = 'yallaflow refresh check [--add-missing] [--resolve FILE=keep|preserve]...\n  yallaflow refresh preview [--add-missing] [--resolve FILE=keep|preserve]...\n  yallaflow refresh apply [--add-missing] [--resolve FILE=keep|preserve]...\n  yallaflow refresh restore [backup-id]\n  yallaflow refresh backups';
 const AGENT_USAGE = 'yallaflow agent status\n  yallaflow agent refresh [--preserve-existing] [--dry-run]\n  yallaflow agent setup <codex|claude> [--preserve-existing] [--dry-run]';
 const REQUIREMENT_USAGE = 'yallaflow requirement record <work-id> --file <requirements.json>\n  yallaflow requirement list <work-id>\n  yallaflow requirement show <work-id> <REQ-###|AC-###>';
 const CONVERGENCE_USAGE = 'yallaflow convergence record <work-id> --file <convergence.json>\n  yallaflow convergence status <work-id>\n  yallaflow convergence show <work-id> [CV-###|AC-###|UR-###]';
@@ -238,6 +249,9 @@ const USAGE = {
   request: 'yallaflow request revise <work-id> --text TEXT --reason TEXT',
   context: CONTEXT_USAGE,
   upgrade: UPGRADE_USAGE,
+  health: HEALTH_USAGE,
+  branches: BRANCHES_USAGE,
+  refresh: REFRESH_USAGE,
   brief: 'yallaflow brief',
   inspect: 'yallaflow inspect',
   limitation: LIMITATION_USAGE,
@@ -311,6 +325,13 @@ const NAMESPACE_ACTIONS = {
   upgrade: {
     status: 'yallaflow upgrade status',
     plan: 'yallaflow upgrade plan'
+  },
+  refresh: {
+    check: 'yallaflow refresh check [--add-missing] [--resolve FILE=keep|preserve]...',
+    preview: 'yallaflow refresh preview [--add-missing] [--resolve FILE=keep|preserve]...',
+    apply: 'yallaflow refresh apply [--add-missing] [--resolve FILE=keep|preserve]...',
+    restore: 'yallaflow refresh restore [backup-id]',
+    backups: 'yallaflow refresh backups'
   },
   agent: {
     status: 'yallaflow agent status',
@@ -437,18 +458,19 @@ async function deliveryCommand(command, rest) {
 // yallaflow.minimumVersion). An older CLI stops before any project-state mutation;
 // read-only orientation, inspection, and integrity commands still run so the developer
 // sees why. YallaFlow never self-updates or downloads anything.
-const READ_ONLY_COMMANDS = new Set(['agents', 'snapshot', 'overview', 'console', 'brief', 'doctor', 'status', 'inspect', 'upgrade', 'handoff', 'resume', 'ready', 'guide', 'progress', 'next', 'finish', 'skill', 'source']);
+const READ_ONLY_COMMANDS = new Set(['agents', 'snapshot', 'overview', 'console', 'brief', 'doctor', 'health', 'status', 'inspect', 'upgrade', 'handoff', 'resume', 'ready', 'guide', 'progress', 'next', 'finish', 'skill', 'source']);
 const READ_ONLY_ACTIONS = {
   shared: ['status', 'check'], context: ['status', 'list', 'show', 'history', 'affected'], knowledge: ['list'], question: ['list'],
   verify: ['list'], baseline: ['status', 'show'], decompose: ['status'], requirement: ['list', 'show'], convergence: ['status', 'show'],
-  work: ['show'], impact: ['status'], limitation: ['list'], qc: ['status'], demo: ['status'], purpose: ['show'], agent: ['status']
+  work: ['show'], impact: ['status'], limitation: ['list'], qc: ['status'], demo: ['status'], purpose: ['show'], agent: ['status'],
+  refresh: ['check', 'preview', 'backups']
 };
 
 // v1.4.0 central lifecycle guard (PF-0041): a held or closed work item refuses every
 // progress mutation. Every write path, the console's included, runs through this
 // dispatcher. Lifecycle operations themselves and reopen of closed work are exempt;
 // core functions repeat the check (defense in depth).
-const LIFECYCLE_EXEMPT = new Set(['history', 'new', 'runtime', 'init', 'start', 'work', 'reopen', 'context', 'shared', 'agent', 'agents', 'upgrade', 'console', 'skill', 'source', 'inspect', 'baseline']);
+const LIFECYCLE_EXEMPT = new Set(['history', 'new', 'runtime', 'init', 'start', 'work', 'reopen', 'context', 'shared', 'agent', 'agents', 'upgrade', 'health', 'refresh', 'branches', 'console', 'skill', 'source', 'inspect', 'baseline']);
 // Conservative: every work id named before a `--` payload, in any argument shape
 // (positional, after a flag, or as --opt=PF-…). A referenced held or closed item refuses
 // the command; the refusal names the command that lifts it.
@@ -500,6 +522,7 @@ async function isClosedWork(workId) {
 
 async function assertCompatibleForCommand(command, rest) {
   if (command === 'init' || READ_ONLY_COMMANDS.has(command)) return;
+  if (command === 'branches' && rest[0] !== 'configure') return;
   const action = rest[0];
   if (READ_ONLY_ACTIONS[command]?.includes(action)) return;
   if (command === 'context' && action === 'reconcile' && ['status', 'show', 'preview'].includes(rest[1])) return;
@@ -542,6 +565,8 @@ async function main() {
 // around recording, never while the verified command runs. `init` creates the workspace.
 function needsWorkspaceLock(command, rest) {
   if (command === 'init' || command === 'verify' || READ_ONLY_COMMANDS.has(command)) return false;
+  // 1.5.5 Branch Health: reading only; `configure` writes config.yaml.
+  if (command === 'branches') return rest[0] === 'configure';
   const action = rest[0];
   // 1.4.0 runtime: only profile edits (add/remove) write shared state. Start/stop/trust/logs
   // touch personal .yallaflow/local state under a per-service lock, and a start may wait a
@@ -1093,6 +1118,42 @@ async function dispatch(command, rest) {
       return limitationCommand('list', positionals[0]);
     }
     throw new Error(`Unknown limitation action: ${action}. Use add or list.`);
+  }
+  if (command === 'health') {
+    const { values, positionals } = parseOptions(rest, { json: { type: 'boolean' } });
+    if (positionals.length) throw new Error(`Usage: ${HEALTH_USAGE}`);
+    return healthCommand({ json: values.json });
+  }
+  if (command === 'branches') {
+    if (rest[0] === 'configure') {
+      const { values, positionals } = parseOptions(rest.slice(1), { flow: { type: 'string' }, hotfix: { type: 'string' }, remote: { type: 'string' }, clear: { type: 'boolean' } });
+      if (positionals.length || (values.clear && (values.flow || values.hotfix || values.remote))) throw new Error(`Usage: ${BRANCHES_USAGE}`);
+      return branchesConfigureCommand({ flow: values.flow, hotfix: values.hotfix, remote: values.remote, clear: values.clear });
+    }
+    const { values, positionals } = parseOptions(rest, { json: { type: 'boolean' } });
+    if (positionals.length) throw new Error(`Usage: ${BRANCHES_USAGE}`);
+    return branchesCommand({ json: values.json });
+  }
+  if (command === 'refresh') {
+    const [action, ...actionArgs] = rest;
+    if (!action) return console.log(`Usage:\n  ${REFRESH_USAGE}\n\nCheck for updates, preview and refresh the YallaFlow integration files (.yallaflow/AGENT.md and the AGENTS.md / CLAUDE.md bootstrap blocks). Only text YallaFlow can prove it wrote is changed; edited text needs --resolve; a backup is kept and \`refresh restore\` undoes it.\n`);
+    if (['check', 'preview', 'apply'].includes(action)) {
+      const { values, positionals } = parseOptions(actionArgs, { 'add-missing': { type: 'boolean' }, resolve: { type: 'string', multiple: true } });
+      if (positionals.length) throw new Error(`Usage: ${NAMESPACE_ACTIONS.refresh[action]}`);
+      const run = { check: refreshCheckCommand, preview: refreshPreviewCommand, apply: refreshApplyCommand }[action];
+      return run({ addMissing: values['add-missing'], resolve: values.resolve ?? [] });
+    }
+    if (action === 'restore') {
+      const { positionals } = parseOptions(actionArgs, {});
+      if (positionals.length > 1) throw new Error('Usage: yallaflow refresh restore [backup-id]');
+      return refreshRestoreCommand(positionals[0]);
+    }
+    if (action === 'backups') {
+      const { positionals } = parseOptions(actionArgs, {});
+      if (positionals.length) throw new Error('Usage: yallaflow refresh backups');
+      return refreshBackupsCommand();
+    }
+    throw new Error(`Unknown refresh action: ${action}. Use check, preview, apply, restore, or backups.`);
   }
   if (command === 'upgrade') {
     const [action, ...actionArgs] = rest;

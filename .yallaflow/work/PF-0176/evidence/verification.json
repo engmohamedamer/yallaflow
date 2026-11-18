@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/runtime-windows.test.js test/runtime-lifecycle-os.test.js test/runtime.test.js test/runtime-fixes.test.js test/runtime-inputs.test.js test/runtime-plan.test.js test/runtime-readiness.test.js test/console-run-fixes.test.js test/console-run-flow.test.js test/shared-project.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/runtime-windows.test.js",
+        "test/runtime-lifecycle-os.test.js",
+        "test/runtime.test.js",
+        "test/runtime-fixes.test.js",
+        "test/runtime-inputs.test.js",
+        "test/runtime-plan.test.js",
+        "test/runtime-readiness.test.js",
+        "test/console-run-fixes.test.js",
+        "test/console-run-flow.test.js",
+        "test/shared-project.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/runtime-windows.test.js test/runtime-lifecycle-os.test.js test/runtime.test.js test/runtime-fixes.test.js test/runtime-inputs.test.js test/runtime-plan.test.js test/runtime-readiness.test.js test/console-run-fixes.test.js test/console-run-flow.test.js test/shared-project.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-18T11:36:37.233Z",
+      "finishedAt": "2026-11-18T11:37:44.887Z",
+      "verifiedAt": "2026-11-18T11:37:44.887Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

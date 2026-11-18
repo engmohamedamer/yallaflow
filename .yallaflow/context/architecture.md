@@ -1026,4 +1026,79 @@ print('by command:', dict(collections.Counter(r['cmd'] for r in rows).most_commo
   - src/runtime/profile.js (repository @ f33eaec)
   - test/runtime-fixes.test.js (repository @ f33eaec)
 
+<!-- yallaflow-fact:CTX-0182 -->
+### CTX-0182 — On Windows, tools installed while the console runs are found without a restart: src/utils/fresh-path.js toolEnvironment() adds the folders of the current registry Path (HKLM Session Manager Environment and HKCU Environment, read with System32 reg.exe, argv only) after the console's own PATH. Tool probes, tool runs, machine setup and new agent sessions all use it so lookup and execution agree; it never writes the system PATH and is a no-op on Linux and macOS.
+
+- **State:** current
+- **Confidence:** inferred
+- **Provenance:** repository
+- **Source work:** PF-0173
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-18T11:18:14.733Z
+- **Verified:** 2026-11-18T11:18:14.733Z (commit 1e63e03)
+- **Evidence:**
+  - src/utils/fresh-path.js (repository @ 1e63e03)
+  - src/newproject/project.js (repository @ 1e63e03)
+  - src/agents/bridge.js (repository @ 1e63e03)
+
+<!-- yallaflow-fact:CTX-0184 -->
+### CTX-0184 — Console state that must survive a restart or a port change lives in user-level files beside console.json (preferences.json incl. recentFolders, new-project-draft.json, console-instances.json), never in browser storage alone: browser storage is per origin and the console moves to the next port when 4747 is taken. onboarding.completed is set by the server when a project joins the console, not when an intent is clicked.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0175
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-18T11:26:55.542Z
+- **Verified:** 2026-11-18T11:26:55.542Z (commit 1e63e03)
+- **Evidence:**
+  - src/console/drafts.js (repository @ 1e63e03)
+  - src/console/preferences.js (repository @ 1e63e03)
+  - src/console/instances.js (repository @ 1e63e03)
+
+<!-- yallaflow-fact:CTX-0187 -->
+### CTX-0187 — The Run Manager supports Windows (PF-0176, revised by PF-0181): process identity is pid plus creation time from one constant Win32_Process CIM query (System32 powershell.exe, argv only), read asynchronously and kept briefly; an unreadable list makes identity 'unverifiable' (nothing signalled, no record cleared, a start whose identity cannot be recorded is refused). Stop is forceful and never uses taskkill /T: a tree is expanded only from a process whose pid and creation time match, children count only when created after their parent, each process is ended individually while its creation time matches, survivors are reported. Services launch through the shared resolveCommand (.cmd shims become node + script) with safeEnvironment and the refreshed PATH, not detached and with windowsHide (own hidden console). Docker Compose lifecycle is refused on Windows (RUNTIME_COMPOSE_WINDOWS). runtimeStatus carries capabilities { lifecycle, compose, gracefulStop, verified }.
+
+- **State:** current
+- **Confidence:** inferred
+- **Provenance:** repository
+- **Source work:** PF-0181
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-18T13:03:20.862Z
+- **Supersedes:** CTX-0185
+- **Verified:** 2026-11-18T13:03:20.862Z (commit 1e63e03)
+- **Evidence:**
+  - src/runtime/process.js (repository @ 1e63e03)
+  - src/runtime/supervisor.js (repository @ 1e63e03)
+
+<!-- yallaflow-fact:CTX-0189 -->
+### CTX-0189 — yallaflow health (src/core/health.js) is a read-only five-class project check (healthy, update-available, repairable, manual-review, unsafe) built on assessWorkspace/doctor; yallaflow refresh (src/agent/refresh.js) updates only hash-provable managed text (AGENT.md contract block or known generated template, AGENTS.md/CLAUDE.md bootstrap blocks), is all-or-nothing on conflicts or refused files, backs up to .yallaflow/local/backups with a manifest (before/intended/after hashes), verifies afterwards, and restore refuses files changed since.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0183
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-18T15:51:51.196Z
+- **Verified:** 2026-11-18T15:51:51.196Z (commit 1e63e03)
+- **Evidence:**
+  - src/agent/refresh.js (repository @ 1e63e03)
+  - src/core/health.js (repository @ 1e63e03)
+  - node --import ./test-support/isolate-user-config.js --test test/health-refresh.test.js test/cli.test.js test/agent-bootstrap.test.js test/agent-bootstrap-security.test.js test/agent-contract.test.js test/upgrade-intelligence.test.js test/cli-help-safety.test.js test/recursive-help-safety.test.js test/help-payload-boundary.test.js test/workspace-lock.test.js test/shared-project.test.js (passed) (runtime, PF-0183 V-001)
+
+<!-- yallaflow-fact:CTX-0190 -->
+### CTX-0190 — yallaflow branches (src/core/branches.js) is read-only Branch Health: it uses only reading Git subcommands (rev-parse, config --get, rev-list, log, merge-base, status with optional locks off) and previews merges through execution/git-ops.js previewMergeIsolated, which runs merge-tree with a temporary object store (repository objects as an alternate) so no object, ref or index entry is added; an optional branches block in config.yaml sets the flow, otherwise it is detected from branch names.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0184
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-18T16:05:47.125Z
+- **Verified:** 2026-11-18T16:05:47.125Z (commit 1e63e03)
+- **Evidence:**
+  - src/core/branches.js (repository @ 1e63e03)
+  - src/execution/git-ops.js (repository @ 1e63e03)
+  - node --import ./test-support/isolate-user-config.js --test test/branch-health.test.js test/health-refresh.test.js test/cli.test.js test/cli-help-safety.test.js test/recursive-help-safety.test.js test/help-payload-boundary.test.js test/agent-bootstrap.test.js test/shared-project.test.js test/doctor-integrity.test.js (passed) (runtime, PF-0184 V-002)
+
 <!-- yallaflow-context:end -->

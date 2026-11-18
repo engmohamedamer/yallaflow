@@ -1,0 +1,280 @@
+TAP version 13
+# Subtest: simulated Windows: PATH is read whatever its case, and PATHEXT decides the extensions tried
+ok 1 - simulated Windows: PATH is read whatever its case, and PATHEXT decides the extensions tried
+  ---
+  duration_ms: 5.423701
+  type: 'test'
+  ...
+# Subtest: simulated Windows: a native .exe and an npm .cmd shim are found; folders with spaces and Arabic names work
+ok 2 - simulated Windows: a native .exe and an npm .cmd shim are found; folders with spaces and Arabic names work
+  ---
+  duration_ms: 10.235173
+  type: 'test'
+  ...
+# Subtest: POSIX lookup is unchanged: an execute bit is required and the bare name is used
+ok 3 - POSIX lookup is unchanged: an execute bit is required and the bare name is used
+  ---
+  duration_ms: 22.043474
+  type: 'test'
+  ...
+# Subtest: simulated Windows: an npm shim is started as its target with node, never through a shell
+ok 4 - simulated Windows: an npm shim is started as its target with node, never through a shell
+  ---
+  duration_ms: 4.43743
+  type: 'test'
+  ...
+# Subtest: simulated Windows: a broken or unknown command script is refused with a plain reason, not run by a shell
+ok 5 - simulated Windows: a broken or unknown command script is refused with a plain reason, not run by a shell
+  ---
+  duration_ms: 6.157038
+  type: 'test'
+  ...
+# Subtest: a program that cannot be started is an answer with its cause, never a crash
+ok 6 - a program that cannot be started is an answer with its cause, never a crash
+  ---
+  duration_ms: 24.820572
+  type: 'test'
+  ...
+# Subtest: providers are independent: a missing or broken Claude Code never makes Codex unavailable, and the reverse
+ok 7 - providers are independent: a missing or broken Claude Code never makes Codex unavailable, and the reverse
+  ---
+  duration_ms: 336.932559
+  type: 'test'
+  ...
+# Subtest: simulated Windows: the terminal is a new PowerShell window in the project folder; the folder is never in the command text
+ok 8 - simulated Windows: the terminal is a new PowerShell window in the project folder; the folder is never in the command text
+  ---
+  duration_ms: 2.719817
+  type: 'test'
+  ...
+# Subtest: simulated Windows: hook and launch commands use double quotes and forward slashes
+ok 9 - simulated Windows: hook and launch commands use double quotes and forward slashes
+  ---
+  duration_ms: 7.537081
+  type: 'test'
+  ...
+# Subtest: no shell anywhere in agent discovery and launch; an unreachable console is said in plain words
+ok 10 - no shell anywhere in agent discovery and launch; an unreachable console is said in plain words
+  ---
+  duration_ms: 16.954119
+  type: 'test'
+  ...
+# Subtest: the child environment is an allow-list; Windows adds the system variables its programs need
+ok 11 - the child environment is an allow-list; Windows adds the system variables its programs need
+  ---
+  duration_ms: 4.77315
+  type: 'test'
+  ...
+# Subtest: simulated Windows: npx is started as npm's own script with node, never through a shell
+ok 12 - simulated Windows: npx is started as npm's own script with node, never through a shell
+  ---
+  duration_ms: 3.517668
+  type: 'test'
+  ...
+# Subtest: simulated Windows: Composer's installer shim is started as php.exe with composer.phar
+ok 13 - simulated Windows: Composer's installer shim is started as php.exe with composer.phar
+  ---
+  duration_ms: 4.774025
+  type: 'test'
+  ...
+# Subtest: simulated Windows: a missing tool is "not found"; a native .exe starts as itself; an unknown script is refused
+ok 14 - simulated Windows: a missing tool is "not found"; a native .exe starts as itself; an unknown script is refused
+  ---
+  duration_ms: 3.376579
+  type: 'test'
+  ...
+# Subtest: Linux (real files) and simulated macOS: a tool is the executable file on an absolute PATH folder
+ok 15 - Linux (real files) and simulated macOS: a tool is the executable file on an absolute PATH folder
+  ---
+  duration_ms: 21.28425
+  type: 'test'
+  ...
+# Subtest: a plan's prerequisite check finds tools through the shared lookup (real processes on this machine)
+ok 16 - a plan's prerequisite check finds tools through the shared lookup (real processes on this machine)
+  ---
+  duration_ms: 32.353492
+  type: 'test'
+  ...
+# Subtest: first run: the welcome panel offers Create, Manage and Monitor in plain words, in Arabic and English
+ok 17 - first run: the welcome panel offers Create, Manage and Monitor in plain words, in Arabic and English
+  ---
+  duration_ms: 17.849711
+  type: 'test'
+  ...
+# Subtest: first run: the agent state is shown with Create and Manage; its setup opens in place; a ready agent shows no setup
+ok 18 - first run: the agent state is shown with Create and Manage; its setup opens in place; a ready agent shows no setup
+  ---
+  duration_ms: 19.715858
+  type: 'test'
+  ...
+# Subtest: first run: the intent is saved and routes: Create to the wizard, Manage and Monitor to the folder chooser
+ok 19 - first run: the intent is saved and routes: Create to the wizard, Manage and Monitor to the folder chooser
+  ---
+  duration_ms: 9.053066
+  type: 'test'
+  ...
+# Subtest: wizard stack step: planning with the agent is the usual path; fixed templates are a labeled Advanced section
+ok 20 - wizard stack step: planning with the agent is the usual path; fixed templates are a labeled Advanced section
+  ---
+  duration_ms: 24.802387
+  type: 'test'
+  ...
+# Subtest: wizard agent step: an agent-planned project needs a chosen, ready agent; the way around it is a labeled Advanced tick
+ok 21 - wizard agent step: an agent-planned project needs a chosen, ready agent; the way around it is a labeled Advanced tick
+  ---
+  duration_ms: 37.856356
+  type: 'test'
+  ...
+# Subtest: wizard agent step: a fixed template needs no agent; a returning user with a ready usual agent sees no setup
+ok 22 - wizard agent step: a fixed template needs no agent; a returning user with a ready usual agent sees no setup
+  ---
+  duration_ms: 25.65667
+  type: 'test'
+  ...
+# Subtest: layout: the intent cards wrap on narrow screens and use the theme tokens (light and dark)
+ok 23 - layout: the intent cards wrap on narrow screens and use the theme tokens (light and dark)
+  ---
+  duration_ms: 1.612616
+  type: 'test'
+  ...
+# Subtest: Codex: installed, signed in and connection are three separate states with one next step
+ok 24 - Codex: installed, signed in and connection are three separate states with one next step
+  ---
+  duration_ms: 6.521774
+  type: 'test'
+  ...
+# Subtest: Claude Code: experimental everywhere, never "verified" ahead of a session, and shown on every system
+ok 25 - Claude Code: experimental everywhere, never "verified" ahead of a session, and shown on every system
+  ---
+  duration_ms: 1.91328
+  type: 'test'
+  ...
+# Subtest: a saved preferred agent is a wish: offered only when available, with the readiness computed now
+ok 26 - a saved preferred agent is a wish: offered only when available, with the readiness computed now
+  ---
+  duration_ms: 0.924291
+  type: 'test'
+  ...
+# Subtest: console: /api/machine carries the readiness; nothing is written; never in a read-only console
+ok 27 - console: /api/machine carries the readiness; nothing is written; never in a read-only console
+  ---
+  duration_ms: 182.034381
+  type: 'test'
+  ...
+# Subtest: the page: Claude Code on simulated Windows is shown, marked Experimental and not verified, with three separate states
+ok 28 - the page: Claude Code on simulated Windows is shown, marked Experimental and not verified, with three separate states
+  ---
+  duration_ms: 7.723109
+  type: 'test'
+  ...
+# Subtest: the page: the usual agent is listed first and marked, and still needs the click that enables it
+ok 29 - the page: the usual agent is listed first and marked, and still needs the click that enables it
+  ---
+  duration_ms: 6.599741
+  type: 'test'
+  ...
+# Subtest: setup environment keeps npm settings but never a credential
+ok 30 - setup environment keeps npm settings but never a credential
+  ---
+  duration_ms: 5.119856
+  type: 'test'
+  ...
+# Subtest: Codex login status: only a ChatGPT subscription sign-in counts
+ok 31 - Codex login status: only a ChatGPT subscription sign-in counts
+  ---
+  duration_ms: 1.206911
+  type: 'test'
+  ...
+# Subtest: nothing installed: the exact install command, approved before it runs, without sudo or secrets
+ok 32 - nothing installed: the exact install command, approved before it runs, without sudo or secrets
+  ---
+  duration_ms: 352.645419
+  type: 'test'
+  ...
+# Subtest: an npm global folder this user cannot write is refused: no sudo, the command to run by hand instead
+ok 33 - an npm global folder this user cannot write is refused: no sudo, the command to run by hand instead
+  ---
+  duration_ms: 135.841715
+  type: 'test'
+  ...
+# Subtest: sign-in: Codex's own device flow after confirmation; the link and code are shown, nothing else
+ok 34 - sign-in: Codex's own device flow after confirmation; the link and code are shown, nothing else
+  ---
+  duration_ms: 1085.001779
+  type: 'test'
+  ...
+# Subtest: an API-key sign-in is reported as not usable
+ok 35 - an API-key sign-in is reported as not usable
+  ---
+  duration_ms: 80.158597
+  type: 'test'
+  ...
+# Subtest: connection test: handshake only, in an empty temporary folder, no session, process ended
+ok 36 - connection test: handshake only, in an empty temporary folder, no session, process ended
+  ---
+  duration_ms: 213.656687
+  type: 'test'
+  ...
+# Subtest: HTTP: status and actions need the token and Origin; a read-only console runs none of them
+ok 37 - HTTP: status and actions need the token and Origin; a read-only console runs none of them
+  ---
+  duration_ms: 296.256
+  type: 'test'
+  ...
+# Subtest: one setup step at a time from the moment it is accepted; cancel ends the whole process group
+ok 38 - one setup step at a time from the moment it is accepted; cancel ends the whole process group
+  ---
+  duration_ms: 580.054866
+  type: 'test'
+  ...
+# Subtest: setup keeps proxy and certificate settings; a status probe that cannot run is unknown, not signed out
+ok 39 - setup keeps proxy and certificate settings; a status probe that cannot run is unknown, not signed out
+  ---
+  duration_ms: 1.414482
+  type: 'test'
+  ...
+# Subtest: tested Codex versions: exact pins, inside the supported adapter range, checked before an install is offered
+ok 40 - tested Codex versions: exact pins, inside the supported adapter range, checked before an install is offered
+  ---
+  duration_ms: 0.921929
+  type: 'test'
+  ...
+# Subtest: Windows: the setup environment keeps the system variables npm needs (Path whatever its case), never a credential
+ok 41 - Windows: the setup environment keeps the system variables npm needs (Path whatever its case), never a credential
+  ---
+  duration_ms: 0.716582
+  type: 'test'
+  ...
+# Subtest: an npm global folder with an unexpanded variable or a relative path is never installed into
+ok 42 - an npm global folder with an unexpanded variable or a relative path is never installed into
+  ---
+  duration_ms: 127.146844
+  type: 'test'
+  ...
+# Subtest: the prefix probe runs where the install runs (the home folder), not where the console was started
+ok 43 - the prefix probe runs where the install runs (the home folder), not where the console was started
+  ---
+  duration_ms: 60.837065
+  type: 'test'
+  ...
+# Subtest: an install that finished but left Codex unfindable says so, with the folder npm used
+ok 44 - an install that finished but left Codex unfindable says so, with the folder npm used
+  ---
+  duration_ms: 289.94682
+  type: 'test'
+  ...
+# Subtest: Windows cancel: taskkill from System32 for the child and its tree, argv only
+ok 45 - Windows cancel: taskkill from System32 for the child and its tree, argv only
+  ---
+  duration_ms: 2.152624
+  type: 'test'
+  ...
+1..45
+# tests 45
+# suites 0
+# pass 45
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3704.377559

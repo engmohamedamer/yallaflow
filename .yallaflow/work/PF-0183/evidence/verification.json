@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/health-refresh.test.js test/cli.test.js test/agent-bootstrap.test.js test/agent-bootstrap-security.test.js test/agent-contract.test.js test/upgrade-intelligence.test.js test/cli-help-safety.test.js test/recursive-help-safety.test.js test/help-payload-boundary.test.js test/workspace-lock.test.js test/shared-project.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/health-refresh.test.js",
+        "test/cli.test.js",
+        "test/agent-bootstrap.test.js",
+        "test/agent-bootstrap-security.test.js",
+        "test/agent-contract.test.js",
+        "test/upgrade-intelligence.test.js",
+        "test/cli-help-safety.test.js",
+        "test/recursive-help-safety.test.js",
+        "test/help-payload-boundary.test.js",
+        "test/workspace-lock.test.js",
+        "test/shared-project.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/health-refresh.test.js test/cli.test.js test/agent-bootstrap.test.js test/agent-bootstrap-security.test.js test/agent-contract.test.js test/upgrade-intelligence.test.js test/cli-help-safety.test.js test/recursive-help-safety.test.js test/help-payload-boundary.test.js test/workspace-lock.test.js test/shared-project.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-18T15:50:04.077Z",
+      "finishedAt": "2026-11-18T15:51:33.129Z",
+      "verifiedAt": "2026-11-18T15:51:33.129Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

@@ -4,7 +4,7 @@
 // Windows machine (process creation, PowerShell, Git Bash): that is NOT VERIFIED.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { chmod, mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { chmod, mkdtemp, readFile, realpath, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { detectCodex, envValue, isExecutable, launchSpec, programExtensions, run, which } from '../src/agents/detect.js';
@@ -137,6 +137,34 @@ test('providers are independent: a missing or broken Claude Code never makes Cod
   assert.match(bridge, /const providers = \[\{ id: 'codex'[\s\S]{0,400}\}\];\s*if \(project\.claudeOn\) providers\.push\(\{ id: 'claude'/);
 });
 
+// PF-0182: the macOS report — Claude Code read project settings from the home folder. The command
+// the console shows to copy must work when pasted into a terminal that opens anywhere.
+test('macOS/Linux: the copyable Claude launch command starts in the project and names its files absolutely', { skip: !claudeIncluded() && 'the experimental Claude connection is not in this tree' }, async () => {
+  const { launchCommand } = await import('../src/agents/claude-files.js');
+  for (const platform of ['darwin', 'linux']) {
+    const root = "/Users/mona/My Projects/it's shop";
+    const command = launchCommand(root, undefined, undefined, { platform });
+    assert.ok(command.startsWith(`cd '/Users/mona/My Projects/it'\\''s shop' && claude `), command);
+    assert.ok(command.includes(`--mcp-config '/Users/mona/My Projects/it'\\''s shop/.yallaflow/local/agent/claude-mcp.json'`));
+    assert.ok(command.includes(`--settings '/Users/mona/My Projects/it'\\''s shop/.yallaflow/local/agent/claude-settings.json'`));
+    assert.equal(/ \.yallaflow\//.test(command), false, 'no project-relative file name');
+    const withBinary = launchCommand(root, undefined, undefined, { platform, binary: '/opt/homebrew/bin/claude' });
+    assert.ok(withBinary.includes(` && '/opt/homebrew/bin/claude' 'Run yallaflow brief`));
+  }
+  // Run the copied command from another folder: the shell lands in the project and the files resolve there.
+  if (process.platform !== 'win32') {
+    const { spawnSync } = await import('node:child_process');
+    const project = await mkdtemp(path.join(os.tmpdir(), "yf-claude it's-"));
+    const elsewhere = await mkdtemp(path.join(os.tmpdir(), 'yf-home-'));
+    const command = launchCommand(project, undefined, undefined, { platform: process.platform, binary: '/bin/echo' });
+    const out = spawnSync('sh', ['-c', `${command.replace(/ --dangerously.*$/, '')} && pwd`], { cwd: elsewhere, encoding: 'utf8' });
+    assert.equal(out.status, 0, out.stderr);
+    const lines = out.stdout.trim().split('\n');
+    assert.ok(lines[0].includes(`--settings ${project}/.yallaflow/local/agent/claude-settings.json`), lines[0]);
+    assert.equal(await realpath(lines.at(-1)), await realpath(project), 'the command runs in the project folder');
+  }
+});
+
 test('simulated Windows: the terminal is a new PowerShell window in the project folder; the folder is never in the command text', async () => {
   const command = 'claude "Run yallaflow brief, then wait for messages from the YallaFlow console." --mcp-config .yallaflow\\local\\agent\\claude-mcp.json';
   assert.deepEqual(await terminalCommand('D:\\My Work\\متجر', command, W), { file: 'powershell.exe', argv: ['-NoLogo', '-NoExit', '-Command', command] });
@@ -164,11 +192,11 @@ test('simulated Windows: hook and launch commands use double quotes and forward 
   const launch = launchCommand(root, `${root}\\.yallaflow\\local\\agent\\claude-mcp.json`, `${root}\\.yallaflow\\local\\agent\\claude-settings.json`, { platform: 'win32' });
   assert.equal(launch, 'claude "Run yallaflow brief, then wait for messages from the YallaFlow console." --mcp-config .yallaflow\\local\\agent\\claude-mcp.json --settings .yallaflow\\local\\agent\\claude-settings.json --dangerously-load-development-channels server:yallaflow');
   assert.equal(launch.includes(root), false, 'only relative, fixed file names');
-  // POSIX output is unchanged
+  // POSIX hooks are unchanged; the POSIX launch command works from any folder (PF-0182)
   assert.match(hookSettings('/usr/bin/node').hooks.Stop[0].hooks[0].command, /^'\/usr\/bin\/node' '\/.*claude-hook\.mjs'$/);
-  assert.match(launchCommand('/p'), /^claude 'Run yallaflow brief, then wait for messages from the YallaFlow console\.' --mcp-config \.yallaflow\/local\/agent\/claude-mcp\.json /);
+  assert.match(launchCommand('/p', undefined, undefined, { platform: 'darwin' }), /^cd '\/p' && claude 'Run yallaflow brief, then wait for messages from the YallaFlow console\.' --mcp-config '\/p\/\.yallaflow\/local\/agent\/claude-mcp\.json' /);
   const server = await readFile(new URL('../src/console/server.js', import.meta.url), 'utf8');
-  assert.match(server, /binary && process\.platform !== 'win32' \? files\.command\.replace/, 'no machine path is placed in the Windows command text');
+  assert.match(server, /binary && process\.platform !== 'win32' \? \(await loadClaude\(\)\)\.launchCommand\(project\.root, files\.mcpFile, files\.settingsFile, \{ binary \}\) : files\.command/, 'no machine path is placed in the Windows command text');
 });
 
 test('no shell anywhere in agent discovery and launch; an unreachable console is said in plain words', async () => {

@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-18T11:38:33.523Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 2,
+        "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "Assessed after V-001 passed, against requirements revision 2.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "SUPPORTED includes win32 and runtimeStatus returns supported plus capabilities; start and dependency installs go through launchFor (shared resolveCommand on Windows, .cmd shim to node script) with childEnvironment (safeEnvironment incl. Windows system variables, refreshed PATH); never a shell.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:0455fea911596fa8daeaeaa492481142c4163d4f4ccafc4c697a80efc7e6eef1",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/process.js",
+              "contentHash": "sha256:dde205b8353209e562fcaffffddbc74a7cddede80586ed7ee1c07bda5731dd3b",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-windows.test.js test/runtime-lifecycle-os.test.js test/runtime.test.js test/runtime-fixes.test.js test/runtime-inputs.test.js test/runtime-plan.test.js test/runtime-readiness.test.js test/console-run-fixes.test.js test/console-run-flow.test.js test/shared-project.test.js (passed)",
+              "workId": "PF-0176",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "processStartTime/identify read creation time from the constant CIM query on win32; mismatches are 'other'; unreadable table gives no identity; windowsDescendants requires child created after parent (tested with a reused pid).",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/process.js",
+              "contentHash": "sha256:dde205b8353209e562fcaffffddbc74a7cddede80586ed7ee1c07bda5731dd3b",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-windows.test.js",
+              "contentHash": "sha256:2563970c63fa2f8274f33585b7f8881a662349853e29db2561399dc710edbd47",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-windows.test.js test/runtime-lifecycle-os.test.js test/runtime.test.js test/runtime-fixes.test.js test/runtime-inputs.test.js test/runtime-plan.test.js test/runtime-readiness.test.js test/console-run-fixes.test.js test/console-run-flow.test.js test/shared-project.test.js (passed)",
+              "workId": "PF-0176",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "windowsStopTree re-reads the table, taskkills only a verified leader, kills tracked descendants only while their creation time matches and returns survivors; terminateOwned records forced: true and survivors; capabilities.gracefulStop is false on win32.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/process.js",
+              "contentHash": "sha256:dde205b8353209e562fcaffffddbc74a7cddede80586ed7ee1c07bda5731dd3b",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:0455fea911596fa8daeaeaa492481142c4163d4f4ccafc4c697a80efc7e6eef1",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "modified"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-windows.test.js test/runtime-lifecycle-os.test.js test/runtime.test.js test/runtime-fixes.test.js test/runtime-inputs.test.js test/runtime-plan.test.js test/runtime-readiness.test.js test/console-run-fixes.test.js test/console-run-flow.test.js test/shared-project.test.js (passed)",
+              "workId": "PF-0176",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "Services spawn detached with windowsHide; the run record (pid, creation time) is in the user runtime state; the lifecycle test reads the service again after clearing in-memory state and stops it.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:0455fea911596fa8daeaeaa492481142c4163d4f4ccafc4c697a80efc7e6eef1",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-lifecycle-os.test.js",
+              "contentHash": "sha256:85749ae88cb945ee496822d6f3c3abab63481e6f1956bf51e96798b0a556faea",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-windows.test.js test/runtime-lifecycle-os.test.js test/runtime.test.js test/runtime-fixes.test.js test/runtime-inputs.test.js test/runtime-plan.test.js test/runtime-readiness.test.js test/console-run-fixes.test.js test/console-run-flow.test.js test/shared-project.test.js (passed)",
+              "workId": "PF-0176",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "assertComposeHere refuses start, stop and install on win32 with RUNTIME_COMPOSE_WINDOWS before anything runs; start-all skips it and stop-all leaves it; status marks unsupported: compose-windows. The Windows-only test runs on the Windows CI job.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/runtime/supervisor.js",
+              "contentHash": "sha256:0455fea911596fa8daeaeaa492481142c4163d4f4ccafc4c697a80efc7e6eef1",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-lifecycle-os.test.js",
+              "contentHash": "sha256:85749ae88cb945ee496822d6f3c3abab63481e6f1956bf51e96798b0a556faea",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "All existing runtime suites pass on Linux unchanged (POSIX launch keeps the program name as written); the real-process lifecycle test runs on the OS that executes it.",
+          "evidence": [
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/runtime-windows.test.js test/runtime-lifecycle-os.test.js test/runtime.test.js test/runtime-fixes.test.js test/runtime-inputs.test.js test/runtime-plan.test.js test/runtime-readiness.test.js test/console-run-fixes.test.js test/console-run-flow.test.js test/shared-project.test.js (passed)",
+              "workId": "PF-0176",
+              "verificationRunId": "V-001"
+            },
+            {
+              "type": "repository",
+              "path": "test/runtime-lifecycle-os.test.js",
+              "contentHash": "sha256:85749ae88cb945ee496822d6f3c3abab63481e6f1956bf51e96798b0a556faea",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-18T11:38:33.523Z"
+}

@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-18T15:43:52.162Z",
+      "completedAt": "2026-11-18T15:43:52.387Z",
+      "summary": "Existing primitives: src/core/assessment.js assessWorkspace (doctor, agent contract, bootstraps, memory, plan), src/agent/contract.js inspect/refreshAgentContract (hash-recorded managed block, legacy generated templates), src/agent/bootstrap.js inspect/setupBootstrap, src/agent/managed-files.js resolveManagedFile/writeManaged (link-safe atomic writes), src/context/projection.js projectionIssues, src/shared/config.js checkProjectCompatibility, src/agents/local-files.js safeLocalDir/safeWriteFile, src/utils/lock.js. Fixtures test/fixtures/v0.3.6-workspace and v1.0.0-agent.",
+      "evidence": [
+        "src/core/assessment.js",
+        "src/agent/contract.js",
+        "src/agent/bootstrap.js",
+        "src/agent/managed-files.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-18T15:43:53.011Z",
+      "completedAt": "2026-11-18T15:43:53.215Z",
+      "summary": "Intent from the owner's 1.5.5 brief sections 2, 3 and 6 recorded as REQ-001..003 / AC-001..007. Scope decision: refresh owns the agent integration files only (AGENT.md managed contract, AGENTS.md/CLAUDE.md bootstrap blocks); projection drift is reported by health with yallaflow context render as the repair (existing command). CLI first: yallaflow health, yallaflow refresh check|preview|apply|restore|backups."
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-18T15:49:59.764Z",
+      "completedAt": "2026-11-18T15:49:59.970Z",
+      "summary": "New src/agent/refresh.js (plan/preview/apply/restore/list, hash-based ownership via existing contract and bootstrap inspectors, writes via writeManaged, backups+manifest under .yallaflow/local/backups with intended/after hashes, verification after write, all-or-nothing on conflict/refuse), src/core/health.js (five classes from compatibility, workspace link scan, refresh plan, interrupted refresh, assessWorkspace/doctor), src/commands/health.js and refresh.js, CLI wiring (health read-only; refresh check/preview/backups read-only and lock-free; apply/restore take the workspace lock and the compatibility guard), docs/cli.md rows and docs/updating-projects.md. Tests: test/health-refresh.test.js (8).",
+      "evidence": [
+        "src/agent/refresh.js",
+        "src/core/health.js",
+        "test/health-refresh.test.js",
+        "docs/updating-projects.md"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-18T15:51:49.255Z",
+      "completedAt": "2026-11-18T15:51:49.474Z",
+      "summary": "V-001: health-refresh (8 new), cli, agent bootstrap/contract/security, upgrade, help safety, workspace lock, shared-project guards pass on Linux.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    },
+    "delivery-convergence": {
+      "status": "completed",
+      "startedAt": "2026-11-18T15:51:50.516Z",
+      "completedAt": "2026-11-18T15:51:50.729Z",
+      "summary": "7/7 criteria satisfied."
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-18T15:51:50.729Z"
+}

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "limitations": [
+    {
+      "id": "DL-001",
+      "type": "not-inspected",
+      "area": "environment",
+      "summary": "Windows lifecycle verified only with simulated process tables and on Linux; real Windows (CI windows-latest and the manual checklist) pending",
+      "reason": "No Windows machine in this session",
+      "recordedAt": "2026-11-18T11:38:42.363Z"
+    }
+  ],
+  "updatedAt": "2026-11-18T11:38:42.363Z"
+}

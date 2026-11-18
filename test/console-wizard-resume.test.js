@@ -16,13 +16,14 @@ const app = await readFile(new URL('../resources/console/app.js', import.meta.ur
 const cut = (from, to) => { const start = app.indexOf(from); assert.ok(start >= 0, from); const end = app.indexOf(to, start); assert.ok(end > start, to); return app.slice(start, end); };
 const same = (actual, expected, message) => assert.equal(JSON.stringify(actual), JSON.stringify(expected), message);
 
-function wizard({ stored = null, plans = {}, consoleReadOnly = false } = {}) {
+function wizard({ stored = null, plans = {}, consoleReadOnly = false, serverDraft = null } = {}) {
   const local = new Map(stored ? [['wizardDraft', stored]] : []);
-  const calls = { api: [], after: [], timers: 0 };
+  const calls = { api: [], after: [], timers: 0, posts: [] };
   const context = vm.createContext({
     JSON, Object, Math, Date, RegExp, String, Boolean, consoleReadOnly,
     store: { get: (k, d) => (local.has(k) && local.get(k) !== null ? local.get(k) : d), set: (k, v) => local.set(k, v) },
-    api: async (url) => { calls.api.push(url); if (url === '/api/new/catalog') return { catalog: [] }; const id = url.split('/').at(-1); if (!plans[id]) throw new Error('No plan'); return plans[id]; },
+    post: async (url, body) => { calls.posts.push([url, JSON.parse(body)]); return {}; },
+    api: async (url) => { calls.api.push(url); if (url === '/api/new/catalog') return { catalog: [] }; if (url === '/api/new/draft') return { draft: serverDraft }; const id = url.split('/').at(-1); if (!plans[id]) throw new Error('No plan'); return plans[id]; },
     setInterval: () => { calls.timers += 1; return 7; }, clearInterval: () => { calls.timers -= 1; },
     pollWizard() {}, afterCreate: async (outcome, options) => { calls.after.push([outcome, options]); },
     wizForm: null
@@ -133,4 +134,20 @@ test('server side: continuing an interrupted creation repeats no finished step a
   // and once more: nothing left to do, nothing repeated
   await createFromPlan(plan.id, plan.hash, { catalog, hooks: CORE_HOOKS });
   assert.equal(await readFile(counter, 'utf8'), 'x');
+});
+
+
+// PF-0175 (real Windows trial, W5): browser storage is per port; the draft is also kept on this machine.
+test('a draft saved by a console on another port is restored from the machine copy; every save and drop reaches it', async () => {
+  const draft = { form: { name: 'notebook', description: 'simple notebook no login', parent: 'E:\\work', stack: 'empty' }, step: 2, planId: null };
+  const w = wizard({ serverDraft: draft });
+  await w.fx.load();
+  same([w.fx.state().form.name, w.fx.state().form.description, w.fx.state().step], ['notebook', 'simple notebook no login', 2]);
+  w.fx.save();
+  assert.equal(w.calls.posts.at(-1)[0], '/api/new/draft');
+  assert.equal(w.calls.posts.at(-1)[1].draft.form.name, 'notebook');
+  assert.ok(!('files' in w.calls.posts.at(-1)[1].draft.form), 'never the files');
+  const ro = wizard({ serverDraft: draft, consoleReadOnly: true });
+  await ro.fx.load();
+  assert.equal(ro.calls.api.includes('/api/new/draft'), false, 'a read-only console asks for no draft');
 });

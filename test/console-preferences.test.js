@@ -14,7 +14,7 @@ import { startConsoleServer } from '../src/console/server.js';
 
 const POSIX = process.platform !== 'win32';
 const tmp = (prefix) => mkdtemp(path.join(os.tmpdir(), prefix));
-const defaults = { language: null, theme: null, preferredAgent: null, lastFolder: null, saveChatHistory: null, onboarding: { completed: false, intent: null } };
+const defaults = { language: null, theme: null, preferredAgent: null, lastFolder: null, recentFolders: null, saveChatHistory: null, onboarding: { completed: false, intent: null } };
 
 test('the file lives beside console.json on Linux, macOS and Windows (simulated environment values)', () => {
   assert.equal(preferencesPath({ YALLAFLOW_CONSOLE_CONFIG: '/x/y/console.json' }), path.join('/x/y', 'preferences.json'));
@@ -109,7 +109,7 @@ test('console API: read anywhere, write only as JSON with the token and Origin, 
   assert.equal((await refused.json()).error.code, 'BAD_PREFERENCES');
   const ok = await post({ language: 'en', theme: 'dark', preferredAgent: 'codex', lastFolder: home, onboarding: { completed: true, intent: 'create' } });
   assert.equal(ok.status, 200);
-  assert.deepEqual(await ok.json(), { language: 'en', theme: 'dark', preferredAgent: 'codex', lastFolder: home, saveChatHistory: null, onboarding: { completed: true, intent: 'create' }, saved: true });
+  assert.deepEqual(await ok.json(), { language: 'en', theme: 'dark', preferredAgent: 'codex', lastFolder: home, recentFolders: null, saveChatHistory: null, onboarding: { completed: true, intent: 'create' }, saved: true });
   // a second console (another port, a restart) reads the same preferences; a read-only one never writes
   const seen = await (await fetch(`${readOnly.url}api/preferences`, { headers: { Authorization: `Bearer ${readOnly.token}` } })).json();
   assert.deepEqual({ language: seen.language, theme: seen.theme, readOnly: seen.readOnly }, { language: 'en', theme: 'dark', readOnly: true });
@@ -150,4 +150,59 @@ test('the page: saved preferences win over the browser copy; a browser choice is
   const ro = await run({ server: { language: null, theme: null }, browser: { lang: 'en' }, readOnly: true });
   assert.deepEqual(ro.posts, []);
   assert.equal(await ro.save({ theme: 'dark' }), null);
+});
+
+// ---------------------------------------------------------------- PF-0175 (real Windows trial, W5)
+test('recent folders are kept on this machine (absolute paths, at most six), so a console on another port finds them', async () => {
+  const file = path.join(await mkdtemp(path.join(os.tmpdir(), 'yf-prefs-recent-')), 'preferences.json');
+  const list = ['C:\\Users\\u\\work', '/home/u/code'];
+  assert.deepEqual((await savePreferences({ recentFolders: list }, file)).recentFolders, list);
+  assert.deepEqual((await loadPreferences(file)).recentFolders, list);
+  assert.throws(() => validatePreferencesPatch({ recentFolders: ['relative'] }), /recentFolders/);
+  assert.throws(() => validatePreferencesPatch({ recentFolders: Array.from({ length: 7 }, (_, i) => `/f${i}`) }), /recentFolders/);
+  assert.throws(() => validatePreferencesPatch({ recentFolders: 'not-a-list' }), /recentFolders/);
+});
+
+test('the New Project draft is kept on this machine: typed, bounded, never file contents; null removes it', async () => {
+  const { cleanDraft, loadDraft, saveDraft } = await import('../src/console/drafts.js');
+  const file = path.join(await mkdtemp(path.join(os.tmpdir(), 'yf-draft-')), 'new-project-draft.json');
+  assert.deepEqual(await loadDraft(file), { draft: null });
+  const saved = await saveDraft({ draft: { form: { name: 'notebook', description: 'simple notebook no login', parent: 'E:\\work', git: true, files: [{ content: 'x' }], secret: 'nope' }, step: 3, planId: null, savedAt: '2026-11-18T10:00:00.000Z' } }, file);
+  assert.deepEqual(saved.draft.form, { name: 'notebook', description: 'simple notebook no login', parent: 'E:\\work', git: true });
+  assert.deepEqual((await loadDraft(file)).draft, saved.draft);
+  if (process.platform !== 'win32') assert.equal((await stat(file)).mode & 0o777, 0o600);
+  assert.equal(cleanDraft({ form: { name: 'x'.repeat(65) } }), null, 'over-long fields are dropped');
+  assert.equal(cleanDraft({ form: {}, step: 'progress', planId: 'NP-1' }), null);
+  assert.deepEqual(cleanDraft({ form: { name: 'n' }, step: 'progress', planId: 'NP-20261118100000-abcdef' }).step, 'progress');
+  await assert.rejects(saveDraft({ draft: { form: {} } }, file), { code: 'BAD_DRAFT' });
+  await assert.rejects(saveDraft({}, file), { code: 'BAD_DRAFT' });
+  assert.deepEqual(await saveDraft({ draft: null }, file), { draft: null });
+  assert.deepEqual(await loadDraft(file), { draft: null });
+});
+
+test('console API: a draft saved on one port is found by a console on another port; read-only reads none and saves none', async (t) => {
+  const home = await tmp('yf-draft-home-');
+  await initWorkspace(home, 'Home', 'greenfield', 'adaptive');
+  const saved = process.env.YALLAFLOW_CONSOLE_CONFIG;
+  process.env.YALLAFLOW_CONSOLE_CONFIG = path.join(await tmp('yf-draft-cfg-'), 'console.json');
+  const first = await startConsoleServer({ roots: [home], port: 0 });
+  const second = await startConsoleServer({ roots: [home], port: 0 });
+  const readOnly = await startConsoleServer({ roots: [home], port: 0, readOnly: true });
+  t.after(async () => { await first.close(); await second.close(); await readOnly.close(); if (saved === undefined) delete process.env.YALLAFLOW_CONSOLE_CONFIG; else process.env.YALLAFLOW_CONSOLE_CONFIG = saved; });
+  const call = (server, method, body) => fetch(`${server.url}api/new/draft`, { method, headers: { Authorization: `Bearer ${server.token}`, Origin: server.url.replace(/\/$/, ''), 'Content-Type': 'application/json' }, ...(body === undefined ? {} : { body: JSON.stringify(body) }) });
+  assert.notEqual(first.url, second.url);
+  assert.equal((await call(first, 'POST', { draft: { form: { name: 'notebook', description: 'simple notebook no login' }, step: 2 } })).status, 200);
+  assert.deepEqual((await (await call(second, 'GET')).json()).draft.form, { name: 'notebook', description: 'simple notebook no login' });
+  assert.deepEqual(await (await call(readOnly, 'GET')).json(), { draft: null });
+  assert.equal((await call(readOnly, 'POST', { draft: null })).status, 405);
+  assert.equal((await call(second, 'POST', { draft: null })).status, 200);
+  assert.deepEqual(await (await call(first, 'GET')).json(), { draft: null });
+  assert.equal((await fetch(`${first.url}api/new/draft`)).status, 401, 'the token is required');
+});
+
+test('onboarding: choosing an intent remembers it; setup is complete only when a project joins the console', async () => {
+  const server = await readFile(new URL('../src/console/server.js', import.meta.url), 'utf8');
+  const register = server.slice(server.indexOf('async function registerNow('), server.indexOf('async function registerNow(') + 3000);
+  assert.match(register, /savePreferences\(\{ onboarding: \{ completed: true \} \}\)/);
+  assert.match(cut('  function chooseIntent(intent) {', '  // PF-0170'), /savePrefs\(\{ onboarding: \{ intent \} \}\)/);
 });

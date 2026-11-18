@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "business-rule",
+      "source": "implementation-runtime",
+      "summary": "Answering an agent's question in the console records it through Core (yallaflow question answer) and, only when the item's own Codex session is idle with no open approval, also sends it to that session; the console reports delivery as sent only after the agent's turn started, otherwise says busy, other-item, manual (Claude Code), no-session or failed. A task whose question was answered without a new turn waits for the developer's reply (needs-you: reply), never shows working.",
+      "evidence": [
+        "src/console/actions.js",
+        "src/execution/model.js"
+      ],
+      "confidence": "confirmed",
+      "provenance": "repository",
+      "status": "promoted",
+      "createdAt": "2026-11-18T11:24:00.008Z",
+      "factId": "CTX-0183",
+      "promotedAt": "2026-11-18T11:24:00.363Z",
+      "target": "context/business-rules.md"
+    }
+  ],
+  "updatedAt": "2026-11-18T11:24:00.363Z",
+  "reviewedAt": "2026-11-18T11:24:00.363Z"
+}

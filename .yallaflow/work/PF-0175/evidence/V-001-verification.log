@@ -1,0 +1,244 @@
+TAP version 13
+# Subtest: first run: the welcome panel offers Create, Manage and Monitor in plain words, in Arabic and English
+ok 1 - first run: the welcome panel offers Create, Manage and Monitor in plain words, in Arabic and English
+  ---
+  duration_ms: 15.172709
+  type: 'test'
+  ...
+# Subtest: first run: the agent state is shown with Create and Manage; its setup opens in place; a ready agent shows no setup
+ok 2 - first run: the agent state is shown with Create and Manage; its setup opens in place; a ready agent shows no setup
+  ---
+  duration_ms: 8.48426
+  type: 'test'
+  ...
+# Subtest: first run: the intent is saved and routes: Create to the wizard, Manage and Monitor to the folder chooser
+ok 3 - first run: the intent is saved and routes: Create to the wizard, Manage and Monitor to the folder chooser
+  ---
+  duration_ms: 8.387457
+  type: 'test'
+  ...
+# Subtest: wizard stack step: planning with the agent is the usual path; fixed templates are a labeled Advanced section
+ok 4 - wizard stack step: planning with the agent is the usual path; fixed templates are a labeled Advanced section
+  ---
+  duration_ms: 19.434735
+  type: 'test'
+  ...
+# Subtest: wizard agent step: an agent-planned project needs a chosen, ready agent; the way around it is a labeled Advanced tick
+ok 5 - wizard agent step: an agent-planned project needs a chosen, ready agent; the way around it is a labeled Advanced tick
+  ---
+  duration_ms: 31.36178
+  type: 'test'
+  ...
+# Subtest: wizard agent step: a fixed template needs no agent; a returning user with a ready usual agent sees no setup
+ok 6 - wizard agent step: a fixed template needs no agent; a returning user with a ready usual agent sees no setup
+  ---
+  duration_ms: 28.134012
+  type: 'test'
+  ...
+# Subtest: layout: the intent cards wrap on narrow screens and use the theme tokens (light and dark)
+ok 7 - layout: the intent cards wrap on narrow screens and use the theme tokens (light and dark)
+  ---
+  duration_ms: 1.400853
+  type: 'test'
+  ...
+# Subtest: a row is one select button plus an open arrow; nothing in the list navigates on a single click
+ok 8 - a row is one select button plus an open arrow; nothing in the list navigates on a single click
+  ---
+  duration_ms: 11.44455
+  type: 'test'
+  ...
+# Subtest: at home with nothing selected the footer says what to do; selecting makes the button act on that folder
+ok 9 - at home with nothing selected the footer says what to do; selecting makes the button act on that folder
+  ---
+  duration_ms: 7.075476
+  type: 'test'
+  ...
+# Subtest: with nothing selected inside a folder, the button acts on the open folder
+ok 10 - with nothing selected inside a folder, the button acts on the open folder
+  ---
+  duration_ms: 5.322939
+  type: 'test'
+  ...
+# Subtest: choosing and previewing use the selected folder
+ok 11 - choosing and previewing use the selected folder
+  ---
+  duration_ms: 10.714754
+  type: 'test'
+  ...
+# Subtest: keys: arrows move the selection, Enter or the forward arrow opens, the back arrow goes up
+ok 12 - keys: arrows move the selection, Enter or the forward arrow opens, the back arrow goes up
+  ---
+  duration_ms: 18.70247
+  type: 'test'
+  ...
+# Subtest: the path bar is the breadcrumb, with the typed path one click away
+ok 13 - the path bar is the breadcrumb, with the typed path one click away
+  ---
+  duration_ms: 6.286606
+  type: 'test'
+  ...
+# Subtest: the preview offers git init only for a folder with no Git repository, unticked
+ok 14 - the preview offers git init only for a folder with no Git repository, unticked
+  ---
+  duration_ms: 3.659436
+  type: 'test'
+  ...
+# Subtest: connect runs git init only when ticked, after the connect, with the confirmed action
+ok 15 - connect runs git init only when ticked, after the connect, with the confirmed action
+  ---
+  duration_ms: 8.174843
+  type: 'test'
+  ...
+# Subtest: a refused git init is reported and never undoes the connect
+ok 16 - a refused git init is reported and never undoes the connect
+  ---
+  duration_ms: 4.480259
+  type: 'test'
+  ...
+# Subtest: previewConnect reports a Git repository above the folder without running Git
+ok 17 - previewConnect reports a Git repository above the folder without running Git
+  ---
+  duration_ms: 77.413764
+  type: 'test'
+  ...
+# Subtest: the locations row lists Home and the local drives, and marks the current one
+ok 18 - the locations row lists Home and the local drives, and marks the current one
+  ---
+  duration_ms: 8.083119
+  type: 'test'
+  ...
+# Subtest: breadcrumbs, the footer path and the typed path use the server's separator, never "/"
+ok 19 - breadcrumbs, the footer path and the typed path use the server's separator, never "/"
+  ---
+  duration_ms: 10.944303
+  type: 'test'
+  ...
+# Subtest: a folder that cannot be opened is said with its reason; the picker stays where it was
+ok 20 - a folder that cannot be opened is said with its reason; the picker stays where it was
+  ---
+  duration_ms: 17.987302
+  type: 'test'
+  ...
+# Subtest: the preview of a project outside home says so
+ok 21 - the preview of a project outside home says so
+  ---
+  duration_ms: 2.05486
+  type: 'test'
+  ...
+# Subtest: the verdict for existing code says nothing is run and takes an optional first request
+ok 22 - the verdict for existing code says nothing is run and takes an optional first request
+  ---
+  duration_ms: 3.008917
+  type: 'test'
+  ...
+# Subtest: an empty folder gets no first-request field, and an empty field stores nothing
+ok 23 - an empty folder gets no first-request field, and an empty field stores nothing
+  ---
+  duration_ms: 5.575961
+  type: 'test'
+  ...
+# Subtest: the file lives beside console.json on Linux, macOS and Windows (simulated environment values)
+ok 24 - the file lives beside console.json on Linux, macOS and Windows (simulated environment values)
+  ---
+  duration_ms: 5.097343
+  type: 'test'
+  ...
+# Subtest: missing, invalid, oversized or linked files mean defaults; reading never throws
+ok 25 - missing, invalid, oversized or linked files mean defaults; reading never throws
+  ---
+  duration_ms: 39.301848
+  type: 'test'
+  ...
+# Subtest: only known, typed fields can be saved: no free-form value, so no credential
+ok 26 - only known, typed fields can be saved: no free-form value, so no credential
+  ---
+  duration_ms: 2.331057
+  type: 'test'
+  ...
+# Subtest: saving merges, is private (0600), keeps keys a newer version wrote, and leaves console.json alone
+ok 27 - saving merges, is private (0600), keeps keys a newer version wrote, and leaves console.json alone
+  ---
+  duration_ms: 74.116909
+  type: 'test'
+  ...
+# Subtest: console API: read anywhere, write only as JSON with the token and Origin, never read-only
+ok 28 - console API: read anywhere, write only as JSON with the token and Origin, never read-only
+  ---
+  duration_ms: 187.110841
+  type: 'test'
+  ...
+# Subtest: the page: saved preferences win over the browser copy; a browser choice is carried over once; read-only saves nothing
+ok 29 - the page: saved preferences win over the browser copy; a browser choice is carried over once; read-only saves nothing
+  ---
+  duration_ms: 29.813882
+  type: 'test'
+  ...
+# Subtest: recent folders are kept on this machine (absolute paths, at most six), so a console on another port finds them
+ok 30 - recent folders are kept on this machine (absolute paths, at most six), so a console on another port finds them
+  ---
+  duration_ms: 8.660194
+  type: 'test'
+  ...
+# Subtest: the New Project draft is kept on this machine: typed, bounded, never file contents; null removes it
+ok 31 - the New Project draft is kept on this machine: typed, bounded, never file contents; null removes it
+  ---
+  duration_ms: 8.620765
+  type: 'test'
+  ...
+# Subtest: console API: a draft saved on one port is found by a console on another port; read-only reads none and saves none
+ok 32 - console API: a draft saved on one port is found by a console on another port; read-only reads none and saves none
+  ---
+  duration_ms: 71.549224
+  type: 'test'
+  ...
+# Subtest: onboarding: choosing an intent remembers it; setup is complete only when a project joins the console
+ok 33 - onboarding: choosing an intent remembers it; setup is complete only when a project joins the console
+  ---
+  duration_ms: 6.170454
+  type: 'test'
+  ...
+# Subtest: the draft holds typed choices only, each bounded; anything else in storage is ignored
+ok 34 - the draft holds typed choices only, each bounded; anything else in storage is ignored
+  ---
+  duration_ms: 10.674285
+  type: 'test'
+  ...
+# Subtest: choices are saved as the developer goes and restored after a reload, without the reviewed plan
+ok 35 - choices are saved as the developer goes and restored after a reload, without the reviewed plan
+  ---
+  duration_ms: 10.439136
+  type: 'test'
+  ...
+# Subtest: a creation that was running is found again: still running, finished, interrupted, or gone
+ok 36 - a creation that was running is found again: still running, finished, interrupted, or gone
+  ---
+  duration_ms: 11.755739
+  type: 'test'
+  ...
+# Subtest: the page offers the right next step for an interrupted creation, and points to it from Projects
+ok 37 - the page offers the right next step for an interrupted creation, and points to it from Projects
+  ---
+  duration_ms: 3.741558
+  type: 'test'
+  ...
+# Subtest: server side: continuing an interrupted creation repeats no finished step and creates no second project
+ok 38 - server side: continuing an interrupted creation repeats no finished step and creates no second project
+  ---
+  duration_ms: 227.320127
+  type: 'test'
+  ...
+# Subtest: a draft saved by a console on another port is restored from the machine copy; every save and drop reaches it
+ok 39 - a draft saved by a console on another port is restored from the machine copy; every save and drop reaches it
+  ---
+  duration_ms: 5.463674
+  type: 'test'
+  ...
+1..39
+# tests 39
+# suites 0
+# pass 39
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 996.075963

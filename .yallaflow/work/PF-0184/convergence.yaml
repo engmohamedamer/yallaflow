@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-18T16:05:46.019Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+        "verificationRunIds": [
+          "V-002"
+        ]
+      },
+      "summary": "Assessed after V-002 passed.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "analyzeBranches/describeBranches report up-to-date, ready (fast-forward), needs-sync, conflict with files; production-only changes per branch with --cherry-pick patch equivalence and a back-merge preview; hotfix/* in production and missing downstream; upstream ahead/behind/gone; remote-tracking fallback; stale or missing fetch note. Tests cover each.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/core/branches.js",
+              "contentHash": "sha256:a4a2b4f0655041306c95feb4358a6ad60b1a5ca906d2dffd78a95e0f5221c0b6",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/branch-health.test.js",
+              "contentHash": "sha256:aefa550f35bdee356aab520a8a5a342c54b438bfeb6ac13279fee425bb6b6ae1",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/branch-health.test.js test/health-refresh.test.js test/cli.test.js test/cli-help-safety.test.js test/recursive-help-safety.test.js test/help-payload-boundary.test.js test/agent-bootstrap.test.js test/shared-project.test.js test/doctor-integrity.test.js (passed)",
+              "workId": "PF-0184",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "Test snapshots working tree (with an uncommitted edit), index, refs and object contents before/after; merge preview through git-ops previewMergeIsolated with a temporary object store adds no object (object directory compared); git-scan guard confirms only read-only subcommands outside git-ops; suggestions printed as 'Suggested (not run)'. Git may refresh mtimes of existing objects, documented.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/core/branches.js",
+              "contentHash": "sha256:a4a2b4f0655041306c95feb4358a6ad60b1a5ca906d2dffd78a95e0f5221c0b6",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/execution/git-ops.js",
+              "contentHash": "sha256:4749c6020a35545414adae3607bcc3400619425724bc893ec8ae666ae73d867d",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/branch-health.test.js",
+              "contentHash": "sha256:aefa550f35bdee356aab520a8a5a342c54b438bfeb6ac13279fee425bb6b6ae1",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/branch-health.test.js test/health-refresh.test.js test/cli.test.js test/cli-help-safety.test.js test/recursive-help-safety.test.js test/help-payload-boundary.test.js test/agent-bootstrap.test.js test/shared-project.test.js test/doctor-integrity.test.js (passed)",
+              "workId": "PF-0184",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "report.caveat is always set and printed by describeBranches; asserted in tests.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/core/branches.js",
+              "contentHash": "sha256:a4a2b4f0655041306c95feb4358a6ad60b1a5ca906d2dffd78a95e0f5221c0b6",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/branch-health.test.js",
+              "contentHash": "sha256:aefa550f35bdee356aab520a8a5a342c54b438bfeb6ac13279fee425bb6b6ae1",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/branch-health.test.js test/health-refresh.test.js test/cli.test.js test/cli-help-safety.test.js test/recursive-help-safety.test.js test/help-payload-boundary.test.js test/agent-bootstrap.test.js test/shared-project.test.js test/doctor-integrity.test.js (passed)",
+              "workId": "PF-0184",
+              "verificationRunId": "V-002"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "branches configure/--clear write only config.branches after validateBranchesConfig and validateProjectConfig; top-level block ignored by older readers (they validate only known blocks); detection groups; unavailable reasons for no flow and not-a-repository; tested.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/commands/branches.js",
+              "contentHash": "sha256:dec73dd30c3c981e78c41995d2326edde242f3dc30916dbacd3b35981248f2a8",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/shared/config.js",
+              "contentHash": "sha256:426a4c6b9d50cea2081f90a40b3d586afa815c3b615f9fc718130b1caa694f8b",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "modified"
+            },
+            {
+              "type": "repository",
+              "path": "test/branch-health.test.js",
+              "contentHash": "sha256:aefa550f35bdee356aab520a8a5a342c54b438bfeb6ac13279fee425bb6b6ae1",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/branch-health.test.js test/health-refresh.test.js test/cli.test.js test/cli-help-safety.test.js test/recursive-help-safety.test.js test/help-payload-boundary.test.js test/agent-bootstrap.test.js test/shared-project.test.js test/doctor-integrity.test.js (passed)",
+              "workId": "PF-0184",
+              "verificationRunId": "V-002"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-18T16:05:46.019Z"
+}

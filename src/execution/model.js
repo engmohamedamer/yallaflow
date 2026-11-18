@@ -54,6 +54,7 @@ function set(task, state, reason, now, extra = {}) {
 //   permission-resolved   none left open (pending = 0)        → working
 //   review                the item waits for a review gate    → needs-you: review
 //   question              the item has an open question       → needs-you: question
+//   question-answered     answered, no turn started yet       → needs-you: reply
 //   turn-ended            the agent's turn ended, item not DONE and nothing pending → needs-you: reply
 //   turn-started          the agent works again              → working
 //   item-done             the snapshot shows DONE (session may still be up)
@@ -88,6 +89,11 @@ export function applySignal(task, signal, now) {
     case 'question':
       if (!isLive(task)) return task;
       return set(task, 'needs-you', 'question', now);
+    case 'question-answered':
+      // PF-0174: the question was answered but no turn started yet (the answer was not sent to
+      // the agent): the task waits for the developer to continue it, not for an answer.
+      if (task.state !== 'needs-you' || task.reason !== 'question') return task;
+      return set(task, 'needs-you', 'reply', now);
     case 'turn-ended':
       if (task.state !== 'working' || task.itemDone) return task;
       return set(task, 'needs-you', 'reply', now);

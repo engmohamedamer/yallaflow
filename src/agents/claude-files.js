@@ -77,9 +77,21 @@ export async function writeClaudeLaunchFiles(root, nodePath = process.execPath) 
 // Claude Code shows its own warning, which the user decides on. The first prompt comes
 // first (--mcp-config takes several values): it makes Claude Code report its permission
 // mode at once, since SessionStart hooks carry none (PF-0069), and orients the agent.
-export function launchCommand(root, mcpFile = path.join(root, '.yallaflow', 'local', 'agent', 'claude-mcp.json'), settingsFile = path.join(root, '.yallaflow', 'local', 'agent', 'claude-settings.json'), { platform = process.platform } = {}) {
-  const p = platform === 'win32' ? path.win32 : path;
-  const rel = (file) => p.relative(root, file);
-  // The prompt is fixed text without quotes; the file names are relative and fixed.
-  return `claude ${platform === 'win32' ? winQuote(FIRST_PROMPT) : quote(FIRST_PROMPT)} --mcp-config ${rel(mcpFile)} --settings ${rel(settingsFile)} --dangerously-load-development-channels server:${CHANNEL_SERVER_NAME}`;
+//
+// PF-0182: on macOS and Linux the command works from any folder. It used to name the launch
+// files relative to the project, and the console shows it to copy: pasted into a new macOS
+// Terminal (which opens in the home folder), Claude Code looked for
+// ~/.yallaflow/local/agent/claude-settings.json. Now it first changes to the project folder and
+// names the files by absolute path, all single-quoted (nothing in them is expanded by the shell).
+// Windows is unchanged (PF-0148): PowerShell expands $(...) inside double quotes, so no project
+// path is ever placed in that command text; the PowerShell window the console opens starts in the
+// project folder. `binary` (POSIX only) replaces the bare `claude` with the detected program.
+export function launchCommand(root, mcpFile = path.join(root, '.yallaflow', 'local', 'agent', 'claude-mcp.json'), settingsFile = path.join(root, '.yallaflow', 'local', 'agent', 'claude-settings.json'), { platform = process.platform, binary = null } = {}) {
+  const tail = `--dangerously-load-development-channels server:${CHANNEL_SERVER_NAME}`;
+  if (platform === 'win32') {
+    const rel = (file) => path.win32.relative(root, file);
+    return `claude ${winQuote(FIRST_PROMPT)} --mcp-config ${rel(mcpFile)} --settings ${rel(settingsFile)} ${tail}`;
+  }
+  const abs = (file) => quote(path.posix.resolve(root, file));
+  return `cd ${quote(root)} && ${binary ? quote(binary) : 'claude'} ${quote(FIRST_PROMPT)} --mcp-config ${abs(mcpFile)} --settings ${abs(settingsFile)} ${tail}`;
 }

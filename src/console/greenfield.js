@@ -21,16 +21,18 @@ import { loadPlan } from '../newproject/project.js';
 import { ENVIRONMENTS, GIT_INIT_ARGV } from '../newproject/project.js';
 import { SAFE_GIT } from '../utils/git-safety.js';
 import { resolveCommand, safeEnvironment } from '../utils/command.js';
+import { toolEnvironment } from '../utils/fresh-path.js';
 
 const TOOL_TIMEOUT_MS = 5000;
 const SAFE_ENV = ['PATH', 'HOME', 'LANG', 'LC_ALL', 'USER', 'LOGNAME', 'TMPDIR', 'TZ'];
-const scrubbed = () => safeEnvironment(SAFE_ENV);
+// PF-0173: with the PATH a new terminal would get (Windows: the current registry Path added).
+const scrubbed = async () => safeEnvironment(SAFE_ENV, await toolEnvironment(process.env));
 
 // PF-0157: found and started like every other tool (src/utils/command.js): no shell, and a
 // Windows shim's own program is started directly. A tool that is missing or cannot be started
 // is an answer ({ ok: false }), never an exception.
 async function runQuiet(file, args, { cwd = os.homedir() } = {}) {
-  const env = scrubbed();
+  const env = await scrubbed();
   const command = await resolveCommand([file, ...args], env);
   if (!command.ok) return { ok: false, code: 'ENOENT', stdout: '', stderr: command.message, missing: command.reason === 'not-found', problem: command.reason === 'not-startable' ? command.message : null };
   return new Promise((resolve) => {

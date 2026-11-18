@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-18T11:39:13.184Z",
+      "completedAt": "2026-11-18T11:39:13.361Z",
+      "summary": "app.js viewRun returns runtimeUnsupported() for the whole page when runtime.data.supported is false (before the empty-project check), and viewSettings replaces the service-definition panel the same way. serviceCard and runSection always offer Start/Stop/Restart and Start project. PF-0176 added runtime capabilities { lifecycle, compose, gracefulStop, verified } and per-service unsupported: compose-windows.",
+      "evidence": [
+        "resources/console/app.js"
+      ]
+    },
+    "requirement-clarification": {
+      "status": "completed",
+      "startedAt": "2026-11-18T11:39:22.411Z",
+      "completedAt": "2026-11-18T11:39:22.579Z",
+      "summary": "Owner's approved W6a scope (2026-11-18): remove the whole-page restriction; show discovery, definitions, plans, trust, logs and configuration; 'No services yet' for an empty project; accurate capability states; no unsupported operation shown as available; plus (moved from PF-0176 AC-003) the console discloses that Stop on Windows is forceful.",
+      "evidence": [
+        "user:owner-approved-phase-1-brief-2026-11-18"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-18T11:39:22.759Z",
+      "completedAt": "2026-11-18T11:39:22.935Z",
+      "summary": "Plan: runtimeCaps() from runtime.data.capabilities (fallback from supported); viewRun and Settings drop the whole-page block and show a platform note instead (lifecycle unavailable on unknown systems; not yet verified on a real machine for Windows/macOS); empty project keeps 'No services yet'; serviceCard shows a Compose-on-Windows note and no Start/Stop for it, and no lifecycle buttons when lifecycle is unavailable; a forceful-stop note under running services and next to Stop project when gracefulStop is false; Start project counts only startable services. Tests via vm-evaluated app.js.",
+      "evidence": [
+        "resources/console/app.js"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-18T11:41:46.688Z",
+      "completedAt": "2026-11-18T11:41:46.853Z",
+      "summary": "app.js: runtimeCaps() reads PF-0176 capabilities (fallback from supported); runtimePlatformNote() says what is not verified on a real machine, that Stop on Windows is forceful and that Compose is not started on Windows, or that lifecycle is unavailable on an unknown system; viewRun no longer replaces the page (the empty project keeps its own empty state, with the note), Settings keeps the manual service definition; serviceCard offers no Start/Stop/Restart for a Compose service on Windows or when lifecycle is unavailable (a chip and a plain explanation instead, logs and definition stay) and notes the forceful stop on running Windows services; runSection omits project Start/Stop where lifecycle is unavailable and does not count unsupported services as startable. Removed the 'Linux and macOS only' copy. Two harnesses updated (runtimeCaps stub; new empty-state line).",
+      "evidence": [
+        "resources/console/app.js",
+        "test/console-run-windows.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-18T11:42:18.941Z",
+      "completedAt": "2026-11-18T11:42:18.941Z",
+      "summary": "V-001 passed: Windows service card (start/stop/restart, forceful-stop note in AR/EN), Compose-on-Windows card without lifecycle buttons, platform note per system, unknown-system card without Start, no whole-page block and empty state first, plus the existing Run page, first-run, IA and runtime suites.",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-18T11:42:18.941Z"
+}

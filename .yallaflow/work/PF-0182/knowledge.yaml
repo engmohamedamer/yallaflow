@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Commands the console shows for the developer to copy and run must work from any folder: on macOS/Linux they cd to the project first and name files by absolute single-quoted path; on Windows no project path is placed in PowerShell command text (it expands $(...) inside double quotes), so those keep project-relative names and are run in the project folder.",
+      "evidence": [
+        "src/agents/claude-files.js",
+        "verification:V-001"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-18T15:42:13.853Z",
+      "factId": "CTX-0188",
+      "promotedAt": "2026-11-18T15:42:23.801Z",
+      "target": "context/conventions.md"
+    }
+  ],
+  "updatedAt": "2026-11-18T15:42:23.801Z",
+  "reviewedAt": "2026-11-18T15:42:23.801Z"
+}

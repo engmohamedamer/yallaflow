@@ -25,7 +25,8 @@ export const INTENTS = Object.freeze(['monitor', 'create', 'manage']);
 const MAX_PATH = 4096;
 const MAX_BYTES = 64 * 1024;
 
-export const DEFAULT_PREFERENCES = Object.freeze({ language: null, theme: null, preferredAgent: null, lastFolder: null, saveChatHistory: null, onboarding: Object.freeze({ completed: false, intent: null }) });
+export const DEFAULT_PREFERENCES = Object.freeze({ language: null, theme: null, preferredAgent: null, lastFolder: null, recentFolders: null, saveChatHistory: null, onboarding: Object.freeze({ completed: false, intent: null }) });
+const MAX_RECENT = 6;
 
 export function preferencesPath(env = process.env) {
   return path.join(path.dirname(registryPath(env)), PREFERENCES_FILE);
@@ -40,13 +41,17 @@ class PreferencesError extends Error {
 }
 
 const oneOf = (list) => (value) => value === null || list.includes(value);
+const folderPath = (value) => typeof value === 'string' && value.length > 0 && value.length <= MAX_PATH && !/[\u0000-\u001f\u007f]/.test(value) && (path.posix.isAbsolute(value) || path.win32.isAbsolute(value));
 const FIELDS = Object.freeze({
   language: oneOf(LANGUAGES),
   theme: oneOf(THEMES),
   preferredAgent: oneOf(AGENTS),
   // An absolute folder path as text; it is only ever offered back as a starting point and is
   // checked by the folder chooser's own rules when used.
-  lastFolder: (value) => value === null || (typeof value === 'string' && value.length > 0 && value.length <= MAX_PATH && !/[\u0000-\u001f\u007f]/.test(value) && (path.posix.isAbsolute(value) || path.win32.isAbsolute(value))),
+  lastFolder: (value) => value === null || folderPath(value),
+  // PF-0175: the folder chooser's recent folders (browser storage is per port, so they were
+  // lost when the console came back on another port). Absolute paths only, at most six.
+  recentFolders: (value) => value === null || (Array.isArray(value) && value.length <= MAX_RECENT && value.every(folderPath)),
   // PF-0165: keep the agent chat on disk in each project's .yallaflow/local (null: the
   // default, on). false stops saving new messages; what is already saved stays until cleared.
   saveChatHistory: (value) => value === null || typeof value === 'boolean'
@@ -58,7 +63,7 @@ const ONBOARDING_FIELDS = Object.freeze({
 
 // The known fields of a stored document, each valid or its default.
 function view(raw) {
-  const out = { language: null, theme: null, preferredAgent: null, lastFolder: null, saveChatHistory: null, onboarding: { completed: false, intent: null } };
+  const out = { language: null, theme: null, preferredAgent: null, lastFolder: null, recentFolders: null, saveChatHistory: null, onboarding: { completed: false, intent: null } };
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;
   for (const [key, valid] of Object.entries(FIELDS)) if (key in raw && raw[key] !== null && valid(raw[key])) out[key] = raw[key];
   const onboarding = raw.onboarding;

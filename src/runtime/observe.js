@@ -3,6 +3,8 @@
 // no shell. What it sees is transient state for the Review and the start pre-flight; it is
 // never stored as project knowledge. A missing tool is reported, not treated as "nothing".
 import { execFile } from 'node:child_process';
+import { safeEnvironment, windowsSystemProgram } from '../utils/command.js';
+import { windowsProcessTable } from './process.js';
 
 const TIMEOUT_MS = 4000;
 const MAX_BUFFER = 2 * 1024 * 1024;
@@ -84,7 +86,34 @@ export async function observeListeners() {
     }
     return { available: true, listeners };
   }
+  if (process.platform === 'win32') {
+    // PF-0176: System32 netstat (argv only). Its state words are translated on non-English
+    // Windows, so a listening socket is recognised by its unset remote address instead.
+    const result = await new Promise((resolve) => {
+      execFile(windowsSystemProgram('netstat.exe'), ['-ano'], { timeout: TIMEOUT_MS, maxBuffer: MAX_BUFFER, shell: false, windowsHide: true, env: safeEnvironment(['PATH'], process.env, 'win32') }, (error, stdout) => resolve(error ? { ok: false, reason: 'netstat failed' } : { ok: true, stdout: String(stdout) }));
+    });
+    if (!result.ok) return { available: false, reason: result.reason, listeners: [] };
+    const table = windowsProcessTable();
+    return { available: true, listeners: parseWindowsListeners(result.stdout).map((entry) => ({ ...entry, process: table?.get(entry.pid)?.name ?? null })) };
+  }
   return { available: false, reason: `${process.platform} is not supported`, listeners: [] };
+}
+
+// `netstat -ano` → [{ port, pid }] for TCP sockets that listen (remote address 0.0.0.0:0 or [::]:0).
+export function parseWindowsListeners(text) {
+  const listeners = [];
+  const seen = new Set();
+  for (const line of String(text ?? '').split(/\r?\n/)) {
+    const cols = line.trim().split(/\s+/);
+    if (cols[0]?.toUpperCase() !== 'TCP' || cols.length < 5) continue;
+    if (!/^(0\.0\.0\.0:0|\[::\]:0|\*:\*)$/.test(cols[2])) continue;
+    const port = Number(cols[1].split(':').at(-1));
+    const pid = Number(cols.at(-1));
+    if (!Number.isInteger(port) || port <= 0 || seen.has(`${port}/${pid}`)) continue;
+    seen.add(`${port}/${pid}`);
+    listeners.push({ port, pid: Number.isInteger(pid) && pid > 0 ? pid : null });
+  }
+  return listeners;
 }
 
 export async function observeRuntime() {

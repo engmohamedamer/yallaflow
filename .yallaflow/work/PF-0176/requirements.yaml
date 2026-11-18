@@ -1,0 +1,250 @@
+{
+  "schemaVersion": 1,
+  "revision": 2,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "On Windows the Run Manager starts, stops, restarts and reports trusted local development services (including npm-based ones started through .cmd shims) through the existing Runtime Supervisor, using the shared command resolver and safe environment, never a shell and never elevated.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T11:28:12.720Z",
+      "updatedAt": "2026-11-18T11:28:12.720Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "A Windows process is YallaFlow's only while its pid and its verified creation time match the run record; its child processes are tracked the same way; anything whose identity cannot be established or no longer matches is never terminated (fail closed), and nothing is found or ended by name or by port.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T11:28:12.720Z",
+      "updatedAt": "2026-11-18T11:28:12.720Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "Stop on Windows may end a verified, YallaFlow-owned process tree forcefully; identity is checked immediately before termination, the forceful stop is disclosed to the developer, and surviving processes are reported instead of claiming success.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T11:28:12.720Z",
+      "updatedAt": "2026-11-18T11:28:12.720Z"
+    },
+    {
+      "id": "REQ-004",
+      "statement": "A service started by YallaFlow on Windows keeps running when the console stops and is recognised again (status, stop, restart) after the console restarts.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T11:28:12.720Z",
+      "updatedAt": "2026-11-18T11:28:12.720Z"
+    },
+    {
+      "id": "REQ-005",
+      "statement": "Docker Compose services are not started, stopped or restarted on Windows in this release; they show a clear unsupported state while other services stay usable.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T11:28:12.720Z",
+      "updatedAt": "2026-11-18T11:28:12.720Z"
+    },
+    {
+      "id": "REQ-006",
+      "statement": "Linux and macOS service supervision keeps its current behavior.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T11:28:12.720Z",
+      "updatedAt": "2026-11-18T11:28:12.720Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "runtimeStatus reports supported: true on win32, and start resolves service.command through resolveCommand with a safeEnvironment-based environment that includes the Windows system variables and the refreshed PATH; dependency installs use the same launcher.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T11:28:12.720Z",
+      "updatedAt": "2026-11-18T11:28:12.720Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-002",
+      "statement": "On win32 processStartTime/identify read the process creation time from a fixed, argv-only PowerShell CIM query; a pid whose creation time differs is 'other', an unreadable table yields no identity, and descendants are accepted only when created after their parent.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T11:28:12.720Z",
+      "updatedAt": "2026-11-18T11:28:12.720Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-003",
+      "statement": "Windows stop re-verifies the leader, runs System32 taskkill /T /F only for a verified leader, kills only tracked descendants whose creation time still matches, records forced: true and lists survivors; the runtime status discloses it through capabilities.gracefulStop = false and the stop result's forced flag. (The console's wording of it is delivered by the W6a Run Manager UX work item.)",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T11:28:12.720Z",
+      "updatedAt": "2026-11-18T11:38:05.938Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-004",
+      "statement": "Services are spawned detached with a hidden window and their run record (pid, creation time) lives in the user runtime state, so a new console process reads them as running and can stop them.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T11:28:12.720Z",
+      "updatedAt": "2026-11-18T11:28:12.720Z"
+    },
+    {
+      "id": "AC-005",
+      "requirement": "REQ-005",
+      "statement": "On win32 a docker-compose service start, stop or restart is refused with RUNTIME_COMPOSE_WINDOWS before anything runs, start-all skips it with that reason, and status marks it unsupported on this system.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T11:28:12.720Z",
+      "updatedAt": "2026-11-18T11:28:12.720Z"
+    },
+    {
+      "id": "AC-006",
+      "requirement": "REQ-006",
+      "statement": "The existing runtime test suites pass unchanged on Linux, and a real-process lifecycle test (start, child and grandchild, stop, restart, recovery) runs on whichever OS executes it.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T11:28:12.720Z",
+      "updatedAt": "2026-11-18T11:28:12.720Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-18T11:28:12.720Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-18T11:28:12.720Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-18T11:28:12.720Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-004",
+      "at": "2026-11-18T11:28:12.720Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-005",
+      "at": "2026-11-18T11:28:12.720Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-006",
+      "at": "2026-11-18T11:28:12.720Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-18T11:28:12.720Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-18T11:28:12.720Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-18T11:28:12.720Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-11-18T11:28:12.720Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-005",
+      "at": "2026-11-18T11:28:12.720Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-006",
+      "at": "2026-11-18T11:28:12.720Z",
+      "revision": 1
+    },
+    {
+      "action": "revised",
+      "id": "AC-003",
+      "at": "2026-11-18T11:38:05.938Z",
+      "revision": 2,
+      "previous": {
+        "id": "AC-003",
+        "requirement": "REQ-003",
+        "statement": "Windows stop re-verifies the leader, runs System32 taskkill /T /F only for a verified leader, kills only tracked descendants whose creation time still matches, records forced: true and lists survivors; the status and the console disclose that stopping on Windows is forceful.",
+        "provenance": [
+          {
+            "type": "request"
+          }
+        ],
+        "status": "active"
+      }
+    }
+  ],
+  "updatedAt": "2026-11-18T11:38:05.938Z"
+}

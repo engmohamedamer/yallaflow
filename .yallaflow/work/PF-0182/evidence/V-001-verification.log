@@ -1,0 +1,382 @@
+TAP version 13
+# Subtest: claude (simulated): channel server registers, relays chat, replies, permissions, hooks; bridge token protected
+ok 1 - claude (simulated): channel server registers, relays chat, replies, permissions, hooks; bridge token protected
+  ---
+  duration_ms: 7623.648427
+  type: 'test'
+  ...
+# Subtest: claude (simulated): the channel waits for a console and reports undelivered replies honestly
+ok 2 - claude (simulated): the channel waits for a console and reports undelivered replies honestly
+  ---
+  duration_ms: 450.037635
+  type: 'test'
+  ...
+# Subtest: claude (simulated): bridge file, channel takeover, disconnect, bypass, nested workspaces
+ok 3 - claude (simulated): bridge file, channel takeover, disconnect, bypass, nested workspaces
+  ---
+  duration_ms: 7304.049627
+  type: 'test'
+  ...
+# Subtest: claude (simulated): agents claude-files writes git-ignored launch files
+ok 4 - claude (simulated): agents claude-files writes git-ignored launch files
+  ---
+  duration_ms: 410.558452
+  type: 'test'
+  ...
+# Subtest: review: a stale bridge file pointing at another listener receives no token and no data
+ok 5 - review: a stale bridge file pointing at another listener receives no token and no data
+  ---
+  duration_ms: 1534.638169
+  type: 'test'
+  ...
+# Subtest: review: Claude detection runs only after opt-in; a failed Claude enable leaves no lock or bridge file
+ok 6 - review: Claude detection runs only after opt-in; a failed Claude enable leaves no lock or bridge file
+  ---
+  duration_ms: 635.523481
+  type: 'test'
+  ...
+# Subtest: Claude Team accounts get one plain note that does not block
+ok 7 - Claude Team accounts get one plain note that does not block
+  ---
+  duration_ms: 22.391591
+  type: 'test'
+  ...
+# Subtest: simulated Windows: PATH is read whatever its case, and PATHEXT decides the extensions tried
+ok 8 - simulated Windows: PATH is read whatever its case, and PATHEXT decides the extensions tried
+  ---
+  duration_ms: 6.740543
+  type: 'test'
+  ...
+# Subtest: simulated Windows: a native .exe and an npm .cmd shim are found; folders with spaces and Arabic names work
+ok 9 - simulated Windows: a native .exe and an npm .cmd shim are found; folders with spaces and Arabic names work
+  ---
+  duration_ms: 10.689262
+  type: 'test'
+  ...
+# Subtest: POSIX lookup is unchanged: an execute bit is required and the bare name is used
+ok 10 - POSIX lookup is unchanged: an execute bit is required and the bare name is used
+  ---
+  duration_ms: 21.982877
+  type: 'test'
+  ...
+# Subtest: simulated Windows: an npm shim is started as its target with node, never through a shell
+ok 11 - simulated Windows: an npm shim is started as its target with node, never through a shell
+  ---
+  duration_ms: 3.598815
+  type: 'test'
+  ...
+# Subtest: simulated Windows: a broken or unknown command script is refused with a plain reason, not run by a shell
+ok 12 - simulated Windows: a broken or unknown command script is refused with a plain reason, not run by a shell
+  ---
+  duration_ms: 6.64722
+  type: 'test'
+  ...
+# Subtest: a program that cannot be started is an answer with its cause, never a crash
+ok 13 - a program that cannot be started is an answer with its cause, never a crash
+  ---
+  duration_ms: 19.162727
+  type: 'test'
+  ...
+# Subtest: providers are independent: a missing or broken Claude Code never makes Codex unavailable, and the reverse
+ok 14 - providers are independent: a missing or broken Claude Code never makes Codex unavailable, and the reverse
+  ---
+  duration_ms: 383.36288
+  type: 'test'
+  ...
+# Subtest: macOS/Linux: the copyable Claude launch command starts in the project and names its files absolutely
+ok 15 - macOS/Linux: the copyable Claude launch command starts in the project and names its files absolutely
+  ---
+  duration_ms: 14.370056
+  type: 'test'
+  ...
+# Subtest: simulated Windows: the terminal is a new PowerShell window in the project folder; the folder is never in the command text
+ok 16 - simulated Windows: the terminal is a new PowerShell window in the project folder; the folder is never in the command text
+  ---
+  duration_ms: 4.284564
+  type: 'test'
+  ...
+# Subtest: simulated Windows: hook and launch commands use double quotes and forward slashes
+ok 17 - simulated Windows: hook and launch commands use double quotes and forward slashes
+  ---
+  duration_ms: 4.68886
+  type: 'test'
+  ...
+# Subtest: no shell anywhere in agent discovery and launch; an unreachable console is said in plain words
+ok 18 - no shell anywhere in agent discovery and launch; an unreachable console is said in plain words
+  ---
+  duration_ms: 18.131435
+  type: 'test'
+  ...
+# Subtest: agent choice: missing, saved, Claude needs agents, invalid and symlinked files are "nothing chosen"
+ok 19 - agent choice: missing, saved, Claude needs agents, invalid and symlinked files are "nothing chosen"
+  ---
+  duration_ms: 157.289945
+  type: 'test'
+  ...
+# Subtest: setup record: stack summary, what changed, steps, skip, and when the guide is offered
+ok 20 - setup record: stack summary, what changed, steps, skip, and when the guide is offered
+  ---
+  duration_ms: 138.136533
+  type: 'test'
+  ...
+# Subtest: start --all: trusted services in dependency order, untrusted chains skipped with what to review, stop --all reverses
+ok 21 - start --all: trusted services in dependency order, untrusted chains skipped with what to review, stop --all reverses
+  ---
+  duration_ms: 7058.013526
+  type: 'test'
+  ...
+# Subtest: start --all: a failure stops the sequence and nothing after it starts
+ok 22 - start --all: a failure stops the sequence and nothing after it starts
+  ---
+  duration_ms: 2319.094917
+  type: 'test'
+  ...
+# Subtest: profile: open is a path on the service port, never a URL
+ok 23 - profile: open is a path on the service port, never a URL
+  ---
+  duration_ms: 1562.445243
+  type: 'test'
+  ...
+# Subtest: console: a saved choice turns agents and Claude on for that project only; live off removes its bridge file
+ok 24 - console: a saved choice turns agents and Claude on for that project only; live off removes its bridge file
+  ---
+  duration_ms: 4876.292572
+  type: 'test'
+  ...
+# Subtest: console: settings and setup routes are guarded; read-only ignores the saved choice and refuses writes
+ok 25 - console: settings and setup routes are guarded; read-only ignores the saved choice and refuses writes
+  ---
+  duration_ms: 518.334186
+  type: 'test'
+  ...
+# Subtest: UI: the first-time guide shows the current step, and none once done, skipped or read-only
+ok 26 - UI: the first-time guide shows the current step, and none once done, skipped or read-only
+  ---
+  duration_ms: 28.534617
+  type: 'test'
+  ...
+# Subtest: UI: Stack lists the scan with what changed; Run links running services to their own port only
+ok 27 - UI: Stack lists the scan with what changed; Run links running services to their own port only
+  ---
+  duration_ms: 41.149612
+  type: 'test'
+  ...
+# Subtest: UI: the run message is re-rendered in the current language after a switch
+ok 28 - UI: the run message is re-rendered in the current language after a switch
+  ---
+  duration_ms: 6.353624
+  type: 'test'
+  ...
+# Subtest: UI: Agents shows detection, the saved choice and a checklist with fixes
+ok 29 - UI: Agents shows detection, the saved choice and a checklist with fixes
+  ---
+  duration_ms: 12.394822
+  type: 'test'
+  ...
+# Subtest: session fix: the stack shows a summary first, root manifests first, and the full table folded
+ok 30 - session fix: the stack shows a summary first, root manifests first, and the full table folded
+  ---
+  duration_ms: 6.357149
+  type: 'test'
+  ...
+# Subtest: session fix: the launch command shows once the files are current; Codex login is explained; notes in Arabic
+ok 31 - session fix: the launch command shows once the files are current; Codex login is explained; notes in Arabic
+  ---
+  duration_ms: 23.031557
+  type: 'test'
+  ...
+# Subtest: session fix: Rescan this machine keeps the Claude probe in the reload that follows
+ok 32 - session fix: Rescan this machine keeps the Claude probe in the reload that follows
+  ---
+  duration_ms: 3.3123
+  type: 'test'
+  ...
+# Subtest: review: an agents.json committed to the repository or readable by others is ignored
+ok 33 - review: an agents.json committed to the repository or readable by others is ignored
+  ---
+  duration_ms: 84.070118
+  type: 'test'
+  ...
+# Subtest: review: a read-only console runs no agent probes
+ok 34 - review: a read-only console runs no agent probes
+  ---
+  duration_ms: 47.068475
+  type: 'test'
+  ...
+# Subtest: review: turning Claude off cuts its token at once, releases the checkout, and planted launch files are not ticked
+ok 35 - review: turning Claude off cuts its token at once, releases the checkout, and planted launch files are not ticked
+  ---
+  duration_ms: 804.766226
+  type: 'test'
+  ...
+# Subtest: 8/9/11. shared enable is explicit, records policy and version, never commits or pushes
+ok 36 - 8/9/11. shared enable is explicit, records policy and version, never commits or pushes
+  ---
+  duration_ms: 2488.177769
+  type: 'test'
+  ...
+# Subtest: 10. an unhealthy or non-Git workspace cannot enable sharing, and nothing changes
+ok 37 - 10. an unhealthy or non-Git workspace cannot enable sharing, and nothing changes
+  ---
+  duration_ms: 941.271697
+  type: 'test'
+  ...
+# Subtest: 11. an incompatible YallaFlow stops before any project-state mutation; read-only orientation still explains why
+ok 38 - 11. an incompatible YallaFlow stops before any project-state mutation; read-only orientation still explains why
+  ---
+  duration_ms: 2788.683948
+  type: 'test'
+  ...
+# Subtest: 12/52. a single-user workspace is unchanged until sharing is enabled: same IDs, no memory records, reads write nothing
+ok 39 - 12/52. a single-user workspace is unchanged until sharing is enabled: same IDs, no memory records, reads write nothing
+  ---
+  duration_ms: 3648.099724
+  type: 'test'
+  ...
+# Subtest: 13/14/16. two branches from the same base create work and sources without ID or path collision, and merge cleanly
+ok 40 - 13/14/16. two branches from the same base create work and sources without ID or path collision, and merge cleanly
+  ---
+  duration_ms: 3387.601653
+  type: 'test'
+  ...
+# Subtest: 15. legacy PF-\#\#\#\# and SRC-\#\#\#\# stay readable and keep allocating in single-user mode; both forms coexist
+ok 41 - 15. legacy PF-\#\#\#\# and SRC-\#\#\#\# stay readable and keep allocating in single-user mode; both forms coexist
+  ---
+  duration_ms: 1285.226343
+  type: 'test'
+  ...
+# Subtest: checkout tags: 10 Crockford-base32 characters, an unbiased byte mapping, drawn from crypto.randomBytes
+ok 42 - checkout tags: 10 Crockford-base32 characters, an unbiased byte mapping, drawn from crypto.randomBytes
+  ---
+  duration_ms: 6.854079
+  type: 'test'
+  ...
+# Subtest: high-volume deterministic non-reuse: one checkout allocating thousands of IDs across branch switches never repeats a number
+ok 43 - high-volume deterministic non-reuse: one checkout allocating thousands of IDs across branch switches never repeats a number
+  ---
+  duration_ms: 4763.614958
+  type: 'test'
+  ...
+# Subtest: a copied checkout gets a fresh clone tag; the identity is local, gitignored, and needs no join command
+ok 44 - a copied checkout gets a fresh clone tag; the identity is local, gitignored, and needs no join command
+  ---
+  duration_ms: 2488.038341
+  type: 'test'
+  ...
+# Subtest: one checkout never reuses an ID across branch switches or stashes
+ok 45 - one checkout never reuses an ID across branch switches or stashes
+  ---
+  duration_ms: 1730.805947
+  type: 'test'
+  ...
+# Subtest: 17. every global namespace is branch-safe after a multi-branch merge; work-scoped IDs are safe by scope
+ok 46 - 17. every global namespace is branch-safe after a multi-branch merge; work-scoped IDs are safe by scope
+  ---
+  duration_ms: 3198.475594
+  type: 'test'
+  ...
+# Subtest: 18/19/20/21. work captures its memory base; unchanged, unrelated, and referenced changes are told apart
+ok 47 - 18/19/20/21. work captures its memory base; unchanged, unrelated, and referenced changes are told apart
+  ---
+  duration_ms: 1622.637599
+  type: 'test'
+  ...
+# Subtest: 22. without Git the memory base is still a deterministic content fingerprint
+ok 48 - 22. without Git the memory base is still a deterministic content fingerprint
+  ---
+  duration_ms: 112.465137
+  type: 'test'
+  ...
+# Subtest: 23/24/25/26. on a feature branch knowledge is staged work-locally; canonical memory is untouched; DONE and handoff stay coherent
+ok 49 - 23/24/25/26. on a feature branch knowledge is staged work-locally; canonical memory is untouched; DONE and handoff stay coherent
+  ---
+  duration_ms: 3274.405414
+  type: 'test'
+  ...
+# Subtest: a relation proposed against a fact that changes before promotion is refused at staging (revalidate first)
+ok 50 - a relation proposed against a fact that changes before promotion is refused at staging (revalidate first)
+  ---
+  duration_ms: 1417.66063
+  type: 'test'
+  ...
+# Subtest: 27/28/29/30/35. safe new facts, reconfirmations, supersessions, and exact duplicates integrate with full provenance
+ok 51 - 27/28/29/30/35. safe new facts, reconfirmations, supersessions, and exact duplicates integrate with full provenance
+  ---
+  duration_ms: 5487.926085
+  type: 'test'
+  ...
+# Subtest: 31/40. conflicting parallel supersessions block, never overwrite, and memory stays healthy until reconciled
+ok 52 - 31/40. conflicting parallel supersessions block, never overwrite, and memory stays healthy until reconciled
+  ---
+  duration_ms: 5524.032631
+  type: 'test'
+  ...
+# Subtest: 32. a stale base on a feature branch is detected before push, with developer-facing guidance
+ok 53 - 32. a stale base on a feature branch is detected before push, with developer-facing guidance
+  ---
+  duration_ms: 4001.184513
+  type: 'test'
+  ...
+# Subtest: 33/34. integration retry is idempotent and an interrupted or failed integration is never half-applied
+ok 54 - 33/34. integration retry is idempotent and an interrupted or failed integration is never half-applied
+  ---
+  duration_ms: 4233.459669
+  type: 'test'
+  ...
+# Subtest: integration is deterministic: two maintainers integrating the same merge produce identical files
+ok 55 - integration is deterministic: two maintainers integrating the same merge produce identical files
+  ---
+  duration_ms: 2533.337572
+  type: 'test'
+  ...
+# Subtest: doctor detects unsafe shared state: legacy IDs after sharing, local state committed or misplaced, bad metadata, missing CTX, missing provenance
+ok 56 - doctor detects unsafe shared state: legacy IDs after sharing, local state committed or misplaced, bad metadata, missing CTX, missing provenance
+  ---
+  duration_ms: 3081.603335
+  type: 'test'
+  ...
+# Subtest: 47/48/49/50/51. shared check is read-only, provider-neutral, passes a safe branch, and fails a stale one with actionable output
+ok 57 - 47/48/49/50/51. shared check is read-only, provider-neutral, passes a safe branch, and fails a stale one with actionable output
+  ---
+  duration_ms: 2804.031134
+  type: 'test'
+  ...
+# Subtest: 51b/git-scan: the Git scan catches every invocation form, every forbidden subcommand, and git-ops shapes outside the approved set
+ok 58 - 51b/git-scan: the Git scan catches every invocation form, every forbidden subcommand, and git-ops shapes outside the approved set
+  ---
+  duration_ms: 11.593923
+  type: 'test'
+  ...
+# Subtest: 51/no-network: YallaFlow source never invokes mutating or network Git subcommands and calls no LLM provider
+ok 59 - 51/no-network: YallaFlow source never invokes mutating or network Git subcommands and calls no LLM provider
+  ---
+  duration_ms: 276.325237
+  type: 'test'
+  ...
+# Subtest: 42/43/44/45. the adapter orients automatically; finish speaks outcome language and keeps the audit in --verbose
+ok 60 - 42/43/44/45. the adapter orients automatically; finish speaks outcome language and keeps the audit in --verbose
+  ---
+  duration_ms: 3048.187182
+  type: 'test'
+  ...
+# Subtest: 53/54. single-user baseline, freshness, reconciliation helpers and durable sources behave as before
+ok 61 - 53/54. single-user baseline, freshness, reconciliation helpers and durable sources behave as before
+  ---
+  duration_ms: 1166.609911
+  type: 'test'
+  ...
+# Subtest: read commands never write in a Shared Project — not even a fresh clone's local identity
+ok 62 - read commands never write in a Shared Project — not even a fresh clone's local identity
+  ---
+  duration_ms: 10233.019198
+  type: 'test'
+  ...
+1..62
+# tests 62
+# suites 0
+# pass 62
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 75855.664003

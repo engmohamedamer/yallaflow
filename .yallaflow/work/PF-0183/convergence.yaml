@@ -1,0 +1,209 @@
+{
+  "schemaVersion": 1,
+  "assessments": [
+    {
+      "id": "CV-001",
+      "recordedAt": "2026-11-18T15:51:49.886Z",
+      "stage": "VERIFICATION",
+      "basis": {
+        "requirementsRevision": 1,
+        "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+        "verificationRunIds": [
+          "V-001"
+        ]
+      },
+      "summary": "Assessed after V-001 passed.",
+      "findings": [
+        {
+          "criterion": "AC-001",
+          "status": "satisfied",
+          "reason": "src/core/health.js assessHealth: compatibility, workspace link scan, refresh plan (missing/outdated/edited/broken/newer/unsafe), interrupted refresh, doctor failures, projection drift, legacy reconciliation; each finding has message and next; CLI yallaflow health [--json].",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/core/health.js",
+              "contentHash": "sha256:14963bcee82b4a1828bb9ebf572a47bb34008e6facd866506af919696d7fd1c4",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/commands/health.js",
+              "contentHash": "sha256:299a751e7d84b89e98d4ff6def532e367f6dffb78efc2b20464db18279437fac",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/health-refresh.test.js test/cli.test.js test/agent-bootstrap.test.js test/agent-bootstrap-security.test.js test/agent-contract.test.js test/upgrade-intelligence.test.js test/cli-help-safety.test.js test/recursive-help-safety.test.js test/help-payload-boundary.test.js test/workspace-lock.test.js test/shared-project.test.js (passed)",
+              "workId": "PF-0183",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-002",
+          "status": "satisfied",
+          "reason": "test 'a new project is healthy; health, refresh check and preview write nothing' and the older-fixture test compare a full tree snapshot including .git before and after.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/health-refresh.test.js",
+              "contentHash": "sha256:a4c7f73f4787a596e12c84456f782dc1b0a18751a316ccbef5716b46ce0f5998",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/health-refresh.test.js test/cli.test.js test/agent-bootstrap.test.js test/agent-bootstrap-security.test.js test/agent-contract.test.js test/upgrade-intelligence.test.js test/cli-help-safety.test.js test/recursive-help-safety.test.js test/help-payload-boundary.test.js test/workspace-lock.test.js test/shared-project.test.js (passed)",
+              "workId": "PF-0183",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-003",
+          "status": "satisfied",
+          "reason": "planRefresh only covers AGENT.md and the two bootstrap blocks; update requires an unmodified older block (recorded hash) or a known generated template; test checks text outside the blocks is byte-identical and preview shows the changes.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agent/refresh.js",
+              "contentHash": "sha256:a7ab852f2ec1fcdcf143ff3da3488c7d41c20595bbd1f9ba94172e9fa67fe266",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/health-refresh.test.js",
+              "contentHash": "sha256:a4c7f73f4787a596e12c84456f782dc1b0a18751a316ccbef5716b46ce0f5998",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/health-refresh.test.js test/cli.test.js test/agent-bootstrap.test.js test/agent-bootstrap-security.test.js test/agent-contract.test.js test/upgrade-intelligence.test.js test/cli-help-safety.test.js test/recursive-help-safety.test.js test/help-payload-boundary.test.js test/workspace-lock.test.js test/shared-project.test.js (passed)",
+              "workId": "PF-0183",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-004",
+          "status": "satisfied",
+          "reason": "Edited blocks are conflicts; applyRefresh throws REFRESH_CONFLICT before any write unless --resolve keep|preserve; newer/broken/unsafe refused; tested.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agent/refresh.js",
+              "contentHash": "sha256:a7ab852f2ec1fcdcf143ff3da3488c7d41c20595bbd1f9ba94172e9fa67fe266",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/health-refresh.test.js",
+              "contentHash": "sha256:a4c7f73f4787a596e12c84456f782dc1b0a18751a316ccbef5716b46ce0f5998",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/health-refresh.test.js test/cli.test.js test/agent-bootstrap.test.js test/agent-bootstrap-security.test.js test/agent-contract.test.js test/upgrade-intelligence.test.js test/cli-help-safety.test.js test/recursive-help-safety.test.js test/help-payload-boundary.test.js test/workspace-lock.test.js test/shared-project.test.js (passed)",
+              "workId": "PF-0183",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-005",
+          "status": "satisfied",
+          "reason": "Backups and manifest (before, intended, after hashes) written before the first write; restoreRefresh checks every file first and refuses a changed one; interrupted refresh (afterWrite seam) reported by health and restored; second apply writes nothing; tested.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agent/refresh.js",
+              "contentHash": "sha256:a7ab852f2ec1fcdcf143ff3da3488c7d41c20595bbd1f9ba94172e9fa67fe266",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/health-refresh.test.js",
+              "contentHash": "sha256:a4c7f73f4787a596e12c84456f782dc1b0a18751a316ccbef5716b46ce0f5998",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/health-refresh.test.js test/cli.test.js test/agent-bootstrap.test.js test/agent-bootstrap-security.test.js test/agent-contract.test.js test/upgrade-intelligence.test.js test/cli-help-safety.test.js test/recursive-help-safety.test.js test/help-payload-boundary.test.js test/workspace-lock.test.js test/shared-project.test.js (passed)",
+              "workId": "PF-0183",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-006",
+          "status": "satisfied",
+          "reason": "resolveManagedFile/writeManaged refuse links leaving the folder, dangling links and non-regular files; backup folders created with safeLocalDir (no links); health flags links leaving .yallaflow; no Git call in the module; verification re-plans after writing; tests cover outside link, workspace link, dangling link and .git unchanged.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "src/agent/refresh.js",
+              "contentHash": "sha256:a7ab852f2ec1fcdcf143ff3da3488c7d41c20595bbd1f9ba94172e9fa67fe266",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "src/agent/managed-files.js",
+              "contentHash": "sha256:796a0269c71d757aef8031844daf843a09cd09335c5455afecf7aa93319b8ce4",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "head"
+            },
+            {
+              "type": "repository",
+              "path": "test/health-refresh.test.js",
+              "contentHash": "sha256:a4c7f73f4787a596e12c84456f782dc1b0a18751a316ccbef5716b46ce0f5998",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/health-refresh.test.js test/cli.test.js test/agent-bootstrap.test.js test/agent-bootstrap-security.test.js test/agent-contract.test.js test/upgrade-intelligence.test.js test/cli-help-safety.test.js test/recursive-help-safety.test.js test/help-payload-boundary.test.js test/workspace-lock.test.js test/shared-project.test.js (passed)",
+              "workId": "PF-0183",
+              "verificationRunId": "V-001"
+            }
+          ]
+        },
+        {
+          "criterion": "AC-007",
+          "status": "satisfied",
+          "reason": "Older fixture test: health writes nothing; apply writes only .yallaflow/AGENT.md; every other .yallaflow file and project file byte-identical.",
+          "evidence": [
+            {
+              "type": "repository",
+              "path": "test/health-refresh.test.js",
+              "contentHash": "sha256:a4c7f73f4787a596e12c84456f782dc1b0a18751a316ccbef5716b46ce0f5998",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+              "workingTree": "untracked"
+            },
+            {
+              "type": "repository",
+              "path": "test/fixtures/v0.3.6-workspace",
+              "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132"
+            },
+            {
+              "type": "runtime",
+              "description": "node --import ./test-support/isolate-user-config.js --test test/health-refresh.test.js test/cli.test.js test/agent-bootstrap.test.js test/agent-bootstrap-security.test.js test/agent-contract.test.js test/upgrade-intelligence.test.js test/cli-help-safety.test.js test/recursive-help-safety.test.js test/help-payload-boundary.test.js test/workspace-lock.test.js test/shared-project.test.js (passed)",
+              "workId": "PF-0183",
+              "verificationRunId": "V-001"
+            }
+          ]
+        }
+      ],
+      "unrequested": []
+    }
+  ],
+  "updatedAt": "2026-11-18T15:51:49.886Z"
+}

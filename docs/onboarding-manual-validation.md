@@ -1,6 +1,6 @@
-# Manual validation on real Windows and macOS (Phase 1 onboarding)
+# Manual validation on real Windows and macOS (Phase 1 onboarding and the Windows Run Manager)
 
-The automated tests run on Linux. Every Windows and macOS case in them uses **simulated** platform values. They show that the rules are written as intended; they do not show that Windows or macOS behave that way.
+The full automated suite runs on Linux. Most Windows and macOS cases in it use **simulated** platform values: they show that the rules are written as intended, not that Windows or macOS behave that way. Since 1.5.5 a smaller **platform suite** (`npm run test:platform`) also runs on real Windows, macOS and Linux runners in CI, including a lifecycle test with real processes (start, recovery from the record, stop of a process tree, restart). It still does not cover the console in a browser, agent installs, sign-in or real projects: that is what this checklist is for.
 
 **Do not describe Windows or macOS as supported until this checklist has been run on a real machine and its results recorded below.**
 
@@ -9,9 +9,9 @@ Run it once on Windows 11 and once on a current macOS. Use a normal user account
 ## Before you start
 
 1. Install Node.js 20.16 or later.
-2. Install this build: in the repository run `npm pack`, then `npm install -g ./yallaflow-<version>.tgz` on the test machine.
+2. Install this build: the release candidate with `npm install -g yallaflow@next` (or a local build: in the repository run `npm pack`, then `npm install -g ./yallaflow-<version>.tgz`). Check with `yallaflow --version`.
 3. Start from a clean state: no `%APPDATA%\yallaflow` (Windows) or `~/.config/yallaflow` (macOS).
-4. Keep a terminal open to restart the console after you install a tool. A running console keeps its old `PATH`.
+4. Windows: a tool installed while the console runs should be found by **Recheck** without a restart (the console reads the current `Path` from the registry). If it is not, write that down, then restart the console from a **new** terminal. macOS: restart the console from a new terminal after installing a tool.
 
 Write down for each step: **pass**, **fail** (with the exact message and a screenshot), or **not run** (with the reason).
 
@@ -21,7 +21,7 @@ Write down for each step: **pass**, **fail** (with the exact message and a scree
 |---|---|---|
 | A1 | Run `yallaflow console` in an empty folder. | The browser opens. The Projects page shows **Create**, **Manage** and **Monitor**. |
 | A2 | Switch language and theme, then stop and restart the console. | Language and theme are remembered. |
-| A3 | Open `preferences.json` beside `console.json`. | It holds only language, theme, usual agent, last folder and the first-run choice. No token, key or password. |
+| A3 | Open `preferences.json` beside `console.json`. | It holds only language, theme, usual agent, last folder, recent folders, the chat-saving choice and the first-run choice. No token, key or password. |
 
 ## B. Tools the wizard needs (the case that failed in the Windows trial)
 
@@ -46,7 +46,7 @@ If B4, B6 or B7 fail, copy the last lines of the log shown on the page, and the 
 |---|---|---|
 | C1 | With no agent installed, open the first screen. | It says the agent needs setup and that Monitor does not need it. |
 | C2 | Press **Set up the agent**. | Codex shows program, adapter, sign-in and connection as separate rows. On Windows a line says agent setup is not verified on Windows. |
-| C3 | Follow the Codex install and sign-in steps (your ChatGPT subscription). | Each step waits for your approval. No API key is asked for. |
+| C3 | Follow the Codex install and sign-in steps (your ChatGPT subscription). | Each step waits for your approval. No API key is asked for. On Windows the review shows npm's folder as `C:\Users\<you>\AppData\Roaming\npm` (never a path containing `${APPDATA}` or `system32`), and the install runs **inside the console** without an administrator terminal. |
 | C4 | Press **Test the connection**. | It answers with your ChatGPT account, or a plain reason. |
 | C5 | Look at the Claude Code card. | **Experimental**; on Windows **Experimental · not verified on Windows**. Three rows. The connection row says it is checked only when a session starts. |
 | C6 | In the wizard, choose an agent that is not ready and press **Review**. | It does not continue, and the setup card is shown in place. Ticking **Advanced → Continue without a ready agent** lets it continue. |
@@ -84,9 +84,37 @@ Use a copy of a real YallaFlow project.
 
 F3 matters: an older console does not know Monitor only, so **it treats a monitored project as managed**. Do not rely on Monitor only on a machine where older consoles are still used.
 
+## W. Windows 11 first hour, end to end (Phase 1 and 1.1)
+
+The journey that failed in the first real Windows trial (1.5.4). Use a **normal user account** and a **normal (not administrator) PowerShell**. Start with no Git, Codex or Claude Code installed. Keep Task Manager or a second PowerShell open for the process checks.
+
+| # | Step | Expected |
+|---|---|---|
+| W1 | `npm install -g yallaflow@next`, then `yallaflow --version` and `yallaflow console` in an empty folder. | The version is the release candidate. The browser opens on Create, Manage and Monitor. |
+| W2 | Create → choose **Codex** → its setup card → **Install Codex**, tick **I reviewed this command**, **Install**. | The command is `npm install -g @openai/codex@0.167.0 @agentclientprotocol/codex-acp@2.5.0`; the folder shown is under `AppData\Roaming\npm`. Output lines appear while it runs. When it ends, the CLI and adapter rows turn ✓ without a restart. If it fails, the last output lines are shown. |
+| W3 | **Sign in with ChatGPT** → open the link, enter the code with your existing subscription. | The sign-in row turns ✓ "ChatGPT subscription". No API key is asked for. |
+| W4 | **Test the connection**. | "Codex answered on your subscription". |
+| W5 | In the wizard keep **Initialize Git** on. At Review, Git reads as not found. In another window run `winget install --id Git.Git -e` (it may ask for Windows' own permission prompt). Back in the console press **Recheck** — do not restart the console. | Git reads as found with its version. If it does not: record it, then check `where.exe git` in a new PowerShell. |
+| W6 | Create the project: name `notebook`, description `simple notebook no login`, stack: empty project, environment: local. | All steps finish; the project opens with its first work item. |
+| W7 | Start the first work item with Codex (**Run now**). | The chat shows the agent working; the task reads **Working**. |
+| W8 | When the agent asks a question (for example where notes are stored), the chat reads **Waiting for your input — PF-0001**. Press **Answer the question**, choose browser-only storage, submit. | The toast says the answer was **delivered** and the agent works again; the task leaves "Needs you". The item's Verification tab says why there is no run yet (never a blank). |
+| W9 | Let the agent build a small runnable app (for example a Vite or plain Node notebook). | The work item reaches verification and DONE with its evidence; the project folder has a runnable app. |
+| W10 | Run tab → **Find services** (Analyze) → review the plan → save. | The development service is listed with its command (for example `npm run dev`) and port. The page is the normal Run page, not an "unsupported" page. |
+| W11 | **Review and trust** the service, then **Start**. | It reads **running**; the port shows ●. No console window pops up. The log shows the dev server's output. |
+| W12 | Open the app from **Open quickly**. | The app loads in the browser. |
+| W13 | Under the running service the note says Stop ends it at once. Press **Stop**, then **Start**, then **Restart**. | Each finishes with the right state. After Stop the port no longer answers. |
+| W14 | After the last Stop, check for orphans: `Get-CimInstance Win32_Process -Filter "Name='node.exe'" \| Select-Object ProcessId,ParentProcessId,CommandLine` and `netstat -ano \| findstr :<port>`. | No `node.exe` of the service (npm, the dev server or esbuild) is left, and nothing listens on its port. Other node processes (the console itself) are untouched. |
+| W15 | Start the service again. Stop the console with Ctrl+C, close its window, open a **new** PowerShell, run `yallaflow console`, open the Run tab. | The service still runs (the app still loads), the Run tab shows it **running**, and Stop ends it (repeat W14). |
+
+Extra checks for W:
+
+- **Second console.** With one console running, start another in a second window. Its terminal says that another YallaFlow console is still running on port 4747 and that the new one uses 4748. Both pages work; preferences and the unfinished New Project form are the same on both.
+- **Identity safety.** While the service runs, end its process yourself in Task Manager, start any other program, then press Stop in the console. The console reports it as not running or unmanaged and **never ends a process it did not start**.
+- **Compose.** In a project with a `docker-compose.yml` service, the card says Docker Compose is not started from YallaFlow on Windows yet and offers no Start or Stop; the other services work.
+
 ## Result
 
-| System and version | Date | Who | A | B | C | D | E | F | Notes |
-|---|---|---|---|---|---|---|---|---|---|
-| Windows 11 | | | | | | | | | |
-| macOS | | | | | | | | | |
+| System and version | Date | Who | A | B | C | D | E | F | W | Notes |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Windows 11 | | | | | | | | | | |
+| macOS | | | | | | | | | n/a | |

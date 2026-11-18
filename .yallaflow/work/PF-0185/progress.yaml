@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-18T16:06:21.794Z",
+      "completedAt": "2026-11-18T16:06:21.989Z",
+      "summary": "Release state checked 2026-11-18: npm versions end at 1.5.4 (dist-tags latest 1.5.4); yallaflow@1.5.5 not published; git tags end at v1.5.4 on 9edf610; main at 1e63e03; working branch feature/phase1-onboarding with the uncommitted 1.6.0-rc.1 preparation (PF-0172..PF-0181) plus PF-0182..PF-0184. Release policy (docs/releasing.md, .github/workflows/release.yml): tag v+version on main, GitHub Release non-prerelease publishes with --tag latest after guard, tests on Node 20/22/24 and the platform job on windows/macos/ubuntu runners. No release policy requires a manual real-device run.",
+      "evidence": [
+        "docs/releasing.md",
+        ".github/workflows/release.yml"
+      ]
+    },
+    "implementation-planning": {
+      "status": "completed",
+      "startedAt": "2026-11-18T16:06:22.398Z",
+      "completedAt": "2026-11-18T16:06:22.604Z",
+      "summary": "Plan: (1) version 1.6.0-rc.1 -> 1.5.5 in package.json, package-lock.json, src/version.js, two version tests; docs that say 1.6.0 -> 1.5.5. SemVer note: 1.5.5 carries new backward-compatible features (would normally be a minor); the owner chose 1.5.5 deliberately; no breaking change (additive runtime capabilities field, additive optional config block, new commands only). (2) CHANGELOG [1.5.5] stable section, README What's new, .github/release-notes/v1.5.5.md. (3) Independent review of PF-0182..0184 on an isolated copy. (4) Full suite, tw.css scratch check, npm audit, npm pack + isolated smoke. (5) Push branch; CI on Windows/macOS/Ubuntu must pass before tagging. (6) Commit, fast-forward main, annotated tag v1.5.5, push main+tag, GitHub Release (non-prerelease) as engmohamedamer; release.yml publishes npm latest with provenance; verify registry, provenance, install. Stop before publication if any gate fails."
+    },
+    "implementation": {
+      "status": "pending"
+    },
+    "verification": {
+      "status": "pending"
+    },
+    "code-review": {
+      "status": "pending"
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-18T16:06:22.604Z"
+}

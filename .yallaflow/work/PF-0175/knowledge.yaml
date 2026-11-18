@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "Console state that must survive a restart or a port change lives in user-level files beside console.json (preferences.json incl. recentFolders, new-project-draft.json, console-instances.json), never in browser storage alone: browser storage is per origin and the console moves to the next port when 4747 is taken. onboarding.completed is set by the server when a project joins the console, not when an intent is clicked.",
+      "evidence": [
+        "src/console/drafts.js",
+        "src/console/preferences.js",
+        "src/console/instances.js"
+      ],
+      "confidence": "confirmed",
+      "provenance": "repository",
+      "status": "promoted",
+      "createdAt": "2026-11-18T11:26:55.207Z",
+      "factId": "CTX-0184",
+      "promotedAt": "2026-11-18T11:26:55.542Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-18T11:26:55.542Z",
+  "reviewedAt": "2026-11-18T11:26:55.542Z"
+}

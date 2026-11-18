@@ -1,0 +1,43 @@
+{
+  "id": "PF-0182",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "macOS: the copyable Claude Code launch command uses project-relative --mcp-config/--settings paths, so run from a new terminal (home folder) Claude reads settings from the home directory; make the command work from any folder and add regression coverage",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-18T15:39:00.720Z",
+  "updatedAt": "2026-11-18T15:42:24.379Z",
+  "title": "macOS: the copyable Claude Code launch command uses project-relative --mcp-config/--settings paths, so run from a new terminal (home folder) Claude reads settings from the home directory; make the command work from any folder and add regression coverage",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-11-18T15:39:00.811Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-18T15:42:24.379Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

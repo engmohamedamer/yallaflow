@@ -1,0 +1,218 @@
+
+> yallaflow@1.6.0-rc.1 test:platform
+> node --import ./test-support/isolate-user-config.js --test test/runtime-lifecycle-os.test.js test/runtime-windows.test.js test/fresh-path.test.js test/command-platform.test.js test/console-run-windows.test.js test/console-machine-readiness.test.js
+
+TAP version 13
+# Subtest: the child environment is an allow-list; Windows adds the system variables its programs need
+ok 1 - the child environment is an allow-list; Windows adds the system variables its programs need
+  ---
+  duration_ms: 6.477684
+  type: 'test'
+  ...
+# Subtest: simulated Windows: npx is started as npm's own script with node, never through a shell
+ok 2 - simulated Windows: npx is started as npm's own script with node, never through a shell
+  ---
+  duration_ms: 10.436787
+  type: 'test'
+  ...
+# Subtest: simulated Windows: Composer's installer shim is started as php.exe with composer.phar
+ok 3 - simulated Windows: Composer's installer shim is started as php.exe with composer.phar
+  ---
+  duration_ms: 8.819299
+  type: 'test'
+  ...
+# Subtest: simulated Windows: a missing tool is "not found"; a native .exe starts as itself; an unknown script is refused
+ok 4 - simulated Windows: a missing tool is "not found"; a native .exe starts as itself; an unknown script is refused
+  ---
+  duration_ms: 10.657397
+  type: 'test'
+  ...
+# Subtest: Linux (real files) and simulated macOS: a tool is the executable file on an absolute PATH folder
+ok 5 - Linux (real files) and simulated macOS: a tool is the executable file on an absolute PATH folder
+  ---
+  duration_ms: 27.357363
+  type: 'test'
+  ...
+# Subtest: a plan's prerequisite check finds tools through the shared lookup (real processes on this machine)
+ok 6 - a plan's prerequisite check finds tools through the shared lookup (real processes on this machine)
+  ---
+  duration_ms: 52.772868
+  type: 'test'
+  ...
+# Subtest: Codex: installed, signed in and connection are three separate states with one next step
+ok 7 - Codex: installed, signed in and connection are three separate states with one next step
+  ---
+  duration_ms: 4.636377
+  type: 'test'
+  ...
+# Subtest: Claude Code: experimental everywhere, never "verified" ahead of a session, and shown on every system
+ok 8 - Claude Code: experimental everywhere, never "verified" ahead of a session, and shown on every system
+  ---
+  duration_ms: 1.831106
+  type: 'test'
+  ...
+# Subtest: a saved preferred agent is a wish: offered only when available, with the readiness computed now
+ok 9 - a saved preferred agent is a wish: offered only when available, with the readiness computed now
+  ---
+  duration_ms: 0.73358
+  type: 'test'
+  ...
+# Subtest: console: /api/machine carries the readiness; nothing is written; never in a read-only console
+ok 10 - console: /api/machine carries the readiness; nothing is written; never in a read-only console
+  ---
+  duration_ms: 172.609047
+  type: 'test'
+  ...
+# Subtest: the page: Claude Code on simulated Windows is shown, marked Experimental and not verified, with three separate states
+ok 11 - the page: Claude Code on simulated Windows is shown, marked Experimental and not verified, with three separate states
+  ---
+  duration_ms: 8.406799
+  type: 'test'
+  ...
+# Subtest: the page: the usual agent is listed first and marked, and still needs the click that enables it
+ok 12 - the page: the usual agent is listed first and marked, and still needs the click that enables it
+  ---
+  duration_ms: 7.028915
+  type: 'test'
+  ...
+# Subtest: Windows: a trusted service can be started and stopped; a running one says that Stop is forceful
+ok 13 - Windows: a trusted service can be started and stopped; a running one says that Stop is forceful
+  ---
+  duration_ms: 20.875261
+  type: 'test'
+  ...
+# Subtest: Windows: a Docker Compose service shows why it is not started here and offers no Start or Stop
+ok 14 - Windows: a Docker Compose service shows why it is not started here and offers no Start or Stop
+  ---
+  duration_ms: 6.765321
+  type: 'test'
+  ...
+# Subtest: the platform note: what is not verified, the forceful stop and Compose on Windows; nothing on Linux; no lifecycle on an unknown system
+ok 15 - the platform note: what is not verified, the forceful stop and Compose on Windows; nothing on Linux; no lifecycle on an unknown system
+  ---
+  duration_ms: 10.023886
+  type: 'test'
+  ...
+# Subtest: the Run page is never replaced by an "unsupported" page; an empty project shows its own empty state first
+ok 16 - the Run page is never replaced by an "unsupported" page; an empty project shows its own empty state first
+  ---
+  duration_ms: 3.716271
+  type: 'test'
+  ...
+# Subtest: reg query output: the Path value and its type
+ok 17 - reg query output: the Path value and its type
+  ---
+  duration_ms: 4.484375
+  type: 'test'
+  ...
+# Subtest: merge: the current PATH stays first; only new absolute folders are added; unexpanded ones are skipped
+ok 18 - merge: the current PATH stays first; only new absolute folders are added; unexpanded ones are skipped
+  ---
+  duration_ms: 1.35589
+  type: 'test'
+  ...
+# Subtest: Windows: Git installed after the console started is found from the registry Path, under the Path name the process uses
+ok 19 - Windows: Git installed after the console started is found from the registry Path, under the Path name the process uses
+  ---
+  duration_ms: 5.12475
+  type: 'test'
+  ...
+# Subtest: a registry that cannot be read leaves the environment as it was; Linux and macOS are unchanged
+ok 20 - a registry that cannot be read leaves the environment as it was; Linux and macOS are unchanged
+  ---
+  duration_ms: 1.30642
+  type: 'test'
+  ...
+# Subtest: known install folders are for a diagnostic only
+ok 21 - known install folders are for a diagnostic only
+  ---
+  duration_ms: 1.019286
+  type: 'test'
+  ...
+# Subtest: a second console says an earlier console holds the usual port, instead of moving silently
+ok 22 - a second console says an earlier console holds the usual port, instead of moving silently
+  ---
+  duration_ms: 28.072304
+  type: 'test'
+  ...
+# Subtest: real processes on linux: start, find again, stop the whole tree, restart
+ok 23 - real processes on linux: start, find again, stop the whole tree, restart
+  ---
+  duration_ms: 3965.90967
+  type: 'test'
+  ...
+# Subtest: real processes on linux: a record whose identity no longer matches is never signalled; a taken port starts nothing
+ok 24 - real processes on linux: a record whose identity no longer matches is never signalled; a taken port starts nothing
+  ---
+  duration_ms: 1337.792766
+  type: 'test'
+  ...
+# Subtest: Windows: a Docker Compose service is refused before anything runs; other services stay usable
+ok 25 - Windows: a Docker Compose service is refused before anything runs; other services stay usable # SKIP Windows only
+  ---
+  duration_ms: 0.560637
+  type: 'test'
+  ...
+# Subtest: process table: pid, parent, creation time and name from the fixed query; unusable lines are skipped
+ok 26 - process table: pid, parent, creation time and name from the fixed query; unusable lines are skipped
+  ---
+  duration_ms: 7.408027
+  type: 'test'
+  ...
+# Subtest: descendants: the whole tree by parent link, never a process created before its parent, never from a leader that changed
+ok 27 - descendants: the whole tree by parent link, never a process created before its parent, never from a leader that changed
+  ---
+  duration_ms: 2.089577
+  type: 'test'
+  ...
+# Subtest: stop: the verified leader and each process it started are ended one by one; nothing else
+ok 28 - stop: the verified leader and each process it started are ended one by one; nothing else
+  ---
+  duration_ms: 2.320013
+  type: 'test'
+  ...
+# Subtest: review finding 1: a leader pid now held by another program — nothing at all is signalled, not even its children
+ok 29 - review finding 1: a leader pid now held by another program — nothing at all is signalled, not even its children
+  ---
+  duration_ms: 0.765786
+  type: 'test'
+  ...
+# Subtest: a child started during the stop is included; a reused pid of a member is not expanded
+ok 30 - a child started during the stop is included; a reused pid of a member is not expanded
+  ---
+  duration_ms: 3.520348
+  type: 'test'
+  ...
+# Subtest: an unreadable process table signals nothing and is reported as such
+ok 31 - an unreadable process table signals nothing and is reported as such
+  ---
+  duration_ms: 1.360103
+  type: 'test'
+  ...
+# Subtest: netstat: listening TCP sockets with their pid, whatever the language of the state column
+ok 32 - netstat: listening TCP sockets with their pid, whatever the language of the state column
+  ---
+  duration_ms: 1.42713
+  type: 'test'
+  ...
+# Subtest: a Windows service gets the system variables programs need, and still no credential
+ok 33 - a Windows service gets the system variables programs need, and still no credential
+  ---
+  duration_ms: 1.355222
+  type: 'test'
+  ...
+# Subtest: capabilities: Windows runs services but not Compose, and stops forcefully; only Linux is verified on a real machine
+ok 34 - capabilities: Windows runs services but not Compose, and stops forcefully; only Linux is verified on a real machine
+  ---
+  duration_ms: 2.26228
+  type: 'test'
+  ...
+1..34
+# tests 34
+# suites 0
+# pass 33
+# fail 0
+# cancelled 0
+# skipped 1
+# todo 0
+# duration_ms 5632.451562

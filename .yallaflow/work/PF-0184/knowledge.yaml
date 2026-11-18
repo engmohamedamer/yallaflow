@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "yallaflow branches (src/core/branches.js) is read-only Branch Health: it uses only reading Git subcommands (rev-parse, config --get, rev-list, log, merge-base, status with optional locks off) and previews merges through execution/git-ops.js previewMergeIsolated, which runs merge-tree with a temporary object store (repository objects as an alternate) so no object, ref or index entry is added; an optional branches block in config.yaml sets the flow, otherwise it is detected from branch names.",
+      "evidence": [
+        "src/core/branches.js",
+        "src/execution/git-ops.js",
+        "verification:V-002"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-18T16:05:46.915Z",
+      "factId": "CTX-0190",
+      "promotedAt": "2026-11-18T16:05:47.125Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-18T16:05:47.125Z",
+  "reviewedAt": "2026-11-18T16:05:47.125Z"
+}

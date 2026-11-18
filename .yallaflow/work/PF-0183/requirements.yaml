@@ -1,0 +1,198 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "A read-only project health check classifies an existing YallaFlow project as Healthy, Update available, Repairable, Needs manual review, or Unsafe to update, reusing doctor, the workspace assessment, agent-contract and bootstrap inspection, and compatibility checks, with actionable messages instead of raw internal errors.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T15:43:52.804Z",
+      "updatedAt": "2026-11-18T15:43:52.804Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "A safe refresh of YallaFlow-managed integration files offers Check for updates, Preview changes and Refresh YallaFlow integration; it updates only managed blocks with a hash-based ownership rule, never silently overwrites customizations, requires explicit conflict resolution, keeps backups with restore, is idempotent, recovers from interruption, verifies after writing, and never writes through links or outside the project, nor runs Git.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T15:43:52.804Z",
+      "updatedAt": "2026-11-18T15:43:52.804Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "Projects created by older YallaFlow versions keep tasks, memory, decisions, evidence and preferences: the health check never writes, and the refresh never touches historical or user-owned files.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T15:43:52.804Z",
+      "updatedAt": "2026-11-18T15:43:52.804Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "yallaflow health [--json] reports one overall class (worst finding wins) and findings for: missing/damaged managed files, outdated agent instructions, missing agent integration files, project/version and schema compatibility, doctor integrity failures (work history, memory, sources, decisions, evidence links), projection drift, unsafe links inside the workspace or at managed paths, an interrupted refresh; each finding has plain-language text and a next step.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T15:43:52.804Z",
+      "updatedAt": "2026-11-18T15:43:52.804Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-001",
+      "statement": "The health check writes nothing: a byte-for-byte snapshot of the project tree (including .yallaflow and .git) is identical before and after, on a current project and on older fixtures.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T15:43:52.804Z",
+      "updatedAt": "2026-11-18T15:43:52.804Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-002",
+      "statement": "refresh check and refresh preview write nothing; preview shows each planned file change; apply changes only .yallaflow/AGENT.md and the AGENTS.md/CLAUDE.md bootstrap blocks, only when the block is unmodified (recorded hash) and older, or the file is a known generated template; text outside the managed blocks is byte-identical afterwards.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T15:43:52.804Z",
+      "updatedAt": "2026-11-18T15:43:52.804Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-002",
+      "statement": "A managed block edited by hand (or customized legacy AGENT.md) is reported as a conflict and left untouched unless the developer passes --resolve FILE=keep or --resolve FILE=preserve (install the current block and keep the edited text verbatim); a newer, broken, or unclassifiable block is refused with the reason.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T15:43:52.804Z",
+      "updatedAt": "2026-11-18T15:43:52.804Z"
+    },
+    {
+      "id": "AC-005",
+      "requirement": "REQ-002",
+      "statement": "Before any write, apply stores a backup of every file it will change and a manifest under .yallaflow/local/backups; refresh restore puts the files back (refusing a file changed since the refresh); a refresh interrupted after a partial write is reported by health and can be restored or completed; a second apply changes nothing.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T15:43:52.804Z",
+      "updatedAt": "2026-11-18T15:43:52.804Z"
+    },
+    {
+      "id": "AC-006",
+      "requirement": "REQ-002",
+      "statement": "A managed path that is a link leaving its folder, a dangling link, a non-regular file, or a linked .yallaflow folder is refused with nothing written; refresh never runs Git; after writing it re-inspects every file and reports anything not current.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T15:43:52.804Z",
+      "updatedAt": "2026-11-18T15:43:52.804Z"
+    },
+    {
+      "id": "AC-007",
+      "requirement": "REQ-003",
+      "statement": "On older workspace fixtures (v0.3.6 workspace, v1.0.0 agent) health runs without writing and refresh changes only the managed blocks; work records, progress and evidence ledgers, context index, decisions and sources are byte-identical after a refresh.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T15:43:52.804Z",
+      "updatedAt": "2026-11-18T15:43:52.804Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-18T15:43:52.804Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-18T15:43:52.804Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-18T15:43:52.804Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-18T15:43:52.804Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-18T15:43:52.804Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-18T15:43:52.804Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-11-18T15:43:52.804Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-005",
+      "at": "2026-11-18T15:43:52.804Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-006",
+      "at": "2026-11-18T15:43:52.804Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-007",
+      "at": "2026-11-18T15:43:52.804Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-18T15:43:52.804Z"
+}

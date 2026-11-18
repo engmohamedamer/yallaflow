@@ -12,6 +12,7 @@
 //
 // Windows and macOS behavior here is exercised with injected platform data only; it is not
 // verified on those systems.
+import path from 'node:path';
 import { envValue, launchSpec, which } from '../agents/detect.js';
 
 // What Windows programs need to start, find the user's folders and reach the network. None
@@ -33,6 +34,14 @@ export function safeEnvironment(names, source = process.env, platform = process.
     if (typeof value === 'string') env[name] = value;
   }
   return env;
+}
+
+// A Windows system program (reg.exe, taskkill.exe) by its full path in System32, never by a
+// PATH lookup: a folder earlier on PATH cannot put its own program in its place.
+export function windowsSystemProgram(name, env = process.env) {
+  const root = envValue(env, 'SystemRoot', 'win32') ?? envValue(env, 'windir', 'win32');
+  const base = typeof root === 'string' && path.win32.isAbsolute(root) && !/[%$]/.test(root) ? root : 'C:\\Windows';
+  return path.win32.join(base, 'System32', name);
 }
 
 // → { ok: true, file, args } to pass to spawn/execFile with shell:false, or

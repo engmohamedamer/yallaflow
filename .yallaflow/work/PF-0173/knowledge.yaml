@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "architecture",
+      "source": "implementation-runtime",
+      "summary": "On Windows, tools installed while the console runs are found without a restart: src/utils/fresh-path.js toolEnvironment() adds the folders of the current registry Path (HKLM Session Manager Environment and HKCU Environment, read with System32 reg.exe, argv only) after the console's own PATH. Tool probes, tool runs, machine setup and new agent sessions all use it so lookup and execution agree; it never writes the system PATH and is a no-op on Linux and macOS.",
+      "evidence": [
+        "src/utils/fresh-path.js",
+        "src/newproject/project.js",
+        "src/agents/bridge.js"
+      ],
+      "confidence": "inferred",
+      "provenance": "repository",
+      "status": "promoted",
+      "createdAt": "2026-11-18T11:18:14.390Z",
+      "factId": "CTX-0182",
+      "promotedAt": "2026-11-18T11:18:14.733Z",
+      "target": "context/architecture.md"
+    }
+  ],
+  "updatedAt": "2026-11-18T11:18:14.733Z",
+  "reviewedAt": "2026-11-18T11:18:14.733Z"
+}

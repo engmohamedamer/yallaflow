@@ -15702,7 +15702,544 @@
       ],
       "createdAt": "2026-11-17T09:54:57.215Z",
       "updatedAt": "2026-11-17T09:54:57.215Z"
+    },
+    {
+      "id": "CTX-0181",
+      "area": "convention",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Every child process YallaFlow starts gets an allow-listed environment built by safeEnvironment (src/utils/command.js), which on Windows adds the system variables programs need (Path in any case, APPDATA, SystemRoot, TEMP, PATHEXT, ComSpec, ...). A hand-written POSIX-only allow-list breaks Windows children: npm then cannot expand its builtin prefix=${APPDATA}\\npm (seen on a real Windows 11 machine in the 1.5.4 trial).",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0172",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/utils/command.js",
+          "contentHash": "sha256:2b2c2b82934d0a6304128155734698eeb75459b83a0fbb977f74aee78cbce271",
+          "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/agents/setup.js",
+          "contentHash": "sha256:6c011cd93213180ffe78a4008faf23033153de9b2f5bdd82890b3a7fe1c71884",
+          "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+          "workingTree": "modified"
+        }
+      ],
+      "verifiedAt": "2026-11-18T11:12:19.147Z",
+      "verifiedAtCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-18T11:12:19.147Z",
+          "workId": "PF-0172",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-18T11:12:19.147Z",
+      "updatedAt": "2026-11-18T11:12:19.147Z"
+    },
+    {
+      "id": "CTX-0182",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "inferred",
+      "summary": "On Windows, tools installed while the console runs are found without a restart: src/utils/fresh-path.js toolEnvironment() adds the folders of the current registry Path (HKLM Session Manager Environment and HKCU Environment, read with System32 reg.exe, argv only) after the console's own PATH. Tool probes, tool runs, machine setup and new agent sessions all use it so lookup and execution agree; it never writes the system PATH and is a no-op on Linux and macOS.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0173",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/utils/fresh-path.js",
+          "contentHash": "sha256:288ad195696f133d1774d5c73b88d4c8dfc71548384915f602368ba69a730afc",
+          "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/newproject/project.js",
+          "contentHash": "sha256:1e492b8dfd2eb841d3bcb43f6eaf805adbf261c42a57f453970c43533d6253a6",
+          "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/agents/bridge.js",
+          "contentHash": "sha256:24235beb563543411c7dda7be454b33677cbdcb618bdd3e7dc1b15c73aff5181",
+          "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+          "workingTree": "modified"
+        }
+      ],
+      "verifiedAt": "2026-11-18T11:18:14.733Z",
+      "verifiedAtCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-18T11:18:14.733Z",
+          "workId": "PF-0173",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-18T11:18:14.733Z",
+      "updatedAt": "2026-11-18T11:18:14.733Z"
+    },
+    {
+      "id": "CTX-0183",
+      "area": "business-rule",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Answering an agent's question in the console records it through Core (yallaflow question answer) and, only when the item's own Codex session is idle with no open approval, also sends it to that session; the console reports delivery as sent only after the agent's turn started, otherwise says busy, other-item, manual (Claude Code), no-session or failed. A task whose question was answered without a new turn waits for the developer's reply (needs-you: reply), never shows working.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0174",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/console/actions.js",
+          "contentHash": "sha256:b40451651c58fbea0fc30ac14b8fa19fa0ad2d00a3ccf64a6ece680a97e52aac",
+          "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/execution/model.js",
+          "contentHash": "sha256:4d7066d41c8d1bdd2ac38b930ba5b6462954bcec14b57cea62755090e2349dc3",
+          "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+          "workingTree": "modified"
+        }
+      ],
+      "verifiedAt": "2026-11-18T11:24:00.363Z",
+      "verifiedAtCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-18T11:24:00.363Z",
+          "workId": "PF-0174",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-18T11:24:00.363Z",
+      "updatedAt": "2026-11-18T11:24:00.363Z"
+    },
+    {
+      "id": "CTX-0184",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Console state that must survive a restart or a port change lives in user-level files beside console.json (preferences.json incl. recentFolders, new-project-draft.json, console-instances.json), never in browser storage alone: browser storage is per origin and the console moves to the next port when 4747 is taken. onboarding.completed is set by the server when a project joins the console, not when an intent is clicked.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0175",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/console/drafts.js",
+          "contentHash": "sha256:740e6e4113a429d9bc40039993d8102a084ceca906c08cfedfaef2588f0f5de9",
+          "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/console/preferences.js",
+          "contentHash": "sha256:23d825f8194e3c33a108a3eefe905e85d8b203e664e2704589a5246396ec38dd",
+          "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/console/instances.js",
+          "contentHash": "sha256:fa2404d50fe3c61552db25b9c181c7fba0e781acd82cf98d6a38e1f2446297c2",
+          "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+          "workingTree": "untracked"
+        }
+      ],
+      "verifiedAt": "2026-11-18T11:26:55.542Z",
+      "verifiedAtCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-18T11:26:55.542Z",
+          "workId": "PF-0175",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-18T11:26:55.542Z",
+      "updatedAt": "2026-11-18T11:26:55.542Z"
+    },
+    {
+      "id": "CTX-0185",
+      "area": "architecture",
+      "state": "superseded",
+      "confidence": "inferred",
+      "summary": "The Run Manager supports Windows (PF-0176): process identity is pid plus creation time from one constant Win32_Process CIM query (System32 powershell.exe, argv only); stop is forceful there (System32 taskkill /T /F on a re-verified leader, tracked descendants killed only while their creation time matches, survivors reported); services launch through the shared resolveCommand (.cmd shims become node + script) with safeEnvironment and the refreshed PATH, detached and hidden; Docker Compose lifecycle is refused on Windows (RUNTIME_COMPOSE_WINDOWS). runtimeStatus carries capabilities { lifecycle, compose, gracefulStop, verified }.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0176",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/runtime/process.js",
+          "contentHash": "sha256:dde205b8353209e562fcaffffddbc74a7cddede80586ed7ee1c07bda5731dd3b",
+          "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/runtime/supervisor.js",
+          "contentHash": "sha256:0455fea911596fa8daeaeaa492481142c4163d4f4ccafc4c697a80efc7e6eef1",
+          "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+          "workingTree": "modified"
+        }
+      ],
+      "verifiedAt": "2026-11-18T11:38:42.894Z",
+      "verifiedAtCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+      "supersedes": [],
+      "supersededBy": "CTX-0187",
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-18T11:38:42.894Z",
+          "workId": "PF-0176",
+          "candidateId": "K-001"
+        },
+        {
+          "action": "superseded",
+          "at": "2026-11-18T13:03:20.862Z",
+          "supersededBy": "CTX-0187",
+          "workId": "PF-0181",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-18T11:38:42.894Z",
+      "updatedAt": "2026-11-18T13:03:20.862Z"
+    },
+    {
+      "id": "CTX-0186",
+      "area": "convention",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "CI: .github/workflows/ci.yml runs the full suite (npm run check) on Ubuntu and the platform suite (npm run test:platform: real-process runtime lifecycle plus the Windows-rule suites) on windows-latest, macos-latest and ubuntu-latest for pushes and PRs; release.yml runs the same platform job before publish. The full suite is POSIX-only; a test that must pass on every OS belongs in test:platform.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0178",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": ".github/workflows/ci.yml",
+          "contentHash": "sha256:f3c508f60d1458c18b0de324cf6d86bd00b3c38d0c388913f65ad81a743ba77f",
+          "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "package.json",
+          "contentHash": "sha256:9b7b4f15987366fc92350609d3302b3808b47779ef1ef8e2b7d8e9e71eb4ccbc",
+          "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+          "workingTree": "modified"
+        }
+      ],
+      "verifiedAt": "2026-11-18T11:44:35.586Z",
+      "verifiedAtCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-18T11:44:35.586Z",
+          "workId": "PF-0178",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-18T11:44:35.586Z",
+      "updatedAt": "2026-11-18T11:44:35.586Z"
+    },
+    {
+      "id": "CTX-0187",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "inferred",
+      "summary": "The Run Manager supports Windows (PF-0176, revised by PF-0181): process identity is pid plus creation time from one constant Win32_Process CIM query (System32 powershell.exe, argv only), read asynchronously and kept briefly; an unreadable list makes identity 'unverifiable' (nothing signalled, no record cleared, a start whose identity cannot be recorded is refused). Stop is forceful and never uses taskkill /T: a tree is expanded only from a process whose pid and creation time match, children count only when created after their parent, each process is ended individually while its creation time matches, survivors are reported. Services launch through the shared resolveCommand (.cmd shims become node + script) with safeEnvironment and the refreshed PATH, not detached and with windowsHide (own hidden console). Docker Compose lifecycle is refused on Windows (RUNTIME_COMPOSE_WINDOWS). runtimeStatus carries capabilities { lifecycle, compose, gracefulStop, verified }.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0181",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/runtime/process.js",
+          "contentHash": "sha256:5cdb0749586fe84b5e345cde74953a6722cd374151b59ddb9e95cb802c0d3163",
+          "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+          "workingTree": "modified"
+        },
+        {
+          "type": "repository",
+          "path": "src/runtime/supervisor.js",
+          "contentHash": "sha256:4108fc6e44a11bdeea793bc53df6c1f4c314ae3f2282fa5ade4b621e30b6f25f",
+          "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+          "workingTree": "modified"
+        }
+      ],
+      "verifiedAt": "2026-11-18T13:03:20.862Z",
+      "verifiedAtCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+      "supersedes": [
+        "CTX-0185"
+      ],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-18T13:03:20.862Z",
+          "workId": "PF-0181",
+          "candidateId": "K-001",
+          "supersedes": "CTX-0185"
+        }
+      ],
+      "createdAt": "2026-11-18T13:03:20.862Z",
+      "updatedAt": "2026-11-18T13:03:20.862Z"
+    },
+    {
+      "id": "CTX-0188",
+      "area": "convention",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Commands the console shows for the developer to copy and run must work from any folder: on macOS/Linux they cd to the project first and name files by absolute single-quoted path; on Windows no project path is placed in PowerShell command text (it expands $(...) inside double quotes), so those keep project-relative names and are run in the project folder.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0182",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/agents/claude-files.js",
+          "contentHash": "sha256:7b14d32a60fd57ba1ef0705d6067a9802dff3375369a58ec7773d63e68cdfbe6",
+          "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+          "workingTree": "modified"
+        },
+        {
+          "type": "runtime",
+          "description": "node --import ./test-support/isolate-user-config.js --test test/agent-windows.test.js test/agent-claude-experimental.test.js test/project-setup.test.js test/shared-project.test.js (passed)",
+          "workId": "PF-0182",
+          "verificationRunId": "V-001"
+        }
+      ],
+      "verifiedAt": "2026-11-18T15:42:23.801Z",
+      "verifiedAtCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-18T15:42:23.801Z",
+          "workId": "PF-0182",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-18T15:42:23.801Z",
+      "updatedAt": "2026-11-18T15:42:23.801Z"
+    },
+    {
+      "id": "CTX-0189",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "yallaflow health (src/core/health.js) is a read-only five-class project check (healthy, update-available, repairable, manual-review, unsafe) built on assessWorkspace/doctor; yallaflow refresh (src/agent/refresh.js) updates only hash-provable managed text (AGENT.md contract block or known generated template, AGENTS.md/CLAUDE.md bootstrap blocks), is all-or-nothing on conflicts or refused files, backs up to .yallaflow/local/backups with a manifest (before/intended/after hashes), verifies afterwards, and restore refuses files changed since.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0183",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/agent/refresh.js",
+          "contentHash": "sha256:a7ab852f2ec1fcdcf143ff3da3488c7d41c20595bbd1f9ba94172e9fa67fe266",
+          "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/core/health.js",
+          "contentHash": "sha256:14963bcee82b4a1828bb9ebf572a47bb34008e6facd866506af919696d7fd1c4",
+          "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "node --import ./test-support/isolate-user-config.js --test test/health-refresh.test.js test/cli.test.js test/agent-bootstrap.test.js test/agent-bootstrap-security.test.js test/agent-contract.test.js test/upgrade-intelligence.test.js test/cli-help-safety.test.js test/recursive-help-safety.test.js test/help-payload-boundary.test.js test/workspace-lock.test.js test/shared-project.test.js (passed)",
+          "workId": "PF-0183",
+          "verificationRunId": "V-001"
+        }
+      ],
+      "verifiedAt": "2026-11-18T15:51:51.196Z",
+      "verifiedAtCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-18T15:51:51.196Z",
+          "workId": "PF-0183",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-18T15:51:51.196Z",
+      "updatedAt": "2026-11-18T15:51:51.196Z"
+    },
+    {
+      "id": "CTX-0190",
+      "area": "architecture",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "yallaflow branches (src/core/branches.js) is read-only Branch Health: it uses only reading Git subcommands (rev-parse, config --get, rev-list, log, merge-base, status with optional locks off) and previews merges through execution/git-ops.js previewMergeIsolated, which runs merge-tree with a temporary object store (repository objects as an alternate) so no object, ref or index entry is added; an optional branches block in config.yaml sets the flow, otherwise it is detected from branch names.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0184",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/core/branches.js",
+          "contentHash": "sha256:a4a2b4f0655041306c95feb4358a6ad60b1a5ca906d2dffd78a95e0f5221c0b6",
+          "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "repository",
+          "path": "src/execution/git-ops.js",
+          "contentHash": "sha256:4749c6020a35545414adae3607bcc3400619425724bc893ec8ae666ae73d867d",
+          "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+          "workingTree": "modified"
+        },
+        {
+          "type": "runtime",
+          "description": "node --import ./test-support/isolate-user-config.js --test test/branch-health.test.js test/health-refresh.test.js test/cli.test.js test/cli-help-safety.test.js test/recursive-help-safety.test.js test/help-payload-boundary.test.js test/agent-bootstrap.test.js test/shared-project.test.js test/doctor-integrity.test.js (passed)",
+          "workId": "PF-0184",
+          "verificationRunId": "V-002"
+        }
+      ],
+      "verifiedAt": "2026-11-18T16:05:47.125Z",
+      "verifiedAtCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-18T16:05:47.125Z",
+          "workId": "PF-0184",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-18T16:05:47.125Z",
+      "updatedAt": "2026-11-18T16:05:47.125Z"
+    },
+    {
+      "id": "CTX-0191",
+      "area": "business-rule",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "A refresh restore acts only on a backup manifest that this checkout wrote (manifest.root equals the checkout's real path) and only on the three managed paths (.yallaflow/AGENT.md, AGENTS.md, CLAUDE.md) with plain N.bak backup names; any other manifest is ignored, because .yallaflow/local can be committed to a repository by someone else.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0186",
+        "candidateId": "K-001"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/agent/refresh.js",
+          "contentHash": "sha256:c5b5463e52d74746582a4e2973e34e5bf900712ca4e4ceb57593d75f9d1d97eb",
+          "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "node --import ./test-support/isolate-user-config.js --test (passed)",
+          "workId": "PF-0186",
+          "verificationRunId": "V-001"
+        }
+      ],
+      "verifiedAt": "2026-11-18T16:23:36.623Z",
+      "verifiedAtCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-18T16:23:36.623Z",
+          "workId": "PF-0186",
+          "candidateId": "K-001"
+        }
+      ],
+      "createdAt": "2026-11-18T16:23:36.623Z",
+      "updatedAt": "2026-11-18T16:23:36.623Z"
+    },
+    {
+      "id": "CTX-0192",
+      "area": "convention",
+      "state": "current",
+      "confidence": "confirmed",
+      "summary": "Read-only Git analysis never reads the working tree (status/diff can run repository clean filters) and sets GIT_NO_LAZY_FETCH=1 (partial clones would otherwise fetch from the remote); when something cannot be checked the answer is Unknown, never an all-clear.",
+      "provenance": "repository",
+      "origin": {
+        "workId": "PF-0186",
+        "candidateId": "K-002"
+      },
+      "evidence": [
+        {
+          "type": "repository",
+          "path": "src/core/branches.js",
+          "contentHash": "sha256:feb62e03435f1ed769be66b43f76c1fd4d50e8f1d8ef0f5921ea1c20b07b5ffa",
+          "gitCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+          "workingTree": "untracked"
+        },
+        {
+          "type": "runtime",
+          "description": "node --import ./test-support/isolate-user-config.js --test (passed)",
+          "workId": "PF-0186",
+          "verificationRunId": "V-001"
+        }
+      ],
+      "verifiedAt": "2026-11-18T16:23:37.077Z",
+      "verifiedAtCommit": "1e63e0395e31b9b5190506347d40d758dc5f8132",
+      "supersedes": [],
+      "supersededBy": null,
+      "history": [
+        {
+          "action": "introduced",
+          "at": "2026-11-18T16:23:37.077Z",
+          "workId": "PF-0186",
+          "candidateId": "K-002"
+        }
+      ],
+      "createdAt": "2026-11-18T16:23:37.077Z",
+      "updatedAt": "2026-11-18T16:23:37.077Z"
     }
   ],
-  "updatedAt": "2026-11-17T09:54:57.215Z"
+  "updatedAt": "2026-11-18T16:23:37.077Z"
 }

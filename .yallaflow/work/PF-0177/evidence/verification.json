@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --import ./test-support/isolate-user-config.js --test test/console-run-windows.test.js test/console-run-fixes.test.js test/console-run-flow.test.js test/console-first-run.test.js test/console-ia.test.js test/runtime.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--import",
+        "./test-support/isolate-user-config.js",
+        "--test",
+        "test/console-run-windows.test.js",
+        "test/console-run-fixes.test.js",
+        "test/console-run-flow.test.js",
+        "test/console-first-run.test.js",
+        "test/console-ia.test.js",
+        "test/runtime.test.js"
+      ],
+      "displayCommand": "node --import ./test-support/isolate-user-config.js --test test/console-run-windows.test.js test/console-run-fixes.test.js test/console-run-flow.test.js test/console-first-run.test.js test/console-ia.test.js test/runtime.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-18T11:41:47.249Z",
+      "finishedAt": "2026-11-18T11:42:14.116Z",
+      "verifiedAt": "2026-11-18T11:42:14.116Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

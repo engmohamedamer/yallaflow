@@ -124,7 +124,9 @@ function runUi({ services, bulk = [], setupMsg = null, readOnly = false } = {}) 
   const context = vm.createContext({
     ...base(), readOnly, setupBusy: null, setupMsg, runtimeBusy: {}, runtimeLogs: {}, runtimeReview: {}, runtimeErr: {}, failedTail: {},
     runtime: { pid: 'p1', data: { services } }, route: () => ({ v: 'run' }), bulkable: () => services.filter((sv) => bulk.includes(sv.id)),
-    reviewPanel: () => '', sharedConfirm: () => '', openLinks: () => ''
+    reviewPanel: () => '', sharedConfirm: () => '', openLinks: () => '',
+    // PF-0177: a system that runs services (Linux); the Windows wording is in console-run-windows.test.js.
+    runtimeCaps: () => ({ platform: 'linux', lifecycle: true, compose: true, gracefulStop: true, verified: true })
   });
   vm.runInContext(`${cut('  const RT_STATE = {', '  // ---------- Analyze → Review and save')}\n${cut('  // PF-0140: up, but not started by YallaFlow', '  // ---------- agent setup on this machine')}\nthis.card = serviceCard; this.section = runSection;`, context);
   return context;

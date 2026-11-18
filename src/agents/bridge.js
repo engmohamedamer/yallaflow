@@ -4,6 +4,7 @@
 // - Session records and permission decisions live in .yallaflow/local/agent-sessions/
 //   (git-ignored). Transcripts stay with the provider; credentials are never touched.
 // - It never activates work, approves gates, or writes .yallaflow outside local/.
+import { toolEnvironment } from '../utils/fresh-path.js';
 import { createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import { lstat, readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -636,10 +637,13 @@ export class AgentBridge {
 
   async launch(project, slot, run) {
     try {
-      const detected = (await detectProviders({ env: this.env })).codex;
+      // PF-0173: a session started now gets the PATH a new terminal would get (on Windows the
+      // current registry Path is added), so the agent can use a tool installed since the console started.
+      const env = await toolEnvironment(this.env);
+      const detected = (await detectProviders({ env })).codex;
       if (!detected.ready) throw Object.assign(new Error(detected.problems.join(' ')), { status: 422, code: 'PROVIDER_UNAVAILABLE' });
       if (slot.cancelled) throw Object.assign(new Error('The console stopped before the session started.'), { status: 409, code: 'CANCELLED' });
-      slot.impl = this.newCodex(project, detected);
+      slot.impl = this.newCodex(project, detected, env);
       const result = await run(slot.impl);
       if (slot.cancelled || project.session !== slot) {
         await slot.impl.end();
@@ -708,11 +712,11 @@ export class AgentBridge {
     return this.sessionSummary(project);
   }
 
-  newCodex(project, detection) {
+  newCodex(project, detection, env = this.env) {
     const impl = new CodexSession({
       root: project.root,
       detection,
-      env: this.env,
+      env,
       emit: (event) => {
         // Events of a session that no longer owns the checkout's slot (a stopped or
         // superseded start) are dropped, and its process is ended.

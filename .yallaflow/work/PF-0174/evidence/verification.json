@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --test test/answer-delivery.test.js test/console-actions.test.js test/console-agent-errors.test.js test/console-execution.test.js test/execution-model.test.js test/execution-queue.test.js test/agent-continue.test.js test/agent-bridge.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--test",
+        "test/answer-delivery.test.js",
+        "test/console-actions.test.js",
+        "test/console-agent-errors.test.js",
+        "test/console-execution.test.js",
+        "test/execution-model.test.js",
+        "test/execution-queue.test.js",
+        "test/agent-continue.test.js",
+        "test/agent-bridge.test.js"
+      ],
+      "displayCommand": "node --test test/answer-delivery.test.js test/console-actions.test.js test/console-agent-errors.test.js test/console-execution.test.js test/execution-model.test.js test/execution-queue.test.js test/agent-continue.test.js test/agent-bridge.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-18T11:22:53.142Z",
+      "finishedAt": "2026-11-18T11:23:53.410Z",
+      "verifiedAt": "2026-11-18T11:23:53.410Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

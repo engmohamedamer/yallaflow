@@ -77,6 +77,7 @@ export function validateProjectConfig(config) {
     }
   }
   errors.push(...validateRequirementsConfig(config.requirements));
+  errors.push(...validateBranchesConfig(config.branches));
   errors.push(...validateQualityConfig(config.quality));
   if (config.shared === undefined) {
     if (config.schemaVersion === CONFIG_SCHEMA_SHARED) errors.push('config.yaml schema v2 requires a shared block (written by `yallaflow shared enable`).');
@@ -167,6 +168,26 @@ export function validateQualityConfig(block) {
   }
   return errors;
 }
+
+// The optional config.yaml block:
+//   "branches": { "flow": ["dev", "qc", "prod"], "hotfix": "hotfix/*", "remote": "origin" }
+// PF-0184 (1.5.5): optional Git Branch Health settings. Older YallaFlow versions ignore this
+// top-level block.
+export function validateBranchesConfig(block) {
+  if (block === undefined) return [];
+  const errors = [];
+  if (!block || typeof block !== 'object' || Array.isArray(block)) return ['config.yaml branches must be an object.'];
+  const unknown = Object.keys(block).filter((key) => !['flow', 'hotfix', 'remote'].includes(key));
+  if (unknown.length) errors.push(`config.yaml branches has unknown field(s): ${unknown.join(', ')}.`);
+  if (!Array.isArray(block.flow) || block.flow.length < 2 || block.flow.length > 8 || !block.flow.every(isBranchName) || new Set(block.flow).size !== block.flow.length) {
+    errors.push('config.yaml branches.flow must list 2 to 8 different branch names, from the first stage to production (for example ["dev", "qc", "prod"]).');
+  }
+  if (block.hotfix !== undefined && !validBranchPattern(block.hotfix)) errors.push('config.yaml branches.hotfix must be a branch name pattern such as "hotfix/*".');
+  if (block.remote !== undefined && !/^[A-Za-z0-9._-]{1,64}$/.test(String(block.remote))) errors.push('config.yaml branches.remote must be a remote name such as "origin".');
+  return errors;
+}
+
+const validBranchPattern = (value) => typeof value === 'string' && value.length <= 100 && /^[A-Za-z0-9._/*-]+$/.test(value) && !value.startsWith('-') && !value.includes('..');
 
 export function isBranchName(value) {
   return typeof value === 'string' && value.trim() === value && value.length > 0 &&

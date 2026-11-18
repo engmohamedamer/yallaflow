@@ -1,0 +1,43 @@
+{
+  "id": "PF-0172",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "W1: Codex install from the console fails on Windows — setup child env drops Path/APPDATA/SystemRoot, npm prefix resolves to an unexpanded ${APPDATA} path, probe and install use different working folders, cancel does not end the process tree on Windows",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-18T11:09:10.675Z",
+  "updatedAt": "2026-11-18T11:12:19.650Z",
+  "title": "W1: Codex install from the console fails on Windows — setup child env drops Path/APPDATA/SystemRoot, npm prefix resolves to an unexpanded ${APPDATA} path, probe and install use different working folders, cancel does not end the process tree on Windows",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-11-18T11:09:10.752Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-18T11:12:19.650Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

@@ -33,10 +33,11 @@ When it is on, the chat's agent picker offers **Codex** and **Claude Code (exper
 
 **Connecting:**
 1. Turn it on (above), open a work item's chat, choose **Claude Code**, and press **Connect Claude Code**.
-2. The panel shows one command. Run it yourself in the project folder:
+2. The panel shows one command. Run it yourself in a terminal. On macOS and Linux it starts by changing to the project folder and names the two files by their full path, so it works from any folder (since 1.5.5; before, a terminal opened in the home folder made Claude Code look for the settings there):
    ```bash
-   claude 'Run yallaflow brief, then wait for messages from the YallaFlow console.' --mcp-config .yallaflow/local/agent/claude-mcp.json --settings .yallaflow/local/agent/claude-settings.json --dangerously-load-development-channels server:yallaflow
+   cd '/path/to/project' && claude 'Run yallaflow brief, then wait for messages from the YallaFlow console.' --mcp-config '/path/to/project/.yallaflow/local/agent/claude-mcp.json' --settings '/path/to/project/.yallaflow/local/agent/claude-settings.json' --dangerously-load-development-channels server:yallaflow
    ```
+   On Windows run it in the project folder: the command names the files relative to it, because PowerShell would expand parts of a folder name placed inside the command.
    - The two files are git-ignored. They point Claude Code at YallaFlow's channel server and an observe-only hook script.
    - While the YallaFlow channel is not on Anthropic's channel allowlist, Claude Code shows a **development-channel warning**; the decision is yours.
    - `yallaflow agents claude-files` writes the same files from the CLI.

@@ -1,0 +1,45 @@
+{
+  "id": "PF-0183",
+  "type": "feature",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Project health check and safe YallaFlow integration refresh: read-only health classification (healthy, update available, repairable, needs manual review, unsafe to update), refresh check/preview/apply with ownership rules, conflict refusal for edited generated files, backups and restore, interrupted-refresh recovery, symlink and path refusal, verification after writing",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-18T15:39:01.202Z",
+  "updatedAt": "2026-11-18T15:51:51.855Z",
+  "title": "Project health check and safe YallaFlow integration refresh: read-only health classification (healthy, update available, repairable, needs manual review, unsafe to update), refresh check/preview/apply with ownership rules, conflict refusal for edited generated files, backups and restore, interrupted-refresh recovery, symlink and path refusal, verification after writing",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow feature --scope bounded`.",
+  "routedAt": "2026-11-18T15:39:01.298Z",
+  "workflow": "feature",
+  "requiredCapabilities": [
+    "discover",
+    "clarify",
+    "implement",
+    "verify",
+    "converge"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "requirement-clarification",
+      "implementation",
+      "verification",
+      "delivery-convergence"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-18T15:51:51.855Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

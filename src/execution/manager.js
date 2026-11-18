@@ -235,6 +235,7 @@ export class ExecutionManager {
     else if (item.lifecycle?.state === 'closed' || item.lifecycle?.state === 'on_hold') signal = { type: 'lifecycle', state: item.lifecycle.state };
     else if (item.waitingFor?.kind === 'review') signal = { type: 'review' };
     else if (item.waitingFor?.kind === 'question') signal = { type: 'question' };
+    else if (live.task.state === 'needs-you' && live.task.reason === 'question') signal = { type: 'question-answered' };
     else if (live.task.state === 'working' && this.bridge.glance(projectId)?.session?.status === 'idle') signal = { type: 'turn-ended' };
     return signal ? this.apply(lane, live.run, live.task, signal, `snapshot ${item.stage}`) : false;
   }

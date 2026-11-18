@@ -1,0 +1,645 @@
+TAP version 13
+# Subtest: AC-101: setup creates the provider file, or appends the block leaving existing content byte-for-byte
+ok 1 - AC-101: setup creates the provider file, or appends the block leaving existing content byte-for-byte
+  ---
+  duration_ms: 761.149821
+  type: 'test'
+  ...
+# Subtest: AC-102/AC-104: setup is idempotent and --dry-run writes nothing
+ok 2 - AC-102/AC-104: setup is idempotent and --dry-run writes nothing
+  ---
+  duration_ms: 714.339988
+  type: 'test'
+  ...
+# Subtest: AC-103: a hand-edited block is refused without --preserve-existing, then kept verbatim with it
+ok 3 - AC-103: a hand-edited block is refused without --preserve-existing, then kept verbatim with it
+  ---
+  duration_ms: 1303.066764
+  type: 'test'
+  ...
+# Subtest: AC-105/AC-106: status reads state from markers; refresh updates only unmodified outdated blocks and never downgrades
+ok 4 - AC-105/AC-106: status reads state from markers; refresh updates only unmodified outdated blocks and never downgrades
+  ---
+  duration_ms: 2740.585421
+  type: 'test'
+  ...
+# Subtest: AC-105: a broken block or another provider's block is reported, never rewritten
+ok 5 - AC-105: a broken block or another provider's block is reported, never rewritten
+  ---
+  duration_ms: 253.854331
+  type: 'test'
+  ...
+# Subtest: AC-107: provider blocks point to AGENT.md and never restate its rules
+ok 6 - AC-107: provider blocks point to AGENT.md and never restate its rules
+  ---
+  duration_ms: 2.204802
+  type: 'test'
+  ...
+# Subtest: AC-108: provider knowledge stays in src/agent and the agent command surface
+ok 7 - AC-108: provider knowledge stays in src/agent and the agent command surface
+  ---
+  duration_ms: 437.095841
+  type: 'test'
+  ...
+# Subtest: bootstrap files are classified as repository-root projections; help never writes
+ok 8 - bootstrap files are classified as repository-root projections; help never writes
+  ---
+  duration_ms: 1131.140542
+  type: 'test'
+  ...
+# Subtest: dev → qc → prod: readiness, production-only hotfix, back-merge conflict; nothing in the repository changes
+ok 9 - dev → qc → prod: readiness, production-only hotfix, back-merge conflict; nothing in the repository changes
+  ---
+  duration_ms: 985.906955
+  type: 'test'
+  ...
+# Subtest: a promotion that would conflict, and one where the upper branch has changes the lower lacks
+ok 10 - a promotion that would conflict, and one where the upper branch has changes the lower lacks
+  ---
+  duration_ms: 1285.655267
+  type: 'test'
+  ...
+# Subtest: configured flow, remote-tracking branches, divergence from upstream and stale fetch information
+ok 11 - configured flow, remote-tracking branches, divergence from upstream and stale fetch information
+  ---
+  duration_ms: 777.727141
+  type: 'test'
+  ...
+# Subtest: the merge preview writes no object into the repository; no flow and no repository are explained
+ok 12 - the merge preview writes no object into the repository; no flow and no repository are explained
+  ---
+  duration_ms: 463.527775
+  type: 'test'
+  ...
+# Subtest: branch settings: validation, the configure command, and the CLI report
+ok 13 - branch settings: validation, the configure command, and the CLI report
+  ---
+  duration_ms: 2958.664241
+  type: 'test'
+  ...
+# Subtest: start --help creates no work and prints help
+ok 14 - start --help creates no work and prints help
+  ---
+  duration_ms: 361.928645
+  type: 'test'
+  ...
+# Subtest: start -h creates no work
+ok 15 - start -h creates no work
+  ---
+  duration_ms: 316.741823
+  type: 'test'
+  ...
+# Subtest: verify --help never attempts to run a verification command
+ok 16 - verify --help never attempts to run a verification command
+  ---
+  duration_ms: 268.307248
+  type: 'test'
+  ...
+# Subtest: help is non-mutating across every command namespace
+ok 17 - help is non-mutating across every command namespace
+  ---
+  duration_ms: 7458.185539
+  type: 'test'
+  ...
+# Subtest: an unknown option returns an actionable error without mutating state
+ok 18 - an unknown option returns an actionable error without mutating state
+  ---
+  duration_ms: 229.411068
+  type: 'test'
+  ...
+# Subtest: exposes the YallaFlow product and CLI identity
+ok 19 - exposes the YallaFlow product and CLI identity
+  ---
+  duration_ms: 317.157628
+  type: 'test'
+  ...
+# Subtest: namespace help is concise and discoverable
+ok 20 - namespace help is concise and discoverable
+  ---
+  duration_ms: 897.817897
+  type: 'test'
+  ...
+# Subtest: doctor reports a healthy workspace with no work items
+ok 21 - doctor reports a healthy workspace with no work items
+  ---
+  duration_ms: 734.370918
+  type: 'test'
+  ...
+# Subtest: doctor detects a DONE stage with an incomplete implementation checkpoint
+ok 22 - doctor detects a DONE stage with an incomplete implementation checkpoint
+  ---
+  duration_ms: 869.537713
+  type: 'test'
+  ...
+# Subtest: doctor detects a completed verification checkpoint with no verification evidence
+ok 23 - doctor detects a completed verification checkpoint with no verification evidence
+  ---
+  duration_ms: 719.882426
+  type: 'test'
+  ...
+# Subtest: doctor detects an impossible DONE state missing required review/knowledge
+ok 24 - doctor detects an impossible DONE state missing required review/knowledge
+  ---
+  duration_ms: 776.637592
+  type: 'test'
+  ...
+# Subtest: doctor considers a healthy reopened work item passing
+ok 25 - doctor considers a healthy reopened work item passing
+  ---
+  duration_ms: 933.39171
+  type: 'test'
+  ...
+# Subtest: doctor accepts a completed gated checkpoint awaiting review at its stage, and flags work past an unapproved gate
+ok 26 - doctor accepts a completed gated checkpoint awaiting review at its stage, and flags work past an unapproved gate
+  ---
+  duration_ms: 4468.45202
+  type: 'test'
+  ...
+# Subtest: a new project is healthy; health, refresh check and preview write nothing
+ok 27 - a new project is healthy; health, refresh check and preview write nothing
+  ---
+  duration_ms: 1973.791363
+  type: 'test'
+  ...
+# Subtest: an older contract and bootstrap: update available, preview, apply only the managed blocks, idempotent, restore
+ok 28 - an older contract and bootstrap: update available, preview, apply only the managed blocks, idempotent, restore
+  ---
+  duration_ms: 946.102733
+  type: 'test'
+  ...
+# Subtest: a hand-edited managed block is a conflict: nothing is written until the developer resolves it
+ok 29 - a hand-edited managed block is a conflict: nothing is written until the developer resolves it
+  ---
+  duration_ms: 1622.448588
+  type: 'test'
+  ...
+# Subtest: missing AGENT.md and missing bootstraps are repairable; --add-missing adds the blocks
+ok 30 - missing AGENT.md and missing bootstraps are repairable; --add-missing adds the blocks
+  ---
+  duration_ms: 773.506154
+  type: 'test'
+  ...
+# Subtest: links: a managed file or workspace link leaving the project is unsafe and never written through
+ok 31 - links: a managed file or workspace link leaving the project is unsafe and never written through
+  ---
+  duration_ms: 1538.953383
+  type: 'test'
+  ...
+# Subtest: a block from a newer YallaFlow is refused; a project requiring a newer YallaFlow is unsafe to update
+ok 32 - a block from a newer YallaFlow is refused; a project requiring a newer YallaFlow is unsafe to update
+  ---
+  duration_ms: 1288.502509
+  type: 'test'
+  ...
+# Subtest: an interrupted refresh is reported and can be restored; restore refuses a file changed afterwards
+ok 33 - an interrupted refresh is reported and can be restored; restore refuses a file changed afterwards
+  ---
+  duration_ms: 432.122306
+  type: 'test'
+  ...
+# Subtest: older workspace fixture: health is read-only, refresh changes only AGENT.md and keeps all history
+ok 34 - older workspace fixture: health is read-only, refresh changes only AGENT.md and keeps all history
+  ---
+  duration_ms: 267.629732
+  type: 'test'
+  ...
+# Subtest: 1. `start --help` shows YallaFlow help and mutates nothing
+ok 35 - 1. `start --help` shows YallaFlow help and mutates nothing
+  ---
+  duration_ms: 411.559803
+  type: 'test'
+  ...
+# Subtest: 2. `baseline start --help` shows the baseline-start usage line and mutates nothing
+ok 36 - 2. `baseline start --help` shows the baseline-start usage line and mutates nothing
+  ---
+  duration_ms: 264.693517
+  type: 'test'
+  ...
+# Subtest: 3. `request revise --help` shows the request-revise usage line and mutates nothing
+ok 37 - 3. `request revise --help` shows the request-revise usage line and mutates nothing
+  ---
+  duration_ms: 302.152535
+  type: 'test'
+  ...
+# Subtest: 4. `verify <id> -- node --help` runs node --help as verification, not YallaFlow help
+ok 38 - 4. `verify <id> -- node --help` runs node --help as verification, not YallaFlow help
+  ---
+  duration_ms: 630.575171
+  type: 'test'
+  ...
+# Subtest: 5. `verify <id> -- npm test -- --help` treats everything after the separator as child argv
+ok 39 - 5. `verify <id> -- npm test -- --help` treats everything after the separator as child argv
+  ---
+  duration_ms: 493.743407
+  type: 'test'
+  ...
+# Subtest: 6. `start` with request text containing "--help" creates the intake normally
+ok 40 - 6. `start` with request text containing "--help" creates the intake normally
+  ---
+  duration_ms: 357.394451
+  type: 'test'
+  ...
+# Subtest: 7. `request revise` with option text containing "--help" revises normally, not treated as help
+ok 41 - 7. `request revise` with option text containing "--help" revises normally, not treated as help
+  ---
+  duration_ms: 405.146858
+  type: 'test'
+  ...
+# Subtest: nested YallaFlow help remains zero-mutation when a work-id is also present
+ok 42 - nested YallaFlow help remains zero-mutation when a work-id is also present
+  ---
+  duration_ms: 270.693372
+  type: 'test'
+  ...
+# Subtest: `--help` positioned before the -- separator still triggers YallaFlow help (it is unambiguously YallaFlow-scoped)
+ok 43 - `--help` positioned before the -- separator still triggers YallaFlow help (it is unambiguously YallaFlow-scoped)
+  ---
+  duration_ms: 287.42409
+  type: 'test'
+  ...
+# Subtest: `yallaflow start --help` exits successfully, shows usage, and mutates nothing
+ok 44 - `yallaflow start --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 679.697451
+  type: 'test'
+  ...
+# Subtest: `yallaflow start -h` exits successfully, shows usage, and mutates nothing
+ok 45 - `yallaflow start -h` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 452.315118
+  type: 'test'
+  ...
+# Subtest: `yallaflow baseline --help` exits successfully, shows usage, and mutates nothing
+ok 46 - `yallaflow baseline --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 568.264175
+  type: 'test'
+  ...
+# Subtest: `yallaflow baseline start --help` exits successfully, shows usage, and mutates nothing
+ok 47 - `yallaflow baseline start --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 638.184562
+  type: 'test'
+  ...
+# Subtest: `yallaflow baseline draft --help` exits successfully, shows usage, and mutates nothing
+ok 48 - `yallaflow baseline draft --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 589.41983
+  type: 'test'
+  ...
+# Subtest: `yallaflow baseline approve --help` exits successfully, shows usage, and mutates nothing
+ok 49 - `yallaflow baseline approve --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 532.820787
+  type: 'test'
+  ...
+# Subtest: `yallaflow request --help` exits successfully, shows usage, and mutates nothing
+ok 50 - `yallaflow request --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 391.340412
+  type: 'test'
+  ...
+# Subtest: `yallaflow request revise --help` exits successfully, shows usage, and mutates nothing
+ok 51 - `yallaflow request revise --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 522.666683
+  type: 'test'
+  ...
+# Subtest: `yallaflow verify --help` exits successfully, shows usage, and mutates nothing
+ok 52 - `yallaflow verify --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 574.50311
+  type: 'test'
+  ...
+# Subtest: `yallaflow verify list --help` exits successfully, shows usage, and mutates nothing
+ok 53 - `yallaflow verify list --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 446.582354
+  type: 'test'
+  ...
+# Subtest: `yallaflow decompose --help` exits successfully, shows usage, and mutates nothing
+ok 54 - `yallaflow decompose --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 543.541399
+  type: 'test'
+  ...
+# Subtest: `yallaflow decompose propose --help` exits successfully, shows usage, and mutates nothing
+ok 55 - `yallaflow decompose propose --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 564.944278
+  type: 'test'
+  ...
+# Subtest: `yallaflow checkpoint --help` exits successfully, shows usage, and mutates nothing
+ok 56 - `yallaflow checkpoint --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 367.351943
+  type: 'test'
+  ...
+# Subtest: `yallaflow knowledge --help` exits successfully, shows usage, and mutates nothing
+ok 57 - `yallaflow knowledge --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 336.848226
+  type: 'test'
+  ...
+# Subtest: `yallaflow question --help` exits successfully, shows usage, and mutates nothing
+ok 58 - `yallaflow question --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 257.554101
+  type: 'test'
+  ...
+# Subtest: `yallaflow requirement --help` exits successfully, shows usage, and mutates nothing
+ok 59 - `yallaflow requirement --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 199.988476
+  type: 'test'
+  ...
+# Subtest: `yallaflow requirement record PF-0001 --file requirements.json --help` exits successfully, shows usage, and mutates nothing
+ok 60 - `yallaflow requirement record PF-0001 --file requirements.json --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 284.467226
+  type: 'test'
+  ...
+# Subtest: `yallaflow convergence record PF-0001 --file convergence.json -h` exits successfully, shows usage, and mutates nothing
+ok 61 - `yallaflow convergence record PF-0001 --file convergence.json -h` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 244.667847
+  type: 'test'
+  ...
+# Subtest: `yallaflow impact assess PF-0001 --file impact.json --help` exits successfully, shows usage, and mutates nothing
+ok 62 - `yallaflow impact assess PF-0001 --file impact.json --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 180.909365
+  type: 'test'
+  ...
+# Subtest: `yallaflow agent setup claude --help` exits successfully, shows usage, and mutates nothing
+ok 63 - `yallaflow agent setup claude --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 188.990525
+  type: 'test'
+  ...
+# Subtest: `yallaflow intake ticket --help` exits successfully, shows usage, and mutates nothing
+ok 64 - `yallaflow intake ticket --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 177.975119
+  type: 'test'
+  ...
+# Subtest: `yallaflow intake ticket github:acme/shop\#7 --fetch --attachments --help` exits successfully, shows usage, and mutates nothing
+ok 65 - `yallaflow intake ticket github:acme/shop\#7 --fetch --attachments --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 178.258718
+  type: 'test'
+  ...
+# Subtest: `yallaflow qc --help` exits successfully, shows usage, and mutates nothing
+ok 66 - `yallaflow qc --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 253.096679
+  type: 'test'
+  ...
+# Subtest: `yallaflow qc record PF-0001 --file result.json --help` exits successfully, shows usage, and mutates nothing
+ok 67 - `yallaflow qc record PF-0001 --file result.json --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 366.00077
+  type: 'test'
+  ...
+# Subtest: `yallaflow demo --help` exits successfully, shows usage, and mutates nothing
+ok 68 - `yallaflow demo --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 209.61269
+  type: 'test'
+  ...
+# Subtest: `yallaflow demo approve PF-0001 --note Approved --help` exits successfully, shows usage, and mutates nothing
+ok 69 - `yallaflow demo approve PF-0001 --note Approved --help` exits successfully, shows usage, and mutates nothing
+  ---
+  duration_ms: 238.253027
+  type: 'test'
+  ...
+# Subtest: a work-id positioned before --help is also non-mutating (not just rest[0])
+ok 70 - a work-id positioned before --help is also non-mutating (not just rest[0])
+  ---
+  duration_ms: 242.599455
+  type: 'test'
+  ...
+# Subtest: request revise --help with a work-id argument still mutates nothing
+ok 71 - request revise --help with a work-id argument still mutates nothing
+  ---
+  duration_ms: 231.799182
+  type: 'test'
+  ...
+# Subtest: a bare `verify --help` (before any -- separator) shows help and creates no evidence
+ok 72 - a bare `verify --help` (before any -- separator) shows help and creates no evidence
+  ---
+  duration_ms: 252.504465
+  type: 'test'
+  ...
+# Subtest: `--help` after the -- separator is payload for the verified command, not a YallaFlow help request
+ok 73 - `--help` after the -- separator is payload for the verified command, not a YallaFlow help request
+  ---
+  duration_ms: 418.841386
+  type: 'test'
+  ...
+# Subtest: an unrelated flag value that happens to contain "--help" text is not itself a false trigger for a real run
+ok 74 - an unrelated flag value that happens to contain "--help" text is not itself a false trigger for a real run
+  ---
+  duration_ms: 526.125802
+  type: 'test'
+  ...
+# Subtest: 8/9/11. shared enable is explicit, records policy and version, never commits or pushes
+ok 75 - 8/9/11. shared enable is explicit, records policy and version, never commits or pushes
+  ---
+  duration_ms: 3859.719962
+  type: 'test'
+  ...
+# Subtest: 10. an unhealthy or non-Git workspace cannot enable sharing, and nothing changes
+ok 76 - 10. an unhealthy or non-Git workspace cannot enable sharing, and nothing changes
+  ---
+  duration_ms: 1339.187698
+  type: 'test'
+  ...
+# Subtest: 11. an incompatible YallaFlow stops before any project-state mutation; read-only orientation still explains why
+ok 77 - 11. an incompatible YallaFlow stops before any project-state mutation; read-only orientation still explains why
+  ---
+  duration_ms: 3436.456474
+  type: 'test'
+  ...
+# Subtest: 12/52. a single-user workspace is unchanged until sharing is enabled: same IDs, no memory records, reads write nothing
+ok 78 - 12/52. a single-user workspace is unchanged until sharing is enabled: same IDs, no memory records, reads write nothing
+  ---
+  duration_ms: 4286.310379
+  type: 'test'
+  ...
+# Subtest: 13/14/16. two branches from the same base create work and sources without ID or path collision, and merge cleanly
+ok 79 - 13/14/16. two branches from the same base create work and sources without ID or path collision, and merge cleanly
+  ---
+  duration_ms: 3006.872348
+  type: 'test'
+  ...
+# Subtest: 15. legacy PF-\#\#\#\# and SRC-\#\#\#\# stay readable and keep allocating in single-user mode; both forms coexist
+ok 80 - 15. legacy PF-\#\#\#\# and SRC-\#\#\#\# stay readable and keep allocating in single-user mode; both forms coexist
+  ---
+  duration_ms: 1197.701728
+  type: 'test'
+  ...
+# Subtest: checkout tags: 10 Crockford-base32 characters, an unbiased byte mapping, drawn from crypto.randomBytes
+ok 81 - checkout tags: 10 Crockford-base32 characters, an unbiased byte mapping, drawn from crypto.randomBytes
+  ---
+  duration_ms: 5.562541
+  type: 'test'
+  ...
+# Subtest: high-volume deterministic non-reuse: one checkout allocating thousands of IDs across branch switches never repeats a number
+ok 82 - high-volume deterministic non-reuse: one checkout allocating thousands of IDs across branch switches never repeats a number
+  ---
+  duration_ms: 5457.736343
+  type: 'test'
+  ...
+# Subtest: a copied checkout gets a fresh clone tag; the identity is local, gitignored, and needs no join command
+ok 83 - a copied checkout gets a fresh clone tag; the identity is local, gitignored, and needs no join command
+  ---
+  duration_ms: 3405.101716
+  type: 'test'
+  ...
+# Subtest: one checkout never reuses an ID across branch switches or stashes
+ok 84 - one checkout never reuses an ID across branch switches or stashes
+  ---
+  duration_ms: 2306.643708
+  type: 'test'
+  ...
+# Subtest: 17. every global namespace is branch-safe after a multi-branch merge; work-scoped IDs are safe by scope
+ok 85 - 17. every global namespace is branch-safe after a multi-branch merge; work-scoped IDs are safe by scope
+  ---
+  duration_ms: 4292.06078
+  type: 'test'
+  ...
+# Subtest: 18/19/20/21. work captures its memory base; unchanged, unrelated, and referenced changes are told apart
+ok 86 - 18/19/20/21. work captures its memory base; unchanged, unrelated, and referenced changes are told apart
+  ---
+  duration_ms: 2045.753336
+  type: 'test'
+  ...
+# Subtest: 22. without Git the memory base is still a deterministic content fingerprint
+ok 87 - 22. without Git the memory base is still a deterministic content fingerprint
+  ---
+  duration_ms: 100.425964
+  type: 'test'
+  ...
+# Subtest: 23/24/25/26. on a feature branch knowledge is staged work-locally; canonical memory is untouched; DONE and handoff stay coherent
+ok 88 - 23/24/25/26. on a feature branch knowledge is staged work-locally; canonical memory is untouched; DONE and handoff stay coherent
+  ---
+  duration_ms: 3573.806958
+  type: 'test'
+  ...
+# Subtest: a relation proposed against a fact that changes before promotion is refused at staging (revalidate first)
+ok 89 - a relation proposed against a fact that changes before promotion is refused at staging (revalidate first)
+  ---
+  duration_ms: 1817.9498
+  type: 'test'
+  ...
+# Subtest: 27/28/29/30/35. safe new facts, reconfirmations, supersessions, and exact duplicates integrate with full provenance
+ok 90 - 27/28/29/30/35. safe new facts, reconfirmations, supersessions, and exact duplicates integrate with full provenance
+  ---
+  duration_ms: 5286.608758
+  type: 'test'
+  ...
+# Subtest: 31/40. conflicting parallel supersessions block, never overwrite, and memory stays healthy until reconciled
+ok 91 - 31/40. conflicting parallel supersessions block, never overwrite, and memory stays healthy until reconciled
+  ---
+  duration_ms: 5852.288114
+  type: 'test'
+  ...
+# Subtest: 32. a stale base on a feature branch is detected before push, with developer-facing guidance
+ok 92 - 32. a stale base on a feature branch is detected before push, with developer-facing guidance
+  ---
+  duration_ms: 4729.507283
+  type: 'test'
+  ...
+# Subtest: 33/34. integration retry is idempotent and an interrupted or failed integration is never half-applied
+ok 93 - 33/34. integration retry is idempotent and an interrupted or failed integration is never half-applied
+  ---
+  duration_ms: 4440.715319
+  type: 'test'
+  ...
+# Subtest: integration is deterministic: two maintainers integrating the same merge produce identical files
+ok 94 - integration is deterministic: two maintainers integrating the same merge produce identical files
+  ---
+  duration_ms: 2797.342825
+  type: 'test'
+  ...
+# Subtest: doctor detects unsafe shared state: legacy IDs after sharing, local state committed or misplaced, bad metadata, missing CTX, missing provenance
+ok 95 - doctor detects unsafe shared state: legacy IDs after sharing, local state committed or misplaced, bad metadata, missing CTX, missing provenance
+  ---
+  duration_ms: 3303.046127
+  type: 'test'
+  ...
+# Subtest: 47/48/49/50/51. shared check is read-only, provider-neutral, passes a safe branch, and fails a stale one with actionable output
+ok 96 - 47/48/49/50/51. shared check is read-only, provider-neutral, passes a safe branch, and fails a stale one with actionable output
+  ---
+  duration_ms: 3069.646378
+  type: 'test'
+  ...
+# Subtest: 51b/git-scan: the Git scan catches every invocation form, every forbidden subcommand, and git-ops shapes outside the approved set
+ok 97 - 51b/git-scan: the Git scan catches every invocation form, every forbidden subcommand, and git-ops shapes outside the approved set
+  ---
+  duration_ms: 11.137542
+  type: 'test'
+  ...
+# Subtest: 51/no-network: YallaFlow source never invokes mutating or network Git subcommands and calls no LLM provider
+not ok 98 - 51/no-network: YallaFlow source never invokes mutating or network Git subcommands and calls no LLM provider
+  ---
+  duration_ms: 272.679289
+  type: 'test'
+  location: '/home/engamer/Amasi/YallaFlow/test/shared-project.test.js:758:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+    + [
+    +   'branches.js: git for-each-ref (wrapper)',
+    +   'branches.js: git merge-tree (wrapper)',
+    +   'branches.js: git for-each-ref (wrapper)',
+    +   'branches.js: git remote (wrapper)',
+    +   'branches.js: git wrapper with a computed argument list (args)'
+    + ]
+    - []
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+    0: 'branches.js: git for-each-ref (wrapper)'
+    1: 'branches.js: git merge-tree (wrapper)'
+    2: 'branches.js: git for-each-ref (wrapper)'
+    3: 'branches.js: git remote (wrapper)'
+    4: 'branches.js: git wrapper with a computed argument list (args)'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/engamer/Amasi/YallaFlow/test/shared-project.test.js:803:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: 42/43/44/45. the adapter orients automatically; finish speaks outcome language and keeps the audit in --verbose
+ok 99 - 42/43/44/45. the adapter orients automatically; finish speaks outcome language and keeps the audit in --verbose
+  ---
+  duration_ms: 3438.050639
+  type: 'test'
+  ...
+# Subtest: 53/54. single-user baseline, freshness, reconciliation helpers and durable sources behave as before
+ok 100 - 53/54. single-user baseline, freshness, reconciliation helpers and durable sources behave as before
+  ---
+  duration_ms: 1301.424035
+  type: 'test'
+  ...
+# Subtest: read commands never write in a Shared Project — not even a fresh clone's local identity
+ok 101 - read commands never write in a Shared Project — not even a fresh clone's local identity
+  ---
+  duration_ms: 11740.591422
+  type: 'test'
+  ...
+1..101
+# tests 101
+# suites 0
+# pass 100
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 90590.932229

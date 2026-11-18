@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --test test/console-machine.test.js test/agent-windows.test.js test/console-first-journey.test.js test/console-machine-readiness.test.js test/command-platform.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--test",
+        "test/console-machine.test.js",
+        "test/agent-windows.test.js",
+        "test/console-first-journey.test.js",
+        "test/console-machine-readiness.test.js",
+        "test/command-platform.test.js"
+      ],
+      "displayCommand": "node --test test/console-machine.test.js test/agent-windows.test.js test/console-first-journey.test.js test/console-machine-readiness.test.js test/command-platform.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-18T11:11:59.447Z",
+      "finishedAt": "2026-11-18T11:12:03.223Z",
+      "verifiedAt": "2026-11-18T11:12:03.223Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "A read-only Branch Health capability shows, for a promotion flow such as feature/* → dev → qc → prod with hotfixes prod → hotfix/* → prod, whether each stage is ready for the next, which production changes or hotfixes are missing from earlier branches, potential merge conflicts, local/upstream divergence, and how fresh the branch information is, with suggested next steps it never runs.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T15:56:38.710Z",
+      "updatedAt": "2026-11-18T15:56:38.710Z"
+    },
+    {
+      "id": "REQ-002",
+      "statement": "Branch Health never merges, cherry-picks, rebases, resets, checks out, fetches, pushes, rewrites history or changes the working tree, index or refs; it separates Git conflicts from semantic/runtime compatibility and never claims a clean merge preview means a safe deployment.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T15:56:38.710Z",
+      "updatedAt": "2026-11-18T15:56:38.710Z"
+    },
+    {
+      "id": "REQ-003",
+      "statement": "The branch flow can optionally be configured per project; without configuration it is detected from common branch names.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T15:56:38.710Z",
+      "updatedAt": "2026-11-18T15:56:38.710Z"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirement": "REQ-001",
+      "statement": "yallaflow branches [--json] reports per adjacent pair: up to date, ready (with fast-forward note), needs sync (upper has changes the lower lacks), or potential conflict (with files); production-only changes per earlier branch (patch-equivalent cherry-picks recognised) with a back-merge conflict preview; hotfix/* branches in production and missing downstream; upstream ahead/behind/gone; remote-tracking fallback; a stale or missing fetch note.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T15:56:38.710Z",
+      "updatedAt": "2026-11-18T15:56:38.710Z"
+    },
+    {
+      "id": "AC-002",
+      "requirement": "REQ-002",
+      "statement": "A test snapshot of the repository (working tree with an uncommitted edit, index, refs, every object by content) is identical after the analysis; the merge preview adds no object to the repository (temporary object store); only read commands are run; suggestions are labelled 'not run'.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T15:56:38.710Z",
+      "updatedAt": "2026-11-18T15:56:38.710Z"
+    },
+    {
+      "id": "AC-003",
+      "requirement": "REQ-002",
+      "statement": "Every report carries the caveat that Git only predicts textual conflicts and that behaviour, migrations, configuration and runtime compatibility need review and testing.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T15:56:38.710Z",
+      "updatedAt": "2026-11-18T15:56:38.710Z"
+    },
+    {
+      "id": "AC-004",
+      "requirement": "REQ-003",
+      "statement": "yallaflow branches configure --flow a,b,c [--hotfix P] [--remote R] and --clear write only the validated branches block of .yallaflow/config.yaml (older YallaFlow versions ignore it); without it the flow is detected (dev/develop, qc/qa/staging/test/uat, prod/production/main/master); no flow found or no Git repository is explained.",
+      "provenance": [
+        {
+          "type": "request"
+        }
+      ],
+      "status": "active",
+      "recordedAt": "2026-11-18T15:56:38.710Z",
+      "updatedAt": "2026-11-18T15:56:38.710Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "added",
+      "id": "REQ-001",
+      "at": "2026-11-18T15:56:38.710Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-002",
+      "at": "2026-11-18T15:56:38.710Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "REQ-003",
+      "at": "2026-11-18T15:56:38.710Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-001",
+      "at": "2026-11-18T15:56:38.710Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-002",
+      "at": "2026-11-18T15:56:38.710Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-003",
+      "at": "2026-11-18T15:56:38.710Z",
+      "revision": 1
+    },
+    {
+      "action": "added",
+      "id": "AC-004",
+      "at": "2026-11-18T15:56:38.710Z",
+      "revision": 1
+    }
+  ],
+  "updatedAt": "2026-11-18T15:56:38.710Z"
+}

@@ -23,7 +23,9 @@ import { inLocalDir, safeLocalDir, safeWriteFile } from '../agents/local-files.j
 import { loadRuntimeProfiles, definitionHash, resolveServiceCwd } from './profile.js';
 import { trustState } from './trust.js';
 import { portListening } from './probe.js';
-import { SUPPORTED, descendantsOf, groupAlive, identify, processGroupOf, processStartTime, serviceEnvironment, signalGroup, signalIfSame } from './process.js';
+import { SUPPORTED, WINDOWS, descendantsOf, groupAlive, identify, primeProcessTable, processGroupOf, processStartTime, readWindowsTable, serviceEnvironment, windowsEndHeldTree, signalGroup, signalIfSame, windowsStopTree } from './process.js';
+import { resolveCommand } from '../utils/command.js';
+import { toolEnvironment } from '../utils/fresh-path.js';
 import { localRuntimeDir } from './local.js';
 import { readState, stateDir, writeState } from './state.js';
 import { composeIdentity, sharedNow } from './discover.js';
@@ -47,7 +49,45 @@ export class RuntimeError extends Error {
 }
 
 function assertSupported() {
-  if (!SUPPORTED) throw new RuntimeError('RUNTIME_UNSUPPORTED_PLATFORM', `The runtime manager supports Linux and macOS; ${process.platform} is not supported yet. Start services with your own tools.`);
+  if (!SUPPORTED) throw new RuntimeError('RUNTIME_UNSUPPORTED_PLATFORM', `The runtime manager supports Linux, macOS and Windows; ${process.platform} is not supported yet. Start services with your own tools.`);
+}
+
+// PF-0176: what this system can do, for the console to show no action it cannot perform.
+export function runtimeCapabilities(platform = process.platform) {
+  const known = ['linux', 'darwin', 'win32'].includes(platform);
+  return {
+    platform,
+    lifecycle: known,
+    compose: known && platform !== 'win32',
+    // Windows cannot ask a detached console program to stop: its stop ends the verified tree at once.
+    gracefulStop: known && platform !== 'win32',
+    // Real-OS verification of the Windows lifecycle is pending (docs/onboarding-manual-validation.md).
+    verified: platform === 'linux'
+  };
+}
+
+// Docker Compose lifecycle is not offered on Windows in this release (PF-0176).
+function assertComposeHere(service) {
+  if (WINDOWS && service.kind === 'docker-compose') throw new RuntimeError('RUNTIME_COMPOSE_WINDOWS', `${service.id} is a Docker Compose service. YallaFlow does not start, stop or restart Docker Compose services on Windows yet; nothing was run. Use Docker Desktop or \`docker compose\` yourself; the other services stay usable.`);
+}
+
+// PF-0176: what to start for a service command, never through a shell. Linux and macOS keep the
+// program name as written (the system finds it, unchanged). Windows: the shared resolver finds
+// it on the service's own PATH (an npm .cmd shim becomes node with its script); a relative path
+// is taken from the service folder.
+async function launchFor(argv, cwd, env) {
+  if (!WINDOWS) return { file: argv[0], args: argv.slice(1) };
+  const first = String(argv[0] ?? '');
+  const program = /[\\/]/.test(first) && !path.win32.isAbsolute(first) ? path.win32.resolve(cwd, first) : first;
+  const command = await resolveCommand([program, ...argv.slice(1)], env);
+  if (!command.ok) throw new RuntimeError('RUNTIME_START_FAILED', command.reason === 'not-found' ? `executable ${first} was not found on PATH` : command.message);
+  return { file: command.file, args: command.args };
+}
+
+// The environment a service (or its dependency install) runs with: the profile's names on the
+// shared allow-list, from the PATH a new terminal would get (Windows: the registry Path added).
+async function childEnvironment(service, extra = {}) {
+  return { ...serviceEnvironment(service.env, await toolEnvironment(process.env)), ...extra };
 }
 
 const readRun = (root, id) => readState(root, `runs/${id}.json`);
@@ -55,6 +95,7 @@ const writeRun = (root, run) => writeState(root, `runs/${run.id}.json`, run);
 
 // ---------------------------------------------------------------- per-service lock
 async function withServiceLock(root, id, fn) {
+  await primeProcessTable(); // PF-0181: Windows identity checks below read this, never wait on PowerShell
   const file = path.join(await stateDir(root, 'locks'), `${id}.lock`);
   const me = { pid: process.pid, start: processStartTime(process.pid) };
   const deadline = Date.now() + LOCK_WAIT_MS;
@@ -71,7 +112,7 @@ async function withServiceLock(root, id, fn) {
         const handle = await open(file, constants.O_RDONLY | constants.O_NONBLOCK | (constants.O_NOFOLLOW ?? 0));
         try { holder = JSON.parse(await handle.readFile('utf8')); } finally { await handle.close(); }
       } catch { /* being written */ }
-      if (holder && identify(holder.pid, holder.start) !== 'ours') {
+      if (holder && !['ours', 'unverifiable'].includes(identify(holder.pid, holder.start))) {
         await rm(file, { force: true }); // its holder is gone: stale
         continue;
       }
@@ -171,6 +212,7 @@ async function computeState(root, service, run) {
   if (who === 'gone') {
     return { state: 'failed', reason: run.exitCode !== undefined && run.exitCode !== null ? `exited with code ${run.exitCode}` : run.signal ? `ended by ${run.signal}` : 'the process ended without a stop from YallaFlow', exitCode: run.exitCode ?? null };
   }
+  if (who === 'unverifiable') return { state: 'unknown', unverifiable: true, reason: 'YallaFlow could not read the Windows process list just now, so it cannot tell whether this is still its process. Nothing was signalled and the record is kept; try again in a moment.' };
   if (who === 'other') return { state: 'unknown', reason: `pid ${run.pid} is no longer the process YallaFlow started (its identity or process group changed); it is unmanaged and is never signalled.` };
   const state = await readiness(root, service, run);
   try { return run.definitionHash !== await definitionHash(root, service) ? { state, stale: true } : { state }; }
@@ -210,7 +252,8 @@ async function portHolder(root, services, port, exceptProject) {
   for (const other of services) {
     const run = await readRun(root, other.id).catch(() => null);
     if (!run || run.stoppedAt || ownership(run) !== 'ours') continue;
-    const sameGroup = listener?.pid && (listener.pid === run.pid || processGroupOf(listener.pid) === run.pgid);
+    // Windows has no process groups: the listener may be a process the service started (npm → node).
+    const sameGroup = listener?.pid && (listener.pid === run.pid || processGroupOf(listener.pid) === run.pgid || (WINDOWS && descendantsOf(run.pid, run.startTime).some((entry) => entry.pid === listener.pid)));
     if (sameGroup || (!listener?.pid && other.ports.includes(port))) { service = { id: other.id, name: other.name }; break; }
   }
   // A service defined on this port that YallaFlow did not start is named as the likely owner.
@@ -228,6 +271,7 @@ async function freePortNear(port, taken) {
 
 export async function runtimeStatus(root) {
   const profiles = await loadRuntimeProfiles(root);
+  await primeProcessTable();
   const services = [];
   const containers = profiles.services.some((service) => service.kind === 'docker-compose') ? await observeContainers() : null;
   for (const service of profiles.services) {
@@ -253,6 +297,8 @@ export async function runtimeStatus(root) {
       trust,
       links: service.links, sharedMarker: service.shared,
       runningOutside,
+      // PF-0176: a service kind this system cannot run from YallaFlow (Compose on Windows).
+      ...(WINDOWS && service.kind === 'docker-compose' ? { unsupported: 'compose-windows' } : {}),
       // PF-0166: what is missing before it can start, and why its last run failed.
       prerequisites: ours ? { state: UNKNOWN, ok: true, problems: [], reason: 'not-checked' } : await prerequisitesOf(root, service),
       ...(state.state === 'failed' ? { failure: await failureOf(root, service.id) } : {}),
@@ -264,7 +310,7 @@ export async function runtimeStatus(root) {
       unmanagedPorts: ours ? [] : ports.filter((entry) => entry.listening).map((entry) => entry.port)
     });
   }
-  return { supported: SUPPORTED, profile: { exists: profiles.exists }, services };
+  return { supported: SUPPORTED, capabilities: runtimeCapabilities(), profile: { exists: profiles.exists }, services };
 }
 
 // ---------------------------------------------------------------- start / stop
@@ -314,6 +360,7 @@ export async function startService(root, id, { startedBy = 'cli', skipSetupCheck
 
 async function startOne(root, service, startedBy, { skipSetupCheck = false } = {}) {
   const id = service.id;
+  assertComposeHere(service);
   return withServiceLock(root, id, async () => {
     const run = await readRun(root, id);
     const current = await computeState(root, service, run);
@@ -359,20 +406,37 @@ async function startOne(root, service, startedBy, { skipSetupCheck = false } = {
     if (skipped) await log.write(`--- yallaflow runtime: dependency check skipped at the developer's request (${skipped.map((problem) => problem.code).join(', ')}) ---\n`);
     let child;
     try {
-      child = spawn(service.command[0], service.command.slice(1), { cwd, env: serviceEnvironment(service.env), detached: true, shell: false, stdio: ['ignore', log.fd, log.fd] });
+      const env = await childEnvironment(service);
+      const launch = await launchFor(service.command, cwd, env);
+      // It keeps running when the console stops. POSIX: its own process group. Windows (PF-0181):
+      // not detached (that would leave it with no console, and the console programs it starts would
+      // each open a visible window) but with a new hidden console of its own, which it shares with
+      // its children; a Ctrl-C or a closed console window does not reach it.
+      child = spawn(launch.file, launch.args, { cwd, env, detached: !WINDOWS, windowsHide: true, shell: false, stdio: ['ignore', log.fd, log.fd] });
       await new Promise((resolve, reject) => { child.once('spawn', resolve); child.once('error', reject); });
     } catch (error) {
       await log.close();
       throw new RuntimeError('RUNTIME_START_FAILED', `Service ${id} could not be started: ${error.code === 'ENOENT' ? `executable ${service.command[0]} was not found on PATH` : error.message}.`);
     }
     await log.close();
-    const record = { schemaVersion: 1, id, pid: child.pid, pgid: child.pid, startTime: processStartTime(child.pid), definitionHash: trustedHash, startedAt, startedBy, logOffset: offset };
+    // PF-0181: on Windows the creation time is read fresh (a kept table may predate this pid). A
+    // service whose identity cannot be recorded is ended at once (this process still holds it, so
+    // its pid cannot belong to anything else) instead of running as an unmanaged process.
+    let startTime = null;
+    if (WINDOWS) {
+      for (let attempt = 0; attempt < 3 && !startTime; attempt++) startTime = (await readWindowsTable({ fresh: true }))?.get(child.pid)?.start ?? null;
+      if (!startTime) {
+        try { child.kill(); } catch { /* gone */ }
+        throw new RuntimeError('RUNTIME_START_FAILED', `Service ${id} was not kept running: YallaFlow could not read the Windows process list, so it could not record which process it started (it would not be able to stop it safely). Try again in a moment.`);
+      }
+    } else startTime = processStartTime(child.pid);
+    const record = { schemaVersion: 1, id, pid: child.pid, pgid: child.pid, startTime, definitionHash: trustedHash, startedAt, startedBy, logOffset: offset };
     let exited = null;
     child.once('exit', (code, signal) => { exited = { code, signal }; });
     child.unref();
     try { await writeRun(root, record); }
     catch (error) {
-      if (ownership(record) === 'ours') signalGroup(record.pgid, 'SIGKILL');
+      if (ownership(record) === 'ours') { if (WINDOWS) { try { child.kill(); } catch { /* gone */ } } else signalGroup(record.pgid, 'SIGKILL'); }
       throw error;
     }
 
@@ -422,6 +486,7 @@ export async function installPrerequisites(root, id, { confirm, startedBy = 'cli
   assertSupported();
   const profiles = await loadRuntimeProfiles(root);
   const service = serviceById(profiles, id);
+  assertComposeHere(service);
   const trusted = await trustState(root, service);
   if (!trusted.trusted) throw new RuntimeError('RUNTIME_UNTRUSTED', `Service ${id} is not trusted; review and trust it before installing its dependencies (an install runs the packages' own scripts).`);
   return withServiceLock(root, id, async () => {
@@ -433,14 +498,20 @@ export async function installPrerequisites(root, id, { confirm, startedBy = 'cli
     const cwd = path.resolve(base, fix.cwd);
     const log = await openServiceLog(root, id);
     await log.write(`\n--- yallaflow runtime: installing dependencies for ${id} at ${new Date().toISOString()} (${startedBy}) ---\n$ ${fix.display}\n`);
+    const installEnv = await childEnvironment(service, { CI: '1' });
+    let launch;
+    try { launch = await launchFor(fix.argv, cwd, installEnv); }
+    catch (error) { await log.close(); throw new RuntimeError('RUNTIME_INSTALL_FAILED', `The install did not start: ${error.message}.`); }
     const result = await new Promise((resolve) => {
       let child;
       try {
-        child = spawn(fix.argv[0], fix.argv.slice(1), { cwd, env: { ...serviceEnvironment(service.env), CI: '1' }, detached: true, shell: false, stdio: ['ignore', log.fd, log.fd] });
+        child = spawn(launch.file, launch.args, { cwd, env: installEnv, detached: !WINDOWS, windowsHide: true, shell: false, stdio: ['ignore', log.fd, log.fd] });
       } catch (error) {
         return resolve({ code: null, error: error.message });
       }
-      const timer = setTimeout(() => { try { process.kill(-child.pid, 'SIGKILL'); } catch { child.kill('SIGKILL'); } }, INSTALL_TIMEOUT_MS);
+      // The install is this process's own child: Windows ends its tree with taskkill (its pid
+      // cannot be reused while the handle is held), POSIX its process group.
+      const timer = setTimeout(() => { if (WINDOWS) windowsEndHeldTree(child).catch(() => {}); else { try { process.kill(-child.pid, 'SIGKILL'); } catch { child.kill('SIGKILL'); } } }, INSTALL_TIMEOUT_MS);
       child.once('error', (error) => { clearTimeout(timer); resolve({ code: null, error: error.code === 'ENOENT' ? `${fix.argv[0]} was not found on PATH` : error.message }); });
       child.once('exit', (code, signal) => { clearTimeout(timer); resolve({ code, signal }); });
     });
@@ -460,6 +531,7 @@ export async function stopService(root, id, { reason = 'stop', confirmShared = f
   assertSupported();
   const profiles = await loadRuntimeProfiles(root);
   const service = serviceById(profiles, id);
+  assertComposeHere(service);
   return withServiceLock(root, id, async () => {
     // Shared infrastructure (S3: judged from the evidence now, a marker only adds protection)
     // is stopped only with an explicit confirmation that saw who else may be affected. Checked
@@ -478,6 +550,7 @@ export async function stopService(root, id, { reason = 'stop', confirmShared = f
       await writeRun(root, run);
       return { id, state: 'stopped', acknowledged: true };
     }
+    if (current.state === 'unknown' && current.unverifiable) throw new RuntimeError('RUNTIME_UNVERIFIABLE', `${id}: ${current.reason}`);
     if (current.state === 'unknown') {
       // Clear our record only; the process itself is not provably ours and is not touched.
       Object.assign(run, { stoppedAt: new Date().toISOString(), stopReason: 'record-cleared-unmanaged' });
@@ -493,6 +566,18 @@ export async function stopService(root, id, { reason = 'stop', confirmShared = f
 // tracked from the verified leader and killed only while their own start time still matches.
 async function terminateOwned(root, service, run, reason) {
   const id = service.id;
+  if (WINDOWS) {
+    // PF-0176/PF-0181: the tree is read from a fresh process table, starting only from a leader
+    // whose creation time matches the record; each process is ended on its own while its creation
+    // time still matches, and what is still there is reported.
+    run.stopRequestedAt = new Date().toISOString();
+    await writeRun(root, run);
+    const ended = await windowsStopTree(run, { waitMs: service.stopTimeoutSeconds * 1000 });
+    if (!ended.verified && !ended.leaderMatched) throw new RuntimeError('RUNTIME_UNVERIFIABLE', `${id} was not stopped: YallaFlow could not read the Windows process list, so it cannot confirm the process is still the one it started. Nothing was signalled; try again in a moment.`);
+    Object.assign(run, { stoppedAt: new Date().toISOString(), stopReason: reason, forced: true, survivors: ended.survivors, ...(ended.verified ? {} : { survivorsUnverified: true }), ...(ended.leaderMatched ? {} : { leaderGone: true }) });
+    await writeRun(root, run);
+    return { id, state: ended.survivors.length ? 'unknown' : 'stopped', forced: true, survivors: ended.survivors };
+  }
   {
     const tracked = descendantsOf(run.pid);
     run.stopRequestedAt = new Date().toISOString();
@@ -549,6 +634,7 @@ export async function startAllServices(root, { startedBy = 'cli' } = {}) {
   const started = [];
   const skipped = [];
   for (const service of order) {
+    if (WINDOWS && service.kind === 'docker-compose') { skipped.push({ id: service.id, blockedBy: service.id, code: 'RUNTIME_COMPOSE_WINDOWS', reason: 'a Docker Compose service, not started from YallaFlow on Windows yet', review: null }); unavailable.set(service.id, 'a Docker Compose service, not started from YallaFlow on Windows yet'); continue; }
     const blocker = blockedBy(service);
     if (blocker) {
       const state = trust.get(blocker.id);
@@ -575,6 +661,7 @@ export async function stopAllServices(root) {
   const results = [];
   // Reverse dependency order: dependents first.
   for (const service of [...profiles.services].reverse()) {
+    if (WINDOWS && service.kind === 'docker-compose') continue; // never started from YallaFlow on Windows
     const run = await readRun(root, service.id);
     if (!run || run.stoppedAt) continue;
     // Stop project never stops shared infrastructure, even one YallaFlow started (S3).

@@ -71,7 +71,7 @@ test('claude (simulated): channel server registers, relays chat, replies, permis
     assert.equal(connect.status, 200);
     const linked = await connect.json();
     assert.match(linked.launch.command, /--dangerously-load-development-channels server:yallaflow/);
-    assert.match(linked.launch.command, /--mcp-config \.yallaflow\/local\/agent\/claude-mcp\.json/);
+    assert.ok(linked.launch.command.includes(`--mcp-config '${path.join(root, '.yallaflow', 'local', 'agent', 'claude-mcp.json')}'`), linked.launch.command);
     assert.equal(spawnSync('git', ['check-ignore', '-q', '.yallaflow/local/agent/claude-mcp.json'], { cwd: root }).status, 0);
     assert.equal(await activeWork(root), null, 'connecting never activates work');
     assert.equal((await c.post('start', { provider: 'codex', workId })).status, 409, 'one session per checkout across providers');

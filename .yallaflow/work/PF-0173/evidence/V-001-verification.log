@@ -1,0 +1,712 @@
+TAP version 13
+# Subtest: versions, forbidden modes, ACP normalization, and API keys stripped from the adapter env
+ok 1 - versions, forbidden modes, ACP normalization, and API keys stripped from the adapter env
+  ---
+  duration_ms: 6.970752
+  type: 'test'
+  ...
+# Subtest: detection: adapter missing, unsupported version, and ready
+ok 2 - detection: adapter missing, unsupported version, and ready
+  ---
+  duration_ms: 90.102146
+  type: 'test'
+  ...
+# Subtest: codex: start, stream, follow-up, permissions (allow, deny, timeout), one session per checkout, no activation
+ok 3 - codex: start, stream, follow-up, permissions (allow, deny, timeout), one session per checkout, no activation
+  ---
+  duration_ms: 5877.438379
+  type: 'test'
+  ...
+# Subtest: codex: cancel, crash, resume after a console restart, explicit activation through Core
+ok 4 - codex: cancel, crash, resume after a console restart, explicit activation through Core
+  ---
+  duration_ms: 9384.868507
+  type: 'test'
+  ...
+# Subtest: codex: ending a session while a permission is pending denies it and never crashes the console
+ok 5 - codex: ending a session while a permission is pending denies it and never crashes the console
+  ---
+  duration_ms: 5317.5327
+  type: 'test'
+  ...
+# Subtest: codex: a non-subscription login is refused and no session starts
+ok 6 - codex: a non-subscription login is refused and no session starts
+  ---
+  duration_ms: 4371.961173
+  type: 'test'
+  ...
+# Subtest: security: opt-in, token, Origin, content type, read-only, unsupported controls
+ok 7 - security: opt-in, token, Origin, content type, read-only, unsupported controls
+  ---
+  duration_ms: 292.6194
+  type: 'test'
+  ...
+# Subtest: security review regressions: start race, modes, symlinks
+ok 8 - security review regressions: start race, modes, symlinks
+  ---
+  duration_ms: 8531.377195
+  type: 'test'
+  ...
+# Subtest: codex: an adapter that cannot be spawned fails the start promptly and frees the checkout
+ok 9 - codex: an adapter that cannot be spawned fails the start promptly and frees the checkout
+  ---
+  duration_ms: 4283.19568
+  type: 'test'
+  ...
+# Subtest: stabilization: Allow for session is session-scoped only; nothing persists or carries to another session
+ok 10 - stabilization: Allow for session is session-scoped only; nothing persists or carries to another session
+  ---
+  duration_ms: 4711.991793
+  type: 'test'
+  ...
+# Subtest: stabilization: ending a Codex session ends what it started, and an incomplete cleanup is never reported as a clean stop
+ok 11 - stabilization: ending a Codex session ends what it started, and an incomplete cleanup is never reported as a clean stop
+  ---
+  duration_ms: 8054.206695
+  type: 'test'
+  ...
+# Subtest: stabilization: one agent console per checkout across separate console processes
+ok 12 - stabilization: one agent console per checkout across separate console processes
+  ---
+  duration_ms: 5038.146231
+  type: 'test'
+  ...
+# Subtest: stabilization: a directory swapped for a link after the check cannot redirect a local write
+ok 13 - stabilization: a directory swapped for a link after the check cannot redirect a local write
+  ---
+  duration_ms: 7.301706
+  type: 'test'
+  ...
+# Subtest: stabilization review: hard links, End while starting, overlapping lock claims, crash cleanup
+ok 14 - stabilization review: hard links, End while starting, overlapping lock claims, crash cleanup
+  ---
+  duration_ms: 2726.21398
+  type: 'test'
+  ...
+# Subtest: CLI: agents detect is read-only; console flag combinations are validated
+ok 15 - CLI: agents detect is read-only; console flag combinations are validated
+  ---
+  duration_ms: 1589.182263
+  type: 'test'
+  ...
+# Subtest: stopFrom: a usage limit is recognised with its retry time; other stops keep their reason
+ok 16 - stopFrom: a usage limit is recognised with its retry time; other stops keep their reason
+  ---
+  duration_ms: 5.084944
+  type: 'test'
+  ...
+# Subtest: codex: a usage-limit turn is a stop with its retry time, kept after End and across a console restart
+ok 17 - codex: a usage-limit turn is a stop with its retry time, kept after End and across a console restart
+  ---
+  duration_ms: 5184.932962
+  type: 'test'
+  ...
+# Subtest: codex: a crash and a plain End are recorded as such
+ok 18 - codex: a crash and a plain End are recorded as such
+  ---
+  duration_ms: 4835.781741
+  type: 'test'
+  ...
+# Subtest: UI: a live Codex usage limit offers Claude Code and a terminal message, not Codex again
+ok 19 - UI: a live Codex usage limit offers Claude Code and a terminal message, not Codex again
+  ---
+  duration_ms: 10.463625
+  type: 'test'
+  ...
+# Subtest: UI: a session started after the stop (the switch itself) clears the card
+ok 20 - UI: a session started after the stop (the switch itself) clears the card
+  ---
+  duration_ms: 3.177701
+  type: 'test'
+  ...
+# Subtest: UI: a message sent after the stop clears the card; another item never shows it
+ok 21 - UI: a message sent after the stop clears the card; another item never shows it
+  ---
+  duration_ms: 13.981226
+  type: 'test'
+  ...
+# Subtest: UI: with no session, the last recorded stop of this item is offered, including the same agent; Arabic too
+ok 22 - UI: with no session, the last recorded stop of this item is offered, including the same agent; Arabic too
+  ---
+  duration_ms: 15.219023
+  type: 'test'
+  ...
+# Subtest: UI: only ready providers are offered
+ok 23 - UI: only ready providers are offered
+  ---
+  duration_ms: 3.433831
+  type: 'test'
+  ...
+# Subtest: UI: switching ends Codex first, connects Claude, and prepares (never sends) the continue message
+ok 24 - UI: switching ends Codex first, connects Claude, and prepares (never sends) the continue message
+  ---
+  duration_ms: 8.451904
+  type: 'test'
+  ...
+# Subtest: UI: a failed End stops the switch; nothing else starts
+ok 25 - UI: a failed End stops the switch; nothing else starts
+  ---
+  duration_ms: 4.558053
+  type: 'test'
+  ...
+# Subtest: UI: the item lists which agent worked on it and how each session stopped
+ok 26 - UI: the item lists which agent worked on it and how each session stopped
+  ---
+  duration_ms: 3.679234
+  type: 'test'
+  ...
+# Subtest: simulated Windows: PATH is read whatever its case, and PATHEXT decides the extensions tried
+ok 27 - simulated Windows: PATH is read whatever its case, and PATHEXT decides the extensions tried
+  ---
+  duration_ms: 6.179061
+  type: 'test'
+  ...
+# Subtest: simulated Windows: a native .exe and an npm .cmd shim are found; folders with spaces and Arabic names work
+ok 28 - simulated Windows: a native .exe and an npm .cmd shim are found; folders with spaces and Arabic names work
+  ---
+  duration_ms: 14.686995
+  type: 'test'
+  ...
+# Subtest: POSIX lookup is unchanged: an execute bit is required and the bare name is used
+ok 29 - POSIX lookup is unchanged: an execute bit is required and the bare name is used
+  ---
+  duration_ms: 36.612339
+  type: 'test'
+  ...
+# Subtest: simulated Windows: an npm shim is started as its target with node, never through a shell
+ok 30 - simulated Windows: an npm shim is started as its target with node, never through a shell
+  ---
+  duration_ms: 4.332777
+  type: 'test'
+  ...
+# Subtest: simulated Windows: a broken or unknown command script is refused with a plain reason, not run by a shell
+ok 31 - simulated Windows: a broken or unknown command script is refused with a plain reason, not run by a shell
+  ---
+  duration_ms: 10.821205
+  type: 'test'
+  ...
+# Subtest: a program that cannot be started is an answer with its cause, never a crash
+ok 32 - a program that cannot be started is an answer with its cause, never a crash
+  ---
+  duration_ms: 53.109102
+  type: 'test'
+  ...
+# Subtest: providers are independent: a missing or broken Claude Code never makes Codex unavailable, and the reverse
+ok 33 - providers are independent: a missing or broken Claude Code never makes Codex unavailable, and the reverse
+  ---
+  duration_ms: 595.009123
+  type: 'test'
+  ...
+# Subtest: simulated Windows: the terminal is a new PowerShell window in the project folder; the folder is never in the command text
+ok 34 - simulated Windows: the terminal is a new PowerShell window in the project folder; the folder is never in the command text
+  ---
+  duration_ms: 4.478243
+  type: 'test'
+  ...
+# Subtest: simulated Windows: hook and launch commands use double quotes and forward slashes
+ok 35 - simulated Windows: hook and launch commands use double quotes and forward slashes
+  ---
+  duration_ms: 12.493114
+  type: 'test'
+  ...
+# Subtest: no shell anywhere in agent discovery and launch; an unreachable console is said in plain words
+ok 36 - no shell anywhere in agent discovery and launch; an unreachable console is said in plain words
+  ---
+  duration_ms: 17.955767
+  type: 'test'
+  ...
+# Subtest: folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+ok 37 - folder chooser: directories inside home only, no hidden folders or files, no symlink escape, markers, Unicode
+  ---
+  duration_ms: 256.974163
+  type: 'test'
+  ...
+# Subtest: registration: an existing YallaFlow project inside home is added once, live; others are refused
+ok 38 - registration: an existing YallaFlow project inside home is added once, live; others are refused
+  ---
+  duration_ms: 626.099684
+  type: 'test'
+  ...
+# Subtest: stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+ok 39 - stepper creation: full-hash confirmation, server-side registration, planned attachments, Git, retry without duplicates
+  ---
+  duration_ms: 1741.879076
+  type: 'test'
+  ...
+# Subtest: a plan that installs dependencies needs an explicit acknowledgement (PF-0085)
+ok 40 - a plan that installs dependencies needs an explicit acknowledgement (PF-0085)
+  ---
+  duration_ms: 628.707352
+  type: 'test'
+  ...
+# Subtest: Git init: explicit, once, never inside another repository; refused read-only
+ok 41 - Git init: explicit, once, never inside another repository; refused read-only
+  ---
+  duration_ms: 138.035157
+  type: 'test'
+  ...
+# Subtest: runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+ok 42 - runtime setup: Core runtime add with option-safe arguments; the service is defined, not trusted, not running
+  ---
+  duration_ms: 847.239823
+  type: 'test'
+  ...
+# Subtest: agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+ok 43 - agents: off by default, enabled for this run only after confirmation, never in read-only; nothing starts
+  ---
+  duration_ms: 61.570562
+  type: 'test'
+  ...
+# Subtest: review: parallel registrations add a project once and lose none from the saved list
+ok 44 - review: parallel registrations add a project once and lose none from the saved list
+  ---
+  duration_ms: 106.730666
+  type: 'test'
+  ...
+# Subtest: review: hidden folders are refused even by path; read-only consoles probe no tools
+ok 45 - review: hidden folders are refused even by path; read-only consoles probe no tools
+  ---
+  duration_ms: 14.417123
+  type: 'test'
+  ...
+# Subtest: review: plans that run package scripts need an acknowledgement; control characters and NUL are refused
+ok 46 - review: plans that run package scripts need an acknowledgement; control characters and NUL are refused
+  ---
+  duration_ms: 704.145973
+  type: 'test'
+  ...
+# Subtest: review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+ok 47 - review: runtime add refuses option-like commands and typed suggestions; a local override keeps the shared kind
+  ---
+  duration_ms: 507.604303
+  type: 'test'
+  ...
+# Subtest: a registration failure after creation is reported as partial success, never as a failed creation
+ok 48 - a registration failure after creation is reported as partial success, never as a failed creation
+  ---
+  duration_ms: 795.996314
+  type: 'test'
+  ...
+# Subtest: Claude Code: off unless chosen explicitly when enabling agents; never read-only
+ok 49 - Claude Code: off unless chosen explicitly when enabling agents; never read-only
+  ---
+  duration_ms: 202.990708
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): a project leaves the running console and the saved list; its files stay
+ok 50 - removal (PF-0081): a project leaves the running console and the saved list; its files stay
+  ---
+  duration_ms: 127.739543
+  type: 'test'
+  ...
+# Subtest: removal (PF-0081): refused while an agent session is live in the project
+ok 51 - removal (PF-0081): refused while an agent session is live in the project
+  ---
+  duration_ms: 2.182841
+  type: 'test'
+  ...
+# Subtest: setup environment keeps npm settings but never a credential
+ok 52 - setup environment keeps npm settings but never a credential
+  ---
+  duration_ms: 12.812223
+  type: 'test'
+  ...
+# Subtest: Codex login status: only a ChatGPT subscription sign-in counts
+ok 53 - Codex login status: only a ChatGPT subscription sign-in counts
+  ---
+  duration_ms: 1.478126
+  type: 'test'
+  ...
+# Subtest: nothing installed: the exact install command, approved before it runs, without sudo or secrets
+ok 54 - nothing installed: the exact install command, approved before it runs, without sudo or secrets
+  ---
+  duration_ms: 589.951348
+  type: 'test'
+  ...
+# Subtest: an npm global folder this user cannot write is refused: no sudo, the command to run by hand instead
+ok 55 - an npm global folder this user cannot write is refused: no sudo, the command to run by hand instead
+  ---
+  duration_ms: 411.635876
+  type: 'test'
+  ...
+# Subtest: sign-in: Codex's own device flow after confirmation; the link and code are shown, nothing else
+ok 56 - sign-in: Codex's own device flow after confirmation; the link and code are shown, nothing else
+  ---
+  duration_ms: 1189.030689
+  type: 'test'
+  ...
+# Subtest: an API-key sign-in is reported as not usable
+ok 57 - an API-key sign-in is reported as not usable
+  ---
+  duration_ms: 102.3148
+  type: 'test'
+  ...
+# Subtest: connection test: handshake only, in an empty temporary folder, no session, process ended
+ok 58 - connection test: handshake only, in an empty temporary folder, no session, process ended
+  ---
+  duration_ms: 265.276531
+  type: 'test'
+  ...
+# Subtest: HTTP: status and actions need the token and Origin; a read-only console runs none of them
+ok 59 - HTTP: status and actions need the token and Origin; a read-only console runs none of them
+  ---
+  duration_ms: 476.702186
+  type: 'test'
+  ...
+# Subtest: one setup step at a time from the moment it is accepted; cancel ends the whole process group
+ok 60 - one setup step at a time from the moment it is accepted; cancel ends the whole process group
+  ---
+  duration_ms: 644.251453
+  type: 'test'
+  ...
+# Subtest: setup keeps proxy and certificate settings; a status probe that cannot run is unknown, not signed out
+ok 61 - setup keeps proxy and certificate settings; a status probe that cannot run is unknown, not signed out
+  ---
+  duration_ms: 1.760435
+  type: 'test'
+  ...
+# Subtest: tested Codex versions: exact pins, inside the supported adapter range, checked before an install is offered
+ok 62 - tested Codex versions: exact pins, inside the supported adapter range, checked before an install is offered
+  ---
+  duration_ms: 1.28552
+  type: 'test'
+  ...
+# Subtest: Windows: the setup environment keeps the system variables npm needs (Path whatever its case), never a credential
+ok 63 - Windows: the setup environment keeps the system variables npm needs (Path whatever its case), never a credential
+  ---
+  duration_ms: 1.072505
+  type: 'test'
+  ...
+# Subtest: an npm global folder with an unexpanded variable or a relative path is never installed into
+ok 64 - an npm global folder with an unexpanded variable or a relative path is never installed into
+  ---
+  duration_ms: 160.037465
+  type: 'test'
+  ...
+# Subtest: the prefix probe runs where the install runs (the home folder), not where the console was started
+ok 65 - the prefix probe runs where the install runs (the home folder), not where the console was started
+  ---
+  duration_ms: 90.414288
+  type: 'test'
+  ...
+# Subtest: an install that finished but left Codex unfindable says so, with the folder npm used
+ok 66 - an install that finished but left Codex unfindable says so, with the folder npm used
+  ---
+  duration_ms: 314.681486
+  type: 'test'
+  ...
+# Subtest: Windows cancel: taskkill from System32 for the child and its tree, argv only
+ok 67 - Windows cancel: taskkill from System32 for the child and its tree, argv only
+  ---
+  duration_ms: 2.496737
+  type: 'test'
+  ...
+# Subtest: reg query output: the Path value and its type
+ok 68 - reg query output: the Path value and its type
+  ---
+  duration_ms: 5.782726
+  type: 'test'
+  ...
+# Subtest: merge: the current PATH stays first; only new absolute folders are added; unexpanded ones are skipped
+ok 69 - merge: the current PATH stays first; only new absolute folders are added; unexpanded ones are skipped
+  ---
+  duration_ms: 1.713224
+  type: 'test'
+  ...
+# Subtest: Windows: Git installed after the console started is found from the registry Path, under the Path name the process uses
+ok 70 - Windows: Git installed after the console started is found from the registry Path, under the Path name the process uses
+  ---
+  duration_ms: 7.323594
+  type: 'test'
+  ...
+# Subtest: a registry that cannot be read leaves the environment as it was; Linux and macOS are unchanged
+ok 71 - a registry that cannot be read leaves the environment as it was; Linux and macOS are unchanged
+  ---
+  duration_ms: 1.099353
+  type: 'test'
+  ...
+# Subtest: known install folders are for a diagnostic only
+ok 72 - known install folders are for a diagnostic only
+  ---
+  duration_ms: 0.821302
+  type: 'test'
+  ...
+# Subtest: a second console says an earlier console holds the usual port, instead of moving silently
+ok 73 - a second console says an earlier console holds the usual port, instead of moving silently
+  ---
+  duration_ms: 49.6931
+  type: 'test'
+  ...
+# Subtest: the check says what is missing and whether an override is possible
+ok 74 - the check says what is missing and whether an override is possible
+  ---
+  duration_ms: 10.073875
+  type: 'test'
+  ...
+# Subtest: guidance exists for Windows, macOS and Linux for every tool the catalog and the console check; it is display only
+ok 75 - guidance exists for Windows, macOS and Linux for every tool the catalog and the console check; it is display only
+  ---
+  duration_ms: 2.120751
+  type: 'test'
+  ...
+# Subtest: creation is refused before anything is created; the override needs the generator itself
+ok 76 - creation is refused before anything is created; the override needs the generator itself
+  ---
+  duration_ms: 1133.274969
+  type: 'test'
+  ...
+# Subtest: console: the plan carries the tool check, create is refused with it, Recheck is a read, never read-only
+ok 77 - console: the plan carries the tool check, create is refused with it, Recheck is a read, never read-only
+  ---
+  duration_ms: 1022.274901
+  type: 'test'
+  ...
+# Subtest: plan: validated name, absent destination, no nesting, catalog-only stacks; nothing is created
+ok 78 - plan: validated name, absent destination, no nesting, catalog-only stacks; nothing is created
+  ---
+  duration_ms: 656.242024
+  type: 'test'
+  ...
+# Subtest: create: hash confirmation, staging, promotion, Core init with provenance → Greenfield, first work item
+ok 79 - create: hash confirmation, staging, promotion, Core init with provenance → Greenfield, first work item
+  ---
+  duration_ms: 1213.920415
+  type: 'test'
+  ...
+# Subtest: existing projects keep the gate: no provenance, no Greenfield; a copied origin on a brownfield workspace is ignored
+ok 80 - existing projects keep the gate: no provenance, no Greenfield; a copied origin on a brownfield workspace is ignored
+  ---
+  duration_ms: 68.151738
+  type: 'test'
+  ...
+# Subtest: failures: generator error, missing marker, destination appearing; staging and diagnostics kept, nothing overwritten
+ok 81 - failures: generator error, missing marker, destination appearing; staging and diagnostics kept, nothing overwritten
+  ---
+  duration_ms: 255.022166
+  type: 'test'
+  ...
+# Subtest: a plan edited outside YallaFlow cannot run a different command
+ok 82 - a plan edited outside YallaFlow cannot run a different command
+  ---
+  duration_ms: 10.058991
+  type: 'test'
+  ...
+# Subtest: CLI: catalog, recommend, plan, create (empty stack), discard
+ok 83 - CLI: catalog, recommend, plan, create (empty stack), discard
+  ---
+  duration_ms: 1592.807804
+  type: 'test'
+  ...
+# Subtest: console: wizard routes are guarded, need the hash confirmation, and are refused read-only
+ok 84 - console: wizard routes are guarded, need the hash confirmation, and are refused read-only
+  ---
+  duration_ms: 1517.214798
+  type: 'test'
+  ...
+# Subtest: review: staging is npm's project root, so a parent .npmrc or node_modules cannot shadow the generator
+ok 85 - review: staging is npm's project root, so a parent .npmrc or node_modules cannot shadow the generator
+  ---
+  duration_ms: 555.592131
+  type: 'test'
+  ...
+# Subtest: review: a retry never labels or installs into a folder that replaced the created one; failure text is redacted
+ok 86 - review: a retry never labels or installs into a folder that replaced the created one; failure text is redacted
+  ---
+  duration_ms: 301.406397
+  type: 'test'
+  ...
+# Subtest: review: a parent npm workspace that would capture staging stops the generator before it runs
+ok 87 - review: a parent npm workspace that would capture staging stops the generator before it runs
+  ---
+  duration_ms: 390.943102
+  type: 'test'
+  ...
+# Subtest: plan carries intent, environment, git and attachments; creation initializes Git and words the first work from the goal
+ok 88 - plan carries intent, environment, git and attachments; creation initializes Git and words the first work from the goal
+  ---
+  duration_ms: 106.306383
+  type: 'test'
+  ...
+# Subtest: custom stack (PF-0087): only with the empty project; recorded in the plan, origin and first work item; nothing runs
+ok 89 - custom stack (PF-0087): only with the empty project; recorded in the plan, origin and first work item; nothing runs
+  ---
+  duration_ms: 1069.90028
+  type: 'test'
+  ...
+# Subtest: isolation (PF-0094): plans and registrations stay in this run's own config folder
+ok 90 - isolation (PF-0094): plans and registrations stay in this run's own config folder
+  ---
+  duration_ms: 0.908137
+  type: 'test'
+  ...
+# Subtest: 8/9/11. shared enable is explicit, records policy and version, never commits or pushes
+ok 91 - 8/9/11. shared enable is explicit, records policy and version, never commits or pushes
+  ---
+  duration_ms: 2929.422597
+  type: 'test'
+  ...
+# Subtest: 10. an unhealthy or non-Git workspace cannot enable sharing, and nothing changes
+ok 92 - 10. an unhealthy or non-Git workspace cannot enable sharing, and nothing changes
+  ---
+  duration_ms: 1013.452631
+  type: 'test'
+  ...
+# Subtest: 11. an incompatible YallaFlow stops before any project-state mutation; read-only orientation still explains why
+ok 93 - 11. an incompatible YallaFlow stops before any project-state mutation; read-only orientation still explains why
+  ---
+  duration_ms: 3657.562345
+  type: 'test'
+  ...
+# Subtest: 12/52. a single-user workspace is unchanged until sharing is enabled: same IDs, no memory records, reads write nothing
+ok 94 - 12/52. a single-user workspace is unchanged until sharing is enabled: same IDs, no memory records, reads write nothing
+  ---
+  duration_ms: 3964.220138
+  type: 'test'
+  ...
+# Subtest: 13/14/16. two branches from the same base create work and sources without ID or path collision, and merge cleanly
+ok 95 - 13/14/16. two branches from the same base create work and sources without ID or path collision, and merge cleanly
+  ---
+  duration_ms: 2975.398823
+  type: 'test'
+  ...
+# Subtest: 15. legacy PF-\#\#\#\# and SRC-\#\#\#\# stay readable and keep allocating in single-user mode; both forms coexist
+ok 96 - 15. legacy PF-\#\#\#\# and SRC-\#\#\#\# stay readable and keep allocating in single-user mode; both forms coexist
+  ---
+  duration_ms: 1929.523493
+  type: 'test'
+  ...
+# Subtest: checkout tags: 10 Crockford-base32 characters, an unbiased byte mapping, drawn from crypto.randomBytes
+ok 97 - checkout tags: 10 Crockford-base32 characters, an unbiased byte mapping, drawn from crypto.randomBytes
+  ---
+  duration_ms: 7.659986
+  type: 'test'
+  ...
+# Subtest: high-volume deterministic non-reuse: one checkout allocating thousands of IDs across branch switches never repeats a number
+ok 98 - high-volume deterministic non-reuse: one checkout allocating thousands of IDs across branch switches never repeats a number
+  ---
+  duration_ms: 7104.909623
+  type: 'test'
+  ...
+# Subtest: a copied checkout gets a fresh clone tag; the identity is local, gitignored, and needs no join command
+ok 99 - a copied checkout gets a fresh clone tag; the identity is local, gitignored, and needs no join command
+  ---
+  duration_ms: 3130.838856
+  type: 'test'
+  ...
+# Subtest: one checkout never reuses an ID across branch switches or stashes
+ok 100 - one checkout never reuses an ID across branch switches or stashes
+  ---
+  duration_ms: 1590.018495
+  type: 'test'
+  ...
+# Subtest: 17. every global namespace is branch-safe after a multi-branch merge; work-scoped IDs are safe by scope
+ok 101 - 17. every global namespace is branch-safe after a multi-branch merge; work-scoped IDs are safe by scope
+  ---
+  duration_ms: 2940.994532
+  type: 'test'
+  ...
+# Subtest: 18/19/20/21. work captures its memory base; unchanged, unrelated, and referenced changes are told apart
+ok 102 - 18/19/20/21. work captures its memory base; unchanged, unrelated, and referenced changes are told apart
+  ---
+  duration_ms: 1492.703447
+  type: 'test'
+  ...
+# Subtest: 22. without Git the memory base is still a deterministic content fingerprint
+ok 103 - 22. without Git the memory base is still a deterministic content fingerprint
+  ---
+  duration_ms: 88.283142
+  type: 'test'
+  ...
+# Subtest: 23/24/25/26. on a feature branch knowledge is staged work-locally; canonical memory is untouched; DONE and handoff stay coherent
+ok 104 - 23/24/25/26. on a feature branch knowledge is staged work-locally; canonical memory is untouched; DONE and handoff stay coherent
+  ---
+  duration_ms: 3405.341197
+  type: 'test'
+  ...
+# Subtest: a relation proposed against a fact that changes before promotion is refused at staging (revalidate first)
+ok 105 - a relation proposed against a fact that changes before promotion is refused at staging (revalidate first)
+  ---
+  duration_ms: 1358.29249
+  type: 'test'
+  ...
+# Subtest: 27/28/29/30/35. safe new facts, reconfirmations, supersessions, and exact duplicates integrate with full provenance
+ok 106 - 27/28/29/30/35. safe new facts, reconfirmations, supersessions, and exact duplicates integrate with full provenance
+  ---
+  duration_ms: 5138.377376
+  type: 'test'
+  ...
+# Subtest: 31/40. conflicting parallel supersessions block, never overwrite, and memory stays healthy until reconciled
+ok 107 - 31/40. conflicting parallel supersessions block, never overwrite, and memory stays healthy until reconciled
+  ---
+  duration_ms: 5401.705459
+  type: 'test'
+  ...
+# Subtest: 32. a stale base on a feature branch is detected before push, with developer-facing guidance
+ok 108 - 32. a stale base on a feature branch is detected before push, with developer-facing guidance
+  ---
+  duration_ms: 3966.766397
+  type: 'test'
+  ...
+# Subtest: 33/34. integration retry is idempotent and an interrupted or failed integration is never half-applied
+ok 109 - 33/34. integration retry is idempotent and an interrupted or failed integration is never half-applied
+  ---
+  duration_ms: 4029.534884
+  type: 'test'
+  ...
+# Subtest: integration is deterministic: two maintainers integrating the same merge produce identical files
+ok 110 - integration is deterministic: two maintainers integrating the same merge produce identical files
+  ---
+  duration_ms: 2467.837592
+  type: 'test'
+  ...
+# Subtest: doctor detects unsafe shared state: legacy IDs after sharing, local state committed or misplaced, bad metadata, missing CTX, missing provenance
+ok 111 - doctor detects unsafe shared state: legacy IDs after sharing, local state committed or misplaced, bad metadata, missing CTX, missing provenance
+  ---
+  duration_ms: 2950.246804
+  type: 'test'
+  ...
+# Subtest: 47/48/49/50/51. shared check is read-only, provider-neutral, passes a safe branch, and fails a stale one with actionable output
+ok 112 - 47/48/49/50/51. shared check is read-only, provider-neutral, passes a safe branch, and fails a stale one with actionable output
+  ---
+  duration_ms: 2675.378182
+  type: 'test'
+  ...
+# Subtest: 51b/git-scan: the Git scan catches every invocation form, every forbidden subcommand, and git-ops shapes outside the approved set
+ok 113 - 51b/git-scan: the Git scan catches every invocation form, every forbidden subcommand, and git-ops shapes outside the approved set
+  ---
+  duration_ms: 11.215025
+  type: 'test'
+  ...
+# Subtest: 51/no-network: YallaFlow source never invokes mutating or network Git subcommands and calls no LLM provider
+ok 114 - 51/no-network: YallaFlow source never invokes mutating or network Git subcommands and calls no LLM provider
+  ---
+  duration_ms: 268.884969
+  type: 'test'
+  ...
+# Subtest: 42/43/44/45. the adapter orients automatically; finish speaks outcome language and keeps the audit in --verbose
+ok 115 - 42/43/44/45. the adapter orients automatically; finish speaks outcome language and keeps the audit in --verbose
+  ---
+  duration_ms: 3380.093378
+  type: 'test'
+  ...
+# Subtest: 53/54. single-user baseline, freshness, reconciliation helpers and durable sources behave as before
+ok 116 - 53/54. single-user baseline, freshness, reconciliation helpers and durable sources behave as before
+  ---
+  duration_ms: 1380.915638
+  type: 'test'
+  ...
+# Subtest: read commands never write in a Shared Project — not even a fresh clone's local identity
+ok 117 - read commands never write in a Shared Project — not even a fresh clone's local identity
+  ---
+  duration_ms: 12062.948078
+  type: 'test'
+  ...
+1..117
+# tests 117
+# suites 0
+# pass 117
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 82691.098674

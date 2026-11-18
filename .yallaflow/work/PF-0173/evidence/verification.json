@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "node --test test/fresh-path.test.js test/agent-bridge.test.js test/agent-windows.test.js test/console-greenfield.test.js test/console-machine.test.js test/new-project-prerequisites.test.js test/new-project.test.js test/shared-project.test.js test/agent-continue.test.js",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "--test",
+        "test/fresh-path.test.js",
+        "test/agent-bridge.test.js",
+        "test/agent-windows.test.js",
+        "test/console-greenfield.test.js",
+        "test/console-machine.test.js",
+        "test/new-project-prerequisites.test.js",
+        "test/new-project.test.js",
+        "test/shared-project.test.js",
+        "test/agent-continue.test.js"
+      ],
+      "displayCommand": "node --test test/fresh-path.test.js test/agent-bridge.test.js test/agent-windows.test.js test/console-greenfield.test.js test/console-machine.test.js test/new-project-prerequisites.test.js test/new-project.test.js test/shared-project.test.js test/agent-continue.test.js",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-18T11:16:43.568Z",
+      "finishedAt": "2026-11-18T11:18:06.349Z",
+      "verifiedAt": "2026-11-18T11:18:06.349Z",
+      "log": "V-001-verification.log"
+    }
+  ]
+}

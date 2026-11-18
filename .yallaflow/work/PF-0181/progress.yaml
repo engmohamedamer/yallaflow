@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-18T12:30:05.887Z",
+      "completedAt": "2026-11-18T12:30:06.119Z",
+      "summary": "Independent review of the PF-0172..PF-0179 diff (isolated copy) reported findings in src/runtime/process.js (windowsDescendants, windowsStopTree, sync spawnSync table), src/runtime/supervisor.js (terminateOwned, startOne startTime, stopService unknown path, spawn flags), src/utils/fresh-path.js (root-relative entries), src/agents/setup.js (install re-resolves npm), src/agents/answer.js (client text).",
+      "evidence": [
+        "src/runtime/process.js"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-18T12:30:06.876Z",
+      "completedAt": "2026-11-18T12:30:07.053Z",
+      "summary": "Confirmed by reading the code: (1) supervisor.terminateOwned calls descendantsOf(run.pid), which walks the tree of whatever process holds the pid now without comparing its creation time to run.startTime; windowsStopTree skips taskkill for a mismatched leader but still kills tracked entries whose own start matches, i.e. children of an unrelated process. (2) taskkill /T walks parent-pid links with no creation-time rule. (3) windowsProcessTable uses spawnSync on status, lock and stop paths. (4) identify returns other when the table is unreadable, so stopService clears the record and start may store startTime null. (5) detached:true on Windows gives the child no console; its console grandchildren may open visible windows.",
+      "evidence": [
+        "src/runtime/supervisor.js"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-18T12:55:37.524Z",
+      "completedAt": "2026-11-18T12:55:37.524Z",
+      "summary": "process.js: async readWindowsTable (one in-flight read, 3 s keep) + primeProcessTable for the async entry points, sync view only as fallback; identify returns 'unverifiable' when the table could not be read; windowsDescendants requires the leader's expected creation time; windowsStopTree builds the tree itself from a fresh table only when the leader matches, ends each member individually while its creation time matches (no taskkill /T), re-expands each pass (late children) without expanding a reused pid, reports survivors; windowsEndHeldTree for held children. supervisor.js: primes the table in runtimeStatus and the service lock; 'unverifiable' gives unknown + RUNTIME_UNVERIFIABLE on stop, never clears the record, and a lock held by an unverifiable holder is not treated as stale; start reads the creation time fresh (3 tries) and otherwise ends the child it still holds and refuses; Windows services spawn not detached with windowsHide (own hidden console); install timeout uses windowsEndHeldTree. setup.js: cancel uses windowsEndHeldTree; install starts plan.npm (the reviewed npm). command.js: windowsTaskkill removed. fresh-path.js: only drive-letter or UNC entries. answer.js: page text used only if it carries the recorded answer and the item. Docs and changelog updated; remaining minor review items listed as known issues.",
+      "evidence": [
+        "src/runtime/process.js",
+        "src/runtime/supervisor.js",
+        "src/agents/setup.js",
+        "src/utils/fresh-path.js",
+        "src/agents/answer.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-18T13:02:52.656Z",
+      "completedAt": "2026-11-18T13:02:52.656Z",
+      "summary": "V-001 full check 1468 tests (1466 pass, 2 skipped, 0 failed), including the rewritten simulated-Windows stop tests (reviewer's reused-leader scenario: no kill at all; late child included; reused member pid not expanded; unreadable table signals nothing and marks identity unverifiable) and the real-process lifecycle test on Linux. V-002 npm run test:platform passed.",
+      "evidence": [
+        "verification:V-001",
+        "verification:V-002"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-18T13:02:52.656Z"
+}

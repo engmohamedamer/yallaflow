@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-18T16:14:36.172Z",
+      "completedAt": "2026-11-18T16:14:36.383Z",
+      "summary": "Independent review (isolated copy) of PF-0182..0184 reported 1 blocking, 3 should-fix, 3 minor findings with repros; files src/agent/refresh.js, src/core/branches.js, src/execution/git-ops.js.",
+      "evidence": [
+        "src/agent/refresh.js",
+        "src/core/branches.js"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-18T16:14:36.613Z",
+      "completedAt": "2026-11-18T16:14:44.815Z",
+      "summary": "Root causes: (1) restoreRefresh trusts manifest entry.file/backup; resolveManagedFile rejects links but not '..', and manifest hashes are attacker-supplied (a cloned repo can commit .yallaflow/local/backups). (2) the write loop calls setupBootstrap for a second item sharing a real path; it is then 'shared' and throws. (3) branches.js git status reads the work tree with repo filters active. (4) partial clones lazily fetch missing blobs during log --cherry-pick/merge-tree. (5) readiness ignores behind-upstream and unavailable preview. (6) backup content read before the write's own read.",
+      "evidence": [
+        "src/agent/refresh.js",
+        "src/core/branches.js"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-18T16:17:33.140Z",
+      "completedAt": "2026-11-18T16:17:33.422Z",
+      "summary": "refresh.js: MANAGED_PATHS allow-list; validManifest (managed paths once each, N.bak names, hashes, existed/before/backup consistency); manifest.root = realpath of this checkout and must match on read; write loop skips a second item sharing a real path, re-hashes each file against the backup immediately before writing (REFRESH_CHANGED_DURING), wraps errors so 'No files were changed' never follows a write and names the restore command; beforeWrite test seam. commands/refresh.js: check wording with optional items. branches.js: no git status (work tree never read), GIT_NO_LAZY_FETCH=1 and partial-clone skip for Git<2.44, missingChanges reports ok:false → Unknown/unchecked instead of an all-clear, 'check-first' when a flow branch is behind or its upstream is gone, preview unavailable → Unknown, remote-only hotfix branches. git-ops previewMergeIsolated sets GIT_NO_LAZY_FETCH. Tests: 3 refresh and 2 branch regression tests from the review repros; docs and changelog updated.",
+      "evidence": [
+        "src/agent/refresh.js",
+        "src/core/branches.js",
+        "test/health-refresh.test.js",
+        "test/branch-health.test.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-18T16:23:35.788Z",
+      "completedAt": "2026-11-18T16:23:35.953Z",
+      "summary": "V-001: full suite 1487 tests, 1485 pass, 2 skipped, 0 failed (includes the five new regression tests from the review repros).",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-18T16:23:35.953Z"
+}

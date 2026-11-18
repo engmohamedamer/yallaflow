@@ -1,0 +1,43 @@
+{
+  "id": "PF-0173",
+  "type": "bug",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "W2: a tool installed while the console runs (Git via winget) stays 'not found' on Windows — the console and its children only ever use the PATH captured at console start; Recheck re-probes with it; a second console silently moves to port 4748",
+  "status": "DONE",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-18T11:12:30.081Z",
+  "updatedAt": "2026-11-18T11:18:15.224Z",
+  "title": "W2: a tool installed while the console runs (Git via winget) stays 'not found' on Windows — the console and its children only ever use the PATH captured at console start; Recheck re-probes with it; a second console silently moves to port 4748",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow bug --scope bounded`.",
+  "routedAt": "2026-11-18T11:12:30.142Z",
+  "workflow": "bug",
+  "requiredCapabilities": [
+    "discover",
+    "systematic-debugging",
+    "implement",
+    "verify"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "systematic-debugging",
+      "implementation",
+      "verification"
+    ]
+  },
+  "completionHistory": [
+    {
+      "completedAt": "2026-11-18T11:18:15.224Z",
+      "verificationRunIds": [
+        "V-001"
+      ]
+    }
+  ]
+}

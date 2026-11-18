@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "impacts": [
+    {
+      "id": "IM-001",
+      "status": "assessed",
+      "raisedAt": "2026-11-18T11:38:05.938Z",
+      "stageAtRaise": "VERIFICATION",
+      "triggers": [
+        {
+          "type": "requirements",
+          "changes": [
+            {
+              "id": "AC-003",
+              "action": "revised",
+              "from": "active",
+              "to": "active"
+            }
+          ],
+          "at": "2026-11-18T11:38:05.938Z"
+        }
+      ],
+      "assessment": {
+        "assessedAt": "2026-11-18T11:38:13.886Z",
+        "stages": {
+          "context-discovery": {
+            "verdict": "unaffected",
+            "reason": "The discovered runtime code paths are the same; only where the console wording is delivered moved."
+          },
+          "requirement-clarification": {
+            "verdict": "unaffected",
+            "reason": "The owner's intent is unchanged (forceful stop disclosed to the developer); the console wording is now owned by the W6a work item, which records it as its own criterion."
+          },
+          "implementation": {
+            "verdict": "unaffected",
+            "reason": "The backend already reports capabilities.gracefulStop=false and forced: true; no code change follows from narrowing AC-003."
+          }
+        },
+        "applied": {
+          "revised": [],
+          "convergenceInvalidated": false
+        }
+      }
+    }
+  ],
+  "updatedAt": "2026-11-18T11:38:13.886Z"
+}

@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "reviewStatus": "reviewed",
+  "candidates": [
+    {
+      "id": "K-001",
+      "kind": "business-rule",
+      "source": "implementation-runtime",
+      "summary": "A refresh restore acts only on a backup manifest that this checkout wrote (manifest.root equals the checkout's real path) and only on the three managed paths (.yallaflow/AGENT.md, AGENTS.md, CLAUDE.md) with plain N.bak backup names; any other manifest is ignored, because .yallaflow/local can be committed to a repository by someone else.",
+      "evidence": [
+        "src/agent/refresh.js",
+        "verification:V-001"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-18T16:23:36.302Z",
+      "factId": "CTX-0191",
+      "promotedAt": "2026-11-18T16:23:36.623Z",
+      "target": "context/business-rules.md"
+    },
+    {
+      "id": "K-002",
+      "kind": "convention",
+      "source": "implementation-runtime",
+      "summary": "Read-only Git analysis never reads the working tree (status/diff can run repository clean filters) and sets GIT_NO_LAZY_FETCH=1 (partial clones would otherwise fetch from the remote); when something cannot be checked the answer is Unknown, never an all-clear.",
+      "evidence": [
+        "src/core/branches.js",
+        "verification:V-001"
+      ],
+      "status": "promoted",
+      "createdAt": "2026-11-18T16:23:36.460Z",
+      "factId": "CTX-0192",
+      "promotedAt": "2026-11-18T16:23:37.077Z",
+      "target": "context/conventions.md"
+    }
+  ],
+  "updatedAt": "2026-11-18T16:23:37.077Z",
+  "reviewedAt": "2026-11-18T16:23:37.077Z"
+}

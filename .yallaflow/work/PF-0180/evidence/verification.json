@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-18T12:18:24.556Z",
+      "finishedAt": "2026-11-18T12:24:32.124Z",
+      "verifiedAt": "2026-11-18T12:24:32.124Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "node src/cli.js doctor",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "src/cli.js",
+        "doctor"
+      ],
+      "displayCommand": "node src/cli.js doctor",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-18T12:24:36.088Z",
+      "finishedAt": "2026-11-18T12:24:38.875Z",
+      "verifiedAt": "2026-11-18T12:24:38.875Z",
+      "log": "V-002-verification.log"
+    },
+    {
+      "id": "V-003",
+      "command": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/cfd076f8-600d-486e-a6e8-7816b2dd6384/scratchpad/pack/smoke.sh",
+      "executionMode": "shell",
+      "executable": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/cfd076f8-600d-486e-a6e8-7816b2dd6384/scratchpad/pack/smoke.sh",
+      "args": [],
+      "displayCommand": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/cfd076f8-600d-486e-a6e8-7816b2dd6384/scratchpad/pack/smoke.sh",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-18T12:25:46.154Z",
+      "finishedAt": "2026-11-18T12:25:49.598Z",
+      "verifiedAt": "2026-11-18T12:25:49.598Z",
+      "log": "V-003-verification.log"
+    },
+    {
+      "id": "V-004",
+      "command": "cd /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/cfd076f8-600d-486e-a6e8-7816b2dd6384/scratchpad/pack && tar -tzf yallaflow-1.6.0-rc.1.tgz | grep -cv '^package/\\(src\\|resources\\|docs\\)/\\|^package/\\(README.md\\|CHANGELOG.md\\|LICENSE\\|package.json\\)$' | grep -qx 0 && ! tar -xzOf yallaflow-1.6.0-rc.1.tgz | grep -aqE 'ghp_[A-Za-z0-9]{36}|-----BEGIN [A-Z ]*PRIVATE KEY-----|AKIA[0-9A-Z]{16}'",
+      "executionMode": "shell",
+      "executable": "cd /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/cfd076f8-600d-486e-a6e8-7816b2dd6384/scratchpad/pack && tar -tzf yallaflow-1.6.0-rc.1.tgz | grep -cv '^package/\\(src\\|resources\\|docs\\)/\\|^package/\\(README.md\\|CHANGELOG.md\\|LICENSE\\|package.json\\)$' | grep -qx 0 && ! tar -xzOf yallaflow-1.6.0-rc.1.tgz | grep -aqE 'ghp_[A-Za-z0-9]{36}|-----BEGIN [A-Z ]*PRIVATE KEY-----|AKIA[0-9A-Z]{16}'",
+      "args": [],
+      "displayCommand": "cd /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/cfd076f8-600d-486e-a6e8-7816b2dd6384/scratchpad/pack && tar -tzf yallaflow-1.6.0-rc.1.tgz | grep -cv '^package/\\(src\\|resources\\|docs\\)/\\|^package/\\(README.md\\|CHANGELOG.md\\|LICENSE\\|package.json\\)$' | grep -qx 0 && ! tar -xzOf yallaflow-1.6.0-rc.1.tgz | grep -aqE 'ghp_[A-Za-z0-9]{36}|-----BEGIN [A-Z ]*PRIVATE KEY-----|AKIA[0-9A-Z]{16}'",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-18T12:25:49.779Z",
+      "finishedAt": "2026-11-18T12:25:49.914Z",
+      "verifiedAt": "2026-11-18T12:25:49.914Z",
+      "log": "V-004-verification.log"
+    },
+    {
+      "id": "V-005",
+      "command": "git diff --check",
+      "executionMode": "argv",
+      "executable": "git",
+      "args": [
+        "diff",
+        "--check"
+      ],
+      "displayCommand": "git diff --check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-18T12:25:50.096Z",
+      "finishedAt": "2026-11-18T12:25:50.229Z",
+      "verifiedAt": "2026-11-18T12:25:50.229Z",
+      "log": "V-005-verification.log"
+    },
+    {
+      "id": "V-006",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-18T13:03:33.791Z",
+      "finishedAt": "2026-11-18T13:10:39.775Z",
+      "verifiedAt": "2026-11-18T13:10:39.775Z",
+      "log": "V-006-verification.log"
+    },
+    {
+      "id": "V-007",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": false,
+      "status": "failed",
+      "exitCode": 1,
+      "startedAt": "2026-11-18T13:11:34.139Z",
+      "finishedAt": "2026-11-18T13:17:45.174Z",
+      "verifiedAt": "2026-11-18T13:17:45.174Z",
+      "log": "V-007-verification.log"
+    },
+    {
+      "id": "V-008",
+      "command": "npm run check",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "check"
+      ],
+      "displayCommand": "npm run check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-18T13:18:05.018Z",
+      "finishedAt": "2026-11-18T13:24:14.040Z",
+      "verifiedAt": "2026-11-18T13:24:14.040Z",
+      "log": "V-008-verification.log"
+    },
+    {
+      "id": "V-009",
+      "command": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/cfd076f8-600d-486e-a6e8-7816b2dd6384/scratchpad/pack/smoke.sh",
+      "executionMode": "shell",
+      "executable": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/cfd076f8-600d-486e-a6e8-7816b2dd6384/scratchpad/pack/smoke.sh",
+      "args": [],
+      "displayCommand": "bash /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/cfd076f8-600d-486e-a6e8-7816b2dd6384/scratchpad/pack/smoke.sh",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-18T13:24:22.527Z",
+      "finishedAt": "2026-11-18T13:24:30.851Z",
+      "verifiedAt": "2026-11-18T13:24:30.851Z",
+      "log": "V-009-verification.log"
+    },
+    {
+      "id": "V-010",
+      "command": "cd /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/cfd076f8-600d-486e-a6e8-7816b2dd6384/scratchpad/pack && tar -tzf yallaflow-1.6.0-rc.1.tgz | grep -cv '^package/\\(src\\|resources\\|docs\\)/\\|^package/\\(README.md\\|CHANGELOG.md\\|LICENSE\\|package.json\\)$' | grep -qx 0 && ! tar -xzOf yallaflow-1.6.0-rc.1.tgz | grep -aqE 'ghp_[A-Za-z0-9]{36}|-----BEGIN [A-Z ]*PRIVATE KEY-----|AKIA[0-9A-Z]{16}'",
+      "executionMode": "shell",
+      "executable": "cd /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/cfd076f8-600d-486e-a6e8-7816b2dd6384/scratchpad/pack && tar -tzf yallaflow-1.6.0-rc.1.tgz | grep -cv '^package/\\(src\\|resources\\|docs\\)/\\|^package/\\(README.md\\|CHANGELOG.md\\|LICENSE\\|package.json\\)$' | grep -qx 0 && ! tar -xzOf yallaflow-1.6.0-rc.1.tgz | grep -aqE 'ghp_[A-Za-z0-9]{36}|-----BEGIN [A-Z ]*PRIVATE KEY-----|AKIA[0-9A-Z]{16}'",
+      "args": [],
+      "displayCommand": "cd /tmp/claude-1000/-home-engamer-Amasi-YallaFlow/cfd076f8-600d-486e-a6e8-7816b2dd6384/scratchpad/pack && tar -tzf yallaflow-1.6.0-rc.1.tgz | grep -cv '^package/\\(src\\|resources\\|docs\\)/\\|^package/\\(README.md\\|CHANGELOG.md\\|LICENSE\\|package.json\\)$' | grep -qx 0 && ! tar -xzOf yallaflow-1.6.0-rc.1.tgz | grep -aqE 'ghp_[A-Za-z0-9]{36}|-----BEGIN [A-Z ]*PRIVATE KEY-----|AKIA[0-9A-Z]{16}'",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-18T13:24:31.043Z",
+      "finishedAt": "2026-11-18T13:24:31.203Z",
+      "verifiedAt": "2026-11-18T13:24:31.203Z",
+      "log": "V-010-verification.log"
+    },
+    {
+      "id": "V-011",
+      "command": "git diff --check",
+      "executionMode": "argv",
+      "executable": "git",
+      "args": [
+        "diff",
+        "--check"
+      ],
+      "displayCommand": "git diff --check",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-18T13:24:31.431Z",
+      "finishedAt": "2026-11-18T13:24:31.586Z",
+      "verifiedAt": "2026-11-18T13:24:31.586Z",
+      "log": "V-011-verification.log"
+    },
+    {
+      "id": "V-012",
+      "command": "node src/cli.js doctor",
+      "executionMode": "argv",
+      "executable": "node",
+      "args": [
+        "src/cli.js",
+        "doctor"
+      ],
+      "displayCommand": "node src/cli.js doctor",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-18T13:24:31.805Z",
+      "finishedAt": "2026-11-18T13:24:35.766Z",
+      "verifiedAt": "2026-11-18T13:24:35.766Z",
+      "log": "V-012-verification.log"
+    },
+    {
+      "id": "V-013",
+      "command": "npm run test:platform",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "test:platform"
+      ],
+      "displayCommand": "npm run test:platform",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-18T13:24:35.994Z",
+      "finishedAt": "2026-11-18T13:24:42.305Z",
+      "verifiedAt": "2026-11-18T13:24:42.305Z",
+      "log": "V-013-verification.log"
+    }
+  ]
+}

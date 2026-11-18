@@ -1,0 +1,502 @@
+TAP version 13
+# Subtest: versions, forbidden modes, ACP normalization, and API keys stripped from the adapter env
+ok 1 - versions, forbidden modes, ACP normalization, and API keys stripped from the adapter env
+  ---
+  duration_ms: 7.262173
+  type: 'test'
+  ...
+# Subtest: detection: adapter missing, unsupported version, and ready
+ok 2 - detection: adapter missing, unsupported version, and ready
+  ---
+  duration_ms: 83.473224
+  type: 'test'
+  ...
+# Subtest: codex: start, stream, follow-up, permissions (allow, deny, timeout), one session per checkout, no activation
+ok 3 - codex: start, stream, follow-up, permissions (allow, deny, timeout), one session per checkout, no activation
+  ---
+  duration_ms: 5639.213941
+  type: 'test'
+  ...
+# Subtest: codex: cancel, crash, resume after a console restart, explicit activation through Core
+ok 4 - codex: cancel, crash, resume after a console restart, explicit activation through Core
+  ---
+  duration_ms: 9169.299774
+  type: 'test'
+  ...
+# Subtest: codex: ending a session while a permission is pending denies it and never crashes the console
+ok 5 - codex: ending a session while a permission is pending denies it and never crashes the console
+  ---
+  duration_ms: 4763.69992
+  type: 'test'
+  ...
+# Subtest: codex: a non-subscription login is refused and no session starts
+ok 6 - codex: a non-subscription login is refused and no session starts
+  ---
+  duration_ms: 4382.161939
+  type: 'test'
+  ...
+# Subtest: security: opt-in, token, Origin, content type, read-only, unsupported controls
+ok 7 - security: opt-in, token, Origin, content type, read-only, unsupported controls
+  ---
+  duration_ms: 279.558967
+  type: 'test'
+  ...
+# Subtest: security review regressions: start race, modes, symlinks
+ok 8 - security review regressions: start race, modes, symlinks
+  ---
+  duration_ms: 8795.391293
+  type: 'test'
+  ...
+# Subtest: codex: an adapter that cannot be spawned fails the start promptly and frees the checkout
+ok 9 - codex: an adapter that cannot be spawned fails the start promptly and frees the checkout
+  ---
+  duration_ms: 4350.641046
+  type: 'test'
+  ...
+# Subtest: stabilization: Allow for session is session-scoped only; nothing persists or carries to another session
+ok 10 - stabilization: Allow for session is session-scoped only; nothing persists or carries to another session
+  ---
+  duration_ms: 4809.36735
+  type: 'test'
+  ...
+# Subtest: stabilization: ending a Codex session ends what it started, and an incomplete cleanup is never reported as a clean stop
+ok 11 - stabilization: ending a Codex session ends what it started, and an incomplete cleanup is never reported as a clean stop
+  ---
+  duration_ms: 8111.076386
+  type: 'test'
+  ...
+# Subtest: stabilization: one agent console per checkout across separate console processes
+ok 12 - stabilization: one agent console per checkout across separate console processes
+  ---
+  duration_ms: 4897.423394
+  type: 'test'
+  ...
+# Subtest: stabilization: a directory swapped for a link after the check cannot redirect a local write
+ok 13 - stabilization: a directory swapped for a link after the check cannot redirect a local write
+  ---
+  duration_ms: 9.149298
+  type: 'test'
+  ...
+# Subtest: stabilization review: hard links, End while starting, overlapping lock claims, crash cleanup
+ok 14 - stabilization review: hard links, End while starting, overlapping lock claims, crash cleanup
+  ---
+  duration_ms: 2700.649095
+  type: 'test'
+  ...
+# Subtest: CLI: agents detect is read-only; console flag combinations are validated
+ok 15 - CLI: agents detect is read-only; console flag combinations are validated
+  ---
+  duration_ms: 1614.29559
+  type: 'test'
+  ...
+# Subtest: stopFrom: a usage limit is recognised with its retry time; other stops keep their reason
+ok 16 - stopFrom: a usage limit is recognised with its retry time; other stops keep their reason
+  ---
+  duration_ms: 5.033241
+  type: 'test'
+  ...
+# Subtest: codex: a usage-limit turn is a stop with its retry time, kept after End and across a console restart
+ok 17 - codex: a usage-limit turn is a stop with its retry time, kept after End and across a console restart
+  ---
+  duration_ms: 5129.445305
+  type: 'test'
+  ...
+# Subtest: codex: a crash and a plain End are recorded as such
+ok 18 - codex: a crash and a plain End are recorded as such
+  ---
+  duration_ms: 4668.068853
+  type: 'test'
+  ...
+# Subtest: UI: a live Codex usage limit offers Claude Code and a terminal message, not Codex again
+ok 19 - UI: a live Codex usage limit offers Claude Code and a terminal message, not Codex again
+  ---
+  duration_ms: 7.590197
+  type: 'test'
+  ...
+# Subtest: UI: a session started after the stop (the switch itself) clears the card
+ok 20 - UI: a session started after the stop (the switch itself) clears the card
+  ---
+  duration_ms: 2.985629
+  type: 'test'
+  ...
+# Subtest: UI: a message sent after the stop clears the card; another item never shows it
+ok 21 - UI: a message sent after the stop clears the card; another item never shows it
+  ---
+  duration_ms: 5.173216
+  type: 'test'
+  ...
+# Subtest: UI: with no session, the last recorded stop of this item is offered, including the same agent; Arabic too
+ok 22 - UI: with no session, the last recorded stop of this item is offered, including the same agent; Arabic too
+  ---
+  duration_ms: 8.60103
+  type: 'test'
+  ...
+# Subtest: UI: only ready providers are offered
+ok 23 - UI: only ready providers are offered
+  ---
+  duration_ms: 3.339877
+  type: 'test'
+  ...
+# Subtest: UI: switching ends Codex first, connects Claude, and prepares (never sends) the continue message
+ok 24 - UI: switching ends Codex first, connects Claude, and prepares (never sends) the continue message
+  ---
+  duration_ms: 7.021145
+  type: 'test'
+  ...
+# Subtest: UI: a failed End stops the switch; nothing else starts
+ok 25 - UI: a failed End stops the switch; nothing else starts
+  ---
+  duration_ms: 4.84249
+  type: 'test'
+  ...
+# Subtest: UI: the item lists which agent worked on it and how each session stopped
+ok 26 - UI: the item lists which agent worked on it and how each session stopped
+  ---
+  duration_ms: 3.574642
+  type: 'test'
+  ...
+# Subtest: delivery: sent only to the item's own idle Codex session, and only reported sent once the agent works
+ok 27 - delivery: sent only to the item's own idle Codex session, and only reported sent once the agent works
+  ---
+  duration_ms: 7.220734
+  type: 'test'
+  ...
+# Subtest: execution: an answered question that was not sent leaves the task waiting for a reply; a real turn makes it working
+ok 28 - execution: an answered question that was not sent leaves the task waiting for a reply; a real turn makes it working
+  ---
+  duration_ms: 1.502925
+  type: 'test'
+  ...
+# Subtest: console: the toast says what happened to the answer; verification says why it has no run yet
+ok 29 - console: the toast says what happened to the answer; verification says why it has no run yet
+  ---
+  duration_ms: 8.918577
+  type: 'test'
+  ...
+# Subtest: end to end: Answer on the page records the answer, the idle Codex session receives it and works again (simulated provider)
+ok 30 - end to end: Answer on the page records the answer, the idle Codex session receives it and works again (simulated provider)
+  ---
+  duration_ms: 6046.934997
+  type: 'test'
+  ...
+# Subtest: work-item actions run the canonical commands: same records as the CLI, Core refusals passed through
+ok 31 - work-item actions run the canonical commands: same records as the CLI, Core refusals passed through
+  ---
+  duration_ms: 4492.679349
+  type: 'test'
+  ...
+# Subtest: request edits use full text before work starts and refuse stale or invalid saves
+ok 32 - request edits use full text before work starts and refuse stale or invalid saves
+  ---
+  duration_ms: 2279.868822
+  type: 'test'
+  ...
+# Subtest: action input is validated and values never become options
+ok 33 - action input is validated and values never become options
+  ---
+  duration_ms: 750.741274
+  type: 'test'
+  ...
+# Subtest: security: token, Origin, content type and read-only consoles guard every action and decision
+ok 34 - security: token, Origin, content type and read-only consoles guard every action and decision
+  ---
+  duration_ms: 666.788699
+  type: 'test'
+  ...
+# Subtest: gate decisions: material shown first, exact confirmation, stale and duplicate protection, console provenance
+ok 35 - gate decisions: material shown first, exact confirmation, stale and duplicate protection, console provenance
+  ---
+  duration_ms: 4720.098487
+  type: 'test'
+  ...
+# Subtest: CLI decisions are recorded exactly as before (no provenance), and a bad provenance channel records nothing
+ok 36 - CLI decisions are recorded exactly as before (no provenance), and a bad provenance channel records nothing
+  ---
+  duration_ms: 3367.447178
+  type: 'test'
+  ...
+# Subtest: the Agent Workspace never reaches gate decisions, and agents never inherit the provenance channel
+ok 37 - the Agent Workspace never reaches gate decisions, and agents never inherit the provenance channel
+  ---
+  duration_ms: 19.630928
+  type: 'test'
+  ...
+# Subtest: review findings: re-deciding after "request changes", request ids per gate, malformed bodies, provenance limits, strict doctor
+ok 38 - review findings: re-deciding after "request changes", request ids per gate, malformed bodies, provenance limits, strict doctor
+  ---
+  duration_ms: 5254.427126
+  type: 'test'
+  ...
+# Subtest: revision attachments preserve bytes, deduplicate retries and respect request-edit and HTTP guards
+ok 39 - revision attachments preserve bytes, deduplicate retries and respect request-edit and HTTP guards
+  ---
+  duration_ms: 2955.088292
+  type: 'test'
+  ...
+# Subtest: revision upload rechecks eligibility in the CLI if work starts after its queued check
+ok 40 - revision upload rechecks eligibility in the CLI if work starts after its queued check
+  ---
+  duration_ms: 1057.574223
+  type: 'test'
+  ...
+# Subtest: gate decisions: a required gate that was never requested can be decided while the item waits on it
+ok 41 - gate decisions: a required gate that was never requested can be decided while the item waits on it
+  ---
+  duration_ms: 4047.980916
+  type: 'test'
+  ...
+# Subtest: a refused send keeps its error after the agent state reloads
+ok 42 - a refused send keeps its error after the agent state reloads
+  ---
+  duration_ms: 14.250428
+  type: 'test'
+  ...
+# Subtest: a successful send reports success and leaves no error
+ok 43 - a successful send reports success and leaves no error
+  ---
+  duration_ms: 4.953862
+  type: 'test'
+  ...
+# Subtest: a connected Claude Code that is still being checked offers Copy for terminal, not Send
+ok 44 - a connected Claude Code that is still being checked offers Copy for terminal, not Send
+  ---
+  duration_ms: 15.262802
+  type: 'test'
+  ...
+# Subtest: an unverified connection is Terminal mode: one state, no error, no jargon
+ok 45 - an unverified connection is Terminal mode: one state, no error, no jargon
+  ---
+  duration_ms: 8.944439
+  type: 'test'
+  ...
+# Subtest: once the connection check is acknowledged the panel offers Send
+ok 46 - once the connection check is acknowledged the panel offers Send
+  ---
+  duration_ms: 5.637843
+  type: 'test'
+  ...
+# Subtest: the Arabic panel says the same states
+ok 47 - the Arabic panel says the same states
+  ---
+  duration_ms: 15.283137
+  type: 'test'
+  ...
+# Subtest: each message shows its own state, by chat id, in both languages
+ok 48 - each message shows its own state, by chat id, in both languages
+  ---
+  duration_ms: 12.978085
+  type: 'test'
+  ...
+# Subtest: Copy for terminal copies inside the click and records the message without sending it
+ok 49 - Copy for terminal copies inside the click and records the message without sending it
+  ---
+  duration_ms: 0.875832
+  type: 'test'
+  ...
+# Subtest: a failed send puts the typed message back
+ok 50 - a failed send puts the typed message back
+  ---
+  duration_ms: 1.50447
+  type: 'test'
+  ...
+# Subtest: agent replies use formatted content while user messages stay literal
+ok 51 - agent replies use formatted content while user messages stay literal
+  ---
+  duration_ms: 7.602139
+  type: 'test'
+  ...
+# Subtest: Run Now: Start keeps its v1.4.2 calls; the manager records a one-task run; the inbox shows paths and the command; answering resolves the same request
+ok 52 - Run Now: Start keeps its v1.4.2 calls; the manager records a one-task run; the inbox shows paths and the command; answering resolves the same request
+  ---
+  duration_ms: 5655.283906
+  type: 'test'
+  ...
+# Subtest: restart: a task that was live becomes interrupted and nothing starts by itself; an unreadable store is reported and left alone
+ok 53 - restart: a task that was live becomes interrupted and nothing starts by itself; an unreadable store is reported and left alone
+  ---
+  duration_ms: 322.924592
+  type: 'test'
+  ...
+# Subtest: the Agents view is read-only and needs the token; without agents it reports disabled
+ok 54 - the Agents view is read-only and needs the token; without agents it reports disabled
+  ---
+  duration_ms: 270.974555
+  type: 'test'
+  ...
+# Subtest: Queue end to end: two items run one after the other through the real bridge; each ends its session only after YallaFlow shows DONE
+ok 55 - Queue end to end: two items run one after the other through the real bridge; each ends its session only after YallaFlow shows DONE
+  ---
+  duration_ms: 7958.611352
+  type: 'test'
+  ...
+# Subtest: execution routes: token, Origin and JSON are required; a read-only console refuses them
+ok 56 - execution routes: token, Origin and JSON are required; a read-only console refuses them
+  ---
+  duration_ms: 271.643928
+  type: 'test'
+  ...
+# Subtest: Parallel: two requests become two lanes (named after the project and lane) with their own agents running at the same time; a third lane is refused; Clean up refuses unmerged lanes
+ok 57 - Parallel: two requests become two lanes (named after the project and lane) with their own agents running at the same time; a third lane is refused; Clean up refuses unmerged lanes
+  ---
+  duration_ms: 9827.926549
+  type: 'test'
+  ...
+# Subtest: Review & Merge in the console: the first lane merges to MERGED & VERIFIED; the second conflicts and is sent back to its agent (reopened, started with the conflict instruction)
+ok 58 - Review & Merge in the console: the first lane merges to MERGED & VERIFIED; the second conflicts and is sent back to its agent (reopened, started with the conflict instruction)
+  ---
+  duration_ms: 29363.936383
+  type: 'test'
+  ...
+# Subtest: model: a task becomes done only when the item is DONE and the session ended with every process gone (D7)
+ok 59 - model: a task becomes done only when the item is DONE and the session ended with every process gone (D7)
+  ---
+  duration_ms: 4.778821
+  type: 'test'
+  ...
+# Subtest: model: approvals, reviews, questions and replies block; nothing in the model answers them
+ok 60 - model: approvals, reviews, questions and replies block; nothing in the model answers them
+  ---
+  duration_ms: 3.457906
+  type: 'test'
+  ...
+# Subtest: model: usage limits pause, crashes fail, held or closed items are skipped
+ok 61 - model: usage limits pause, crashes fail, held or closed items are skipped
+  ---
+  duration_ms: 1.239891
+  type: 'test'
+  ...
+# Subtest: model: a restart interrupts live tasks and starts nothing; a claim is write-ahead with an attempt count
+ok 62 - model: a restart interrupts live tasks and starts nothing; a claim is write-ahead with an attempt count
+  ---
+  duration_ms: 1.477589
+  type: 'test'
+  ...
+# Subtest: model: one live task per lane; ownership is unique across runs (FR4); final states stay final
+ok 63 - model: one live task per lane; ownership is unique across runs (FR4); final states stay final
+  ---
+  duration_ms: 10.735458
+  type: 'test'
+  ...
+# Subtest: store: atomic save and load; a missing store is empty; an unreadable store is reported and never overwritten
+ok 64 - store: atomic save and load; a missing store is empty; an unreadable store is reported and never overwritten
+  ---
+  duration_ms: 94.672142
+  type: 'test'
+  ...
+# Subtest: store: a symbolic link in place of the execution folder is refused
+ok 65 - store: a symbolic link in place of the execution folder is refused
+  ---
+  duration_ms: 10.971434
+  type: 'test'
+  ...
+# Subtest: permission scope: Codex tool calls name their files and command; paths inside the checkout become relative; sizes are bounded
+ok 66 - permission scope: Codex tool calls name their files and command; paths inside the checkout become relative; sizes are bounded
+  ---
+  duration_ms: 3.79311
+  type: 'test'
+  ...
+# Subtest: D15: approval wait per project — 5/15/30/60 minutes, default 5 for existing projects, other values refused, a committed file ignored, an expired request DENIED
+ok 67 - D15: approval wait per project — 5/15/30/60 minutes, default 5 for existing projects, other values refused, a committed file ignored, an expired request DENIED
+  ---
+  duration_ms: 165.518162
+  type: 'test'
+  ...
+# Subtest: PF-0115: item-done is applied once; a DONE item whose session stays open is not rewritten on every snapshot
+ok 68 - PF-0115: item-done is applied once; a DONE item whose session stays open is not rewritten on every snapshot
+  ---
+  duration_ms: 3.477771
+  type: 'test'
+  ...
+# Subtest: queue: strictly one task at a time, each in a fresh session; the next starts only after DONE and a fully ended session
+ok 69 - queue: strictly one task at a time, each in a fresh session; the next starts only after DONE and a fully ended session
+  ---
+  duration_ms: 256.106523
+  type: 'test'
+  ...
+# Subtest: queue: an incomplete process cleanup fails the task and blocks the queue (D7)
+ok 70 - queue: an incomplete process cleanup fails the task and blocks the queue (D7)
+  ---
+  duration_ms: 51.038969
+  type: 'test'
+  ...
+# Subtest: queue: a review gate, a question and an open approval each block until the developer acts; nothing is answered
+ok 71 - queue: a review gate, a question and an open approval each block until the developer acts; nothing is answered
+  ---
+  duration_ms: 64.497978
+  type: 'test'
+  ...
+# Subtest: queue: a usage limit pauses that provider in every project; Resume clears it and continues the same session
+ok 72 - queue: a usage limit pauses that provider in every project; Resume clears it and continues the same session
+  ---
+  duration_ms: 69.234369
+  type: 'test'
+  ...
+# Subtest: restart: live tasks become interrupted, nothing starts by itself, and a double Resume starts exactly one session
+ok 73 - restart: live tasks become interrupted, nothing starts by itself, and a double Resume starts exactly one session
+  ---
+  duration_ms: 31.815283
+  type: 'test'
+  ...
+# Subtest: queue controls: pause and next, pause after each task, cancel after current and now, skip, retry, reorder, switch agent
+ok 74 - queue controls: pause and next, pause after each task, cancel after current and now, skip, retry, reorder, switch agent
+  ---
+  duration_ms: 430.509723
+  type: 'test'
+  ...
+# Subtest: queue: Claude Code tasks are assisted — the manager never starts Claude Code
+ok 75 - queue: Claude Code tasks are assisted — the manager never starts Claude Code
+  ---
+  duration_ms: 19.322108
+  type: 'test'
+  ...
+# Subtest: createRun refuses: duplicates, items already queued, DONE, held or closed items, a running item, bad modes, another console
+ok 76 - createRun refuses: duplicates, items already queued, DONE, held or closed items, a running item, bad modes, another console
+  ---
+  duration_ms: 40.512612
+  type: 'test'
+  ...
+# Subtest: review M3: a queued task whose item became DONE, closed or held is never started; the queue moves on
+ok 77 - review M3: a queued task whose item became DONE, closed or held is never started; the queue moves on
+  ---
+  duration_ms: 125.767959
+  type: 'test'
+  ...
+# Subtest: review M4: when the write-ahead claim cannot be saved, no session starts
+ok 78 - review M4: when the write-ahead claim cannot be saved, no session starts
+  ---
+  duration_ms: 86.112209
+  type: 'test'
+  ...
+# Subtest: review M6: a usage limit is derived from the tasks — it survives a restart and ends when the limited task is skipped
+ok 79 - review M6: a usage limit is derived from the tasks — it survives a restart and ends when the limited task is skipped
+  ---
+  duration_ms: 166.681093
+  type: 'test'
+  ...
+# Subtest: review H7: a runs.json YallaFlow could not have written (tracked, readable by others, odd shapes) is never trusted
+ok 80 - review H7: a runs.json YallaFlow could not have written (tracked, readable by others, odd shapes) is never trusted
+  ---
+  duration_ms: 46.196167
+  type: 'test'
+  ...
+# Subtest: review H7: a lane's runs are kept in its home checkout, out of the lane agent's reach
+ok 81 - review H7: a lane's runs are kept in its home checkout, out of the lane agent's reach
+  ---
+  duration_ms: 27.828841
+  type: 'test'
+  ...
+# Subtest: release rule: a queued session never starts after the project's Codex configuration (.codex/) changed since the queue began
+ok 82 - release rule: a queued session never starts after the project's Codex configuration (.codex/) changed since the queue began
+  ---
+  duration_ms: 54.555176
+  type: 'test'
+  ...
+1..82
+# tests 82
+# suites 0
+# pass 82
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 60166.886813

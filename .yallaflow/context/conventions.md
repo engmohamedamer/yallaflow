@@ -355,4 +355,60 @@
   - resources/console/app.js (repository @ f33eaec)
   - test/console-wizard-resume.test.js (repository @ f33eaec)
 
+<!-- yallaflow-fact:CTX-0181 -->
+### CTX-0181 — Every child process YallaFlow starts gets an allow-listed environment built by safeEnvironment (src/utils/command.js), which on Windows adds the system variables programs need (Path in any case, APPDATA, SystemRoot, TEMP, PATHEXT, ComSpec, ...). A hand-written POSIX-only allow-list breaks Windows children: npm then cannot expand its builtin prefix=${APPDATA}\npm (seen on a real Windows 11 machine in the 1.5.4 trial).
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0172
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-18T11:12:19.147Z
+- **Verified:** 2026-11-18T11:12:19.147Z (commit 1e63e03)
+- **Evidence:**
+  - src/utils/command.js (repository @ 1e63e03)
+  - src/agents/setup.js (repository @ 1e63e03)
+
+<!-- yallaflow-fact:CTX-0186 -->
+### CTX-0186 — CI: .github/workflows/ci.yml runs the full suite (npm run check) on Ubuntu and the platform suite (npm run test:platform: real-process runtime lifecycle plus the Windows-rule suites) on windows-latest, macos-latest and ubuntu-latest for pushes and PRs; release.yml runs the same platform job before publish. The full suite is POSIX-only; a test that must pass on every OS belongs in test:platform.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0178
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-18T11:44:35.586Z
+- **Verified:** 2026-11-18T11:44:35.586Z (commit 1e63e03)
+- **Evidence:**
+  - .github/workflows/ci.yml (repository @ 1e63e03)
+  - package.json (repository @ 1e63e03)
+
+<!-- yallaflow-fact:CTX-0188 -->
+### CTX-0188 — Commands the console shows for the developer to copy and run must work from any folder: on macOS/Linux they cd to the project first and name files by absolute single-quoted path; on Windows no project path is placed in PowerShell command text (it expands $(...) inside double quotes), so those keep project-relative names and are run in the project folder.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0182
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-18T15:42:23.801Z
+- **Verified:** 2026-11-18T15:42:23.801Z (commit 1e63e03)
+- **Evidence:**
+  - src/agents/claude-files.js (repository @ 1e63e03)
+  - node --import ./test-support/isolate-user-config.js --test test/agent-windows.test.js test/agent-claude-experimental.test.js test/project-setup.test.js test/shared-project.test.js (passed) (runtime, PF-0182 V-001)
+
+<!-- yallaflow-fact:CTX-0192 -->
+### CTX-0192 — Read-only Git analysis never reads the working tree (status/diff can run repository clean filters) and sets GIT_NO_LAZY_FETCH=1 (partial clones would otherwise fetch from the remote); when something cannot be checked the answer is Unknown, never an all-clear.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0186
+- **Knowledge ID:** K-002
+- **Promoted at:** 2026-11-18T16:23:37.077Z
+- **Verified:** 2026-11-18T16:23:37.077Z (commit 1e63e03)
+- **Evidence:**
+  - src/core/branches.js (repository @ 1e63e03)
+  - node --import ./test-support/isolate-user-config.js --test (passed) (runtime, PF-0186 V-001)
+
 <!-- yallaflow-context:end -->

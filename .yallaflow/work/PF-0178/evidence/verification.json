@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "id": "V-001",
+      "command": "npm run test:platform",
+      "executionMode": "argv",
+      "executable": "npm",
+      "args": [
+        "run",
+        "test:platform"
+      ],
+      "displayCommand": "npm run test:platform",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-18T11:44:21.994Z",
+      "finishedAt": "2026-11-18T11:44:27.790Z",
+      "verifiedAt": "2026-11-18T11:44:27.790Z",
+      "log": "V-001-verification.log"
+    },
+    {
+      "id": "V-002",
+      "command": "python3 -c \"import yaml; [yaml.safe_load(open(f)) for f in ['.github/workflows/ci.yml','.github/workflows/release.yml']]\"",
+      "executionMode": "shell",
+      "executable": "python3 -c \"import yaml; [yaml.safe_load(open(f)) for f in ['.github/workflows/ci.yml','.github/workflows/release.yml']]\"",
+      "args": [],
+      "displayCommand": "python3 -c \"import yaml; [yaml.safe_load(open(f)) for f in ['.github/workflows/ci.yml','.github/workflows/release.yml']]\"",
+      "success": true,
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-11-18T11:44:27.974Z",
+      "finishedAt": "2026-11-18T11:44:28.069Z",
+      "verifiedAt": "2026-11-18T11:44:28.069Z",
+      "log": "V-002-verification.log"
+    }
+  ]
+}

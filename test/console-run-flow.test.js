@@ -123,7 +123,7 @@ test('nothing to approve shows no card; a read-only console never offers approva
 });
 
 test('the Run tab hosts the flow; Overview names the next run step; Settings keeps advanced editing', () => {
-  assert.match(app, /if \(!readOnly\) return projectPage\('run', profileError\(r\) \+ runFind\(r\) \+ dev\);/);
+  assert.match(app, /if \(!readOnly\) return projectPage\('run', profileError\(r\) \+ runFind\(r\) \+ runtimePlatformNote\(r\) \+ dev\);/);
   assert.match(app, /<div class="pmain">\$\{runApprove\(r\)\}\$\{runSection\(r, rows/);
   assert.match(app, /href="#\/run" data-run-next="\$\{esc\(st\.status\)\}"/);
   assert.doesNotMatch(app, /'Define the services'/);

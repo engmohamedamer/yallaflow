@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "behavior": {
+    "registryVersion": 9
+  },
+  "skills": {
+    "context-discovery": {
+      "status": "completed",
+      "startedAt": "2026-11-18T11:12:37.047Z",
+      "completedAt": "2026-11-18T11:12:37.227Z",
+      "summary": "Recheck (app.js data-wiz-recheck -> wizardPlanNow -> POST /api/new/plan -> runner.runAside yallaflow new plan) runs a fresh CLI child that inherits the console's process.env (src/console/runner.js:43); prerequisite probes filter that env (src/newproject/project.js scrubbedEnv). Agent sessions, machine setup and detection also use the console's process.env. listen() in src/commands/console.js falls back from 4747 to 4748 without saying so.",
+      "evidence": [
+        "src/console/runner.js"
+      ]
+    },
+    "systematic-debugging": {
+      "status": "completed",
+      "startedAt": "2026-11-18T11:12:37.974Z",
+      "completedAt": "2026-11-18T11:12:38.156Z",
+      "summary": "Root cause: on Windows a process's PATH is a copy taken from its parent when it starts; winget/installers update the registry (HKLM Session Manager Environment and HKCU Environment Path) but no running process. YallaFlow never re-reads it, so Recheck repeats the same stale lookup; restarting the console from the same old PowerShell inherits the same stale PATH. Nothing caches the result (each Recheck is a new CLI child), so the defect is the environment source, not caching. Not reproducible on Linux (no registry); verified by code trace.",
+      "evidence": [
+        "src/newproject/project.js"
+      ]
+    },
+    "implementation": {
+      "status": "completed",
+      "startedAt": "2026-11-18T11:16:43.064Z",
+      "completedAt": "2026-11-18T11:16:43.064Z",
+      "summary": "New src/utils/fresh-path.js: on Windows reads the current machine and user Path from the registry with System32 reg.exe (argv, no shell, 1.5 s cache), expands REG_EXPAND_SZ variables, appends only new absolute folders after the console's own PATH (system PATH never written); Linux/macOS unchanged. Used by: new-project prerequisite probes, generator runs and npm-root check (one env for lookup and run), greenfield tool probes and git init, machine setup (status/install/sign-in/verify, so the install planHash also binds the npm found), and new Codex sessions (bridge.launch passes the refreshed env to CodexSession). Missing git/docker/node in their usual Windows folder is reported as installed-but-not-on-PATH. A console finding its usual port taken now says whether an earlier console (pid-checked record in console-instances.json beside console.json; no network) holds it. Wizard Recheck copy updated for Windows.",
+      "evidence": [
+        "src/utils/fresh-path.js",
+        "src/console/instances.js",
+        "src/commands/console.js",
+        "src/agents/bridge.js"
+      ]
+    },
+    "verification": {
+      "status": "completed",
+      "startedAt": "2026-11-18T11:18:14.072Z",
+      "completedAt": "2026-11-18T11:18:14.072Z",
+      "summary": "V-001 passed (123 tests): simulated reg.exe Path parsing/expansion/merge, stale-vs-fresh PATH lookup of C:\\Program Files\\Git\\cmd\\git.exe, unreadable registry fallback, Linux/macOS passthrough, earlier-console port note, plus the bridge, agent, wizard, greenfield, machine and network-guard suites. Real Windows registry read is not verified (Linux machine).",
+      "evidence": [
+        "verification:V-001"
+      ]
+    }
+  },
+  "rulings": [],
+  "history": [],
+  "updatedAt": "2026-11-18T11:18:14.072Z"
+}

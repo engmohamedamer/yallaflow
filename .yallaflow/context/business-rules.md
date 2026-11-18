@@ -249,4 +249,32 @@
   - src/runtime/profile.js (repository @ f33eaec)
   - node --import ./test-support/isolate-user-config.js --test test/runtime-readiness.test.js test/runtime-fixes.test.js test/console-run-fixes.test.js test/console-monitor-mode.test.js test/console-ia.test.js test/console-run-flow.test.js (passed) (runtime, PF-0166 V-004)
 
+<!-- yallaflow-fact:CTX-0183 -->
+### CTX-0183 — Answering an agent's question in the console records it through Core (yallaflow question answer) and, only when the item's own Codex session is idle with no open approval, also sends it to that session; the console reports delivery as sent only after the agent's turn started, otherwise says busy, other-item, manual (Claude Code), no-session or failed. A task whose question was answered without a new turn waits for the developer's reply (needs-you: reply), never shows working.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0174
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-18T11:24:00.363Z
+- **Verified:** 2026-11-18T11:24:00.363Z (commit 1e63e03)
+- **Evidence:**
+  - src/console/actions.js (repository @ 1e63e03)
+  - src/execution/model.js (repository @ 1e63e03)
+
+<!-- yallaflow-fact:CTX-0191 -->
+### CTX-0191 — A refresh restore acts only on a backup manifest that this checkout wrote (manifest.root equals the checkout's real path) and only on the three managed paths (.yallaflow/AGENT.md, AGENTS.md, CLAUDE.md) with plain N.bak backup names; any other manifest is ignored, because .yallaflow/local can be committed to a repository by someone else.
+
+- **State:** current
+- **Confidence:** confirmed
+- **Provenance:** repository
+- **Source work:** PF-0186
+- **Knowledge ID:** K-001
+- **Promoted at:** 2026-11-18T16:23:36.623Z
+- **Verified:** 2026-11-18T16:23:36.623Z (commit 1e63e03)
+- **Evidence:**
+  - src/agent/refresh.js (repository @ 1e63e03)
+  - node --import ./test-support/isolate-user-config.js --test (passed) (runtime, PF-0186 V-001)
+
 <!-- yallaflow-context:end -->
