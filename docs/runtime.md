@@ -171,7 +171,7 @@ yallaflow runtime stop web          # or: yallaflow runtime stop --all
   - Log files that are symbolic or hard links are refused, and showing logs never writes, truncates or rotates anything.
   - Recognizable secrets are redacted when the log is shown. This is best effort, since an arbitrary program can print secrets in forms no pattern recognizes.
 
-## Fixing a service that does not start (unreleased)
+## Fixing a service that does not start
 
 These fixes are offered where the service fails: on its card in the console's Run tab, and as commands.
 

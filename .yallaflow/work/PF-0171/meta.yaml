@@ -1,0 +1,37 @@
+{
+  "id": "PF-0171",
+  "type": "release",
+  "scope": "bounded",
+  "routingStatus": "routed",
+  "rawRequest": "Release v1.5.4: version bump, changelog, README and website for PF-0157 to PF-0170; tag v1.5.4, push main and the tag, GitHub Release (npm publish through release.yml), website deploy",
+  "status": "VERIFICATION",
+  "readOnly": false,
+  "knowledgePolicy": {
+    "version": 1,
+    "reviewRequired": true
+  },
+  "createdAt": "2026-11-18T08:01:21.925Z",
+  "updatedAt": "2026-11-18T08:03:01.023Z",
+  "title": "Release v1.5.4: version bump, changelog, README and website for PF-0157 to PF-0170; tag v1.5.4, push main and the tag, GitHub Release (npm publish through release.yml), website deploy",
+  "routingConfidence": "high",
+  "routingReason": "Explicitly classified by the user: `yallaflow release --scope bounded`.",
+  "routedAt": "2026-11-18T08:01:21.999Z",
+  "workflow": "release",
+  "requiredCapabilities": [
+    "discover",
+    "plan",
+    "implement",
+    "verify",
+    "review"
+  ],
+  "behaviorContract": {
+    "registryVersion": 9,
+    "skills": [
+      "context-discovery",
+      "implementation-planning",
+      "implementation",
+      "verification",
+      "code-review"
+    ]
+  }
+}

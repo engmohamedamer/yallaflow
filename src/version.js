@@ -1,2 +1,2 @@
 // The installed package version — one source for `--version` and upgrade assessment.
-export const PACKAGE_VERSION = '1.5.3';
+export const PACKAGE_VERSION = '1.5.4';

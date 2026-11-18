@@ -117,7 +117,7 @@ flowchart LR
 YallaFlow never updates itself and never checks the network for versions. You decide when to upgrade:
 
 ```bash
-npm install -g yallaflow@latest     # or an exact version: yallaflow@1.5.3
+npm install -g yallaflow@latest     # or an exact version: yallaflow@1.5.4
 yallaflow --version
 
 # in each project
@@ -172,6 +172,18 @@ flowchart TB
 ```
 
 The depth adapts to the work. A bounded bug fix goes from root-cause analysis straight to the fix, while architectural work gets a reviewed design, specification, or plan. Nothing is called done without fresh verification evidence, and work that carries acceptance criteria is checked against them before it closes. What was learned becomes reviewed project knowledge. [Workflows in detail →](docs/workflows.md)
+
+## What's new in 1.5.4
+
+**Your first hour, your way.** [Changelog →](CHANGELOG.md#154---2026-11-18--your-first-hour-your-way)
+
+- **Create, Manage or Monitor.** The console starts from what you want to do. Create and Manage are agent-first and set up your agent in place; **Monitor only** watches an existing YallaFlow project, and the server refuses every write for it.
+- **Your preferences follow you**: language, theme, last folder and usual agent, in one file that can hold no credentials.
+- **The conversation is kept.** Long replies no longer push earlier messages out, and the chat comes back after a restart. You can turn saving off or delete it.
+- **Run says why a service does not start**: what is missing with the exact install command, who holds a port and a free one, and the line of the log that explains a failure.
+- **New Project blocks a generator while a tool it needs is missing**, with install guidance per system, and resumes an interrupted creation.
+- **All projects is a clear overview**: one status and one next action per card, search, filters and a **⋯** menu. Pages open faster.
+- Windows and macOS are tested with simulated platform data only.
 
 ## What's new in 1.5.3
 
@@ -353,7 +365,7 @@ The YallaFlow website, [engmohamedamer.github.io/yallaflow](https://engmohamedam
 
 ## Status
 
-**1.5.3** gives an existing project a clearer start (a Project Brief, suggested first tasks, approval from the console) after 1.5.2 made the first hour easier, on the console of 1.5.0, which runs work your way: one task now, or a queue of tasks one after another, with review and manual merge for lanes. Parallel execution and Automated Merge are disabled in this release. 1.0.0 was the first public, stable release. YallaFlow follows Semantic Versioning and keeps existing workspaces readable ([compatibility promise](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise)).
+**1.5.4** lets the first hour start from what you want to do (Create, Manage or Monitor), keeps the conversation and explains why a service does not start, after 1.5.3 gave an existing project a clearer start, on the console of 1.5.0, which runs work your way: one task now, or a queue of tasks one after another, with review and manual merge for lanes. Parallel execution and Automated Merge are disabled in this release. 1.0.0 was the first public, stable release. YallaFlow follows Semantic Versioning and keeps existing workspaces readable ([compatibility promise](docs/releasing.md#semantic-versioning-and-the-10-compatibility-promise)).
 
 - **Local-first.** There is no YallaFlow server, account, or cloud service.
 - **Agent-agnostic**, with first-party setup for Claude Code and Codex.

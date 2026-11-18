@@ -37,7 +37,7 @@ yallaflow console list
 - **What it holds.** Folder paths only. Each project's state stays in its own `.yallaflow/`.
 - **Missing folders.** A saved project whose folder is gone is listed as unavailable, never dropped silently.
 
-## Your first hour: Create, Manage or Monitor (unreleased, Phase 1 onboarding)
+## Your first hour: Create, Manage or Monitor (1.5.4)
 
 With no project yet, the Projects page asks what you want to do:
 
@@ -89,7 +89,7 @@ The header has a **project switcher**, then **Workspace · Project · More**:
 - **Workspace.** The Flow and the List, switched next to the filters. The last view is remembered.
 - **Project.** Three tabs: **Overview**, **Run** and **Settings** (agents, services, team mode).
 - **More.** Insights and Worktrees.
-- **All projects.** **Needs you** comes first: the agent requests from every project. Each project card shows its open and done work, its running agents, and **Open**, **Open folder** and **Copy path**.
+- **All projects.** **Needs you** comes first: the agent requests from every project (a small *Nothing needs you* line when there are none). Each project card shows one status (needs you, a check failed, agent working, open work, all tasks completed, no work yet), its open and done counts, the current work item, live agent rows only, project memory health, the last activity and one next action taken from the project's real state. Click the card or **Open project** to open it; **Open folder**, **Copy path** and **Remove** are in its **⋯** menu, and Remove still asks for confirmation. Search by name or path, filter by status (each project counts in one filter), and order by latest activity or by what needs attention; the order does not change while you work on the page.
 
 Every older link (`#/map`, `#/lines`, `#/insights`, `#/team`, `#/item/<id>`, `#/setup`, `#/agents`) still opens the matching page or tab.
 
@@ -121,7 +121,7 @@ Claude Code is detected and shown as experimental. In the chat, **Connect** open
 
 ## Run: get your app running (1.4.1, one guided flow since 1.5.2)
 
-**Run is the one place to set up, diagnose and fix services (unreleased).** A service card shows what is missing before it can start with the exact install command, a taken port with its owner and a free port, the line of the log that explains a failure, and **Edit** (rarely used fields are under *Advanced options*). Every change says where it is saved: **this machine only**, or **shared with the team** (the repository file, which travels only after you commit and push). **Find more services** under the list holds the analysis, the agent's proposal and the suggestions. **Settings → Define services manually** is only for typing a service YallaFlow does not propose. Details: [`runtime.md`](runtime.md#fixing-a-service-that-does-not-start-unreleased).
+**Run is the one place to set up, diagnose and fix services (1.5.4).** A service card shows what is missing before it can start with the exact install command, a taken port with its owner and a free port, the line of the log that explains a failure, and **Edit** (rarely used fields are under *Advanced options*). Every change says where it is saved: **this machine only**, or **shared with the team** (the repository file, which travels only after you commit and push). **Find more services** under the list holds the analysis, the agent's proposal and the suggestions. **Settings → Define services manually** is only for typing a service YallaFlow does not propose. Details: [`runtime.md`](runtime.md#fixing-a-service-that-does-not-start).
 
 **Project → Run** has two layouts. [Screens →](tour.md#part-3--get-the-app-running-then-just-press-start)
 
@@ -368,7 +368,7 @@ The corner chat button is on every project page (Overview, Flow, Work, Setup, Wo
 - an idle Codex session on another item shows **End the PF-x session and work here**: it ends that session (it stays under earlier sessions, to resume later) and shows the agent picker here; while Codex is working, the page says to wait;
 - with Claude Code connected, **Use Codex for this item** explains that Claude Code must close first: type `/exit` in its terminal. As soon as it disconnects, the chat switches to Codex with a prepared first message. The console never just unlinks Claude Code for this, because Claude Code would keep running and could still edit files.
 
-### The conversation is kept (unreleased)
+### The conversation is kept (1.5.4)
 
 - **Nothing disappears during a long reply.** A streamed reply is one entry, however many pieces it arrives in.
 - **Saved on this machine.** The chat comes back after a page reload or a console restart, and stays readable after its session ends. See [`agents.md`](agents.md#what-is-stored) for where it is saved and its limit.

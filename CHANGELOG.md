@@ -6,11 +6,36 @@ All notable changes to YallaFlow are documented here. The format loosely follows
 
 ## [Unreleased]
 
+## [1.5.4] - 2026-11-18 — Your first hour, your way
+
+A first hour that starts from what you want to do, a chat that keeps the conversation, a Run page that says why a service does not start, and a clearer All projects page. Existing workspaces load unchanged.
+
+### Added
+- **Create, Manage or Monitor** (PF-0161, PF-0162). With no project yet, the console asks what you want to do. Create and Manage are agent-first: the panel shows whether an agent is ready on this machine and opens its setup in place. Generating starter code from a fixed template, or continuing without a ready agent, are labelled **Advanced** options. A returning user with a ready usual agent sees no setup prompts.
+- **Monitor only** (PF-0161). A mode of one existing YallaFlow project, saved in your console list and never in the project. The server refuses every write, agent action and queue action for it (`405 MONITOR_ONLY`), and opening it writes nothing inside it. Switching to Manage and back asks for confirmation.
+- **Your preferences** (PF-0159). Language, theme, last-used folder, usual agent and first-run choice are kept in `preferences.json` beside `console.json`, readable only by you. Only known settings are stored; no credential can be saved there.
+- **Agents on this machine** (PF-0160). Settings → Agents and the first-run panel show, per agent, the program, the sign-in (your subscription, never an API key) and the console's connection. Your usual agent is preselected for a new project but turned on only when you confirm it. Claude Code stays experimental and is shown as not verified on Windows.
+- **The conversation is kept** (PF-0165). A long streamed reply is one entry, so earlier messages are no longer pushed out. The chat is saved per checkout in `.yallaflow/local/agent-chat` (git-ignored), comes back after a reload or restart, stays readable after its session ends, and loads older messages on demand without moving your reading position. Saving can be turned off for every project on this machine (existing history is kept until you delete it); deleting this project's saved chat asks first. Redaction of saved text is best effort.
+- **Run says why a service does not start** (PF-0166). Dependency readiness is ready, needs setup (with the exact install command, run only when you confirm) or unknown (explained, never blocking). **Start it anyway** skips only that check for that service. A taken port names its owner and offers a free one; the line of the log that explains a failure is shown; every change says whether it is saved for this machine or shared in the repository; a service is edited from its card.
+
+### Changed
+- **New Project: missing tools block creation** (PF-0157, PF-0158). A generator is not started while a tool it needs is missing (`NEW_PROJECT_PREREQUISITES`). The console shows how to get each tool on Windows, macOS and Linux, a **Recheck** button and **Create an empty project instead**. YallaFlow installs none of these tools. The Advanced override works only when the generator's own program is present and skips no other check. Tools are found and started through one cross-platform layer shared with agent detection (Windows `.cmd` shims, an allow-listed environment).
+- **New Project keeps your choices** (PF-0163) across a reload or console restart, and an interrupted creation continues from its saved plan without repeating finished steps.
+- **All projects is a clear overview** (PF-0168, PF-0169). Three cards per row (two on tablets, one on phones), each as tall as its content. A card shows one status, its open and done counts, the current work item, only live agent rows, project memory health, the last activity and one next action taken from the project's real state. The unlabelled mini charts and the circular percentage are gone. Click the card or **Open project** to open it; **Open folder**, **Copy path** and **Remove** (same confirmation) are in a keyboard-accessible **⋯** menu. Search by name or path, filter by status (each project counts once, so the filters add up to All), and order by latest activity or by what needs attention, without reordering while you work. An empty **Needs you** is a single line.
+- **Pages open faster** (PF-0170). A page draws as soon as the project's records arrive; the overview, readiness and run status fill in afterwards. The loading text is now a spinner, still under reduced motion.
+
+### Documentation
+- First-run journey, Monitor only, preferences, missing-tool blocking and resume, cross-platform notes, and a manual validation checklist for real Windows and macOS machines (PF-0164, `docs/onboarding-manual-validation.md`).
+
 ### Known issues
 - **Intermittent test failures under the load of the full suite** (PF-0167). Two tests can fail when the whole suite runs, and pass when run on their own. The code they cover was not changed in this cycle. Until they are fixed, the full suite is not reported as fully passing.
   - `test/agent-claude-experimental.test.js`, "claude (simulated): channel server registers, relays chat, replies, permissions, hooks; bridge token protected": the check that a request answered in Claude Code is closed as `elsewhere` gets `deny` instead. Passed 3 of 3 runs alone.
   - `test/console-execution.test.js`, "Queue end to end: two items run one after the other through the real bridge…": `condition not met in time`. Passed 3 of 3 runs alone.
-  - Last two full runs (2026-11-17): 1417 tests, 1415 pass, 1 skipped, 1 failed each time (the Claude Code test in one run, the Queue test in the other).
+  - Last two full runs (2026-11-17): 1417 tests, 1415 pass, 1 skipped, 1 failed each time (the Claude Code test in one run, the Queue test in the other). On 2026-11-18 the Queue test failed once more in a full run and passed 3 of 3 alone.
+
+**Windows and macOS** behaviour in this release (tool and agent launch, prerequisites, drives and volumes) is tested with simulated platform data only, not yet on real machines.
+
+Parallel execution and Automated Merge stay disabled, as in 1.5.0.
 
 ## [1.5.3] - 2026-11-15 — A clearer start
 
