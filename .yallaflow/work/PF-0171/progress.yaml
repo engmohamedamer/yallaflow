@@ -45,7 +45,14 @@
       "summary": "Reviewed the release diff: version strings agree in package.json, lockfile, src/version.js, tests, README and site; the CHANGELOG 1.5.4 section names PF-0157 to PF-0170 and its claims follow the items' commits (e8096a2, ec8b2ef) and docs; Windows and macOS stated as simulated-tested only; the intermittent-test known issue ships with the version; docs markers and one anchor updated; no unrelated change; untracked research/ux-1.5.2/ stays out. Not done: tour screenshots and the site's 'New in' section are unchanged."
     }
   },
-  "rulings": [],
+  "rulings": [
+    {
+      "decision": "Released 1.5.4: release commit 9edf610 fast-forwarded onto main, annotated tag v1.5.4, GitHub Release by engmohamedamer, release.yml run 44264806618 green (guard, test on Node 20/22/24, publish with provenance), published tarball shasum b6677ea6a9c21cd0699ad8cc7d984484d2bd5146 identical to the local pack; Pages run 44264753981 green, live site (EN and AR) reports 1.5.4",
+      "reason": "The owner approved the changes, asked to commit and release, and chose version 1.5.4 over 1.6.0 in the agent session on 2026-11-18",
+      "costIfWrong": "A published npm version cannot be unpublished or reused; a fix needs 1.5.5",
+      "createdAt": "2026-11-18T08:21:12.712Z"
+    }
+  ],
   "history": [],
-  "updatedAt": "2026-11-18T08:10:19.378Z"
+  "updatedAt": "2026-11-18T08:21:12.712Z"
 }
